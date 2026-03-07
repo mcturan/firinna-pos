@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masraflar - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🍽️ Fırınna POS</div>
+        <div class="nav-links">
+            <a href="/">Masalar</a>
+            <a href="/products">Ürünler</a>
+            <a href="/tables">Masa Yönetimi</a>
+            <a href="/expenses" class="active">Masraflar</a>
+            <a href="/reports">Raporlar</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="management-section">
+            <h2>Masraf Ekle</h2>
+            <form id="expenseForm" class="add-form">
+                <input type="text" id="expenseDescription" placeholder="Açıklama" required>
+                <select id="expenseCategory">
+                    <option value="Genel">Genel</option>
+                    <option value="Malzeme">Malzeme</option>
+                    <option value="Personel">Personel</option>
+                    <option value="Kira">Kira</option>
+                    <option value="Fatura">Fatura</option>
+                    <option value="Diğer">Diğer</option>
+                </select>
+                <input type="number" id="expenseAmount" placeholder="Tutar" step="0.01" required>
+                <button type="submit" class="btn btn-primary">➕ Ekle</button>
+            </form>
+        </div>
+
+        <div class="management-section">
+            <h2>Masraf Listesi</h2>
+            
+            <div class="filters">
+                <input type="date" id="startDate">
+                <input type="date" id="endDate">
+                <button class="btn btn-secondary" onclick="filterExpenses()">Filtrele</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">Temizle</button>
+            </div>
+            
+            <div id="expensesList" class="items-list"></div>
+            
+            <div class="expense-summary">
+                <strong>Toplam Masraf:</strong>
+                <span id="totalExpenses">0.00 TL</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadExpenses();
+
+            // Bugünün tarihini varsayılan olarak ayarla
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+            document.getElementById('endDate').value = today;
+
+            document.getElementById('expenseForm').onsubmit = async function(e) {
+                e.preventDefault();
+                
+                const description = document.getElementById('expenseDescription').value;
+                const category = document.getElementById('expenseCategory').value;
+                const amount = parseFloat(document.getElementById('expenseAmount').value);
+                
+                await fetch('/api/expenses', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({description, category, amount})
+                });
+                
+                document.getElementById('expenseForm').reset();
+                loadExpenses();
+            };
+        });
+
+        async function loadExpenses(startDate = null, endDate = null) {
+            let url = '/api/expenses';
+            if (startDate && endDate) {
+                url += `?start_date=${startDate}&end_date=${endDate}`;
+            }
+            
+            const expenses = await fetch(url).then(r => r.json());
+            const expensesList = document.getElementById('expensesList');
+            const totalExpenses = document.getElementById('totalExpenses');
+            
+            if (expenses.length === 0) {
+                expensesList.innerHTML = '<p class="no-data">Henüz masraf kaydı yok</p>';
+                totalExpenses.textContent = '0.00 TL';
+                return;
+            }
+            
+            expensesList.innerHTML = expenses.map(exp => {
+                const date = new Date(exp.created_at).toLocaleDateString('tr-TR');
+                const time = new Date(exp.created_at).toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'});
+                
+                return `
+                    <div class="item-row">
+                        <div class="item-info">
+                            <span class="item-name">${exp.description}</span>
+                            <span class="item-meta">${exp.category} • ${date} ${time}</span>
+                        </div>
+                        <div class="expense-amount">
+                            <strong>${exp.amount.toFixed(2)} TL</strong>
+                            <button class="btn-delete" onclick="deleteExpense(${exp.id})">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            totalExpenses.textContent = total.toFixed(2) + ' TL';
+        }
+
+        function filterExpenses() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                alert('Lütfen tarih aralığı seçin!');
+                return;
+            }
+            
+            loadExpenses(startDate, endDate);
+        }
+
+        function clearFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            loadExpenses();
+        }
+
+        async function deleteExpense(id) {
+            if (!confirm('Bu masrafı silmek istediğinize emin misiniz?')) return;
+            
+            await fetch(`/api/expenses/${id}`, {method: 'DELETE'});
+            
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (startDate && endDate) {
+                loadExpenses(startDate, endDate);
+            } else {
+                loadExpenses();
+            }
+        }
+    </script>
+</body>
+</html>

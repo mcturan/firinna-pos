@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Yönetimi - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🍽️ Fırınna POS</div>
+        <div class="nav-links">
+            <a href="/">Masalar</a>
+            <a href="/products" class="active">Ürünler</a>
+            <a href="/tables">Masa Yönetimi</a>
+            <a href="/expenses">Masraflar</a>
+            <a href="/reports">Raporlar</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="management-grid">
+            <!-- Kategoriler -->
+            <div class="management-section">
+                <h2>Kategoriler</h2>
+                <form id="categoryForm" class="add-form">
+                    <input type="text" id="categoryName" placeholder="Kategori adı" required>
+                    <input type="color" id="categoryColor" value="#3B82F6">
+                    <button type="submit" class="btn btn-primary">➕ Ekle</button>
+                </form>
+                
+                <div id="categoriesList" class="items-list"></div>
+            </div>
+
+            <!-- Ürünler -->
+            <div class="management-section">
+                <h2>Ürünler</h2>
+                <form id="productForm" class="add-form">
+                    <input type="text" id="productName" placeholder="Ürün adı" required>
+                    <select id="productCategory" required>
+                        <option value="">Kategori seç</option>
+                    </select>
+                    <input type="number" id="productPrice" placeholder="Fiyat" step="0.01" required>
+                    <button type="submit" class="btn btn-primary">➕ Ekle</button>
+                </form>
+                
+                <div id="productsList" class="items-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+            loadProducts();
+
+            document.getElementById('categoryForm').onsubmit = async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('categoryName').value;
+                const color = document.getElementById('categoryColor').value;
+                
+                await fetch('/api/categories', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, color})
+                });
+                
+                document.getElementById('categoryForm').reset();
+                document.getElementById('categoryColor').value = '#3B82F6';
+                loadCategories();
+                loadProducts();
+            };
+
+            document.getElementById('productForm').onsubmit = async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('productName').value;
+                const category_id = parseInt(document.getElementById('productCategory').value);
+                const price = parseFloat(document.getElementById('productPrice').value);
+                
+                await fetch('/api/products', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, category_id, price})
+                });
+                
+                document.getElementById('productForm').reset();
+                loadProducts();
+            };
+        });
+
+        async function loadCategories() {
+            const categories = await fetch('/api/categories').then(r => r.json());
+            const categoriesList = document.getElementById('categoriesList');
+            const productCategory = document.getElementById('productCategory');
+            
+            categoriesList.innerHTML = categories.map(cat => `
+                <div class="item-row" style="border-left: 4px solid ${cat.color}">
+                    <span class="item-name">${cat.name}</span>
+                    <button class="btn-delete" onclick="deleteCategory(${cat.id})">🗑️</button>
+                </div>
+            `).join('');
+            
+            productCategory.innerHTML = '<option value="">Kategori seç</option>' + 
+                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        }
+
+        async function loadProducts() {
+            const products = await fetch('/api/products').then(r => r.json());
+            const productsList = document.getElementById('productsList');
+            
+            if (products.length === 0) {
+                productsList.innerHTML = '<p class="no-data">Henüz ürün eklenmemiş</p>';
+                return;
+            }
+            
+            productsList.innerHTML = products.map(prod => `
+                <div class="item-row">
+                    <div class="item-info">
+                        <span class="item-name">${prod.name}</span>
+                        <span class="item-meta">${prod.category_name} • ${prod.price.toFixed(2)} TL</span>
+                    </div>
+                    <button class="btn-delete" onclick="deleteProduct(${prod.id})">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('Bu kategoriyi silmek istediğinize emin misiniz?')) return;
+            
+            await fetch(`/api/categories/${id}`, {method: 'DELETE'});
+            loadCategories();
+            loadProducts();
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Bu ürünü silmek istediğinize emin misiniz?')) return;
+            
+            await fetch(`/api/products/${id}`, {method: 'DELETE'});
+            loadProducts();
+        }
+    </script>
+</body>
+</html>

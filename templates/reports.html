@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raporlar - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🍽️ Fırınna POS</div>
+        <div class="nav-links">
+            <a href="/">Masalar</a>
+            <a href="/products">Ürünler</a>
+            <a href="/tables">Masa Yönetimi</a>
+            <a href="/expenses">Masraflar</a>
+            <a href="/reports" class="active">Raporlar</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Günlük Rapor -->
+        <div class="management-section">
+            <h2>📊 Günlük Rapor</h2>
+            
+            <div class="report-controls">
+                <input type="date" id="reportDate">
+                <button class="btn btn-primary" onclick="loadReport()">Rapor Getir</button>
+                <button class="btn btn-secondary" onclick="printDailyReport()">🖨️ Yazdır</button>
+            </div>
+
+            <div id="reportContent" class="report-content"></div>
+        </div>
+
+        <!-- Yedekleme ve Ayarlar -->
+        <div class="management-section">
+            <h2>⚙️ Sistem Yönetimi</h2>
+            
+            <div class="system-actions">
+                <div class="action-card">
+                    <h3>💾 Yedekleme</h3>
+                    <p>Veritabanını yedekleyin</p>
+                    <button class="btn btn-success" onclick="backupDatabase()">Yedek Al</button>
+                </div>
+
+                <div class="action-card">
+                    <h3>🗑️ Test Verilerini Temizle</h3>
+                    <p>Bugün hariç tüm siparişleri sil</p>
+                    <button class="btn btn-warning" onclick="clearTestData()">Temizle</button>
+                </div>
+
+                <div class="action-card">
+                    <h3>🖨️ Yazıcı Ayarları</h3>
+                    <div class="printer-settings">
+                        <input type="text" id="printerIP" placeholder="IP Adresi">
+                        <input type="number" id="printerPort" placeholder="Port">
+                        <button class="btn btn-secondary" onclick="savePrinterSettings()">Kaydet</button>
+                        <button class="btn btn-secondary" onclick="testPrinter()">Test</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bugünün tarihini ayarla
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('reportDate').value = today;
+            loadReport();
+            loadPrinterSettings();
+        });
+
+        async function loadReport() {
+            const date = document.getElementById('reportDate').value;
+            const report = await fetch(`/api/reports/daily?date=${date}`).then(r => r.json());
+            
+            const reportContent = document.getElementById('reportContent');
+            
+            if (report.total_sales === 0 && report.total_expenses === 0) {
+                reportContent.innerHTML = '<p class="no-data">Bu tarihte işlem yok</p>';
+                return;
+            }
+            
+            let html = `
+                <div class="report-summary">
+                    <div class="summary-item">
+                        <div class="summary-label">💰 Toplam Satış</div>
+                        <div class="summary-value success">${report.total_sales.toFixed(2)} TL</div>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <div class="summary-label">💸 Toplam Masraf</div>
+                        <div class="summary-value danger">${report.total_expenses.toFixed(2)} TL</div>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <div class="summary-label">📈 Net Kar</div>
+                        <div class="summary-value ${report.net >= 0 ? 'success' : 'danger'}">
+                            ${report.net.toFixed(2)} TL
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (report.products.length > 0) {
+                html += '<h3>Ürün Bazlı Satışlar</h3>';
+                html += '<table class="report-table"><thead><tr><th>Ürün</th><th>Adet</th><th>Toplam</th></tr></thead><tbody>';
+                
+                report.products.forEach(product => {
+                    html += `
+                        <tr>
+                            <td>${product.name}</td>
+                            <td>${product.quantity}</td>
+                            <td>${product.total.toFixed(2)} TL</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+            }
+            
+            reportContent.innerHTML = html;
+        }
+
+        async function printDailyReport() {
+            const date = document.getElementById('reportDate').value;
+            
+            const result = await fetch('/api/print/daily-report', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({date})
+            }).then(r => r.json());
+            
+            if (result.success) {
+                alert('Rapor yazdırıldı!');
+            } else {
+                alert('Yazıcı bağlantısı başarısız!');
+            }
+        }
+
+        async function backupDatabase() {
+            const result = await fetch('/api/backup', {method: 'POST'}).then(r => r.json());
+            
+            if (result.success) {
+                alert(`Yedekleme başarılı!\nDosya: ${result.path}`);
+            } else {
+                alert('Yedekleme başarısız!');
+            }
+        }
+
+        async function clearTestData() {
+            if (!confirm('Bugün hariç tüm sipariş ve masraf kayıtlarını silmek istediğinize emin misiniz?\n\nBu işlem GERİ ALINAMAZ!')) {
+                return;
+            }
+            
+            if (!confirm('SON UYARI: Bu işlem kalıcıdır ve geri alınamaz. Devam etmek istediğinize emin misiniz?')) {
+                return;
+            }
+            
+            const result = await fetch('/api/clear-test-data', {method: 'POST'}).then(r => r.json());
+            
+            if (result.success) {
+                alert('Test verileri temizlendi!');
+                loadReport();
+            }
+        }
+
+        async function loadPrinterSettings() {
+            const settings = await fetch('/api/settings/printer').then(r => r.json());
+            document.getElementById('printerIP').value = settings.ip;
+            document.getElementById('printerPort').value = settings.port;
+        }
+
+        async function savePrinterSettings() {
+            const ip = document.getElementById('printerIP').value;
+            const port = document.getElementById('printerPort').value;
+            
+            if (!ip || !port) {
+                alert('Lütfen IP ve Port girin!');
+                return;
+            }
+            
+            const result = await fetch('/api/settings/printer', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ip, port})
+            }).then(r => r.json());
+            
+            if (result.success) {
+                alert('Ayarlar kaydedildi!');
+            }
+        }
+
+        async function testPrinter() {
+            const result = await fetch('/api/printer/test', {method: 'POST'}).then(r => r.json());
+            
+            if (result.success) {
+                alert('Yazıcı testi başarılı!');
+            } else {
+                alert('Yazıcı bağlantısı kurulamadı! IP ve Port ayarlarını kontrol edin.');
+            }
+        }
+    </script>
+</body>
+</html>
