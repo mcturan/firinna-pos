@@ -697,3 +697,16 @@ def reopen_order(order_id):
     ''', (order_id,))
     conn.commit()
     conn.close()
+
+def delete_order(order_id):
+    """Siparişi tamamen sil (items ile birlikte)"""
+    conn = get_db()
+    
+    # Önce order_items'ları sil
+    conn.execute('DELETE FROM order_items WHERE order_id = ?', (order_id,))
+    
+    # Sonra order'ı sil
+    conn.execute('DELETE FROM orders WHERE id = ?', (order_id,))
+    
+    conn.commit()
+    conn.close()

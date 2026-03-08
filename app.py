@@ -370,6 +370,14 @@ def api_update_product_name(product_id):
     db.update_product_name(product_id, data['name'])
     return jsonify({'success': True})
 
+
+# ===== SİPARİŞ SİLME =====
+
+@app.route('/api/orders/<int:order_id>', methods=['DELETE'])
+def api_delete_order(order_id):
+    db.delete_order(order_id)
+    return jsonify({'success': True})
+
 if __name__ == '__main__':
     db.init_db()
     app.run(host='0.0.0.0', port=5000, debug=True)

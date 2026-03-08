@@ -835,8 +835,7 @@
                         </div>
                         <div style="text-align: right;">
                             <div style="font-size: 1.5rem; font-weight: bold; color: #667eea;">${order.total.toFixed(2)} TL</div>
-                            <button class="btn btn-secondary" style="margin-top: 0.5rem;" onclick="reopenOrder(${order.id})">Tekrar Aç</button>
-                        </div>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;"><button class="btn btn-secondary" onclick="reopenOrder(${order.id})" title="Tekrar Aç" style="padding: 0.5rem 0.75rem;">🔄</button><button class="btn" onclick="deleteOrder(${order.id})" style="background: #f56565; color: white; padding: 0.5rem 0.75rem;" title="Sil">🗑️</button></div>
                     </div>
                     <div style="font-size: 0.9rem; color: #718096;">
                         ${order.items.map(item => `${item.quantity}x ${item.product_name}`).join(', ')}
@@ -849,6 +848,22 @@
         function clearHistoryFilter() {
             document.getElementById('historyDate').value = '';
             loadOrderHistory();
+
+        async function deleteOrder(orderId) {
+            if (!confirm('Bu siparişi kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz!')) return;
+            
+            try {
+                const response = await fetch(`/api/orders/${orderId}`, {method: 'DELETE'});
+                if (response.ok) {
+                    alert('Sipariş silindi!');
+                    loadOrderHistory();
+                } else {
+                    alert('Sipariş silinemedi!');
+                }
+            } catch (error) {
+                alert('Hata oluştu: ' + error.message);
+            }
+        }
         }
 
         async function reopenOrder(orderId) {
@@ -858,6 +873,22 @@
             alert('Sipariş tekrar açıldı!');
             closeOrderHistory();
             selectZone(currentZone);
+        }
+
+        async function deleteOrder(orderId) {
+            if (!confirm("Bu siparişi kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz!")) return;
+            
+            try {
+                const response = await fetch(`/api/orders/${orderId}`, {method: "DELETE"});
+                if (response.ok) {
+                    alert("Sipariş silindi!");
+                    loadOrderHistory();
+                } else {
+                    alert("Sipariş silinemedi!");
+                }
+            } catch (error) {
+                alert("Hata oluştu: " + error.message);
+            }
         }
 
         function openTableNote(tableId, tableName, event) {
