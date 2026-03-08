@@ -38,6 +38,12 @@
                 <!-- Sol: Kategoriler ve Ürünler -->
                 <div class="products-section">
                     <div class="categories" id="categoriesBar"></div>
+                    
+                    <!-- Özel Sipariş Butonu (#12) -->
+                    <button class="btn btn-warning" style="margin-bottom: 1rem; width: 100%;" onclick="openCustomItemModal()">
+                        ➕ Özel Sipariş Ekle
+                    </button>
+                    
                     <div class="products-grid" id="productsGrid"></div>
                 </div>
 
@@ -46,16 +52,172 @@
                     <h3>Sipariş Özeti</h3>
                     <div class="order-items" id="orderItems"></div>
                     
+                    <!-- İndirim Bölümü (#13) -->
+                    <div id="discountSection" style="margin-bottom: 1rem; display: none;">
+                        <div style="background: #fff5f5; padding: 1rem; border-radius: 8px; border-left: 4px solid #f56565;">
+                            <strong>İndirim:</strong> <span id="discountText"></span>
+                            <button class="btn-delete" onclick="removeDiscount()" style="float: right;">❌</button>
+                        </div>
+                    </div>
+                    
                     <div class="order-total">
-                        <strong>TOPLAM:</strong>
-                        <span id="orderTotal">0.00 TL</span>
+                        <div>
+                            <div style="font-size: 0.9rem; color: #718096;">Ara Toplam:</div>
+                            <strong>TOPLAM:</strong>
+                        </div>
+                        <div>
+                            <div id="orderSubtotal" style="font-size: 0.9rem; color: #718096;">0.00 TL</div>
+                            <span id="orderTotal">0.00 TL</span>
+                        </div>
                     </div>
 
                     <div class="order-actions">
+                        <button class="btn btn-warning" onclick="openDiscountModal()">🏷️ İndirim Ekle</button>
                         <button class="btn btn-secondary" onclick="printReceipt()">📄 Adisyon Yazdır</button>
-                        <button class="btn btn-success" onclick="closeOrder()">💰 Hesap Kapat</button>
+                        <button class="btn btn-success" onclick="openPaymentModal()">💰 Hesap Kapat</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Özel Sipariş Modal (#12) -->
+    <div id="customItemModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Özel Sipariş</h2>
+                <span class="close" onclick="closeCustomItemModal()">&times;</span>
+            </div>
+            <div style="padding: 2rem;">
+                <div style="margin-bottom: 1rem;">
+                    <label>Ürün Adı:</label>
+                    <input type="text" id="customItemName" placeholder="Özel içecek, vb." style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label>Fiyat (TL):</label>
+                    <input type="number" id="customItemPrice" placeholder="0.00" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
+                <button class="btn btn-success" style="width: 100%;" onclick="addCustomItem()">Ekle</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- İndirim Modal (#13) -->
+    <div id="discountModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>İndirim Ekle</h2>
+                <span class="close" onclick="closeDiscountModal()">&times;</span>
+            </div>
+            <div style="padding: 2rem;">
+                <div style="margin-bottom: 1rem;">
+                    <label>İndirim Tipi:</label><br>
+                    <label style="margin-right: 2rem;"><input type="radio" name="discountType" value="percent" checked> Yüzde (%)</label>
+                    <label><input type="radio" name="discountType" value="fixed"> Tutar (TL)</label>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Değer:</label>
+                    <input type="number" id="discountValue" placeholder="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label>Sebep:</label>
+                    <select id="discountReason" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                        <option value="Öğrenci">Öğrenci</option>
+                        <option value="Komşu">Komşu</option>
+                        <option value="Personel">Personel</option>
+                        <option value="Kampanya">Kampanya</option>
+                        <option value="Diğer">Diğer</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" style="width: 100%;" onclick="applyDiscount()">Uygula</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ödeme Modal (#5, #10, #11) -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>Ödeme Al</h2>
+                <span class="close" onclick="closePaymentModal()">&times;</span>
+            </div>
+            <div style="padding: 2rem;">
+                <div style="background: #f7fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; color: #667eea;">
+                        <span>TOPLAM:</span>
+                        <span id="paymentTotal">0.00 TL</span>
+                    </div>
+                </div>
+
+                <!-- Hesap Bölme (#11) -->
+                <div style="margin-bottom: 1.5rem;">
+                    <button class="btn btn-warning" style="width: 100%;" onclick="toggleSplitSection()">
+                        ➗ Hesabı Böl
+                    </button>
+                    <div id="splitSection" style="display: none; margin-top: 1rem; padding: 1rem; background: #fff5f5; border-radius: 8px;">
+                        <label>Kişi Sayısı:</label>
+                        <input type="number" id="numPeople" value="2" min="2" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin: 0.5rem 0;">
+                        <button class="btn btn-secondary" style="width: 100%;" onclick="calculateSplit()">Hesapla</button>
+                        <div id="splitResult" style="margin-top: 1rem; font-weight: bold; text-align: center; font-size: 1.2rem;"></div>
+                    </div>
+                </div>
+
+                <hr style="margin: 1.5rem 0;">
+
+                <!-- Karma Ödeme (#5) -->
+                <div style="margin-bottom: 1rem;">
+                    <label>💵 Nakit (TL):</label>
+                    <input type="number" id="paymentCash" value="0" step="0.01" oninput="updateRemaining()" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>💳 Kart (TL):</label>
+                    <input type="number" id="paymentCard" value="0" step="0.01" oninput="updateRemaining()" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
+                
+                <div id="remainingAmount" style="padding: 1rem; background: #fff5f5; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-weight: bold; color: #f56565;">
+                    Kalan: 0.00 TL
+                </div>
+
+                <!-- Bahşiş (#10) -->
+                <div style="margin-bottom: 1rem;">
+                    <label>🎁 Bahşiş (Opsiyonel):</label>
+                    <input type="number" id="tipAmount" value="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin: 0.5rem 0;">
+                    <div>
+                        <label style="margin-right: 2rem;"><input type="radio" name="tipMethod" value="cash" checked> Nakit</label>
+                        <label><input type="radio" name="tipMethod" value="card"> Kart</label>
+                    </div>
+                </div>
+
+                <button class="btn btn-success" style="width: 100%; padding: 1rem; font-size: 1.1rem;" onclick="completePayment()">
+                    ✅ Ödemeyi Tamamla
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ürün Düzenleme Modal (#6, #20) -->
+    <div id="editItemModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Ürün Düzenle</h2>
+                <span class="close" onclick="closeEditItemModal()">&times;</span>
+            </div>
+            <div style="padding: 2rem;">
+                <h3 id="editItemName" style="margin-bottom: 1.5rem; color: #667eea;"></h3>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="editIsComplimentary" style="margin-right: 0.5rem; width: 20px; height: 20px;">
+                        <span style="font-weight: bold;">İkram (Ücretsiz)</span>
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label>Şefe Not:</label>
+                    <textarea id="editKitchenNotes" rows="3" placeholder="Az acılı, ekstra sos, vb." style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem; font-family: inherit;"></textarea>
+                </div>
+
+                <button class="btn btn-success" style="width: 100%;" onclick="saveItemEdit()">Kaydet</button>
             </div>
         </div>
     </div>
@@ -65,20 +227,22 @@
         let currentZone = null;
         let currentTable = null;
         let currentOrder = null;
+        let currentEditItemId = null;
 
         // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', function() {
             loadZones();
             
-            // Modal kapat
-            document.querySelector('.close').onclick = function() {
-                document.getElementById('orderModal').style.display = 'none';
-            };
+            // Modal kapatma
+            document.querySelectorAll('.close').forEach(el => {
+                el.onclick = function() {
+                    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+                };
+            });
             
             window.onclick = function(event) {
-                const modal = document.getElementById('orderModal');
-                if (event.target == modal) {
-                    modal.style.display = 'none';
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
                 }
             };
         });
@@ -93,17 +257,17 @@
             }
             
             zoneTabs.innerHTML = zones.map((zone, index) => 
-                `<button class="zone-tab ${index === 0 ? 'active' : ''}" onclick="selectZone(${zone.id})">${zone.name}</button>`
+                `<button class="zone-tab ${index === 0 ? 'active' : ''}" onclick="selectZone(${zone.id}, event)">${zone.name}</button>`
             ).join('');
             
             selectZone(zones[0].id);
         }
 
-        async function selectZone(zoneId) {
+        async function selectZone(zoneId, event) {
             currentZone = zoneId;
             
             document.querySelectorAll('.zone-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
+            if (event) event.target.classList.add('active');
             
             const tables = await fetch(`/api/tables?zone_id=${zoneId}`).then(r => r.json());
             const tablesGrid = document.getElementById('tablesGrid');
@@ -156,15 +320,15 @@
             categoriesBar.innerHTML = categories.map((cat, index) => 
                 `<button class="category-btn ${index === 0 ? 'active' : ''}" 
                          style="background: ${cat.color}" 
-                         onclick="selectCategory(${cat.id})">${cat.name}</button>`
+                         onclick="selectCategory(${cat.id}, event)">${cat.name}</button>`
             ).join('');
             
             selectCategory(categories[0].id);
         }
 
-        async function selectCategory(categoryId) {
+        async function selectCategory(categoryId, event) {
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            if (event) event.target.classList.add('active');
             
             const products = await fetch(`/api/products?category_id=${categoryId}`).then(r => r.json());
             const productsGrid = document.getElementById('productsGrid');
@@ -194,29 +358,249 @@
             updateOrderSummary();
         }
 
+        // #4 - Miktar değiştirme
+        async function changeQuantity(itemId, change) {
+            const item = currentOrder.items.find(i => i.id === itemId);
+            const newQty = item.quantity + change;
+            
+            await fetch(`/api/orders/items/${itemId}/quantity`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({quantity: newQty})
+            });
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+        }
+
+        // #6 & #20 - Ürün düzenleme
+        function openEditItem(itemId, itemName) {
+            currentEditItemId = itemId;
+            const item = currentOrder.items.find(i => i.id === itemId);
+            
+            document.getElementById('editItemName').textContent = itemName;
+            document.getElementById('editIsComplimentary').checked = item.is_complimentary == 1;
+            document.getElementById('editKitchenNotes').value = item.kitchen_notes || '';
+            
+            document.getElementById('editItemModal').style.display = 'block';
+        }
+
+        function closeEditItemModal() {
+            document.getElementById('editItemModal').style.display = 'none';
+        }
+
+        async function saveItemEdit() {
+            await fetch(`/api/orders/items/${currentEditItemId}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    is_complimentary: document.getElementById('editIsComplimentary').checked,
+                    kitchen_notes: document.getElementById('editKitchenNotes').value
+                })
+            });
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+            closeEditItemModal();
+        }
+
+        // #12 - Özel sipariş
+        function openCustomItemModal() {
+            document.getElementById('customItemName').value = '';
+            document.getElementById('customItemPrice').value = '';
+            document.getElementById('customItemModal').style.display = 'block';
+        }
+
+        function closeCustomItemModal() {
+            document.getElementById('customItemModal').style.display = 'none';
+        }
+
+        async function addCustomItem() {
+            const name = document.getElementById('customItemName').value;
+            const price = parseFloat(document.getElementById('customItemPrice').value);
+            
+            if (!name || !price) {
+                alert('Lütfen ürün adı ve fiyat girin!');
+                return;
+            }
+            
+            await fetch(`/api/orders/${currentOrder.id}/custom-item`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, price})
+            });
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+            closeCustomItemModal();
+        }
+
+        // #13 - İndirim
+        function openDiscountModal() {
+            document.getElementById('discountModal').style.display = 'block';
+        }
+
+        function closeDiscountModal() {
+            document.getElementById('discountModal').style.display = 'none';
+        }
+
+        async function applyDiscount() {
+            const type = document.querySelector('input[name="discountType"]:checked').value;
+            const value = parseFloat(document.getElementById('discountValue').value);
+            const reason = document.getElementById('discountReason').value;
+            
+            if (!value) {
+                alert('Lütfen indirim değeri girin!');
+                return;
+            }
+            
+            await fetch(`/api/orders/${currentOrder.id}/discount`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({type, value, reason})
+            });
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+            closeDiscountModal();
+        }
+
+        async function removeDiscount() {
+            await fetch(`/api/orders/${currentOrder.id}/discount`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({type: null, value: 0, reason: ''})
+            });
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+        }
+
+        // #5 & #10 - Karma ödeme
+        function openPaymentModal() {
+            document.getElementById('paymentTotal').textContent = currentOrder.total.toFixed(2) + ' TL';
+            document.getElementById('paymentCash').value = currentOrder.total.toFixed(2);
+            document.getElementById('paymentCard').value = '0.00';
+            document.getElementById('tipAmount').value = '0.00';
+            updateRemaining();
+            document.getElementById('paymentModal').style.display = 'block';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function updateRemaining() {
+            const total = currentOrder.total;
+            const cash = parseFloat(document.getElementById('paymentCash').value) || 0;
+            const card = parseFloat(document.getElementById('paymentCard').value) || 0;
+            const remaining = total - cash - card;
+            
+            const remainingEl = document.getElementById('remainingAmount');
+            remainingEl.textContent = `Kalan: ${remaining.toFixed(2)} TL`;
+            remainingEl.style.color = remaining > 0.01 ? '#f56565' : '#48bb78';
+        }
+
+        async function completePayment() {
+            const cash = parseFloat(document.getElementById('paymentCash').value) || 0;
+            const card = parseFloat(document.getElementById('paymentCard').value) || 0;
+            const tip = parseFloat(document.getElementById('tipAmount').value) || 0;
+            const tipMethod = document.querySelector('input[name="tipMethod"]:checked').value;
+            
+            if (Math.abs(cash + card - currentOrder.total) > 0.01) {
+                alert('Ödeme tutarı toplam ile eşleşmiyor!');
+                return;
+            }
+            
+            await fetch(`/api/orders/${currentOrder.id}/close-with-payment`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    payment_cash: cash,
+                    payment_card: card,
+                    tip_amount: tip,
+                    tip_method: tipMethod
+                })
+            });
+            
+            alert('Hesap kapatıldı!');
+            document.getElementById('paymentModal').style.display = 'none';
+            document.getElementById('orderModal').style.display = 'none';
+            selectZone(currentZone);
+        }
+
+        // #11 - Hesap bölme
+        function toggleSplitSection() {
+            const section = document.getElementById('splitSection');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function calculateSplit() {
+            const numPeople = parseInt(document.getElementById('numPeople').value);
+            const response = await fetch(`/api/orders/${currentOrder.id}/split`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({num_people: numPeople})
+            }).then(r => r.json());
+            
+            document.getElementById('splitResult').textContent = 
+                `Kişi başı: ${response.per_person.toFixed(2)} TL`;
+        }
+
         function updateOrderSummary() {
             const orderItems = document.getElementById('orderItems');
             const orderTotal = document.getElementById('orderTotal');
+            const orderSubtotal = document.getElementById('orderSubtotal');
             
             if (currentOrder.items.length === 0) {
                 orderItems.innerHTML = '<p class="no-data">Henüz ürün eklenmedi</p>';
                 orderTotal.textContent = '0.00 TL';
+                orderSubtotal.textContent = '0.00 TL';
                 return;
             }
             
-            orderItems.innerHTML = currentOrder.items.map(item => `
+            // Ara toplam hesapla
+            let subtotal = 0;
+            currentOrder.items.forEach(item => {
+                if (!item.is_complimentary) {
+                    subtotal += item.quantity * item.price;
+                }
+            });
+            
+            orderItems.innerHTML = currentOrder.items.map(item => {
+                const itemTotal = item.is_complimentary ? 0 : (item.quantity * item.price);
+                return `
                 <div class="order-item">
                     <div class="order-item-info">
-                        <strong>${item.quantity}x</strong> ${item.product_name}
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button class="btn-delete" onclick="changeQuantity(${item.id}, -1)" style="background: #ed8936; padding: 0.25rem 0.5rem;">-</button>
+                            <strong>${item.quantity}x</strong>
+                            <button class="btn-delete" onclick="changeQuantity(${item.id}, 1)" style="background: #48bb78; padding: 0.25rem 0.5rem;">+</button>
+                            <span>${item.product_name || 'Özel Ürün'} ${item.is_complimentary ? '(İKRAM)' : ''}</span>
+                        </div>
+                        ${item.kitchen_notes ? `<div style="font-size: 0.85rem; color: #718096; margin-top: 0.25rem;">📝 ${item.kitchen_notes}</div>` : ''}
                     </div>
                     <div class="order-item-price">
-                        ${(item.quantity * item.price).toFixed(2)} TL
+                        ${itemTotal.toFixed(2)} TL
+                        <button class="btn-delete" onclick="openEditItem(${item.id}, '${item.product_name}')" style="background: #667eea;">✏️</button>
                         <button class="btn-delete" onclick="deleteItem(${item.id})">🗑️</button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
             
+            orderSubtotal.textContent = subtotal.toFixed(2) + ' TL';
             orderTotal.textContent = currentOrder.total.toFixed(2) + ' TL';
+            
+            // İndirim gösterimi
+            if (currentOrder.discount_value && currentOrder.discount_value > 0) {
+                const discountText = currentOrder.discount_type === 'percent' 
+                    ? `%${currentOrder.discount_value} (${currentOrder.discount_reason})`
+                    : `${currentOrder.discount_value} TL (${currentOrder.discount_reason})`;
+                document.getElementById('discountText').textContent = discountText;
+                document.getElementById('discountSection').style.display = 'block';
+            } else {
+                document.getElementById('discountSection').style.display = 'none';
+            }
         }
 
         async function deleteItem(itemId) {
@@ -236,16 +620,6 @@
             } else {
                 alert('Yazıcı bağlantısı başarısız! Ayarları kontrol edin.');
             }
-        }
-
-        async function closeOrder() {
-            if (!confirm('Hesabı kapatmak istediğinize emin misiniz?')) return;
-            
-            await fetch(`/api/orders/${currentOrder.id}/close`, {method: 'POST'});
-            
-            alert('Hesap kapatıldı!');
-            document.getElementById('orderModal').style.display = 'none';
-            selectZone(currentZone);
         }
     </script>
 </body>
