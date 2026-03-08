@@ -509,3 +509,119 @@ def split_order_equal(order_id, num_people):
         return per_person
     conn.close()
     return 0
+
+# ===== FAZ 2 YENİ FONKSİYONLAR =====
+
+def update_category_order(category_id, sort_order):
+    """Kategori sıralamasını güncelle"""
+    conn = get_db()
+    conn.execute('UPDATE categories SET sort_order = ? WHERE id = ?', (sort_order, category_id))
+    conn.commit()
+    conn.close()
+
+def update_product_order(product_id, sort_order):
+    """Ürün sıralamasını güncelle"""
+    conn = get_db()
+    conn.execute('UPDATE products SET sort_order = ? WHERE id = ?', (sort_order, product_id))
+    conn.commit()
+    conn.close()
+
+def toggle_product_favorite(product_id):
+    """Ürünü favori olarak işaretle/kaldır"""
+    conn = get_db()
+    product = conn.execute('SELECT is_favorite FROM products WHERE id = ?', (product_id,)).fetchone()
+    if product:
+        new_value = 0 if product['is_favorite'] else 1
+        conn.execute('UPDATE products SET is_favorite = ? WHERE id = ?', (new_value, product_id))
+    conn.commit()
+    conn.close()
+    return new_value if product else 0
+
+def search_products(query):
+    """Ürün adına göre arama"""
+    conn = get_db()
+    products = conn.execute('''
+        SELECT p.*, c.name as category_name, c.color as category_color
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.name LIKE ? OR c.name LIKE ?
+        ORDER BY p.is_favorite DESC, p.sort_order, p.name
+    ''', (f'%{query}%', f'%{query}%')).fetchall()
+    conn.close()
+    return [dict(p) for p in products]
+
+def get_closed_orders(date=None, limit=50):
+    """Kapalı siparişleri getir"""
+    conn = get_db()
+    if date:
+        orders = conn.execute('''
+            SELECT o.*, t.name as table_name, z.name as zone_name
+            FROM orders o
+            JOIN tables t ON o.table_id = t.id
+            JOIN zones z ON t.zone_id = z.id
+            WHERE o.status = 'closed' AND DATE(o.closed_at) = ?
+            ORDER BY o.closed_at DESC
+            LIMIT ?
+        ''', (date, limit)).fetchall()
+    else:
+        orders = conn.execute('''
+            SELECT o.*, t.name as table_name, z.name as zone_name
+            FROM orders o
+            JOIN tables t ON o.table_id = t.id
+            JOIN zones z ON t.zone_id = z.id
+            WHERE o.status = 'closed'
+            ORDER BY o.closed_at DESC
+            LIMIT ?
+        ''', (limit,)).fetchall()
+    
+    result = []
+    for order in orders:
+        order_dict = dict(order)
+        items = conn.execute('''
+            SELECT oi.*, COALESCE(oi.product_name, p.name) as product_name
+            FROM order_items oi
+            LEFT JOIN products p ON oi.product_id = p.id
+            WHERE oi.order_id = ?
+        ''', (order_dict['id'],)).fetchall()
+        order_dict['items'] = [dict(item) for item in items]
+        result.append(order_dict)
+    
+    conn.close()
+    return result
+
+def reopen_order(order_id):
+    """Kapalı siparişi tekrar aç"""
+    conn = get_db()
+    conn.execute('''
+        UPDATE orders 
+        SET status = 'open', closed_at = NULL, 
+            payment_cash = 0, payment_card = 0, tip_amount = 0
+        WHERE id = ?
+    ''', (order_id,))
+    conn.commit()
+    conn.close()
+
+def update_table_note(table_id, note):
+    """Masa notunu güncelle"""
+    conn = get_db()
+    conn.execute('UPDATE tables SET table_note = ? WHERE id = ?', (note, table_id))
+    conn.commit()
+    conn.close()
+
+def get_setting(key, default=None):
+    """Ayar değerini getir"""
+    conn = get_db()
+    setting = conn.execute('SELECT value FROM settings WHERE key = ?', (key,)).fetchone()
+    conn.close()
+    return setting['value'] if setting else default
+
+def set_setting(key, value):
+    """Ayar değerini kaydet"""
+    conn = get_db()
+    conn.execute('''
+        INSERT INTO settings (key, value, updated_at) 
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(key) DO UPDATE SET value = ?, updated_at = CURRENT_TIMESTAMP
+    ''', (key, value, value))
+    conn.commit()
+    conn.close()

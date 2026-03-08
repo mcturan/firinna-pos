@@ -269,9 +269,57 @@ def api_split_order(order_id):
     per_person = db.split_order_equal(order_id, data['num_people'])
     return jsonify({'per_person': per_person})
 
+@app.route('/api/categories/<int:category_id>/order', methods=['PATCH'])
+def api_update_category_order(category_id):
+    data = request.json
+    db.update_category_order(category_id, data['sort_order'])
+    return jsonify({'success': True})
+
+@app.route('/api/products/<int:product_id>/order', methods=['PATCH'])
+def api_update_product_order(product_id):
+    data = request.json
+    db.update_product_order(product_id, data['sort_order'])
+    return jsonify({'success': True})
+
+@app.route('/api/products/<int:product_id>/favorite', methods=['PATCH'])
+def api_toggle_favorite(product_id):
+    new_value = db.toggle_product_favorite(product_id)
+    return jsonify({'success': True, 'is_favorite': new_value})
+
+@app.route('/api/products/search', methods=['GET'])
+def api_search_products():
+    query = request.args.get('q', '')
+    products = db.search_products(query)
+    return jsonify(products)
+
+@app.route('/api/orders/history', methods=['GET'])
+def api_order_history():
+    date = request.args.get('date')
+    limit = int(request.args.get('limit', 50))
+    orders = db.get_closed_orders(date, limit)
+    return jsonify(orders)
+
+@app.route('/api/orders/<int:order_id>/reopen', methods=['POST'])
+def api_reopen_order(order_id):
+    db.reopen_order(order_id)
+    return jsonify({'success': True})
+
+@app.route('/api/tables/<int:table_id>/note', methods=['PATCH'])
+def api_update_table_note(table_id):
+    data = request.json
+    db.update_table_note(table_id, data['note'])
+    return jsonify({'success': True})
+
+@app.route('/api/settings/<key>', methods=['GET', 'PUT'])
+def api_settings(key):
+    if request.method == 'GET':
+        value = db.get_setting(key)
+        return jsonify({'key': key, 'value': value})
+    else:
+        data = request.json
+        db.set_setting(key, data['value'])
+        return jsonify({'success': True})
+
 if __name__ == '__main__':
-    # Veritabanını başlat
     db.init_db()
-    
-    # Uygulamayı başlat (0.0.0.0 = tüm ağdan erişilebilir)
     app.run(host='0.0.0.0', port=5000, debug=True)
