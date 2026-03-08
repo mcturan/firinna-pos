@@ -1,18 +1,10 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify
 import database as db
 from printer import ThermalPrinter
 import os
 from datetime import datetime
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Ana sayfa (masalar görünümü)
 @app.route('/')
@@ -164,29 +156,6 @@ def api_delete_expense(expense_id):
 def api_daily_report():
     date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
     report = db.get_daily_report(date)
-    return jsonify(report)
-
-@app.route('/api/reports/range', methods=['GET'])
-def api_report_range():
-    from datetime import timedelta
-    period = request.args.get('period', 'daily')
-    today = datetime.now().date()
-    if period == 'daily':
-        date = request.args.get('date', str(today))
-        start = end = date
-    elif period == 'weekly':
-        start = str(today - timedelta(days=today.weekday()))
-        end = str(today)
-    elif period == 'monthly':
-        start = str(today.replace(day=1))
-        end = str(today)
-    elif period == 'custom':
-        start = request.args.get('start', str(today))
-        end = request.args.get('end', str(today))
-    else:
-        start = '2000-01-01'
-        end = str(today)
-    report = db.get_report(start, end)
     return jsonify(report)
 
 @app.route('/api/print/daily-report', methods=['POST'])
@@ -411,77 +380,6 @@ def api_print_kitchen(order_id):
     return jsonify({'success': success})
 
 
-# ===== LOGO YÜKLEME (#15) =====
-
-@app.route('/api/settings/logo', methods=['POST'])
-def api_upload_logo():
-    if 'logo' not in request.files:
-        return jsonify({'success': False, 'error': 'Dosya seçilmedi'}), 400
-    file = request.files['logo']
-    if file.filename == '':
-        return jsonify({'success': False, 'error': 'Boş dosya adı'}), 400
-    if not allowed_file(file.filename):
-        return jsonify({'success': False, 'error': 'Desteklenmeyen format. PNG, JPG, GIF veya WEBP kullanın'}), 400
-    # Sabit isim kullan — her yüklemede üzerine yaz
-    ext = file.filename.rsplit('.', 1)[1].lower()
-    filename = f'logo.{ext}'
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    # Eski logo dosyalarını temizle
-    for old_ext in ALLOWED_EXTENSIONS:
-        old_path = os.path.join(UPLOAD_FOLDER, f'logo.{old_ext}')
-        if os.path.exists(old_path) and old_ext != ext:
-            os.remove(old_path)
-    file.save(filepath)
-    logo_url = f'/static/uploads/{filename}'
-    db.set_setting('logo_url', logo_url)
-    return jsonify({'success': True, 'url': logo_url})
-
-@app.route('/api/settings/logo', methods=['DELETE'])
-def api_delete_logo():
-    logo_url = db.get_setting('logo_url', '')
-    if logo_url:
-        filepath = os.path.join(os.path.dirname(__file__), logo_url.lstrip('/'))
-        if os.path.exists(filepath):
-            os.remove(filepath)
-        db.set_setting('logo_url', '')
-    return jsonify({'success': True})
-
-@app.route('/api/settings/logo', methods=['GET'])
-def api_get_logo():
-    logo_url = db.get_setting('logo_url', '')
-    return jsonify({'url': logo_url})
-
-
-# ===== NOT SAYFASI YAZDIRMA (#17) =====
-
-@app.route('/api/print/note', methods=['POST'])
-def api_print_note():
-    data = request.json
-    note_text = data.get('note', '').strip()
-    title = data.get('title', 'NOT')
-    if not note_text:
-        return jsonify({'success': False, 'error': 'Not içeriği boş'}), 400
-    try:
-        p = ThermalPrinter(printer_type='receipt')
-        success = p.print_note(title, note_text)
-        return jsonify({'success': success})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/print/note/preview', methods=['POST'])
-def api_preview_note():
-    data = request.json
-    note_text = data.get('note', '').strip()
-    title = data.get('title', 'NOT')
-    restaurant_name = db.get_setting('restaurant_name', 'Fırınna')
-    return render_template('receipts/note_receipt.html',
-        note=note_text,
-        title=title,
-        restaurant_name=restaurant_name,
-        timestamp=datetime.now().strftime('%d.%m.%Y %H:%M')
-    )
-
-
 # ===== FİŞ ÖNİZLEME =====
 
 @app.route('/api/print/receipt/<int:order_id>/preview', methods=['GET'])
@@ -495,8 +393,7 @@ def api_preview_receipt(order_id):
         restaurant_name=db.get_setting('restaurant_name', 'Fırınna'),
         restaurant_address=db.get_setting('restaurant_address', ''),
         restaurant_phone=db.get_setting('restaurant_phone', ''),
-        footer_note=db.get_setting('receipt_footer', 'Afiyet olsun!'),
-        logo_url=db.get_setting('logo_url', '')
+        footer_note=db.get_setting('receipt_footer', 'Afiyet olsun!')
     )
 
 @app.route('/api/print/kitchen/<int:order_id>/preview', methods=['GET'])
@@ -525,8 +422,7 @@ def api_pdf_receipt(order_id):
         restaurant_name=db.get_setting('restaurant_name', 'Fırınna'),
         restaurant_address=db.get_setting('restaurant_address', ''),
         restaurant_phone=db.get_setting('restaurant_phone', ''),
-        footer_note=db.get_setting('receipt_footer', 'Afiyet olsun!'),
-        logo_url=db.get_setting('logo_url', '')
+        footer_note=db.get_setting('receipt_footer', 'Afiyet olsun!')
     )
     
     # PDF'e çevir

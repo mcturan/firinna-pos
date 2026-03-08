@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Not Fişi</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 300px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        .center { text-align: center; }
+        .bold { font-weight: bold; }
+        .separator { border-top: 1px dashed #000; margin: 10px 0; }
+        .note-content {
+            font-size: 1.1em;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 12px 0;
+            min-height: 60px;
+        }
+        @media print {
+            body { border: none; margin: 0; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="center bold">{{ restaurant_name }}</div>
+    <div class="separator"></div>
+    <div class="center bold" style="font-size: 1.1em;">--- {{ title }} ---</div>
+    <div style="font-size: 0.85em; color: #555; margin-top: 4px;">{{ timestamp }}</div>
+    <div class="separator"></div>
+    <div class="note-content">{{ note }}</div>
+    <div class="separator"></div>
+</body>
+</html>

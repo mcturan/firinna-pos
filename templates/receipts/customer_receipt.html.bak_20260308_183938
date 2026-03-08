@@ -22,11 +22,6 @@
     </style>
 </head>
 <body>
-    {% if logo_url %}
-    <div class="center" style="margin-bottom: 8px;">
-        <img src="{{ logo_url }}" alt="Logo" style="max-width: 160px; max-height: 80px; object-fit: contain;">
-    </div>
-    {% endif %}
     <div class="center bold">{{ restaurant_name }}</div>
     {% if restaurant_address %}<div class="center">{{ restaurant_address }}</div>{% endif %}
     {% if restaurant_phone %}<div class="center">Tel: {{ restaurant_phone }}</div>{% endif %}

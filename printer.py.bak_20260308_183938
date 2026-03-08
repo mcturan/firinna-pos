@@ -180,38 +180,3 @@ class ThermalPrinter:
         data += CUT
         
         return self.send_command(data)
-
-    def print_note(self, title, note_text):
-        """Serbest metin not fişi yazdır (#17)"""
-        ESC = b'\x1B'
-        INIT = ESC + b'@'
-        CENTER = ESC + b'a\x01'
-        LEFT = ESC + b'a\x00'
-        BOLD_ON = ESC + b'E\x01'
-        BOLD_OFF = ESC + b'E\x00'
-        CUT = ESC + b'd\x05' + ESC + b'm'
-
-        restaurant_name = db.get_setting('restaurant_name', 'Fırınna')
-        now = datetime.now().strftime('%d.%m.%Y %H:%M')
-
-        data = INIT
-        data += CENTER
-        data += BOLD_ON
-        data += f"{restaurant_name}\n".encode('cp857')
-        data += BOLD_OFF
-        data += "================================\n".encode('cp857')
-        data += BOLD_ON
-        data += f"--- {title} ---\n".encode('cp857')
-        data += BOLD_OFF
-        data += f"{now}\n".encode('cp857')
-        data += "================================\n".encode('cp857')
-        data += LEFT
-        data += "\n".encode('cp857')
-        for line in note_text.split('\n'):
-            data += f"{line}\n".encode('cp857')
-        data += "\n================================\n".encode('cp857')
-        data += "\n\n".encode('cp857')
-        data += CUT
-
-        return self.send_command(data)
-

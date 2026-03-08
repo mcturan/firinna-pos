@@ -545,7 +545,7 @@ def search_products(query):
         SELECT p.*, c.name as category_name, c.color as category_color
         FROM products p
         LEFT JOIN categories c ON p.category_id = c.id
-        WHERE p.active = 1 AND (p.name LIKE ? OR c.name LIKE ?)
+        WHERE p.name LIKE ? OR c.name LIKE ?
         ORDER BY p.is_favorite DESC, p.sort_order, p.name
     ''', (f'%{query}%', f'%{query}%')).fetchall()
     conn.close()
@@ -746,81 +746,3 @@ def get_table_order_by_id(order_id):
     
     conn.close()
     return order_dict
-
-# ===== GENİŞLETİLMİŞ RAPORLAR (#7, #31) =====
-
-def get_report(start_date, end_date):
-    """Tarih aralığı raporu — günlük/haftalık/aylık/toplam için ortak fonksiyon"""
-    conn = get_db()
-
-    # Toplam satış, nakit, kart, bahşiş, indirim, sipariş sayısı
-    summary = conn.execute('''
-        SELECT
-            COUNT(*) as order_count,
-            COALESCE(SUM(total), 0) as total_sales,
-            COALESCE(SUM(payment_cash), 0) as total_cash,
-            COALESCE(SUM(payment_card), 0) as total_card,
-            COALESCE(SUM(tip_amount), 0) as total_tips,
-            COALESCE(SUM(discount_value), 0) as total_discount
-        FROM orders
-        WHERE DATE(closed_at) BETWEEN ? AND ?
-          AND status = 'closed'
-    ''', (start_date, end_date)).fetchone()
-
-    # Top ürünler
-    top_products = conn.execute('''
-        SELECT
-            COALESCE(oi.product_name, p.name, 'Silinmiş Ürün') as name,
-            SUM(oi.quantity) as quantity,
-            SUM(CASE WHEN oi.is_complimentary = 0 THEN oi.quantity * oi.price ELSE 0 END) as total
-        FROM order_items oi
-        LEFT JOIN products p ON oi.product_id = p.id
-        JOIN orders o ON oi.order_id = o.id
-        WHERE DATE(o.closed_at) BETWEEN ? AND ?
-          AND o.status = 'closed'
-          AND oi.is_complimentary = 0
-        GROUP BY COALESCE(oi.product_name, p.name)
-        ORDER BY quantity DESC
-        LIMIT 20
-    ''', (start_date, end_date)).fetchall()
-
-    # Günlük dağılım (grafik için)
-    daily = conn.execute('''
-        SELECT
-            DATE(closed_at) as day,
-            COUNT(*) as order_count,
-            COALESCE(SUM(total), 0) as total_sales,
-            COALESCE(SUM(tip_amount), 0) as tips
-        FROM orders
-        WHERE DATE(closed_at) BETWEEN ? AND ?
-          AND status = 'closed'
-        GROUP BY DATE(closed_at)
-        ORDER BY day
-    ''', (start_date, end_date)).fetchall()
-
-    # Masraf
-    expenses = conn.execute('''
-        SELECT COALESCE(SUM(amount), 0) as total
-        FROM expenses
-        WHERE DATE(created_at) BETWEEN ? AND ?
-    ''', (start_date, end_date)).fetchone()
-
-    conn.close()
-
-    s = dict(summary)
-    net = s['total_sales'] + s['total_tips'] - expenses['total']
-
-    return {
-        'start_date': start_date,
-        'end_date': end_date,
-        'order_count': s['order_count'],
-        'total_sales': round(s['total_sales'], 2),
-        'total_cash': round(s['total_cash'], 2),
-        'total_card': round(s['total_card'], 2),
-        'total_tips': round(s['total_tips'], 2),
-        'total_discount': round(s['total_discount'], 2),
-        'total_expenses': round(expenses['total'], 2),
-        'net': round(net, 2),
-        'top_products': [dict(p) for p in top_products],
-        'daily': [dict(d) for d in daily],
-    }

@@ -166,29 +166,6 @@ def api_daily_report():
     report = db.get_daily_report(date)
     return jsonify(report)
 
-@app.route('/api/reports/range', methods=['GET'])
-def api_report_range():
-    from datetime import timedelta
-    period = request.args.get('period', 'daily')
-    today = datetime.now().date()
-    if period == 'daily':
-        date = request.args.get('date', str(today))
-        start = end = date
-    elif period == 'weekly':
-        start = str(today - timedelta(days=today.weekday()))
-        end = str(today)
-    elif period == 'monthly':
-        start = str(today.replace(day=1))
-        end = str(today)
-    elif period == 'custom':
-        start = request.args.get('start', str(today))
-        end = request.args.get('end', str(today))
-    else:
-        start = '2000-01-01'
-        end = str(today)
-    report = db.get_report(start, end)
-    return jsonify(report)
-
 @app.route('/api/print/daily-report', methods=['POST'])
 def api_print_daily_report():
     data = request.json
@@ -422,11 +399,9 @@ def api_upload_logo():
         return jsonify({'success': False, 'error': 'Boş dosya adı'}), 400
     if not allowed_file(file.filename):
         return jsonify({'success': False, 'error': 'Desteklenmeyen format. PNG, JPG, GIF veya WEBP kullanın'}), 400
-    # Sabit isim kullan — her yüklemede üzerine yaz
     ext = file.filename.rsplit('.', 1)[1].lower()
     filename = f'logo.{ext}'
     filepath = os.path.join(UPLOAD_FOLDER, filename)
-    # Eski logo dosyalarını temizle
     for old_ext in ALLOWED_EXTENSIONS:
         old_path = os.path.join(UPLOAD_FOLDER, f'logo.{old_ext}')
         if os.path.exists(old_path) and old_ext != ext:

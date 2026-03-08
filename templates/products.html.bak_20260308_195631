@@ -136,12 +136,8 @@
 
         async function deleteProduct(id) {
             if (!confirm('Bu ürünü silmek istediğinize emin misiniz?')) return;
-            const res = await fetch(`/api/products/${id}`, {method: 'DELETE'});
-            const data = await res.json();
-            if (!data.success) {
-                alert('⚠️ ' + (data.error || 'Ürün silinemedi'));
-                return;
-            }
+            
+            await fetch(`/api/products/${id}`, {method: 'DELETE'});
             loadProducts();
         }
     </script>

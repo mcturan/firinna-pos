@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raporlar - Fırınna POS</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .report-tabs { display: flex; gap: 0; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.5rem; }
+        .report-tab { padding: 0.75rem 1.5rem; border: none; background: none; font-size: 1rem; font-weight: 600; color: #718096; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+        .report-tab:hover { color: #2d6a4f; }
+        .report-tab.active { color: #2d6a4f; border-bottom-color: #2d6a4f; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card { background: white; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: #2d6a4f; }
+        .stat-value.red { color: #e53e3e; }
+        .stat-value.blue { color: #3b82f6; }
+        .stat-value.orange { color: #ed8936; }
+        .stat-label { font-size: 0.8rem; color: #718096; margin-top: 0.3rem; }
+        .top-table { width: 100%; border-collapse: collapse; }
+        .top-table th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; color: #4a5568; border-bottom: 2px solid #e2e8f0; }
+        .top-table td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+        .top-table tr:hover td { background: #f7fafc; }
+        .bar { height: 8px; background: #e2e8f0; border-radius: 4px; margin-top: 0.4rem; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #2d6a4f, #48bb78); border-radius: 4px; }
+        .date-controls { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .date-controls input { padding: 0.5rem 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; }
+        .export-btn { background: #217346; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        .section-title { font-size: 1rem; font-weight: 700; color: #2d3748; margin: 1.5rem 0 0.75rem; }
+        .no-data { text-align: center; color: #a0aec0; padding: 2rem; }
+        .loading { text-align: center; padding: 3rem; color: #718096; }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -17,189 +42,159 @@
             <a href="/reports" class="active">Raporlar</a>
         </div>
     </nav>
-
     <div class="container">
-        <!-- Günlük Rapor -->
-        <div class="management-section">
-            <h2>📊 Günlük Rapor</h2>
-            
-            <div class="report-controls">
-                <input type="date" id="reportDate">
-                <button class="btn btn-primary" onclick="loadReport()">Rapor Getir</button>
-                <button class="btn btn-secondary" onclick="printDailyReport()">🖨️ Yazdır</button>
-            </div>
-
-            <div id="reportContent" class="report-content"></div>
+        <h1 style="margin-bottom:1.5rem;">📊 Raporlar</h1>
+        <div class="report-tabs">
+            <button class="report-tab active" onclick="switchTab('daily')" id="tab-daily">📅 Günlük</button>
+            <button class="report-tab" onclick="switchTab('weekly')" id="tab-weekly">📆 Haftalık</button>
+            <button class="report-tab" onclick="switchTab('monthly')" id="tab-monthly">🗓️ Aylık</button>
+            <button class="report-tab" onclick="switchTab('total')" id="tab-total">📈 Toplam</button>
+            <button class="report-tab" onclick="switchTab('custom')" id="tab-custom">🔍 Özel Aralık</button>
         </div>
-
-        <!-- Yedekleme ve Ayarlar -->
-        <div class="management-section">
-            <h2>⚙️ Sistem Yönetimi</h2>
-            
-            <div class="system-actions">
-                <div class="action-card">
-                    <h3>💾 Yedekleme</h3>
-                    <p>Veritabanını yedekleyin</p>
-                    <button class="btn btn-success" onclick="backupDatabase()">Yedek Al</button>
-                </div>
-
-                <div class="action-card">
-                    <h3>🗑️ Test Verilerini Temizle</h3>
-                    <p>Bugün hariç tüm siparişleri sil</p>
-                    <button class="btn btn-warning" onclick="clearTestData()">Temizle</button>
-                </div>
-
-                <div class="action-card">
-                    <h3>🖨️ Yazıcı Ayarları</h3>
-                    <div class="printer-settings">
-                        <input type="text" id="printerIP" placeholder="IP Adresi">
-                        <input type="number" id="printerPort" placeholder="Port">
-                        <button class="btn btn-secondary" onclick="savePrinterSettings()">Kaydet</button>
-                        <button class="btn btn-secondary" onclick="testPrinter()">Test</button>
-                    </div>
-                </div>
-            </div>
+        <div id="ctrl-daily" class="date-controls">
+            <input type="date" id="dailyDate">
+            <button class="btn btn-primary" onclick="loadReport()">Getir</button>
+            <button class="export-btn" onclick="exportExcel()">📥 Excel İndir</button>
+            <button class="btn btn-secondary" onclick="printDailyReport()">🖨️ Yazdır</button>
         </div>
+        <div id="ctrl-custom" class="date-controls" style="display:none;">
+            <label style="font-weight:600;">Başlangıç:</label>
+            <input type="date" id="customStart">
+            <label style="font-weight:600;">Bitiş:</label>
+            <input type="date" id="customEnd">
+            <button class="btn btn-primary" onclick="loadReport()">Getir</button>
+            <button class="export-btn" onclick="exportExcel()">📥 Excel İndir</button>
+        </div>
+        <div id="ctrl-other" class="date-controls" style="display:none;">
+            <button class="export-btn" onclick="exportExcel()">📥 Excel İndir</button>
+        </div>
+        <div id="reportContent"><div class="loading">⏳ Yükleniyor...</div></div>
     </div>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Bugünün tarihini ayarla
+        let currentTab = 'daily';
+        let currentReport = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('reportDate').value = today;
+            document.getElementById('dailyDate').value = today;
+            document.getElementById('customStart').value = today;
+            document.getElementById('customEnd').value = today;
             loadReport();
-            loadPrinterSettings();
         });
 
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('ctrl-daily').style.display = 'none';
+            document.getElementById('ctrl-custom').style.display = 'none';
+            document.getElementById('ctrl-other').style.display = 'none';
+            if (tab === 'daily') document.getElementById('ctrl-daily').style.display = 'flex';
+            else if (tab === 'custom') document.getElementById('ctrl-custom').style.display = 'flex';
+            else document.getElementById('ctrl-other').style.display = 'flex';
+            loadReport();
+        }
+
         async function loadReport() {
-            const date = document.getElementById('reportDate').value;
-            const report = await fetch(`/api/reports/daily?date=${date}`).then(r => r.json());
-            
-            const reportContent = document.getElementById('reportContent');
-            
-            if (report.total_sales === 0 && report.total_expenses === 0) {
-                reportContent.innerHTML = '<p class="no-data">Bu tarihte işlem yok</p>';
+            document.getElementById('reportContent').innerHTML = '<div class="loading">⏳ Yükleniyor...</div>';
+            let url = '/api/reports/range?period=' + currentTab;
+            if (currentTab === 'daily') url += '&date=' + document.getElementById('dailyDate').value;
+            else if (currentTab === 'custom') {
+                url += '&start=' + document.getElementById('customStart').value;
+                url += '&end=' + document.getElementById('customEnd').value;
+            }
+            const report = await fetch(url).then(r => r.json());
+            currentReport = report;
+            renderReport(report);
+        }
+
+        function renderReport(r) {
+            if (r.order_count === 0) {
+                document.getElementById('reportContent').innerHTML = '<div class="no-data">Bu dönemde kayıt bulunamadı.</div>';
                 return;
             }
-            
-            let html = `
-                <div class="report-summary">
-                    <div class="summary-item">
-                        <div class="summary-label">💰 Toplam Satış</div>
-                        <div class="summary-value success">${report.total_sales.toFixed(2)} TL</div>
-                    </div>
-                    
-                    <div class="summary-item">
-                        <div class="summary-label">💸 Toplam Masraf</div>
-                        <div class="summary-value danger">${report.total_expenses.toFixed(2)} TL</div>
-                    </div>
-                    
-                    <div class="summary-item">
-                        <div class="summary-label">📈 Net Kar</div>
-                        <div class="summary-value ${report.net >= 0 ? 'success' : 'danger'}">
-                            ${report.net.toFixed(2)} TL
-                        </div>
-                    </div>
+            const maxQty = r.top_products.length > 0 ? r.top_products[0].quantity : 1;
+            const productRows = r.top_products.map((p, i) => `
+                <tr>
+                    <td style="font-weight:700;color:#2d6a4f;">#${i+1}</td>
+                    <td>${p.name}</td>
+                    <td style="text-align:center;">
+                        <strong>${p.quantity}</strong>
+                        <div class="bar"><div class="bar-fill" style="width:${Math.round(p.quantity/maxQty*100)}%"></div></div>
+                    </td>
+                    <td style="text-align:right;">${p.total.toFixed(2)} ₺</td>
+                </tr>`).join('');
+            const dailyRows = r.daily.map(d => `
+                <tr>
+                    <td>${d.day}</td>
+                    <td>${d.order_count}</td>
+                    <td><strong>${d.total_sales.toFixed(2)} ₺</strong></td>
+                    <td>${d.tips.toFixed(2)} ₺</td>
+                </tr>`).join('');
+            document.getElementById('reportContent').innerHTML = `
+                <div class="stat-grid">
+                    <div class="stat-card"><div class="stat-value">${r.order_count}</div><div class="stat-label">Toplam Sipariş</div></div>
+                    <div class="stat-card"><div class="stat-value">${r.total_sales.toFixed(2)} ₺</div><div class="stat-label">Toplam Satış</div></div>
+                    <div class="stat-card"><div class="stat-value blue">${r.total_cash.toFixed(2)} ₺</div><div class="stat-label">💵 Nakit</div></div>
+                    <div class="stat-card"><div class="stat-value blue">${r.total_card.toFixed(2)} ₺</div><div class="stat-label">💳 Kart</div></div>
+                    <div class="stat-card"><div class="stat-value orange">${r.total_tips.toFixed(2)} ₺</div><div class="stat-label">🎁 Bahşiş</div></div>
+                    <div class="stat-card"><div class="stat-value orange">${r.total_discount.toFixed(2)} ₺</div><div class="stat-label">🏷️ İndirim</div></div>
+                    <div class="stat-card"><div class="stat-value red">${r.total_expenses.toFixed(2)} ₺</div><div class="stat-label">📤 Masraf</div></div>
+                    <div class="stat-card"><div class="stat-value ${r.net >= 0 ? '' : 'red'}">${r.net.toFixed(2)} ₺</div><div class="stat-label">📊 Net Kazanç</div></div>
                 </div>
-            `;
-            
-            if (report.products.length > 0) {
-                html += '<h3>Ürün Bazlı Satışlar</h3>';
-                html += '<table class="report-table"><thead><tr><th>Ürün</th><th>Adet</th><th>Toplam</th></tr></thead><tbody>';
-                
-                report.products.forEach(product => {
-                    html += `
-                        <tr>
-                            <td>${product.name}</td>
-                            <td>${product.quantity}</td>
-                            <td>${product.total.toFixed(2)} TL</td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</tbody></table>';
-            }
-            
-            reportContent.innerHTML = html;
+                <div class="section-title">🏆 En Çok Satan Ürünler</div>
+                ${r.top_products.length === 0 ? '<div class="no-data">Veri yok.</div>' :
+                `<table class="top-table">
+                    <thead><tr><th>#</th><th>Ürün</th><th>Adet</th><th style="text-align:right;">Tutar</th></tr></thead>
+                    <tbody>${productRows}</tbody>
+                </table>`}
+                ${r.daily.length > 1 ? `
+                <div class="section-title">📅 Günlük Dağılım</div>
+                <table class="top-table">
+                    <thead><tr><th>Tarih</th><th>Sipariş</th><th>Satış</th><th>Bahşiş</th></tr></thead>
+                    <tbody>${dailyRows}</tbody>
+                </table>` : ''}`;
         }
 
         async function printDailyReport() {
-            const date = document.getElementById('reportDate').value;
-            
-            const result = await fetch('/api/print/daily-report', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+            const date = document.getElementById('dailyDate').value;
+            const res = await fetch('/api/print/daily-report', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({date})
-            }).then(r => r.json());
-            
-            if (result.success) {
-                alert('Rapor yazdırıldı!');
-            } else {
-                alert('Yazıcı bağlantısı başarısız!');
-            }
+            });
+            alert('Rapor yazıcıya gönderildi.');
         }
 
-        async function backupDatabase() {
-            const result = await fetch('/api/backup', {method: 'POST'}).then(r => r.json());
-            
-            if (result.success) {
-                alert(`Yedekleme başarılı!\nDosya: ${result.path}`);
-            } else {
-                alert('Yedekleme başarısız!');
+        function exportExcel() {
+            if (!currentReport) { alert('Önce rapor yükleyin.'); return; }
+            const r = currentReport;
+            let csv = '\uFEFF';
+            csv += `Firinna POS Rapor\n`;
+            csv += `Donem;${r.start_date} - ${r.end_date}\n\n`;
+            csv += `OZET\n`;
+            csv += `Toplam Siparis;${r.order_count}\n`;
+            csv += `Toplam Satis;${r.total_sales.toFixed(2)}\n`;
+            csv += `Nakit;${r.total_cash.toFixed(2)}\n`;
+            csv += `Kart;${r.total_card.toFixed(2)}\n`;
+            csv += `Bahsis;${r.total_tips.toFixed(2)}\n`;
+            csv += `Indirim;${r.total_discount.toFixed(2)}\n`;
+            csv += `Masraf;${r.total_expenses.toFixed(2)}\n`;
+            csv += `Net Kazanc;${r.net.toFixed(2)}\n\n`;
+            csv += `EN COK SATAN URUNLER\n`;
+            csv += `Sira;Urun;Adet;Tutar\n`;
+            r.top_products.forEach((p,i) => { csv += `${i+1};${p.name};${p.quantity};${p.total.toFixed(2)}\n`; });
+            if (r.daily.length > 1) {
+                csv += `\nGUNLUK DAGILIM\n`;
+                csv += `Tarih;Siparis;Satis;Bahsis\n`;
+                r.daily.forEach(d => { csv += `${d.day};${d.order_count};${d.total_sales.toFixed(2)};${d.tips.toFixed(2)}\n`; });
             }
-        }
-
-        async function clearTestData() {
-            if (!confirm('Bugün hariç tüm sipariş ve masraf kayıtlarını silmek istediğinize emin misiniz?\n\nBu işlem GERİ ALINAMAZ!')) {
-                return;
-            }
-            
-            if (!confirm('SON UYARI: Bu işlem kalıcıdır ve geri alınamaz. Devam etmek istediğinize emin misiniz?')) {
-                return;
-            }
-            
-            const result = await fetch('/api/clear-test-data', {method: 'POST'}).then(r => r.json());
-            
-            if (result.success) {
-                alert('Test verileri temizlendi!');
-                loadReport();
-            }
-        }
-
-        async function loadPrinterSettings() {
-            const settings = await fetch('/api/settings/printer').then(r => r.json());
-            document.getElementById('printerIP').value = settings.ip;
-            document.getElementById('printerPort').value = settings.port;
-        }
-
-        async function savePrinterSettings() {
-            const ip = document.getElementById('printerIP').value;
-            const port = document.getElementById('printerPort').value;
-            
-            if (!ip || !port) {
-                alert('Lütfen IP ve Port girin!');
-                return;
-            }
-            
-            const result = await fetch('/api/settings/printer', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ip, port})
-            }).then(r => r.json());
-            
-            if (result.success) {
-                alert('Ayarlar kaydedildi!');
-            }
-        }
-
-        async function testPrinter() {
-            const result = await fetch('/api/printer/test', {method: 'POST'}).then(r => r.json());
-            
-            if (result.success) {
-                alert('Yazıcı testi başarılı!');
-            } else {
-                alert('Yazıcı bağlantısı kurulamadı! IP ve Port ayarlarını kontrol edin.');
-            }
+            const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `firinna_rapor_${r.start_date}_${r.end_date}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
         }
     </script>
 </body>

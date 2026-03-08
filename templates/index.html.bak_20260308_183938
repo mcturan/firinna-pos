@@ -17,7 +17,6 @@
             <a href="/reports">Raporlar</a>
             <a href="#" onclick="openOrderHistory(); return false;">📜 Geçmiş</a>
             <a href="#" onclick="openPastOrderModal(); return false;">➕ Eski Sipariş Ekle</a>
-            <a href="#" onclick="openSettingsModal(); return false;">⚙️ Ayarlar</a>
         </div>
     </nav>
 
@@ -32,12 +31,6 @@
             <div class="modal-header">
                 <h2>Sipariş - <span id="modalTableName"></span></h2>
                 <span class="close">&times;</span>
-            </div>
-            <div style="padding: 0.5rem 1.5rem; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                <input type="text" id="orderNoteText" placeholder="📝 Not: müşteri adı, özel istek..."
-                    style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;
-                    font-family: inherit; font-size: 0.9rem; box-sizing: border-box; background: white;"
-                    oninput="saveOrderNote()">
             </div>
 
             <div class="order-layout">
@@ -369,116 +362,6 @@
         </div>
     </div>
 
-    <!-- Ayarlar Modal -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content" style="max-width: 620px;">
-            <div class="modal-header">
-                <h2>⚙️ Ayarlar</h2>
-                <button class="close-btn" onclick="closeSettingsModal()">✕</button>
-            </div>
-            <div style="display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.5rem;">
-                <button class="settings-tab active" onclick="switchSettingsTab('business')" id="tab-business">🏪 İşletme</button>
-                <button class="settings-tab" onclick="switchSettingsTab('printer')" id="tab-printer">🖨️ Yazıcı</button>
-                <button class="settings-tab" onclick="switchSettingsTab('logo')" id="tab-logo">🖼️ Logo</button>
-                <button class="settings-tab" onclick="switchSettingsTab('note')" id="tab-note">📝 Not Fişi</button>
-            </div>
-
-            <!-- İşletme Bilgileri -->
-            <div id="settings-business" class="settings-panel">
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div>
-                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">İşletme Adı</label>
-                        <input type="text" id="s-restaurant-name" placeholder="Fırınna" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
-                    </div>
-                    <div>
-                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Adres</label>
-                        <input type="text" id="s-restaurant-address" placeholder="Beyoğlu, İstanbul" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
-                    </div>
-                    <div>
-                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Telefon</label>
-                        <input type="text" id="s-restaurant-phone" placeholder="+90 212 ..." style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
-                    </div>
-                    <div>
-                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Fiş Alt Notu</label>
-                        <textarea id="s-receipt-footer" rows="3" placeholder="Afiyet olsun!" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box; resize: vertical; font-family: inherit;"></textarea>
-                    </div>
-                    <button onclick="saveBusinessSettings()" style="padding: 0.75rem; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">💾 Kaydet</button>
-                </div>
-            </div>
-
-            <!-- Yazıcı Ayarları -->
-            <div id="settings-printer" class="settings-panel" style="display: none;">
-                <div style="display: flex; flex-direction: column; gap: 1.2rem;">
-                    <div style="background: #f8fafc; border-radius: 10px; padding: 1rem;">
-                        <p style="font-weight: 700; margin: 0 0 0.8rem;">🧾 Müşteri Yazıcısı</p>
-                        <div style="display: flex; gap: 1rem;">
-                            <div style="flex: 2;">
-                                <label style="font-size: 0.85rem; font-weight: 600;">IP Adresi</label>
-                                <input type="text" id="s-printer-ip" placeholder="192.168.1.x" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; margin-top: 0.3rem;">
-                            </div>
-                            <div style="flex: 1;">
-                                <label style="font-size: 0.85rem; font-weight: 600;">Port</label>
-                                <input type="number" id="s-printer-port" placeholder="9100" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; margin-top: 0.3rem;">
-                            </div>
-                        </div>
-                    </div>
-                    <div style="background: #f8fafc; border-radius: 10px; padding: 1rem;">
-                        <p style="font-weight: 700; margin: 0 0 0.8rem;">🍳 Mutfak Yazıcısı</p>
-                        <div style="display: flex; gap: 1rem;">
-                            <div style="flex: 2;">
-                                <label style="font-size: 0.85rem; font-weight: 600;">IP Adresi</label>
-                                <input type="text" id="s-kitchen-ip" placeholder="192.168.1.x" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; margin-top: 0.3rem;">
-                            </div>
-                            <div style="flex: 1;">
-                                <label style="font-size: 0.85rem; font-weight: 600;">Port</label>
-                                <input type="number" id="s-kitchen-port" placeholder="9100" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; margin-top: 0.3rem;">
-                            </div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 0.75rem;">
-                        <button onclick="savePrinterSettings()" style="flex: 1; padding: 0.75rem; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">💾 Kaydet</button>
-                        <button onclick="testPrinter()" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">🖨️ Test Yazdır</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Logo -->
-            <div id="settings-logo" class="settings-panel" style="display: none;">
-                <div style="display: flex; flex-direction: column; gap: 1.2rem; align-items: center;">
-                    <div id="logo-preview-box" style="width: 200px; height: 100px; border: 2px dashed #cbd5e1; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #f8fafc;">
-                        <span id="logo-placeholder-text" style="color: #94a3b8; font-size: 0.9rem;">Logo yüklenmemiş</span>
-                        <img id="logo-preview-img" src="" alt="Logo" style="display: none; max-width: 190px; max-height: 90px; object-fit: contain;">
-                    </div>
-                    <p style="font-size: 0.85rem; color: #64748b; text-align: center; margin: 0;">PNG, JPG veya WebP · Önerilen boyut: 300×150px</p>
-                    <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display: none;" onchange="previewLogoFile(event)">
-                    <div style="display: flex; gap: 0.75rem; width: 100%;">
-                        <button onclick="document.getElementById('logo-file-input').click()" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">📁 Dosya Seç</button>
-                        <button onclick="uploadLogo()" id="btn-upload-logo" disabled style="flex: 1; padding: 0.75rem; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; opacity: 0.5;">⬆️ Yükle</button>
-                        <button onclick="deleteLogo()" style="flex: 1; padding: 0.75rem; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">🗑️ Sil</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Not Fişi -->
-            <div id="settings-note" class="settings-panel" style="display: none;">
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div>
-                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Başlık</label>
-                        <input type="text" id="note-title" value="NOT" placeholder="NOT" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
-                    </div>
-                    <div>
-                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Not İçeriği</label>
-                        <textarea id="note-content" rows="6" placeholder="Yazdırmak istediğiniz notu buraya girin..." style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box; resize: vertical; font-family: inherit;"></textarea>
-                    </div>
-                    <div style="display: flex; gap: 0.75rem;">
-                        <button onclick="previewNote()" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">👁️ Önizle</button>
-                        <button onclick="printNote()" style="flex: 1; padding: 0.75rem; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">🖨️ Yazdır</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Masa Notu Modal -->
     <div id="tableNoteModal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
@@ -561,27 +444,15 @@
                 
                 return `
                     <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
-                        ${noteIcon ? `<div style="position: absolute; top: 0.5rem; right: 0.5rem; font-size: 1.2rem; pointer-events: none;">${noteIcon}</div>` : ''}
+                        <div style="position: absolute; top: 0.5rem; right: 0.5rem; font-size: 1.2rem;" onclick="openTableNote(${table.id}, '${table.name}', event)">
+                            ${noteIcon || '📄'}
+                        </div>
                         <div class="table-icon">${icon}</div>
                         <div class="table-name">${table.name}</div>
                         <div class="table-status">${hasOrder ? 'Dolu' : 'Boş'}</div>
                     </div>
                 `;
             }).join('');
-        }
-
-        let noteDebounce = null;
-        async function saveOrderNote() {
-            if (!currentOrder) return;
-            clearTimeout(noteDebounce);
-            noteDebounce = setTimeout(async () => {
-                const note = document.getElementById('orderNoteText').value;
-                await fetch(`/api/orders/${currentOrder.id}/note`, {
-                    method: 'PATCH',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({note})
-                });
-            }, 800);
         }
 
         async function openTable(tableId, tableName) {
@@ -593,14 +464,6 @@
             await loadCategories();
             updateOrderSummary();
             
-            // #37: Sipariş notunu yükle
-            if (currentOrder && currentOrder.id) {
-                fetch(`/api/orders/${currentOrder.id}/note`)
-                    .then(r => r.json())
-                    .then(d => { document.getElementById('orderNoteText').value = d.note || ''; });
-            } else {
-                document.getElementById('orderNoteText').value = '';
-            }
             document.getElementById('orderModal').style.display = 'block';
         }
 
@@ -1416,154 +1279,5 @@ function cancelOrder() {
     overlay.onclick = () => document.body.removeChild(overlay);
     overlay.appendChild(menu);
     document.body.appendChild(overlay);
-}
-
-// ===== AYARLAR MODAL (#15 Logo, #17 Not, Ayarlar UI) =====
-
-async function openSettingsModal() {
-    document.getElementById('settingsModal').style.display = 'block';
-    await loadBusinessSettings();
-    await loadPrinterSettings();
-    await loadLogoSettings();
-}
-function closeSettingsModal() {
-    document.getElementById('settingsModal').style.display = 'none';
-}
-function switchSettingsTab(tab) {
-    document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.settings-panel').forEach(p => p.style.display = 'none');
-    document.getElementById('tab-' + tab).classList.add('active');
-    document.getElementById('settings-' + tab).style.display = 'block';
-}
-async function loadBusinessSettings() {
-    const keys = ['restaurant_name','restaurant_address','restaurant_phone','receipt_footer'];
-    const ids  = ['s-restaurant-name','s-restaurant-address','s-restaurant-phone','s-receipt-footer'];
-    for (let i = 0; i < keys.length; i++) {
-        const res = await fetch(`/api/settings/${keys[i]}`);
-        const data = await res.json();
-        document.getElementById(ids[i]).value = data.value || '';
-    }
-}
-async function saveBusinessSettings() {
-    const fields = [
-        {key:'restaurant_name', id:'s-restaurant-name'},
-        {key:'restaurant_address', id:'s-restaurant-address'},
-        {key:'restaurant_phone', id:'s-restaurant-phone'},
-        {key:'receipt_footer', id:'s-receipt-footer'},
-    ];
-    for (const f of fields) {
-        await fetch(`/api/settings/${f.key}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({value: document.getElementById(f.id).value})
-        });
-    }
-    alert('✅ İşletme bilgileri kaydedildi!');
-}
-async function loadPrinterSettings() {
-    const map = [
-        ['printer_ip','s-printer-ip'],['printer_port','s-printer-port'],
-        ['kitchen_printer_ip','s-kitchen-ip'],['kitchen_printer_port','s-kitchen-port']
-    ];
-    for (const [key, id] of map) {
-        const res = await fetch(`/api/settings/${key}`);
-        const data = await res.json();
-        document.getElementById(id).value = data.value || '';
-    }
-}
-async function savePrinterSettings() {
-    const fields = [
-        {key:'printer_ip', id:'s-printer-ip'},
-        {key:'printer_port', id:'s-printer-port'},
-        {key:'kitchen_printer_ip', id:'s-kitchen-ip'},
-        {key:'kitchen_printer_port', id:'s-kitchen-port'},
-    ];
-    for (const f of fields) {
-        await fetch(`/api/settings/${f.key}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({value: document.getElementById(f.id).value})
-        });
-    }
-    alert('✅ Yazıcı ayarları kaydedildi!');
-}
-async function testPrinter() {
-    const res = await fetch('/api/printer/test', {method: 'POST'});
-    const data = await res.json();
-    alert(data.success ? '✅ Test fişi gönderildi!' : '❌ Yazıcıya ulaşılamadı.');
-}
-let pendingLogoFile = null;
-async function loadLogoSettings() {
-    const res = await fetch('/api/settings/logo');
-    const data = await res.json();
-    if (data.url) {
-        document.getElementById('logo-preview-img').src = data.url + '?t=' + Date.now();
-        document.getElementById('logo-preview-img').style.display = 'block';
-        document.getElementById('logo-placeholder-text').style.display = 'none';
-    } else {
-        document.getElementById('logo-preview-img').style.display = 'none';
-        document.getElementById('logo-placeholder-text').style.display = 'block';
-    }
-}
-function previewLogoFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    pendingLogoFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        document.getElementById('logo-preview-img').src = e.target.result;
-        document.getElementById('logo-preview-img').style.display = 'block';
-        document.getElementById('logo-placeholder-text').style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-    const btn = document.getElementById('btn-upload-logo');
-    btn.disabled = false; btn.style.opacity = '1';
-}
-async function uploadLogo() {
-    if (!pendingLogoFile) return;
-    const formData = new FormData();
-    formData.append('logo', pendingLogoFile);
-    const res = await fetch('/api/settings/logo', {method: 'POST', body: formData});
-    const data = await res.json();
-    if (data.success) {
-        alert('✅ Logo yüklendi!');
-        pendingLogoFile = null;
-        const btn = document.getElementById('btn-upload-logo');
-        btn.disabled = true; btn.style.opacity = '0.5';
-    } else { alert('❌ Hata: ' + data.error); }
-}
-async function deleteLogo() {
-    if (!confirm('Logo silinsin mi?')) return;
-    await fetch('/api/settings/logo', {method: 'DELETE'});
-    document.getElementById('logo-preview-img').style.display = 'none';
-    document.getElementById('logo-placeholder-text').style.display = 'block';
-    document.getElementById('logo-file-input').value = '';
-    pendingLogoFile = null;
-    alert('✅ Logo silindi.');
-}
-async function previewNote() {
-    const title = document.getElementById('note-title').value || 'NOT';
-    const note  = document.getElementById('note-content').value.trim();
-    if (!note) { alert('Not içeriği boş!'); return; }
-    const res = await fetch('/api/print/note/preview', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({title, note})
-    });
-    const html = await res.text();
-    const win = window.open('', '_blank', 'width=400,height=600');
-    win.document.write(html); win.document.close();
-}
-async function printNote() {
-    const title = document.getElementById('note-title').value || 'NOT';
-    const note  = document.getElementById('note-content').value.trim();
-    if (!note) { alert('Not içeriği boş!'); return; }
-    const res = await fetch('/api/print/note', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({title, note})
-    });
-    const data = await res.json();
-    alert(data.success ? '✅ Not fişi yazdırıldı!' : '❌ Yazıcı hatası: ' + (data.error || ''));
 }
 </script>
