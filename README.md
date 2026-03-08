@@ -258,3 +258,9 @@ Kişisel kullanım içindir.
 - **[🗺️ Roadmap](https://htmlpreview.github.io/?https://github.com/mcturan/firinna-pos/blob/main/roadmap.html)** - Geliştirme yol haritası ve özellik durumları
 - **[📝 Changelog](https://htmlpreview.github.io/?https://github.com/mcturan/firinna-pos/blob/main/CHANGELOG.html)** - Sürüm notları ve değişiklik geçmişi
 
+
+## 📋 Dokümantasyon
+
+- **[🗺️ Roadmap](https://htmlpreview.github.io/?https://github.com/mcturan/firinna-pos/blob/main/roadmap.html)** - Geliştirme yol haritası ve özellik durumları
+- **[📝 Changelog](https://htmlpreview.github.io/?https://github.com/mcturan/firinna-pos/blob/main/CHANGELOG.html)** - Sürüm notları ve değişiklik geçmişi
+
