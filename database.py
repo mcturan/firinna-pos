@@ -1,3 +1,4 @@
+from datetime import date
 import sqlite3
 import json
 from datetime import datetime
@@ -588,17 +589,6 @@ def get_closed_orders(date=None, limit=50):
     
     conn.close()
     return result
-
-def reopen_order(order_id):
-    """Kapalı siparişi tekrar aç"""
-    conn = get_db()
-    conn.execute('''
-        UPDATE orders 
-        SET status = 'open', closed_at = NULL, 
-            payment_cash = 0, payment_card = 0, tip_amount = 0
-        WHERE id = ?
-    ''', (order_id,))
-    conn.commit()
     conn.close()
 
 def update_table_note(table_id, note):
@@ -657,3 +647,53 @@ def create_past_order(table_id, created_at, closed_at, items, payment_cash=0, pa
     conn.close()
     
     return order_id
+
+# ===== İSİM DÜZENLEME FONKSİYONLARI =====
+
+def update_zone_name(zone_id, new_name):
+    """Bölge adını güncelle"""
+    conn = get_db()
+    conn.execute('UPDATE zones SET name = ? WHERE id = ?', (new_name, zone_id))
+    conn.commit()
+    conn.close()
+
+def update_table_name(table_id, new_name):
+    """Masa adını güncelle"""
+    conn = get_db()
+    conn.execute('UPDATE tables SET name = ? WHERE id = ?', (new_name, table_id))
+    conn.commit()
+    conn.close()
+
+def update_category_name(category_id, new_name):
+    """Kategori adını güncelle"""
+    conn = get_db()
+    conn.execute('UPDATE categories SET name = ? WHERE id = ?', (new_name, category_id))
+    conn.commit()
+    conn.close()
+
+def update_product_name(product_id, new_name):
+    """Ürün adını güncelle"""
+    conn = get_db()
+    conn.execute('UPDATE products SET name = ? WHERE id = ?', (new_name, product_id))
+    conn.commit()
+    conn.close()
+
+def reopen_order(order_id):
+    """Kapalı siparişi tekrar aç (sadece bugünkü siparişler)"""
+    conn = get_db()
+    
+    # Siparişin tarihini kontrol et
+    order = conn.execute('SELECT DATE(closed_at) as order_date FROM orders WHERE id = ?', (order_id,)).fetchone()
+    
+    if order and order['order_date'] != date.today().isoformat():
+        conn.close()
+        raise ValueError('1 günden eski siparişler düzenlenemez!')
+    
+    conn.execute('''
+        UPDATE orders 
+        SET status = 'open', closed_at = NULL, 
+            payment_cash = 0, payment_card = 0, tip_amount = 0
+        WHERE id = ?
+    ''', (order_id,))
+    conn.commit()
+    conn.close()

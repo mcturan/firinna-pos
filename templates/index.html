@@ -669,11 +669,31 @@
         async function completePayment() {
             const cash = parseFloat(document.getElementById('paymentCash').value) || 0;
             const card = parseFloat(document.getElementById('paymentCard').value) || 0;
-            const tip = parseFloat(document.getElementById('tipAmount').value) || 0;
+            let tip = parseFloat(document.getElementById('tipAmount').value) || 0;
             const tipMethod = document.querySelector('input[name="tipMethod"]:checked').value;
             
-            if (Math.abs(cash + card - currentOrder.total) > 0.01) {
-                alert('Ödeme tutarı toplam ile eşleşmiyor!');
+            const total = currentOrder.total;
+            const paid = cash + card;
+            const diff = paid - total;
+            
+            // Fazla ödeme kontrolü
+            if (diff > 0.01) {
+                if (confirm(`${diff.toFixed(2)} TL fazla ödeme var. Bahşiş olarak eklensin mi?`)) {
+                    tip += diff;
+                    // Nakit ödemeyi düzelt
+                    if (cash >= total) {
+                        document.getElementById('paymentCash').value = total.toFixed(2);
+                        document.getElementById('paymentCard').value = '0.00';
+                    } else {
+                        document.getElementById('paymentCard').value = (total - cash).toFixed(2);
+                    }
+                    document.getElementById('tipAmount').value = tip.toFixed(2);
+                } else {
+                    alert('Lütfen ödeme tutarını düzeltin!');
+                    return;
+                }
+            } else if (diff < -0.01) {
+                alert('Ödeme tutarı yetersiz!');
                 return;
             }
             
@@ -681,8 +701,8 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    payment_cash: cash,
-                    payment_card: card,
+                    payment_cash: parseFloat(document.getElementById('paymentCash').value) || 0,
+                    payment_card: parseFloat(document.getElementById('paymentCard').value) || 0,
                     tip_amount: tip,
                     tip_method: tipMethod
                 })
@@ -693,7 +713,6 @@
             document.getElementById('orderModal').style.display = 'none';
             selectZone(currentZone);
         }
-
         function toggleSplitSection() {
             const section = document.getElementById('splitSection');
             section.style.display = section.style.display === 'none' ? 'block' : 'none';

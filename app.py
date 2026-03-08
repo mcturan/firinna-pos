@@ -343,6 +343,33 @@ def api_create_past_order():
     
     return jsonify({'success': True, 'order_id': order_id})
 
+
+# ===== İSİM DÜZENLEME API'LERİ =====
+
+@app.route('/api/zones/<int:zone_id>/name', methods=['PATCH'])
+def api_update_zone_name(zone_id):
+    data = request.json
+    db.update_zone_name(zone_id, data['name'])
+    return jsonify({'success': True})
+
+@app.route('/api/tables/<int:table_id>/name', methods=['PATCH'])
+def api_update_table_name(table_id):
+    data = request.json
+    db.update_table_name(table_id, data['name'])
+    return jsonify({'success': True})
+
+@app.route('/api/categories/<int:category_id>/name', methods=['PATCH'])
+def api_update_category_name(category_id):
+    data = request.json
+    db.update_category_name(category_id, data['name'])
+    return jsonify({'success': True})
+
+@app.route('/api/products/<int:product_id>/name', methods=['PATCH'])
+def api_update_product_name(product_id):
+    data = request.json
+    db.update_product_name(product_id, data['name'])
+    return jsonify({'success': True})
+
 if __name__ == '__main__':
     db.init_db()
     app.run(host='0.0.0.0', port=5000, debug=True)
