@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Fiş #{{ order['order_id'] }}</title>
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; 
+            max-width: 300px; 
+            margin: 20px auto; 
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        .center { text-align: center; }
+        .bold { font-weight: bold; }
+        .separator { border-top: 1px dashed #000; margin: 10px 0; }
+        .item { display: flex; justify-content: space-between; margin: 5px 0; }
+        .total { font-size: 1.2em; font-weight: bold; margin-top: 10px; }
+        @media print {
+            body { border: none; margin: 0; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="center bold">{{ restaurant_name }}</div>
+    {% if restaurant_address %}<div class="center">{{ restaurant_address }}</div>{% endif %}
+    {% if restaurant_phone %}<div class="center">Tel: {{ restaurant_phone }}</div>{% endif %}
+    <div class="separator"></div>
+    
+    <div>Tarih: {{ order['closed_at'] or order['created_at'] }}</div>
+    <div>Masa: {{ order['table_name'] }}</div>
+    <div>Sipariş No: {{ order['order_id'] }}</div>
+    <div class="separator"></div>
+    
+    {% for item in order['items'] %}
+    <div class="item">
+        <span>{{ item.quantity }}x {{ item.product_name }}{% if item.is_complimentary %} (İKRAM){% endif %}</span>
+        {% if not item.is_complimentary %}<span>{{ "%.2f"|format(item.quantity * item.price) }} TL</span>{% endif %}
+    </div>
+    {% if item.kitchen_notes %}
+    <div style="margin-left: 20px; font-size: 0.9em; color: #666;">Not: {{ item.kitchen_notes }}</div>
+    {% endif %}
+    {% endfor %}
+    
+    <div class="separator"></div>
+    <div class="item"><span>Ara Toplam:</span><span>{{ "%.2f"|format(order['subtotal']) }} TL</span></div>
+    {% if order['discount_value'] > 0 %}
+    <div class="item"><span>{{ order['discount_reason'] or 'İndirim' }}:</span><span>-{{ "%.2f"|format(order['discount_value']) }} TL</span></div>
+    {% endif %}
+    <div class="item total"><span>TOPLAM:</span><span>{{ "%.2f"|format(order['total']) }} TL</span></div>
+    <div class="separator"></div>
+    
+    {% if order['payment_cash'] > 0 %}<div class="item"><span>Nakit:</span><span>{{ "%.2f"|format(order['payment_cash']) }} TL</span></div>{% endif %}
+    {% if order['payment_card'] > 0 %}<div class="item"><span>Kart:</span><span>{{ "%.2f"|format(order['payment_card']) }} TL</span></div>{% endif %}
+    {% if order['tip_amount'] > 0 %}<div class="item"><span>Bahşiş:</span><span>{{ "%.2f"|format(order['tip_amount']) }} TL</span></div>{% endif %}
+    
+    <div class="separator"></div>
+    <div class="center" style="white-space: pre-line;">{{ footer_note }}</div>
+</body>
+</html>

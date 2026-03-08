@@ -1,12 +1,22 @@
 import socket
 from datetime import datetime
+import database as db
 
 class ThermalPrinter:
     """XPrinter POS80 için ESC/POS komutları"""
     
-    def __init__(self, ip='192.168.1.100', port=9100):
-        self.ip = ip
-        self.port = port
+    def __init__(self, printer_type='receipt'):
+        """
+        printer_type: 'receipt' (müşteri) veya 'kitchen' (mutfak)
+        """
+        if printer_type == 'kitchen':
+            self.ip = db.get_setting('kitchen_printer_ip', '192.168.1.99')
+            self.port = int(db.get_setting('kitchen_printer_port', 9100))
+        else:
+            self.ip = db.get_setting('printer_ip', '192.168.1.99')
+            self.port = int(db.get_setting('printer_port', 9100))
+        
+        self.printer_type = printer_type
     
     def send_command(self, data):
         """Yazıcıya komut gönder"""
@@ -22,67 +32,105 @@ class ThermalPrinter:
             return False
     
     def print_receipt(self, order_data):
-        """Adisyon yazdır"""
-        # ESC/POS komutları
+        """Müşteri adisyonu yazdır"""
         ESC = b'\x1B'
-        INIT = ESC + b'@'  # Yazıcıyı başlat
-        CENTER = ESC + b'a\x01'  # Ortala
-        LEFT = ESC + b'a\x00'  # Sola hizala
-        BOLD_ON = ESC + b'E\x01'  # Kalın
-        BOLD_OFF = ESC + b'E\x00'  # Kalın kapat
-        DOUBLE_HEIGHT = ESC + b'!\x10'  # Çift yükseklik
-        NORMAL_SIZE = ESC + b'!\x00'  # Normal boyut
-        CUT = b'\x1D\x56\x00'  # Kağıdı kes
+        INIT = ESC + b'@'
+        CENTER = ESC + b'a\x01'
+        LEFT = ESC + b'a\x00'
+        BOLD_ON = ESC + b'E\x01'
+        BOLD_OFF = ESC + b'E\x00'
+        CUT = ESC + b'd\x05' + ESC + b'm'
+        
+        # Settings'ten bilgileri al
+        restaurant_name = db.get_setting('restaurant_name', 'Fırınna')
+        restaurant_address = db.get_setting('restaurant_address', '')
+        restaurant_phone = db.get_setting('restaurant_phone', '')
+        restaurant_web = db.get_setting('restaurant_web', '')
+        footer_note = db.get_setting('receipt_footer', 'Afiyet olsun!')
         
         data = INIT
         
-        # Başlık
-        data += CENTER + BOLD_ON + DOUBLE_HEIGHT
-        data += "FIRINNA\n".encode('cp857')
-        data += NORMAL_SIZE + BOLD_OFF
-        data += "Cafe & Restaurant\n".encode('cp857')
-        data += "-" * 32 + "\n"
-        
-        # Masa bilgisi
-        data += LEFT + BOLD_ON
-        data += f"MASA: {order_data['table_name']}\n".encode('cp857')
+        # Header
+        data += CENTER
+        data += BOLD_ON
+        data += f"{restaurant_name}\n".encode('cp857')
         data += BOLD_OFF
-        data += f"Tarih: {datetime.now().strftime('%d.%m.%Y %H:%M')}\n".encode('cp857')
-        data += f"Adisyon No: {order_data['order_id']}\n".encode('cp857')
-        data += "-" * 32 + "\n\n"
+        
+        if restaurant_address:
+            data += f"{restaurant_address}\n".encode('cp857')
+        if restaurant_phone:
+            data += f"Tel: {restaurant_phone}\n".encode('cp857')
+        if restaurant_web:
+            data += f"{restaurant_web}\n".encode('cp857')
+        
+        data += "================================\n".encode('cp857')
+        data += LEFT
+        
+        # Tarih/Saat
+        now = datetime.now().strftime('%d.%m.%Y %H:%M')
+        data += f"Tarih: {now}\n".encode('cp857')
+        data += f"Masa: {order_data.get('table_name', '-')}\n".encode('cp857')
+        data += f"Siparis No: {order_data.get('order_id', '-')}\n".encode('cp857')
+        data += "================================\n".encode('cp857')
         
         # Ürünler
-        data += LEFT
-        for item in order_data['items']:
-            name = item['product_name'][:20]  # Uzun isimleri kısalt
-            quantity = item['quantity']
-            price = item['price']
-            total = quantity * price
+        for item in order_data.get('items', []):
+            name = item.get('product_name', 'Urun')
+            qty = item.get('quantity', 1)
+            price = item.get('price', 0)
+            total = qty * price
             
-            line = f"{quantity}x {name}"
-            spaces = 32 - len(line) - len(f"{total:.2f}")
-            data += f"{line}{' ' * spaces}{total:.2f}\n".encode('cp857')
+            if item.get('is_complimentary'):
+                data += f"{qty}x {name}".encode('cp857')
+                data += " (IKRAM)\n".encode('cp857')
+            else:
+                line = f"{qty}x {name}"
+                price_str = f"{total:.2f} TL"
+                spaces = 32 - len(line) - len(price_str)
+                data += f"{line}{' ' * spaces}{price_str}\n".encode('cp857')
+            
+            if item.get('kitchen_notes'):
+                data += f"  Not: {item.get('kitchen_notes')}\n".encode('cp857')
         
-        data += "\n" + "=" * 32 + "\n"
+        data += "================================\n".encode('cp857')
         
         # Toplam
-        data += BOLD_ON + DOUBLE_HEIGHT
-        total_str = f"TOPLAM: {order_data['total']:.2f} TL"
-        data += total_str.encode('cp857') + "\n"
-        data += NORMAL_SIZE + BOLD_OFF
+        subtotal = order_data.get('subtotal', 0)
+        discount = order_data.get('discount_value', 0)
+        total = order_data.get('total', 0)
         
-        data += "\n" + "-" * 32 + "\n"
+        data += f"Ara Toplam:            {subtotal:.2f} TL\n".encode('cp857')
+        
+        if discount > 0:
+            discount_text = order_data.get('discount_reason', 'Indirim')
+            data += f"{discount_text}:           -{discount:.2f} TL\n".encode('cp857')
+        
+        data += BOLD_ON
+        data += f"TOPLAM:                {total:.2f} TL\n".encode('cp857')
+        data += BOLD_OFF
+        data += "================================\n".encode('cp857')
+        
+        # Ödeme bilgisi
+        if order_data.get('payment_cash', 0) > 0:
+            data += f"Nakit:                 {order_data['payment_cash']:.2f} TL\n".encode('cp857')
+        if order_data.get('payment_card', 0) > 0:
+            data += f"Kart:                  {order_data['payment_card']:.2f} TL\n".encode('cp857')
+        if order_data.get('tip_amount', 0) > 0:
+            data += f"Bahsis:                {order_data['tip_amount']:.2f} TL\n".encode('cp857')
+        
+        # Footer
+        data += "\n".encode('cp857')
         data += CENTER
-        data += "Bizi tercih ettiginiz icin\ntesekkur ederiz!\n\n".encode('cp857')
+        for line in footer_note.split('\n'):
+            data += f"{line}\n".encode('cp857')
         
-        # Kağıdı kes
-        data += b'\n\n\n'
+        data += "\n\n".encode('cp857')
         data += CUT
         
         return self.send_command(data)
     
-    def print_daily_report(self, report_data):
-        """Günlük rapor yazdır"""
+    def print_kitchen_order(self, order_data):
+        """Mutfak fişi yazdır (sadece ürünler + notlar)"""
         ESC = b'\x1B'
         INIT = ESC + b'@'
         CENTER = ESC + b'a\x01'
@@ -90,61 +138,45 @@ class ThermalPrinter:
         BOLD_ON = ESC + b'E\x01'
         BOLD_OFF = ESC + b'E\x00'
         DOUBLE_HEIGHT = ESC + b'!\x10'
-        NORMAL_SIZE = ESC + b'!\x00'
-        CUT = b'\x1D\x56\x00'
+        NORMAL = ESC + b'!\x00'
+        CUT = ESC + b'd\x05' + ESC + b'm'
         
         data = INIT
+        data += CENTER
+        data += BOLD_ON + DOUBLE_HEIGHT
+        data += "MUTFAK SIPARIS\n".encode('cp857')
+        data += NORMAL + BOLD_OFF
+        data += "================================\n".encode('cp857')
+        data += LEFT
         
-        # Başlık
-        data += CENTER + BOLD_ON + DOUBLE_HEIGHT
-        data += "GUNLUK RAPOR\n".encode('cp857')
-        data += NORMAL_SIZE + BOLD_OFF
-        data += f"{report_data['date']}\n".encode('cp857')
-        data += "-" * 32 + "\n\n"
-        
-        # Özet
-        data += LEFT + BOLD_ON
-        data += f"TOPLAM SATIS: {report_data['total_sales']:.2f} TL\n".encode('cp857')
-        data += f"TOPLAM MASRAF: {report_data['total_expenses']:.2f} TL\n".encode('cp857')
-        data += "-" * 32 + "\n"
-        data += f"NET: {report_data['net']:.2f} TL\n".encode('cp857')
+        # Tarih/Saat
+        now = datetime.now().strftime('%d.%m.%Y %H:%M')
+        data += BOLD_ON
+        data += f"MASA: {order_data.get('table_name', '-')}\n".encode('cp857')
+        data += f"Saat: {now}\n".encode('cp857')
         data += BOLD_OFF
-        data += "\n"
+        data += "================================\n".encode('cp857')
         
-        # Ürün detayları
-        if report_data['products']:
-            data += "URUN BAZLI SATIS:\n".encode('cp857')
-            data += "-" * 32 + "\n"
+        # Ürünler (ikramlar hariç)
+        for item in order_data.get('items', []):
+            if item.get('is_complimentary'):
+                continue
             
-            for product in report_data['products']:
-                name = product['name'][:15]
-                qty = product['quantity']
-                total = product['total']
-                
-                line = f"{name} x{qty}"
-                spaces = 32 - len(line) - len(f"{total:.2f}")
-                data += f"{line}{' ' * spaces}{total:.2f}\n".encode('cp857')
+            name = item.get('product_name', 'Urun')
+            qty = item.get('quantity', 1)
+            
+            data += BOLD_ON + DOUBLE_HEIGHT
+            data += f"{qty}x ".encode('cp857')
+            data += NORMAL
+            data += f"{name}\n".encode('cp857')
+            data += BOLD_OFF
+            
+            if item.get('kitchen_notes'):
+                data += f">>> {item.get('kitchen_notes')}\n".encode('cp857')
+            
+            data += "--------------------------------\n".encode('cp857')
         
-        data += b'\n\n\n'
-        data += CUT
-        
-        return self.send_command(data)
-    
-    def test_print(self):
-        """Test yazdırma"""
-        ESC = b'\x1B'
-        INIT = ESC + b'@'
-        CENTER = ESC + b'a\x01'
-        BOLD_ON = ESC + b'E\x01'
-        BOLD_OFF = ESC + b'E\x00'
-        CUT = b'\x1D\x56\x00'
-        
-        data = INIT
-        data += CENTER + BOLD_ON
-        data += "YAZICI TEST\n".encode('cp857')
-        data += BOLD_OFF
-        data += f"{datetime.now().strftime('%d.%m.%Y %H:%M:%S')}\n".encode('cp857')
-        data += "Baglanti basarili!\n\n\n".encode('cp857')
+        data += "\n\n".encode('cp857')
         data += CUT
         
         return self.send_command(data)

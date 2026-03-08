@@ -710,3 +710,39 @@ def delete_order(order_id):
     
     conn.commit()
     conn.close()
+
+def get_table_order_by_id(order_id):
+    """Order ID ile sipariş detaylarını getir (yazdırma için)"""
+    conn = get_db()
+    
+    order = conn.execute('''
+        SELECT o.*, t.name as table_name, z.name as zone_name
+        FROM orders o
+        JOIN tables t ON o.table_id = t.id
+        JOIN zones z ON t.zone_id = z.id
+        WHERE o.id = ?
+    ''', (order_id,)).fetchone()
+    
+    if not order:
+        conn.close()
+        return None
+    
+    order_dict = dict(order)
+    order_dict['order_id'] = order_id
+    
+    # Items'ları getir
+    items = conn.execute('''
+        SELECT oi.*, COALESCE(oi.product_name, p.name) as product_name
+        FROM order_items oi
+        LEFT JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ?
+    ''', (order_id,)).fetchall()
+    
+    order_dict['items'] = [dict(item) for item in items]
+    
+    # Ara toplam hesapla
+    subtotal = sum(item['quantity'] * item['price'] for item in order_dict['items'] if not item['is_complimentary'])
+    order_dict['subtotal'] = subtotal
+    
+    conn.close()
+    return order_dict

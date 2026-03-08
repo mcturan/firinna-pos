@@ -6,12 +6,6 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Yazıcı ayarları (config'den okunacak)
-PRINTER_IP = os.getenv('PRINTER_IP', '192.168.1.100')
-PRINTER_PORT = int(os.getenv('PRINTER_PORT', 9100))
-
-printer = ThermalPrinter(PRINTER_IP, PRINTER_PORT)
-
 # Ana sayfa (masalar görünümü)
 @app.route('/')
 def index():
@@ -130,27 +124,14 @@ def api_close_order(order_id):
 # API: Adisyon yazdır
 @app.route('/api/print/receipt/<int:order_id>', methods=['POST'])
 def api_print_receipt(order_id):
-    # Sipariş bilgilerini al
-    conn = db.get_db()
-    order = conn.execute('SELECT * FROM orders WHERE id = ?', (order_id,)).fetchone()
-    table = conn.execute('SELECT * FROM tables WHERE id = ?', (order['table_id'],)).fetchone()
-    items = conn.execute('''
-        SELECT oi.*, p.name as product_name
-        FROM order_items oi
-        JOIN products p ON oi.product_id = p.id
-        WHERE oi.order_id = ?
-    ''', (order_id,)).fetchall()
-    conn.close()
+    order = db.get_table_order_by_id(order_id)
+    if not order:
+        return jsonify({"success": False, "error": "Sipariş bulunamadı"})
     
-    order_data = {
-        'order_id': order['id'],
-        'table_name': table['name'],
-        'total': order['total'],
-        'items': [dict(item) for item in items]
-    }
-    
-    success = printer.print_receipt(order_data)
-    return jsonify({'success': success})
+    from printer import ThermalPrinter
+    printer = ThermalPrinter(printer_type="receipt")
+    success = printer.print_receipt(order)
+    return jsonify({"success": success})
 
 # API: Masraflar
 @app.route('/api/expenses', methods=['GET', 'POST'])
@@ -377,6 +358,104 @@ def api_update_product_name(product_id):
 def api_delete_order(order_id):
     db.delete_order(order_id)
     return jsonify({'success': True})
+
+
+# ===== MUTFAK FİŞİ =====
+
+@app.route('/api/print/kitchen/<int:order_id>', methods=['POST'])
+def api_print_kitchen(order_id):
+    order = db.get_table_order_by_id(order_id)
+    if not order:
+        return jsonify({'success': False, 'error': 'Sipariş bulunamadı'})
+    
+    # Mutfak yazıcısı kontrolü
+    kitchen_ip = db.get_setting('kitchen_printer_ip')
+    if not kitchen_ip:
+        return jsonify({'success': False, 'error': 'Mutfak yazıcısı ayarlanmamış'})
+    
+    from printer import ThermalPrinter
+    printer = ThermalPrinter(printer_type='kitchen')
+    
+    success = printer.print_kitchen_order(order)
+    return jsonify({'success': success})
+
+
+# ===== FİŞ ÖNİZLEME =====
+
+@app.route('/api/print/receipt/<int:order_id>/preview', methods=['GET'])
+def api_preview_receipt(order_id):
+    order = db.get_table_order_by_id(order_id)
+    if not order:
+        return "Sipariş bulunamadı", 404
+    
+    return render_template('receipts/customer_receipt.html',
+        order=order,
+        restaurant_name=db.get_setting('restaurant_name', 'Fırınna'),
+        restaurant_address=db.get_setting('restaurant_address', ''),
+        restaurant_phone=db.get_setting('restaurant_phone', ''),
+        footer_note=db.get_setting('receipt_footer', 'Afiyet olsun!')
+    )
+
+@app.route('/api/print/kitchen/<int:order_id>/preview', methods=['GET'])
+def api_preview_kitchen(order_id):
+    order = db.get_table_order_by_id(order_id)
+    if not order:
+        return "Sipariş bulunamadı", 404
+    
+    return render_template('receipts/kitchen_receipt.html', order=order)
+
+
+# ===== FİŞ PDF EXPORT =====
+
+@app.route('/api/print/receipt/<int:order_id>/pdf', methods=['GET'])
+def api_pdf_receipt(order_id):
+    from weasyprint import HTML
+    from io import BytesIO
+    
+    order = db.get_table_order_by_id(order_id)
+    if not order:
+        return "Sipariş bulunamadı", 404
+    
+    # HTML render et
+    html_content = render_template('receipts/customer_receipt.html',
+        order=order,
+        restaurant_name=db.get_setting('restaurant_name', 'Fırınna'),
+        restaurant_address=db.get_setting('restaurant_address', ''),
+        restaurant_phone=db.get_setting('restaurant_phone', ''),
+        footer_note=db.get_setting('receipt_footer', 'Afiyet olsun!')
+    )
+    
+    # PDF'e çevir
+    pdf_file = BytesIO()
+    HTML(string=html_content).write_pdf(pdf_file)
+    pdf_file.seek(0)
+    
+    from flask import send_file
+    return send_file(pdf_file, mimetype='application/pdf', 
+                     as_attachment=True, 
+                     download_name=f'fis_{order_id}.pdf')
+
+@app.route('/api/print/kitchen/<int:order_id>/pdf', methods=['GET'])
+def api_pdf_kitchen(order_id):
+    from weasyprint import HTML
+    from io import BytesIO
+    
+    order = db.get_table_order_by_id(order_id)
+    if not order:
+        return "Sipariş bulunamadı", 404
+    
+    # HTML render et
+    html_content = render_template('receipts/kitchen_receipt.html', order=order)
+    
+    # PDF'e çevir
+    pdf_file = BytesIO()
+    HTML(string=html_content).write_pdf(pdf_file)
+    pdf_file.seek(0)
+    
+    from flask import send_file
+    return send_file(pdf_file, mimetype='application/pdf',
+                     as_attachment=True,
+                     download_name=f'mutfak_{order_id}.pdf')
 
 if __name__ == '__main__':
     db.init_db()

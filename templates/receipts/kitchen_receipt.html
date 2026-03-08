@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mutfak Fişi - {{ order['table_name'] }}</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 300px; 
+            margin: 20px auto; 
+            padding: 20px;
+            border: 2px solid #000;
+        }
+        .header { text-align: center; font-size: 1.5em; font-weight: bold; margin-bottom: 10px; }
+        .table { font-size: 1.8em; font-weight: bold; text-align: center; margin: 15px 0; }
+        .separator { border-top: 2px solid #000; margin: 10px 0; }
+        .item { margin: 15px 0; padding: 10px; border: 1px solid #ccc; }
+        .qty { font-size: 1.5em; font-weight: bold; }
+        .note { margin-top: 5px; padding: 5px; background: #ffffcc; font-weight: bold; }
+        @media print {
+            body { border: 2px solid #000; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">MUTFAK SİPARİŞ</div>
+    <div class="separator"></div>
+    <div class="table">MASA: {{ order['table_name'] }}</div>
+    <div style="text-align: center;">{{ order['closed_at'] or order['created_at'] }}</div>
+    <div class="separator"></div>
+    
+    {% for item in order['items'] %}
+    {% if not item.is_complimentary %}
+    <div class="item">
+        <div class="qty">{{ item.quantity }}x {{ item.product_name }}</div>
+        {% if item.kitchen_notes %}
+        <div class="note">>>> {{ item.kitchen_notes }}</div>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endfor %}
+</body>
+</html>
