@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fırınna POS - Roadmap</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            color: #2d3748;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 2rem;
+            background: #f7fafc;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #718096;
+            margin-top: 0.5rem;
+        }
+        .phases {
+            padding: 2rem;
+        }
+        .phase {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .phase:hover {
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+            border-color: #667eea;
+        }
+        .phase-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f7fafc;
+        }
+        .phase-header:hover {
+            background: #edf2f7;
+        }
+        .phase-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .phase-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .badge-done {
+            background: #48bb78;
+            color: white;
+        }
+        .badge-progress {
+            background: #ed8936;
+            color: white;
+        }
+        .badge-planned {
+            background: #cbd5e0;
+            color: #4a5568;
+        }
+        .badge-cancelled {
+            background: #f56565;
+            color: white;
+        }
+        .phase-content {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            display: none;
+        }
+        .phase-content.active {
+            display: block;
+        }
+        .feature {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid #e2e8f0;
+            background: #f7fafc;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .feature.done {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+        .feature.cancelled {
+            border-left-color: #f56565;
+            background: #fff5f5;
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        .feature-icon {
+            font-size: 1.5rem;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+            transition: width 0.3s;
+        }
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+        .toggle-icon.active {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Fırınna POS</h1>
+            <p>Geliştirme Yol Haritası</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">32</div>
+                <div class="stat-label">Toplam Özellik</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="stat-label">✅ Tamamlandı</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24</div>
+                <div class="stat-label">📋 Planlandı</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">25%</div>
+                <div class="stat-label">İlerleme</div>
+            </div>
+        </div>
+
+        <div class="phases">
+            <!-- FAZ 1 -->
+            <div class="phase">
+                <div class="phase-header" onclick="togglePhase(this)">
+                    <div class="phase-title">
+                        <h2>FAZ 1: Sipariş Akışı & Ödeme</h2>
+                        <span class="phase-badge badge-done">✅ TAMAMLANDI</span>
+                    </div>
+                    <span class="toggle-icon active">▼</span>
+                </div>
+                <div class="phase-content active">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="feature done">
+                        <span class="feature-icon">✅</span>
+                        <div>
+                            <strong>#4 - Ürün Miktarı +/- Butonları</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Sipariş ekranında miktarı artırma/azaltma</p>
+                        </div>
+                    </div>
+                    <div class="feature done">
+                        <span class="feature-icon">✅</span>
+                        <div>
+                            <strong>#6 - Ürün Düzenleme & İkram</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Ürünleri ikram olarak işaretleme, düzenleme modal'ı</p>
+                        </div>
+                    </div>
+                    <div class="feature done">
+                        <span class="feature-icon">✅</span>
+                        <div>
+                            <strong>#12 - Özel Sipariş Girişi</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Menüde olmayan ürünler için özel sipariş ekleme</p>
+                        </div>
+                    </div>
+                    <div class="feature done">
+                        <span class="feature-icon">✅</span>
+                        <div>
+                            <strong>#20 - Sipariş Notu (Şefe)</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Mutfağa özel talimatlar (az acılı, ekstra sos vb.)</p>
+                        </div>
+                    </div>
+                    <div class="feature done">
+                        <span class="feature-icon">✅</span>
+                        <div>
+                            <strong>#13 - İndirim Sistemi</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Yüzde veya TL cinsinden indirim, sebep kaydı</p>
+                        </div>
+                    </div>
+                    <div class="feature done">
+                        <span class="feature-icon">✅</span>
+                        <div>
+                            <strong>#5 - Karma Ödeme</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Nakit + kart kombinasyonlu ödeme</p>
+                        </div>
+                    </div>
+                    <div class="feature done">
+                        <span class="feature-icon">✅</span>
+                        <div>
+                            <strong>#10 - Bahşiş Takibi</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Bahşiş miktarı ve ödeme yöntemi kaydı</p>
+                        </div>
+                    </div>
+                    <div class="feature done">
+                        <span class="feature-icon">✅</span>
+                        <div>
+                            <strong>#11 - Hesap Bölme</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Basit eşit bölme (kişi sayısına göre)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAZ 2 -->
+            <div class="phase">
+                <div class="phase-header" onclick="togglePhase(this)">
+                    <div class="phase-title">
+                        <h2>FAZ 2: UI İyileştirmeleri</h2>
+                        <span class="phase-badge badge-planned">📋 PLANLANDI</span>
+                    </div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="phase-content">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📋</span>
+                        <div>
+                            <strong>#1 - Kategori/Ürün Sıralama</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Drag & drop ile özel sıralama</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📋</span>
+                        <div>
+                            <strong>#2 - Ürün Arama/Filtreleme</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Hızlı ürün bulma ve filtreleme</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📋</span>
+                        <div>
+                            <strong>#3 - Hızlı Erişim Favoriler</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Sık kullanılan ürünler için favori butonu</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📋</span>
+                        <div>
+                            <strong>#7 - Sipariş Geçmişi</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Kapalı siparişleri görüntüleme ve tekrar açma</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📋</span>
+                        <div>
+                            <strong>#8 - Masaya Not</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Müşteri bilgisi, özel istekler için masa notu</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📋</span>
+                        <div>
+                            <strong>#9 - Renk/Tema Özelleştirme</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Kategori renkleri, genel tema ayarları</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAZ 3 -->
+            <div class="phase">
+                <div class="phase-header" onclick="togglePhase(this)">
+                    <div class="phase-title">
+                        <h2>FAZ 3: Yazıcı & Fiş</h2>
+                        <span class="phase-badge badge-planned">📋 PLANLANDI</span>
+                    </div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="phase-content">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📋</span>
+                        <div>
+                            <strong>#14 - Mutfak Fişi</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Ayrı mutfak yazıcısına fiş yazdırma</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📋</span>
+                        <div>
+                            <strong>#15 - Logo/Header Özelleştirme</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Fişlerde logo ve özel başlık</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📋</span>
+                        <div>
+                            <strong>#16 - Fiş Formatı Ayarları</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Tarih/saat formatı, vergi bilgisi vb.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diğer fazlar... -->
+            <div class="phase">
+                <div class="phase-header" onclick="togglePhase(this)">
+                    <div class="phase-title">
+                        <h2>FAZ 4-8: Raporlama, Kasa, Bulut, Stok, Detaylar</h2>
+                        <span class="phase-badge badge-planned">📋 PLANLANDI</span>
+                    </div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="phase-content">
+                    <p style="color: #718096; padding: 1rem;">Detaylı planlamalar roadmap belgelerinde mevcuttur.</p>
+                </div>
+            </div>
+
+            <!-- İptal Edilenler -->
+            <div class="phase">
+                <div class="phase-header" onclick="togglePhase(this)">
+                    <div class="phase-title">
+                        <h2>İptal Edilen Özellikler</h2>
+                        <span class="phase-badge badge-cancelled">❌ İPTAL</span>
+                    </div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="phase-content">
+                    <div class="feature cancelled">
+                        <span class="feature-icon">❌</span>
+                        <div>
+                            <strong>AI Asistan (v2.0'a ertelendi)</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Doğal dil ile sipariş alma - FAZ 9'a taşındı</p>
+                        </div>
+                    </div>
+                    <div class="feature cancelled">
+                        <span class="feature-icon">❌</span>
+                        <div>
+                            <strong>Lokasyonlar Arası Sync</strong>
+                            <p style="font-size: 0.9rem; color: #718096; margin-top: 0.25rem;">Manuel yapılacak, otomatik sync yok</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePhase(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            content.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
