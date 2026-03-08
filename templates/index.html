@@ -43,14 +43,14 @@
 
                     <div class="categories" id="categoriesBar"></div>
                     
-                    <button class="btn btn-warning" style="margin-bottom: 1rem; width: 100%;" onclick="openCustomItemModal()">
+                    <button class="btn btn-warning" style="margin-bottom: 1rem;" onclick="openCustomItemModal()">
                         ➕ Özel Sipariş Ekle
                     </button>
                     
                     <div class="products-grid" id="productsGrid"></div>
                 </div>
 
-                <div class="order-summary">
+                <div class="order-summary" style="min-width: 450px;">
                     <h3>Sipariş Özeti</h3>
                     <div class="order-items" id="orderItems"></div>
                     
@@ -73,9 +73,26 @@
                     </div>
 
                     <div class="order-actions">
-                        <button class="btn btn-warning" onclick="openDiscountModal()">🏷️ İndirim Ekle</button>
-                        <button class="btn btn-secondary" onclick="printReceipt()">📄 Adisyon Yazdır</button>
-                        <button class="btn btn-success" onclick="openPaymentModal()">💰 Hesap Kapat</button>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                            <button class="btn btn-warning" onclick="openDiscountModal()">🏷️ İndirim</button>
+                            <button class="btn btn-success" onclick="openPaymentModal()">💰 Hesap Öde</button>
+                        </div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem; color: #4a5568;">📄 Sipariş Fişi</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                            <button class="btn" onclick="previewReceipt()" style="background: #4299e1; color: white;">👁️ Önizle</button>
+                            <button class="btn btn-secondary" onclick="printReceipt()">🖨️ Yazdır</button>
+                        </div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem; color: #4a5568;">👨‍🍳 Mutfak Fişi</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                            <button class="btn" onclick="previewKitchen()" style="background: #48bb78; color: white;">👁️ Önizle</button>
+                            <button class="btn" onclick="printKitchen()" style="background: #38a169; color: white;">🖨️ Yazdır</button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                            <button class="btn" onclick="downloadPDF()" style="background: #ed8936; color: white;">📥</button>
+                            <button class="btn" onclick="sendToPhone()" style="background: #9f7aea; color: white;">📱</button>
+                        </div>
+                        <button class="btn" onclick="cancelOrder()" style="background: #f56565; color: white; width: 100%;">🗑️ Sipariş İptal</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -110,7 +127,7 @@
                     <div class="products-grid" id="pastProductsGrid"></div>
                 </div>
 
-                <div class="order-summary">
+                <div class="order-summary" style="min-width: 450px;">
                     <h3>Sipariş Sepeti</h3>
                     <div class="order-items" id="pastOrderItems"></div>
                     
@@ -1182,3 +1199,85 @@
     </script>
 </body>
 </html>
+<script>
+// Fiş önizleme fonksiyonları
+function previewReceipt() {
+    if (!currentOrder || !currentOrder.id) {
+        alert('Önce siparişi kaydedin!');
+        return;
+    }
+    window.open(`/api/print/receipt/${currentOrder.id}/preview`, '_blank');
+}
+
+function previewKitchen() {
+    if (!currentOrder || !currentOrder.id) {
+        alert('Önce siparişi kaydedin!');
+        return;
+    }
+    window.open(`/api/print/kitchen/${currentOrder.id}/preview`, '_blank');
+}
+
+function downloadPDF() {
+
+function printKitchen() {
+    if (!currentOrder || !currentOrder.id) {
+        alert("Önce siparişi kaydedin!");
+        return;
+    }
+    fetch(`/api/print/kitchen/${currentOrder.id}`, {method: "POST"})
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert("Mutfak fişi yazıcıya gönderildi!");
+            } else {
+                alert("Yazıcı hatası: " + (data.error || "Bilinmeyen hata"));
+            }
+        });
+}
+
+function sendToPhone() {
+    if (!currentOrder || !currentOrder.id) {
+        alert("Önce siparişi kaydedin!");
+        return;
+    }
+    const phone = prompt("Telefon numarası (5XX XXX XX XX):");
+    if (!phone) return;
+    alert("WhatsApp entegrasyonu yakında eklenecek!");
+}
+
+function cancelOrder() {
+    if (!confirm("Bu siparişi iptal etmek istediğinize emin misiniz?\n\nTüm ürünler silinecek ve sipariş kaydedilmeyecek!")) return;
+    document.getElementById("orderModal").style.display = "none";
+    currentOrder = null;
+    selectZone(currentZone);
+}
+    if (!currentOrder || !currentOrder.id) {
+        alert('Önce siparişi kaydedin!');
+        return;
+    }
+    
+    const menu = document.createElement('div');
+    menu.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 10000;';
+    menu.innerHTML = `
+        <h3 style="margin-bottom: 1rem;">PDF İndir</h3>
+        <button onclick="window.open('/api/print/receipt/${currentOrder.id}/pdf'); document.body.removeChild(this.parentElement.parentElement);" 
+                style="display: block; width: 100%; padding: 1rem; margin: 0.5rem 0; background: #4299e1; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            📄 Müşteri Fişi
+        </button>
+        <button onclick="window.open('/api/print/kitchen/${currentOrder.id}/pdf'); document.body.removeChild(this.parentElement.parentElement);" 
+                style="display: block; width: 100%; padding: 1rem; margin: 0.5rem 0; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            👨‍🍳 Mutfak Fişi
+        </button>
+        <button onclick="document.body.removeChild(this.parentElement.parentElement);" 
+                style="display: block; width: 100%; padding: 1rem; margin: 0.5rem 0; background: #718096; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            ❌ İptal
+        </button>
+    `;
+    
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999;';
+    overlay.onclick = () => document.body.removeChild(overlay);
+    overlay.appendChild(menu);
+    document.body.appendChild(overlay);
+}
+</script>
