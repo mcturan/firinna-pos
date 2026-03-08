@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fırınna POS - Sürüm Notları</title>
+    <title>Fırınna POS - Changelog</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -11,7 +11,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 2rem;
             color: #2d3748;
-            line-height: 1.6;
         }
         .container {
             max-width: 900px;
@@ -35,13 +34,30 @@
             font-size: 1.2rem;
             opacity: 0.9;
         }
-        .content {
+        .timeline {
             padding: 2rem;
         }
         .version {
-            border-left: 4px solid #667eea;
-            padding-left: 1.5rem;
-            margin-bottom: 3rem;
+            position: relative;
+            padding-left: 3rem;
+            padding-bottom: 3rem;
+            border-left: 3px solid #e2e8f0;
+        }
+        .version:last-child {
+            border-left-color: transparent;
+            padding-bottom: 0;
+        }
+        .version::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 0;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #667eea;
         }
         .version-header {
             display: flex;
@@ -50,320 +66,165 @@
             margin-bottom: 1rem;
         }
         .version-number {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #667eea;
         }
         .version-date {
             color: #718096;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
         .version-badge {
             padding: 0.25rem 0.75rem;
             border-radius: 12px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             background: #48bb78;
             color: white;
         }
-        .section {
-            margin-bottom: 2rem;
+        .changes {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .change-section {
+            margin-bottom: 1.5rem;
+        }
+        .change-section:last-child {
+            margin-bottom: 0;
         }
         .section-title {
-            font-size: 1.3rem;
-            color: #2d3748;
+            font-weight: 600;
+            color: #667eea;
             margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        .section-icon {
-            font-size: 1.5rem;
-        }
         .change-list {
             list-style: none;
         }
-        .change-item {
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            background: #f7fafc;
-            border-radius: 8px;
-            border-left: 3px solid #cbd5e0;
-        }
-        .change-item.added {
-            background: #f0fff4;
-            border-left-color: #48bb78;
-        }
-        .change-item.changed {
-            background: #fffaf0;
-            border-left-color: #ed8936;
-        }
-        .change-item.fixed {
-            background: #ebf8ff;
-            border-left-color: #4299e1;
-        }
-        .change-item.removed {
-            background: #fff5f5;
-            border-left-color: #f56565;
-        }
-        .change-title {
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 0.25rem;
-        }
-        .change-desc {
-            font-size: 0.9rem;
-            color: #718096;
-        }
-        .tech-details {
-            background: #edf2f7;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-top: 1.5rem;
-        }
-        .tech-title {
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #4a5568;
-        }
-        .tech-list {
-            list-style: none;
-            font-size: 0.95rem;
-            color: #718096;
-        }
-        .tech-list li {
-            padding: 0.25rem 0;
+        .change-list li {
+            padding: 0.5rem 0;
             padding-left: 1.5rem;
             position: relative;
         }
-        .tech-list li:before {
-            content: "→";
+        .change-list li::before {
+            content: '•';
             position: absolute;
-            left: 0;
+            left: 0.5rem;
             color: #667eea;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        .stat-box {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            border: 2px solid #e2e8f0;
-        }
-        .stat-value {
-            font-size: 2rem;
             font-weight: bold;
-            color: #667eea;
-        }
-        .stat-label {
-            font-size: 0.85rem;
-            color: #718096;
-            margin-top: 0.25rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📝 Sürüm Notları</h1>
-            <p>Fırınna POS - Değişiklik Geçmişi</p>
+            <h1>📝 Changelog</h1>
+            <p>Fırınna POS Sürüm Geçmişi</p>
         </div>
 
-        <div class="content">
+        <div class="timeline">
+            <!-- v0.2.0 - FAZ 2 -->
+            <div class="version">
+                <div class="version-header">
+                    <span class="version-number">v0.2.0</span>
+                    <span class="version-badge">FAZ 2</span>
+                    <span class="version-date">8 Mart 2026</span>
+                </div>
+                <div class="changes">
+                    <div class="change-section">
+                        <div class="section-title">✨ Yeni Özellikler</div>
+                        <ul class="change-list">
+                            <li><strong>Ürün Arama:</strong> Sipariş modal'ında 🔍 arama kutusu ile hızlı ürün bulma</li>
+                            <li><strong>Favori Ürünler:</strong> ⭐ yıldız ikonu ile sık kullanılan ürünleri işaretleme</li>
+                            <li><strong>Sipariş Geçmişi:</strong> Navbar'da 📜 Geçmiş butonu, kapalı siparişleri görüntüleme</li>
+                            <li><strong>Tarih Filtresi:</strong> Sipariş geçmişinde tarihe göre filtreleme</li>
+                            <li><strong>Sipariş Yeniden Açma:</strong> Kapalı siparişleri "Tekrar Aç" butonu ile aktif hale getirme</li>
+                            <li><strong>Masa Notları:</strong> Masa kartlarında 📝 not ikonu, müşteri bilgisi ve özel istekler için</li>
+                            <li><strong>Tema Altyapısı:</strong> Settings tablosu oluşturuldu (gelecek sürümler için)</li>
+                            <li><strong>Sıralama Altyapısı:</strong> Kategoriler ve ürünler için sort_order kolonları</li>
+                        </ul>
+                    </div>
+
+                    <div class="change-section">
+                        <div class="section-title">🔧 Backend Değişiklikleri</div>
+                        <ul class="change-list">
+                            <li>9 yeni API endpoint eklendi</li>
+                            <li>11 yeni database fonksiyonu (search, favorites, history, notes, settings)</li>
+                            <li>Migration: 5 yeni kolon (sort_order x2, is_favorite, table_note, settings table)</li>
+                        </ul>
+                    </div>
+
+                    <div class="change-section">
+                        <div class="section-title">🎨 Frontend İyileştirmeleri</div>
+                        <ul class="change-list">
+                            <li>2 yeni modal (Sipariş Geçmişi, Masa Notu)</li>
+                            <li>Arama kutusu dinamik filtreleme</li>
+                            <li>Favori butonları toggle animasyonu</li>
+                            <li>Masa kartlarında not ikonu göstergesi</li>
+                        </ul>
+                    </div>
+
+                    <div class="change-section">
+                        <div class="section-title">📊 API Endpoints (Yeni)</div>
+                        <ul class="change-list">
+                            <li>PATCH /api/categories/&lt;id&gt;/order - Kategori sıralaması</li>
+                            <li>PATCH /api/products/&lt;id&gt;/order - Ürün sıralaması</li>
+                            <li>PATCH /api/products/&lt;id&gt;/favorite - Favori toggle</li>
+                            <li>GET /api/products/search?q=... - Ürün arama</li>
+                            <li>GET /api/orders/history?date=... - Sipariş geçmişi</li>
+                            <li>POST /api/orders/&lt;id&gt;/reopen - Sipariş yeniden açma</li>
+                            <li>PATCH /api/tables/&lt;id&gt;/note - Masa notu güncelleme</li>
+                            <li>GET/PUT /api/settings/&lt;key&gt; - Ayar yönetimi</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- v0.1.0 - FAZ 1 -->
             <div class="version">
                 <div class="version-header">
                     <span class="version-number">v0.1.0</span>
-                    <span class="version-badge">SON SÜRÜM</span>
-                    <span class="version-date">8 Mart 2026</span>
-                </div>
-
-                <div class="section">
-                    <h3 class="section-title">
-                        <span class="section-icon">✨</span>
-                        Yeni Özellikler (FAZ 1)
-                    </h3>
-                    <ul class="change-list">
-                        <li class="change-item added">
-                            <div class="change-title">#4 - Ürün Miktarı Kontrolleri</div>
-                            <div class="change-desc">Sipariş ekranında her ürünün yanına + ve - butonları eklendi. Miktar değiştirildiğinde otomatik güncelleme.</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">#6 - Ürün Düzenleme ve İkram Sistemi</div>
-                            <div class="change-desc">✏️ butonu ile ürünleri düzenleme modal'ı. İkram checkbox'ı ile ücretsiz ürün işaretleme. İkram ürünler fiyata dahil edilmiyor.</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">#12 - Özel Sipariş Girişi</div>
-                            <div class="change-desc">"Özel Sipariş Ekle" butonu ile menüde olmayan ürünler için ad ve fiyat girişi. product_name kolonu ile database desteği.</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">#20 - Şefe Özel Notlar</div>
-                            <div class="change-desc">Her ürün için mutfağa özel talimat girişi (az acılı, ekstra sos, vb.). kitchen_notes alanı ile kayıt.</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">#13 - İndirim Sistemi</div>
-                            <div class="change-desc">Yüzde (%) veya sabit tutar (TL) cinsinden indirim uygulama. İndirim sebebi kaydı (Öğrenci, Komşu, Personel, Kampanya, Diğer).</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">#5 - Karma Ödeme</div>
-                            <div class="change-desc">Nakit + kart kombinasyonlu ödeme desteği. Kalan tutar göstergesi ile eksik/fazla kontrol.</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">#10 - Bahşiş Takibi</div>
-                            <div class="change-desc">Bahşiş miktarı ve ödeme yöntemi (nakit/kart) kaydı. Raporlamada ayrı gösterim.</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">#11 - Basit Hesap Bölme</div>
-                            <div class="change-desc">Kişi sayısına göre eşit hesap bölme. Kişi başı tutar hesaplama.</div>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="section">
-                    <h3 class="section-title">
-                        <span class="section-icon">🔧</span>
-                        Teknik Değişiklikler
-                    </h3>
-                    <ul class="change-list">
-                        <li class="change-item changed">
-                            <div class="change-title">Database Migration</div>
-                            <div class="change-desc">order_items tablosuna product_name kolonu eklendi. is_complimentary ve kitchen_notes kolonları eklendi. orders tablosuna indirim ve ödeme kolonları eklendi.</div>
-                        </li>
-                        <li class="change-item changed">
-                            <div class="change-title">LEFT JOIN Desteği</div>
-                            <div class="change-desc">Özel siparişler (product_id NULL) için LEFT JOIN ile product_name birleştirme. COALESCE ile öncelik sıralaması.</div>
-                        </li>
-                        <li class="change-item changed">
-                            <div class="change-title">Yeni API Endpoints</div>
-                            <div class="change-desc">7 yeni endpoint: quantity güncelleme, item düzenleme, özel sipariş, indirim, karma ödeme, hesap bölme.</div>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="section">
-                    <h3 class="section-title">
-                        <span class="section-icon">🐛</span>
-                        Hata Düzeltmeleri
-                    </h3>
-                    <ul class="change-list">
-                        <li class="change-item fixed">
-                            <div class="change-title">product_name NULL Hatası</div>
-                            <div class="change-desc">Normal ürünlerde product_name NULL gelme sorunu COALESCE ile çözüldü.</div>
-                        </li>
-                        <li class="change-item fixed">
-                            <div class="change-title">Route Tanıma Sorunu</div>
-                            <div class="change-desc">İki kere if __name__ bloğu nedeniyle yeni route'lar yüklenmiyordu. Eski blok silindi.</div>
-                        </li>
-                        <li class="change-item fixed">
-                            <div class="change-title">Özel Sipariş Görünmeme</div>
-                            <div class="change-desc">INNER JOIN yerine LEFT JOIN kullanımıyla özel siparişler artık listede görünüyor.</div>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="tech-details">
-                    <div class="tech-title">📊 Teknik Detaylar</div>
-                    <div class="stats-grid">
-                        <div class="stat-box">
-                            <div class="stat-value">550+</div>
-                            <div class="stat-label">Yeni Kod Satırı</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">15+</div>
-                            <div class="stat-label">Yeni Fonksiyon</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">7</div>
-                            <div class="stat-label">API Endpoint</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">9</div>
-                            <div class="stat-label">DB Kolonu</div>
-                        </div>
-                    </div>
-                    <ul class="tech-list">
-                        <li><strong>app.py:</strong> 287 satır (+66 satır)</li>
-                        <li><strong>database.py:</strong> 515 satır (+128 satır)</li>
-                        <li><strong>templates/index.html:</strong> 610 satır (+356 satır)</li>
-                        <li><strong>Yeni Dosyalar:</strong> migration_faz1.py, .gitignore</li>
-                        <li><strong>Geliştirme Süresi:</strong> ~4 saat</li>
-                        <li><strong>GitHub Commits:</strong> 3 commit</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- v0.0.1 - İlk Sürüm -->
-            <div class="version">
-                <div class="version-header">
-                    <span class="version-number">v0.0.1</span>
+                    <span class="version-badge">FAZ 1</span>
                     <span class="version-date">7 Mart 2026</span>
                 </div>
+                <div class="changes">
+                    <div class="change-section">
+                        <div class="section-title">✨ İlk Sürüm Özellikleri</div>
+                        <ul class="change-list">
+                            <li><strong>Ürün Miktarı +/- Butonları:</strong> Sipariş ekranında miktarı artırma/azaltma</li>
+                            <li><strong>Ürün Düzenleme & İkram:</strong> Ürünleri ikram olarak işaretleme, düzenleme modal'ı</li>
+                            <li><strong>Özel Sipariş:</strong> Menüde olmayan ürünler için özel sipariş ekleme</li>
+                            <li><strong>Şefe Not:</strong> Mutfağa özel talimatlar (az acılı, ekstra sos vb.)</li>
+                            <li><strong>İndirim Sistemi:</strong> Yüzde veya TL cinsinden indirim, sebep kaydı</li>
+                            <li><strong>Karma Ödeme:</strong> Nakit + kart kombinasyonlu ödeme</li>
+                            <li><strong>Bahşiş Takibi:</strong> Bahşiş miktarı ve ödeme yöntemi kaydı</li>
+                            <li><strong>Hesap Bölme:</strong> Basit eşit bölme (kişi sayısına göre)</li>
+                        </ul>
+                    </div>
 
-                <div class="section">
-                    <h3 class="section-title">
-                        <span class="section-icon">🎉</span>
-                        İlk Kurulum
-                    </h3>
-                    <ul class="change-list">
-                        <li class="change-item added">
-                            <div class="change-title">Temel POS Yapısı</div>
-                            <div class="change-desc">Flask backend, SQLite database, basit sipariş ve masa yönetimi.</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">Masa Sistemi</div>
-                            <div class="change-desc">Bölge ve masa yönetimi, dolu/boş göstergesi.</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">Kategori & Ürün</div>
-                            <div class="change-desc">Kategori bazlı ürün gösterimi, fiyat takibi.</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">Basit Sipariş</div>
-                            <div class="change-desc">Ürün ekleme, silme, sipariş kapama.</div>
-                        </li>
-                        <li class="change-item added">
-                            <div class="change-title">Thermal Printer</div>
-                            <div class="change-desc">XPrinter POS80 desteği, adisyon yazdırma.</div>
-                        </div>
-                    </ul>
-                </div>
-            </div>
+                    <div class="change-section">
+                        <div class="section-title">🔧 Teknik Altyapı</div>
+                        <ul class="change-list">
+                            <li>Flask backend kurulumu</li>
+                            <li>SQLite database şeması</li>
+                            <li>Masa/bölge yönetimi</li>
+                            <li>Sipariş takibi sistemi</li>
+                            <li>Adisyon yazdırma (XPrinter desteği)</li>
+                        </ul>
+                    </div>
 
-            <!-- Gelecek Sürümler -->
-            <div class="version">
-                <div class="version-header">
-                    <span class="version-number">v0.2.0</span>
-                    <span class="version-badge" style="background: #cbd5e0; color: #4a5568;">PLANLANDI</span>
-                    <span class="version-date">Mart 2026</span>
-                </div>
-
-                <div class="section">
-                    <h3 class="section-title">
-                        <span class="section-icon">🎨</span>
-                        FAZ 2 - UI İyileştirmeleri
-                    </h3>
-                    <ul class="change-list">
-                        <li class="change-item" style="opacity: 0.6;">
-                            <div class="change-title">#1 - Kategori/Ürün Sıralama</div>
-                            <div class="change-desc">Drag & drop ile özel sıralama</div>
-                        </li>
-                        <li class="change-item" style="opacity: 0.6;">
-                            <div class="change-title">#2 - Ürün Arama/Filtreleme</div>
-                            <div class="change-desc">Hızlı ürün bulma</div>
-                        </li>
-                        <li class="change-item" style="opacity: 0.6;">
-                            <div class="change-title">#3 - Hızlı Erişim Favoriler</div>
-                            <div class="change-desc">Sık kullanılan ürünler</div>
-                        </li>
-                        <li class="change-item" style="opacity: 0.6;">
-                            <div class="change-title">+ 3 özellik daha...</div>
-                        </li>
-                    </ul>
+                    <div class="change-section">
+                        <div class="section-title">🎨 Arayüz</div>
+                        <ul class="change-list">
+                            <li>Responsive tasarım</li>
+                            <li>5 modal (Sipariş, Özel Sipariş, İndirim, Ödeme, Ürün Düzenleme)</li>
+                            <li>Kategori bazlı ürün görünümü</li>
+                            <li>Masa durumu göstergeleri (boş/dolu)</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
