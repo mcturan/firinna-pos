@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stok - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .stok-tabs { display:flex; gap:0; border-bottom:2px solid #e2e8f0; margin-bottom:1.5rem; }
+        .stok-tab { padding:.75rem 1.5rem; border:none; background:none; font-size:1rem; font-weight:600; color:#718096; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; }
+        .stok-tab.active { color:#2d6a4f; border-bottom-color:#2d6a4f; }
+
+        .stok-table { width:100%; border-collapse:collapse; font-size:.9rem; }
+        .stok-table th { background:#f7fafc; padding:.7rem .75rem; text-align:left; color:#4a5568; font-weight:600; border-bottom:2px solid #e2e8f0; }
+        .stok-table td { padding:.65rem .75rem; border-bottom:1px solid #f0f0f0; }
+        .stok-table tr:hover td { background:#fafafa; }
+        .qty-low { color:#e53e3e; font-weight:700; }
+        .qty-ok { color:#2d6a4f; font-weight:700; }
+
+        .add-form-card { background:white; border-radius:12px; padding:1.25rem; box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.5rem; }
+        .add-form-card h4 { margin:0 0 1rem; color:#4a5568; }
+        .form-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:flex-end; }
+        .form-row input, .form-row select { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; }
+        .form-row input[type=text] { flex:2; min-width:130px; }
+        .form-row input[type=number] { flex:1; min-width:90px; }
+        .form-row select { flex:1; min-width:90px; }
+
+        .move-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1000; align-items:center; justify-content:center; }
+        .move-modal.open { display:flex; }
+        .move-box { background:white; border-radius:14px; padding:2rem; min-width:360px; max-width:95vw; }
+        .move-box h3 { margin:0 0 1.5rem; }
+
+        .no-data { text-align:center; color:#a0aec0; padding:2rem; }
+        .badge { padding:.2rem .6rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .badge-in { background:#d1fae5; color:#065f46; }
+        .badge-out { background:#fee2e2; color:#991b1b; }
+        .badge-adj { background:#fef3c7; color:#92400e; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🍽️ Fırınna POS</div>
+        <div class="nav-links">
+            <a href="/">Masalar</a>
+            <a href="/products">Ürünler</a>
+            <a href="/kasa">Kasa</a>
+            <a href="/stok" class="active">Stok</a>
+            <a href="/recete">Reçete</a>
+            <a href="/expenses">Masraflar</a>
+            <a href="/tables">Masa Yönetimi</a>
+            <a href="/reports">Raporlar</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 style="margin-bottom:1.5rem;">📦 Stok Yönetimi</h1>
+
+        <div class="stok-tabs">
+            <button class="stok-tab" onclick="switchTab('ozet')" id="tab-ozet">📊 Stok Özeti</button>
+            <button class="stok-tab active" onclick="switchTab('stok')" id="tab-stok">📦 Kalemler</button>
+            <button class="stok-tab" onclick="switchTab('hareketler')" id="tab-hareketler">📋 Hareketler</button>
+        </div>
+        <!-- ÖZET PANELİ -->
+        <div id="panel-ozet" style="display:none;"></div>
+
+        <!-- STOK KALEMLERİ -->
+        <div id="panel-stok">
+            <div class="add-form-card">
+                <h4>➕ Yeni Stok Kalemi</h4>
+                <div class="form-row">
+                    <input type="text" id="sName" placeholder="Ürün adı (örn: Domates)">
+                    <select id="sUnit">
+                        <option value="kg">kg</option>
+                        <option value="gr">gr</option>
+                        <option value="lt">lt</option>
+                        <option value="ml">ml</option>
+                        <option value="adet">adet</option>
+                        <option value="paket">paket</option>
+                        <option value="dilim">dilim</option>
+                    </select>
+                    <select id="sCat">
+                        <option>Sebze/Meyve</option>
+                        <option>Et/Tavuk</option>
+                        <option>Süt Ürünleri</option>
+                        <option>Tahıl/Un</option>
+                        <option>Baharat</option>
+                        <option>İçecek</option>
+                        <option>Temizlik</option>
+                        <option>Genel</option>
+                    </select>
+                    <input type="number" id="sMinQty" placeholder="Min stok" step="0.01" min="0">
+                    <input type="number" id="sCost" placeholder="Birim maliyet ₺" step="0.01" min="0">
+                    <button class="btn btn-primary" onclick="addStockItem()">Ekle</button>
+                </div>
+            </div>
+
+            <div id="stockList"><div class="no-data">⏳ Yükleniyor...</div></div>
+        </div>
+
+        <!-- HAREKETLER -->
+        <div id="panel-hareketler" style="display:none;">
+            <div id="movementList"><div class="no-data">⏳ Yükleniyor...</div></div>
+        </div>
+    </div>
+
+    <!-- Hareket Modal -->
+    <div class="move-modal" id="moveModal">
+        <div class="move-box">
+            <h3 id="moveTitle">Stok Hareketi</h3>
+            <input type="hidden" id="moveItemId">
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+                <div>
+                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">İşlem Türü</label>
+                    <select id="moveType" onchange="onMoveTypeChange()" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;">
+                        <option value="in">▲ Giriş (Alım)</option>
+                        <option value="out">▼ Çıkış (Kullanım/Fire)</option>
+                        <option value="adjust">⚖️ Düzeltme (Sayım)</option>
+                    </select>
+                </div>
+                <div id="movePaymentDiv">
+                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Ödeme Kaynağı</label>
+                    <select id="movePayment" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;">
+                        <option value="cash">💵 Nakit Kasa</option>
+                        <option value="card">💳 Banka Kasa</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Miktar (<span id="moveUnit"></span>)</label>
+                    <input type="number" id="moveQty" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0">
+                </div>
+                <div>
+                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Maliyet ₺ (opsiyonel)</label>
+                    <input type="number" id="moveCost" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0.00">
+                </div>
+                <div>
+                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Açıklama</label>
+                    <input type="text" id="moveDesc" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="örn: Migros alımı">
+                </div>
+                <div style="display:flex;gap:.75rem;justify-content:flex-end;">
+                    <button class="btn btn-secondary" onclick="closeMoveModal()">İptal</button>
+                    <button class="btn btn-primary" onclick="saveMovement()">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let stockItems = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStock();
+        });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.stok-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('panel-ozet').style.display = tab === 'ozet' ? 'block' : 'none';
+            document.getElementById('panel-stok').style.display = tab === 'stok' ? 'block' : 'none';
+            document.getElementById('panel-hareketler').style.display = tab === 'hareketler' ? 'block' : 'none';
+            if (tab === 'hareketler') loadMovements();
+            if (tab === 'ozet') renderOzet();
+        }
+
+        function renderOzet() {
+            if (stockItems.length === 0) {
+                document.getElementById('panel-ozet').innerHTML = '<div class="no-data">Henüz stok kalemi yok.</div>';
+                return;
+            }
+            const cats = {};
+            stockItems.forEach(s => { if (!cats[s.category]) cats[s.category] = []; cats[s.category].push(s); });
+
+            let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem;">';
+            Object.entries(cats).forEach(([cat, items]) => {
+                html += `<div style="background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.07);">
+                    <h4 style="margin:0 0 1rem;color:#4a5568;border-bottom:2px solid #e2e8f0;padding-bottom:.5rem;">${cat}</h4>`;
+                items.forEach(s => {
+                    const qty = s.current_qty || 0;
+                    const low = qty <= s.min_quantity;
+                    const pct = s.min_quantity > 0 ? Math.min(100, Math.round(qty / (s.min_quantity * 2) * 100)) : 50;
+                    html += `<div style="margin-bottom:.9rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;">
+                            <span style="font-weight:600;font-size:.9rem;">${s.name}</span>
+                            <span style="font-weight:700;font-size:.95rem;color:${low?'#e53e3e':'#2d6a4f'};">
+                                ${qty.toFixed(2)} ${s.unit} ${low?'⚠️':''}
+                            </span>
+                        </div>
+                        <div style="height:6px;background:#e2e8f0;border-radius:3px;">
+                            <div style="height:100%;width:${pct}%;background:${low?'#fc8181':'#48bb78'};border-radius:3px;transition:width .4s;"></div>
+                        </div>
+                        ${s.min_quantity > 0 ? `<div style="font-size:.72rem;color:#a0aec0;margin-top:.2rem;">Min: ${s.min_quantity} ${s.unit}</div>` : ''}
+                    </div>`;
+                });
+                html += '</div>';
+            });
+            html += '</div>';
+            document.getElementById('panel-ozet').innerHTML = html;
+        }
+
+        function editStokItem(id) {
+            const btn = document.getElementById('stok-btn-' + id);
+            const name = btn.dataset.name;
+            const unit = btn.dataset.unit;
+            const cat = btn.dataset.cat;
+            const minQty = parseFloat(btn.dataset.min) || 0;
+            const cost = parseFloat(btn.dataset.cost) || 0;
+            const units = ['kg','gr','lt','ml','adet','paket','dilim'];
+            const cats = ['Sebze/Meyve','Et/Tavuk','Süt Ürünleri','Tahıl/Un','Baharat','İçecek','Temizlik','Genel'];
+            const unitOpts = units.map(u => `<option ${u===unit?'selected':''}>${u}</option>`).join('');
+            const catOpts = cats.map(c => `<option ${c===cat?'selected':''}>${c}</option>`).join('');
+            const modal = document.createElement('div');
+            modal.id = 'editStokModal';
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:14px;padding:2rem;min-width:340px;max-width:95vw;">
+                    <h3 style="margin:0 0 1.5rem;">✏️ Düzenle: ${name}</h3>
+                    <div style="display:flex;flex-direction:column;gap:1rem;">
+                        <div><label style="font-weight:600;display:block;margin-bottom:.3rem;">İsim</label>
+                            <input type="text" id="ei-name" value="${name}" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;box-sizing:border-box;"></div>
+                        <div style="display:flex;gap:.75rem;">
+                            <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Birim</label>
+                                <select id="ei-unit" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;">${unitOpts}</select></div>
+                            <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Kategori</label>
+                                <select id="ei-cat" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;">${catOpts}</select></div>
+                        </div>
+                        <div style="display:flex;gap:.75rem;">
+                            <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Min Stok</label>
+                                <input type="number" id="ei-min" value="${minQty}" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;box-sizing:border-box;"></div>
+                            <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Birim Maliyet ₺</label>
+                                <input type="number" id="ei-cost" value="${cost}" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;box-sizing:border-box;"></div>
+                        </div>
+                        <div style="display:flex;gap:.75rem;justify-content:flex-end;margin-top:.5rem;">
+                            <button class="btn btn-secondary" onclick="document.getElementById('editStokModal').remove()">İptal</button>
+                            <button class="btn btn-primary" onclick="saveStokEdit(${id})">Kaydet</button>
+                        </div>
+                    </div>
+                </div>`;
+            document.body.appendChild(modal);
+        }
+
+        async function saveStokEdit(id) {
+            const name = document.getElementById('ei-name').value.trim();
+            const unit = document.getElementById('ei-unit').value;
+            const cat = document.getElementById('ei-cat').value;
+            const minQty = parseFloat(document.getElementById('ei-min').value) || 0;
+            const cost = parseFloat(document.getElementById('ei-cost').value) || 0;
+            if (!name) { alert('İsim gerekli.'); return; }
+            await fetch('/api/stock/' + id, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name, unit, category:cat, min_quantity:minQty, cost_per_unit:cost})
+            });
+            document.getElementById('editStokModal').remove();
+            loadStock();
+        }
+
+        async function deleteStokItem(id) {
+            const name = document.getElementById('stok-del-' + id).dataset.name;
+            if (!confirm(`"${name}" silinsin mi?\nReçete veya harekette kullanılıyorsa silinmez.`)) return;
+            const res = await fetch('/api/stock/' + id, {method: 'DELETE'});
+            const data = await res.json();
+            if (!data.success) { alert('⚠️ ' + data.error); return; }
+            loadStock();
+        }
+
+        async function loadStock() {
+            stockItems = await fetch('/api/stock').then(r => r.json());
+            const list = document.getElementById('stockList');
+            if (stockItems.length === 0) {
+                list.innerHTML = '<div class="no-data">Henüz stok kalemi yok. Yukarıdan ekleyin.</div>';
+                return;
+            }
+            let bycat = {};
+            stockItems.forEach(s => { if (!bycat[s.category]) bycat[s.category] = []; bycat[s.category].push(s); });
+            let html = '<table class="stok-table"><thead><tr><th>Ürün</th><th>Kategori</th><th>Birim</th><th>Güncel Stok</th><th>Min</th><th>Birim Maliyet</th><th></th></tr></thead><tbody>';
+            Object.entries(bycat).forEach(([cat, items]) => {
+                items.forEach(s => {
+                    const qty = s.current_qty || 0;
+                    const low = qty <= s.min_quantity;
+                    html += `<tr>
+                        <td><strong>${s.name}</strong></td>
+                        <td><span style="color:#718096;font-size:.85rem;">${s.category}</span></td>
+                        <td>${s.unit}</td>
+                        <td class="${low ? 'qty-low' : 'qty-ok'}">${qty.toFixed(2)} ${s.unit} ${low ? '⚠️' : ''}</td>
+                        <td style="color:#a0aec0;">${s.min_quantity} ${s.unit}</td>
+                        <td style="color:#718096;">${s.cost_per_unit ? s.cost_per_unit.toFixed(2) + ' ₺' : '—'}</td>
+                        <td style="white-space:nowrap;">
+                            <button class="btn btn-secondary" style="padding:.35rem .75rem;font-size:.85rem;" onclick="openMoveModal(${s.id},'${s.name}','${s.unit}')">📥 Hareket</button>
+                            <button style="background:none;border:none;cursor:pointer;font-size:1rem;padding:0 .3rem;" onclick="editStokItem(${s.id})" data-name="${s.name}" data-unit="${s.unit}" data-cat="${s.category}" data-min="${s.min_quantity||0}" data-cost="${s.cost_per_unit||0}" id="stok-btn-${s.id}" title="Düzenle">✏️</button>
+                            <button style="background:none;border:none;cursor:pointer;font-size:1rem;padding:0 .3rem;" onclick="deleteStokItem(${s.id})" data-name="${s.name}" id="stok-del-${s.id}">🗑️</button>
+                        </td>
+                    </tr>`;
+                });
+            });
+            html += '</tbody></table>';
+            list.innerHTML = html;
+        }
+
+        function editMovement(id, qty, cost) {
+            const row = document.getElementById('mrow-' + id);
+            const cells = row.querySelectorAll('td');
+            cells[3].innerHTML = `<input type="number" id="mq-${id}" value="${qty}" step="0.001" min="0" style="width:75px;padding:.3rem;border:2px solid #4299e1;border-radius:6px;">`;
+            cells[4].innerHTML = `<input type="number" id="mc-${id}" value="${cost}" step="0.01" min="0" style="width:75px;padding:.3rem;border:2px solid #4299e1;border-radius:6px;">`;
+            cells[6].innerHTML = `
+                <button class="btn btn-primary" style="padding:.3rem .6rem;font-size:.82rem;" onclick="saveMovement2(${id})">✓</button>
+                <button class="btn btn-secondary" style="padding:.3rem .6rem;font-size:.82rem;" onclick="loadMovements()">✕</button>`;
+        }
+        async function saveMovement2(id) {
+            const qty = parseFloat(document.getElementById('mq-' + id).value);
+            const cost = parseFloat(document.getElementById('mc-' + id).value) || 0;
+            if (isNaN(qty) || qty <= 0) { alert('Geçerli miktar girin.'); return; }
+            await fetch('/api/stock/movements/' + id, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({quantity: qty, cost, description: ''})
+            });
+            loadMovements(); loadStock();
+        }
+        async function deleteMovement(id) {
+            if (!confirm('Bu hareketi silmek istiyor musun?')) return;
+            const res = await fetch('/api/stock/movements/' + id, {method: 'DELETE'});
+            const d = await res.json();
+            if (!d.success) { alert('⚠️ ' + d.error); return; }
+            loadMovements(); loadStock();
+        }
+
+        async function loadMovements() {
+            const moves = await fetch('/api/stock/movements').then(r => r.json());
+            const list = document.getElementById('movementList');
+            if (moves.length === 0) { list.innerHTML = '<div class="no-data">Hareket yok.</div>'; return; }
+            const typeLabel = { in: 'Giriş', out: 'Çıkış', adjust: 'Düzeltme' };
+            const typeBadge = { in: 'badge-in', out: 'badge-out', adjust: 'badge-adj' };
+            list.innerHTML = `<table class="stok-table">
+                <thead><tr><th>Tarih</th><th>Ürün</th><th>İşlem</th><th>Miktar</th><th>Maliyet</th><th>Açıklama</th><th></th></tr></thead>
+                <tbody>${moves.map(m => {
+                    const dt = new Date(m.created_at).toLocaleDateString('tr-TR');
+                    const canEdit = m.reason !== 'satis';
+                    return `<tr id="mrow-${m.id}">
+                        <td style="color:#718096;font-size:.82rem;">${dt}</td>
+                        <td><strong>${m.item_name}</strong></td>
+                        <td><span class="badge ${typeBadge[m.movement_type]}">${typeLabel[m.movement_type]}</span></td>
+                        <td>${m.quantity} ${m.unit}</td>
+                        <td>${m.cost ? m.cost.toFixed(2) + ' ₺' : '—'}</td>
+                        <td style="color:#4a5568;">${m.description || m.reason || '—'}</td>
+                        <td>${canEdit ? `<button style="background:none;border:none;cursor:pointer;" onclick="editMovement(${m.id},${m.quantity},${m.cost||0})">✏️</button><button style="background:none;border:none;cursor:pointer;" onclick="deleteMovement(${m.id})">🗑️</button>` : ''}</td>
+                    </tr>`;
+                }).join('')}</tbody>
+            </table>`;
+        }
+
+        async function addStockItem() {
+            const name = document.getElementById('sName').value.trim();
+            const unit = document.getElementById('sUnit').value;
+            const cat = document.getElementById('sCat').value;
+            const minQty = parseFloat(document.getElementById('sMinQty').value) || 0;
+            const cost = parseFloat(document.getElementById('sCost').value) || 0;
+            if (!name) { alert('Ürün adı gerekli.'); return; }
+            await fetch('/api/stock', {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name, unit, category:cat, min_quantity:minQty, cost_per_unit:cost})
+            });
+            document.getElementById('sName').value = '';
+            document.getElementById('sMinQty').value = '';
+            document.getElementById('sCost').value = '';
+            loadStock();
+        }
+
+        function openMoveModal(id, name, unit) {
+            document.getElementById('moveItemId').value = id;
+            document.getElementById('moveTitle').textContent = '📥 ' + name;
+            document.getElementById('moveUnit').textContent = unit;
+            document.getElementById('moveQty').value = '';
+            document.getElementById('moveCost').value = '';
+            document.getElementById('moveDesc').value = '';
+            document.getElementById('moveModal').classList.add('open');
+        }
+        function closeMoveModal() { document.getElementById('moveModal').classList.remove('open'); }
+
+        function onMoveTypeChange() {
+            const type = document.getElementById('moveType').value;
+            document.getElementById('movePaymentDiv').style.display = type === 'in' ? 'block' : 'none';
+        }
+
+        async function saveMovement() {
+            const id = document.getElementById('moveItemId').value;
+            const type = document.getElementById('moveType').value;
+            const qty = parseFloat(document.getElementById('moveQty').value);
+            const cost = parseFloat(document.getElementById('moveCost').value) || 0;
+            const desc = document.getElementById('moveDesc').value.trim();
+            const payment = document.getElementById('movePayment').value;
+            if (isNaN(qty) || qty <= 0) { alert('Geçerli bir miktar girin.'); return; }
+            await fetch(`/api/stock/${id}/movement`, {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    movement_type: type, quantity: qty, cost,
+                    payment_method: payment,
+                    reason: type==='adjust'?'duzeltme':type==='in'?'alim':'manuel',
+                    description: desc
+                })
+            });
+            closeMoveModal();
+            loadStock();
+        }
+    </script>
+</body>
+</html>

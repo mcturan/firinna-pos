@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasa - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .kasa-tabs { display:flex; gap:0; border-bottom:2px solid #e2e8f0; margin-bottom:1.5rem; }
+        .kasa-tab { padding:.75rem 1.75rem; border:none; background:none; font-size:1rem; font-weight:600; color:#718096; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; }
+        .kasa-tab:hover { color:#2d6a4f; }
+        .kasa-tab.active { color:#2d6a4f; border-bottom-color:#2d6a4f; }
+
+        .period-bar { display:flex; gap:.75rem; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; }
+        .period-bar input { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; }
+        .period-btn { padding:.5rem 1rem; border:2px solid #e2e8f0; border-radius:8px; background:white; font-size:.9rem; cursor:pointer; font-weight:600; color:#718096; }
+        .period-btn.active { border-color:#2d6a4f; color:#2d6a4f; background:#f0fdf4; }
+
+        .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+        .sum-card { background:white; border-radius:12px; padding:1.2rem; box-shadow:0 2px 8px rgba(0,0,0,.07); text-align:center; }
+        .sum-val { font-size:1.5rem; font-weight:800; }
+        .sum-val.green { color:#2d6a4f; }
+        .sum-val.red { color:#e53e3e; }
+        .sum-val.blue { color:#3b82f6; }
+        .sum-val.orange { color:#ed8936; }
+        .sum-label { font-size:.78rem; color:#a0aec0; margin-top:.3rem; }
+
+        .tx-table { width:100%; border-collapse:collapse; font-size:.9rem; }
+        .tx-table th { background:#f7fafc; padding:.65rem .75rem; text-align:left; color:#4a5568; font-weight:600; border-bottom:2px solid #e2e8f0; }
+        .tx-table td { padding:.6rem .75rem; border-bottom:1px solid #f0f0f0; }
+        .tx-table tr:hover td { background:#fafafa; }
+        .badge-in { background:#d1fae5; color:#065f46; padding:.2rem .6rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .badge-out { background:#fee2e2; color:#991b1b; padding:.2rem .6rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .cat-badge { background:#e2e8f0; color:#4a5568; padding:.15rem .5rem; border-radius:20px; font-size:.72rem; }
+
+        .add-tx-form { background:white; border-radius:12px; padding:1.25rem; box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.5rem; }
+        .add-tx-form h4 { margin:0 0 1rem; color:#4a5568; }
+        .tx-inputs { display:flex; gap:.5rem; flex-wrap:wrap; align-items:flex-end; }
+        .tx-inputs select, .tx-inputs input { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; }
+        .tx-inputs input[type=text] { flex:2; min-width:150px; }
+        .tx-inputs input[type=number] { flex:1; min-width:100px; }
+        .no-data { text-align:center; color:#a0aec0; padding:2rem; }
+        .btn-del { background:none; border:none; cursor:pointer; color:#cbd5e0; font-size:.9rem; }
+        .btn-del:hover { color:#e53e3e; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🍽️ Fırınna POS</div>
+        <div class="nav-links">
+            <a href="/">Masalar</a>
+            <a href="/products">Ürünler</a>
+            <a href="/kasa" class="active">Kasa</a>
+            <a href="/stok">Stok</a>
+            <a href="/expenses">Masraflar</a>
+            <a href="/tables">Masa Yönetimi</a>
+            <a href="/reports">Raporlar</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+            <h1 style="margin:0;">💰 Kasa</h1>
+            <div class="period-bar" style="margin:0;">
+                <button class="period-btn active" onclick="setPeriod('daily')" id="pb-daily">Bugün</button>
+                <button class="period-btn" onclick="setPeriod('weekly')" id="pb-weekly">Bu Hafta</button>
+                <button class="period-btn" onclick="setPeriod('monthly')" id="pb-monthly">Bu Ay</button>
+                <button class="period-btn" onclick="setPeriod('custom')" id="pb-custom">Özel</button>
+                <input type="date" id="dateInput" style="display:none;">
+                <span id="customRange" style="display:none;gap:.5rem;align-items:center;">
+                    <input type="date" id="customStart">
+                    <span>—</span>
+                    <input type="date" id="customEnd">
+                </span>
+                <button class="btn btn-primary" onclick="loadAll()" style="padding:.5rem 1rem;">Getir</button>
+            </div>
+        </div>
+
+        <!-- Sekmeler -->
+        <div class="kasa-tabs">
+            <button class="kasa-tab" onclick="switchKasa('nakit')" id="tab-nakit">💵 Nakit Kasa</button>
+            <button class="kasa-tab" onclick="switchKasa('kart')" id="tab-kart">💳 Banka Kasa</button>
+            <button class="kasa-tab active" onclick="switchKasa('ana')" id="tab-ana">📊 Ana Kasa</button>
+        </div>
+
+        <div id="kasaContent"><div class="no-data">⏳ Yükleniyor...</div></div>
+    </div>
+
+    <script>
+        let currentKasa = 'ana';
+        let currentPeriod = 'daily';
+        let data = { nakit: null, kart: null, ana: null };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateInput').value = today;
+            document.getElementById('customStart').value = today;
+            document.getElementById('customEnd').value = today;
+            loadAll();
+        });
+
+        function setPeriod(p) {
+            currentPeriod = p;
+            document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('pb-' + p).classList.add('active');
+            document.getElementById('dateInput').style.display = p === 'daily' ? 'block' : 'none';
+            document.getElementById('customRange').style.display = p === 'custom' ? 'flex' : 'none';
+        }
+
+        function getParams() {
+            let url = '?period=' + currentPeriod;
+            if (currentPeriod === 'daily') url += '&date=' + document.getElementById('dateInput').value;
+            else if (currentPeriod === 'custom') {
+                url += '&start=' + document.getElementById('customStart').value;
+                url += '&end=' + document.getElementById('customEnd').value;
+            }
+            return url;
+        }
+
+        async function loadAll() {
+            document.getElementById('kasaContent').innerHTML = '<div class="no-data">⏳ Yükleniyor...</div>';
+            const base = getParams();
+            const [nakit, kart, ana] = await Promise.all([
+                fetch('/api/kasa/data' + base + '&method=cash').then(r => r.json()),
+                fetch('/api/kasa/data' + base + '&method=card').then(r => r.json()),
+                fetch('/api/kasa/data' + base).then(r => r.json()),
+            ]);
+            data = { nakit, kart, ana };
+            renderKasa();
+        }
+
+        function switchKasa(tab) {
+            currentKasa = tab;
+            document.querySelectorAll('.kasa-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            renderKasa();
+        }
+
+        function fmt(n) { return (n||0).toFixed(2) + ' ₺'; }
+        const catLabel = { satis:'Satış', bahsis:'Bahşiş', masraf:'Masraf', stok_alim:'Stok Alım', sarf:'Sarf', duzeltme:'Düzeltme', Genel:'Genel' };
+        const methodLabel = { cash:'Nakit', card:'Kart' };
+
+        function renderKasa() {
+            const d = data[currentKasa];
+            if (!d) { document.getElementById('kasaContent').innerHTML = '<div class="no-data">Veri yok</div>'; return; }
+
+            const isAna = currentKasa === 'ana';
+            const txRows = d.movements.map(m => `
+                <tr>
+                    <td style="color:#718096;font-size:.82rem;">${m.date}</td>
+                    <td><span class="${m.type==='in'?'badge-in':'badge-out'}">${m.type==='in'?'▲ GİRİŞ':'▼ ÇIKIŞ'}</span></td>
+                    <td>${m.description || '—'}</td>
+                    <td><span class="cat-badge">${catLabel[m.category]||m.category}</span></td>
+                    ${isAna ? `<td><span class="cat-badge">${methodLabel[m.payment_method]||m.payment_method}</span></td>` : ''}
+                    <td style="font-weight:700;color:${m.type==='in'?'#2d6a4f':'#e53e3e'};">${m.type==='in'?'+':'−'}${m.amount.toFixed(2)} ₺</td>
+                    <td>${m.related_order_id ? '' : `<button class="btn-del" onclick="delTx(${m.id})">🗑️</button>`}</td>
+                </tr>`).join('');
+
+            document.getElementById('kasaContent').innerHTML = `
+                <!-- Özet kartlar -->
+                <div class="summary-grid">
+                    <div class="sum-card"><div class="sum-val green">${fmt(d.income)}</div><div class="sum-label">Toplam Giriş</div></div>
+                    <div class="sum-card"><div class="sum-val">${fmt(d.satis)}</div><div class="sum-label">Satış</div></div>
+                    <div class="sum-card"><div class="sum-val orange">${fmt(d.bahsis)}</div><div class="sum-label">Bahşiş</div></div>
+                    <div class="sum-card"><div class="sum-val red">${fmt(d.outcome)}</div><div class="sum-label">Toplam Çıkış</div></div>
+                    <div class="sum-card"><div class="sum-val red">${fmt(d.masraf)}</div><div class="sum-label">Masraf</div></div>
+                    <div class="sum-card"><div class="sum-val red">${fmt(d.stok_alim)}</div><div class="sum-label">Stok Alım</div></div>
+                    <div class="sum-card"><div class="sum-val ${d.net>=0?'green':'red'}" style="font-size:1.8rem;">${fmt(d.net)}</div><div class="sum-label">Net Kasa</div></div>
+                </div>
+
+                <!-- Manuel işlem ekle -->
+                <div class="add-tx-form">
+                    <h4>➕ Manuel İşlem Ekle <span style="font-size:.78rem;font-weight:400;color:#a0aec0;">(Masraflar için ayrı sayfa)</span></h4>
+                    <div class="tx-inputs">
+                        <select id="txType">
+                            <option value="out">▼ Çıkış</option>
+                            <option value="in">▲ Giriş</option>
+                        </select>
+                        <select id="txCat" onchange="onCatChange()">
+                            <option value="stok_alim">Stok Alım</option>
+                            <option value="sarf">Sarf Malzeme</option>
+                            <option value="duzeltme">Düzeltme</option>
+                            <option value="in_transfer">Nakit Giriş</option>
+                            <option value="Genel">Diğer</option>
+                        </select>
+                        <select id="txStokItem" style="display:none;flex:2;min-width:150px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;"></select>
+                        <input type="text" id="txDesc" placeholder="Açıklama">
+                        <select id="txMethod">
+                            <option value="cash">Nakit</option>
+                            <option value="card">Kart</option>
+                        </select>
+                        <input type="number" id="txAmount" placeholder="Tutar ₺" step="0.01" min="0">
+                        <button class="btn btn-warning" onclick="addTx()">Ekle</button>
+                    </div>
+                </div>
+
+                <!-- İşlem listesi -->
+                <h3 style="color:#2d3748;margin-bottom:.75rem;">📋 İşlem Listesi</h3>
+                ${d.movements.length === 0
+                    ? '<div class="no-data">Bu dönemde işlem yok.</div>'
+                    : `<table class="tx-table">
+                        <thead><tr>
+                            <th>Tarih</th><th>Tür</th><th>Açıklama</th><th>Kategori</th>
+                            ${isAna ? '<th>Kasa</th>' : ''}
+                            <th>Tutar</th><th></th>
+                        </tr></thead>
+                        <tbody>${txRows}</tbody>
+                    </table>`}
+            `;
+        }
+
+        let stockItemsCache = [];
+
+        async function loadStockItems() {
+            if (stockItemsCache.length > 0) return;
+            stockItemsCache = await fetch('/api/stock').then(r => r.json());
+        }
+
+        function onCatChange() {
+            const cat = document.getElementById('txCat').value;
+            const stokSel = document.getElementById('txStokItem');
+            const descInput = document.getElementById('txDesc');
+            if (cat === 'stok_alim') {
+                loadStockItems().then(() => {
+                    stokSel.innerHTML = stockItemsCache.map(s =>
+                        `<option value="${s.name}">${s.name} (${s.unit})</option>`).join('');
+                    stokSel.style.display = 'block';
+                    descInput.style.display = 'none';
+                });
+            } else {
+                stokSel.style.display = 'none';
+                descInput.style.display = 'block';
+            }
+        }
+
+        async function addTx() {
+            const type = document.getElementById('txType').value;
+            const cat = document.getElementById('txCat').value;
+            const method = currentKasa === 'kart' ? 'card' : document.getElementById('txMethod').value;
+            const amount = parseFloat(document.getElementById('txAmount').value);
+            let desc;
+            if (cat === 'stok_alim') {
+                desc = document.getElementById('txStokItem').value;
+            } else {
+                desc = document.getElementById('txDesc').value.trim();
+            }
+            if (!desc || isNaN(amount) || amount <= 0) { alert('Açıklama ve tutar gerekli.'); return; }
+            await fetch('/api/transactions', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({type, amount, category:cat, payment_method:method, description:desc})
+            });
+            document.getElementById('txDesc').value = '';
+            document.getElementById('txAmount').value = '';
+            loadAll();
+        }
+
+        async function delTx(id) {
+            if (!confirm('Bu işlemi silmek istediğine emin misin?')) return;
+            await fetch(`/api/transactions/${id}`, {method:'DELETE'});
+            loadAll();
+        }
+    </script>
+</body>
+</html>

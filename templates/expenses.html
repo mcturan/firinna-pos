@@ -5,6 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masraflar - Fırınna POS</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .exp-tabs { display:flex; gap:0; border-bottom:2px solid #e2e8f0; margin-bottom:1.5rem; }
+        .exp-tab { padding:.75rem 1.5rem; border:none; background:none; font-size:1rem; font-weight:600; color:#718096; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; }
+        .exp-tab:hover { color:#2d6a4f; }
+        .exp-tab.active { color:#2d6a4f; border-bottom-color:#2d6a4f; }
+
+        .add-card { background:white; border-radius:12px; padding:1.5rem; box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.5rem; }
+        .add-card h4 { margin:0 0 1rem; color:#4a5568; }
+        .form-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:flex-end; }
+        .form-row input, .form-row select { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; }
+        .form-row input[type=text] { flex:2; min-width:150px; }
+        .form-row input[type=number] { flex:1; min-width:100px; }
+        .form-row select { flex:1; min-width:120px; }
+
+        .exp-table { width:100%; border-collapse:collapse; font-size:.9rem; }
+        .exp-table th { background:#f7fafc; padding:.7rem .75rem; text-align:left; color:#4a5568; font-weight:600; border-bottom:2px solid #e2e8f0; }
+        .exp-table td { padding:.65rem .75rem; border-bottom:1px solid #f0f0f0; }
+        .exp-table tr:hover td { background:#fafafa; }
+
+        .cat-card { background:white; border-radius:12px; padding:1.25rem; box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1rem; }
+        .cat-card h4 { margin:0 0 .75rem; display:flex; justify-content:space-between; color:#2d3748; }
+        .cat-row { display:flex; justify-content:space-between; align-items:center; padding:.4rem 0; border-bottom:1px solid #f0f0f0; font-size:.9rem; color:#4a5568; }
+        .cat-row:last-child { border-bottom:none; }
+        .cat-total { font-weight:700; color:#e53e3e; }
+        .badge-cash { background:#d1fae5; color:#065f46; padding:.15rem .5rem; border-radius:12px; font-size:.75rem; }
+        .badge-card { background:#dbeafe; color:#1e40af; padding:.15rem .5rem; border-radius:12px; font-size:.75rem; }
+
+        .filter-bar { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-bottom:1.5rem; }
+        .filter-bar input { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; }
+        .period-btn { padding:.5rem 1rem; border:2px solid #e2e8f0; border-radius:8px; background:white; font-size:.9rem; cursor:pointer; font-weight:600; color:#718096; }
+        .period-btn.active { border-color:#2d6a4f; color:#2d6a4f; background:#f0fdf4; }
+
+        .total-bar { background:#2d6a4f; color:white; padding:1rem 1.5rem; border-radius:12px; display:flex; justify-content:space-between; margin-bottom:1.5rem; font-weight:700; font-size:1.1rem; }
+
+        .btn-del { background:none; border:none; cursor:pointer; color:#cbd5e0; font-size:.9rem; }
+        .btn-del:hover { color:#e53e3e; }
+        .no-data { text-align:center; color:#a0aec0; padding:2rem; }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -12,145 +50,290 @@
         <div class="nav-links">
             <a href="/">Masalar</a>
             <a href="/products">Ürünler</a>
-            <a href="/tables">Masa Yönetimi</a>
+            <a href="/kasa">Kasa</a>
+            <a href="/stok">Stok</a>
+            <a href="/recete">Reçete</a>
             <a href="/expenses" class="active">Masraflar</a>
+            <a href="/tables">Masa Yönetimi</a>
             <a href="/reports">Raporlar</a>
         </div>
     </nav>
 
     <div class="container">
-        <div class="management-section">
-            <h2>Masraf Ekle</h2>
-            <form id="expenseForm" class="add-form">
-                <input type="text" id="expenseDescription" placeholder="Açıklama" required>
-                <select id="expenseCategory">
-                    <option value="Genel">Genel</option>
-                    <option value="Malzeme">Malzeme</option>
-                    <option value="Personel">Personel</option>
+        <h1 style="margin-bottom:1.5rem;">📤 Masraf Yönetimi</h1>
+
+        <!-- Masraf Ekle -->
+        <div class="add-card">
+            <h4>➕ Masraf Ekle</h4>
+            <div class="form-row">
+                <select id="expCat" onchange="updateSubcats()">
+                    <option value="Faturalar">Faturalar</option>
                     <option value="Kira">Kira</option>
-                    <option value="Fatura">Fatura</option>
+                    <option value="Personel">Personel</option>
+                    <option value="Malzeme">Malzeme</option>
+                    <option value="Temizlik">Temizlik</option>
+                    <option value="Tamir/Bakım">Tamir/Bakım</option>
+                    <option value="Demirbaş">Demirbaş</option>
+                    <option value="Pazarlama">Pazarlama</option>
                     <option value="Diğer">Diğer</option>
                 </select>
-                <input type="number" id="expenseAmount" placeholder="Tutar" step="0.01" required>
-                <button type="submit" class="btn btn-primary">➕ Ekle</button>
-            </form>
+                <select id="expSubcat">
+                    <option value="">Alt başlık seç...</option>
+                </select>
+                <input type="text" id="expDesc" placeholder="Açıklama (örn: Şubat elektrik faturası)">
+                <select id="expPayment">
+                    <option value="cash">💵 Nakit Kasa</option>
+                    <option value="card">💳 Banka Kasa</option>
+                </select>
+                <input type="number" id="expAmount" placeholder="Tutar ₺" step="0.01" min="0">
+                <button class="btn btn-primary" onclick="addExpense()">Ekle</button>
+            </div>
         </div>
 
-        <div class="management-section">
-            <h2>Masraf Listesi</h2>
-            
-            <div class="filters">
-                <input type="date" id="startDate">
-                <input type="date" id="endDate">
-                <button class="btn btn-secondary" onclick="filterExpenses()">Filtrele</button>
-                <button class="btn btn-secondary" onclick="clearFilters()">Temizle</button>
-            </div>
-            
-            <div id="expensesList" class="items-list"></div>
-            
-            <div class="expense-summary">
-                <strong>Toplam Masraf:</strong>
-                <span id="totalExpenses">0.00 TL</span>
-            </div>
+        <!-- Dönem filtresi -->
+        <div class="filter-bar">
+            <button class="period-btn active" onclick="setPeriod('monthly')" id="pb-monthly">Bu Ay</button>
+            <button class="period-btn" onclick="setPeriod('weekly')" id="pb-weekly">Bu Hafta</button>
+            <button class="period-btn" onclick="setPeriod('all')" id="pb-all">Tümü</button>
+            <button class="period-btn" onclick="setPeriod('custom')" id="pb-custom">Özel</button>
+            <span id="customRange" style="display:none;gap:.5rem;align-items:center;display:none;">
+                <input type="date" id="customStart">
+                <span>—</span>
+                <input type="date" id="customEnd">
+            </span>
+            <button class="btn btn-secondary" onclick="loadAll()" style="padding:.5rem 1rem;">Getir</button>
         </div>
+
+        <!-- Sekmeler -->
+        <div class="exp-tabs">
+            <button class="exp-tab active" onclick="switchTab('liste')" id="tab-liste">📋 Liste</button>
+            <button class="exp-tab" onclick="switchTab('ozet')" id="tab-ozet">📊 Kategori Özeti</button>
+        </div>
+
+        <div id="totalBar" style="display:none;" class="total-bar">
+            <span>Toplam Masraf</span>
+            <span id="totalAmount">0.00 ₺</span>
+        </div>
+
+        <div id="panel-liste"></div>
+        <div id="panel-ozet" style="display:none;"></div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            loadExpenses();
+        const SUBCATS = {
+            'Faturalar':    ['Elektrik','Su','Doğalgaz','İnternet','Telefon','Abonelik'],
+            'Kira':         ['Kira','Depozito','Aidat'],
+            'Personel':     ['Maaş','Sigorta','İkramiye'],
+            'Malzeme':      ['Gıda','Ambalaj','Tek Kullanımlık'],
+            'Temizlik':     ['Deterjan','Sarf Malzeme','Dezenfektan'],
+            'Tamir/Bakım':  ['Cihaz Tamiri','Bina Bakım','Servis'],
+            'Demirbaş':     ['Ekipman','Mobilya','Elektronik'],
+            'Pazarlama':    ['Reklam','Sosyal Medya','Tanıtım'],
+            'Diğer':        ['Diğer'],
+        };
 
-            // Bugünün tarihini varsayılan olarak ayarla
+        let currentPeriod = 'monthly';
+
+        document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('startDate').value = today;
-            document.getElementById('endDate').value = today;
-
-            document.getElementById('expenseForm').onsubmit = async function(e) {
-                e.preventDefault();
-                
-                const description = document.getElementById('expenseDescription').value;
-                const category = document.getElementById('expenseCategory').value;
-                const amount = parseFloat(document.getElementById('expenseAmount').value);
-                
-                await fetch('/api/expenses', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({description, category, amount})
-                });
-                
-                document.getElementById('expenseForm').reset();
-                loadExpenses();
-            };
+            document.getElementById('customStart').value = today;
+            document.getElementById('customEnd').value = today;
+            updateSubcats();
+            loadAll();
         });
 
-        async function loadExpenses(startDate = null, endDate = null) {
+        function updateSubcats() {
+            const cat = document.getElementById('expCat').value;
+            const subs = SUBCATS[cat] || ['Diğer'];
+            document.getElementById('expSubcat').innerHTML =
+                '<option value="">Alt başlık seç...</option>' +
+                subs.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+
+        function setPeriod(p) {
+            currentPeriod = p;
+            document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('pb-' + p).classList.add('active');
+            const cr = document.getElementById('customRange');
+            cr.style.display = p === 'custom' ? 'flex' : 'none';
+        }
+
+        function getDateRange() {
+            const today = new Date();
+            if (currentPeriod === 'weekly') {
+                const mon = new Date(today);
+                mon.setDate(today.getDate() - today.getDay() + 1);
+                return [mon.toISOString().split('T')[0], today.toISOString().split('T')[0]];
+            } else if (currentPeriod === 'monthly') {
+                return [today.toISOString().split('T')[0].slice(0,8) + '01', today.toISOString().split('T')[0]];
+            } else if (currentPeriod === 'custom') {
+                return [document.getElementById('customStart').value, document.getElementById('customEnd').value];
+            }
+            return [null, null];
+        }
+
+        async function loadAll() {
+            const [start, end] = getDateRange();
             let url = '/api/expenses';
-            if (startDate && endDate) {
-                url += `?start_date=${startDate}&end_date=${endDate}`;
-            }
-            
+            if (start && end) url += `?start_date=${start}&end_date=${end}`;
             const expenses = await fetch(url).then(r => r.json());
-            const expensesList = document.getElementById('expensesList');
-            const totalExpenses = document.getElementById('totalExpenses');
-            
+
+            let sumUrl = '/api/expenses/summary';
+            if (start && end) sumUrl += `?start=${start}&end=${end}`;
+            const summary = await fetch(sumUrl).then(r => r.json());
+
+            renderListe(expenses);
+            renderOzet(summary);
+
+            const total = expenses.reduce((s, e) => s + e.amount, 0);
+            document.getElementById('totalAmount').textContent = total.toFixed(2) + ' ₺';
+            document.getElementById('totalBar').style.display = expenses.length > 0 ? 'flex' : 'none';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.exp-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('panel-liste').style.display = tab === 'liste' ? 'block' : 'none';
+            document.getElementById('panel-ozet').style.display = tab === 'ozet' ? 'block' : 'none';
+        }
+
+        function renderListe(expenses) {
             if (expenses.length === 0) {
-                expensesList.innerHTML = '<p class="no-data">Henüz masraf kaydı yok</p>';
-                totalExpenses.textContent = '0.00 TL';
+                document.getElementById('panel-liste').innerHTML = '<div class="no-data">Bu dönemde masraf yok.</div>';
                 return;
             }
-            
-            expensesList.innerHTML = expenses.map(exp => {
-                const date = new Date(exp.created_at).toLocaleDateString('tr-TR');
-                const time = new Date(exp.created_at).toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'});
-                
-                return `
-                    <div class="item-row">
-                        <div class="item-info">
-                            <span class="item-name">${exp.description}</span>
-                            <span class="item-meta">${exp.category} • ${date} ${time}</span>
-                        </div>
-                        <div class="expense-amount">
-                            <strong>${exp.amount.toFixed(2)} TL</strong>
-                            <button class="btn-delete" onclick="deleteExpense(${exp.id})">🗑️</button>
-                        </div>
-                    </div>
-                `;
+            const rows = expenses.map(e => {
+                const dt = new Date(e.created_at).toLocaleDateString('tr-TR');
+                const tm = new Date(e.created_at).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+                const pm = e.payment_method === 'card'
+                    ? '<span class="badge-card">Kart</span>'
+                    : '<span class="badge-cash">Nakit</span>';
+                return `<tr id="exp-row-${e.id}">
+                    <td style="color:#718096;font-size:.82rem;">${dt} ${tm}</td>
+                    <td><strong>${e.category}</strong>${e.subcategory ? ' / <span style="color:#718096;">'+e.subcategory+'</span>' : ''}</td>
+                    <td>${e.description}</td>
+                    <td>${pm}</td>
+                    <td style="font-weight:700;color:#e53e3e;">${e.amount.toFixed(2)} ₺</td>
+                    <td>
+                        <button style="background:none;border:none;cursor:pointer;" onclick="editExpense(${e.id})"
+                            data-desc="${e.description}" data-amount="${e.amount}"
+                            data-cat="${e.category}" data-sub="${e.subcategory||''}"
+                            data-pm="${e.payment_method||'cash'}" id="exp-btn-${e.id}">✏️</button>
+                        <button class="btn-del" onclick="deleteExpense(${e.id})">🗑️</button>
+                    </td>
+                </tr>`;
             }).join('');
-            
-            const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-            totalExpenses.textContent = total.toFixed(2) + ' TL';
+            document.getElementById('panel-liste').innerHTML = `
+                <table class="exp-table">
+                    <thead><tr><th>Tarih</th><th>Kategori</th><th>Açıklama</th><th>Ödeme</th><th>Tutar</th><th></th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>`;
         }
 
-        function filterExpenses() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            
-            if (!startDate || !endDate) {
-                alert('Lütfen tarih aralığı seçin!');
+        function renderOzet(summary) {
+            if (summary.length === 0) {
+                document.getElementById('panel-ozet').innerHTML = '<div class="no-data">Bu dönemde masraf yok.</div>';
                 return;
             }
-            
-            loadExpenses(startDate, endDate);
+            // Kategoriye göre grupla
+            const cats = {};
+            summary.forEach(r => {
+                if (!cats[r.category]) cats[r.category] = { total: 0, items: [] };
+                cats[r.category].total += r.total;
+                cats[r.category].items.push(r);
+            });
+            const sortedCats = Object.entries(cats).sort((a,b) => b[1].total - a[1].total);
+            const grandTotal = sortedCats.reduce((s,[,v]) => s + v.total, 0);
+            const maxTotal = sortedCats[0][1].total;
+
+            let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;">';
+            sortedCats.forEach(([cat, data]) => {
+                const pct = Math.round(data.total / grandTotal * 100);
+                const barPct = Math.round(data.total / maxTotal * 100);
+                const subRows = data.items.map(i => `
+                    <div class="cat-row">
+                        <span>${i.subcategory || '—'} <span class="${i.payment_method==='card'?'badge-card':'badge-cash'}">${i.payment_method==='card'?'Kart':'Nakit'}</span></span>
+                        <span>${i.count} işlem · <strong>${i.total.toFixed(2)} ₺</strong></span>
+                    </div>`).join('');
+                html += `<div class="cat-card">
+                    <h4>
+                        <span>${cat}</span>
+                        <span class="cat-total">${data.total.toFixed(2)} ₺ <span style="color:#a0aec0;font-weight:400;font-size:.82rem;">(${pct}%)</span></span>
+                    </h4>
+                    <div style="height:6px;background:#e2e8f0;border-radius:3px;margin-bottom:.75rem;">
+                        <div style="height:100%;width:${barPct}%;background:#e53e3e;border-radius:3px;"></div>
+                    </div>
+                    ${subRows}
+                </div>`;
+            });
+            html += '</div>';
+            document.getElementById('panel-ozet').innerHTML = html;
         }
 
-        function clearFilters() {
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
-            loadExpenses();
+        async function addExpense() {
+            const cat = document.getElementById('expCat').value;
+            const sub = document.getElementById('expSubcat').value;
+            const desc = document.getElementById('expDesc').value.trim();
+            const pm = document.getElementById('expPayment').value;
+            const amount = parseFloat(document.getElementById('expAmount').value);
+            if (!desc || isNaN(amount) || amount <= 0) { alert('Açıklama ve tutar gerekli.'); return; }
+            await fetch('/api/expenses', {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({description:desc, amount, category:cat, subcategory:sub, payment_method:pm})
+            });
+            document.getElementById('expDesc').value = '';
+            document.getElementById('expAmount').value = '';
+            loadAll();
+        }
+
+        function editExpense(id) {
+            const btn = document.getElementById('exp-btn-' + id);
+            const row = document.getElementById('exp-row-' + id);
+            const desc = btn.dataset.desc;
+            const amount = btn.dataset.amount;
+            const cat = btn.dataset.cat;
+            const sub = btn.dataset.sub;
+            const pm = btn.dataset.pm;
+            const catOpts = Object.keys(SUBCATS).map(c=>`<option ${c===cat?'selected':''}>${c}</option>`).join('');
+            const subs = SUBCATS[cat] || ['Diğer'];
+            const subOpts = subs.map(s=>`<option ${s===sub?'selected':''}>${s}</option>`).join('');
+            const pmOpts = `<option value="cash" ${pm==='cash'?'selected':''}>💵 Nakit</option><option value="card" ${pm==='card'?'selected':''}>💳 Kart</option>`;
+            row.innerHTML = `
+                <td colspan="4">
+                    <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">
+                        <select id="ec-cat-${id}" style="padding:.4rem;border:2px solid #4299e1;border-radius:6px;font-size:.88rem;">${catOpts}</select>
+                        <select id="ec-sub-${id}" style="padding:.4rem;border:2px solid #4299e1;border-radius:6px;font-size:.88rem;">${subOpts}</select>
+                        <input type="text" id="ec-desc-${id}" value="${desc}" style="flex:2;min-width:120px;padding:.4rem;border:2px solid #4299e1;border-radius:6px;font-size:.88rem;">
+                        <select id="ec-pm-${id}" style="padding:.4rem;border:2px solid #4299e1;border-radius:6px;font-size:.88rem;">${pmOpts}</select>
+                    </div>
+                </td>
+                <td><input type="number" id="ec-amt-${id}" value="${amount}" step="0.01" style="width:90px;padding:.4rem;border:2px solid #4299e1;border-radius:6px;font-size:.88rem;"></td>
+                <td>
+                    <button class="btn btn-primary" style="padding:.35rem .6rem;" onclick="saveExpenseEdit(${id})">✓</button>
+                    <button class="btn btn-secondary" style="padding:.35rem .6rem;" onclick="loadAll()">✕</button>
+                </td>`;
+        }
+
+        async function saveExpenseEdit(id) {
+            const description = document.getElementById('ec-desc-' + id).value.trim();
+            const category = document.getElementById('ec-cat-' + id).value;
+            const subcategory = document.getElementById('ec-sub-' + id).value;
+            const payment_method = document.getElementById('ec-pm-' + id).value;
+            const amount = parseFloat(document.getElementById('ec-amt-' + id).value);
+            if (!description || isNaN(amount)) return;
+            await fetch(`/api/expenses/${id}`, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({description, category, subcategory, payment_method, amount})
+            });
+            loadAll();
         }
 
         async function deleteExpense(id) {
-            if (!confirm('Bu masrafı silmek istediğinize emin misiniz?')) return;
-            
-            await fetch(`/api/expenses/${id}`, {method: 'DELETE'});
-            
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            
-            if (startDate && endDate) {
-                loadExpenses(startDate, endDate);
-            } else {
-                loadExpenses();
-            }
+            if (!confirm('Bu masrafı silmek istiyor musun?')) return;
+            const res = await fetch(`/api/expenses/${id}`, {method: 'DELETE'});
+            const d = await res.json();
+            if (!d.success) { alert('⚠️ ' + d.error); return; }
+            loadAll();
         }
     </script>
 </body>

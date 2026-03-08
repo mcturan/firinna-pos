@@ -96,9 +96,12 @@
             }
             
             zonesList.innerHTML = zones.map(zone => `
-                <div class="item-row">
+                <div class="item-row" id="zone-row-${zone.id}">
                     <span class="item-name">${zone.name}</span>
-                    <button class="btn-delete" onclick="deleteZone(${zone.id})">🗑️</button>
+                    <div style="display:flex;gap:.4rem;">
+                        <button class="btn-delete" style="background:none;border:none;cursor:pointer;font-size:1rem;" onclick="editZone(${zone.id})" data-name="${zone.name}" id="zone-btn-${zone.id}" title="Düzenle">✏️</button>
+                        <button class="btn-delete" onclick="deleteZone(${zone.id})">🗑️</button>
+                    </div>
                 </div>
             `).join('');
             
@@ -116,32 +119,78 @@
             }
             
             tablesList.innerHTML = tables.map(table => `
-                <div class="item-row">
+                <div class="item-row" id="table-row-${table.id}">
                     <div class="item-info">
                         <span class="item-name">${table.name}</span>
                         <span class="item-meta">${table.zone_name}</span>
                     </div>
-                    <button class="btn-delete" onclick="deleteTable(${table.id})">🗑️</button>
+                    <div style="display:flex;gap:.4rem;">
+                        <button class="btn-delete" style="background:none;border:none;cursor:pointer;font-size:1rem;" onclick="editTable(${table.id})" data-name="${table.name}" id="table-btn-${table.id}" title="Düzenle">✏️</button>
+                        <button class="btn-delete" onclick="deleteTable(${table.id})">🗑️</button>
+                    </div>
                 </div>
             `).join('');
         }
 
+        function editZone(id) {
+            const currentName = document.getElementById('zone-btn-' + id).dataset.name;
+            const row = document.getElementById('zone-row-' + id);
+            row.innerHTML = `
+                <input type="text" id="zone-edit-${id}" value="${currentName}"
+                    style="flex:1;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.95rem;">
+                <div style="display:flex;gap:.4rem;">
+                    <button class="btn btn-primary" style="padding:.35rem .75rem;" onclick="saveZoneEdit(${id})">✓</button>
+                    <button class="btn btn-secondary" style="padding:.35rem .75rem;" onclick="loadZones()">✕</button>
+                </div>`;
+            document.getElementById('zone-edit-' + id).focus();
+        }
+
+        async function saveZoneEdit(id) {
+            const name = document.getElementById('zone-edit-' + id).value.trim();
+            if (!name) return;
+            await fetch(`/api/zones/${id}/name`, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name})
+            });
+            loadZones(); loadTables();
+        }
+
+        function editTable(id) {
+            const currentName = document.getElementById('table-btn-' + id).dataset.name;
+            const row = document.getElementById('table-row-' + id);
+            row.innerHTML = `
+                <input type="text" id="table-edit-${id}" value="${currentName}"
+                    style="flex:1;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.95rem;">
+                <div style="display:flex;gap:.4rem;">
+                    <button class="btn btn-primary" style="padding:.35rem .75rem;" onclick="saveTableEdit(${id})">✓</button>
+                    <button class="btn btn-secondary" style="padding:.35rem .75rem;" onclick="loadTables()">✕</button>
+                </div>`;
+            document.getElementById('table-edit-' + id).focus();
+        }
+
+        async function saveTableEdit(id) {
+            const name = document.getElementById('table-edit-' + id).value.trim();
+            if (!name) return;
+            await fetch(`/api/tables/${id}/name`, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name})
+            });
+            loadTables();
+        }
+
         async function deleteZone(id) {
             if (!confirm('Bu bölgeyi silmek istediğinize emin misiniz?')) return;
-            
-            try {
-                await fetch(`/api/zones/${id}`, {method: 'DELETE'});
-                loadZones();
-                loadTables();
-            } catch(e) {
-                alert('Bu bölgeye ait masalar var, önce masaları silin!');
-            }
+            const res = await fetch(`/api/zones/${id}`, {method: 'DELETE'});
+            const d = await res.json();
+            if (!d.success) { alert('⚠️ ' + d.error); return; }
+            loadZones(); loadTables();
         }
 
         async function deleteTable(id) {
             if (!confirm('Bu masayı silmek istediğinize emin misiniz?')) return;
-            
-            await fetch(`/api/tables/${id}`, {method: 'DELETE'});
+            const res = await fetch(`/api/tables/${id}`, {method: 'DELETE'});
+            const d = await res.json();
+            if (!d.success) { alert('⚠️ ' + d.error); return; }
             loadTables();
         }
     </script>

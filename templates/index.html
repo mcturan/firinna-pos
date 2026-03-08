@@ -12,6 +12,9 @@
         <div class="nav-links">
             <a href="/" class="active">Masalar</a>
             <a href="/products">Ürünler</a>
+            <a href="/kasa">Kasa</a>
+            <a href="/stok">Stok</a>
+            <a href="/recete">Reçete</a>
             <a href="/tables">Masa Yönetimi</a>
             <a href="/expenses">Masraflar</a>
             <a href="/reports">Raporlar</a>
@@ -376,6 +379,7 @@
                 <h2>⚙️ Ayarlar</h2>
                 <button class="close-btn" onclick="closeSettingsModal()">✕</button>
             </div>
+            <!-- Sekmeler -->
             <div style="display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.5rem;">
                 <button class="settings-tab active" onclick="switchSettingsTab('business')" id="tab-business">🏪 İşletme</button>
                 <button class="settings-tab" onclick="switchSettingsTab('printer')" id="tab-printer">🖨️ Yazıcı</button>
@@ -561,7 +565,9 @@
                 
                 return `
                     <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
-                        ${noteIcon ? `<div style="position: absolute; top: 0.5rem; right: 0.5rem; font-size: 1.2rem; pointer-events: none;">${noteIcon}</div>` : ''}
+                        <div style="position: absolute; top: 0.5rem; right: 0.5rem; font-size: 1.2rem;" onclick="openTableNote(${table.id}, '${table.name}', event)">
+                            ${noteIcon || '📄'}
+                        </div>
                         <div class="table-icon">${icon}</div>
                         <div class="table-name">${table.name}</div>
                         <div class="table-status">${hasOrder ? 'Dolu' : 'Boş'}</div>
@@ -572,7 +578,7 @@
 
         let noteDebounce = null;
         async function saveOrderNote() {
-            if (!currentOrder) return;
+            if (!currentOrder || !currentOrder.id) return;
             clearTimeout(noteDebounce);
             noteDebounce = setTimeout(async () => {
                 const note = document.getElementById('orderNoteText').value;
@@ -592,7 +598,7 @@
             
             await loadCategories();
             updateOrderSummary();
-            
+
             // #37: Sipariş notunu yükle
             if (currentOrder && currentOrder.id) {
                 fetch(`/api/orders/${currentOrder.id}/note`)
@@ -601,6 +607,7 @@
             } else {
                 document.getElementById('orderNoteText').value = '';
             }
+            
             document.getElementById('orderModal').style.display = 'block';
         }
 
@@ -1426,73 +1433,91 @@ async function openSettingsModal() {
     await loadPrinterSettings();
     await loadLogoSettings();
 }
+
 function closeSettingsModal() {
     document.getElementById('settingsModal').style.display = 'none';
 }
+
 function switchSettingsTab(tab) {
     document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.settings-panel').forEach(p => p.style.display = 'none');
     document.getElementById('tab-' + tab).classList.add('active');
     document.getElementById('settings-' + tab).style.display = 'block';
 }
+
+// --- İşletme ---
 async function loadBusinessSettings() {
-    const keys = ['restaurant_name','restaurant_address','restaurant_phone','receipt_footer'];
-    const ids  = ['s-restaurant-name','s-restaurant-address','s-restaurant-phone','s-receipt-footer'];
+    const keys = ['restaurant_name', 'restaurant_address', 'restaurant_phone', 'receipt_footer'];
+    const ids = ['s-restaurant-name', 's-restaurant-address', 's-restaurant-phone', 's-receipt-footer'];
     for (let i = 0; i < keys.length; i++) {
         const res = await fetch(`/api/settings/${keys[i]}`);
         const data = await res.json();
         document.getElementById(ids[i]).value = data.value || '';
     }
 }
+
 async function saveBusinessSettings() {
     const fields = [
-        {key:'restaurant_name', id:'s-restaurant-name'},
-        {key:'restaurant_address', id:'s-restaurant-address'},
-        {key:'restaurant_phone', id:'s-restaurant-phone'},
-        {key:'receipt_footer', id:'s-receipt-footer'},
+        { key: 'restaurant_name', id: 's-restaurant-name' },
+        { key: 'restaurant_address', id: 's-restaurant-address' },
+        { key: 'restaurant_phone', id: 's-restaurant-phone' },
+        { key: 'receipt_footer', id: 's-receipt-footer' },
     ];
     for (const f of fields) {
         await fetch(`/api/settings/${f.key}`, {
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({value: document.getElementById(f.id).value})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: document.getElementById(f.id).value })
         });
     }
     alert('✅ İşletme bilgileri kaydedildi!');
 }
+
+// --- Yazıcı ---
 async function loadPrinterSettings() {
-    const map = [
-        ['printer_ip','s-printer-ip'],['printer_port','s-printer-port'],
-        ['kitchen_printer_ip','s-kitchen-ip'],['kitchen_printer_port','s-kitchen-port']
-    ];
-    for (const [key, id] of map) {
-        const res = await fetch(`/api/settings/${key}`);
-        const data = await res.json();
-        document.getElementById(id).value = data.value || '';
-    }
+    const r1 = await fetch('/api/settings/printer_ip');
+    const d1 = await r1.json();
+    document.getElementById('s-printer-ip').value = d1.value || '';
+
+    const r2 = await fetch('/api/settings/printer_port');
+    const d2 = await r2.json();
+    document.getElementById('s-printer-port').value = d2.value || '9100';
+
+    const r3 = await fetch('/api/settings/kitchen_printer_ip');
+    const d3 = await r3.json();
+    document.getElementById('s-kitchen-ip').value = d3.value || '';
+
+    const r4 = await fetch('/api/settings/kitchen_printer_port');
+    const d4 = await r4.json();
+    document.getElementById('s-kitchen-port').value = d4.value || '9100';
 }
+
 async function savePrinterSettings() {
     const fields = [
-        {key:'printer_ip', id:'s-printer-ip'},
-        {key:'printer_port', id:'s-printer-port'},
-        {key:'kitchen_printer_ip', id:'s-kitchen-ip'},
-        {key:'kitchen_printer_port', id:'s-kitchen-port'},
+        { key: 'printer_ip', id: 's-printer-ip' },
+        { key: 'printer_port', id: 's-printer-port' },
+        { key: 'kitchen_printer_ip', id: 's-kitchen-ip' },
+        { key: 'kitchen_printer_port', id: 's-kitchen-port' },
     ];
     for (const f of fields) {
         await fetch(`/api/settings/${f.key}`, {
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({value: document.getElementById(f.id).value})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: document.getElementById(f.id).value })
         });
     }
     alert('✅ Yazıcı ayarları kaydedildi!');
 }
+
 async function testPrinter() {
-    const res = await fetch('/api/printer/test', {method: 'POST'});
+    const res = await fetch('/api/printer/test', { method: 'POST' });
     const data = await res.json();
-    alert(data.success ? '✅ Test fişi gönderildi!' : '❌ Yazıcıya ulaşılamadı.');
+    alert(data.success ? '✅ Test fişi gönderildi!' : '❌ Yazıcıya ulaşılamadı. IP/Port kontrol edin.');
 }
+
+// --- Logo (#15) ---
 let pendingLogoFile = null;
+
 async function loadLogoSettings() {
     const res = await fetch('/api/settings/logo');
     const data = await res.json();
@@ -1505,6 +1530,7 @@ async function loadLogoSettings() {
         document.getElementById('logo-placeholder-text').style.display = 'block';
     }
 }
+
 function previewLogoFile(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -1516,54 +1542,62 @@ function previewLogoFile(event) {
         document.getElementById('logo-placeholder-text').style.display = 'none';
     };
     reader.readAsDataURL(file);
-    const btn = document.getElementById('btn-upload-logo');
-    btn.disabled = false; btn.style.opacity = '1';
+    document.getElementById('btn-upload-logo').disabled = false;
+    document.getElementById('btn-upload-logo').style.opacity = '1';
 }
+
 async function uploadLogo() {
     if (!pendingLogoFile) return;
     const formData = new FormData();
     formData.append('logo', pendingLogoFile);
-    const res = await fetch('/api/settings/logo', {method: 'POST', body: formData});
+    const res = await fetch('/api/settings/logo', { method: 'POST', body: formData });
     const data = await res.json();
     if (data.success) {
         alert('✅ Logo yüklendi!');
         pendingLogoFile = null;
-        const btn = document.getElementById('btn-upload-logo');
-        btn.disabled = true; btn.style.opacity = '0.5';
-    } else { alert('❌ Hata: ' + data.error); }
+        document.getElementById('btn-upload-logo').disabled = true;
+        document.getElementById('btn-upload-logo').style.opacity = '0.5';
+    } else {
+        alert('❌ Hata: ' + data.error);
+    }
 }
+
 async function deleteLogo() {
     if (!confirm('Logo silinsin mi?')) return;
-    await fetch('/api/settings/logo', {method: 'DELETE'});
+    await fetch('/api/settings/logo', { method: 'DELETE' });
     document.getElementById('logo-preview-img').style.display = 'none';
     document.getElementById('logo-placeholder-text').style.display = 'block';
     document.getElementById('logo-file-input').value = '';
     pendingLogoFile = null;
     alert('✅ Logo silindi.');
 }
+
+// --- Not Fişi (#17) ---
 async function previewNote() {
     const title = document.getElementById('note-title').value || 'NOT';
-    const note  = document.getElementById('note-content').value.trim();
+    const note = document.getElementById('note-content').value.trim();
     if (!note) { alert('Not içeriği boş!'); return; }
     const res = await fetch('/api/print/note/preview', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({title, note})
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, note })
     });
     const html = await res.text();
     const win = window.open('', '_blank', 'width=400,height=600');
-    win.document.write(html); win.document.close();
+    win.document.write(html);
+    win.document.close();
 }
+
 async function printNote() {
     const title = document.getElementById('note-title').value || 'NOT';
-    const note  = document.getElementById('note-content').value.trim();
+    const note = document.getElementById('note-content').value.trim();
     if (!note) { alert('Not içeriği boş!'); return; }
     const res = await fetch('/api/print/note', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({title, note})
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, note })
     });
     const data = await res.json();
-    alert(data.success ? '✅ Not fişi yazdırıldı!' : '❌ Yazıcı hatası: ' + (data.error || ''));
+    alert(data.success ? '✅ Not fişi yazdırıldı!' : '❌ Yazıcı hatası: ' + (data.error || 'Bilinmeyen'));
 }
 </script>

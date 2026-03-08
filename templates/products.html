@@ -12,6 +12,9 @@
         <div class="nav-links">
             <a href="/">Masalar</a>
             <a href="/products" class="active">Ürünler</a>
+            <a href="/kasa">Kasa</a>
+            <a href="/stok">Stok</a>
+            <a href="/recete">Reçete</a>
             <a href="/tables">Masa Yönetimi</a>
             <a href="/expenses">Masraflar</a>
             <a href="/reports">Raporlar</a>
@@ -96,9 +99,12 @@
             const productCategory = document.getElementById('productCategory');
             
             categoriesList.innerHTML = categories.map(cat => `
-                <div class="item-row" style="border-left: 4px solid ${cat.color}">
+                <div class="item-row" style="border-left: 4px solid ${cat.color}" id="cat-row-${cat.id}">
                     <span class="item-name">${cat.name}</span>
-                    <button class="btn-delete" onclick="deleteCategory(${cat.id})">🗑️</button>
+                    <div style="display:flex;gap:.4rem;">
+                        <button class="btn-delete" style="background:none;border:none;cursor:pointer;font-size:1rem;" onclick="editCategory(${cat.id})" data-name="${cat.name}" id="cat-btn-${cat.id}" title="Düzenle">✏️</button>
+                        <button class="btn-delete" onclick="deleteCategory(${cat.id})">🗑️</button>
+                    </div>
                 </div>
             `).join('');
             
@@ -116,26 +122,91 @@
             }
             
             productsList.innerHTML = products.map(prod => `
-                <div class="item-row">
+                <div class="item-row" id="prod-row-${prod.id}">
                     <div class="item-info">
                         <span class="item-name">${prod.name}</span>
                         <span class="item-meta">${prod.category_name} • ${prod.price.toFixed(2)} TL</span>
                     </div>
-                    <button class="btn-delete" onclick="deleteProduct(${prod.id})">🗑️</button>
+                    <div style="display:flex;gap:.4rem;">
+                        <button class="btn-delete" style="background:none;border:none;cursor:pointer;font-size:1rem;" onclick="editProduct(${prod.id})" data-name="${prod.name}" data-price="${prod.price}" data-catid="${prod.category_id||0}" id="prod-btn-${prod.id}" title="Düzenle">✏️</button>
+                        <button class="btn-delete" onclick="deleteProduct(${prod.id})">🗑️</button>
+                    </div>
                 </div>
             `).join('');
         }
 
+        function editCategory(id) {
+            const currentName = document.getElementById('cat-btn-' + id).dataset.name;
+            const row = document.getElementById('cat-row-' + id);
+            row.innerHTML = `
+                <input type="text" id="cat-edit-${id}" value="${currentName}"
+                    style="flex:1;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.95rem;">
+                <div style="display:flex;gap:.4rem;">
+                    <button class="btn btn-primary" style="padding:.35rem .75rem;" onclick="saveCategoryEdit(${id})">✓</button>
+                    <button class="btn btn-secondary" style="padding:.35rem .75rem;" onclick="loadCategories()">✕</button>
+                </div>`;
+            document.getElementById('cat-edit-' + id).focus();
+        }
+
+        async function saveCategoryEdit(id) {
+            const name = document.getElementById('cat-edit-' + id).value.trim();
+            if (!name) return;
+            await fetch(`/api/categories/${id}/name`, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name})
+            });
+            loadCategories(); loadProducts();
+        }
+
+        function editProduct(id) {
+            const btn = document.getElementById('prod-btn-' + id);
+            const currentName = btn.dataset.name;
+            const currentPrice = parseFloat(btn.dataset.price);
+            const currentCatId = btn.dataset.catid;
+            const row = document.getElementById('prod-row-' + id);
+            const catOptions = Array.from(document.getElementById('productCategory').options)
+                .filter(o => o.value)
+                .map(o => `<option value="${o.value}" ${o.value == currentCatId ? 'selected' : ''}>${o.text}</option>`)
+                .join('');
+            row.innerHTML = `
+                <div style="display:flex;gap:.4rem;flex:1;flex-wrap:wrap;">
+                    <input type="text" id="prod-name-${id}" value="${currentName}"
+                        style="flex:2;min-width:120px;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.95rem;">
+                    <input type="number" id="prod-price-${id}" value="${currentPrice}" step="0.01" min="0"
+                        style="flex:1;min-width:80px;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.95rem;">
+                    <select id="prod-cat-${id}" style="flex:1;min-width:100px;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.9rem;">
+                        ${catOptions}
+                    </select>
+                </div>
+                <div style="display:flex;gap:.4rem;">
+                    <button class="btn btn-primary" style="padding:.35rem .75rem;" onclick="saveProductEdit(${id})">✓</button>
+                    <button class="btn btn-secondary" style="padding:.35rem .75rem;" onclick="loadProducts()">✕</button>
+                </div>`;
+        }
+
+        async function saveProductEdit(id) {
+            const name = document.getElementById('prod-name-' + id).value.trim();
+            const price = parseFloat(document.getElementById('prod-price-' + id).value);
+            const category_id = document.getElementById('prod-cat-' + id).value;
+            if (!name || isNaN(price)) return;
+            await fetch(`/api/products/${id}`, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name, price, category_id})
+            });
+            loadProducts();
+        }
+
         async function deleteCategory(id) {
             if (!confirm('Bu kategoriyi silmek istediğinize emin misiniz?')) return;
-            
-            await fetch(`/api/categories/${id}`, {method: 'DELETE'});
-            loadCategories();
-            loadProducts();
+            const res = await fetch(`/api/categories/${id}`, {method: 'DELETE'});
+            const d = await res.json();
+            if (!d.success) { alert('⚠️ ' + d.error); return; }
+            loadCategories(); loadProducts();
         }
 
         async function deleteProduct(id) {
             if (!confirm('Bu ürünü silmek istediğinize emin misiniz?')) return;
+            
             const res = await fetch(`/api/products/${id}`, {method: 'DELETE'});
             const data = await res.json();
             if (!data.success) {

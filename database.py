@@ -305,12 +305,45 @@ def get_expenses(start_date=None, end_date=None):
     conn.close()
     return [dict(exp) for exp in expenses]
 
-def add_expense(description, amount, category='Genel'):
+def add_expense(description, amount, category='Genel', payment_method='cash', subcategory=''):
     conn = get_db()
-    conn.execute('INSERT INTO expenses (description, amount, category) VALUES (?, ?, ?)', 
-                 (description, amount, category))
+    # Migration: kolonlar yoksa ekle
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(expenses)").fetchall()]
+    if 'payment_method' not in cols:
+        conn.execute("ALTER TABLE expenses ADD COLUMN payment_method TEXT DEFAULT 'cash'")
+    if 'subcategory' not in cols:
+        conn.execute("ALTER TABLE expenses ADD COLUMN subcategory TEXT DEFAULT ''")
+    conn.execute('INSERT INTO expenses (description, amount, category, payment_method, subcategory) VALUES (?, ?, ?, ?, ?)',
+                 (description, amount, category, payment_method, subcategory))
+    # Transaction kaydı
+    date = datetime.now().strftime('%Y-%m-%d')
+    conn.execute('''INSERT INTO transactions
+        (date, type, amount, category, payment_method, description)
+        VALUES (?, 'out', ?, 'masraf', ?, ?)''',
+        (date, amount, payment_method, f'[{category}] {description}'))
     conn.commit()
     conn.close()
+
+def get_expense_summary(start_date=None, end_date=None):
+    """Kategori bazlı masraf özeti"""
+    conn = get_db()
+    if not start_date:
+        start_date = '2000-01-01'
+    if not end_date:
+        from datetime import datetime as dt
+        end_date = dt.now().strftime('%Y-%m-%d')
+    rows = conn.execute('''
+        SELECT category, subcategory,
+               COUNT(*) as count,
+               COALESCE(SUM(amount),0) as total,
+               payment_method
+        FROM expenses
+        WHERE DATE(created_at) BETWEEN ? AND ?
+        GROUP BY category, subcategory, payment_method
+        ORDER BY category, total DESC
+    ''', (start_date, end_date)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 def delete_expense(expense_id):
     conn = get_db()
@@ -487,18 +520,21 @@ def set_order_discount(order_id, discount_type, discount_value, discount_reason=
 def close_order_with_payment(order_id, payment_cash=0, payment_card=0, tip_amount=0, tip_method='cash'):
     """Sipariş kapat ve ödeme kaydet (#5, #10)"""
     conn = get_db()
+    closed_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     conn.execute('''
         UPDATE orders 
         SET status = 'closed', 
-            closed_at = CURRENT_TIMESTAMP,
+            closed_at = ?,
             payment_cash = ?,
             payment_card = ?,
             tip_amount = ?,
             tip_method = ?
         WHERE id = ?
-    ''', (payment_cash, payment_card, tip_amount, tip_method, order_id))
+    ''', (closed_at, payment_cash, payment_card, tip_amount, tip_method, order_id))
+    record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amount, tip_method, closed_at)
     conn.commit()
     conn.close()
+    deduct_stock_for_order(order_id)
 
 def split_order_equal(order_id, num_people):
     """Hesabı eşit böl (#11)"""
@@ -824,3 +860,506 @@ def get_report(start_date, end_date):
         'top_products': [dict(p) for p in top_products],
         'daily': [dict(d) for d in daily],
     }
+
+# ===== KASA (#8) =====
+
+def get_kasa_summary(date=None):
+    """Günlük kasa özeti"""
+    if not date:
+        date = datetime.now().strftime('%Y-%m-%d')
+    conn = get_db()
+
+    # Nakit, kart, bahşiş
+    payments = conn.execute('''
+        SELECT
+            COALESCE(SUM(payment_cash), 0) as cash,
+            COALESCE(SUM(payment_card), 0) as card,
+            COALESCE(SUM(tip_amount), 0) as tips,
+            COUNT(*) as order_count,
+            COALESCE(SUM(total), 0) as total_sales
+        FROM orders
+        WHERE DATE(closed_at) = ? AND status = 'closed'
+    ''', (date,)).fetchone()
+
+    # Masraflar
+    expenses = conn.execute('''
+        SELECT COALESCE(SUM(amount), 0) as total, COUNT(*) as count
+        FROM expenses
+        WHERE DATE(created_at) = ?
+    ''', (date,)).fetchone()
+
+    # Masraf listesi
+    expense_list = conn.execute('''
+        SELECT id, description, category, amount, created_at
+        FROM expenses
+        WHERE DATE(created_at) = ?
+        ORDER BY created_at DESC
+    ''', (date,)).fetchall()
+
+    # Açık siparişler (kasada bekleyen)
+    open_orders = conn.execute('''
+        SELECT o.id, t.name as table_name, o.total
+        FROM orders o
+        JOIN tables t ON o.table_id = t.id
+        WHERE o.status = 'open'
+        ORDER BY o.created_at
+    ''').fetchall()
+
+    conn.close()
+
+    cash = payments['cash']
+    card = payments['card']
+    tips = payments['tips']
+    exp = expenses['total']
+    net_cash = cash - exp  # kasadaki net nakit
+
+    return {
+        'date': date,
+        'order_count': payments['order_count'],
+        'total_sales': round(payments['total_sales'], 2),
+        'cash': round(cash, 2),
+        'card': round(card, 2),
+        'tips': round(tips, 2),
+        'total_expenses': round(exp, 2),
+        'expense_count': expenses['count'],
+        'net_cash': round(net_cash, 2),
+        'net_total': round(cash + card + tips - exp, 2),
+        'expense_list': [dict(e) for e in expense_list],
+        'open_orders': [dict(o) for o in open_orders],
+    }
+
+# ===== ÖN MUHASEBE ALTYAPISI =====
+
+def init_muhasebe_tables():
+    """Muhasebe, stok ve reçete tablolarını oluştur"""
+    conn = get_db()
+    c = conn.cursor()
+
+    # Tüm para hareketleri — kasanın temeli
+    c.execute('''CREATE TABLE IF NOT EXISTS transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        type TEXT NOT NULL,           -- 'in' / 'out'
+        amount REAL NOT NULL,
+        category TEXT DEFAULT 'Genel', -- 'satis','bahsis','masraf','stok_alim','sarf','duzeltme'
+        payment_method TEXT DEFAULT 'cash',  -- 'cash' / 'card'
+        description TEXT,
+        related_order_id INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    # Stok kalemleri
+    c.execute('''CREATE TABLE IF NOT EXISTS stock_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        unit TEXT DEFAULT 'adet',     -- kg, lt, gr, adet, paket, ml
+        quantity REAL DEFAULT 0,
+        min_quantity REAL DEFAULT 0,
+        cost_per_unit REAL DEFAULT 0,
+        category TEXT DEFAULT 'Genel',
+        active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    # Stok hareketleri
+    c.execute('''CREATE TABLE IF NOT EXISTS stock_movements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        stock_item_id INTEGER NOT NULL,
+        movement_type TEXT NOT NULL,  -- 'in' / 'out' / 'adjust'
+        quantity REAL NOT NULL,
+        cost REAL DEFAULT 0,
+        reason TEXT DEFAULT 'manuel', -- 'satis','alim','duzeltme','fire'
+        description TEXT,
+        related_transaction_id INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (stock_item_id) REFERENCES stock_items(id)
+    )''')
+
+    # Reçeteler — ürün = hangi stok kalemlerinden oluşur
+    c.execute('''CREATE TABLE IF NOT EXISTS recipes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        product_id INTEGER NOT NULL,
+        stock_item_id INTEGER NOT NULL,
+        quantity REAL NOT NULL,
+        FOREIGN KEY (product_id) REFERENCES products(id),
+        FOREIGN KEY (stock_item_id) REFERENCES stock_items(id)
+    )''')
+
+    conn.commit()
+    conn.close()
+
+def migrate_orders_to_transactions():
+    """Mevcut kapalı siparişleri transactions tablosuna aktar (bir kez çalışır)"""
+    conn = get_db()
+    existing = conn.execute('SELECT COUNT(*) as c FROM transactions WHERE related_order_id IS NOT NULL').fetchone()
+    if existing['c'] > 0:
+        conn.close()
+        return 0  # Zaten migrasyon yapılmış
+
+    orders = conn.execute('''
+        SELECT id, closed_at, payment_cash, payment_card, tip_amount, tip_method, total
+        FROM orders WHERE status = 'closed' AND closed_at IS NOT NULL
+    ''').fetchall()
+
+    count = 0
+    for o in orders:
+        date = o['closed_at'][:10] if o['closed_at'] else datetime.now().strftime('%Y-%m-%d')
+        if o['payment_cash'] and o['payment_cash'] > 0:
+            conn.execute('''INSERT INTO transactions
+                (date, type, amount, category, payment_method, description, related_order_id, created_at)
+                VALUES (?, 'in', ?, 'satis', 'cash', 'Sipariş #' || ?, ?, ?)''',
+                (date, o['payment_cash'], o['id'], o['id'], o['closed_at']))
+        if o['payment_card'] and o['payment_card'] > 0:
+            conn.execute('''INSERT INTO transactions
+                (date, type, amount, category, payment_method, description, related_order_id, created_at)
+                VALUES (?, 'in', ?, 'satis', 'card', 'Sipariş #' || ?, ?, ?)''',
+                (date, o['payment_card'], o['id'], o['id'], o['closed_at']))
+        if o['tip_amount'] and o['tip_amount'] > 0:
+            method = o['tip_method'] or 'cash'
+            conn.execute('''INSERT INTO transactions
+                (date, type, amount, category, payment_method, description, related_order_id, created_at)
+                VALUES (?, 'in', ?, 'bahsis', ?, 'Bahşiş - Sipariş #' || ?, ?, ?)''',
+                (date, o['tip_amount'], method, o['id'], o['id'], o['closed_at']))
+        count += 1
+
+    # Mevcut masrafları da transactions'a aktar
+    expenses = conn.execute('SELECT * FROM expenses').fetchall()
+    for e in expenses:
+        date = e['created_at'][:10] if e['created_at'] else datetime.now().strftime('%Y-%m-%d')
+        conn.execute('''INSERT INTO transactions
+            (date, type, amount, category, payment_method, description, created_at)
+            VALUES (?, 'out', ?, 'masraf', 'cash', ?, ?)''',
+            (date, e['amount'], e['description'] + ' (' + (e['category'] or 'Genel') + ')', e['created_at']))
+
+    conn.commit()
+    conn.close()
+    return count
+
+def record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amount, tip_method, closed_at):
+    """Sipariş kapanışında otomatik transaction kaydı"""
+    date = closed_at[:10] if closed_at else datetime.now().strftime('%Y-%m-%d')
+    if payment_cash and payment_cash > 0:
+        conn.execute('''INSERT INTO transactions
+            (date, type, amount, category, payment_method, description, related_order_id, created_at)
+            VALUES (?, 'in', ?, 'satis', 'cash', 'Sipariş #' || ?, ?, ?)''',
+            (date, payment_cash, order_id, order_id, closed_at))
+    if payment_card and payment_card > 0:
+        conn.execute('''INSERT INTO transactions
+            (date, type, amount, category, payment_method, description, related_order_id, created_at)
+            VALUES (?, 'in', ?, 'satis', 'card', 'Sipariş #' || ?, ?, ?)''',
+            (date, payment_card, order_id, order_id, closed_at))
+    if tip_amount and tip_amount > 0:
+        conn.execute('''INSERT INTO transactions
+            (date, type, amount, category, payment_method, description, related_order_id, created_at)
+            VALUES (?, 'in', ?, 'bahsis', ?, 'Bahşiş - Sipariş #' || ?, ?, ?)''',
+            (date, tip_amount, tip_method or 'cash', order_id, order_id, closed_at))
+
+def add_transaction(type_, amount, category, payment_method, description, related_order_id=None):
+    """Manuel transaction ekle"""
+    conn = get_db()
+    date = datetime.now().strftime('%Y-%m-%d')
+    conn.execute('''INSERT INTO transactions
+        (date, type, amount, category, payment_method, description, related_order_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)''',
+        (date, type_, amount, category, payment_method, description, related_order_id))
+    conn.commit()
+    conn.close()
+
+def delete_transaction(transaction_id):
+    conn = get_db()
+    conn.execute('DELETE FROM transactions WHERE id = ? AND related_order_id IS NULL', (transaction_id,))
+    conn.commit()
+    conn.close()
+
+def get_kasa_data(start_date, end_date, payment_method=None):
+    """Kasa verisi — nakit, kart veya tümü"""
+    conn = get_db()
+    params_in = [start_date, end_date]
+    params_out = [start_date, end_date]
+    method_filter = ''
+    if payment_method:
+        method_filter = " AND payment_method = ?"
+        params_in.append(payment_method)
+        params_out.append(payment_method)
+
+    income = conn.execute(f'''
+        SELECT COALESCE(SUM(amount),0) as total,
+               COALESCE(SUM(CASE WHEN category='satis' THEN amount ELSE 0 END),0) as satis,
+               COALESCE(SUM(CASE WHEN category='bahsis' THEN amount ELSE 0 END),0) as bahsis,
+               COUNT(CASE WHEN category='satis' THEN 1 END) as siparis_count
+        FROM transactions
+        WHERE date BETWEEN ? AND ? AND type='in' {method_filter}
+    ''', params_in).fetchone()
+
+    outcome = conn.execute(f'''
+        SELECT COALESCE(SUM(amount),0) as total,
+               COALESCE(SUM(CASE WHEN category='masraf' THEN amount ELSE 0 END),0) as masraf,
+               COALESCE(SUM(CASE WHEN category='stok_alim' THEN amount ELSE 0 END),0) as stok_alim,
+               COALESCE(SUM(CASE WHEN category='sarf' THEN amount ELSE 0 END),0) as sarf
+        FROM transactions
+        WHERE date BETWEEN ? AND ? AND type='out' {method_filter}
+    ''', params_out).fetchone()
+
+    # Son 50 işlem
+    list_params = [start_date, end_date]
+    list_filter = ''
+    if payment_method:
+        list_filter = " AND payment_method = ?"
+        list_params.append(payment_method)
+    movements = conn.execute(f'''
+        SELECT id, date, type, amount, category, payment_method, description, related_order_id, created_at
+        FROM transactions
+        WHERE date BETWEEN ? AND ? {list_filter}
+        ORDER BY created_at DESC LIMIT 100
+    ''', list_params).fetchall()
+
+    conn.close()
+    net = income['total'] - outcome['total']
+    return {
+        'income': round(income['total'],2),
+        'satis': round(income['satis'],2),
+        'bahsis': round(income['bahsis'],2),
+        'siparis_count': income['siparis_count'],
+        'outcome': round(outcome['total'],2),
+        'masraf': round(outcome['masraf'],2),
+        'stok_alim': round(outcome['stok_alim'],2),
+        'sarf': round(outcome['sarf'],2),
+        'net': round(net,2),
+        'movements': [dict(m) for m in movements],
+    }
+
+# ===== STOK =====
+
+def get_stock_items():
+    conn = get_db()
+    items = conn.execute('''
+        SELECT s.*,
+               (SELECT COALESCE(SUM(CASE WHEN movement_type='in' THEN quantity
+                                        WHEN movement_type='out' THEN -quantity
+                                        ELSE quantity END), 0)
+                FROM stock_movements WHERE stock_item_id = s.id) as current_qty
+        FROM stock_items s WHERE s.active = 1 ORDER BY s.category, s.name
+    ''').fetchall()
+    conn.close()
+    return [dict(i) for i in items]
+
+def add_stock_item(name, unit, min_quantity, cost_per_unit, category):
+    conn = get_db()
+    conn.execute('INSERT INTO stock_items (name, unit, min_quantity, cost_per_unit, category) VALUES (?,?,?,?,?)',
+                 (name, unit, min_quantity, cost_per_unit, category))
+    conn.commit()
+    conn.close()
+
+def add_stock_movement(stock_item_id, movement_type, quantity, cost, reason, description, transaction_id=None):
+    """Stok hareketi ekle"""
+    conn = get_db()
+    conn.execute('''INSERT INTO stock_movements
+        (stock_item_id, movement_type, quantity, cost, reason, description, related_transaction_id)
+        VALUES (?,?,?,?,?,?,?)''',
+        (stock_item_id, movement_type, quantity, cost, reason, description, transaction_id))
+    conn.commit()
+    conn.close()
+
+def get_stock_movements(stock_item_id=None, limit=50):
+    conn = get_db()
+    if stock_item_id:
+        rows = conn.execute('''
+            SELECT sm.*, si.name as item_name, si.unit
+            FROM stock_movements sm JOIN stock_items si ON sm.stock_item_id = si.id
+            WHERE sm.stock_item_id = ? ORDER BY sm.created_at DESC LIMIT ?
+        ''', (stock_item_id, limit)).fetchall()
+    else:
+        rows = conn.execute('''
+            SELECT sm.*, si.name as item_name, si.unit
+            FROM stock_movements sm JOIN stock_items si ON sm.stock_item_id = si.id
+            ORDER BY sm.created_at DESC LIMIT ?
+        ''', (limit,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+# ===== REÇETE =====
+
+def get_recipes(product_id=None):
+    conn = get_db()
+    if product_id:
+        rows = conn.execute('''
+            SELECT r.*, s.name as stock_name, s.unit
+            FROM recipes r JOIN stock_items s ON r.stock_item_id = s.id
+            WHERE r.product_id = ?
+        ''', (product_id,)).fetchall()
+    else:
+        rows = conn.execute('''
+            SELECT r.*, p.name as product_name, s.name as stock_name, s.unit
+            FROM recipes r
+            JOIN products p ON r.product_id = p.id
+            JOIN stock_items s ON r.stock_item_id = s.id
+            ORDER BY p.name, s.name
+        ''').fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def set_recipe(product_id, stock_item_id, quantity):
+    conn = get_db()
+    existing = conn.execute('SELECT id FROM recipes WHERE product_id=? AND stock_item_id=?',
+                            (product_id, stock_item_id)).fetchone()
+    if existing:
+        conn.execute('UPDATE recipes SET quantity=? WHERE id=?', (quantity, existing['id']))
+    else:
+        conn.execute('INSERT INTO recipes (product_id, stock_item_id, quantity) VALUES (?,?,?)',
+                     (product_id, stock_item_id, quantity))
+    conn.commit()
+    conn.close()
+
+def delete_recipe(recipe_id):
+    conn = get_db()
+    conn.execute('DELETE FROM recipes WHERE id=?', (recipe_id,))
+    conn.commit()
+    conn.close()
+
+def deduct_stock_for_order(order_id):
+    """Sipariş kapanışında reçetedeki malzemeleri stoktan düş"""
+    conn = get_db()
+    items = conn.execute('''
+        SELECT oi.product_id, oi.quantity as sold_qty
+        FROM order_items oi WHERE oi.order_id = ? AND oi.is_complimentary = 0
+    ''', (order_id,)).fetchall()
+    for item in items:
+        recipes = conn.execute('''
+            SELECT r.stock_item_id, r.quantity as recipe_qty
+            FROM recipes r WHERE r.product_id = ?
+        ''', (item['product_id'],)).fetchall()
+        for r in recipes:
+            total_deduct = r['recipe_qty'] * item['sold_qty']
+            conn.execute('''INSERT INTO stock_movements
+                (stock_item_id, movement_type, quantity, reason, description)
+                VALUES (?, 'out', ?, 'satis', 'Sipariş #' || ?)''',
+                (r['stock_item_id'], total_deduct, order_id))
+    conn.commit()
+    conn.close()
+
+
+def update_stock_item(item_id, name, unit, min_quantity, cost_per_unit, category):
+    conn = get_db()
+    conn.execute('''UPDATE stock_items SET name=?, unit=?, min_quantity=?, cost_per_unit=?, category=?
+                    WHERE id=?''', (name, unit, min_quantity, cost_per_unit, category, item_id))
+    conn.commit()
+    conn.close()
+
+def delete_stock_item(item_id):
+    """Başka yerde kullanılmıyorsa sil"""
+    conn = get_db()
+    used_recipe = conn.execute('SELECT COUNT(*) as c FROM recipes WHERE stock_item_id=?', (item_id,)).fetchone()
+    used_move = conn.execute('SELECT COUNT(*) as c FROM stock_movements WHERE stock_item_id=?', (item_id,)).fetchone()
+    if used_recipe['c'] > 0 or used_move['c'] > 0:
+        conn.close()
+        return False, 'Bu kalem reçete veya harekette kullanılıyor, silinemez.'
+    conn.execute('UPDATE stock_items SET active=0 WHERE id=?', (item_id,))
+    conn.commit()
+    conn.close()
+    return True, ''
+
+def update_product(product_id, name, price, category_id):
+    conn = get_db()
+    conn.execute('UPDATE products SET name=?, price=?, category_id=? WHERE id=?',
+                 (name, price, category_id, product_id))
+    conn.commit()
+    conn.close()
+
+def update_expense(expense_id, description, amount, category, payment_method='cash', subcategory=''):
+    conn = get_db()
+    conn.execute('''UPDATE expenses SET description=?, amount=?, category=?,
+                    payment_method=?, subcategory=? WHERE id=?''',
+                 (description, amount, category, payment_method, subcategory, expense_id))
+    conn.commit()
+    conn.close()
+
+# ===== KULLANIM KONTROLLÜ SİLME/DÜZENLEME =====
+
+def delete_category_safe(category_id):
+    conn = get_db()
+    used = conn.execute('SELECT COUNT(*) as c FROM products WHERE category_id=? AND active=1', (category_id,)).fetchone()
+    if used['c'] > 0:
+        conn.close()
+        return False, f'Bu kategoride {used["c"]} aktif ürün var. Önce ürünleri başka kategoriye taşıyın.'
+    conn.execute('DELETE FROM categories WHERE id=?', (category_id,))
+    conn.commit()
+    conn.close()
+    return True, ''
+
+def delete_zone_safe(zone_id):
+    conn = get_db()
+    used = conn.execute('SELECT COUNT(*) as c FROM tables WHERE zone_id=?', (zone_id,)).fetchone()
+    if used['c'] > 0:
+        conn.close()
+        return False, f'Bu bölgede {used["c"]} masa var. Önce masaları silin.'
+    conn.execute('DELETE FROM zones WHERE id=?', (zone_id,))
+    conn.commit()
+    conn.close()
+    return True, ''
+
+def delete_table_safe(table_id):
+    conn = get_db()
+    used = conn.execute("SELECT COUNT(*) as c FROM orders WHERE table_id=? AND status='open'", (table_id,)).fetchone()
+    if used['c'] > 0:
+        conn.close()
+        return False, 'Bu masada açık sipariş var. Önce siparişi kapatın.'
+    conn.execute('DELETE FROM tables WHERE id=?', (table_id,))
+    conn.commit()
+    conn.close()
+    return True, ''
+
+def delete_expense_safe(expense_id):
+    """Masraf sil — transaction'da kaydı varsa onu da sil"""
+    conn = get_db()
+    expense = conn.execute('SELECT * FROM expenses WHERE id=?', (expense_id,)).fetchone()
+    if not expense:
+        conn.close()
+        return False, 'Kayıt bulunamadı.'
+    conn.execute('DELETE FROM expenses WHERE id=?', (expense_id,))
+    conn.commit()
+    conn.close()
+    return True, ''
+
+# Stok hareketi düzenle/sil
+def update_stock_movement(movement_id, quantity, cost, description):
+    conn = get_db()
+    conn.execute('UPDATE stock_movements SET quantity=?, cost=?, description=? WHERE id=?',
+                 (quantity, cost, description, movement_id))
+    conn.commit()
+    conn.close()
+
+def delete_stock_movement(movement_id):
+    conn = get_db()
+    # Satıştan gelen hareketler silinemez
+    m = conn.execute('SELECT reason FROM stock_movements WHERE id=?', (movement_id,)).fetchone()
+    if not m:
+        conn.close()
+        return False, 'Kayıt bulunamadı.'
+    if m['reason'] == 'satis':
+        conn.close()
+        return False, 'Satıştan oluşan stok hareketleri silinemez.'
+    conn.execute('DELETE FROM stock_movements WHERE id=?', (movement_id,))
+    conn.commit()
+    conn.close()
+    return True, ''
+
+def add_stock_purchase(stock_item_id, quantity, cost, payment_method, description):
+    """Stok alımı: hem stok hareketi hem transaction kaydı"""
+    conn = get_db()
+    date = datetime.now().strftime('%Y-%m-%d')
+    # Stok hareketi
+    conn.execute('''INSERT INTO stock_movements
+        (stock_item_id, movement_type, quantity, cost, reason, description)
+        VALUES (?, 'in', ?, ?, 'alim', ?)''',
+        (stock_item_id, quantity, cost, description))
+    # Kasadan çıkış (eğer tutar girilmişse)
+    if cost and cost > 0:
+        item = conn.execute('SELECT name FROM stock_items WHERE id=?', (stock_item_id,)).fetchone()
+        item_name = item['name'] if item else 'Stok'
+        desc = description or item_name + ' alımı'
+        conn.execute('''INSERT INTO transactions
+            (date, type, amount, category, payment_method, description)
+            VALUES (?, 'out', ?, 'stok_alim', ?, ?)''',
+            (date, cost, payment_method, desc))
+    conn.commit()
+    conn.close()

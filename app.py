@@ -28,6 +28,149 @@ def products_page():
 def tables_page():
     return render_template('tables.html')
 
+@app.route('/kasa')
+def kasa_page():
+    return render_template('kasa.html')
+
+@app.route('/stok')
+def stok_page():
+    return render_template('stok.html')
+
+@app.route('/recete')
+def recete_page():
+    return render_template('recete.html')
+
+@app.route('/api/kasa/summary', methods=['GET'])
+def api_kasa_summary():
+    date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
+    return jsonify(db.get_kasa_summary(date))
+
+@app.route('/api/kasa/data', methods=['GET'])
+def api_kasa_data():
+    from datetime import timedelta
+    period = request.args.get('period', 'daily')
+    today = datetime.now().date()
+    if period == 'daily':
+        start = end = request.args.get('date', str(today))
+    elif period == 'weekly':
+        start = str(today - timedelta(days=today.weekday()))
+        end = str(today)
+    elif period == 'monthly':
+        start = str(today.replace(day=1))
+        end = str(today)
+    elif period == 'custom':
+        start = request.args.get('start', str(today))
+        end = request.args.get('end', str(today))
+    else:
+        start = '2000-01-01'
+        end = str(today)
+    method = request.args.get('method', None)
+    return jsonify(db.get_kasa_data(start, end, method))
+
+@app.route('/api/transactions', methods=['GET'])
+def api_transactions():
+    start = request.args.get('start', datetime.now().strftime('%Y-%m-%d'))
+    end = request.args.get('end', datetime.now().strftime('%Y-%m-%d'))
+    method = request.args.get('method', None)
+    return jsonify(db.get_kasa_data(start, end, method))
+
+@app.route('/api/transactions', methods=['POST'])
+def api_add_transaction():
+    data = request.json
+    db.add_transaction(
+        data['type'], data['amount'], data.get('category','masraf'),
+        data.get('payment_method','cash'), data.get('description',''),
+    )
+    return jsonify({'success': True})
+
+@app.route('/api/transactions/<int:tid>', methods=['DELETE'])
+def api_delete_transaction(tid):
+    db.delete_transaction(tid)
+    return jsonify({'success': True})
+
+# STOK
+@app.route('/api/stock', methods=['GET'])
+def api_stock_list():
+    return jsonify(db.get_stock_items())
+
+@app.route('/api/stock', methods=['POST'])
+def api_add_stock():
+    d = request.json
+    db.add_stock_item(d['name'], d.get('unit','adet'), d.get('min_quantity',0),
+                      d.get('cost_per_unit',0), d.get('category','Genel'))
+    return jsonify({'success': True})
+
+@app.route('/api/stock/<int:item_id>', methods=['PATCH'])
+def api_update_stock(item_id):
+    d = request.json
+    db.update_stock_item(item_id, d['name'], d.get('unit','adet'),
+                         d.get('min_quantity',0), d.get('cost_per_unit',0), d.get('category','Genel'))
+    return jsonify({'success': True})
+
+@app.route('/api/stock/<int:item_id>', methods=['DELETE'])
+def api_delete_stock(item_id):
+    ok, msg = db.delete_stock_item(item_id)
+    return jsonify({'success': ok, 'error': msg})
+
+@app.route('/api/products/<int:product_id>', methods=['PATCH'])
+def api_update_product(product_id):
+    d = request.json
+    db.update_product(product_id, d['name'], d['price'], d.get('category_id'))
+    return jsonify({'success': True})
+
+@app.route('/api/expenses/<int:expense_id>', methods=['PATCH'])
+def api_update_expense(expense_id):
+    d = request.json
+    db.update_expense(expense_id, d['description'], d['amount'],
+                      d.get('category','Genel'), d.get('payment_method','cash'), d.get('subcategory',''))
+    return jsonify({'success': True})
+
+@app.route('/api/stock/<int:item_id>/movement', methods=['POST'])
+def api_stock_movement(item_id):
+    d = request.json
+    mtype = d['movement_type']
+    if mtype == 'in':
+        # Alım: kasaya da yaz
+        db.add_stock_purchase(item_id, d['quantity'], d.get('cost', 0),
+                              d.get('payment_method', 'cash'), d.get('description', ''))
+    else:
+        db.add_stock_movement(item_id, mtype, d['quantity'],
+                              d.get('cost', 0), d.get('reason', 'manuel'), d.get('description', ''))
+    return jsonify({'success': True})
+
+@app.route('/api/stock/movements/<int:mid>', methods=['PATCH'])
+def api_update_movement(mid):
+    d = request.json
+    db.update_stock_movement(mid, d['quantity'], d.get('cost', 0), d.get('description', ''))
+    return jsonify({'success': True})
+
+@app.route('/api/stock/movements/<int:mid>', methods=['DELETE'])
+def api_delete_movement(mid):
+    ok, msg = db.delete_stock_movement(mid)
+    return jsonify({'success': ok, 'error': msg})
+
+@app.route('/api/stock/movements', methods=['GET'])
+def api_stock_movements():
+    item_id = request.args.get('item_id', None)
+    return jsonify(db.get_stock_movements(item_id))
+
+# REÇETE
+@app.route('/api/recipes', methods=['GET'])
+def api_recipes():
+    product_id = request.args.get('product_id', None)
+    return jsonify(db.get_recipes(product_id))
+
+@app.route('/api/recipes', methods=['POST'])
+def api_set_recipe():
+    d = request.json
+    db.set_recipe(d['product_id'], d['stock_item_id'], d['quantity'])
+    return jsonify({'success': True})
+
+@app.route('/api/recipes/<int:rid>', methods=['DELETE'])
+def api_delete_recipe(rid):
+    db.delete_recipe(rid)
+    return jsonify({'success': True})
+
 @app.route('/expenses')
 def expenses_page():
     return render_template('expenses.html')
@@ -49,8 +192,8 @@ def api_categories():
 
 @app.route('/api/categories/<int:category_id>', methods=['DELETE'])
 def api_delete_category(category_id):
-    db.delete_category(category_id)
-    return jsonify({'success': True})
+    ok, msg = db.delete_category_safe(category_id)
+    return jsonify({'success': ok, 'error': msg})
 
 # API: Ürünler
 @app.route('/api/products', methods=['GET', 'POST'])
@@ -82,8 +225,8 @@ def api_zones():
 
 @app.route('/api/zones/<int:zone_id>', methods=['DELETE'])
 def api_delete_zone(zone_id):
-    db.delete_zone(zone_id)
-    return jsonify({'success': True})
+    ok, msg = db.delete_zone_safe(zone_id)
+    return jsonify({'success': ok, 'error': msg})
 
 # API: Masalar
 @app.route('/api/tables', methods=['GET', 'POST'])
@@ -99,8 +242,8 @@ def api_tables():
 
 @app.route('/api/tables/<int:table_id>', methods=['DELETE'])
 def api_delete_table(table_id):
-    db.delete_table(table_id)
-    return jsonify({'success': True})
+    ok, msg = db.delete_table_safe(table_id)
+    return jsonify({'success': ok, 'error': msg})
 
 # API: Siparişler
 @app.route('/api/orders/table/<int:table_id>', methods=['GET'])
@@ -148,16 +291,26 @@ def api_expenses():
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
         return jsonify(db.get_expenses(start_date, end_date))
-    
     elif request.method == 'POST':
         data = request.json
-        db.add_expense(data['description'], data['amount'], data.get('category', 'Genel'))
+        db.add_expense(
+            data['description'], data['amount'],
+            data.get('category', 'Genel'),
+            data.get('payment_method', 'cash'),
+            data.get('subcategory', '')
+        )
         return jsonify({'success': True})
+
+@app.route('/api/expenses/summary', methods=['GET'])
+def api_expense_summary():
+    start = request.args.get('start')
+    end = request.args.get('end')
+    return jsonify(db.get_expense_summary(start, end))
 
 @app.route('/api/expenses/<int:expense_id>', methods=['DELETE'])
 def api_delete_expense(expense_id):
-    db.delete_expense(expense_id)
-    return jsonify({'success': True})
+    ok, msg = db.delete_expense_safe(expense_id)
+    return jsonify({'success': ok, 'error': msg})
 
 # API: Raporlar
 @app.route('/api/reports/daily', methods=['GET'])
@@ -560,6 +713,10 @@ def api_pdf_kitchen(order_id):
     return send_file(pdf_file, mimetype='application/pdf',
                      as_attachment=True,
                      download_name=f'mutfak_{order_id}.pdf')
+
+# Muhasebe tablolarını başlat ve migrasyonu çalıştır
+db.init_muhasebe_tables()
+db.migrate_orders_to_transactions()
 
 if __name__ == '__main__':
     db.init_db()
