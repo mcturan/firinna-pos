@@ -4,3 +4,7 @@ __pycache__/
 .env
 *.backup
 templates/*.backup
+*.bak_*
+pos_data.db
+static/uploads/
+backups/
