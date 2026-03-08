@@ -206,12 +206,13 @@ def api_printer_test():
 # API: Ayarlar
 @app.route('/api/settings/printer', methods=['GET', 'POST'])
 def api_printer_settings():
+    global PRINTER_IP, PRINTER_PORT, printer
+    
     if request.method == 'GET':
         return jsonify({'ip': PRINTER_IP, 'port': PRINTER_PORT})
     
     elif request.method == 'POST':
         data = request.json
-        global PRINTER_IP, PRINTER_PORT, printer
         PRINTER_IP = data['ip']
         PRINTER_PORT = int(data['port'])
         printer = ThermalPrinter(PRINTER_IP, PRINTER_PORT)
@@ -223,3 +224,56 @@ if __name__ == '__main__':
     
     # Uygulamayı başlat (0.0.0.0 = tüm ağdan erişilebilir)
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+# ===== FAZ 1 YENİ API ENDPOINT'LERİ =====
+
+@app.route('/api/orders/items/<int:item_id>/quantity', methods=['PATCH'])
+def api_update_item_quantity(item_id):
+    data = request.json
+    db.update_order_item_quantity(item_id, data['quantity'])
+    return jsonify({'success': True})
+
+@app.route('/api/orders/items/<int:item_id>', methods=['PATCH'])
+def api_update_item(item_id):
+    data = request.json
+    db.update_order_item(
+        item_id,
+        is_complimentary=data.get('is_complimentary'),
+        kitchen_notes=data.get('kitchen_notes')
+    )
+    return jsonify({'success': True})
+
+@app.route('/api/orders/<int:order_id>/custom-item', methods=['POST'])
+def api_add_custom_item(order_id):
+    data = request.json
+    db.add_custom_order_item(order_id, data['name'], data['price'])
+    return jsonify({'success': True})
+
+@app.route('/api/orders/<int:order_id>/discount', methods=['PATCH'])
+def api_set_discount(order_id):
+    data = request.json
+    db.set_order_discount(
+        order_id,
+        data['type'],
+        data['value'],
+        data.get('reason', '')
+    )
+    return jsonify({'success': True})
+
+@app.route('/api/orders/<int:order_id>/close-with-payment', methods=['POST'])
+def api_close_with_payment(order_id):
+    data = request.json
+    db.close_order_with_payment(
+        order_id,
+        data.get('payment_cash', 0),
+        data.get('payment_card', 0),
+        data.get('tip_amount', 0),
+        data.get('tip_method', 'cash')
+    )
+    return jsonify({'success': True})
+
+@app.route('/api/orders/<int:order_id>/split', methods=['POST'])
+def api_split_order(order_id):
+    data = request.json
+    per_person = db.split_order_equal(order_id, data['num_people'])
+    return jsonify({'per_person': per_person})

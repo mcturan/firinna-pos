@@ -385,3 +385,125 @@ def clear_test_data():
 # İlk çalıştırmada DB'yi oluştur
 if not os.path.exists(DB_PATH):
     init_db()
+
+# ===== FAZ 1 YENİ FONKSİYONLAR =====
+
+def update_order_item_quantity(item_id, quantity):
+    """Ürün miktarını güncelle (#4)"""
+    conn = get_db()
+    item = conn.execute('SELECT order_id FROM order_items WHERE id = ?', (item_id,)).fetchone()
+    if not item:
+        conn.close()
+        return
+    
+    order_id = item['order_id']
+    
+    if quantity <= 0:
+        conn.execute('DELETE FROM order_items WHERE id = ?', (item_id,))
+    else:
+        conn.execute('UPDATE order_items SET quantity = ? WHERE id = ?', (quantity, item_id))
+    
+    update_order_total(conn, order_id)
+    conn.commit()
+    conn.close()
+
+def update_order_item(item_id, is_complimentary=None, kitchen_notes=None):
+    """Sipariş kalemini güncelle (#6, #20)"""
+    conn = get_db()
+    item = conn.execute('SELECT order_id FROM order_items WHERE id = ?', (item_id,)).fetchone()
+    if not item:
+        conn.close()
+        return
+    
+    order_id = item['order_id']
+    updates = []
+    params = []
+    
+    if is_complimentary is not None:
+        updates.append('is_complimentary = ?')
+        params.append(1 if is_complimentary else 0)
+    
+    if kitchen_notes is not None:
+        updates.append('kitchen_notes = ?')
+        params.append(kitchen_notes)
+    
+    if updates:
+        params.append(item_id)
+        conn.execute(f'UPDATE order_items SET {", ".join(updates)} WHERE id = ?', params)
+        update_order_total(conn, order_id)
+    
+    conn.commit()
+    conn.close()
+
+def add_custom_order_item(order_id, product_name, price):
+    """Özel sipariş ekle (#12)"""
+    conn = get_db()
+    conn.execute('''
+        INSERT INTO order_items (order_id, product_id, quantity, price, kitchen_notes) 
+        VALUES (?, NULL, 1, ?, ?)
+    ''', (order_id, price, f'ÖZEL: {product_name}'))
+    
+    update_order_total(conn, order_id)
+    conn.commit()
+    conn.close()
+
+def update_order_total(conn, order_id):
+    """Sipariş toplamını güncelle (indirim ve ikramlar dahil)"""
+    result = conn.execute('''
+        SELECT COALESCE(SUM(CASE WHEN is_complimentary = 0 THEN quantity * price ELSE 0 END), 0) as subtotal
+        FROM order_items WHERE order_id = ?
+    ''', (order_id,)).fetchone()
+    
+    subtotal = result['subtotal']
+    
+    order = conn.execute('SELECT discount_type, discount_value FROM orders WHERE id = ?', (order_id,)).fetchone()
+    discount = 0
+    
+    if order and order['discount_value']:
+        if order['discount_type'] == 'percent':
+            discount = subtotal * (order['discount_value'] / 100)
+        else:
+            discount = order['discount_value']
+    
+    total = max(0, subtotal - discount)
+    conn.execute('UPDATE orders SET total = ? WHERE id = ?', (total, order_id))
+
+def set_order_discount(order_id, discount_type, discount_value, discount_reason=''):
+    """Sipariş indirimi ekle (#13)"""
+    conn = get_db()
+    conn.execute('''
+        UPDATE orders 
+        SET discount_type = ?, discount_value = ?, discount_reason = ?
+        WHERE id = ?
+    ''', (discount_type, discount_value, discount_reason, order_id))
+    
+    update_order_total(conn, order_id)
+    conn.commit()
+    conn.close()
+
+def close_order_with_payment(order_id, payment_cash=0, payment_card=0, tip_amount=0, tip_method='cash'):
+    """Sipariş kapat ve ödeme kaydet (#5, #10)"""
+    conn = get_db()
+    conn.execute('''
+        UPDATE orders 
+        SET status = 'closed', 
+            closed_at = CURRENT_TIMESTAMP,
+            payment_cash = ?,
+            payment_card = ?,
+            tip_amount = ?,
+            tip_method = ?
+        WHERE id = ?
+    ''', (payment_cash, payment_card, tip_amount, tip_method, order_id))
+    conn.commit()
+    conn.close()
+
+def split_order_equal(order_id, num_people):
+    """Hesabı eşit böl (#11)"""
+    conn = get_db()
+    order = conn.execute('SELECT total FROM orders WHERE id = ?', (order_id,)).fetchone()
+    if order:
+        per_person = order['total'] / num_people
+        conn.close()
+        return per_person
+    conn.close()
+    return 0
