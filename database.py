@@ -625,3 +625,35 @@ def set_setting(key, value):
     ''', (key, value, value))
     conn.commit()
     conn.close()
+
+# ===== GEÇMİŞ SİPARİŞ GİRİŞİ =====
+
+def create_past_order(table_id, created_at, closed_at, items, payment_cash=0, payment_card=0, 
+                      discount_type=None, discount_value=0, discount_reason='', tip_amount=0, tip_method='cash'):
+    """Geçmiş tarihli kapalı sipariş oluştur"""
+    conn = get_db()
+    
+    cursor = conn.execute('''
+        INSERT INTO orders (table_id, status, total, created_at, closed_at, 
+                           payment_cash, payment_card, discount_type, discount_value, 
+                           discount_reason, tip_amount, tip_method)
+        VALUES (?, 'closed', 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (table_id, created_at, closed_at, payment_cash, payment_card, 
+          discount_type, discount_value, discount_reason, tip_amount, tip_method))
+    
+    order_id = cursor.lastrowid
+    
+    for item in items:
+        conn.execute('''
+            INSERT INTO order_items (order_id, product_id, product_name, quantity, price, is_complimentary, kitchen_notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (order_id, item.get('product_id'), item.get('product_name'), 
+              item['quantity'], item['price'], item.get('is_complimentary', 0), 
+              item.get('kitchen_notes', '')))
+    
+    update_order_total(conn, order_id)
+    
+    conn.commit()
+    conn.close()
+    
+    return order_id

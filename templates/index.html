@@ -16,6 +16,7 @@
             <a href="/expenses">Masraflar</a>
             <a href="/reports">Raporlar</a>
             <a href="#" onclick="openOrderHistory(); return false;">📜 Geçmiş</a>
+            <a href="#" onclick="openPastOrderModal(); return false;">➕ Eski Sipariş Ekle</a>
         </div>
     </nav>
 
@@ -34,7 +35,6 @@
 
             <div class="order-layout">
                 <div class="products-section">
-                    <!-- #2 - Arama Kutusu -->
                     <div style="margin-bottom: 1rem;">
                         <input type="text" id="productSearch" placeholder="🔍 Ürün ara..." 
                                oninput="searchProducts(this.value)"
@@ -76,6 +76,81 @@
                         <button class="btn btn-warning" onclick="openDiscountModal()">🏷️ İndirim Ekle</button>
                         <button class="btn btn-secondary" onclick="printReceipt()">📄 Adisyon Yazdır</button>
                         <button class="btn btn-success" onclick="openPaymentModal()">💰 Hesap Kapat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GEÇMİŞ SİPARİŞ MODAL -->
+    <div id="pastOrderModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header">
+                <h2>➕ Geçmiş Sipariş Ekle</h2>
+                <span class="close" onclick="closePastOrderModal()">&times;</span>
+            </div>
+            <div class="order-layout">
+                <div class="products-section">
+                    <div style="background: #f7fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <label>📅 Sipariş Tarihi:</label>
+                                <input type="datetime-local" id="pastOrderDate" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                            </div>
+                            <div>
+                                <label>🍽️ Masa:</label>
+                                <select id="pastOrderTable" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                                    <option value="">Masa seçin...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="categories" id="pastCategoriesBar"></div>
+                    <div class="products-grid" id="pastProductsGrid"></div>
+                </div>
+
+                <div class="order-summary">
+                    <h3>Sipariş Sepeti</h3>
+                    <div class="order-items" id="pastOrderItems"></div>
+                    
+                    <div id="pastDiscountSection" style="margin-bottom: 1rem; display: none;">
+                        <div style="background: #fff5f5; padding: 1rem; border-radius: 8px; border-left: 4px solid #f56565;">
+                            <strong>İndirim:</strong> <span id="pastDiscountText"></span>
+                            <button class="btn-delete" onclick="removePastDiscount()" style="float: right;">❌</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-total">
+                        <div>
+                            <div style="font-size: 0.9rem; color: #718096;">Ara Toplam:</div>
+                            <strong>TOPLAM:</strong>
+                        </div>
+                        <div>
+                            <div id="pastOrderSubtotal" style="font-size: 0.9rem; color: #718096;">0.00 TL</div>
+                            <span id="pastOrderTotal">0.00 TL</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding: 1.5rem; background: #f7fafc; border-radius: 12px;">
+                        <h4 style="margin-bottom: 1rem;">💰 Ödeme Bilgisi</h4>
+                        <div style="margin-bottom: 1rem;">
+                            <label>💵 Nakit (TL):</label>
+                            <input type="number" id="pastPaymentCash" value="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>💳 Kart (TL):</label>
+                            <input type="number" id="pastPaymentCard" value="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>🎁 Bahşiş (TL):</label>
+                            <input type="number" id="pastTipAmount" value="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                        </div>
+                    </div>
+
+                    <div class="order-actions" style="margin-top: 1.5rem;">
+                        <button class="btn btn-warning" onclick="openPastDiscountModal()">🏷️ İndirim Ekle</button>
+                        <button class="btn btn-success" onclick="savePastOrder()">✅ Kaydet</button>
                     </div>
                 </div>
             </div>
@@ -131,6 +206,38 @@
                     </select>
                 </div>
                 <button class="btn btn-success" style="width: 100%;" onclick="applyDiscount()">Uygula</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Geçmiş Sipariş İndirim Modal -->
+    <div id="pastDiscountModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>İndirim Ekle</h2>
+                <span class="close" onclick="closePastDiscountModal()">&times;</span>
+            </div>
+            <div style="padding: 2rem;">
+                <div style="margin-bottom: 1rem;">
+                    <label>İndirim Tipi:</label><br>
+                    <label style="margin-right: 2rem;"><input type="radio" name="pastDiscountType" value="percent" checked> Yüzde (%)</label>
+                    <label><input type="radio" name="pastDiscountType" value="fixed"> Tutar (TL)</label>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Değer:</label>
+                    <input type="number" id="pastDiscountValue" placeholder="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label>Sebep:</label>
+                    <select id="pastDiscountReason" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                        <option value="Öğrenci">Öğrenci</option>
+                        <option value="Komşu">Komşu</option>
+                        <option value="Personel">Personel</option>
+                        <option value="Kampanya">Kampanya</option>
+                        <option value="Diğer">Diğer</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" style="width: 100%;" onclick="applyPastDiscount()">Uygula</button>
             </div>
         </div>
     </div>
@@ -220,7 +327,7 @@
         </div>
     </div>
 
-    <!-- #7 - Sipariş Geçmişi Modal -->
+    <!-- Sipariş Geçmişi Modal -->
     <div id="orderHistoryModal" class="modal">
         <div class="modal-content" style="max-width: 1000px;">
             <div class="modal-header">
@@ -238,7 +345,7 @@
         </div>
     </div>
 
-    <!-- #8 - Masa Notu Modal -->
+    <!-- Masa Notu Modal -->
     <div id="tableNoteModal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
@@ -261,6 +368,10 @@
         let currentEditItemId = null;
         let currentNoteTableId = null;
         let allProducts = [];
+        
+        // Geçmiş sipariş için
+        let pastOrderCart = [];
+        let pastOrderDiscount = { type: null, value: 0, reason: '' };
 
         document.addEventListener('DOMContentLoaded', function() {
             loadZones();
@@ -760,6 +871,263 @@
             alert('Masa notu kaydedildi!');
             closeTableNoteModal();
             selectZone(currentZone);
+        }
+
+        // ===== GEÇMİŞ SİPARİŞ FONKSİYONLARI =====
+
+        async function openPastOrderModal() {
+            pastOrderCart = [];
+            pastOrderDiscount = { type: null, value: 0, reason: '' };
+            
+            // Bugünün tarihini default olarak ayarla
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 16);
+            document.getElementById('pastOrderDate').value = dateStr;
+            
+            // Masaları yükle
+            const allTables = [];
+            const zones = await fetch('/api/zones').then(r => r.json());
+            for (const zone of zones) {
+                const tables = await fetch(`/api/tables?zone_id=${zone.id}`).then(r => r.json());
+                tables.forEach(t => t.zone_name = zone.name);
+                allTables.push(...tables);
+            }
+            
+            document.getElementById('pastOrderTable').innerHTML = 
+                '<option value="">Masa seçin...</option>' +
+                allTables.map(t => `<option value="${t.id}">${t.zone_name} - ${t.name}</option>`).join('');
+            
+            // Kategorileri yükle
+            await loadPastCategories();
+            
+            updatePastOrderSummary();
+            document.getElementById('pastOrderModal').style.display = 'block';
+        }
+
+        function closePastOrderModal() {
+            document.getElementById('pastOrderModal').style.display = 'none';
+        }
+
+        async function loadPastCategories() {
+            const categories = await fetch('/api/categories').then(r => r.json());
+            const categoriesBar = document.getElementById('pastCategoriesBar');
+            
+            categoriesBar.innerHTML = categories.map((cat, index) => 
+                `<button class="category-btn ${index === 0 ? 'active' : ''}" 
+                         style="background: ${cat.color}" 
+                         onclick="selectPastCategory(${cat.id}, event)">${cat.name}</button>`
+            ).join('');
+            
+            if (categories.length > 0) {
+                selectPastCategory(categories[0].id);
+            }
+        }
+
+        async function selectPastCategory(categoryId, event) {
+            if (event) {
+                document.querySelectorAll('#pastCategoriesBar .category-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+            }
+            
+            const products = await fetch(`/api/products?category_id=${categoryId}`).then(r => r.json());
+            displayPastProducts(products);
+        }
+
+        function displayPastProducts(products) {
+            const productsGrid = document.getElementById('pastProductsGrid');
+            
+            productsGrid.innerHTML = products.map(product => `
+                <div class="product-card" onclick="addToPastCart(${product.id}, '${product.name}', ${product.price})">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">${product.price.toFixed(2)} TL</div>
+                </div>
+            `).join('');
+        }
+
+        function addToPastCart(productId, productName, price) {
+            const existing = pastOrderCart.find(item => item.product_id === productId);
+            
+            if (existing) {
+                existing.quantity++;
+            } else {
+                pastOrderCart.push({
+                    product_id: productId,
+                    product_name: productName,
+                    quantity: 1,
+                    price: price,
+                    is_complimentary: 0,
+                    kitchen_notes: ''
+                });
+            }
+            
+            updatePastOrderSummary();
+        }
+
+        function changePastQuantity(index, change) {
+            pastOrderCart[index].quantity += change;
+            
+            if (pastOrderCart[index].quantity <= 0) {
+                pastOrderCart.splice(index, 1);
+            }
+            
+            updatePastOrderSummary();
+        }
+
+        function removePastItem(index) {
+            pastOrderCart.splice(index, 1);
+            updatePastOrderSummary();
+        }
+
+        function updatePastOrderSummary() {
+            const orderItems = document.getElementById('pastOrderItems');
+            const orderTotal = document.getElementById('pastOrderTotal');
+            const orderSubtotal = document.getElementById('pastOrderSubtotal');
+            
+            if (pastOrderCart.length === 0) {
+                orderItems.innerHTML = '<p class="no-data">Henüz ürün eklenmedi</p>';
+                orderTotal.textContent = '0.00 TL';
+                orderSubtotal.textContent = '0.00 TL';
+                return;
+            }
+            
+            let subtotal = 0;
+            pastOrderCart.forEach(item => {
+                if (!item.is_complimentary) {
+                    subtotal += item.quantity * item.price;
+                }
+            });
+            
+            let total = subtotal;
+            if (pastOrderDiscount.type === 'percent') {
+                total = subtotal * (1 - pastOrderDiscount.value / 100);
+            } else if (pastOrderDiscount.type === 'fixed') {
+                total = subtotal - pastOrderDiscount.value;
+            }
+            
+            orderItems.innerHTML = pastOrderCart.map((item, index) => {
+                const itemTotal = item.is_complimentary ? 0 : (item.quantity * item.price);
+                return `
+                <div class="order-item">
+                    <div class="order-item-info">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button class="btn-delete" onclick="changePastQuantity(${index}, -1)" style="background: #ed8936; padding: 0.25rem 0.5rem;">-</button>
+                            <strong>${item.quantity}x</strong>
+                            <button class="btn-delete" onclick="changePastQuantity(${index}, 1)" style="background: #48bb78; padding: 0.25rem 0.5rem;">+</button>
+                            <span>${item.product_name}</span>
+                        </div>
+                    </div>
+                    <div class="order-item-price">
+                        ${itemTotal.toFixed(2)} TL
+                        <button class="btn-delete" onclick="removePastItem(${index})">🗑️</button>
+                    </div>
+                </div>
+            `}).join('');
+            
+            orderSubtotal.textContent = subtotal.toFixed(2) + ' TL';
+            orderTotal.textContent = total.toFixed(2) + ' TL';
+            
+            if (pastOrderDiscount.value > 0) {
+                const discountText = pastOrderDiscount.type === 'percent' 
+                    ? `%${pastOrderDiscount.value} (${pastOrderDiscount.reason})`
+                    : `${pastOrderDiscount.value} TL (${pastOrderDiscount.reason})`;
+                document.getElementById('pastDiscountText').textContent = discountText;
+                document.getElementById('pastDiscountSection').style.display = 'block';
+            } else {
+                document.getElementById('pastDiscountSection').style.display = 'none';
+            }
+        }
+
+        function openPastDiscountModal() {
+            document.getElementById('pastDiscountModal').style.display = 'block';
+        }
+
+        function closePastDiscountModal() {
+            document.getElementById('pastDiscountModal').style.display = 'none';
+        }
+
+        function applyPastDiscount() {
+            const type = document.querySelector('input[name="pastDiscountType"]:checked').value;
+            const value = parseFloat(document.getElementById('pastDiscountValue').value);
+            const reason = document.getElementById('pastDiscountReason').value;
+            
+            if (!value) {
+                alert('Lütfen indirim değeri girin!');
+                return;
+            }
+            
+            pastOrderDiscount = { type, value, reason };
+            updatePastOrderSummary();
+            closePastDiscountModal();
+        }
+
+        function removePastDiscount() {
+            pastOrderDiscount = { type: null, value: 0, reason: '' };
+            updatePastOrderSummary();
+        }
+
+        async function savePastOrder() {
+            const tableId = parseInt(document.getElementById('pastOrderTable').value);
+            const datetime = document.getElementById('pastOrderDate').value;
+            const cash = parseFloat(document.getElementById('pastPaymentCash').value) || 0;
+            const card = parseFloat(document.getElementById('pastPaymentCard').value) || 0;
+            const tip = parseFloat(document.getElementById('pastTipAmount').value) || 0;
+            
+            if (!tableId) {
+                alert('Lütfen masa seçin!');
+                return;
+            }
+            
+            if (!datetime) {
+                alert('Lütfen tarih ve saat seçin!');
+                return;
+            }
+            
+            if (pastOrderCart.length === 0) {
+                alert('Lütfen en az bir ürün ekleyin!');
+                return;
+            }
+            
+            // Toplam tutarı hesapla
+            let subtotal = pastOrderCart.reduce((sum, item) => {
+                return sum + (item.is_complimentary ? 0 : item.quantity * item.price);
+            }, 0);
+            
+            let total = subtotal;
+            if (pastOrderDiscount.type === 'percent') {
+                total = subtotal * (1 - pastOrderDiscount.value / 100);
+            } else if (pastOrderDiscount.type === 'fixed') {
+                total = subtotal - pastOrderDiscount.value;
+            }
+            
+            if (Math.abs(cash + card - total) > 0.01) {
+                alert('Ödeme tutarı toplam ile eşleşmiyor!');
+                return;
+            }
+            
+            const response = await fetch('/api/orders/past', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    table_id: tableId,
+                    created_at: datetime,
+                    closed_at: datetime,
+                    items: pastOrderCart,
+                    payment_cash: cash,
+                    payment_card: card,
+                    discount_type: pastOrderDiscount.type,
+                    discount_value: pastOrderDiscount.value,
+                    discount_reason: pastOrderDiscount.reason,
+                    tip_amount: tip,
+                    tip_method: cash > 0 ? 'cash' : 'card'
+                })
+            });
+            
+            if (response.ok) {
+                alert('Geçmiş sipariş başarıyla kaydedildi!');
+                closePastOrderModal();
+            } else {
+                alert('Hata oluştu! Lütfen tekrar deneyin.');
+            }
         }
     </script>
 </body>

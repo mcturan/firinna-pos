@@ -320,6 +320,29 @@ def api_settings(key):
         db.set_setting(key, data['value'])
         return jsonify({'success': True})
 
+
+# ===== GEÇMİŞ SİPARİŞ GİRİŞİ API =====
+
+@app.route('/api/orders/past', methods=['POST'])
+def api_create_past_order():
+    data = request.json
+    
+    order_id = db.create_past_order(
+        table_id=data['table_id'],
+        created_at=data['created_at'],
+        closed_at=data['closed_at'],
+        items=data['items'],
+        payment_cash=data.get('payment_cash', 0),
+        payment_card=data.get('payment_card', 0),
+        discount_type=data.get('discount_type'),
+        discount_value=data.get('discount_value', 0),
+        discount_reason=data.get('discount_reason', ''),
+        tip_amount=data.get('tip_amount', 0),
+        tip_method=data.get('tip_method', 'cash')
+    )
+    
+    return jsonify({'success': True, 'order_id': order_id})
+
 if __name__ == '__main__':
     db.init_db()
     app.run(host='0.0.0.0', port=5000, debug=True)
