@@ -252,3 +252,9 @@ Kişisel kullanım içindir.
 **Versiyon:** 1.0  
 **Tarih:** Şubat 2025  
 **İletişim:** Muhammed Cevad Turan (TA1XTA)
+
+## 📋 Dokümantasyon
+
+- **[🗺️ Roadmap](https://htmlpreview.github.io/?https://github.com/mcturan/firinna-pos/blob/main/roadmap.html)** - Geliştirme yol haritası ve özellik durumları
+- **[📝 Changelog](https://htmlpreview.github.io/?https://github.com/mcturan/firinna-pos/blob/main/CHANGELOG.html)** - Sürüm notları ve değişiklik geçmişi
+
