@@ -217,9 +217,11 @@ def get_table_order(table_id):
     
     order_dict = dict(order)
     items = conn.execute('''
-        SELECT oi.*, p.name as product_name
+        SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.price, 
+               oi.is_complimentary, oi.kitchen_notes, oi.created_at,
+               COALESCE(oi.product_name, p.name) as product_name
         FROM order_items oi
-        JOIN products p ON oi.product_id = p.id
+        LEFT JOIN products p ON oi.product_id = p.id
         WHERE oi.order_id = ?
     ''', (order_dict['id'],)).fetchall()
     
@@ -439,9 +441,9 @@ def add_custom_order_item(order_id, product_name, price):
     """Özel sipariş ekle (#12)"""
     conn = get_db()
     conn.execute('''
-        INSERT INTO order_items (order_id, product_id, quantity, price, kitchen_notes) 
-        VALUES (?, NULL, 1, ?, ?)
-    ''', (order_id, price, f'ÖZEL: {product_name}'))
+        INSERT INTO order_items (order_id, product_id, product_name, quantity, price, kitchen_notes) 
+        VALUES (?, NULL, ?, 1, ?, ?)
+    ''', (order_id, product_name, price, f'ÖZEL: {product_name}'))
     
     update_order_total(conn, order_id)
     conn.commit()

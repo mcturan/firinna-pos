@@ -217,17 +217,8 @@ def api_printer_settings():
         PRINTER_PORT = int(data['port'])
         printer = ThermalPrinter(PRINTER_IP, PRINTER_PORT)
         return jsonify({'success': True})
-
-if __name__ == '__main__':
-    # Veritabanını başlat
-    db.init_db()
-    
-    # Uygulamayı başlat (0.0.0.0 = tüm ağdan erişilebilir)
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
-# ===== FAZ 1 YENİ API ENDPOINT'LERİ =====
-
 @app.route('/api/orders/items/<int:item_id>/quantity', methods=['PATCH'])
+
 def api_update_item_quantity(item_id):
     data = request.json
     db.update_order_item_quantity(item_id, data['quantity'])
@@ -277,3 +268,10 @@ def api_split_order(order_id):
     data = request.json
     per_person = db.split_order_equal(order_id, data['num_people'])
     return jsonify({'per_person': per_person})
+
+if __name__ == '__main__':
+    # Veritabanını başlat
+    db.init_db()
+    
+    # Uygulamayı başlat (0.0.0.0 = tüm ağdan erişilebilir)
+    app.run(host='0.0.0.0', port=5000, debug=True)
