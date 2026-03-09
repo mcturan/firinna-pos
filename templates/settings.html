@@ -351,6 +351,18 @@
                 <button class="btn btn-primary" onclick="saveAutoPull()">💾 Kaydet</button>
             </div>
 
+            <!-- Otomatik Push -->
+            <h4 style="margin:1.5rem 0 .75rem;color:#4a5568;font-size:.9rem;">⏰ Otomatik Push (Günlük)</h4>
+            <p style="font-size:.82rem;color:#718096;margin-bottom:.75rem;">
+                Her gün belirlediğin saatte tüm veriler (DB dahil) otomatik olarak GitHub'a yüklenir.
+            </p>
+            <div class="auto-pull-row">
+                <input type="time" id="auto-push-time" style="padding:.5rem .75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:.9rem;">
+                <button class="btn btn-primary" onclick="saveAutoPush()">💾 Kaydet</button>
+                <button class="btn btn-secondary" onclick="clearAutoPush()">🚫 Kapat</button>
+            </div>
+            <div id="auto-push-status" style="font-size:.8rem;color:#718096;margin-top:.5rem;"></div>
+
             <!-- İşlem Logu -->
             <div id="git-log" class="git-log-box" style="margin-top:1.25rem;display:none;"></div>
         </div>
@@ -365,7 +377,7 @@
             document.querySelectorAll('.settings-tab').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + name).style.display = 'block';
             btn.classList.add('active');
-            if (name === 'github') { loadGitStatus(); loadAutoPullSetting(); }
+            if (name === 'github') { loadGitStatus(); loadAutoPullSetting(); loadAutoPushSetting(); }
         }
 
         // ===== GİTHUB SYNC =====
@@ -472,6 +484,37 @@
                 const sel = document.getElementById('auto-pull-interval');
                 if (sel) sel.value = String(d.interval || 0);
             } catch(e) {}
+        }
+
+        async function loadAutoPushSetting() {
+            try {
+                const d = await fetch('/api/git/auto-push').then(r => r.json());
+                const inp = document.getElementById('auto-push-time');
+                const status = document.getElementById('auto-push-status');
+                if (inp) inp.value = d.time || '';
+                if (status) status.textContent = d.time ? ('\u2705 Her gun ' + d.time + "'de otomatik push aktif") : '\u26d4 Otomatik push kapali';
+            } catch(e) {}
+        }
+
+        async function saveAutoPush() {
+            const t = document.getElementById('auto-push-time').value;
+            if (!t) { toast('\u26a0\ufe0f Saat se\u00e7in', false); return; }
+            await fetch('/api/git/auto-push', {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({time: t})
+            });
+            document.getElementById('auto-push-status').textContent = '\u2705 Her gun ' + t + "'de otomatik push aktif";
+            toast('\u2705 Otomatik push kaydedildi!');
+        }
+
+        async function clearAutoPush() {
+            await fetch('/api/git/auto-push', {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({time: ''})
+            });
+            document.getElementById('auto-push-time').value = '';
+            document.getElementById('auto-push-status').textContent = '\u26d4 Otomatik push kapal\u0131';
+            toast('\u2705 Otomatik push kapat\u0131ld\u0131!');
         }
 
         function showGitLog(text) {

@@ -954,6 +954,54 @@ def start_auto_pull(interval_minutes):
     _auto_pull_timer.daemon = True
     _auto_pull_timer.start()
 
+# ===== OTOMATİK PUSH (belirli saatte) =====
+
+_auto_push_thread = None
+_auto_push_running = False
+
+def start_auto_push():
+    """Her gün ayarlanan saatte otomatik push yapar"""
+    global _auto_push_running
+    _auto_push_running = True
+
+    def loop():
+        import time as _time
+        while _auto_push_running:
+            push_time = db.get_setting('git_auto_push_time', '')  # '23:00' formatı
+            if push_time:
+                now = datetime.now()
+                try:
+                    h, m = map(int, push_time.split(':'))
+                    # Tam saate geldik mi? (1 dakika tolerans)
+                    if now.hour == h and now.minute == m:
+                        ok, status = run_git(['status', '--short'])
+                        # DB dahil commit edilmemiş değişiklik varsa push et
+                        ok_add, _ = run_git(['add', '-A'])
+                        if ok_add:
+                            msg = f"Otomatik push - {now.strftime('%d.%m.%Y %H:%M')}"
+                            run_git(['commit', '-m', msg])
+                        run_git(['push', 'origin', 'main'])
+                        _time.sleep(70)  # Aynı dakikada tekrar tetiklenmesin
+                        continue
+                except Exception as e:
+                    print(f"Auto push hatası: {e}")
+            _time.sleep(30)  # 30 saniyede bir kontrol
+
+    global _auto_push_thread
+    _auto_push_thread = threading.Thread(target=loop, daemon=True)
+    _auto_push_thread.start()
+
+@app.route('/api/git/auto-push', methods=['GET'])
+def api_auto_push_status():
+    t = db.get_setting('git_auto_push_time', '')
+    return jsonify({'time': t})
+
+@app.route('/api/git/auto-push', methods=['POST'])
+def api_auto_push_set():
+    t = request.json.get('time', '').strip()
+    db.set_setting('git_auto_push_time', t)
+    return jsonify({'success': True, 'time': t})
+
 if __name__ == '__main__':
     db.init_db()
     # Auto-pull başlat (eğer ayarlıysa)
@@ -963,4 +1011,6 @@ if __name__ == '__main__':
             start_auto_pull(interval)
     except:
         pass
+    # Auto-push başlat
+    start_auto_push()
     app.run(host='0.0.0.0', port=5000, debug=True)
