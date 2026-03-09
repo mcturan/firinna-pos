@@ -1,4 +1,6 @@
-Flask==3.0.0
-python-escpos==3.0
-Pillow==10.1.0
-pytz==2023.3
+# Fırınna POS — Python Bağımlılıkları
+# Python 3.10+ gerektirir
+
+Flask>=3.0.0
+Werkzeug>=3.0.0
+Pillow>=10.0.0

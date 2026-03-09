@@ -1,266 +1,198 @@
-# 🍽️ Fırınna POS Sistemi
+# 🍽️ Fırınna POS
 
-Fırınna Cafe & Restaurant için özel geliştirilmiş hafif ve kullanışlı POS uygulaması.
-
-## ✨ Özellikler
-
-✅ **Kategori & Ürün Yönetimi**
-- Renk kodlu kategoriler
-- Sınırsız ürün ekleme
-- Hızlı ürün seçimi
-
-✅ **Masa & Bölge Yönetimi**
-- Bölgelere göre masa organizasyonu
-- Dolu/boş masa göstergesi
-- Sınırsız masa ve bölge
-
-✅ **Sipariş Yönetimi**
-- Hızlı sipariş alma
-- Gerçek zamanlı sipariş özeti
-- Adisyon yazdırma (XPrinter POS80)
-
-✅ **Masraf Takibi**
-- Kategorize masraf girişi
-- Tarih bazlı filtreleme
-- Toplam masraf özeti
-
-✅ **Raporlama**
-- Günlük satış raporları
-- Ürün bazlı analiz
-- Net kar/zarar hesaplama
-- Rapor yazdırma
-
-✅ **Yedekleme & Güvenlik**
-- Otomatik veritabanı yedekleme
-- Manuel yedek alma
-- Test verilerini temizleme
-
-✅ **Çoklu Cihaz Desteği**
-- Web tabanlı (kurulum yok)
-- PC, tablet, telefon uyumlu
-- Responsive tasarım
-
-## 📋 Gereksinimler
-
-- **İşletim Sistemi:** Pardus Linux (herhangi bir sürüm)
-- **Python:** 3.8 veya üstü
-- **Yazıcı:** XPrinter POS80 (Ethernet bağlantılı)
-- **Ağ:** Lokal ağ erişimi (opsiyonel)
-
-## 🚀 Kurulum
-
-### Adım 1: Dosyaları indirin
-```bash
-# Tüm dosyaları bir klasöre kopyalayın (örn: /opt/firinna-pos)
-cd /opt
-sudo mkdir firinna-pos
-cd firinna-pos
-# Dosyaları buraya kopyalayın
-```
-
-### Adım 2: Kurulum scriptini çalıştırın
-```bash
-sudo chmod +x install.sh
-sudo bash install.sh
-```
-
-Script otomatik olarak:
-- Python ve bağımlılıkları kurar
-- Veritabanını oluşturur
-- Sistem servisi kurar
-- Uygulamayı başlatır
-
-### Adım 3: Yazıcı ayarları
-Kurulum sırasında XPrinter POS80'in IP adresini girin.
-
-**Yazıcı IP'sini bulmak için:**
-1. Yazıcıyı açın
-2. Test sayfası çıktısı alın (genelde FEED tuşuna 3 saniye basılı tutarak)
-3. Test sayfasında IP adresi yazıyor olacak
-
-## 📱 Kullanım
-
-### İlk Kurulum Sonrası
-
-1. **Tarayıcıdan açın:** `http://localhost:5000`
-
-2. **Bölge ekleyin:**
-   - "Masa Yönetimi" → Bölge ekle
-   - Örnek: "İç Mekan", "Dış Mekan", "Teras"
-
-3. **Masalar ekleyin:**
-   - "Masa Yönetimi" → Masa ekle
-   - Örnek: "Masa 1", "Masa 2", vb.
-
-4. **Kategori oluşturun:**
-   - "Ürünler" → Kategori ekle
-   - Örnek: "Sıcak İçecekler", "Soğuk İçecekler", "Tatlılar"
-
-5. **Ürün ekleyin:**
-   - "Ürünler" → Ürün ekle
-   - İsim, kategori, fiyat girin
-
-### Sipariş Alma
-
-1. Ana sayfada masa seçin (dolu masalar kırmızı, boş masalar yeşil)
-2. Kategori seçin
-3. Ürünlere tıklayarak sipariş ekleyin
-4. "Adisyon Yazdır" ile fişi yazdırın
-5. "Hesap Kapat" ile ödeme alın
-
-### Masraf Girişi
-
-1. "Masraflar" sayfasına gidin
-2. Açıklama, kategori ve tutarı girin
-3. "Ekle" butonuna basın
-
-### Raporlar
-
-1. "Raporlar" sayfasına gidin
-2. Tarih seçin
-3. "Rapor Getir" ile günlük özeti görün
-4. "Yazdır" ile raporu yazıcıdan çıktı alın
-
-## 🔧 Ayarlar
-
-### Yazıcı IP Değiştirme
-1. "Raporlar" → Yazıcı Ayarları
-2. Yeni IP ve Port girin
-3. "Kaydet" butonuna basın
-4. "Test" ile bağlantıyı kontrol edin
-
-### Yedekleme
-
-**Manuel yedek:**
-1. "Raporlar" → Yedekleme
-2. "Yedek Al" butonuna basın
-3. Yedek dosyası `backups/` klasörüne kaydedilir
-
-**Otomatik yedek:**
-- Sistem her gece 03:00'te otomatik yedek alır
-- Yedekler: `backups/pos_backup_YYYYMMDD_HHMMSS.db`
-
-### Test Verilerini Temizleme
-
-**DİKKAT:** Bu işlem geri alınamaz!
-
-1. "Raporlar" → Test Verilerini Temizle
-2. Bugün hariç tüm sipariş ve masrafları siler
-3. Kategoriler, ürünler, masalar korunur
-
-## 🌐 Ağ Erişimi
-
-Uygulamaya başka cihazlardan erişmek için:
-
-1. Bilgisayarın IP adresini öğrenin:
-```bash
-hostname -I
-```
-
-2. Diğer cihazlardan tarayıcıda:
-```
-http://[IP-ADRESİ]:5000
-```
-
-Örnek: `http://192.168.1.50:5000`
-
-## 🛠️ Sorun Giderme
-
-### Uygulama açılmıyor
-```bash
-# Servis durumunu kontrol edin
-sudo systemctl status firinna-pos
-
-# Logları görün
-sudo journalctl -u firinna-pos -f
-
-# Yeniden başlatın
-sudo systemctl restart firinna-pos
-```
-
-### Yazıcı çalışmıyor
-1. Yazıcının açık olduğundan emin olun
-2. IP adresinin doğru olduğunu kontrol edin
-3. Aynı ağda olduğunuzu doğrulayın
-4. Test yazdırma yapın
-
-### Veritabanı hatası
-```bash
-# Veritabanını yeniden oluştur
-cd /opt/firinna-pos
-source venv/bin/activate
-rm pos_data.db
-python3 -c "import database; database.init_db()"
-```
-
-## 📂 Dosya Yapısı
-
-```
-firinna-pos/
-├── app.py              # Ana Flask uygulaması
-├── database.py         # Veritabanı işlemleri
-├── printer.py          # Yazıcı kontrolü
-├── requirements.txt    # Python bağımlılıkları
-├── install.sh          # Kurulum scripti
-├── pos_data.db         # SQLite veritabanı
-├── backups/            # Yedekler
-├── static/
-│   ├── css/
-│   │   └── style.css
-│   └── js/
-│       └── app.js
-└── templates/
-    ├── index.html      # Ana sayfa (masalar)
-    ├── products.html   # Ürün yönetimi
-    ├── tables.html     # Masa yönetimi
-    ├── expenses.html   # Masraflar
-    └── reports.html    # Raporlar
-```
-
-## 🔐 Güvenlik
-
-- Uygulama sadece lokal ağdan erişilebilir
-- Kullanıcı adı/şifre yok (iç kullanım için)
-- Hassas veri internet üzerinden paylaşılmaz
-
-## 💾 Yedekleme Stratejisi
-
-1. **Günlük otomatik yedek** (03:00)
-2. **Manuel yedek** (istediğiniz zaman)
-3. **Yedekleri harici diske kopyalayın** (haftalık önerilen)
-
-```bash
-# Yedekleri USB'ye kopyalama
-cp backups/* /media/usb/firinna-backups/
-```
-
-## 🆘 Destek
-
-Sorun yaşarsanız:
-1. Log dosyalarını kontrol edin
-2. Yazıcı bağlantısını test edin
-3. Servisi yeniden başlatın
-
-## 📄 Lisans
-
-Bu yazılım Fırınna Cafe & Restaurant için özel geliştirilmiştir.
-Kişisel kullanım içindir.
+**Fırınna Cafe** için özel geliştirilmiş, hafif ve tam özellikli satış noktası (POS) uygulaması.  
+Flask + SQLite tabanlı, internet bağlantısı gerektirmez, ağdaki her cihazdan tarayıcıyla erişilir.
 
 ---
 
-**Geliştirici:** Claude (Anthropic)  
-**Versiyon:** 1.0  
-**Tarih:** Şubat 2025  
-**İletişim:** Muhammed Cevad Turan (TA1XTA)
+## ✨ Özellikler
 
-## 📋 Dokümantasyon
+| Modül | Açıklama |
+|---|---|
+| 🪑 Masa & Bölge | Bölgelere göre masa yönetimi, dolu/boş gösterge |
+| 🛒 Sipariş | Hızlı ürün ekleme, miktar düzenleme, ikram, mutfak notu |
+| 🖨️ Fiş Yazdırma | ESC/POS ile müşteri fişi + mutfak fişi (XPrinter POS80) |
+| 📋 Geçmiş Sipariş | Gün içi kapanmış siparişler, yeniden açma |
+| 📦 Stok | Stok girişi, hareket takibi, min stok uyarısı |
+| 💰 Kasa | Nakit/banka ayrımı, masraf girişi, dönem özeti |
+| 📊 Raporlar | Günlük/haftalık/aylık satış, ürün bazlı analiz, CSV export |
+| ⚙️ Ayarlar | Yazıcı IP, işletme adı, logo, fiş notu |
 
-- **[🗺️ Roadmap](https://htmlpreview.github.io/?https://github.com/mcturan/firinna-pos/blob/main/roadmap.html)** - Geliştirme yol haritası ve özellik durumları
-- **[📝 Changelog](https://htmlpreview.github.io/?https://github.com/mcturan/firinna-pos/blob/main/CHANGELOG.html)** - Sürüm notları ve değişiklik geçmişi
+---
 
+## 🖥️ Gereksinimler
 
-## 📋 Dokümantasyon
+### Donanım
+- Bilgisayar: Pardus / Ubuntu / Debian Linux (Raspberry Pi de çalışır)
+- Yazıcı: **XPrinter POS80** veya ESC/POS uyumlu termal yazıcı (ağ bağlantılı)
+- Ağ: Yazıcı ve POS bilgisayarı aynı yerel ağda olmalı
 
-- **[🗺️ Roadmap](https://htmlpreview.github.io/?https://github.com/mcturan/firinna-pos/blob/main/roadmap.html)** - Geliştirme yol haritası ve özellik durumları
-- **[📝 Changelog](https://htmlpreview.github.io/?https://github.com/mcturan/firinna-pos/blob/main/CHANGELOG.html)** - Sürüm notları ve değişiklik geçmişi
+### Yazılım
+| Bağımlılık | Minimum Sürüm | Kurulum |
+|---|---|---|
+| Python | 3.10 | `sudo apt install python3 python3-pip python3-venv` |
+| Flask | 3.0 | `pip install flask` |
+| Pillow | 10.0 | `pip install pillow` |
+| SQLite | 3.x | Python ile birlikte gelir |
 
+> Yazıcı saf TCP/IP socket ile haberleşir, ek sürücü gerekmez.
+
+---
+
+## 🚀 Kurulum
+
+### 1. Otomatik (Önerilen)
+
+```bash
+git clone https://github.com/mcturan/firinna-pos.git
+cd firinna-pos
+sudo bash install.sh
+```
+
+Script şunları yapar:
+- Python virtual environment oluşturur
+- Bağımlılıkları kurar
+- Systemd servisi oluşturur ve başlatır
+- Yazıcı IP'sini sorar
+
+### 2. Manuel
+
+```bash
+# Repoyu indir
+git clone https://github.com/mcturan/firinna-pos.git
+cd firinna-pos
+
+# Sanal ortam oluştur
+python3 -m venv venv
+source venv/bin/activate
+
+# Bağımlılıkları kur
+pip install -r requirements.txt
+
+# Uygulamayı başlat
+python app.py
+```
+
+Tarayıcıdan `http://localhost:5000` adresine git.
+
+### 3. Systemd Servisi (Otomatik Başlatma)
+
+```bash
+sudo nano /etc/systemd/system/firinna-pos.service
+```
+
+```ini
+[Unit]
+Description=Firinna POS Service
+After=network.target
+
+[Service]
+Type=simple
+User=KULLANICI_ADI
+WorkingDirectory=/opt/firinna-pos
+Environment="PATH=/opt/firinna-pos/venv/bin"
+ExecStart=/opt/firinna-pos/venv/bin/python /opt/firinna-pos/app.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable firinna-pos
+sudo systemctl start firinna-pos
+```
+
+---
+
+## ⚙️ Yapılandırma
+
+Uygulama ayarları tarayıcıdan **⚙️ Ayarlar** menüsünden yapılır:
+
+| Ayar | Açıklama |
+|---|---|
+| İşletme Adı | Fişlerde görünen başlık |
+| Yazıcı IP | Müşteri fişi yazıcısı (örn: `192.168.1.100`) |
+| Mutfak Yazıcısı IP | Mutfak fişi yazıcısı (örn: `192.168.1.101`) |
+| Yazıcı Portu | Varsayılan `9100` |
+| Fiş Notu | Fişin altında çıkan teşekkür notu |
+
+> Yazıcı ayarları veritabanında saklanır, `.env` dosyası gerekmez.
+
+---
+
+## 🗃️ Veritabanı
+
+Uygulama `pos_data.db` (SQLite) kullanır. İlk çalıştırmada otomatik oluşturulur.
+
+**Yedekleme:**
+```bash
+cp /opt/firinna-pos/pos_data.db ~/yedekler/pos_$(date +%Y%m%d).db
+```
+
+**Güncelleme sonrası migrasyon:**
+```bash
+python migration_faz1.py   # FAZ 1 → FAZ 2
+python migration_faz2.py   # FAZ 2 → FAZ 3
+```
+
+---
+
+## 🔧 Servis Yönetimi
+
+```bash
+sudo systemctl start firinna-pos      # Başlat
+sudo systemctl stop firinna-pos       # Durdur
+sudo systemctl restart firinna-pos    # Yeniden başlat
+sudo systemctl status firinna-pos     # Durum
+sudo journalctl -u firinna-pos -f     # Canlı log
+```
+
+---
+
+## 📁 Proje Yapısı
+
+```
+firinna-pos/
+├── app.py                  # Flask uygulama ve tüm API endpoint'leri
+├── database.py             # SQLite veritabanı işlemleri
+├── printer.py              # ESC/POS yazıcı sınıfı
+├── requirements.txt        # Python bağımlılıkları
+├── install.sh              # Otomatik kurulum scripti
+├── migration_faz1.py       # v1→v2 veritabanı migrasyonu
+├── migration_faz2.py       # v2→v3 veritabanı migrasyonu
+├── static/
+│   └── css/style.css       # Tüm CSS (responsive, design system)
+└── templates/
+    ├── index.html          # Ana sayfa (masa görünümü + sipariş modali)
+    ├── products.html       # Ürün & kategori yönetimi
+    ├── tables.html         # Masa & bölge yönetimi
+    ├── kasa.html           # Kasa & muhasebe
+    ├── expenses.html       # Masraf girişi
+    ├── stok.html           # Stok takibi
+    ├── recete.html         # Reçete yönetimi
+    ├── reports.html        # Raporlar
+    ├── settings.html       # Ayarlar
+    └── receipts/
+        ├── customer_receipt.html
+        └── kitchen_receipt.html
+```
+
+---
+
+## 🗺️ Roadmap
+
+Bkz: [ROADMAP.md](ROADMAP.md)
+
+---
+
+## 👤 Geliştirici
+
+**Muhammed Cevad Turan** — TA1XTA  
+Fırınna Cafe, Beyoğlu İstanbul
+
+---
+
+*Fırınna POS — TA1XTA © 2026*

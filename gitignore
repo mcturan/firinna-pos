@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+*.egg-info/
+
+# Veritabanı (prod DB'yi commit etme)
+pos_data.db
+*.db-journal
+
+# Yedekler
+backups/
+*.bak
+*.backup
+
+# Ortam
+.env
+*.env
+
+# Log
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Geçici
+*.tmp
+*.swp
