@@ -151,6 +151,45 @@ def get_products(category_id=None):
     conn.close()
     return [dict(prod) for prod in products]
 
+def migrate_product_stock_link():
+    """products tablosuna stock_item_id kolonu ekle (bir kez)"""
+    conn = get_db()
+    cols = [r[1] for r in conn.execute('PRAGMA table_info(products)').fetchall()]
+    if 'stock_item_id' not in cols:
+        conn.execute('ALTER TABLE products ADD COLUMN stock_item_id INTEGER DEFAULT NULL')
+        conn.commit()
+    conn.close()
+
+def get_product_stock_link(product_id):
+    conn = get_db()
+    row = conn.execute('SELECT stock_item_id FROM products WHERE id=?', (product_id,)).fetchone()
+    conn.close()
+    return row['stock_item_id'] if row else None
+
+def set_product_stock_link(product_id, stock_item_id):
+    conn = get_db()
+    conn.execute('UPDATE products SET stock_item_id=? WHERE id=?', (stock_item_id, product_id))
+    conn.commit()
+    conn.close()
+
+def deduct_stock_for_order(order_id):
+    """Sipariş kapanınca direkt bağlı ürünlerin stoğunu düş"""
+    conn = get_db()
+    items = conn.execute('''
+        SELECT oi.product_id, oi.quantity, p.stock_item_id, p.name
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ? AND oi.is_complimentary = 0 AND p.stock_item_id IS NOT NULL
+    ''', (order_id,)).fetchall()
+    for item in items:
+        conn.execute('''INSERT INTO stock_movements
+            (stock_item_id, movement_type, quantity, cost, reason, description)
+            VALUES (?, 'out', ?, 0, 'satis', ?)''',
+            (item['stock_item_id'], item['quantity'], f'Sipariş #{order_id} — {item["name"]}'))
+    conn.commit()
+    conn.close()
+    return len(items)
+
 def add_product(name, category_id, price):
     conn = get_db()
     conn.execute('INSERT INTO products (name, category_id, price) VALUES (?, ?, ?)', 

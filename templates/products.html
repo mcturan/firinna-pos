@@ -154,27 +154,41 @@
                 categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         }
 
+        let stockItemsForLink = [];
+
         async function loadProducts() {
-            const products = await fetch('/api/products').then(r => r.json());
+            const [products, stockItems] = await Promise.all([
+                fetch('/api/products').then(r => r.json()),
+                fetch('/api/stock').then(r => r.json())
+            ]);
+            stockItemsForLink = stockItems;
             const productsList = document.getElementById('productsList');
-            
+
             if (products.length === 0) {
                 productsList.innerHTML = '<p class="no-data">Henüz ürün eklenmemiş</p>';
                 return;
             }
-            
-            productsList.innerHTML = products.map(prod => `
+
+            productsList.innerHTML = products.map(prod => {
+                const linked = prod.stock_item_id
+                    ? stockItems.find(s => s.id === prod.stock_item_id)
+                    : null;
+                const badge = linked
+                    ? `<span style="font-size:.72rem;background:#d1fae5;color:#065f46;border-radius:10px;padding:.1rem .5rem;margin-left:.4rem;">📦 ${linked.name}</span>`
+                    : `<span style="font-size:.72rem;background:#f1f5f9;color:#94a3b8;border-radius:10px;padding:.1rem .5rem;margin-left:.4rem;">Stok yok</span>`;
+                return `
                 <div class="item-row" id="prod-row-${prod.id}">
                     <div class="item-info">
                         <span class="item-name">${prod.name}</span>
-                        <span class="item-meta">${prod.category_name} • ${prod.price.toFixed(2)} TL</span>
+                        <span class="item-meta">${prod.category_name} • ${prod.price.toFixed(2)} TL ${badge}</span>
                     </div>
-                    <div style="display:flex;gap:.4rem;">
+                    <div style="display:flex;gap:.4rem;align-items:center;">
+                        <button style="background:none;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:.8rem;padding:.25rem .5rem;color:#4a5568;" onclick="openStockLink(${prod.id},'${prod.name}',${prod.stock_item_id||'null'})" title="Stok Bağla">📦</button>
                         <button class="btn-delete" style="background:none;border:none;cursor:pointer;font-size:1rem;" onclick="editProduct(${prod.id})" data-name="${prod.name}" data-price="${prod.price}" data-catid="${prod.category_id||0}" id="prod-btn-${prod.id}" title="Düzenle">✏️</button>
                         <button class="btn-delete" onclick="deleteProduct(${prod.id})">🗑️</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         function editCategory(id) {
@@ -246,6 +260,32 @@
             loadCategories(); loadProducts();
         }
 
+        function openStockLink(productId, productName, currentStockId) {
+            document.getElementById('slProductId').value = productId;
+            document.getElementById('slProductName').textContent = productName;
+            const sel = document.getElementById('slStockSelect');
+            sel.innerHTML = '<option value="">— Bağlama (stok düşme yok) —</option>' +
+                stockItemsForLink.map(s =>
+                    `<option value="${s.id}" ${s.id === currentStockId ? 'selected' : ''}>${s.name} (${Number(s.current_qty||0).toFixed(1)} ${s.unit})</option>`
+                ).join('');
+            document.getElementById('stockLinkModal').style.display = 'block';
+        }
+
+        async function saveStockLink() {
+            const pid = document.getElementById('slProductId').value;
+            const sid = document.getElementById('slStockSelect').value;
+            if (sid) {
+                await fetch(`/api/products/${pid}/stock-link`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({stock_item_id: parseInt(sid)})
+                });
+            } else {
+                await fetch(`/api/products/${pid}/stock-link`, {method: 'DELETE'});
+            }
+            document.getElementById('stockLinkModal').style.display = 'none';
+            loadProducts();
+        }
+
         async function deleteProduct(id) {
             if (!confirm('Bu ürünü silmek istediğinize emin misiniz?')) return;
             
@@ -314,6 +354,22 @@
         }
     </script>
     </div><!-- /container -->
+
+    <!-- Stok Bağlantı Modal -->
+    <div id="stockLinkModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;display:none;">
+        <div style="background:white;border-radius:16px;padding:1.5rem;width:90%;max-width:420px;margin:auto;margin-top:15vh;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+            <h3 style="margin:0 0 .5rem;font-size:1rem;">📦 Stok Bağlantısı</h3>
+            <p style="font-size:.85rem;color:#718096;margin:0 0 1rem;">
+                <strong id="slProductName"></strong> satıldığında seçilen stok kaleminden <strong>1 adet</strong> otomatik düşer.
+            </p>
+            <input type="hidden" id="slProductId">
+            <select id="slStockSelect" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;margin-bottom:1rem;"></select>
+            <div style="display:flex;gap:.5rem;">
+                <button onclick="saveStockLink()" style="flex:1;padding:.65rem;background:#2d6a4f;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">💾 Kaydet</button>
+                <button onclick="document.getElementById('stockLinkModal').style.display='none'" style="flex:1;padding:.65rem;background:#f1f5f9;color:#4a5568;border:none;border-radius:8px;font-weight:600;cursor:pointer;">İptal</button>
+            </div>
+        </div>
+    </div>
 
     <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
         Fırınna POS &mdash; TA1XTA &copy; 2026

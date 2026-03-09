@@ -1137,6 +1137,11 @@
             document.getElementById('orderHistoryModal').style.display = 'block';
         }
 
+        async function printHistoryReceipt(orderId) {
+            const result = await fetch(`/api/print/receipt/${orderId}`, {method: 'POST'}).then(r => r.json());
+            if (!result.success) alert('Yazıcı hatası: ' + (result.error || 'bilinmiyor'));
+        }
+
         function closeOrderHistory() {
             document.getElementById('orderHistoryModal').style.display = 'none';
         }
@@ -1153,7 +1158,11 @@
                 return;
             }
             
-            list.innerHTML = orders.map(order => `
+            const todayStr = new Date().toISOString().slice(0,10);
+            list.innerHTML = orders.map(order => {
+                const orderDate = order.closed_at ? order.closed_at.slice(0,10) : '';
+                const isToday = orderDate === todayStr;
+                return `
                 <div style="border:1px solid #e2e8f0;border-radius:10px;padding:.85rem 1rem;margin-bottom:.6rem;background:white;">
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;">
                         <div style="flex:1;min-width:0;">
@@ -1165,13 +1174,14 @@
                         <div style="text-align:right;flex-shrink:0;">
                             <div style="font-size:1rem;font-weight:700;color:#2d6a4f;">${order.total.toFixed(2)} ₺</div>
                             <div style="display:flex;gap:.3rem;margin-top:.4rem;justify-content:flex-end;">
-                                <button class="btn btn-secondary" onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.3rem .6rem;font-size:.8rem;">✏️</button>
-                                <button class="btn" onclick="deleteOrder(${order.id})" style="background:#f56565;color:white;padding:.3rem .6rem;font-size:.8rem;" title="Sil">🗑️</button>
+                                ${isToday ? `<button class="btn btn-secondary" onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.3rem .6rem;font-size:.8rem;">✏️</button>` : ''}
+                                <button class="btn" onclick="printHistoryReceipt(${order.id})" title="Fiş Yazdır" style="background:#48bb78;color:white;padding:.3rem .6rem;font-size:.8rem;">🖨️</button>
+                                <button class="btn" onclick="deleteOrder(${order.id})" title="Sil" style="background:#f56565;color:white;padding:.3rem .6rem;font-size:.8rem;">🗑️</button>
                             </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         function clearHistoryFilter() {

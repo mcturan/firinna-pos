@@ -12,6 +12,13 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
+# DB migration — __name__ kontrolü olmadan her başlangıçta çalışır
+try:
+    db.init_db()
+    db.migrate_product_stock_link()
+except Exception as _e:
+    print(f"Startup migration warning: {_e}")
+
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -370,6 +377,7 @@ def api_delete_order_item(item_id):
 @app.route('/api/orders/<int:order_id>/close', methods=['POST'])
 def api_close_order(order_id):
     db.close_order(order_id)
+    db.deduct_stock_for_order(order_id)
     telegram_notify.check_low_stock_after_order(order_id)
     return jsonify({'success': True})
 
@@ -536,6 +544,7 @@ def api_close_with_payment(order_id):
         data.get('tip_amount', 0),
         data.get('tip_method', 'cash')
     )
+    db.deduct_stock_for_order(order_id)
     telegram_notify.check_low_stock_after_order(order_id)
     return jsonify({'success': True})
 
@@ -894,6 +903,21 @@ def api_remove_order_item(item_id):
     conn.commit()
     conn.close()
     return jsonify({'success': True})
+
+# ===== ÜRÜN-STOK BAĞLANTISI =====
+
+@app.route('/api/products/<int:product_id>/stock-link', methods=['GET', 'POST', 'DELETE'])
+def api_product_stock_link(product_id):
+    if request.method == 'GET':
+        sid = db.get_product_stock_link(product_id)
+        return jsonify({'stock_item_id': sid})
+    elif request.method == 'POST':
+        sid = request.json.get('stock_item_id')
+        db.set_product_stock_link(product_id, sid)
+        return jsonify({'success': True})
+    elif request.method == 'DELETE':
+        db.set_product_stock_link(product_id, None)
+        return jsonify({'success': True})
 
 # ===== STOK UYARI API =====
 
@@ -1441,9 +1465,14 @@ def api_auto_push_set():
 
 if __name__ == '__main__':
     db.init_db()
-    db.init_muhasebe_tables()
-    db.migrate_orders_to_transactions()
-    db.init_telegram_contacts()
+    try: db.init_muhasebe_tables()
+    except: pass
+    try: db.migrate_product_stock_link()
+    except: pass
+    try: db.migrate_orders_to_transactions()
+    except: pass
+    try: db.init_telegram_contacts()
+    except: pass
     # Auto-pull başlat (local config'e göre)
     try:
         start_auto_pull_smart()
