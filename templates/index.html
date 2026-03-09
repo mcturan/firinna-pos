@@ -52,6 +52,10 @@
 
     <div class="container">
         <div class="zone-tabs" id="zoneTabs"></div>
+        <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap;">
+            <button onclick="openOrderHistory()" style="padding:.45rem 1rem;background:#4a5568;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">📜 Geçmiş Siparişler</button>
+            <button onclick="openPastOrderModal()" style="padding:.45rem 1rem;background:#667eea;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">➕ Geçmiş Sipariş Ekle</button>
+        </div>
         <div class="tables-grid" id="tablesGrid"></div>
     </div>
 
@@ -128,6 +132,8 @@
                             <button class="btn" onclick="sendToPhone()" style="background:#9f7aea;color:white;">📱</button>
                         </div>
                         <button class="btn" onclick="cancelOrder()" style="background:#f56565;color:white;width:100%;">🗑️ Fiş İptal</button>
+                        <hr style="margin:.75rem 0;border:none;border-top:1px solid #e2e8f0;">
+                        <button class="btn" onclick="openOrderHistory()" style="background:#4a5568;color:white;width:100%;">📜 Geçmiş Siparişler</button>
                         </div>
                     </div>
                 </div>
@@ -612,12 +618,14 @@
             document.querySelectorAll('.close').forEach(el => {
                 el.onclick = function() {
                     document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+                    refreshZone();
                 };
             });
             
             window.onclick = function(event) {
                 if (event.target.classList.contains('modal')) {
                     event.target.style.display = 'none';
+                    refreshZone();
                 }
             };
         });
@@ -795,6 +803,7 @@
             });
             currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
             updateOrderSummary();
+            refreshZone(); // Masa rengini hemen güncelle
         }
 
         async function changeQuantity(itemId, change) {
@@ -1145,22 +1154,22 @@
             }
             
             list.innerHTML = orders.map(order => `
-                <div style="border: 2px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; background: white;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <div>
-                            <strong style="font-size: 1.2rem;">${order.table_name} (${order.zone_name})</strong>
-                            <div style="color: #718096; font-size: 0.9rem; margin-top: 0.25rem;">
-                                ${new Date(order.closed_at).toLocaleString('tr-TR')}
+                <div style="border:1px solid #e2e8f0;border-radius:10px;padding:.85rem 1rem;margin-bottom:.6rem;background:white;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;">
+                        <div style="flex:1;min-width:0;">
+                            <strong style="font-size:.9rem;">${order.table_name} (${order.zone_name})</strong>
+                            <div style="color:#718096;font-size:.78rem;margin-top:.1rem;">${new Date(order.closed_at).toLocaleString('tr-TR')}</div>
+                            <div style="font-size:.78rem;color:#94a3b8;margin-top:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${order.items.map(i=>`${i.quantity}x ${i.product_name}`).join(', ')}</div>
+                            ${order.discount_value ? `<div style="font-size:.75rem;color:#f56565;margin-top:.15rem;">İndirim: ${order.discount_value} ₺</div>` : ''}
+                        </div>
+                        <div style="text-align:right;flex-shrink:0;">
+                            <div style="font-size:1rem;font-weight:700;color:#2d6a4f;">${order.total.toFixed(2)} ₺</div>
+                            <div style="display:flex;gap:.3rem;margin-top:.4rem;justify-content:flex-end;">
+                                <button class="btn btn-secondary" onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.3rem .6rem;font-size:.8rem;">✏️</button>
+                                <button class="btn" onclick="deleteOrder(${order.id})" style="background:#f56565;color:white;padding:.3rem .6rem;font-size:.8rem;" title="Sil">🗑️</button>
                             </div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #667eea;">${order.total.toFixed(2)} TL</div>
-                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;"><button class="btn btn-secondary" onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding: 0.5rem 0.75rem;">✏️</button><button class="btn" onclick="deleteOrder(${order.id})" style="background: #f56565; color: white; padding: 0.5rem 0.75rem;" title="Sil">🗑️</button></div>
                     </div>
-                    <div style="font-size: 0.9rem; color: #718096;">
-                        ${order.items.map(item => `${item.quantity}x ${item.product_name}`).join(', ')}
-                    </div>
-                    ${order.discount_value ? `<div style="margin-top: 0.5rem; color: #f56565;">İndirim: ${order.discount_value} (${order.discount_reason})</div>` : ''}
                 </div>
             `).join('');
         }
