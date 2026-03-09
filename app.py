@@ -12,6 +12,9 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
+APP_VERSION = "1.2.0"
+APP_BUILD   = "2026-03-09"
+
 # DB migration — __name__ kontrolü olmadan her başlangıçta çalışır
 try:
     db.init_db()
@@ -27,6 +30,24 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Ana sayfa (masalar görünümü)
+@app.route('/api/version')
+def api_version():
+    import sqlite3
+    db_path = 'pos_data.db'
+    try:
+        conn = sqlite3.connect(db_path)
+        pv = conn.execute('PRAGMA user_version').fetchone()[0]
+        conn.close()
+    except:
+        pv = 0
+    db_size = os.path.getsize(db_path) if os.path.exists(db_path) else 0
+    return jsonify({
+        'app_version': APP_VERSION,
+        'build_date':  APP_BUILD,
+        'db_version':  pv,
+        'db_size_kb':  round(db_size / 1024, 1)
+    })
+
 @app.route('/')
 def index():
     return render_template('index.html')

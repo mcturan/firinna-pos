@@ -1658,6 +1658,25 @@
         setInterval(loadAlerts, 60000);
     })();
     </script>
+
+    <!-- Footer -->
+    <div id="app-footer" style="text-align:center;padding:1.5rem 1rem .8rem;color:#a0aec0;font-size:.72rem;border-top:1px solid #f0f0f0;margin-top:2rem;">
+        <span>🍽️ Fırınna POS</span>
+        <span style="margin:0 .5rem;">·</span>
+        <span id="footer-version">v—</span>
+        <span style="margin:0 .5rem;">·</span>
+        <span id="footer-build">—</span>
+        <span style="margin:0 .5rem;">·</span>
+        <span>DB <span id="footer-dbver">—</span> (<span id="footer-dbsize">—</span>)</span>
+    </div>
+    <script>
+    fetch('/api/version').then(r=>r.json()).then(d=>{
+        document.getElementById('footer-version').textContent = 'v'+d.app_version;
+        document.getElementById('footer-build').textContent   = d.build_date;
+        document.getElementById('footer-dbver').textContent  = 'schema '+d.db_version;
+        document.getElementById('footer-dbsize').textContent = d.db_size_kb+' KB';
+    }).catch(()=>{});
+    </script>
 </body>
 </html>
 <script>

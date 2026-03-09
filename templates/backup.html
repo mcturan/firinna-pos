@@ -51,27 +51,27 @@
 </head>
 <body>
 <nav class="navbar">
-    <div class="nav-brand">&#127829; Firinna POS</div>
-    <div class="nav-links">
-        <a href="/" class="nav-link">&#127968; Siparisler</a>
-        <div class="nav-dropdown" id="navDropdown">
-            <button class="nav-dropdown-btn" onclick="document.getElementById('navDropdown').classList.toggle('open')">&#9881;&#65039; Yonetim &#9660;</button>
-            <div class="nav-dropdown-menu">
-                <a href="/kasa">&#128176; Kasa</a>
-                <a href="/muhasebe">&#128211; Muhasebe</a>
-                <hr>
-                <a href="/products">&#127838; Urunler</a>
-                <a href="/stok">&#128230; Stok</a>
-                <a href="/recete">&#129518; Recete</a>
-                <a href="/expenses">&#128228; Masraflar</a>
-                <a href="/tables">&#129681; Masa Yonetimi</a>
-                <hr>
-                <a href="/backup">&#128190; Yedek</a>
-                <a href="/settings">&#9881;&#65039; Ayarlar</a>
+        <div class="nav-brand">🍽️ Fırınna POS</div>
+        <div class="nav-links">
+            <a href="/">Masalar</a>
+            <div class="nav-dropdown" id="navDropdown">
+                <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
+                <div class="nav-dropdown-menu">
+            <a href="/kasa">💰 Kasa</a>
+            <a href="/muhasebe">📒 Muhasebe</a>
+            <hr>
+            <a href="/products">🍞 Ürünler</a>
+            <a href="/stok">📦 Stok</a>
+            <a href="/recete">🧾 Reçete</a>
+            <a href="/expenses">📤 Masraflar</a>
+            <a href="/tables">🪑 Masa Yönetimi</a>
+            <hr>
+            <a href="/backup" class="active">💾 Yedek</a>
+            <a href="/settings">⚙️ Ayarlar</a>
+                </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 <div class="container" style="max-width:860px;">
     <div style="margin-bottom:1.1rem;">
         <h1 style="font-size:1.3rem;margin:0 0 .2rem;color:#1a202c;">&#128190; Yedekleme &amp; Senkronizasyon</h1>
@@ -244,6 +244,8 @@ async function saveAutoPull(){var mode=document.querySelector("input[name=\"pull
 async function loadAutoPushSetting(){try{var d=await fetch("/api/git/auto-push").then(r=>r.json()),st=document.getElementById("auto-push-status");if(d.mode==="interval"&&d.interval>0){document.getElementById("push-mode-interval").checked=true;document.getElementById("auto-push-interval").value=String(d.interval);togglePushMode();st.textContent="Her "+d.interval+" dk aktif";}else if(d.mode==="time"&&d.time){document.getElementById("push-mode-time").checked=true;document.getElementById("auto-push-time").value=d.time;togglePushMode();st.textContent="Her gun "+d.time+"'de aktif";}else{document.getElementById("push-mode-off").checked=true;st.textContent="Kapali";}}catch(e){}}
 async function saveAutoPush(){var mode=document.querySelector("input[name=\"push-mode\"]:checked").value,p={mode};if(mode==="interval")p.interval=parseInt(document.getElementById("auto-push-interval").value);if(mode==="time")p.time=document.getElementById("auto-push-time").value;var d=await fetch("/api/git/auto-push",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}).then(r=>r.json());document.getElementById("auto-push-status").textContent=mode==="interval"?"Her "+p.interval+" dk aktif":mode==="time"?"Her gun "+p.time+"'de aktif":"Kapali";showToast(d.success?"&#10003; Kaydedildi!":"&#10008; Hata",d.success?"ok":"err");}
 function showGitLog(text){var b=document.getElementById("git-log");b.style.display="block";b.textContent=text;b.scrollTop=b.scrollHeight;}
+function toggleNav(){document.getElementById('navDropdown').classList.toggle('open');}
+document.addEventListener('click',function(e){var d=document.getElementById('navDropdown');if(d&&!d.contains(e.target))d.classList.remove('open');});
 loadBackupList();loadGitStatus();loadAutoPullSetting();loadAutoPushSetting();
 </script>
 </body>
