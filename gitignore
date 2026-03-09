@@ -6,18 +6,18 @@ venv/
 .venv/
 *.egg-info/
 
-# Veritabanı (prod DB'yi commit etme)
-pos_data.db
+# Veritabanı yedekleri (ana DB dahil edilir)
 *.db-journal
+*.db-wal
+*.db-shm
+backups/
 
 # Yedekler
-backups/
 *.bak
 *.backup
 
-# Ortam
+# Ortam (token burada saklanıyor, commit etme)
 .env
-*.env
 
 # Log
 *.log
@@ -33,3 +33,4 @@ Thumbs.db
 # Geçici
 *.tmp
 *.swp
+local_config.json
