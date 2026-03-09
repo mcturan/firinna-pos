@@ -42,15 +42,32 @@
         <div class="nav-brand">🍽️ Fırınna POS</div>
         <div class="nav-links">
             <a href="/">Masalar</a>
-            <a href="/products">Ürünler</a>
-            <a href="/kasa">Kasa</a>
-            <a href="/stok" class="active">Stok</a>
-            <a href="/recete">Reçete</a>
-            <a href="/expenses">Masraflar</a>
-            <a href="/tables">Masa Yönetimi</a>
-            <a href="/reports">Raporlar</a>
+            <div class="nav-dropdown" id="navDropdown">
+                <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
+                <div class="nav-dropdown-menu">
+            <a href="/kasa">💰 Kasa</a>
+            <a href="/reports">📊 Raporlar</a>
+            <hr>
+            <a href="/products">🍞 Ürünler</a>
+            <a href="/stok" class="active">📦 Stok</a>
+            <a href="/recete">🧾 Reçete</a>
+            <a href="/expenses">📤 Masraflar</a>
+            <a href="/tables">🪑 Masa Yönetimi</a>
+            <hr>
+            <a href="/settings">⚙️ Ayarlar</a>
+                </div>
+            </div>
         </div>
     </nav>
+    <script>
+        function toggleNav() {
+            document.getElementById('navDropdown').classList.toggle('open');
+        }
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('navDropdown');
+            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+        });
+    </script>
 
     <div class="container">
         <h1 style="margin-bottom:1.5rem;">📦 Stok Yönetimi</h1>
@@ -129,7 +146,7 @@
                     <input type="number" id="moveQty" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0">
                 </div>
                 <div>
-                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Maliyet ₺ (opsiyonel)</label>
+                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Tutar ₺ <span id="costRequired" style="color:#e53e3e;font-size:.82rem;">(Alım için zorunlu)</span></label>
                     <input type="number" id="moveCost" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0.00">
                 </div>
                 <div>
@@ -369,6 +386,8 @@
             document.getElementById('moveQty').value = '';
             document.getElementById('moveCost').value = '';
             document.getElementById('moveDesc').value = '';
+            document.getElementById('moveType').value = 'in';
+            document.getElementById('movePaymentDiv').style.display = 'block';
             document.getElementById('moveModal').classList.add('open');
         }
         function closeMoveModal() { document.getElementById('moveModal').classList.remove('open'); }
@@ -376,6 +395,7 @@
         function onMoveTypeChange() {
             const type = document.getElementById('moveType').value;
             document.getElementById('movePaymentDiv').style.display = type === 'in' ? 'block' : 'none';
+            document.getElementById('costRequired').style.display = type === 'in' ? 'inline' : 'none';
         }
 
         async function saveMovement() {
@@ -386,7 +406,8 @@
             const desc = document.getElementById('moveDesc').value.trim();
             const payment = document.getElementById('movePayment').value;
             if (isNaN(qty) || qty <= 0) { alert('Geçerli bir miktar girin.'); return; }
-            await fetch(`/api/stock/${id}/movement`, {
+            if (type === 'in' && (!cost || cost <= 0)) { alert('Alım işlemi için tutar zorunludur.'); return; }
+            const res = await fetch(`/api/stock/${id}/movement`, {
                 method: 'POST', headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({
                     movement_type: type, quantity: qty, cost,
@@ -395,9 +416,18 @@
                     description: desc
                 })
             });
+            const result = await res.json();
+            if (!result.success) {
+                alert('Hata: ' + (result.error || 'Bilinmeyen hata'));
+                return;
+            }
             closeMoveModal();
             loadStock();
         }
     </script>
+
+    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
+        Fırınna POS &mdash; TA1XTA &copy; 2026
+    </footer>
 </body>
 </html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayarlar - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .settings-card { background:white; border-radius:14px; padding:2rem; box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.5rem; }
+        .settings-card h3 { margin:0 0 1.5rem; color:#2d3748; font-size:1.1rem; display:flex; align-items:center; gap:.5rem; }
+        .field-group { display:flex; flex-direction:column; gap:1rem; }
+        .field-group label { display:block; font-weight:600; margin-bottom:.3rem; color:#4a5568; font-size:.9rem; }
+        .field-group input, .field-group textarea {
+            width:100%; padding:.6rem; border:2px solid #e2e8f0; border-radius:8px;
+            font-size:1rem; box-sizing:border-box; font-family:inherit;
+        }
+        .field-group input:focus, .field-group textarea:focus { border-color:#4299e1; outline:none; }
+        .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        .printer-box { background:#f8fafc; border-radius:10px; padding:1rem; margin-bottom:1rem; }
+        .printer-box p { font-weight:700; margin:0 0 .8rem; }
+        .save-row { display:flex; gap:.75rem; margin-top:.5rem; }
+        .save-row button { flex:1; }
+        .logo-area { display:flex; flex-direction:column; align-items:center; gap:1rem; }
+        #logo-preview-box { width:200px; height:100px; border:2px dashed #cbd5e1; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#f8fafc; }
+        .toast { position:fixed; bottom:2rem; right:2rem; background:#2d6a4f; color:white; padding:1rem 1.5rem; border-radius:10px; font-weight:600; z-index:9999; opacity:0; transition:opacity .3s; }
+        .toast.show { opacity:1; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🍽️ Fırınna POS</div>
+        <div class="nav-links">
+            <a href="/">Masalar</a>
+            <div class="nav-dropdown" id="navDropdown">
+                <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
+                <div class="nav-dropdown-menu">
+            <a href="/kasa">💰 Kasa</a>
+            <a href="/reports">📊 Raporlar</a>
+            <hr>
+            <a href="/products">🍞 Ürünler</a>
+            <a href="/stok">📦 Stok</a>
+            <a href="/recete">🧾 Reçete</a>
+            <a href="/expenses">📤 Masraflar</a>
+            <a href="/tables">🪑 Masa Yönetimi</a>
+            <hr>
+            <a href="/settings" class="active">⚙️ Ayarlar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>
+        function toggleNav() { document.getElementById('navDropdown').classList.toggle('open'); }
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('navDropdown');
+            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+        });
+    </script>
+
+    <div class="container">
+        <h1 style="margin-bottom:1.5rem;">⚙️ Ayarlar</h1>
+
+        <!-- İşletme Bilgileri -->
+        <div class="settings-card">
+            <h3>🏪 İşletme Bilgileri</h3>
+            <div class="field-group">
+                <div><label>İşletme Adı</label><input type="text" id="s-restaurant-name" placeholder="Fırınna"></div>
+                <div><label>Adres</label><input type="text" id="s-restaurant-address" placeholder="Beyoğlu, İstanbul"></div>
+                <div class="two-col">
+                    <div><label>Telefon</label><input type="text" id="s-restaurant-phone" placeholder="+90 212 ..."></div>
+                    <div><label>Vergi No</label><input type="text" id="s-tax-number" placeholder="1234567890"></div>
+                </div>
+                <div><label>Fiş Alt Notu</label><textarea id="s-receipt-footer" rows="2" placeholder="Afiyet olsun!"></textarea></div>
+                <div><button class="btn btn-primary" onclick="saveBusinessSettings()">💾 Kaydet</button></div>
+            </div>
+        </div>
+
+        <!-- Yazıcı Ayarları -->
+        <div class="settings-card">
+            <h3>🖨️ Yazıcı Ayarları</h3>
+            <div class="printer-box">
+                <p>🧾 Müşteri Yazıcısı</p>
+                <div class="two-col">
+                    <div><label>IP Adresi</label><input type="text" id="s-printer-ip" placeholder="192.168.1.x"></div>
+                    <div><label>Port</label><input type="number" id="s-printer-port" placeholder="9100"></div>
+                </div>
+            </div>
+            <div class="printer-box">
+                <p>🍳 Mutfak Yazıcısı</p>
+                <div class="two-col">
+                    <div><label>IP Adresi</label><input type="text" id="s-kitchen-ip" placeholder="192.168.1.x"></div>
+                    <div><label>Port</label><input type="number" id="s-kitchen-port" placeholder="9100"></div>
+                </div>
+            </div>
+            <div class="save-row">
+                <button class="btn btn-primary" onclick="savePrinterSettings()">💾 Kaydet</button>
+                <button class="btn btn-secondary" onclick="testPrinter()">🖨️ Test Yazdır</button>
+            </div>
+        </div>
+
+        <!-- Logo -->
+        <div class="settings-card">
+            <h3>🖼️ Logo</h3>
+            <div class="logo-area">
+                <div id="logo-preview-box">
+                    <span id="logo-placeholder-text" style="color:#94a3b8;font-size:.9rem;">Logo yüklenmemiş</span>
+                    <img id="logo-preview-img" src="" alt="Logo" style="display:none;max-width:190px;max-height:90px;object-fit:contain;">
+                </div>
+                <p style="font-size:.85rem;color:#64748b;text-align:center;margin:0;">PNG, JPG veya WebP · Önerilen: 300×150px</p>
+                <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;" onchange="previewLogoFile(event)">
+                <div class="save-row" style="width:100%;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('logo-file-input').click()">📁 Dosya Seç</button>
+                    <button class="btn btn-primary" onclick="uploadLogo()" id="btn-upload-logo" disabled style="opacity:.5;">⬆️ Yükle</button>
+                    <button class="btn" style="background:#ef4444;color:white;" onclick="deleteLogo()">🗑️ Sil</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Not Fişi -->
+        <div class="settings-card">
+            <h3>📝 Not Fişi</h3>
+            <div class="field-group">
+                <div><label>Başlık</label><input type="text" id="note-title" value="NOT" placeholder="NOT"></div>
+                <div><label>Not İçeriği</label><textarea id="note-content" rows="5" placeholder="Yazdırmak istediğiniz notu buraya girin..."></textarea></div>
+                <div class="save-row">
+                    <button class="btn btn-secondary" onclick="previewNote()">👁️ Önizle</button>
+                    <button class="btn btn-primary" onclick="printNote()">🖨️ Yazdır</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        function toast(msg, ok=true) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.style.background = ok ? '#2d6a4f' : '#e53e3e';
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2500);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadBusinessSettings();
+            await loadPrinterSettings();
+            await loadLogoSettings();
+        });
+
+        async function loadBusinessSettings() {
+            const keys = ['restaurant_name','restaurant_address','restaurant_phone','tax_number','receipt_footer'];
+            const ids  = ['s-restaurant-name','s-restaurant-address','s-restaurant-phone','s-tax-number','s-receipt-footer'];
+            for (let i = 0; i < keys.length; i++) {
+                try {
+                    const d = await fetch(`/api/settings/${keys[i]}`).then(r => r.json());
+                    document.getElementById(ids[i]).value = d.value || '';
+                } catch {}
+            }
+        }
+
+        async function saveBusinessSettings() {
+            const fields = [
+                {key:'restaurant_name', id:'s-restaurant-name'},
+                {key:'restaurant_address', id:'s-restaurant-address'},
+                {key:'restaurant_phone', id:'s-restaurant-phone'},
+                {key:'tax_number', id:'s-tax-number'},
+                {key:'receipt_footer', id:'s-receipt-footer'},
+            ];
+            for (const f of fields) {
+                await fetch(`/api/settings/${f.key}`, {
+                    method:'PUT', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({value: document.getElementById(f.id).value})
+                });
+            }
+            toast('✅ İşletme bilgileri kaydedildi!');
+        }
+
+        async function loadPrinterSettings() {
+            const map = {
+                'printer_ip':'s-printer-ip', 'printer_port':'s-printer-port',
+                'kitchen_printer_ip':'s-kitchen-ip', 'kitchen_printer_port':'s-kitchen-port'
+            };
+            for (const [key, id] of Object.entries(map)) {
+                try {
+                    const d = await fetch(`/api/settings/${key}`).then(r => r.json());
+                    document.getElementById(id).value = d.value || '';
+                } catch {}
+            }
+        }
+
+        async function savePrinterSettings() {
+            const fields = [
+                {key:'printer_ip',id:'s-printer-ip'},{key:'printer_port',id:'s-printer-port'},
+                {key:'kitchen_printer_ip',id:'s-kitchen-ip'},{key:'kitchen_printer_port',id:'s-kitchen-port'},
+            ];
+            for (const f of fields) {
+                await fetch(`/api/settings/${f.key}`, {
+                    method:'PUT', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({value: document.getElementById(f.id).value})
+                });
+            }
+            toast('✅ Yazıcı ayarları kaydedildi!');
+        }
+
+        async function testPrinter() {
+            const res = await fetch('/api/printer/test', {method:'POST'});
+            const d = await res.json();
+            toast(d.success ? '✅ Test fişi gönderildi!' : '❌ Yazıcıya ulaşılamadı', d.success);
+        }
+
+        let pendingLogoFile = null;
+        async function loadLogoSettings() {
+            try {
+                const d = await fetch('/api/settings/logo').then(r => r.json());
+                if (d.url) {
+                    document.getElementById('logo-preview-img').src = d.url + '?t=' + Date.now();
+                    document.getElementById('logo-preview-img').style.display = 'block';
+                    document.getElementById('logo-placeholder-text').style.display = 'none';
+                }
+            } catch {}
+        }
+        function previewLogoFile(event) {
+            const file = event.target.files[0]; if (!file) return;
+            pendingLogoFile = file;
+            const r = new FileReader();
+            r.onload = e => {
+                document.getElementById('logo-preview-img').src = e.target.result;
+                document.getElementById('logo-preview-img').style.display = 'block';
+                document.getElementById('logo-placeholder-text').style.display = 'none';
+            };
+            r.readAsDataURL(file);
+            const btn = document.getElementById('btn-upload-logo');
+            btn.disabled = false; btn.style.opacity = '1';
+        }
+        async function uploadLogo() {
+            if (!pendingLogoFile) return;
+            const fd = new FormData(); fd.append('logo', pendingLogoFile);
+            const d = await fetch('/api/settings/logo', {method:'POST', body:fd}).then(r => r.json());
+            if (d.success) { toast('✅ Logo yüklendi!'); pendingLogoFile = null; }
+            else toast('❌ Hata: ' + d.error, false);
+        }
+        async function deleteLogo() {
+            if (!confirm('Logo silinsin mi?')) return;
+            await fetch('/api/settings/logo', {method:'DELETE'});
+            document.getElementById('logo-preview-img').style.display = 'none';
+            document.getElementById('logo-placeholder-text').style.display = 'block';
+            toast('✅ Logo silindi.');
+        }
+
+        async function previewNote() {
+            const title = document.getElementById('note-title').value || 'NOT';
+            const note = document.getElementById('note-content').value.trim();
+            if (!note) { toast('Not içeriği boş!', false); return; }
+            const res = await fetch('/api/print/note/preview', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({title, note})
+            });
+            const html = await res.text();
+            const win = window.open('','_blank','width=400,height=600');
+            win.document.write(html); win.document.close();
+        }
+        async function printNote() {
+            const title = document.getElementById('note-title').value || 'NOT';
+            const note = document.getElementById('note-content').value.trim();
+            if (!note) { toast('Not içeriği boş!', false); return; }
+            const d = await fetch('/api/print/note', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({title, note})
+            }).then(r => r.json());
+            toast(d.success ? '✅ Not fişi yazdırıldı!' : '❌ ' + (d.error||'Hata'), d.success);
+        }
+    </script>
+
+    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
+        Fırınna POS &mdash; TA1XTA &copy; 2026
+    </footer>
+</body>
+</html>

@@ -36,15 +36,39 @@
         <div class="nav-brand">🍽️ Fırınna POS</div>
         <div class="nav-links">
             <a href="/">Masalar</a>
-            <a href="/products">Ürünler</a>
-            <a href="/kasa">Kasa</a>
-            <a href="/stok">Stok</a>
-            <a href="/recete">Reçete</a>
-            <a href="/tables">Masa Yönetimi</a>
-            <a href="/expenses">Masraflar</a>
-            <a href="/reports" class="active">Raporlar</a>
+            <div class="nav-dropdown" id="navDropdown">
+                <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
+                <div class="nav-dropdown-menu">
+            <a href="/kasa">💰 Kasa</a>
+            <a href="/reports" class="active">📊 Raporlar</a>
+            <hr>
+            <a href="/products">🍞 Ürünler</a>
+            <a href="/stok">📦 Stok</a>
+            <a href="/recete">🧾 Reçete</a>
+            <a href="/expenses">📤 Masraflar</a>
+            <a href="/tables">🪑 Masa Yönetimi</a>
+            <hr>
+            <a href="/settings">⚙️ Ayarlar</a>
+                </div>
+            </div>
         </div>
     </nav>
+    <script>
+        function localDate(d) {
+            d = d || new Date();
+            return d.getFullYear() + '-' +
+                String(d.getMonth()+1).padStart(2,'0') + '-' +
+                String(d.getDate()).padStart(2,'0');
+        }
+
+        function toggleNav() {
+            document.getElementById('navDropdown').classList.toggle('open');
+        }
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('navDropdown');
+            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+        });
+    </script>
     <div class="container">
         <h1 style="margin-bottom:1.5rem;">📊 Raporlar</h1>
         <div class="report-tabs">
@@ -78,7 +102,7 @@
         let currentReport = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
+            const today = localDate();
             document.getElementById('dailyDate').value = today;
             document.getElementById('customStart').value = today;
             document.getElementById('customEnd').value = today;
@@ -200,5 +224,9 @@
             URL.revokeObjectURL(url);
         }
     </script>
+
+    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
+        Fırınna POS &mdash; TA1XTA &copy; 2026
+    </footer>
 </body>
 </html>

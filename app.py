@@ -129,14 +129,18 @@ def api_update_expense(expense_id):
 def api_stock_movement(item_id):
     d = request.json
     mtype = d['movement_type']
-    if mtype == 'in':
-        # Alım: kasaya da yaz
-        db.add_stock_purchase(item_id, d['quantity'], d.get('cost', 0),
-                              d.get('payment_method', 'cash'), d.get('description', ''))
-    else:
-        db.add_stock_movement(item_id, mtype, d['quantity'],
-                              d.get('cost', 0), d.get('reason', 'manuel'), d.get('description', ''))
-    return jsonify({'success': True})
+    try:
+        if mtype == 'in':
+            db.add_stock_purchase(item_id, d['quantity'], d.get('cost', 0),
+                                  d.get('payment_method', 'cash'), d.get('description', ''))
+        else:
+            db.add_stock_movement(item_id, mtype, d['quantity'],
+                                  d.get('cost', 0), d.get('reason', 'manuel'), d.get('description', ''))
+        return jsonify({'success': True})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/stock/movements/<int:mid>', methods=['PATCH'])
 def api_update_movement(mid):
@@ -252,9 +256,27 @@ def api_get_table_order(table_id):
     if order:
         return jsonify(order)
     else:
-        # Yeni sipariş oluştur
-        order_id = db.create_order(table_id)
-        return jsonify({'id': order_id, 'table_id': table_id, 'total': 0, 'items': []})
+        # Sipariş yok — boş döndür, ürün eklenince create edilecek
+        return jsonify({'id': None, 'table_id': table_id, 'total': 0, 'items': []})
+
+@app.route('/api/orders/create', methods=['POST'])
+def api_create_order():
+    data = request.json
+    table_id = data.get('table_id')
+    if not table_id:
+        return jsonify({'error': 'table_id gerekli'}), 400
+    # Zaten açık sipariş varsa onu döndür
+    existing = db.get_table_order(table_id)
+    if existing:
+        return jsonify({'id': existing['id']})
+    order_id = db.create_order(table_id)
+    return jsonify({'id': order_id})
+
+@app.route('/api/orders/cleanup-empty', methods=['POST'])
+def api_cleanup_empty_orders():
+    """items'sız boş siparişleri temizle"""
+    deleted = db.cleanup_empty_orders()
+    return jsonify({'success': True, 'deleted': deleted})
 
 @app.route('/api/orders/<int:order_id>/items', methods=['POST'])
 def api_add_order_item(order_id):
@@ -369,6 +391,10 @@ def api_printer_test():
     return jsonify({'success': success})
 
 # API: Ayarlar
+@app.route('/settings')
+def settings_page():
+    return render_template('settings.html')
+
 @app.route('/api/settings/printer', methods=['GET', 'POST'])
 def api_printer_settings():
     global PRINTER_IP, PRINTER_PORT, printer
@@ -717,6 +743,40 @@ def api_pdf_kitchen(order_id):
 # Muhasebe tablolarını başlat ve migrasyonu çalıştır
 db.init_muhasebe_tables()
 db.migrate_orders_to_transactions()
+
+@app.route('/debug/transactions')
+def debug_transactions():
+    import os
+    try:
+        conn = db.get_db()
+        # Hangi DB dosyası kullanılıyor?
+        db_path = db.DB_PATH
+        abs_path = os.path.abspath(db_path)
+        # transactions tablosu var mı?
+        tables = [r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+        # Son 10 transaction
+        txns = []
+        if 'transactions' in tables:
+            txns = [dict(r) for r in conn.execute("SELECT * FROM transactions ORDER BY id DESC LIMIT 10").fetchall()]
+        # Son 5 stock_movement
+        moves = []
+        if 'stock_movements' in tables:
+            moves = [dict(r) for r in conn.execute("SELECT * FROM stock_movements ORDER BY id DESC LIMIT 5").fetchall()]
+        conn.close()
+        return jsonify({
+            'db_path_relative': db_path,
+            'db_path_absolute': abs_path,
+            'db_exists': os.path.exists(abs_path),
+            'db_size_bytes': os.path.getsize(abs_path) if os.path.exists(abs_path) else 0,
+            'cwd': os.getcwd(),
+            'tables': tables,
+            'last_transactions': txns,
+            'last_stock_movements': moves,
+        })
+    except Exception as e:
+        import traceback
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()})
+
 
 if __name__ == '__main__':
     db.init_db()

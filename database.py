@@ -747,6 +747,19 @@ def delete_order(order_id):
     conn.commit()
     conn.close()
 
+def cleanup_empty_orders():
+    """Hiç ürünü olmayan açık siparişleri sil (kalıntıları temizle)"""
+    conn = get_db()
+    rows = conn.execute('''
+        DELETE FROM orders
+        WHERE status = 'open'
+          AND id NOT IN (SELECT DISTINCT order_id FROM order_items)
+    ''')
+    deleted = rows.rowcount
+    conn.commit()
+    conn.close()
+    return deleted
+
 def get_table_order_by_id(order_id):
     """Order ID ile sipariş detaylarını getir (yazdırma için)"""
     conn = get_db()
@@ -1067,7 +1080,19 @@ def add_transaction(type_, amount, category, payment_method, description, relate
 
 def delete_transaction(transaction_id):
     conn = get_db()
-    conn.execute('DELETE FROM transactions WHERE id = ? AND related_order_id IS NULL', (transaction_id,))
+    # Sipariş kaynağından gelenler silinemez
+    tx = conn.execute('SELECT * FROM transactions WHERE id=?', (transaction_id,)).fetchone()
+    if tx and tx['related_order_id']:
+        conn.close()
+        return
+    # Stok alımıysa ilgili stock_movement'ı da sil
+    if tx and tx['category'] == 'stok_alim':
+        conn.execute('''DELETE FROM stock_movements
+            WHERE related_transaction_id=? OR
+                  (reason='alim' AND cost=? AND
+                   ABS(JULIANDAY(created_at) - JULIANDAY(?)) < 0.02)''',
+            (transaction_id, tx['amount'], tx['created_at']))
+    conn.execute('DELETE FROM transactions WHERE id=?', (transaction_id,))
     conn.commit()
     conn.close()
 
@@ -1330,14 +1355,23 @@ def update_stock_movement(movement_id, quantity, cost, description):
 
 def delete_stock_movement(movement_id):
     conn = get_db()
-    # Satıştan gelen hareketler silinemez
-    m = conn.execute('SELECT reason FROM stock_movements WHERE id=?', (movement_id,)).fetchone()
+    m = conn.execute('SELECT * FROM stock_movements WHERE id=?', (movement_id,)).fetchone()
     if not m:
         conn.close()
         return False, 'Kayıt bulunamadı.'
     if m['reason'] == 'satis':
         conn.close()
         return False, 'Satıştan oluşan stok hareketleri silinemez.'
+    # İlgili transaction'ı da sil (alım ise)
+    if m['reason'] == 'alim' and m['cost'] and m['cost'] > 0:
+        if m['related_transaction_id']:
+            conn.execute('DELETE FROM transactions WHERE id=?', (m['related_transaction_id'],))
+        else:
+            # related_transaction_id yoksa tarih+tutar+açıklama ile eşleştir
+            conn.execute('''DELETE FROM transactions
+                WHERE category='stok_alim' AND amount=? AND
+                      ABS(JULIANDAY(created_at) - JULIANDAY(?)) < 0.01''',
+                (m['cost'], m['created_at']))
     conn.execute('DELETE FROM stock_movements WHERE id=?', (movement_id,))
     conn.commit()
     conn.close()
@@ -1346,13 +1380,25 @@ def delete_stock_movement(movement_id):
 def add_stock_purchase(stock_item_id, quantity, cost, payment_method, description):
     """Stok alımı: hem stok hareketi hem transaction kaydı"""
     conn = get_db()
+    # transactions tablosu yoksa oluştur
+    conn.execute('''CREATE TABLE IF NOT EXISTS transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        type TEXT NOT NULL,
+        amount REAL NOT NULL,
+        category TEXT DEFAULT 'Genel',
+        payment_method TEXT DEFAULT 'cash',
+        description TEXT,
+        related_order_id INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
     date = datetime.now().strftime('%Y-%m-%d')
     # Stok hareketi
     conn.execute('''INSERT INTO stock_movements
         (stock_item_id, movement_type, quantity, cost, reason, description)
         VALUES (?, 'in', ?, ?, 'alim', ?)''',
         (stock_item_id, quantity, cost, description))
-    # Kasadan çıkış (eğer tutar girilmişse)
+    # Kasadan çıkış
     if cost and cost > 0:
         item = conn.execute('SELECT name FROM stock_items WHERE id=?', (stock_item_id,)).fetchone()
         item_name = item['name'] if item else 'Stok'

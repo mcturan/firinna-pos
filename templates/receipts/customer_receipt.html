@@ -42,9 +42,7 @@
         <span>{{ item.quantity }}x {{ item.product_name }}{% if item.is_complimentary %} (İKRAM){% endif %}</span>
         {% if not item.is_complimentary %}<span>{{ "%.2f"|format(item.quantity * item.price) }} TL</span>{% endif %}
     </div>
-    {% if item.kitchen_notes %}
-    <div style="margin-left: 20px; font-size: 0.9em; color: #666;">Not: {{ item.kitchen_notes }}</div>
-    {% endif %}
+
     {% endfor %}
     
     <div class="separator"></div>

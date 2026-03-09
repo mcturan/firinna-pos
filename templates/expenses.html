@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
         .exp-tabs { display:flex; gap:0; border-bottom:2px solid #e2e8f0; margin-bottom:1.5rem; }
-        .exp-tab { padding:.75rem 1.5rem; border:none; background:none; font-size:1rem; font-weight:600; color:#718096; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; }
+        .exp-tab { padding:.75rem 1.5rem; border:none; background:none; font-weight:600; color:#718096; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; }
         .exp-tab:hover { color:#2d6a4f; }
         .exp-tab.active { color:#2d6a4f; border-bottom-color:#2d6a4f; }
 
@@ -49,15 +49,39 @@
         <div class="nav-brand">🍽️ Fırınna POS</div>
         <div class="nav-links">
             <a href="/">Masalar</a>
-            <a href="/products">Ürünler</a>
-            <a href="/kasa">Kasa</a>
-            <a href="/stok">Stok</a>
-            <a href="/recete">Reçete</a>
-            <a href="/expenses" class="active">Masraflar</a>
-            <a href="/tables">Masa Yönetimi</a>
-            <a href="/reports">Raporlar</a>
+            <div class="nav-dropdown" id="navDropdown">
+                <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
+                <div class="nav-dropdown-menu">
+            <a href="/kasa">💰 Kasa</a>
+            <a href="/reports">📊 Raporlar</a>
+            <hr>
+            <a href="/products">🍞 Ürünler</a>
+            <a href="/stok">📦 Stok</a>
+            <a href="/recete">🧾 Reçete</a>
+            <a href="/expenses" class="active">📤 Masraflar</a>
+            <a href="/tables">🪑 Masa Yönetimi</a>
+            <hr>
+            <a href="/settings">⚙️ Ayarlar</a>
+                </div>
+            </div>
         </div>
     </nav>
+    <script>
+        function localDate(d) {
+            d = d || new Date();
+            return d.getFullYear() + '-' +
+                String(d.getMonth()+1).padStart(2,'0') + '-' +
+                String(d.getDate()).padStart(2,'0');
+        }
+
+        function toggleNav() {
+            document.getElementById('navDropdown').classList.toggle('open');
+        }
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('navDropdown');
+            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+        });
+    </script>
 
     <div class="container">
         <h1 style="margin-bottom:1.5rem;">📤 Masraf Yönetimi</h1>
@@ -135,7 +159,7 @@
         let currentPeriod = 'monthly';
 
         document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
+            const today = localDate();
             document.getElementById('customStart').value = today;
             document.getElementById('customEnd').value = today;
             updateSubcats();
@@ -336,5 +360,9 @@
             loadAll();
         }
     </script>
+
+    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
+        Fırınna POS &mdash; TA1XTA &copy; 2026
+    </footer>
 </body>
 </html>
