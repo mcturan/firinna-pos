@@ -1031,26 +1031,44 @@ def start_auto_push():
 
     def loop():
         import time as _time
+        last_interval_push = 0
+        last_time_push_date = None
         while _auto_push_running:
-            push_time = read_local_config().get('auto_push_time', '')  # '23:00' formatı — yerel ayar
-            if push_time:
+            try:
+                cfg = read_local_config()
+                mode = cfg.get('auto_push_mode', 'off')
                 now = datetime.now()
-                try:
-                    h, m = map(int, push_time.split(':'))
-                    # Tam saate geldik mi? (1 dakika tolerans)
-                    if now.hour == h and now.minute == m:
-                        ok, status = run_git(['status', '--short'])
-                        # DB dahil commit edilmemiş değişiklik varsa push et
-                        ok_add, _ = run_git(['add', '-A'])
-                        if ok_add:
-                            msg = f"Otomatik push - {now.strftime('%d.%m.%Y %H:%M')}"
-                            run_git(['commit', '-m', msg])
-                        run_git(['push', 'origin', 'main'])
-                        _time.sleep(70)  # Aynı dakikada tekrar tetiklenmesin
-                        continue
-                except Exception as e:
-                    print(f"Auto push hatası: {e}")
-            _time.sleep(30)  # 30 saniyede bir kontrol
+                should_push = False
+
+                if mode == 'interval':
+                    interval_min = int(cfg.get('auto_push_interval', 0))
+                    if interval_min > 0:
+                        elapsed = (_time.time() - last_interval_push) / 60
+                        if elapsed >= interval_min:
+                            should_push = True
+
+                elif mode == 'time':
+                    push_time = cfg.get('auto_push_time', '')
+                    if push_time:
+                        h, m = map(int, push_time.split(':'))
+                        today = now.strftime('%Y-%m-%d')
+                        if now.hour == h and now.minute == m and last_time_push_date != today:
+                            should_push = True
+                            last_time_push_date = today
+
+                if should_push:
+                    ok_add, _ = run_git(['add', '-A'])
+                    if ok_add:
+                        msg = f"Otomatik push - {now.strftime('%d.%m.%Y %H:%M')}"
+                        run_git(['commit', '-m', msg])
+                    run_git(['push', 'origin', 'main'])
+                    last_interval_push = _time.time()
+                    _time.sleep(70)
+                    continue
+
+            except Exception as e:
+                print(f"Auto push hatası: {e}")
+            _time.sleep(30)
 
     global _auto_push_thread
     _auto_push_thread = threading.Thread(target=loop, daemon=True)
@@ -1059,13 +1077,24 @@ def start_auto_push():
 @app.route('/api/git/auto-push', methods=['GET'])
 def api_auto_push_status():
     cfg = read_local_config()
-    return jsonify({'time': cfg.get('auto_push_time', '')})
+    return jsonify({
+        'mode': cfg.get('auto_push_mode', 'off'),
+        'interval': int(cfg.get('auto_push_interval', 0)),
+        'time': cfg.get('auto_push_time', '')
+    })
 
 @app.route('/api/git/auto-push', methods=['POST'])
 def api_auto_push_set():
-    t = request.json.get('time', '').strip()
-    write_local_config({'auto_push_time': t})
-    return jsonify({'success': True, 'time': t})
+    data = request.json or {}
+    mode = data.get('mode', 'off')
+    interval = int(data.get('interval', 0))
+    push_time = data.get('time', '')
+    write_local_config({
+        'auto_push_mode': mode,
+        'auto_push_interval': interval,
+        'auto_push_time': push_time
+    })
+    return jsonify({'success': True, 'mode': mode})
 
 if __name__ == '__main__':
     db.init_db()

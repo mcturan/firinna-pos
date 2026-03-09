@@ -372,16 +372,42 @@
             <div id="auto-pull-status" style="font-size:.8rem;color:#718096;margin-top:.5rem;"></div>
 
             <!-- Otomatik Push -->
-            <h4 style="margin:1.5rem 0 .75rem;color:#4a5568;font-size:.9rem;">⏰ Otomatik Push (Günlük)</h4>
+            <h4 style="margin:1.5rem 0 .75rem;color:#4a5568;font-size:.9rem;">⬆️ Otomatik Push</h4>
             <p style="font-size:.82rem;color:#718096;margin-bottom:.75rem;">
-                Her gün belirlediğin saatte tüm veriler (DB dahil) otomatik olarak GitHub'a yüklenir.
+                Bu cihaza özel ayardır — diğer cihaza sync olmaz. Çakışma olmaz.
             </p>
-            <div class="auto-pull-row">
+
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem;">
+                <label style="font-size:.85rem;color:#4a5568;">
+                    <input type="radio" name="push-mode" value="interval" id="push-mode-interval" onchange="togglePushMode()"> Aralıklı
+                </label>
+                <label style="font-size:.85rem;color:#4a5568;">
+                    <input type="radio" name="push-mode" value="time" id="push-mode-time" onchange="togglePushMode()"> Belirli saat
+                </label>
+                <label style="font-size:.85rem;color:#4a5568;">
+                    <input type="radio" name="push-mode" value="off" id="push-mode-off" checked onchange="togglePushMode()"> Kapalı
+                </label>
+            </div>
+
+            <div id="push-interval-row" class="auto-pull-row" style="display:none;">
+                <select id="auto-push-interval">
+                    <option value="15">Her 15 dakika</option>
+                    <option value="30">Her 30 dakika</option>
+                    <option value="60">Her 1 saat</option>
+                    <option value="120">Her 2 saat</option>
+                    <option value="360">Her 6 saat</option>
+                </select>
+            </div>
+
+            <div id="push-time-row" class="auto-pull-row" style="display:none;">
                 <input type="time" id="auto-push-time" style="padding:.5rem .75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:.9rem;">
+            </div>
+
+            <div style="margin-top:.75rem;">
                 <button class="btn btn-primary" onclick="saveAutoPush()">💾 Kaydet</button>
-                <button class="btn btn-secondary" onclick="clearAutoPush()">🚫 Kapat</button>
             </div>
             <div id="auto-push-status" style="font-size:.8rem;color:#718096;margin-top:.5rem;"></div>
+
 
             <!-- İşlem Logu -->
             <div id="git-log" class="git-log-box" style="margin-top:1.25rem;display:none;"></div>
@@ -532,36 +558,51 @@
             } catch(e) {}
         }
 
+        function togglePushMode() {
+            const mode = document.querySelector('input[name="push-mode"]:checked').value;
+            document.getElementById('push-interval-row').style.display = mode === 'interval' ? 'flex' : 'none';
+            document.getElementById('push-time-row').style.display = mode === 'time' ? 'flex' : 'none';
+        }
+
         async function loadAutoPushSetting() {
             try {
                 const d = await fetch('/api/git/auto-push').then(r => r.json());
-                const inp = document.getElementById('auto-push-time');
                 const status = document.getElementById('auto-push-status');
-                if (inp) inp.value = d.time || '';
-                if (status) status.textContent = d.time ? ('\u2705 Her gun ' + d.time + "'de otomatik push aktif") : '\u26d4 Otomatik push kapali';
+                if (d.mode === 'interval' && d.interval > 0) {
+                    document.getElementById('push-mode-interval').checked = true;
+                    document.getElementById('auto-push-interval').value = String(d.interval);
+                    togglePushMode();
+                    if (status) status.textContent = 'Her ' + d.interval + ' dakikada bir push aktif';
+                } else if (d.mode === 'time' && d.time) {
+                    document.getElementById('push-mode-time').checked = true;
+                    document.getElementById('auto-push-time').value = d.time;
+                    togglePushMode();
+                    if (status) status.textContent = "Her gun " + d.time + "'de push aktif";
+                } else {
+                    document.getElementById('push-mode-off').checked = true;
+                    if (status) status.textContent = 'Otomatik push kapali';
+                }
             } catch(e) {}
         }
 
         async function saveAutoPush() {
-            const t = document.getElementById('auto-push-time').value;
-            if (!t) { toast('\u26a0\ufe0f Saat se\u00e7in', false); return; }
-            await fetch('/api/git/auto-push', {
-                method: 'POST', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({time: t})
-            });
-            document.getElementById('auto-push-status').textContent = '\u2705 Her gun ' + t + "'de otomatik push aktif";
-            toast('\u2705 Otomatik push kaydedildi!');
+            const mode = document.querySelector('input[name="push-mode"]:checked').value;
+            let payload = {mode};
+            if (mode === 'interval') payload.interval = parseInt(document.getElementById('auto-push-interval').value);
+            if (mode === 'time') payload.time = document.getElementById('auto-push-time').value;
+            const d = await fetch('/api/git/auto-push', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            }).then(r => r.json());
+            const status = document.getElementById('auto-push-status');
+            if (d.success && status) {
+                if (mode === 'interval') status.textContent = 'Her ' + payload.interval + ' dakikada bir push aktif';
+                else if (mode === 'time') status.textContent = "Her gun " + payload.time + "'de push aktif";
+                else status.textContent = 'Otomatik push kapali';
+            }
+            toast(d.success ? '✅ Kaydedildi!' : '❌ Hata', d.success);
         }
 
-        async function clearAutoPush() {
-            await fetch('/api/git/auto-push', {
-                method: 'POST', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({time: ''})
-            });
-            document.getElementById('auto-push-time').value = '';
-            document.getElementById('auto-push-status').textContent = '\u26d4 Otomatik push kapal\u0131';
-            toast('\u2705 Otomatik push kapat\u0131ld\u0131!');
-        }
 
         function showGitLog(text) {
             const box = document.getElementById('git-log');
