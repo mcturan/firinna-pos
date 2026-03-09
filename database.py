@@ -83,8 +83,14 @@ def init_db():
     # Ayarlar
     c.execute('''CREATE TABLE IF NOT EXISTS settings (
         key TEXT PRIMARY KEY,
-        value TEXT
+        value TEXT,
+        updated_at TEXT
     )''')
+    # Mevcut tabloda updated_at eksikse ekle (migrasyon)
+    try:
+        c.execute('ALTER TABLE settings ADD COLUMN updated_at TEXT')
+    except:
+        pass
     
     conn.commit()
     conn.close()

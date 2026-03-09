@@ -390,8 +390,13 @@ def api_clear_test_data():
 # API: Yazıcı test
 @app.route('/api/printer/test', methods=['POST'])
 def api_printer_test():
-    success = printer.test_print()
-    return jsonify({'success': success})
+    try:
+        from printer import ThermalPrinter
+        p = ThermalPrinter(printer_type='receipt')
+        success = p.test_print()
+        return jsonify({'success': success})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 # API: Ayarlar
 @app.route('/settings')
