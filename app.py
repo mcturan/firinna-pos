@@ -1313,6 +1313,17 @@ def debug_transactions():
 # ===== GİTHUB SYNC (#40) =====
 
 GIT_DIR = os.path.dirname(os.path.abspath(__file__))
+GIT_CRED_FILE = '/home/turan/.firinna_git_credentials.json'
+
+def get_git_credentials():
+    try:
+        if os.path.exists(GIT_CRED_FILE):
+            with open(GIT_CRED_FILE) as f:
+                import json as _json
+                return _json.load(f)
+    except:
+        pass
+    return {'username': '', 'token': ''}
 
 def run_git(args, timeout=30):
     """Git komutunu çalıştır, (success, output) döndür"""
@@ -1328,6 +1339,34 @@ def run_git(args, timeout=30):
         return False, 'Zaman aşımı (30s)'
     except Exception as e:
         return False, str(e)
+
+@app.route('/api/git/credentials', methods=['GET'])
+def api_git_credentials_get():
+    cred = get_git_credentials()
+    return jsonify({'username': cred.get('username',''), 'has_token': bool(cred.get('token',''))})
+
+@app.route('/api/git/credentials', methods=['POST'])
+def api_git_credentials_set():
+    data = request.json or {}
+    username = data.get('username','').strip()
+    token    = data.get('token','').strip()
+    existing = get_git_credentials()
+    if not token:
+        token = existing.get('token','')
+    try:
+        import json as _json
+        with open(GIT_CRED_FILE, 'w') as f:
+            _json.dump({'username': username, 'token': token}, f)
+        os.chmod(GIT_CRED_FILE, 0o600)
+        if username and token:
+            subprocess.run(
+                ['/usr/bin/git', 'remote', 'set-url', 'origin',
+                 f'https://{username}:{token}@github.com/{username}/firinna-pos.git'],
+                cwd=GIT_DIR
+            )
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/api/git/status', methods=['GET'])
 def api_git_status():
