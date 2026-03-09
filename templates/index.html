@@ -285,56 +285,68 @@
 
     <!-- Ödeme Modal -->
     <div id="paymentModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content" style="max-width:520px;">
             <div class="modal-header">
-                <h2>Ödeme Al</h2>
+                <h2>💰 Ödeme Al</h2>
                 <span class="close" onclick="closePaymentModal()">&times;</span>
             </div>
-            <div style="padding: 2rem;">
-                <div style="background: #f7fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; color: #667eea;">
-                        <span>TOPLAM:</span>
-                        <span id="paymentTotal">0.00 TL</span>
+            <div style="padding:1.5rem;">
+
+                <!-- Toplam + Kalan -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem;">
+                    <div style="background:#f0fdf4;border-radius:10px;padding:1rem;text-align:center;">
+                        <div style="font-size:.75rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Toplam</div>
+                        <div id="paymentTotal" style="font-size:1.6rem;font-weight:800;color:#2d6a4f;">0.00 ₺</div>
+                    </div>
+                    <div style="background:#fff5f5;border-radius:10px;padding:1rem;text-align:center;">
+                        <div style="font-size:.75rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Kalan</div>
+                        <div id="payRemainingDisplay" style="font-size:1.6rem;font-weight:800;color:#e53e3e;">0.00 ₺</div>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 1.5rem;">
-                    <button class="btn btn-warning" style="width:100%;" onclick="toggleSplitSection()">
-                        ➗ Hesabı Böl
+                <!-- Ödeme girişleri listesi -->
+                <div id="payEntries" style="margin-bottom:1rem;"></div>
+
+                <!-- Yeni giriş satırı -->
+                <div style="display:flex;gap:.5rem;align-items:center;background:#f8fafc;border-radius:10px;padding:.75rem;margin-bottom:1rem;">
+                    <input type="number" id="payEntryAmount" placeholder="Tutar" step="0.01" min="0"
+                        style="flex:1;padding:.6rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;font-weight:600;"
+                        onkeydown="if(event.key==='Enter')addPayEntry()">
+                    <button onclick="setEntryType('cash')" id="btnCash"
+                        style="padding:.6rem .9rem;border:2px solid #2d6a4f;border-radius:8px;font-weight:700;background:#2d6a4f;color:white;cursor:pointer;font-size:.85rem;">
+                        💵 Nakit
                     </button>
-                    <div id="splitSection" style="display: none; margin-top: 1rem; padding: 1rem; background: #fff5f5; border-radius: 8px;">
+                    <button onclick="setEntryType('card')" id="btnCard"
+                        style="padding:.6rem .9rem;border:2px solid #3b82f6;border-radius:8px;font-weight:700;background:white;color:#3b82f6;cursor:pointer;font-size:.85rem;">
+                        💳 Kart
+                    </button>
+                    <button onclick="addPayEntry()"
+                        style="padding:.6rem .9rem;border:none;border-radius:8px;background:#667eea;color:white;font-weight:700;cursor:pointer;font-size:.85rem;">
+                        ＋ Ekle
+                    </button>
+                </div>
+
+                <!-- Hesabı böl -->
+                <div style="margin-bottom:1rem;">
+                    <button class="btn btn-warning" style="width:100%;font-size:.9rem;padding:.6rem;" onclick="toggleSplitSection()">➗ Hesabı Böl</button>
+                    <div id="splitSection" style="display:none;margin-top:.75rem;padding:1rem;background:#fff5f5;border-radius:8px;">
                         <label>Kişi Sayısı:</label>
-                        <input type="number" id="numPeople" value="2" min="2" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin: 0.5rem 0;">
+                        <input type="number" id="numPeople" value="2" min="2" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;margin:.5rem 0;">
                         <button class="btn btn-secondary" style="width:100%;" onclick="calculateSplit()">Hesapla</button>
-                        <div id="splitResult" style="margin-top: 1rem; font-weight: bold; text-align: center; font-size: 1.2rem;"></div>
+                        <div id="splitResult" style="margin-top:.75rem;font-weight:bold;text-align:center;font-size:1.1rem;"></div>
                     </div>
                 </div>
 
-                <hr style="margin: 1.5rem 0;">
-
-                <div>
-                    <label>💵 Nakit (TL):</label>
-                    <input type="number" id="paymentCash" value="0" step="0.01" oninput="updateRemaining()" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
-                </div>
-                <div>
-                    <label>💳 Kart (TL):</label>
-                    <input type="number" id="paymentCard" value="0" step="0.01" oninput="updateRemaining()" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
-                </div>
-                
-                <div id="remainingAmount" style="padding: 1rem; background: #fff5f5; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-weight: bold; color: #f56565;">
-                    Kalan: 0.00 TL
+                <!-- Bahşiş -->
+                <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.25rem;background:#fffbeb;border-radius:10px;padding:.75rem;">
+                    <span style="font-size:.9rem;font-weight:600;color:#92400e;white-space:nowrap;">🎁 Bahşiş</span>
+                    <input type="number" id="tipAmount" value="0" step="0.01" placeholder="0.00"
+                        style="flex:1;padding:.6rem;border:2px solid #fde68a;border-radius:8px;font-size:.95rem;">
+                    <label style="font-size:.85rem;"><input type="radio" name="tipMethod" value="cash" checked> Nakit</label>
+                    <label style="font-size:.85rem;"><input type="radio" name="tipMethod" value="card"> Kart</label>
                 </div>
 
-                <div>
-                    <label>🎁 Bahşiş (Opsiyonel):</label>
-                    <input type="number" id="tipAmount" value="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin: 0.5rem 0;">
-                    <div>
-                        <label style="margin-right: 2rem;"><input type="radio" name="tipMethod" value="cash" checked> Nakit</label>
-                        <label><input type="radio" name="tipMethod" value="card"> Kart</label>
-                    </div>
-                </div>
-
-                <button class="btn btn-success" style="width:100%;" onclick="completePayment()">
+                <button class="btn btn-success" style="width:100%;font-size:1.1rem;padding:.85rem;" onclick="completePayment()">
                     ✅ Ödemeyi Tamamla
                 </button>
             </div>
@@ -830,75 +842,126 @@
             updateOrderSummary();
         }
 
+        // === YENİ ÖDEME SİSTEMİ ===
+        let payEntries = [];   // [{type:'cash'|'card', amount:float}]
+        let payEntryType = 'cash';
+
+        function setEntryType(type) {
+            payEntryType = type;
+            document.getElementById('btnCash').style.background = type === 'cash' ? '#2d6a4f' : 'white';
+            document.getElementById('btnCash').style.color     = type === 'cash' ? 'white' : '#2d6a4f';
+            document.getElementById('btnCard').style.background = type === 'card' ? '#3b82f6' : 'white';
+            document.getElementById('btnCard').style.color     = type === 'card' ? 'white' : '#3b82f6';
+        }
+
+        function addPayEntry() {
+            const amtInput = document.getElementById('payEntryAmount');
+            const amt = parseFloat(amtInput.value);
+            if (!amt || amt <= 0) { amtInput.focus(); return; }
+            const remaining = getRemainingAmount();
+            const actual = Math.min(amt, remaining > 0 ? remaining : amt);
+            payEntries.push({ type: payEntryType, amount: actual });
+            amtInput.value = '';
+            amtInput.focus();
+            renderPayEntries();
+            updatePayRemaining();
+        }
+
+        function removePayEntry(idx) {
+            payEntries.splice(idx, 1);
+            renderPayEntries();
+            updatePayRemaining();
+        }
+
+        function renderPayEntries() {
+            const el = document.getElementById('payEntries');
+            if (!payEntries.length) { el.innerHTML = ''; return; }
+            el.innerHTML = payEntries.map((e, i) => `
+                <div style="display:flex;justify-content:space-between;align-items:center;
+                            padding:.5rem .75rem;background:${e.type==='cash'?'#f0fdf4':'#eff6ff'};
+                            border-radius:8px;margin-bottom:.4rem;">
+                    <span style="font-size:1rem;">${e.type==='cash'?'💵 Nakit':'💳 Kart'}</span>
+                    <span style="font-weight:700;font-size:1rem;">${e.amount.toFixed(2)} ₺</span>
+                    <button onclick="removePayEntry(${i})"
+                        style="border:none;background:none;color:#e53e3e;font-size:1.1rem;cursor:pointer;padding:0 .25rem;">✕</button>
+                </div>`).join('');
+        }
+
+        function getRemainingAmount() {
+            const total = currentOrder ? currentOrder.total : 0;
+            const paid  = payEntries.reduce((s, e) => s + e.amount, 0);
+            return total - paid;
+        }
+
+        function updatePayRemaining() {
+            const rem = getRemainingAmount();
+            const el  = document.getElementById('payRemainingDisplay');
+            el.textContent = rem.toFixed(2) + ' ₺';
+            el.style.color = rem > 0.01 ? '#e53e3e' : '#2d6a4f';
+            // Kalan kadar tutar kutusuna yaz
+            if (rem > 0.01) {
+                document.getElementById('payEntryAmount').value = rem.toFixed(2);
+            } else {
+                document.getElementById('payEntryAmount').value = '';
+            }
+        }
+
         function openPaymentModal() {
-            document.getElementById('paymentTotal').textContent = currentOrder.total.toFixed(2) + ' TL';
-            document.getElementById('paymentCash').value = currentOrder.total.toFixed(2);
-            document.getElementById('paymentCard').value = '0.00';
-            document.getElementById('tipAmount').value = '0.00';
-            updateRemaining();
+            payEntries = [];
+            payEntryType = 'cash';
+            setEntryType('cash');
+            document.getElementById('payEntries').innerHTML = '';
+            document.getElementById('payEntryAmount').value = '';
+            document.getElementById('tipAmount').value = '0';
+            document.getElementById('paymentTotal').textContent = currentOrder.total.toFixed(2) + ' ₺';
+            updatePayRemaining();
             document.getElementById('paymentModal').style.display = 'block';
+            setTimeout(() => document.getElementById('payEntryAmount').focus(), 100);
         }
 
         function closePaymentModal() {
             document.getElementById('paymentModal').style.display = 'none';
         }
 
-        function updateRemaining() {
-            const total = currentOrder.total;
-            const cash = parseFloat(document.getElementById('paymentCash').value) || 0;
-            const card = parseFloat(document.getElementById('paymentCard').value) || 0;
-            const remaining = total - cash - card;
-            
-            const remainingEl = document.getElementById('remainingAmount');
-            remainingEl.textContent = `Kalan: ${remaining.toFixed(2)} TL`;
-            remainingEl.style.color = remaining > 0.01 ? '#f56565' : '#48bb78';
-        }
+        function updateRemaining() {}  // eski çağrılar için boş bırak
 
         async function completePayment() {
-            const cash = parseFloat(document.getElementById('paymentCash').value) || 0;
-            const card = parseFloat(document.getElementById('paymentCard').value) || 0;
-            let tip = parseFloat(document.getElementById('tipAmount').value) || 0;
-            const tipMethod = document.querySelector('input[name="tipMethod"]:checked').value;
-            
-            const total = currentOrder.total;
-            const paid = cash + card;
-            const diff = paid - total;
-            
-            // Fazla ödeme kontrolü
-            if (diff > 0.01) {
-                if (confirm(`${diff.toFixed(2)} TL fazla ödeme var. Bahşiş olarak eklensin mi?`)) {
-                    tip += diff;
-                    // Nakit ödemeyi düzelt
-                    if (cash >= total) {
-                        document.getElementById('paymentCash').value = total.toFixed(2);
-                        document.getElementById('paymentCard').value = '0.00';
-                    } else {
-                        document.getElementById('paymentCard').value = (total - cash).toFixed(2);
-                    }
-                    document.getElementById('tipAmount').value = tip.toFixed(2);
-                } else {
-                    alert('Lütfen ödeme tutarını düzeltin!');
-                    return;
-                }
-            } else if (diff < -0.01) {
-                alert('Ödeme tutarı yetersiz!');
+            const remaining = getRemainingAmount();
+            if (remaining > 0.01) {
+                alert(`Henüz ${remaining.toFixed(2)} ₺ ödenmedi!`);
                 return;
             }
-            
+            let tip = parseFloat(document.getElementById('tipAmount').value) || 0;
+            const tipMethod = document.querySelector('input[name="tipMethod"]:checked').value;
+
+            // Fazla ödeme → bahşiş
+            if (remaining < -0.01) {
+                const extra = Math.abs(remaining);
+                if (confirm(`${extra.toFixed(2)} ₺ fazla ödendi. Bahşiş olarak eklensin mi?`)) {
+                    tip += extra;
+                    // Son girişi düzelt
+                    const last = payEntries[payEntries.length - 1];
+                    last.amount -= extra;
+                } else return;
+            }
+
+            const totalCash = payEntries.filter(e=>e.type==='cash').reduce((s,e)=>s+e.amount,0);
+            const totalCard = payEntries.filter(e=>e.type==='card').reduce((s,e)=>s+e.amount,0);
+
             await fetch(`/api/orders/${currentOrder.id}/close-with-payment`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    payment_cash: parseFloat(document.getElementById('paymentCash').value) || 0,
-                    payment_card: parseFloat(document.getElementById('paymentCard').value) || 0,
+                    payment_cash: totalCash,
+                    payment_card: totalCard,
                     tip_amount: tip,
                     tip_method: tipMethod
                 })
             });
-            
+
             alert('Hesap kapatıldı!');
             document.getElementById('paymentModal').style.display = 'none';
-            document.getElementById('orderModal').style.display = 'none';
+            document.getElementById('orderModal').style.display   = 'none';
             refreshZone();
         }
         function toggleSplitSection() {

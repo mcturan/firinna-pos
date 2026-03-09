@@ -216,6 +216,71 @@ def api_products():
         db.add_product(data['name'], data['category_id'], data['price'])
         return jsonify({'success': True})
 
+@app.route('/api/products/excel-export', methods=['GET'])
+def api_products_excel_export():
+    """Ürünleri CSV olarak indir"""
+    import io, csv
+    products = db.get_products()
+    categories = db.get_categories()
+    output = io.StringIO()
+    writer = csv.writer(output, delimiter=';')
+    writer.writerow(['id', 'name', 'price', 'category_name'])
+    for p in products:
+        writer.writerow([p['id'], p['name'], p['price'], p.get('category_name', '')])
+    output.seek(0)
+    bom = '\ufeff'
+    from flask import Response
+    return Response(
+        bom + output.getvalue(),
+        mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': 'attachment; filename=firinna_urunler.csv'}
+    )
+
+@app.route('/api/products/excel-import', methods=['POST'])
+def api_products_excel_import():
+    """CSV'den ürün güncelle/ekle"""
+    import io, csv
+    data = request.json  # [{id, name, price, category_name}]
+    if not data:
+        return jsonify({'error': 'Veri yok'}), 400
+
+    categories = {c['name']: c['id'] for c in db.get_categories()}
+    results = {'updated': 0, 'added': 0, 'errors': []}
+
+    for row in data:
+        try:
+            name = str(row.get('name', '')).strip()
+            price = float(str(row.get('price', 0)).replace(',', '.'))
+            cat_name = str(row.get('category_name', '')).strip()
+            pid = row.get('id')
+
+            if not name or price < 0:
+                results['errors'].append(f"Geçersiz satır: {row}")
+                continue
+
+            cat_id = categories.get(cat_name)
+            if not cat_id and cat_name:
+                db.add_category(cat_name)
+                categories = {c['name']: c['id'] for c in db.get_categories()}
+                cat_id = categories.get(cat_name)
+
+            if pid:
+                try:
+                    db.update_product(int(pid), name, price, cat_id)
+                    results['updated'] += 1
+                except:
+                    results['errors'].append(f"Güncelleme hatası id={pid}")
+            else:
+                if cat_id:
+                    db.add_product(name, cat_id, price)
+                    results['added'] += 1
+                else:
+                    results['errors'].append(f"Kategori bulunamadı: {cat_name}")
+        except Exception as e:
+            results['errors'].append(str(e))
+
+    return jsonify(results)
+
 @app.route('/api/products/<int:product_id>', methods=['DELETE'])
 def api_delete_product(product_id):
     db.delete_product(product_id)

@@ -15,7 +15,7 @@
                 <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
                 <div class="nav-dropdown-menu">
             <a href="/kasa">💰 Kasa</a>
-            <a href="/reports">📊 Raporlar</a>
+            <a href="/muhasebe">📒 Muhasebe</a>
             <hr>
             <a href="/products" class="active">🍞 Ürünler</a>
             <a href="/stok">📦 Stok</a>
@@ -39,6 +39,19 @@
     </script>
 
     <div class="container">
+        <!-- Excel İmport/Export Bar -->
+        <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;">
+            <span style="font-weight:700;color:#4a5568;font-size:.95rem;">📊 Excel:</span>
+            <button onclick="downloadTemplate()" style="padding:.5rem 1rem;background:#217346;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">
+                📥 Şablon İndir / Dışa Aktar
+            </button>
+            <label style="padding:.5rem 1rem;background:#1d6fa5;color:white;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">
+                📤 Excel'den Güncelle
+                <input type="file" id="excelFile" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleExcelImport(event)">
+            </label>
+            <span id="importStatus" style="font-size:.85rem;color:#718096;"></span>
+        </div>
+
         <div class="management-grid">
             <!-- Kategoriler -->
             <div class="management-section">
@@ -232,7 +245,63 @@
             }
             loadProducts();
         }
+
+        // === EXCEL IMPORT/EXPORT ===
+        function downloadTemplate() {
+            // Mevcut ürünleri CSV olarak indir
+            window.location.href = '/api/products/excel-export';
+        }
+
+        async function handleExcelImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const status = document.getElementById('importStatus');
+            status.textContent = '⏳ Okunuyor...';
+
+            const ext = file.name.split('.').pop().toLowerCase();
+            let rows = [];
+
+            if (ext === 'csv') {
+                const text = await file.text();
+                const lines = text.replace(/\r/g,'').split('\n').filter(l=>l.trim());
+                const headers = lines[0].split(';').map(h=>h.replace(/^\uFEFF/,'').trim());
+                for (let i=1; i<lines.length; i++) {
+                    const vals = lines[i].split(';');
+                    const obj = {};
+                    headers.forEach((h,j) => obj[h] = (vals[j]||'').trim());
+                    if (obj.name) rows.push(obj);
+                }
+            } else {
+                // xlsx — basit okuma için uyarı
+                status.textContent = '⚠️ Lütfen CSV formatında yükleyin. "Şablon İndir" ile CSV alabilirsiniz.';
+                event.target.value = '';
+                return;
+            }
+
+            if (!rows.length) { status.textContent = '⚠️ Veri bulunamadı.'; return; }
+
+            // Önizleme onayla
+            const preview = rows.slice(0,5).map(r=>`${r.name} — ${r.price} ₺ (${r.category_name})`).join('\n');
+            const more = rows.length > 5 ? `\n...ve ${rows.length-5} satır daha` : '';
+            if (!confirm(`${rows.length} satır yüklenecek:\n\n${preview}${more}\n\nDevam edilsin mi?`)) {
+                event.target.value = '';
+                status.textContent = '';
+                return;
+            }
+
+            status.textContent = '⏳ Yükleniyor...';
+            const res = await fetch('/api/products/excel-import', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(rows)
+            }).then(r=>r.json());
+
+            status.textContent = `✅ ${res.updated} güncellendi, ${res.added} eklendi${res.errors.length ? ', '+res.errors.length+' hata' : ''}`;
+            event.target.value = '';
+            loadProducts();
+        }
     </script>
+    </div><!-- /container -->
 
     <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
         Fırınna POS &mdash; TA1XTA &copy; 2026
