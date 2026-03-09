@@ -1,5 +1,5 @@
 -- Fırınna POS DB Dump
--- 2026-03-09 22:30:46
+-- 2026-03-09 22:30:58
 
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
