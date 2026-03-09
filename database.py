@@ -64,12 +64,21 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         order_id INTEGER,
         product_id INTEGER,
+        product_name TEXT,
         quantity INTEGER DEFAULT 1,
         price REAL NOT NULL,
+        kitchen_notes TEXT,
+        is_complimentary INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (order_id) REFERENCES orders(id),
         FOREIGN KEY (product_id) REFERENCES products(id)
     )''')
+    # Migrasyon: mevcut tabloya eksik kolonları ekle
+    for _col, _def in [('product_name','TEXT'), ('kitchen_notes','TEXT'), ('is_complimentary','INTEGER DEFAULT 0')]:
+        try:
+            c.execute(f'ALTER TABLE order_items ADD COLUMN {_col} {_def}')
+        except:
+            pass
     
     # Masraflar
     c.execute('''CREATE TABLE IF NOT EXISTS expenses (
@@ -787,13 +796,18 @@ def get_table_order_by_id(order_id):
     
     # Items'ları getir
     items = conn.execute('''
-        SELECT oi.*, COALESCE(oi.product_name, p.name) as product_name
+        SELECT oi.*, COALESCE(oi.product_name, p.name, 'Ürün') as product_name
         FROM order_items oi
         LEFT JOIN products p ON oi.product_id = p.id
         WHERE oi.order_id = ?
     ''', (order_id,)).fetchall()
     
-    order_dict['items'] = [dict(item) for item in items]
+    order_dict['items'] = []
+    for item in items:
+        d = dict(item)
+        if not d.get('product_name'):
+            d['product_name'] = 'Ürün'
+        order_dict['items'].append(d)
     
     # Ara toplam hesapla
     subtotal = sum(item['quantity'] * item['price'] for item in order_dict['items'] if not item['is_complimentary'])

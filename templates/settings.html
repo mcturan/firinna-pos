@@ -148,6 +148,29 @@
             </div>
         </div>
 
+        <!-- Fiş QR Kodu -->
+        <div class="settings-card">
+            <h3>📍 Fiş Alt QR Kodu</h3>
+            <p style="font-size:.85rem;color:#64748b;margin-bottom:1rem;">
+                Fişin altında gösterilecek QR kod görseli (Google Haritalar, Instagram vb. için).
+                QR kodu harici bir araçla oluşturup buraya yükleyin.
+            </p>
+            <div class="logo-area">
+                <div id="qr-preview-box">
+                    <span id="qr-placeholder-text" style="color:#94a3b8;font-size:.9rem;">QR kod yüklenmemiş</span>
+                    <img id="qr-preview-img" src="" alt="QR" style="display:none;width:100px;height:100px;object-fit:contain;">
+                </div>
+                <div><label style="font-size:.85rem;color:#4a5568;">QR Altı Yazı</label>
+                    <input type="text" id="qr-label" placeholder="Bizi Google Haritalarda bulun"></div>
+                <input type="file" id="qr-file-input" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewQrFile(event)">
+                <div class="save-row" style="width:100%;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('qr-file-input').click()">📁 QR Görsel Seç</button>
+                    <button class="btn btn-primary" onclick="uploadQr()" id="btn-upload-qr" disabled style="opacity:.5;">⬆️ Yükle</button>
+                    <button class="btn" style="background:#ef4444;color:white;" onclick="deleteQr()">🗑️ Sil</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Not Fişi -->
         <div class="settings-card">
             <h3>📝 Not Fişi</h3>
@@ -242,6 +265,44 @@
         }
 
         let pendingLogoFile = null;
+        let pendingQrFile = null;
+
+        function previewQrFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            pendingQrFile = file;
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('qr-preview-img').src = e.target.result;
+                document.getElementById('qr-preview-img').style.display = 'block';
+                document.getElementById('qr-placeholder-text').style.display = 'none';
+                document.getElementById('btn-upload-qr').disabled = false;
+                document.getElementById('btn-upload-qr').style.opacity = '1';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function uploadQr() {
+            if (!pendingQrFile) return;
+            const formData = new FormData();
+            formData.append('file', pendingQrFile);
+            const label = document.getElementById('qr-label').value;
+            formData.append('label', label);
+            const res = await fetch('/api/settings/qr', {method:'POST', body: formData});
+            const d = await res.json();
+            if (d.success) toast('\u2705 QR kodu kaydedildi!');
+            else toast('\u274c Hata: ' + d.error, false);
+        }
+
+        async function deleteQr() {
+            await fetch('/api/settings/qr', {method:'DELETE'});
+            document.getElementById('qr-preview-img').style.display = 'none';
+            document.getElementById('qr-placeholder-text').style.display = 'block';
+            document.getElementById('btn-upload-qr').disabled = true;
+            document.getElementById('btn-upload-qr').style.opacity = '.5';
+            toast('\u2705 QR kodu silindi!');
+        }
+
         async function loadLogoSettings() {
             try {
                 const d = await fetch('/api/settings/logo').then(r => r.json());
@@ -251,6 +312,16 @@
                     document.getElementById('logo-placeholder-text').style.display = 'none';
                 }
             } catch {}
+            // QR yükle
+            try {
+                const qr = await fetch('/api/settings/qr').then(r => r.json());
+                if (qr.url) {
+                    document.getElementById('qr-preview-img').src = qr.url;
+                    document.getElementById('qr-preview-img').style.display = 'block';
+                    document.getElementById('qr-placeholder-text').style.display = 'none';
+                }
+                if (qr.label) document.getElementById('qr-label').value = qr.label;
+            } catch(e) {}
         }
         function previewLogoFile(event) {
             const file = event.target.files[0]; if (!file) return;

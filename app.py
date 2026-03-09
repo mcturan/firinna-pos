@@ -521,6 +521,38 @@ def api_settings(key):
         return jsonify({'success': True})
 
 
+# ===== QR KOD (FİŞ ALT) =====
+
+@app.route('/api/settings/qr', methods=['GET'])
+def api_qr_get():
+    url = db.get_setting('receipt_qr_image_url', '')
+    label = db.get_setting('receipt_qr_label', '')
+    return jsonify({'url': url, 'label': label})
+
+@app.route('/api/settings/qr', methods=['POST'])
+def api_qr_upload():
+    import base64
+    file = request.files.get('file')
+    label = request.form.get('label', '')
+    if not file:
+        return jsonify({'success': False, 'error': 'Dosya yok'})
+    try:
+        data = file.read()
+        b64 = base64.b64encode(data).decode()
+        mime = file.content_type or 'image/png'
+        data_url = f'data:{mime};base64,{b64}'
+        db.set_setting('receipt_qr_image_url', data_url)
+        db.set_setting('receipt_qr_label', label)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/settings/qr', methods=['DELETE'])
+def api_qr_delete():
+    db.set_setting('receipt_qr_image_url', '')
+    db.set_setting('receipt_qr_label', '')
+    return jsonify({'success': True})
+
 # ===== GEÇMİŞ SİPARİŞ GİRİŞİ API =====
 
 @app.route('/api/orders/past', methods=['POST'])
@@ -684,7 +716,9 @@ def api_preview_receipt(order_id):
         restaurant_address=db.get_setting('restaurant_address', ''),
         restaurant_phone=db.get_setting('restaurant_phone', ''),
         footer_note=db.get_setting('receipt_footer', 'Afiyet olsun!'),
-        logo_url=db.get_setting('logo_url', '')
+        logo_url=db.get_setting('logo_url', ''),
+        qr_image_url=db.get_setting('receipt_qr_image_url', ''),
+        qr_label=db.get_setting('receipt_qr_label', 'Bizi Google Haritalarda bulun')
     )
 
 @app.route('/api/print/kitchen/<int:order_id>/preview', methods=['GET'])

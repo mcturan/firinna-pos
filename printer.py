@@ -35,6 +35,7 @@ class ThermalPrinter:
         """Müşteri adisyonu yazdır"""
         ESC = b'\x1B'
         INIT = ESC + b'@'
+        CODEPAGE = ESC + b't\x06'   # Code Page 857 (Turkish)
         CENTER = ESC + b'a\x01'
         LEFT = ESC + b'a\x00'
         BOLD_ON = ESC + b'E\x01'
@@ -49,6 +50,7 @@ class ThermalPrinter:
         footer_note = db.get_setting('receipt_footer', 'Afiyet olsun!')
         
         data = INIT
+        data += CODEPAGE
         
         # Header
         data += CENTER
@@ -130,6 +132,7 @@ class ThermalPrinter:
         """Mutfak fişi yazdır (sadece ürünler + notlar)"""
         ESC = b'\x1B'
         INIT = ESC + b'@'
+        CODEPAGE = ESC + b't\x06'   # Code Page 857 (Turkish)
         CENTER = ESC + b'a\x01'
         LEFT = ESC + b'a\x00'
         BOLD_ON = ESC + b'E\x01'
@@ -139,6 +142,7 @@ class ThermalPrinter:
         CUT = ESC + b'd\x05' + ESC + b'm'
         
         data = INIT
+        data += CODEPAGE
         data += CENTER
         data += BOLD_ON + DOUBLE_HEIGHT
         data += "MUTFAK SIPARIS\n".encode('cp857', errors='replace')
