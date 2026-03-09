@@ -413,7 +413,15 @@
                     body: JSON.stringify({message: msg})
                 }).then(r => r.json());
                 if (d.success) {
-                    showGitLog(d.had_changes ? '✅ Push başarılı!\n' + d.output : '✅ Değişiklik yok, push gerekmedi.\n' + d.output);
+                    (() => {
+                        if (d.had_changes) {
+                            showGitLog('✅ Commit edildi ve push yapıldı!\n' + d.output);
+                        } else if (d.output && d.output.includes('->')) {
+                            showGitLog('✅ Push tamam! (Bekleyen commit gönderildi)\n' + d.output);
+                        } else {
+                            showGitLog('✅ Zaten güncel, gönderilecek bir şey yok.');
+                        }
+                    })();
                     toast('✅ GitHub\'a yüklendi!');
                     document.getElementById('commit-message').value = '';
                     setTimeout(loadGitStatus, 1500);
