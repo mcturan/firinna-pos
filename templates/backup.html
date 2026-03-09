@@ -261,31 +261,13 @@ async function loadAutoPullSetting(){try{var d=await fetch("/api/git/auto-pull/s
 async function saveAutoPull(){var mode=document.querySelector("input[name=\"pull-mode\"]:checked").value,p={mode};if(mode==="interval")p.interval=parseInt(document.getElementById("auto-pull-interval").value);if(mode==="time")p.time=document.getElementById("auto-pull-time").value;var d=await fetch("/api/git/auto-pull/set",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}).then(r=>r.json());document.getElementById("auto-pull-status").textContent=mode==="interval"?"Her "+p.interval+" dk aktif":mode==="time"?"Her gun "+p.time+"'de aktif":"Kapali";showToast(d.success?"&#10003; Kaydedildi!":"&#10008; Hata",d.success?"ok":"err");}
 async function loadAutoPushSetting(){try{var d=await fetch("/api/git/auto-push").then(r=>r.json()),st=document.getElementById("auto-push-status");if(d.mode==="interval"&&d.interval>0){document.getElementById("push-mode-interval").checked=true;document.getElementById("auto-push-interval").value=String(d.interval);togglePushMode();st.textContent="Her "+d.interval+" dk aktif";}else if(d.mode==="time"&&d.time){document.getElementById("push-mode-time").checked=true;document.getElementById("auto-push-time").value=d.time;togglePushMode();st.textContent="Her gun "+d.time+"'de aktif";}else{document.getElementById("push-mode-off").checked=true;st.textContent="Kapali";}}catch(e){}}
 async function saveAutoPush(){var mode=document.querySelector("input[name=\"push-mode\"]:checked").value,p={mode};if(mode==="interval")p.interval=parseInt(document.getElementById("auto-push-interval").value);if(mode==="time")p.time=document.getElementById("auto-push-time").value;var d=await fetch("/api/git/auto-push",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}).then(r=>r.json());document.getElementById("auto-push-status").textContent=mode==="interval"?"Her "+p.interval+" dk aktif":mode==="time"?"Her gun "+p.time+"'de aktif":"Kapali";showToast(d.success?"&#10003; Kaydedildi!":"&#10008; Hata",d.success?"ok":"err");}
-async function saveCredentials(){
-    var u=document.getElementById("git-username").value.trim();
-    var t=document.getElementById("git-token").value.trim();
-    if(!u){showToast("Kullanıcı adı gerekli","err");return;}
-    var d=await fetch("/api/git/credentials",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,token:t})}).then(r=>r.json());
-    if(d.success){
-        showToast("✅ Kaydedildi! Artık push/pull çalışacak.");
-        document.getElementById("git-token").value="";
-        document.getElementById("cred-status").textContent="✓ Token kayıtlı";
-        document.getElementById("cred-status").style.color="#2d6a4f";
-    }else showToast("❌ "+d.error,"err");
-}
-async function loadCredentials(){
-    try{
-        var d=await fetch("/api/git/credentials").then(r=>r.json());
-        if(d.username)document.getElementById("git-username").value=d.username;
-        var st=document.getElementById("cred-status");
-        if(d.has_token){st.textContent="✓ Token kayıtlı";st.style.color="#2d6a4f";}
         else{st.textContent="⚠ Token girilmemiş";st.style.color="#d97706";}
     }catch(e){}
 }
 function showGitLog(text){var b=document.getElementById("git-log");b.style.display="block";b.textContent=text;b.scrollTop=b.scrollHeight;}
 function toggleNav(){document.getElementById('navDropdown').classList.toggle('open');}
 document.addEventListener('click',function(e){var d=document.getElementById('navDropdown');if(d&&!d.contains(e.target))d.classList.remove('open');});
-loadBackupList();loadGitStatus();loadAutoPullSetting();loadAutoPushSetting();loadCredentials();
+loadBackupList();loadGitStatus();loadAutoPullSetting();loadAutoPushSetting();
 </script>
 </body>
 </html>
