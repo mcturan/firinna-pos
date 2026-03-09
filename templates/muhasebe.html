@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ön Muhasebe - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --green:  #2d6a4f;
+            --green2: #40916c;
+            --red:    #e53e3e;
+            --blue:   #3b82f6;
+            --gold:   #d97706;
+            --bg:     #f0f4f1;
+        }
+        body { background: var(--bg); }
+
+        .page-header {
+            background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 60%, #40916c 100%);
+            color: white;
+            padding: 1.5rem 2rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 0 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .page-header h1 { margin: 0; font-size: 1.4rem; font-weight: 700; letter-spacing: .5px; }
+        .page-header p  { margin: .2rem 0 0; font-size: .85rem; opacity: .8; }
+
+        /* Zaman sekmeler */
+        .period-bar {
+            display: flex;
+            gap: .4rem;
+            background: white;
+            border-radius: 12px;
+            padding: .4rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .period-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: .55rem .5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: .9rem;
+            font-weight: 600;
+            color: #718096;
+            background: none;
+            cursor: pointer;
+            transition: all .2s;
+            text-align: center;
+        }
+        .period-btn:hover { background: #f0f4f1; color: var(--green); }
+        .period-btn.active { background: var(--green); color: white; }
+
+        .date-range-row {
+            display: none;
+            gap: .75rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.25rem;
+        }
+        .date-range-row.show { display: flex; }
+        .date-range-row input {
+            padding: .5rem .75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: .9rem;
+            font-family: inherit;
+        }
+        .date-range-row button {
+            padding: .5rem 1.25rem;
+            background: var(--green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: .9rem;
+        }
+
+        /* Özet kartlar */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .sum-card {
+            background: white;
+            border-radius: 14px;
+            padding: 1.25rem 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .sum-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--accent, #e2e8f0);
+        }
+        .sum-card.green  { --accent: var(--green); }
+        .sum-card.red    { --accent: var(--red); }
+        .sum-card.blue   { --accent: var(--blue); }
+        .sum-card.gold   { --accent: var(--gold); }
+        .sum-card.teal   { --accent: #0891b2; }
+        .sum-card.purple { --accent: #7c3aed; }
+
+        .sum-icon  { font-size: 1.6rem; margin-bottom: .3rem; }
+        .sum-value { font-size: 1.5rem; font-weight: 800; color: #1a202c; line-height: 1; }
+        .sum-value.positive { color: var(--green); }
+        .sum-value.negative { color: var(--red); }
+        .sum-label { font-size: .75rem; color: #718096; margin-top: .35rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+
+        /* Bölüm kartlar */
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+            margin-bottom: 1.25rem;
+        }
+        .card h3 { margin: 0 0 1.25rem; font-size: 1rem; color: #2d3748; display: flex; align-items: center; gap: .5rem; }
+
+        /* Grafik */
+        .chart-wrap { position: relative; height: 220px; }
+
+        /* Ödeme dağılımı */
+        .pay-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .pay-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .pay-amount { font-size: 1.3rem; font-weight: 700; }
+        .pay-label  { font-size: .78rem; color: #718096; margin-top: .2rem; }
+        .pay-bar-wrap { height: 6px; background: #e2e8f0; border-radius: 3px; margin-top: .5rem; }
+        .pay-bar { height: 100%; border-radius: 3px; transition: width .6s; }
+
+        /* Masraf kategoriler */
+        .expense-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .6rem 0;
+            border-bottom: 1px solid #f0f4f1;
+        }
+        .expense-row:last-child { border-bottom: none; }
+        .exp-name  { font-weight: 600; font-size: .9rem; }
+        .exp-bar-wrap { flex: 1; margin: 0 1rem; height: 6px; background: #e2e8f0; border-radius: 3px; }
+        .exp-bar { height: 100%; background: var(--red); border-radius: 3px; transition: width .6s; }
+        .exp-amount { font-weight: 700; color: var(--red); font-size: .9rem; white-space: nowrap; }
+
+        /* Top ürünler */
+        .prod-row {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .6rem 0;
+            border-bottom: 1px solid #f0f4f1;
+        }
+        .prod-row:last-child { border-bottom: none; }
+        .prod-rank { width: 24px; height: 24px; border-radius: 50%; background: var(--green); color: white; font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .prod-name { flex: 1; font-weight: 600; font-size: .9rem; }
+        .prod-qty  { color: #718096; font-size: .82rem; }
+        .prod-total{ font-weight: 700; color: var(--green); font-size: .9rem; white-space: nowrap; }
+
+        /* Net renk */
+        .net-positive { color: var(--green) !important; }
+        .net-negative { color: var(--red) !important; }
+
+        .loading { text-align: center; padding: 3rem; color: #a0aec0; font-size: 1rem; }
+        .no-data  { text-align: center; padding: 2rem; color: #a0aec0; font-size: .9rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🍽️ Fırınna POS</div>
+        <div class="nav-links">
+            <a href="/">Masalar</a>
+            <div class="nav-dropdown" id="navDropdown">
+                <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
+                <div class="nav-dropdown-menu">
+                    <a href="/kasa">💰 Kasa</a>
+                    <a href="/muhasebe">📒 Muhasebe</a>
+                    <a href="/muhasebe" class="active">📒 Ön Muhasebe</a>
+                    <hr>
+                    <a href="/products">🍞 Ürünler</a>
+                    <a href="/stok">📦 Stok</a>
+                    <a href="/recete">🧾 Reçete</a>
+                    <a href="/expenses">📤 Masraflar</a>
+                    <a href="/tables">🪑 Masa Yönetimi</a>
+                    <hr>
+                    <a href="/settings">⚙️ Ayarlar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>
+        function toggleNav() { document.getElementById('navDropdown').classList.toggle('open'); }
+        document.addEventListener('click', e => {
+            const dd = document.getElementById('navDropdown');
+            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+        });
+    </script>
+
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>📒 Ön Muhasebe</h1>
+                <p id="period-label">Yükleniyor...</p>
+            </div>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                <button onclick="exportExcel()" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.4);padding:.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">📥 Excel</button>
+                <button onclick="printDailyReport()" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.4);padding:.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">🖨️ Yazdır</button>
+            </div>
+        </div>
+
+        <!-- Dönem Seçimi -->
+        <div class="period-bar">
+            <button class="period-btn active" onclick="setPeriod('today',this)">Bugün</button>
+            <button class="period-btn" onclick="setPeriod('week',this)">Bu Hafta</button>
+            <button class="period-btn" onclick="setPeriod('month',this)">Bu Ay</button>
+            <button class="period-btn" onclick="setPeriod('custom',this)">Tarih Seç</button>
+        </div>
+
+        <div class="date-range-row" id="custom-range">
+            <input type="date" id="date-from">
+            <span style="color:#718096;">—</span>
+            <input type="date" id="date-to">
+            <button onclick="loadCustom()">Göster</button>
+        </div>
+
+        <!-- Özet Kartlar -->
+        <div class="summary-grid" id="summary-grid">
+            <div class="loading">Yükleniyor...</div>
+        </div>
+
+        <!-- Grafik + Ödeme Dağılımı -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;" id="mid-row">
+            <div class="card" style="grid-column:1/-1;">
+                <h3>📈 Günlük Gelir</h3>
+                <div class="chart-wrap">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;">
+            <!-- Ödeme Yöntemi -->
+            <div class="card">
+                <h3>💳 Ödeme Yöntemi</h3>
+                <div id="payment-section"><div class="loading">...</div></div>
+            </div>
+            <!-- Masraf Kategorileri -->
+            <div class="card">
+                <h3>📤 Masraf Kategorileri</h3>
+                <div id="expense-section"><div class="loading">...</div></div>
+            </div>
+        </div>
+
+        <!-- En Çok Satanlar -->
+        <div class="card">
+            <h3>🏆 En Çok Satan Ürünler</h3>
+            <div id="products-section"><div class="loading">...</div></div>
+        </div>
+
+        <!-- Günlük Dağılım Tablosu -->
+        <div class="card" id="daily-table-card" style="display:none;">
+            <h3>📅 Günlük Dağılım</h3>
+            <div id="daily-table-section"></div>
+        </div>
+    </div>
+
+    <script>
+    let chartInstance = null;
+    let currentStart = '', currentEnd = '';
+
+    function localToday() {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+
+    function setPeriod(period, btn) {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('custom-range').classList.toggle('show', period === 'custom');
+
+        const today = new Date();
+        let start, end;
+
+        if (period === 'today') {
+            start = end = localToday();
+        } else if (period === 'week') {
+            const day = today.getDay() || 7;
+            const mon = new Date(today); mon.setDate(today.getDate() - day + 1);
+            start = mon.toISOString().slice(0,10);
+            end = localToday();
+        } else if (period === 'month') {
+            start = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-01';
+            end = localToday();
+        } else {
+            return;
+        }
+        loadData(start, end);
+    }
+
+    function loadCustom() {
+        const s = document.getElementById('date-from').value;
+        const e = document.getElementById('date-to').value;
+        if (!s || !e) { alert('Tarih seçin'); return; }
+        loadData(s, e);
+    }
+
+    async function loadData(start, end) {
+        currentStart = start; currentEnd = end;
+
+        // Etiket güncelle
+        document.getElementById('period-label').textContent =
+            start === end ? start : start + '  →  ' + end;
+
+        // Loading
+        document.getElementById('summary-grid').innerHTML = '<div class="loading" style="grid-column:1/-1">Yükleniyor...</div>';
+
+        try {
+            const data = await fetch(`/api/muhasebe?start=${start}&end=${end}`).then(r => r.json());
+            lastData = data;
+            renderSummary(data);
+            renderChart(data.daily);
+            renderPayment(data);
+            renderExpenses(data.expense_categories || []);
+            renderProducts(data.top_products || []);
+            renderDailyTable(data.daily || []);
+        } catch(e) {
+            document.getElementById('summary-grid').innerHTML = '<div class="no-data" style="grid-column:1/-1">Veri yüklenemedi.</div>';
+        }
+    }
+
+    function fmt(n) {
+        return Number(n).toLocaleString('tr-TR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' ₺';
+    }
+
+    function renderSummary(d) {
+        const netClass = d.net >= 0 ? 'positive' : 'negative';
+        document.getElementById('summary-grid').innerHTML = `
+            <div class="sum-card green">
+                <div class="sum-icon">💰</div>
+                <div class="sum-value positive">${fmt(d.total_sales)}</div>
+                <div class="sum-label">Toplam Satış</div>
+            </div>
+            <div class="sum-card red">
+                <div class="sum-icon">📤</div>
+                <div class="sum-value negative">${fmt(d.total_expenses)}</div>
+                <div class="sum-label">Toplam Masraf</div>
+            </div>
+            <div class="sum-card ${d.net >= 0 ? 'green' : 'red'}">
+                <div class="sum-icon">${d.net >= 0 ? '📈' : '📉'}</div>
+                <div class="sum-value ${netClass}">${fmt(d.net)}</div>
+                <div class="sum-label">Net Kar/Zarar</div>
+            </div>
+            <div class="sum-card gold">
+                <div class="sum-icon">🎁</div>
+                <div class="sum-value" style="color:var(--gold)">${fmt(d.total_tips)}</div>
+                <div class="sum-label">Bahşiş</div>
+            </div>
+            <div class="sum-card teal">
+                <div class="sum-icon">🧾</div>
+                <div class="sum-value" style="color:#0891b2">${d.order_count}</div>
+                <div class="sum-label">Sipariş</div>
+            </div>
+            <div class="sum-card purple">
+                <div class="sum-icon">🏷️</div>
+                <div class="sum-value" style="color:#7c3aed">${fmt(d.total_discount)}</div>
+                <div class="sum-label">İndirim</div>
+            </div>
+        `;
+    }
+
+    function renderChart(daily) {
+        const ctx = document.getElementById('dailyChart').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+
+        if (!daily || !daily.length) {
+            ctx.canvas.parentElement.innerHTML = '<div class="no-data">Bu dönemde veri yok.</div>';
+            return;
+        }
+
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: daily.map(d => d.day.slice(5)),
+                datasets: [{
+                    label: 'Satış (₺)',
+                    data: daily.map(d => d.total_sales),
+                    backgroundColor: 'rgba(45,106,79,.75)',
+                    borderColor: '#2d6a4f',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: v => v.toLocaleString('tr-TR') + ' ₺', font: {size:11} },
+                        grid: { color: '#f0f4f1' }
+                    },
+                    x: { grid: { display: false }, ticks: { font: {size:11} } }
+                }
+            }
+        });
+    }
+
+    function renderPayment(d) {
+        const total = d.total_cash + d.total_card || 1;
+        const cashPct = Math.round(d.total_cash / total * 100);
+        const cardPct = 100 - cashPct;
+        document.getElementById('payment-section').innerHTML = `
+            <div class="pay-grid">
+                <div class="pay-item">
+                    <div class="pay-amount" style="color:#2d6a4f">${fmt(d.total_cash)}</div>
+                    <div class="pay-label">💵 Nakit</div>
+                    <div class="pay-bar-wrap"><div class="pay-bar" style="width:${cashPct}%;background:#2d6a4f;"></div></div>
+                    <div style="font-size:.75rem;color:#94a3b8;margin-top:.3rem;">${cashPct}%</div>
+                </div>
+                <div class="pay-item">
+                    <div class="pay-amount" style="color:#3b82f6">${fmt(d.total_card)}</div>
+                    <div class="pay-label">💳 Kart</div>
+                    <div class="pay-bar-wrap"><div class="pay-bar" style="width:${cardPct}%;background:#3b82f6;"></div></div>
+                    <div style="font-size:.75rem;color:#94a3b8;margin-top:.3rem;">${cardPct}%</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderExpenses(cats) {
+        if (!cats.length) {
+            document.getElementById('expense-section').innerHTML = '<div class="no-data">Bu dönemde masraf yok.</div>';
+            return;
+        }
+        const max = Math.max(...cats.map(c => c.total));
+        document.getElementById('expense-section').innerHTML = cats.map(c => `
+            <div class="expense-row">
+                <span class="exp-name">${c.category}</span>
+                <div class="exp-bar-wrap"><div class="exp-bar" style="width:${Math.round(c.total/max*100)}%"></div></div>
+                <span class="exp-amount">${fmt(c.total)}</span>
+            </div>
+        `).join('');
+    }
+
+    function renderProducts(prods) {
+        if (!prods.length) {
+            document.getElementById('products-section').innerHTML = '<div class="no-data">Bu dönemde satış yok.</div>';
+            return;
+        }
+        document.getElementById('products-section').innerHTML = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem 1.5rem;">
+            ${prods.slice(0,20).map((p,i) => `
+                <div class="prod-row">
+                    <div class="prod-rank">${i+1}</div>
+                    <span class="prod-name">${p.name}</span>
+                    <span class="prod-qty">${p.quantity} adet</span>
+                    <span class="prod-total">${fmt(p.total)}</span>
+                </div>
+            `).join('')}
+            </div>
+        `;
+    }
+
+    function renderDailyTable(daily) {
+        const card = document.getElementById('daily-table-card');
+        if (!daily || daily.length <= 1) { card.style.display = 'none'; return; }
+        card.style.display = 'block';
+        document.getElementById('daily-table-section').innerHTML = `
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr style="background:#f7fafc;">
+                        <th style="padding:.7rem;text-align:left;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Tarih</th>
+                        <th style="padding:.7rem;text-align:center;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Sipariş</th>
+                        <th style="padding:.7rem;text-align:right;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Satış</th>
+                        <th style="padding:.7rem;text-align:right;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Bahşiş</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${daily.map(d => `
+                    <tr style="border-bottom:1px solid #f0f0f0;">
+                        <td style="padding:.65rem .7rem;">${d.day}</td>
+                        <td style="padding:.65rem .7rem;text-align:center;">${d.order_count}</td>
+                        <td style="padding:.65rem .7rem;text-align:right;font-weight:600;">${fmt(d.total_sales)}</td>
+                        <td style="padding:.65rem .7rem;text-align:right;color:var(--gold);">${fmt(d.tips)}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    let lastData = null;
+
+    function exportExcel() {
+        if (!lastData) { alert('Önce veri yükleyin.'); return; }
+        const r = lastData;
+        let csv = '\uFEFF';
+        csv += `Firinna POS - On Muhasebe\n`;
+        csv += `Donem;${currentStart} - ${currentEnd}\n\n`;
+        csv += `OZET\n`;
+        csv += `Toplam Siparis;${r.order_count}\n`;
+        csv += `Toplam Satis;${r.total_sales}\n`;
+        csv += `Nakit;${r.total_cash}\n`;
+        csv += `Kart;${r.total_card}\n`;
+        csv += `Bahsis;${r.total_tips}\n`;
+        csv += `Indirim;${r.total_discount}\n`;
+        csv += `Masraf;${r.total_expenses}\n`;
+        csv += `Net;${r.net}\n\n`;
+        if (r.expense_categories && r.expense_categories.length) {
+            csv += `MASRAF KATEGORILERI\n`;
+            csv += `Kategori;Tutar\n`;
+            r.expense_categories.forEach(c => { csv += `${c.category};${c.total}\n`; });
+            csv += `\n`;
+        }
+        csv += `EN COK SATAN URUNLER\n`;
+        csv += `Sira;Urun;Adet;Tutar\n`;
+        (r.top_products||[]).forEach((p,i) => { csv += `${i+1};${p.name};${p.quantity};${p.total}\n`; });
+        if (r.daily && r.daily.length > 1) {
+            csv += `\nGUNLUK DAGILIM\n`;
+            csv += `Tarih;Siparis;Satis;Bahsis\n`;
+            r.daily.forEach(d => { csv += `${d.day};${d.order_count};${d.total_sales};${d.tips}\n`; });
+        }
+        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `firinna_${currentStart}_${currentEnd}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    async function printDailyReport() {
+        if (!currentStart) { alert('Önce tarih seçin.'); return; }
+        try {
+            await fetch('/api/print/daily-report', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({date: currentStart})
+            });
+            alert('Rapor yazıcıya gönderildi.');
+        } catch(e) { alert('Yazıcı hatası: ' + e.message); }
+    }
+
+    // İlk yükle
+    document.addEventListener('DOMContentLoaded', () => {
+        const today = localToday();
+        document.getElementById('date-from').value = today;
+        document.getElementById('date-to').value = today;
+        loadData(today, today);
+    });
+    </script>
+</body>
+</html>

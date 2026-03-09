@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
 import database as db
 import telegram_notify
 from printer import ThermalPrinter
@@ -809,6 +809,40 @@ def api_send_telegram_note():
     if ok:
         return jsonify({'success': True})
     return jsonify({'success': False, 'error': 'Mesaj gönderilemedi. Chat ID veya token hatalı olabilir.'})
+
+# ===== ÖN MUHASEBE (#50) =====
+
+@app.route('/muhasebe')
+def page_muhasebe():
+    return render_template('muhasebe.html')
+
+@app.route('/reports')
+def page_reports_redirect():
+    return redirect('/muhasebe')
+
+@app.route('/api/muhasebe')
+def api_muhasebe():
+    start = request.args.get('start', datetime.now().strftime('%Y-%m-%d'))
+    end   = request.args.get('end',   datetime.now().strftime('%Y-%m-%d'))
+
+    data = db.get_report(start, end)
+
+    # Masraf kategorileri
+    import sqlite3
+    conn = sqlite3.connect(db.DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cats = conn.execute('''
+        SELECT COALESCE(category,'Genel') as category,
+               SUM(amount) as total
+        FROM expenses
+        WHERE DATE(created_at) BETWEEN ? AND ?
+        GROUP BY category
+        ORDER BY total DESC
+    ''', (start, end)).fetchall()
+    conn.close()
+    data['expense_categories'] = [dict(r) for r in cats]
+
+    return jsonify(data)
 
 # ===== NOT QR =====
 
