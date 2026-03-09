@@ -25,6 +25,7 @@
             <a href="/expenses">📤 Masraflar</a>
             <a href="/tables">🪑 Masa Yönetimi</a>
             <hr>
+            <a href="/backup">💾 Yedek</a>
             <a href="/settings">⚙️ Ayarlar</a>
                 </div>
             </div>
@@ -128,12 +129,11 @@
                             <button class="btn" onclick="printKitchen()" style="background:#38a169;color:white;">🖨️ Yazdır</button>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                            <button class="btn" onclick="downloadPDF()" style="background:#ed8936;color:white;">📥</button>
+                            <button class="btn" onclick="previewReceiptPDF()" style="background:#ed8936;color:white;" title="Müşteri fişi önizle / PDF kaydet">📄 PDF</button>
                             <button class="btn" onclick="sendToPhone()" style="background:#9f7aea;color:white;">📱</button>
                         </div>
                         <button class="btn" onclick="cancelOrder()" style="background:#f56565;color:white;width:100%;">🗑️ Fiş İptal</button>
-                        <hr style="margin:.75rem 0;border:none;border-top:1px solid #e2e8f0;">
-                        <button class="btn" onclick="openOrderHistory()" style="background:#4a5568;color:white;width:100%;">📜 Geçmiş Siparişler</button>
+
                         </div>
                     </div>
                 </div>
@@ -1756,34 +1756,16 @@ async function refreshZone() {
     }).join('');
 }
 
-function downloadPDF() {
+function previewReceiptPDF() {
     if (!currentOrder || !currentOrder.id) {
-        alert('Önce siparişi kaydedin!');
+        alert('Önce sipariş oluşturun!');
         return;
     }
-    const menu = document.createElement('div');
-    menu.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:1.5rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:10000;min-width:240px;';
-    menu.innerHTML = `
-        <h3 style="margin:0 0 1rem;font-size:1rem;">PDF İndir</h3>
-        <button class="btn btn-primary" style="width:100%;margin-bottom:.5rem;"
-            onclick="window.open('/api/print/receipt/${currentOrder.id}/pdf');document.body.removeChild(this.closest('.pdf-overlay'));">
-            📄 Müşteri Fişi
-        </button>
-        <button class="btn btn-success" style="width:100%;margin-bottom:.5rem;"
-            onclick="window.open('/api/print/kitchen/${currentOrder.id}/pdf');document.body.removeChild(this.closest('.pdf-overlay'));">
-            👨‍🍳 Mutfak Fişi
-        </button>
-        <button class="btn btn-secondary" style="width:100%;"
-            onclick="document.body.removeChild(this.closest('.pdf-overlay'));">
-            ❌ Kapat
-        </button>
-    `;
-    const overlay = document.createElement('div');
-    overlay.className = 'pdf-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
-    overlay.onclick = (e) => { if (e.target===overlay) document.body.removeChild(overlay); };
-    overlay.appendChild(menu);
-    document.body.appendChild(overlay);
+    window.open(`/api/print/receipt/${currentOrder.id}/preview`, '_blank');
+}
+
+function downloadPDF() {
+    previewReceiptPDF();
 }
 
 // ===== AYARLAR MODAL (#15 Logo, #17 Not, Ayarlar UI) =====

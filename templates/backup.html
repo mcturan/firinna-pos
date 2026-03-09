@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yedekleme — Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .backup-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;}
+        @media(max-width:700px){.backup-grid{grid-template-columns:1fr;}}
+        .card{background:white;border-radius:14px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #e2e8f0;}
+        .card h3{margin:0 0 .35rem;font-size:.95rem;color:#1a202c;}
+        .card p{margin:0 0 .9rem;font-size:.8rem;color:#718096;line-height:1.5;}
+        .btn-w{width:100%;padding:.6rem 1rem;border:none;border-radius:9px;font-weight:600;font-size:.85rem;cursor:pointer;transition:opacity .15s;margin-bottom:.5rem;}
+        .btn-w:last-child{margin-bottom:0;}.btn-w:hover{opacity:.88;}.btn-w:disabled{opacity:.55;cursor:not-allowed;}
+        .c-green{background:#2d6a4f;color:white;}.c-blue{background:#3182ce;color:white;}
+        .c-red{background:#e53e3e;color:white;}.c-purple{background:#667eea;color:white;}
+        .c-teal{background:#38a169;color:white;}.c-gray{background:#4a5568;color:white;}
+        .divider{margin:.7rem 0;border:none;border-top:1px solid #e2e8f0;}
+        .file-drop{border:2px dashed #cbd5e0;border-radius:10px;padding:1rem;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:.7rem;}
+        .file-drop:hover{border-color:#667eea;}.file-drop input{display:none;}
+        .file-drop .lbl{font-size:.82rem;color:#718096;}.file-drop .sel{font-size:.8rem;color:#2d6a4f;font-weight:600;margin-top:.25rem;}
+        .backup-list{max-height:260px;overflow-y:auto;}
+        .bitem{display:flex;justify-content:space-between;align-items:center;padding:.5rem .7rem;border-radius:8px;margin-bottom:.3rem;background:#f8fafc;border:1px solid #e2e8f0;font-size:.8rem;}
+        .bitem .nm{font-weight:600;color:#2d3748;flex:1;word-break:break-all;}
+        .bitem .mt{color:#94a3b8;font-size:.73rem;}
+        .bitem button{padding:.22rem .5rem;border:none;border-radius:6px;cursor:pointer;font-size:.76rem;font-weight:600;background:#fed7d7;color:#c53030;margin-left:.4rem;flex-shrink:0;}
+        .bitem button:hover{background:#feb2b2;}
+        .warn{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:.85rem 1rem;margin-bottom:1rem;font-size:.82rem;color:#9a3412;}
+        .section-title{font-size:1rem;font-weight:700;color:#1a202c;margin:1.25rem 0 .75rem;padding-bottom:.35rem;border-bottom:2px solid #e2e8f0;}
+        .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:.3rem;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        .toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:.65rem 1.1rem;border-radius:10px;font-size:.85rem;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transition:opacity .3s;pointer-events:none;}
+        .toast.show{opacity:1;}.toast.ok{background:#2d6a4f;color:white;}.toast.err{background:#e53e3e;color:white;}
+        .sync-status-box{background:#f8fafc;border-radius:10px;padding:1rem;margin-bottom:.85rem;}
+        .sync-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid #e2e8f0;font-size:.82rem;}
+        .sync-row:last-child{border-bottom:none;}.sync-row label{color:#718096;font-weight:600;min-width:130px;}
+        .badge-ahead{background:#d1fae5;color:#065f46;padding:.12rem .45rem;border-radius:20px;font-size:.72rem;font-weight:700;}
+        .badge-behind{background:#fee2e2;color:#991b1b;padding:.12rem .45rem;border-radius:20px;font-size:.72rem;font-weight:700;}
+        .badge-ok{background:#e0f2fe;color:#0369a1;padding:.12rem .45rem;border-radius:20px;font-size:.72rem;font-weight:700;}
+        .diff-box{background:#1e293b;color:#94a3b8;border-radius:8px;padding:.75rem;font-family:monospace;font-size:.75rem;line-height:1.6;max-height:150px;overflow-y:auto;white-space:pre-wrap;margin-top:.5rem;}
+        .commit-input{width:100%;padding:.5rem .7rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.85rem;font-family:inherit;margin-bottom:.6rem;box-sizing:border-box;}
+        .commit-input:focus{outline:none;border-color:#667eea;}
+        .auto-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.5rem;}
+        .auto-row label{font-size:.82rem;color:#4a5568;}
+        .auto-row select,.auto-row input[type=time]{padding:.4rem .6rem;border:1px solid #e2e8f0;border-radius:7px;font-size:.82rem;}
+        .git-log-box{background:#f8fafc;border-radius:8px;padding:.7rem;font-size:.75rem;font-family:monospace;color:#475569;line-height:1.7;max-height:120px;overflow-y:auto;white-space:pre-wrap;margin-top:.6rem;display:none;}
+        .sub-title{font-size:.82rem;font-weight:700;color:#4a5568;margin:.85rem 0 .4rem;}
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-brand">&#127829; Firinna POS</div>
+    <div class="nav-links">
+        <a href="/" class="nav-link">&#127968; Siparisler</a>
+        <div class="nav-dropdown" id="navDropdown">
+            <button class="nav-dropdown-btn" onclick="document.getElementById('navDropdown').classList.toggle('open')">&#9881;&#65039; Yonetim &#9660;</button>
+            <div class="nav-dropdown-menu">
+                <a href="/kasa">&#128176; Kasa</a>
+                <a href="/muhasebe">&#128211; Muhasebe</a>
+                <hr>
+                <a href="/products">&#127838; Urunler</a>
+                <a href="/stok">&#128230; Stok</a>
+                <a href="/recete">&#129518; Recete</a>
+                <a href="/expenses">&#128228; Masraflar</a>
+                <a href="/tables">&#129681; Masa Yonetimi</a>
+                <hr>
+                <a href="/backup">&#128190; Yedek</a>
+                <a href="/settings">&#9881;&#65039; Ayarlar</a>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="container" style="max-width:860px;">
+    <div style="margin-bottom:1.1rem;">
+        <h1 style="font-size:1.3rem;margin:0 0 .2rem;color:#1a202c;">&#128190; Yedekleme &amp; Senkronizasyon</h1>
+        <p style="color:#718096;font-size:.82rem;margin:0;">Veritabanini yedekle, geri yukle. Iki lokasyon arasinda GitHub ile senkronize et.</p>
+    </div>
+    <div class="warn">&#9888;&#65039; Geri yukleme mevcut tum verilerin uzerine yazar. Islem oncesinde otomatik yedek alinir.</div>
+    <div class="backup-grid">
+        <div class="card">
+            <h3>&#128229; Yedek Indir</h3>
+            <p>Tum verileri bilgisayarina indir. Guvenli bir yerde sakla.</p>
+            <button class="btn-w c-green" onclick="downloadDB()">&#128230; .db Dosyasi Indir</button>
+            <hr class="divider">
+            <p>Metin formatinda SQL dump. Farkli sistemde acilabilir.</p>
+            <button class="btn-w c-blue" onclick="downloadSQL()">&#128196; SQL Dump Indir</button>
+        </div>
+        <div class="card">
+            <h3>&#11014;&#65039; Yedekten Geri Yukle</h3>
+            <p>.db veya .sql dosyasi sec. Mevcut veriler yedeğe alinir.</p>
+            <div class="file-drop" onclick="document.getElementById('restoreFile').click()">
+                <input type="file" id="restoreFile" accept=".db,.sql" onchange="onFileSelect(this)">
+                <div class="lbl">&#128194; .db veya .sql dosyasi sec</div>
+                <div class="sel" id="selectedFileName"></div>
+            </div>
+            <button class="btn-w c-red" onclick="restoreFromFile()" id="restoreBtn" disabled>&#128260; Geri Yukle</button>
+        </div>
+    </div>
+    <div class="section-title">&#128260; GitHub Senkronizasyonu</div>
+    <div class="card" style="margin-bottom:1.25rem;">
+        <div class="backup-grid" style="margin-bottom:0;">
+            <div>
+                <div class="sub-title">&#128225; Durum</div>
+                <div class="sync-status-box" id="git-status-box">
+                    <div style="color:#94a3b8;font-size:.82rem;text-align:center;padding:.75rem;">Yukleniyor...</div>
+                </div>
+                <button class="btn-w c-gray" onclick="loadGitStatus()" id="btn-refresh-status">&#128260; Durumu Yenile</button>
+                <div class="sub-title" style="margin-top:.9rem;">&#11014;&#65039; Push</div>
+                <input type="text" class="commit-input" id="commit-message" placeholder="Commit mesaji (bos birakilirsa otomatik)">
+                <button class="btn-w c-purple" onclick="gitPush()" id="btn-push">&#11014;&#65039; GitHub'a Yukle (Kod + DB)</button>
+                <div class="sub-title">&#11015;&#65039; Pull</div>
+                <p style="font-size:.78rem;color:#718096;margin:0 0 .5rem;">GitHub'dan ceker, DB dump varsa otomatik uygular.</p>
+                <button class="btn-w c-teal" onclick="gitPull()" id="btn-pull">&#11015;&#65039; GitHub'dan Guncelle + DB</button>
+            </div>
+            <div>
+                <div class="sub-title">&#9200; Otomatik Pull</div>
+                <div class="auto-row">
+                    <label><input type="radio" name="pull-mode" value="interval" id="pull-mode-interval" onchange="togglePullMode()"> Aralikli</label>
+                    <label><input type="radio" name="pull-mode" value="time" id="pull-mode-time" onchange="togglePullMode()"> Belirli saat</label>
+                    <label><input type="radio" name="pull-mode" value="off" id="pull-mode-off" checked onchange="togglePullMode()"> Kapali</label>
+                </div>
+                <div id="pull-interval-row" style="display:none;" class="auto-row">
+                    <select id="auto-pull-interval">
+                        <option value="5">Her 5 dk</option><option value="15">Her 15 dk</option>
+                        <option value="30">Her 30 dk</option><option value="60">Her 1 saat</option>
+                    </select>
+                </div>
+                <div id="pull-time-row" style="display:none;" class="auto-row">
+                    <input type="time" id="auto-pull-time">
+                </div>
+                <button class="btn-w c-blue" onclick="saveAutoPull()" style="margin-top:.4rem;">&#128190; Pull Ayarini Kaydet</button>
+                <div id="auto-pull-status" style="font-size:.75rem;color:#718096;margin-top:.3rem;"></div>
+                <div class="sub-title" style="margin-top:.9rem;">&#9200; Otomatik Push</div>
+                <div class="auto-row">
+                    <label><input type="radio" name="push-mode" value="interval" id="push-mode-interval" onchange="togglePushMode()"> Aralikli</label>
+                    <label><input type="radio" name="push-mode" value="time" id="push-mode-time" onchange="togglePushMode()"> Belirli saat</label>
+                    <label><input type="radio" name="push-mode" value="off" id="push-mode-off" checked onchange="togglePushMode()"> Kapali</label>
+                </div>
+                <div id="push-interval-row" style="display:none;" class="auto-row">
+                    <select id="auto-push-interval">
+                        <option value="15">Her 15 dk</option><option value="30">Her 30 dk</option>
+                        <option value="60">Her 1 saat</option><option value="120">Her 2 saat</option>
+                        <option value="360">Her 6 saat</option>
+                    </select>
+                </div>
+                <div id="push-time-row" style="display:none;" class="auto-row">
+                    <input type="time" id="auto-push-time">
+                </div>
+                <button class="btn-w c-purple" onclick="saveAutoPush()" style="margin-top:.4rem;">&#128190; Push Ayarini Kaydet</button>
+                <div id="auto-push-status" style="font-size:.75rem;color:#718096;margin-top:.3rem;"></div>
+            </div>
+        </div>
+        <div class="git-log-box" id="git-log"></div>
+    </div>
+    <div class="section-title">&#128193; Sunucudaki Yedekler</div>
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.65rem;">
+            <span style="font-size:.8rem;color:#718096;">Otomatik ve manuel yedekler</span>
+            <button onclick="loadBackupList()" style="background:none;border:1px solid #e2e8f0;border-radius:7px;padding:.25rem .6rem;cursor:pointer;font-size:.78rem;color:#4a5568;">&#128260; Yenile</button>
+        </div>
+        <div class="backup-list" id="backupList">
+            <div style="text-align:center;color:#94a3b8;padding:1.5rem;font-size:.82rem;">Yukleniyor...</div>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+function showToast(msg,type){type=type||"ok";var t=document.getElementById("toast");t.textContent=msg;t.className="toast show "+type;setTimeout(function(){t.className="toast";},3200);}
+var toast=showToast;
+function setLoading(btn,on,orig){btn.disabled=on;btn.innerHTML=on?"<span class=\"spinner\"></span>Isleniyor...":orig;}
+function downloadDB(){window.location.href="/api/backup/download";showToast("Indirme basladi");}
+function downloadSQL(){window.location.href="/api/backup/dump";showToast("SQL dump indiriliyor...");}
+function onFileSelect(input){var fn=input.files[0]?input.files[0].name:"";document.getElementById("selectedFileName").textContent=fn?"&#10003; "+fn:"";document.getElementById("restoreBtn").disabled=!fn;}
+async function restoreFromFile(){
+    var file=document.getElementById("restoreFile").files[0];if(!file)return;
+    if(!confirm('"'+file.name+'" dosyasindan geri yuklenecek.\n\nMevcut tum veriler silinecek. Devam?'))return;
+    var btn=document.getElementById("restoreBtn"),orig=btn.innerHTML;setLoading(btn,true,orig);
+    var fd=new FormData();fd.append("file",file);
+    try{var r=await fetch("/api/backup/restore",{method:"POST",body:fd}).then(r=>r.json());
+    if(r.success){showToast("&#10003; Geri yukleme basarili!");setTimeout(()=>location.reload(),2000);}
+    else showToast("&#10008; "+r.error,"err");}
+    catch(e){showToast("&#10008; Baglanti hatasi","err");}
+    setLoading(btn,false,orig);
+}
+async function loadBackupList(){
+    var list=document.getElementById("backupList");
+    list.innerHTML="<div style=\"text-align:center;color:#94a3b8;padding:1.5rem;font-size:.8rem;\">Yukleniyor...</div>";
+    try{var bk=await fetch("/api/backup/list").then(r=>r.json());
+    if(!bk.length){list.innerHTML="<div style=\"text-align:center;color:#94a3b8;padding:1.5rem;font-size:.8rem;\">Henuz yedek yok</div>";return;}
+    list.innerHTML=bk.map(b=>`<div class="bitem"><div style="flex:1;min-width:0;"><div class="nm">${b.filename}</div><div class="mt">${b.modified} &middot; ${fmtSize(b.size)}</div></div><button onclick="restoreLocal('${b.filename}')">&#128260; Geri Yukle</button></div>`).join("");}
+    catch(e){list.innerHTML="<div style=\"text-align:center;color:#e53e3e;padding:1rem;font-size:.8rem;\">Yuklenemedi</div>";}
+}
+async function restoreLocal(fn){
+    if(!confirm('"'+fn+'" yedeğine geri donulecek. Mevcut veriler silinecek. Devam?'))return;
+    var r=await fetch("/api/backup/restore-local/"+fn,{method:"POST"}).then(r=>r.json());
+    if(r.success){showToast("&#10003; Geri yukleme basarili!");loadBackupList();}
+    else showToast("&#10008; "+r.error,"err");
+}
+function fmtSize(b){if(b<1024)return b+" B";if(b<1048576)return (b/1024).toFixed(1)+" KB";return (b/1048576).toFixed(1)+" MB";}
+async function loadGitStatus(){
+    var box=document.getElementById("git-status-box");
+    box.innerHTML="<div style=\"color:#94a3b8;font-size:.8rem;text-align:center;padding:.75rem;\">&#10000; Kontrol ediliyor...</div>";
+    document.getElementById("btn-refresh-status").disabled=true;
+    try{var d=await fetch("/api/git/status").then(r=>r.json());
+    var ahead=d.ahead>0?`<span class="badge-ahead">&#8593; ${d.ahead} commit ileride</span>`:"";
+    var behind=d.behind>0?`<span class="badge-behind">&#8595; ${d.behind} commit geride</span>`:"";
+    var sync=(!d.ahead&&!d.behind)?'<span class="badge-ok">&#10003; Senkronize</span>':"";
+    var dirty=d.dirty_count>0?`<span class="badge-behind">${d.dirty_count} degisik dosya</span>`:`<span class="badge-ok">Temiz</span>`;
+    var diffHtml="";
+    if(d.diff_stat){var lines=d.diff_stat.split("\n").map(l=>{if(l.match(/\+/))return `<span style="color:#4ade80">${l}</span>`;if(l.match(/-/))return `<span style="color:#f87171">${l}</span>`;return l;}).join("\n");diffHtml=`<div class="diff-box">${lines}</div>`;}
+    box.innerHTML=`<div class="sync-row"><label>Senkronizasyon</label><span>${ahead}${behind}${sync}</span></div><div class="sync-row"><label>Yerel degisiklik</label><span>${dirty}</span></div><div class="sync-row"><label>Son yerel commit</label><span>${d.last_local||"-"}</span></div><div class="sync-row"><label>Son GitHub commit</label><span>${d.last_remote||"-"}</span></div>${diffHtml}`;}
+    catch(e){box.innerHTML=`<div style="color:#e53e3e;font-size:.8rem;padding:.5rem;">&#10008; ${e.message}</div>`;}
+    document.getElementById("btn-refresh-status").disabled=false;
+}
+async function gitPush(){
+    var btn=document.getElementById("btn-push"),msg=document.getElementById("commit-message").value.trim(),orig=btn.innerHTML;
+    setLoading(btn,true,orig);showGitLog("Push + DB dump baslatiliyor...");
+    try{var d=await fetch("/api/git/push",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:msg})}).then(r=>r.json());
+    if(d.success){showGitLog("&#10003; Push tamam!\n"+(d.output||""));showToast("&#10003; GitHub'a yuklendi!");document.getElementById("commit-message").value="";setTimeout(loadGitStatus,1500);}
+    else{showGitLog("&#10008; Push hatasi:\n"+d.error);showToast("&#10008; Push basarisiz","err");}}
+    catch(e){showGitLog("&#10008; "+e.message);}
+    setLoading(btn,false,orig);
+}
+async function gitPull(){
+    var btn=document.getElementById("btn-pull"),orig=btn.innerHTML;
+    setLoading(btn,true,orig);showGitLog("Pull baslatiliyor...");
+    try{var d=await fetch("/api/git/pull",{method:"POST"}).then(r=>r.json());
+    if(!d.success){showGitLog("&#10008; Pull hatasi:\n"+d.error);showToast("&#10008; Pull basarisiz","err");setLoading(btn,false,orig);return;}
+    showGitLog((d.already_up?"&#10003; Zaten guncel.":"&#10003; Kod guncellendi.")+" DB dump uygulanıyor...");
+    var d2=await fetch("/api/backup/restore-local/db_export.sql",{method:"POST"}).then(r=>r.json()).catch(()=>({success:false,error:"sql yok"}));
+    var log=document.getElementById("git-log");
+    if(d2.success){log.textContent+="\n&#10003; DB basariyla uygulandi!";showToast("&#10003; Sync tamamlandi!");setTimeout(()=>location.reload(),2500);}
+    else{log.textContent+="\n&#9888; DB uygulanamadi: "+(d2.error||"db_export.sql bulunamadi");showToast("&#9888; Kod guncellendi, DB uygulanamadi","err");}
+    setTimeout(loadGitStatus,1500);}
+    catch(e){showGitLog("&#10008; "+e.message);}
+    setLoading(btn,false,orig);
+}
+function togglePullMode(){var m=document.querySelector("input[name=\"pull-mode\"]:checked").value;document.getElementById("pull-interval-row").style.display=m==="interval"?"flex":"none";document.getElementById("pull-time-row").style.display=m==="time"?"flex":"none";}
+function togglePushMode(){var m=document.querySelector("input[name=\"push-mode\"]:checked").value;document.getElementById("push-interval-row").style.display=m==="interval"?"flex":"none";document.getElementById("push-time-row").style.display=m==="time"?"flex":"none";}
+async function loadAutoPullSetting(){try{var d=await fetch("/api/git/auto-pull/status").then(r=>r.json()),st=document.getElementById("auto-pull-status");if(d.mode==="interval"&&d.interval>0){document.getElementById("pull-mode-interval").checked=true;document.getElementById("auto-pull-interval").value=String(d.interval);togglePullMode();st.textContent="Her "+d.interval+" dk aktif";}else if(d.mode==="time"&&d.time){document.getElementById("pull-mode-time").checked=true;document.getElementById("auto-pull-time").value=d.time;togglePullMode();st.textContent="Her gun "+d.time+"'de aktif";}else{document.getElementById("pull-mode-off").checked=true;st.textContent="Kapali";}}catch(e){}}
+async function saveAutoPull(){var mode=document.querySelector("input[name=\"pull-mode\"]:checked").value,p={mode};if(mode==="interval")p.interval=parseInt(document.getElementById("auto-pull-interval").value);if(mode==="time")p.time=document.getElementById("auto-pull-time").value;var d=await fetch("/api/git/auto-pull/set",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}).then(r=>r.json());document.getElementById("auto-pull-status").textContent=mode==="interval"?"Her "+p.interval+" dk aktif":mode==="time"?"Her gun "+p.time+"'de aktif":"Kapali";showToast(d.success?"&#10003; Kaydedildi!":"&#10008; Hata",d.success?"ok":"err");}
+async function loadAutoPushSetting(){try{var d=await fetch("/api/git/auto-push").then(r=>r.json()),st=document.getElementById("auto-push-status");if(d.mode==="interval"&&d.interval>0){document.getElementById("push-mode-interval").checked=true;document.getElementById("auto-push-interval").value=String(d.interval);togglePushMode();st.textContent="Her "+d.interval+" dk aktif";}else if(d.mode==="time"&&d.time){document.getElementById("push-mode-time").checked=true;document.getElementById("auto-push-time").value=d.time;togglePushMode();st.textContent="Her gun "+d.time+"'de aktif";}else{document.getElementById("push-mode-off").checked=true;st.textContent="Kapali";}}catch(e){}}
+async function saveAutoPush(){var mode=document.querySelector("input[name=\"push-mode\"]:checked").value,p={mode};if(mode==="interval")p.interval=parseInt(document.getElementById("auto-push-interval").value);if(mode==="time")p.time=document.getElementById("auto-push-time").value;var d=await fetch("/api/git/auto-push",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}).then(r=>r.json());document.getElementById("auto-push-status").textContent=mode==="interval"?"Her "+p.interval+" dk aktif":mode==="time"?"Her gun "+p.time+"'de aktif":"Kapali";showToast(d.success?"&#10003; Kaydedildi!":"&#10008; Hata",d.success?"ok":"err");}
+function showGitLog(text){var b=document.getElementById("git-log");b.style.display="block";b.textContent=text;b.scrollTop=b.scrollHeight;}
+loadBackupList();loadGitStatus();loadAutoPullSetting();loadAutoPushSetting();
+</script>
+</body>
+</html>

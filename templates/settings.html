@@ -94,7 +94,6 @@
             <button class="settings-tab active" onclick="switchTab('isletme',this)">🏪 İşletme</button>
             <button class="settings-tab" onclick="switchTab('yazici',this)">🖨️ Yazıcı</button>
             <button class="settings-tab" onclick="switchTab('logo',this)">🖼️ Logo & Fiş</button>
-            <button class="settings-tab" onclick="switchTab('github',this)">🔗 GitHub Sync</button>
             <button class="settings-tab" onclick="switchTab('not',this)">📝 Not</button>
             <button class="settings-tab" onclick="switchTab('telegram',this)">📲 Telegram</button>
         </div>
@@ -730,114 +729,6 @@
 
         </div><!-- /tab-telegram -->
 
-        <!-- GitHub Sync -->
-        <div id="tab-github" class="settings-panel" style="display:none;">
-        <div class="settings-card">
-            <h3>🔗 GitHub Senkronizasyonu</h3>
-
-            <!-- Durum -->
-            <div class="sync-status-box" id="git-status-box">
-                <div style="color:#94a3b8;font-size:.85rem;text-align:center;padding:1rem;">Durum yükleniyor...</div>
-            </div>
-            <div style="display:flex;gap:.5rem;margin-bottom:1.5rem;">
-                <button class="btn btn-secondary" onclick="loadGitStatus()" id="btn-refresh-status">🔄 Yenile</button>
-            </div>
-
-            <!-- Push -->
-            <h4 style="margin:0 0 .75rem;color:#4a5568;font-size:.9rem;">⬆️ Push — Yerel → GitHub</h4>
-            <input type="text" class="commit-input" id="commit-message" placeholder="Commit mesajı (boş bırakılırsa otomatik)">
-            <button class="btn btn-primary" onclick="gitPush()" id="btn-push" style="width:100%;margin-bottom:1.5rem;">
-                ⬆️ GitHub'a Yükle (Push)
-            </button>
-
-            <!-- Pull -->
-            <h4 style="margin:0 0 .75rem;color:#4a5568;font-size:.9rem;">⬇️ Pull — GitHub → PC</h4>
-            <p style="font-size:.82rem;color:#718096;margin-bottom:.75rem;">
-                GitHub'daki son sürümü bu PC'ye çeker. Yeni dosyalar varsa uygulama otomatik yeniden başlar.
-            </p>
-            <button class="btn btn-success" onclick="gitPull()" id="btn-pull" style="width:100%;margin-bottom:1.5rem;">
-                ⬇️ GitHub'dan Güncelle (Pull)
-            </button>
-
-            <!-- Auto-pull -->
-            <h4 style="margin:0 0 .75rem;color:#4a5568;font-size:.9rem;">⬇️ Otomatik Pull</h4>
-            <p style="font-size:.82rem;color:#718096;margin-bottom:.75rem;">
-                Bu cihaza özel ayardır — diğer cihaza sync olmaz. Push tetiklemez, çakışma olmaz.
-            </p>
-
-            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem;">
-                <label style="font-size:.85rem;color:#4a5568;">
-                    <input type="radio" name="pull-mode" value="interval" id="pull-mode-interval" onchange="togglePullMode()"> Aralıklı
-                </label>
-                <label style="font-size:.85rem;color:#4a5568;">
-                    <input type="radio" name="pull-mode" value="time" id="pull-mode-time" onchange="togglePullMode()"> Belirli saat
-                </label>
-                <label style="font-size:.85rem;color:#4a5568;">
-                    <input type="radio" name="pull-mode" value="off" id="pull-mode-off" checked onchange="togglePullMode()"> Kapalı
-                </label>
-            </div>
-
-            <div id="pull-interval-row" class="auto-pull-row" style="display:none;">
-                <select id="auto-pull-interval">
-                    <option value="5">Her 5 dakika</option>
-                    <option value="15">Her 15 dakika</option>
-                    <option value="30">Her 30 dakika</option>
-                    <option value="60">Her 1 saat</option>
-                </select>
-            </div>
-
-            <div id="pull-time-row" class="auto-pull-row" style="display:none;">
-                <input type="time" id="auto-pull-time" style="padding:.5rem .75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:.9rem;">
-            </div>
-
-            <div style="margin-top:.75rem;">
-                <button class="btn btn-primary" onclick="saveAutoPull()">💾 Kaydet</button>
-            </div>
-            <div id="auto-pull-status" style="font-size:.8rem;color:#718096;margin-top:.5rem;"></div>
-
-            <!-- Otomatik Push -->
-            <h4 style="margin:1.5rem 0 .75rem;color:#4a5568;font-size:.9rem;">⬆️ Otomatik Push</h4>
-            <p style="font-size:.82rem;color:#718096;margin-bottom:.75rem;">
-                Bu cihaza özel ayardır — diğer cihaza sync olmaz. Çakışma olmaz.
-            </p>
-
-            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem;">
-                <label style="font-size:.85rem;color:#4a5568;">
-                    <input type="radio" name="push-mode" value="interval" id="push-mode-interval" onchange="togglePushMode()"> Aralıklı
-                </label>
-                <label style="font-size:.85rem;color:#4a5568;">
-                    <input type="radio" name="push-mode" value="time" id="push-mode-time" onchange="togglePushMode()"> Belirli saat
-                </label>
-                <label style="font-size:.85rem;color:#4a5568;">
-                    <input type="radio" name="push-mode" value="off" id="push-mode-off" checked onchange="togglePushMode()"> Kapalı
-                </label>
-            </div>
-
-            <div id="push-interval-row" class="auto-pull-row" style="display:none;">
-                <select id="auto-push-interval">
-                    <option value="15">Her 15 dakika</option>
-                    <option value="30">Her 30 dakika</option>
-                    <option value="60">Her 1 saat</option>
-                    <option value="120">Her 2 saat</option>
-                    <option value="360">Her 6 saat</option>
-                </select>
-            </div>
-
-            <div id="push-time-row" class="auto-pull-row" style="display:none;">
-                <input type="time" id="auto-push-time" style="padding:.5rem .75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:.9rem;">
-            </div>
-
-            <div style="margin-top:.75rem;">
-                <button class="btn btn-primary" onclick="saveAutoPush()">💾 Kaydet</button>
-            </div>
-            <div id="auto-push-status" style="font-size:.8rem;color:#718096;margin-top:.5rem;"></div>
-
-
-            <!-- İşlem Logu -->
-            <div id="git-log" class="git-log-box" style="margin-top:1.25rem;display:none;"></div>
-        </div>
-        </div><!-- /tab-github -->
-
     </div><!-- /container -->
 
     <script>
@@ -847,7 +738,7 @@
             document.querySelectorAll('.settings-tab').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + name).style.display = 'block';
             btn.classList.add('active');
-            if (name === 'github') { loadGitStatus(); loadAutoPullSetting(); loadAutoPushSetting(); }
+            
         }
 
         // ===== GİTHUB SYNC =====

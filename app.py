@@ -465,6 +465,145 @@ def api_backup():
     backup_path = db.backup_database()
     return jsonify({'success': True, 'path': backup_path})
 
+@app.route('/api/backup/download', methods=['GET'])
+def api_backup_download():
+    """Mevcut DB'yi doğrudan indir"""
+    from flask import send_file
+    import io, shutil
+    tmp = io.BytesIO()
+    with open(db.DB_PATH, 'rb') as f:
+        tmp.write(f.read())
+    tmp.seek(0)
+    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    return send_file(tmp, mimetype='application/octet-stream',
+                     as_attachment=True, download_name=f'firinna_backup_{ts}.db')
+
+@app.route('/api/backup/dump', methods=['GET'])
+def api_backup_dump():
+    """DB'yi SQL dump olarak indir"""
+    from flask import send_file
+    dump_path = db.dump_database_sql()
+    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    return send_file(dump_path, mimetype='text/plain',
+                     as_attachment=True, download_name=f'firinna_dump_{ts}.sql')
+
+@app.route('/api/backup/list', methods=['GET'])
+def api_backup_list():
+    return jsonify(db.list_backups())
+
+@app.route('/api/backup/restore', methods=['POST'])
+def api_backup_restore():
+    """Yüklenen .db veya .sql dosyasından geri yükle"""
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'Dosya yok'})
+    f = request.files['file']
+    fn = f.filename.lower()
+    import tempfile, os
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(fn)[1])
+    f.save(tmp.name)
+    tmp.close()
+    try:
+        if fn.endswith('.sql'):
+            db.restore_database_sql(tmp.name)
+        elif fn.endswith('.db'):
+            import shutil
+            # Önce yedeğini al
+            ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+            import os as _os
+            bdir = _os.path.join(_os.path.dirname(db.DB_PATH), 'backups')
+            _os.makedirs(bdir, exist_ok=True)
+            shutil.copy2(db.DB_PATH, _os.path.join(bdir, f'pre_restore_{ts}.db'))
+            shutil.copy2(tmp.name, db.DB_PATH)
+        else:
+            return jsonify({'success': False, 'error': 'Sadece .db veya .sql dosyası'})
+        os.unlink(tmp.name)
+        return jsonify({'success': True})
+    except Exception as e:
+        try: os.unlink(tmp.name)
+        except: pass
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/backup/restore-local/<filename>', methods=['POST'])
+def api_backup_restore_local(filename):
+    """Sunucudaki yerel yedekten geri yükle"""
+    import os, shutil
+    backup_dir = os.path.join(os.path.dirname(db.DB_PATH), 'backups')
+    fp = os.path.join(backup_dir, filename)
+    if not os.path.exists(fp):
+        return jsonify({'success': False, 'error': 'Dosya bulunamadı'})
+    try:
+        if filename.endswith('.sql'):
+            db.restore_database_sql(fp)
+        else:
+            ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+            shutil.copy2(db.DB_PATH, os.path.join(backup_dir, f'pre_restore_{ts}.db'))
+            shutil.copy2(fp, db.DB_PATH)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/backup/download-local/<filename>', methods=['GET'])
+def api_backup_download_local(filename):
+    import os
+    from flask import send_file
+    backup_dir = os.path.join(os.path.dirname(db.DB_PATH), 'backups')
+    fp = os.path.join(backup_dir, filename)
+    if not os.path.exists(fp):
+        return "Dosya bulunamadi", 404
+    return send_file(fp, as_attachment=True, download_name=filename)
+
+@app.route('/api/backup/full-zip', methods=['GET'])
+def api_backup_full_zip():
+    import zipfile, io, os
+    buf = io.BytesIO()
+    base = os.path.dirname(db.DB_PATH)
+    skip = {'__pycache__', '.git', 'backups', 'venv'}
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for root, dirs, files in os.walk(base):
+            dirs[:] = [d for d in dirs if d not in skip]
+            for fname in files:
+                if fname.endswith('.pyc'):
+                    continue
+                fpath = os.path.join(root, fname)
+                zf.write(fpath, os.path.relpath(fpath, base))
+    buf.seek(0)
+    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    from flask import send_file
+    return send_file(buf, mimetype='application/zip',
+                     as_attachment=True, download_name=f'firinna_full_{ts}.zip')
+
+@app.route('/api/backup/sync-push', methods=['POST'])
+def api_backup_sync_push():
+    import subprocess, os
+    try:
+        db.backup_database()
+        dump_path = db.dump_database_sql()
+        base = os.path.dirname(db.DB_PATH)
+        subprocess.run(['git', '-C', base, 'add', 'db_export.sql'], capture_output=True, timeout=30)
+        r = subprocess.run(['git', '-C', base, 'commit', '-m',
+            f'db sync {datetime.now().strftime("%Y-%m-%d %H:%M")}'],
+            capture_output=True, text=True, timeout=30)
+        subprocess.run(['git', '-C', base, 'push'], capture_output=True, timeout=60)
+        return jsonify({'success': True, 'message': "Veritabani GitHub'a gonderildi."})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/backup/sync-pull', methods=['POST'])
+def api_backup_sync_pull():
+    import subprocess, os
+    try:
+        base = os.path.dirname(db.DB_PATH)
+        subprocess.run(['git', '-C', base, 'pull'], capture_output=True, text=True, timeout=60)
+        dump_path = os.path.join(base, 'db_export.sql')
+        if os.path.exists(dump_path):
+            db.backup_database()
+            db.restore_database_sql(dump_path)
+            return jsonify({'success': True, 'message': 'Pull yapildi ve veritabani guncellendi.'})
+        else:
+            return jsonify({'success': True, 'message': 'Pull yapildi. db_export.sql bulunamadi, veritabani degistirilmedi.'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 # API: Test verilerini temizle
 @app.route('/api/clear-test-data', methods=['POST'])
 def api_clear_test_data():
@@ -948,6 +1087,10 @@ def api_reclose_order(order_id):
 
 # ===== ÖN MUHASEBE (#50) =====
 
+@app.route('/backup')
+def backup_page():
+    return render_template('backup.html')
+
 @app.route('/muhasebe')
 def page_muhasebe():
     return render_template('muhasebe.html')
@@ -1227,7 +1370,15 @@ def api_git_push():
         run_git(['rebase', '--abort'])
         return jsonify({'success': False, 'error': 'Pull/rebase hatası: ' + out_pull})
 
-    # 3. Push
+    # 3. DB dump al ve commit'e ekle
+    try:
+        dump_path = db.dump_database_sql()
+        run_git(['add', dump_path])
+        ok_dc, out_dc = run_git(['commit', '-m', f'DB dump — {datetime.now().strftime("%d.%m.%Y %H:%M")}'])
+    except Exception as e:
+        pass  # dump başarısız olsa da push devam eder
+
+    # 4. Push
     ok3, out3 = run_git(['push', 'origin', 'main'], timeout=60)
     if not ok3:
         return jsonify({'success': False, 'error': 'git push hatası: ' + out3})

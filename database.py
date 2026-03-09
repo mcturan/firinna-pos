@@ -464,6 +464,57 @@ def backup_database():
     shutil.copy2(DB_PATH, backup_path)
     return backup_path
 
+def dump_database_sql():
+    """DB'yi SQL metin dosyası olarak dışa aktar (git için)"""
+    import sqlite3 as _sq
+    conn = _sq.connect(DB_PATH)
+    lines = ['-- Fırınna POS DB Dump', f'-- {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', '']
+    for line in conn.iterdump():
+        lines.append(line)
+    conn.close()
+    dump_path = os.path.join(os.path.dirname(DB_PATH), 'db_export.sql')
+    with open(dump_path, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(lines))
+    return dump_path
+
+def restore_database_sql(sql_path=None):
+    """SQL dump'tan DB'yi geri yükle"""
+    import sqlite3 as _sq
+    if sql_path is None:
+        sql_path = os.path.join(os.path.dirname(DB_PATH), 'db_export.sql')
+    if not os.path.exists(sql_path):
+        raise FileNotFoundError(f'SQL dump bulunamadı: {sql_path}')
+    # Önce yedeğini al
+    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    backup_dir = os.path.join(os.path.dirname(DB_PATH), 'backups')
+    os.makedirs(backup_dir, exist_ok=True)
+    shutil.copy2(DB_PATH, os.path.join(backup_dir, f'pre_restore_{ts}.db'))
+    # Mevcut DB'yi sil, yeniden oluştur
+    os.remove(DB_PATH)
+    conn = _sq.connect(DB_PATH)
+    with open(sql_path, 'r', encoding='utf-8') as f:
+        sql = f.read()
+    conn.executescript(sql)
+    conn.close()
+    return True
+
+def list_backups():
+    """Yedek listesini döndür"""
+    backup_dir = os.path.join(os.path.dirname(DB_PATH), 'backups')
+    if not os.path.exists(backup_dir):
+        return []
+    files = []
+    for fn in sorted(os.listdir(backup_dir), reverse=True):
+        if fn.endswith('.db') or fn.endswith('.sql'):
+            fp = os.path.join(backup_dir, fn)
+            stat = os.stat(fp)
+            files.append({
+                'filename': fn,
+                'size': stat.st_size,
+                'modified': datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+            })
+    return files
+
 def clear_test_data():
     """Test verilerini temizle (bugünün siparişleri hariç)"""
     conn = get_db()
