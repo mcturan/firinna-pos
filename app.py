@@ -746,6 +746,70 @@ def api_test_telegram():
     result = telegram_notify.test_connection()
     return jsonify(result)
 
+@app.route('/api/telegram/contacts', methods=['GET'])
+def api_get_telegram_contacts():
+    return jsonify(db.get_telegram_contacts())
+
+@app.route('/api/telegram/contacts', methods=['POST'])
+def api_add_telegram_contact():
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    chat_id = data.get('chat_id', '').strip()
+    if not name or not chat_id:
+        return jsonify({'success': False, 'error': 'İsim ve Chat ID zorunlu'}), 400
+    db.add_telegram_contact(name, chat_id)
+    return jsonify({'success': True})
+
+@app.route('/api/telegram/contacts/<int:contact_id>', methods=['DELETE'])
+def api_delete_telegram_contact(contact_id):
+    db.delete_telegram_contact(contact_id)
+    return jsonify({'success': True})
+
+@app.route('/api/telegram/updates', methods=['GET'])
+def api_telegram_get_updates():
+    """Bota yazan kişilerin chat ID'lerini getir"""
+    try:
+        import urllib.request, json as _json
+        token = db.get_setting('telegram_bot_token', '')
+        if not token:
+            return jsonify([])
+        url = f'https://api.telegram.org/bot{token}/getUpdates?limit=50'
+        with urllib.request.urlopen(url, timeout=8) as resp:
+            data = _json.loads(resp.read())
+        seen = {}
+        for upd in data.get('result', []):
+            msg = upd.get('message') or upd.get('callback_query', {}).get('message')
+            if not msg:
+                continue
+            chat = msg.get('chat', {})
+            cid = str(chat.get('id', ''))
+            if cid and cid not in seen:
+                first = chat.get('first_name', '')
+                last  = chat.get('last_name', '')
+                seen[cid] = {
+                    'chat_id': cid,
+                    'name': (first + ' ' + last).strip() or chat.get('title', 'Anonim'),
+                    'username': chat.get('username', '')
+                }
+        return jsonify(list(seen.values()))
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/settings/telegram/send', methods=['POST'])
+def api_send_telegram_note():
+    data = request.get_json()
+    message = data.get('message', '').strip()
+    chat_id = (data.get('chat_id') or '').strip()  # opsiyonel — None veya boşsa default
+    if not message:
+        return jsonify({'success': False, 'error': 'Mesaj boş'}), 400
+    if chat_id:
+        ok = telegram_notify.send_message_to(message, chat_id)
+    else:
+        ok = telegram_notify.send_message(message)
+    if ok:
+        return jsonify({'success': True})
+    return jsonify({'success': False, 'error': 'Mesaj gönderilemedi. Chat ID veya token hatalı olabilir.'})
+
 # ===== NOT QR =====
 
 @app.route('/api/settings/note-qr', methods=['POST'])
@@ -1231,6 +1295,7 @@ def api_auto_push_set():
 
 if __name__ == '__main__':
     db.init_db()
+    db.init_telegram_contacts()
     # Auto-pull başlat (local config'e göre)
     try:
         start_auto_pull_smart()

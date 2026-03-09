@@ -323,6 +323,131 @@
             btn.disabled = false; btn.textContent = '📨 Test Mesajı Gönder';
         }
 
+        // --- getUpdates ---
+        async function getUpdates() {
+            const btn = event.target;
+            btn.disabled = true; btn.textContent = '🔄 Yükleniyor...';
+            const listEl = document.getElementById('updates-list');
+            listEl.style.display = 'block';
+            listEl.innerHTML = 'Yükleniyor...';
+            try {
+                const res = await fetch('/api/telegram/updates');
+                const d = await res.json();
+                if (!d.length) {
+                    listEl.innerHTML = '<em style="color:#94a3b8;">Mesaj bulunamadı. Kişi bota /start yazmış olmalı.</em>';
+                } else {
+                    listEl.innerHTML = d.map(u => `
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:.4rem .5rem;border-bottom:1px solid #e2e8f0;">
+                            <div>
+                                <b>${u.name}</b>
+                                <span style="color:#718096;font-size:.8rem;margin-left:.5rem;">@${u.username||'—'}</span><br>
+                                <code style="font-size:.82rem;">${u.chat_id}</code>
+                            </div>
+                            <button onclick="fillContact('${u.name}','${u.chat_id}')"
+                                style="background:#667eea;color:white;border:none;border-radius:6px;padding:.25rem .6rem;cursor:pointer;font-size:.8rem;">
+                                + Rehbere Ekle
+                            </button>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) {
+                listEl.innerHTML = '<em style="color:#e53e3e;">Hata: ' + e.message + '</em>';
+            }
+            btn.disabled = false; btn.textContent = '🔍 Bota Yazan Kişileri Listele (getUpdates)';
+        }
+
+        function fillContact(name, chatId) {
+            document.getElementById('new-contact-name').value = name;
+            document.getElementById('new-contact-chatid').value = chatId;
+        }
+
+        // --- Telegram Rehber ---
+        let tgContacts = [];
+
+        async function loadContacts() {
+            tgContacts = await fetch('/api/telegram/contacts').then(r=>r.json()).catch(()=>[]);
+            renderContacts();
+            renderRecipientSelect();
+        }
+
+        function renderContacts() {
+            const list = document.getElementById('contact-list');
+            if (!tgContacts.length) {
+                list.innerHTML = '<div style="color:#94a3b8;font-size:.85rem;text-align:center;padding:.5rem;">Henüz kişi eklenmedi.</div>';
+                return;
+            }
+            list.innerHTML = tgContacts.map(c => `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+                    <div>
+                        <span style="font-weight:600;">${c.name}</span>
+                        <span style="color:#94a3b8;font-size:.8rem;margin-left:.5rem;">ID: ${c.chat_id}</span>
+                    </div>
+                    <button onclick="deleteContact(${c.id})" style="background:#ef4444;color:white;border:none;border-radius:6px;padding:.25rem .6rem;cursor:pointer;font-size:.8rem;">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function renderRecipientSelect() {
+            const sel = document.getElementById('tg-recipient');
+            const cur = sel.value;
+            sel.innerHTML = '<option value="">⬅ Varsayılan (stok uyarı chat ID)</option>';
+            tgContacts.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.chat_id;
+                opt.textContent = c.name + ' (' + c.chat_id + ')';
+                sel.appendChild(opt);
+            });
+            if (cur) sel.value = cur;
+        }
+
+        async function addContact() {
+            const name = document.getElementById('new-contact-name').value.trim();
+            const chat_id = document.getElementById('new-contact-chatid').value.trim();
+            if (!name || !chat_id) { toast('İsim ve Chat ID zorunlu!', false); return; }
+            if (!/^-?[0-9]+$/.test(chat_id)) { toast('❌ Chat ID sadece sayı olmalı (örn: 1326104090)', false); return; }
+            const res = await fetch('/api/telegram/contacts', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({name, chat_id})
+            });
+            const d = await res.json();
+            if (d.success) {
+                document.getElementById('new-contact-name').value = '';
+                document.getElementById('new-contact-chatid').value = '';
+                toast('✅ Kişi eklendi!');
+                loadContacts();
+            } else toast('❌ ' + (d.error||'Hata'), false);
+        }
+
+        async function deleteContact(id) {
+            await fetch('/api/telegram/contacts/' + id, {method:'DELETE'});
+            toast('🗑️ Kişi silindi');
+            loadContacts();
+        }
+
+        // --- Telegram Mesaj Gönder ---
+        async function sendTelegramNote() {
+            const note = document.getElementById('tg-manual-note').value.trim();
+            if (!note) { toast('Mesaj boş olamaz!', false); return; }
+            const chat_id = document.getElementById('tg-recipient').value || null;
+            const statusEl = document.getElementById('tg-note-status');
+            statusEl.style.display = 'none';
+            const res = await fetch('/api/settings/telegram/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: note, chat_id})
+            });
+            const d = await res.json();
+            statusEl.style.display = 'block';
+            if (d.success) {
+                statusEl.style.background = '#d1fae5'; statusEl.style.color = '#065f46';
+                statusEl.textContent = '✅ Mesaj gönderildi!';
+                document.getElementById('tg-manual-note').value = '';
+            } else {
+                statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+                statusEl.textContent = '❌ ' + (d.error || 'Gönderilemedi');
+            }
+        }
+
         // --- Note QR ---
         let pendingNoteQrFile = null;
 
@@ -425,6 +550,9 @@
                 const tg = await fetch('/api/settings/telegram').then(r=>r.json()).catch(()=>({}));
                 if (tg.token) document.getElementById('tg-token').value = tg.token;
                 if (tg.chat_id) document.getElementById('tg-chat-id').value = tg.chat_id;
+
+                // Telegram rehberi yükle
+                loadContacts();
             } catch(e) {}
         }
         function previewLogoFile(event) {
@@ -524,43 +652,67 @@
 
         <!-- Telegram -->
         <div id="tab-telegram" class="settings-panel" style="display:none;">
-        <div class="settings-card">
-            <h3>📲 Telegram Stok Bildirimleri</h3>
-            <p style="font-size:.85rem;color:#718096;margin-bottom:1.25rem;">
-                Bir stok kalemi minimum seviyenin altına düştüğünde Telegram'a otomatik mesaj gönderilir.
-            </p>
 
+        <!-- 1. Mesaj Gönder -->
+        <div class="settings-card">
+            <h3>✉️ Mesaj Gönder</h3>
+            <div class="field-group">
+                <div>
+                    <label>Alıcı</label>
+                    <select id="tg-recipient" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;">
+                        <option value="">— Varsayılan (Bot Chat ID) —</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Mesaj</label>
+                    <textarea id="tg-manual-note" rows="4" placeholder="Göndermek istediğiniz mesajı yazın..."></textarea>
+                </div>
+                <div class="save-row">
+                    <button class="btn btn-primary" onclick="sendTelegramNote()" style="flex:1;">📤 Gönder</button>
+                </div>
+                <div id="tg-note-status" style="display:none;padding:.6rem .9rem;border-radius:8px;font-size:.88rem;font-weight:600;"></div>
+            </div>
+        </div>
+
+        <!-- 2. Kişi Rehberi -->
+        <div class="settings-card">
+            <h3>👥 Kişi Rehberi</h3>
+            <p style="font-size:.85rem;color:#718096;margin-bottom:.75rem;">
+                Kişinin Chat ID'sini öğrenmek için terminalde: <code>getUpdates</code> butonuna bas.
+            </p>
+            <div id="contact-list" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem;"></div>
+            <div style="display:flex;gap:.5rem;">
+                <input type="text" id="new-contact-name" placeholder="Ad (Tedarikçi, Personel...)" style="flex:2;padding:.55rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                <input type="text" id="new-contact-chatid" placeholder="Chat ID" style="flex:1;padding:.55rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                <button class="btn btn-primary" onclick="addContact()" style="white-space:nowrap;">➕ Ekle</button>
+            </div>
+            <div style="margin-top:.75rem;">
+                <button class="btn btn-secondary" onclick="getUpdates()" style="width:100%;">🔍 Bota Yazan Kişileri Listele (getUpdates)</button>
+            </div>
+            <div id="updates-list" style="display:none;margin-top:.75rem;background:#f8fafc;border-radius:8px;padding:.75rem;font-size:.85rem;"></div>
+        </div>
+
+        <!-- 3. Bot Ayarları (ALTTA) -->
+        <div class="settings-card">
+            <h3>⚙️ Bot Ayarları</h3>
             <div class="field-group">
                 <div>
                     <label>Bot Token</label>
                     <input type="text" id="tg-token" placeholder="123456789:ABCdefGHI...">
-                    <div style="font-size:.78rem;color:#94a3b8;margin-top:.3rem;">
-                        @BotFather'dan alınan token
-                    </div>
+                    <div style="font-size:.78rem;color:#94a3b8;margin-top:.3rem;">@BotFather'dan alınan token</div>
                 </div>
                 <div>
-                    <label>Chat ID</label>
+                    <label>Varsayılan Chat ID <span style="font-size:.78rem;color:#94a3b8;">(stok uyarıları buraya gider)</span></label>
                     <input type="text" id="tg-chat-id" placeholder="-100123456789 veya kişisel ID">
-                    <div style="font-size:.78rem;color:#94a3b8;margin-top:.3rem;">
-                        @userinfobot'a /start yaz → ID'ni öğren
-                    </div>
                 </div>
                 <div class="save-row">
                     <button class="btn btn-primary" onclick="saveTelegram()">💾 Kaydet</button>
                     <button class="btn btn-secondary" onclick="testTelegram()">📨 Test Mesajı Gönder</button>
                 </div>
             </div>
-
             <div id="tg-status" style="margin-top:1rem;padding:.75rem;border-radius:8px;display:none;font-size:.9rem;font-weight:600;"></div>
-
-            <div style="margin-top:1.5rem;background:#f8fafc;border-radius:10px;padding:1rem;font-size:.82rem;color:#4a5568;line-height:1.8;">
-                <strong>Nasıl kurulur?</strong><br>
-                1. Telegram'da <code>@BotFather</code>'a yaz → <code>/newbot</code> → token al<br>
-                2. <code>@userinfobot</code>'a <code>/start</code> yaz → Chat ID'ni al<br>
-                3. Grup kullanmak istersen: Botu gruba ekle → <code>@userinfobot</code>'u gruba ekle → ID al<br>
-                4. Token + Chat ID'yi yukarıya gir → Kaydet → Test Gönder
-            </div>
         </div>
+
         </div><!-- /tab-telegram -->
 
         <!-- GitHub Sync -->

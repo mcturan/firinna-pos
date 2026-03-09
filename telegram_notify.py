@@ -37,6 +37,28 @@ def send_message(text: str) -> bool:
         return False
 
 
+def send_message_to(text: str, chat_id: str) -> bool:
+    """Belirli bir chat_id'ye mesaj gönder."""
+    try:
+        token, _ = get_bot_config()
+        if not token:
+            return False
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        payload = json.dumps({
+            "chat_id": chat_id,
+            "text": text,
+            "parse_mode": "HTML"
+        }).encode('utf-8')
+        req = urllib.request.Request(url, data=payload,
+                                     headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            result = json.loads(resp.read())
+            return result.get('ok', False)
+    except Exception as e:
+        print(f"[Telegram] Gönderim hatası (chat_id={chat_id}): {e}")
+        return False
+
+
 def send_async(text: str):
     """Arka planda gönder — siparişi yavaşlatmaz."""
     t = threading.Thread(target=send_message, args=(text,), daemon=True)

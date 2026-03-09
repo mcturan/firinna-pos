@@ -1179,6 +1179,37 @@ def get_kasa_data(start_date, end_date, payment_method=None):
 
 # ===== STOK =====
 
+# ===== TELEGRAM REHBER =====
+
+def init_telegram_contacts():
+    conn = get_db()
+    conn.execute('''CREATE TABLE IF NOT EXISTS telegram_contacts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        chat_id TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+    conn.commit()
+    conn.close()
+
+def get_telegram_contacts():
+    conn = get_db()
+    rows = conn.execute('SELECT * FROM telegram_contacts ORDER BY name').fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def add_telegram_contact(name, chat_id):
+    conn = get_db()
+    conn.execute('INSERT INTO telegram_contacts (name, chat_id) VALUES (?,?)', (name, chat_id))
+    conn.commit()
+    conn.close()
+
+def delete_telegram_contact(contact_id):
+    conn = get_db()
+    conn.execute('DELETE FROM telegram_contacts WHERE id=?', (contact_id,))
+    conn.commit()
+    conn.close()
+
 def get_stock_items():
     conn = get_db()
     items = conn.execute('''
