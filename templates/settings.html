@@ -336,20 +336,40 @@
             </button>
 
             <!-- Auto-pull -->
-            <h4 style="margin:0 0 .75rem;color:#4a5568;font-size:.9rem;">⏱️ Otomatik Pull</h4>
+            <h4 style="margin:0 0 .75rem;color:#4a5568;font-size:.9rem;">⬇️ Otomatik Pull</h4>
             <p style="font-size:.82rem;color:#718096;margin-bottom:.75rem;">
-                GitHub'ta değişiklik olunca bu PC otomatik güncellenir. Push tetiklemez — sonsuz döngü olmaz.
+                Bu cihaza özel ayardır — diğer cihaza sync olmaz. Push tetiklemez, çakışma olmaz.
             </p>
-            <div class="auto-pull-row">
+
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem;">
+                <label style="font-size:.85rem;color:#4a5568;">
+                    <input type="radio" name="pull-mode" value="interval" id="pull-mode-interval" onchange="togglePullMode()"> Aralıklı
+                </label>
+                <label style="font-size:.85rem;color:#4a5568;">
+                    <input type="radio" name="pull-mode" value="time" id="pull-mode-time" onchange="togglePullMode()"> Belirli saat
+                </label>
+                <label style="font-size:.85rem;color:#4a5568;">
+                    <input type="radio" name="pull-mode" value="off" id="pull-mode-off" checked onchange="togglePullMode()"> Kapalı
+                </label>
+            </div>
+
+            <div id="pull-interval-row" class="auto-pull-row" style="display:none;">
                 <select id="auto-pull-interval">
-                    <option value="0">Kapalı</option>
                     <option value="5">Her 5 dakika</option>
                     <option value="15">Her 15 dakika</option>
                     <option value="30">Her 30 dakika</option>
                     <option value="60">Her 1 saat</option>
                 </select>
+            </div>
+
+            <div id="pull-time-row" class="auto-pull-row" style="display:none;">
+                <input type="time" id="auto-pull-time" style="padding:.5rem .75rem;border:1px solid #e2e8f0;border-radius:6px;font-size:.9rem;">
+            </div>
+
+            <div style="margin-top:.75rem;">
                 <button class="btn btn-primary" onclick="saveAutoPull()">💾 Kaydet</button>
             </div>
+            <div id="auto-pull-status" style="font-size:.8rem;color:#718096;margin-top:.5rem;"></div>
 
             <!-- Otomatik Push -->
             <h4 style="margin:1.5rem 0 .75rem;color:#4a5568;font-size:.9rem;">⏰ Otomatik Push (Günlük)</h4>
@@ -468,21 +488,47 @@
         }
 
         async function saveAutoPull() {
-            const interval = parseInt(document.getElementById('auto-pull-interval').value);
+            const mode = document.querySelector('input[name="pull-mode"]:checked').value;
+            let payload = {mode};
+            if (mode === 'interval') payload.interval = parseInt(document.getElementById('auto-pull-interval').value);
+            if (mode === 'time') payload.time = document.getElementById('auto-pull-time').value;
             const d = await fetch('/api/git/auto-pull/set', {
-                method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({interval})
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
             }).then(r => r.json());
-            toast(d.success
-                ? (interval > 0 ? `✅ Otomatik pull: her ${interval} dk` : '✅ Otomatik pull kapalı')
-                : '❌ Kaydedilemedi', d.success);
+            const status = document.getElementById('auto-pull-status');
+            if (d.success && status) {
+                if (mode === 'interval') status.textContent = 'Her ' + payload.interval + ' dakikada bir kontrol aktif';
+                else if (mode === 'time') status.textContent = "Her gun " + payload.time + "'de pull aktif";
+                else status.textContent = 'Otomatik pull kapali';
+            }
+            toast(d.success ? '\u2705 Kaydedildi!' : '\u274c Hata', d.success);
+        }
+
+        function togglePullMode() {
+            const mode = document.querySelector('input[name="pull-mode"]:checked').value;
+            document.getElementById('pull-interval-row').style.display = mode === 'interval' ? 'flex' : 'none';
+            document.getElementById('pull-time-row').style.display = mode === 'time' ? 'flex' : 'none';
         }
 
         async function loadAutoPullSetting() {
             try {
                 const d = await fetch('/api/git/auto-pull/status').then(r => r.json());
-                const sel = document.getElementById('auto-pull-interval');
-                if (sel) sel.value = String(d.interval || 0);
+                const status = document.getElementById('auto-pull-status');
+                if (d.mode === 'interval' && d.interval > 0) {
+                    document.getElementById('pull-mode-interval').checked = true;
+                    document.getElementById('auto-pull-interval').value = String(d.interval);
+                    togglePullMode();
+                    if (status) status.textContent = 'Her ' + d.interval + ' dakikada bir kontrol aktif';
+                } else if (d.mode === 'time' && d.time) {
+                    document.getElementById('pull-mode-time').checked = true;
+                    document.getElementById('auto-pull-time').value = d.time;
+                    togglePullMode();
+                    if (status) status.textContent = 'Her gun ' + d.time + "'de pull aktif";
+                } else {
+                    document.getElementById('pull-mode-off').checked = true;
+                    if (status) status.textContent = 'Otomatik pull kapali';
+                }
             } catch(e) {}
         }
 

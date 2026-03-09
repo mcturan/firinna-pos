@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 import database as db
 from printer import ThermalPrinter
 import os
+import json
 import subprocess
 import threading
 import time
@@ -912,20 +913,84 @@ def api_git_pull():
 
 @app.route('/api/git/auto-pull/status', methods=['GET'])
 def api_auto_pull_status():
-    interval = db.get_setting('git_auto_pull_interval', '0')
-    return jsonify({'interval': int(interval)})
+    cfg = read_local_config()
+    return jsonify({
+        'mode': cfg.get('auto_pull_mode', 'off'),
+        'interval': int(cfg.get('auto_pull_interval', 0)),
+        'time': cfg.get('auto_pull_time', '')
+    })
 
 @app.route('/api/git/auto-pull/set', methods=['POST'])
 def api_auto_pull_set():
     data = request.json or {}
-    interval = int(data.get('interval', 0))  # dakika, 0 = kapalı
-    db.set_setting('git_auto_pull_interval', str(interval))
-    if interval > 0:
-        start_auto_pull(interval)
-    return jsonify({'success': True, 'interval': interval})
+    mode = data.get('mode', 'off')
+    interval = int(data.get('interval', 0))
+    pull_time = data.get('time', '')
+    write_local_config({
+        'auto_pull_mode': mode,
+        'auto_pull_interval': interval,
+        'auto_pull_time': pull_time
+    })
+    # Thread'i yeniden başlat
+    start_auto_pull_smart()
+    return jsonify({'success': True, 'mode': mode})
 
 # --- Auto-pull arka plan iş parçacığı ---
 _auto_pull_timer = None
+_auto_pull_time_thread = None
+_auto_pull_time_running = False
+
+def start_auto_pull_smart():
+    """Local config'e göre doğru pull modunu başlat"""
+    cfg = read_local_config()
+    mode = cfg.get('auto_pull_mode', 'off')
+    if mode == 'interval':
+        interval = int(cfg.get('auto_pull_interval', 0))
+        if interval > 0:
+            start_auto_pull(interval)
+    elif mode == 'time':
+        pull_time = cfg.get('auto_pull_time', '')
+        if pull_time:
+            start_auto_pull_at_time(pull_time)
+    else:
+        # Kapat
+        global _auto_pull_timer, _auto_pull_time_running
+        if _auto_pull_timer:
+            _auto_pull_timer.cancel()
+        _auto_pull_time_running = False
+
+def start_auto_pull_at_time(pull_time_str):
+    """Her gün belirli saatte pull yap"""
+    global _auto_pull_time_running, _auto_pull_time_thread
+    _auto_pull_time_running = True
+
+    def loop():
+        import time as _time
+        last_pulled = None
+        while _auto_pull_time_running:
+            cfg = read_local_config()
+            t = cfg.get('auto_pull_time', '')
+            if t:
+                try:
+                    now = datetime.now()
+                    h, m = map(int, t.split(':'))
+                    today = now.strftime('%Y-%m-%d')
+                    if now.hour == h and now.minute == m and last_pulled != today:
+                        ok, out = run_git(['pull', 'origin', 'main', '--strategy-option=theirs'])
+                        if ok and 'Already up to date' not in out:
+                            try:
+                                subprocess.Popen(['/usr/bin/sudo', '/usr/bin/systemctl', 'restart', 'firinna-pos'])
+                            except:
+                                pass
+                        last_pulled = today
+                        _time.sleep(70)
+                        continue
+                except Exception as e:
+                    print(f"Auto pull time hatasi: {e}")
+            _time.sleep(30)
+
+    _auto_pull_time_thread = threading.Thread(target=loop, daemon=True)
+    _auto_pull_time_thread.start()
 
 def start_auto_pull(interval_minutes):
     global _auto_pull_timer
@@ -942,7 +1007,7 @@ def start_auto_pull(interval_minutes):
             run_git(['pull', 'origin', 'main'])
             # Sadece gerçekten pull yapılırsa restart
             try:
-                subprocess.Popen(['sudo', 'systemctl', 'restart', 'firinna-pos'])
+                subprocess.Popen(['/usr/bin/sudo', '/usr/bin/systemctl', 'restart', 'firinna-pos'])
             except:
                 pass
         # Bir sonraki kontrol
@@ -967,7 +1032,7 @@ def start_auto_push():
     def loop():
         import time as _time
         while _auto_push_running:
-            push_time = db.get_setting('git_auto_push_time', '')  # '23:00' formatı
+            push_time = read_local_config().get('auto_push_time', '')  # '23:00' formatı — yerel ayar
             if push_time:
                 now = datetime.now()
                 try:
@@ -993,22 +1058,20 @@ def start_auto_push():
 
 @app.route('/api/git/auto-push', methods=['GET'])
 def api_auto_push_status():
-    t = db.get_setting('git_auto_push_time', '')
-    return jsonify({'time': t})
+    cfg = read_local_config()
+    return jsonify({'time': cfg.get('auto_push_time', '')})
 
 @app.route('/api/git/auto-push', methods=['POST'])
 def api_auto_push_set():
     t = request.json.get('time', '').strip()
-    db.set_setting('git_auto_push_time', t)
+    write_local_config({'auto_push_time': t})
     return jsonify({'success': True, 'time': t})
 
 if __name__ == '__main__':
     db.init_db()
-    # Auto-pull başlat (eğer ayarlıysa)
+    # Auto-pull başlat (local config'e göre)
     try:
-        interval = int(db.get_setting('git_auto_pull_interval', '0'))
-        if interval > 0:
-            start_auto_pull(interval)
+        start_auto_pull_smart()
     except:
         pass
     # Auto-push başlat
