@@ -848,12 +848,12 @@ def api_git_push():
         now = datetime.now().strftime('%d.%m.%Y %H:%M')
         msg = f'Güncelleme — {now}'
     
-    # Commit edilmemiş değişiklik var mı?
+    # Commit edilmemiş değişiklik var mı? (DB dahil her şey)
     ok, status = run_git(['status', '--short'])
     has_changes = bool(status.strip())
     
     if has_changes:
-        ok1, out1 = run_git(['add', '-A'])
+        ok1, out1 = run_git(['add', '-A'])  # DB dahil her şey
         if not ok1:
             return jsonify({'success': False, 'error': 'git add hatası: ' + out1})
         
@@ -873,23 +873,40 @@ def api_git_push():
 
 @app.route('/api/git/pull', methods=['POST'])
 def api_git_pull():
-    """GitHub'tan en son sürümü çek"""
-    ok, out = run_git(['pull', 'origin', 'main'], timeout=60)
+    """GitHub'tan en son sürümü çek — DB dahil"""
+    # Önce fetch
+    ok_fetch, out_fetch = run_git(['fetch', 'origin', 'main'], timeout=30)
+    if not ok_fetch:
+        return jsonify({'success': False, 'error': 'fetch hatası: ' + out_fetch})
+
+    # Kaç commit geride?
+    ok_behind, behind = run_git(['rev-list', '--count', 'HEAD..origin/main'])
+    already_up = ok_behind and behind.strip() == '0'
+
+    if already_up:
+        return jsonify({'success': True, 'already_up': True, 'output': 'Zaten güncel.'})
+
+    # Yerel commit edilmemiş değişiklik varsa stash'e at
+    ok_s, dirty = run_git(['status', '--short'])
+    if dirty.strip():
+        run_git(['stash', '--include-untracked'])
+
+    # Pull
+    ok, out = run_git(['pull', 'origin', 'main', '--strategy-option=theirs'], timeout=60)
     if not ok:
+        # Stash'i geri al
+        run_git(['stash', 'pop'])
         return jsonify({'success': False, 'error': out})
-    
-    already_up = 'Already up to date' in out or 'Zaten güncel' in out
-    
-    if not already_up:
-        # Servis restart et (değişiklikler aktif olsun)
-        try:
-            subprocess.Popen(['sudo', 'systemctl', 'restart', 'firinna-pos'])
-        except:
-            pass
-    
+
+    # Servis restart et
+    try:
+        subprocess.Popen(['/usr/bin/sudo', '/usr/bin/systemctl', 'restart', 'firinna-pos'])
+    except:
+        pass
+
     return jsonify({
         'success': True,
-        'already_up': already_up,
+        'already_up': False,
         'output': out
     })
 
