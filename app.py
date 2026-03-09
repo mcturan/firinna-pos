@@ -842,35 +842,43 @@ def api_git_status():
 
 @app.route('/api/git/push', methods=['POST'])
 def api_git_push():
-    """Tüm değişiklikleri commit + push"""
+    """Tüm değişiklikleri commit + push (önce pull ile senkronize et)"""
     data = request.json or {}
     msg = data.get('message', '').strip()
     if not msg:
         now = datetime.now().strftime('%d.%m.%Y %H:%M')
         msg = f'Güncelleme — {now}'
-    
-    # Commit edilmemiş değişiklik var mı? (DB dahil her şey)
-    ok, status = run_git(['status', '--short'])
-    has_changes = bool(status.strip())
-    
+
+    # 1. Önce commit edilmemiş değişiklikleri stash'e al
+    ok_s, dirty = run_git(['status', '--short'])
+    has_changes = bool(dirty.strip())
+
     if has_changes:
-        ok1, out1 = run_git(['add', '-A'])  # DB dahil her şey
+        ok1, out1 = run_git(['add', '-A'])
         if not ok1:
             return jsonify({'success': False, 'error': 'git add hatası: ' + out1})
-        
         ok2, out2 = run_git(['commit', '-m', msg])
         if not ok2:
             return jsonify({'success': False, 'error': 'git commit hatası: ' + out2})
-    
+
+    # 2. Önce GitHub'dan pull (rebase ile — commit geçmişini temiz tutar)
+    ok_pull, out_pull = run_git(['pull', '--rebase', 'origin', 'main'], timeout=60)
+    if not ok_pull:
+        # Rebase çakışması — abort + force push yerine hata ver
+        run_git(['rebase', '--abort'])
+        return jsonify({'success': False, 'error': 'Pull/rebase hatası: ' + out_pull})
+
+    # 3. Push
     ok3, out3 = run_git(['push', 'origin', 'main'], timeout=60)
     if not ok3:
         return jsonify({'success': False, 'error': 'git push hatası: ' + out3})
-    
+
     return jsonify({
         'success': True,
         'had_changes': has_changes,
-        'output': out3
+        'output': out_pull + '\n' + out3
     })
+
 
 @app.route('/api/git/pull', methods=['POST'])
 def api_git_pull():
