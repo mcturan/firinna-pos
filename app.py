@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import database as db
+import telegram_notify
 from printer import ThermalPrinter
 import os
 import json
@@ -304,6 +305,7 @@ def api_delete_order_item(item_id):
 @app.route('/api/orders/<int:order_id>/close', methods=['POST'])
 def api_close_order(order_id):
     db.close_order(order_id)
+    telegram_notify.check_low_stock_after_order(order_id)
     return jsonify({'success': True})
 
 # API: Adisyon yazdır
@@ -469,6 +471,7 @@ def api_close_with_payment(order_id):
         data.get('tip_amount', 0),
         data.get('tip_method', 'cash')
     )
+    telegram_notify.check_low_stock_after_order(order_id)
     return jsonify({'success': True})
 
 @app.route('/api/orders/<int:order_id>/split', methods=['POST'])
@@ -721,6 +724,27 @@ def api_preview_note():
         timestamp=datetime.now().strftime('%d.%m.%Y %H:%M')
     )
 
+
+# ===== TELEGRAM (#41) =====
+
+@app.route('/api/settings/telegram', methods=['GET'])
+def api_get_telegram():
+    return jsonify({
+        'token': db.get_setting('telegram_bot_token', ''),
+        'chat_id': db.get_setting('telegram_chat_id', '')
+    })
+
+@app.route('/api/settings/telegram', methods=['POST'])
+def api_save_telegram():
+    data = request.get_json()
+    db.set_setting('telegram_bot_token', data.get('token', '').strip())
+    db.set_setting('telegram_chat_id', data.get('chat_id', '').strip())
+    return jsonify({'success': True})
+
+@app.route('/api/settings/telegram/test', methods=['POST'])
+def api_test_telegram():
+    result = telegram_notify.test_connection()
+    return jsonify(result)
 
 # ===== NOT QR =====
 

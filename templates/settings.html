@@ -84,6 +84,7 @@
             <button class="settings-tab" onclick="switchTab('logo',this)">🖼️ Logo & Fiş</button>
             <button class="settings-tab" onclick="switchTab('github',this)">🔗 GitHub Sync</button>
             <button class="settings-tab" onclick="switchTab('not',this)">📝 Not</button>
+            <button class="settings-tab" onclick="switchTab('telegram',this)">📲 Telegram</button>
         </div>
 
         <!-- İşletme Bilgileri -->
@@ -284,6 +285,44 @@
             else toast('\u274c Hata: ' + d.error, false);
         }
 
+        // --- Telegram ---
+        async function saveTelegram() {
+            const token = document.getElementById('tg-token').value.trim();
+            const chat_id = document.getElementById('tg-chat-id').value.trim();
+            const res = await fetch('/api/settings/telegram', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({token, chat_id})
+            });
+            const d = await res.json();
+            if (d.success) toast('✅ Telegram ayarları kaydedildi!');
+            else toast('❌ Kayıt hatası', false);
+        }
+
+        async function testTelegram() {
+            const btn = event.target;
+            btn.disabled = true; btn.textContent = '📨 Gönderiliyor...';
+            const statusEl = document.getElementById('tg-status');
+            statusEl.style.display = 'none';
+            try {
+                const res = await fetch('/api/settings/telegram/test', {method:'POST'});
+                const d = await res.json();
+                statusEl.style.display = 'block';
+                if (d.success) {
+                    statusEl.style.background = '#d1fae5'; statusEl.style.color = '#065f46';
+                    statusEl.textContent = '✅ Test mesajı başarıyla gönderildi!';
+                } else {
+                    statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+                    statusEl.textContent = '❌ ' + (d.error || 'Gönderim başarısız');
+                }
+            } catch(e) {
+                statusEl.style.display = 'block';
+                statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+                statusEl.textContent = '❌ Bağlantı hatası';
+            }
+            btn.disabled = false; btn.textContent = '📨 Test Mesajı Gönder';
+        }
+
         // --- Note QR ---
         let pendingNoteQrFile = null;
 
@@ -381,6 +420,11 @@
                     document.getElementById('note-qr-placeholder').style.display = 'none';
                 }
                 if (noteQr.label) document.getElementById('note-qr-label').value = noteQr.label;
+
+                // Telegram ayarları yükle
+                const tg = await fetch('/api/settings/telegram').then(r=>r.json()).catch(()=>({}));
+                if (tg.token) document.getElementById('tg-token').value = tg.token;
+                if (tg.chat_id) document.getElementById('tg-chat-id').value = tg.chat_id;
             } catch(e) {}
         }
         function previewLogoFile(event) {
@@ -477,6 +521,47 @@
         </div>
 
         </div><!-- /tab-not -->
+
+        <!-- Telegram -->
+        <div id="tab-telegram" class="settings-panel" style="display:none;">
+        <div class="settings-card">
+            <h3>📲 Telegram Stok Bildirimleri</h3>
+            <p style="font-size:.85rem;color:#718096;margin-bottom:1.25rem;">
+                Bir stok kalemi minimum seviyenin altına düştüğünde Telegram'a otomatik mesaj gönderilir.
+            </p>
+
+            <div class="field-group">
+                <div>
+                    <label>Bot Token</label>
+                    <input type="text" id="tg-token" placeholder="123456789:ABCdefGHI...">
+                    <div style="font-size:.78rem;color:#94a3b8;margin-top:.3rem;">
+                        @BotFather'dan alınan token
+                    </div>
+                </div>
+                <div>
+                    <label>Chat ID</label>
+                    <input type="text" id="tg-chat-id" placeholder="-100123456789 veya kişisel ID">
+                    <div style="font-size:.78rem;color:#94a3b8;margin-top:.3rem;">
+                        @userinfobot'a /start yaz → ID'ni öğren
+                    </div>
+                </div>
+                <div class="save-row">
+                    <button class="btn btn-primary" onclick="saveTelegram()">💾 Kaydet</button>
+                    <button class="btn btn-secondary" onclick="testTelegram()">📨 Test Mesajı Gönder</button>
+                </div>
+            </div>
+
+            <div id="tg-status" style="margin-top:1rem;padding:.75rem;border-radius:8px;display:none;font-size:.9rem;font-weight:600;"></div>
+
+            <div style="margin-top:1.5rem;background:#f8fafc;border-radius:10px;padding:1rem;font-size:.82rem;color:#4a5568;line-height:1.8;">
+                <strong>Nasıl kurulur?</strong><br>
+                1. Telegram'da <code>@BotFather</code>'a yaz → <code>/newbot</code> → token al<br>
+                2. <code>@userinfobot</code>'a <code>/start</code> yaz → Chat ID'ni al<br>
+                3. Grup kullanmak istersen: Botu gruba ekle → <code>@userinfobot</code>'u gruba ekle → ID al<br>
+                4. Token + Chat ID'yi yukarıya gir → Kaydet → Test Gönder
+            </div>
+        </div>
+        </div><!-- /tab-telegram -->
 
         <!-- GitHub Sync -->
         <div id="tab-github" class="settings-panel" style="display:none;">
