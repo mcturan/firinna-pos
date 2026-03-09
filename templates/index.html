@@ -2,6 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fırınna POS</title>
     <link rel="stylesheet" href="/static/css/style.css">
@@ -11,6 +12,7 @@
         <div class="nav-brand">🍽️ Fırınna POS</div>
         <div class="nav-links">
             <a href="/" class="active">Masalar</a>
+                        <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">🔔<span class="alert-badge" id="alertBadge" style="display:none">0</span></button>
             <div class="nav-dropdown" id="navDropdown">
                 <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
                 <div class="nav-dropdown-menu">
@@ -28,6 +30,16 @@
             </div>
         </div>
     </nav>
+    <!-- Stok Uyarı Paneli -->
+    <div class="alert-panel" id="alertPanel">
+        <div class="alert-panel-header">
+            <span>⚠️ Düşük Stok Uyarıları</span>
+            <a href="/stok" style="color:white;font-size:.8rem;text-decoration:underline;">Stoka Git →</a>
+        </div>
+        <div class="alert-panel-body" id="alertPanelBody">
+            <div class="alert-empty">Yükleniyor...</div>
+        </div>
+    </div>
     <script>
         function toggleNav() {
             document.getElementById('navDropdown').classList.toggle('open');
@@ -394,6 +406,63 @@
                     <button class="btn btn-secondary" onclick="clearHistoryFilter()" style="margin-left: 0.5rem;">Tümü</button>
                 </div>
                 <div id="orderHistoryList" style="max-height: 500px; overflow-y: auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kapalı Sipariş Düzenleme Modal -->
+    <div id="editOrderModal" class="modal">
+        <div class="modal-content" style="max-width:640px;">
+            <div class="modal-header">
+                <h2>✏️ Siparişi Düzenle</h2>
+                <span class="close" onclick="closeEditOrderModal()">&times;</span>
+            </div>
+            <div style="padding:1.5rem;">
+                <div style="background:#f7fafc;border-radius:10px;padding:1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <div id="editOrderInfo" style="font-weight:700;font-size:1rem;"></div>
+                        <div id="editOrderDate" style="font-size:.82rem;color:#718096;"></div>
+                    </div>
+                    <div id="editOrderTotal" style="font-size:1.5rem;font-weight:800;color:#2d6a4f;"></div>
+                </div>
+
+                <!-- Mevcut ürünler -->
+                <div id="editOrderItems" style="margin-bottom:1rem;max-height:260px;overflow-y:auto;"></div>
+
+                <!-- Ürün ekle -->
+                <div style="background:#f0fdf4;border-radius:10px;padding:.75rem;margin-bottom:1rem;">
+                    <div style="font-weight:600;font-size:.85rem;color:#2d6a4f;margin-bottom:.5rem;">➕ Ürün Ekle</div>
+                    <div style="display:flex;gap:.5rem;">
+                        <select id="editAddProduct" style="flex:1;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                            <option value="">Ürün seç...</option>
+                        </select>
+                        <input type="number" id="editAddQty" value="1" min="1" style="width:70px;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                        <button onclick="addItemToEditOrder()" style="padding:.6rem 1rem;background:#2d6a4f;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Ekle</button>
+                    </div>
+                </div>
+
+                <!-- Ödeme -->
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:1rem;">
+                    <div>
+                        <label style="font-size:.8rem;font-weight:600;color:#4a5568;">💵 Nakit</label>
+                        <input type="number" id="editCash" value="0" step="0.01"
+                            style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;margin-top:.25rem;box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="font-size:.8rem;font-weight:600;color:#4a5568;">💳 Kart</label>
+                        <input type="number" id="editCard" value="0" step="0.01"
+                            style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;margin-top:.25rem;box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="font-size:.8rem;font-weight:600;color:#4a5568;">🎁 Bahşiş</label>
+                        <input type="number" id="editTip" value="0" step="0.01"
+                            style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;margin-top:.25rem;box-sizing:border-box;">
+                    </div>
+                </div>
+
+                <button onclick="saveEditOrder()" style="width:100%;padding:.85rem;background:#2d6a4f;color:white;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">
+                    💾 Kaydet ve Kapat
+                </button>
             </div>
         </div>
     </div>
@@ -1086,7 +1155,7 @@
                         </div>
                         <div style="text-align: right;">
                             <div style="font-size: 1.5rem; font-weight: bold; color: #667eea;">${order.total.toFixed(2)} TL</div>
-                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;"><button class="btn btn-secondary" onclick="reopenOrder(${order.id})" title="Tekrar Aç" style="padding: 0.5rem 0.75rem;">🔄</button><button class="btn" onclick="deleteOrder(${order.id})" style="background: #f56565; color: white; padding: 0.5rem 0.75rem;" title="Sil">🗑️</button></div>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;"><button class="btn btn-secondary" onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding: 0.5rem 0.75rem;">✏️</button><button class="btn" onclick="deleteOrder(${order.id})" style="background: #f56565; color: white; padding: 0.5rem 0.75rem;" title="Sil">🗑️</button></div>
                     </div>
                     <div style="font-size: 0.9rem; color: #718096;">
                         ${order.items.map(item => `${item.quantity}x ${item.product_name}`).join(', ')}
@@ -1119,11 +1188,107 @@
 
         async function reopenOrder(orderId) {
             if (!confirm('Bu siparişi tekrar açmak istediğinize emin misiniz?')) return;
-            
             await fetch(`/api/orders/${orderId}/reopen`, {method: 'POST'});
             alert('Sipariş tekrar açıldı!');
             closeOrderHistory();
             refreshZone();
+        }
+
+        // === KAPALI SİPARİŞ DÜZENLEME ===
+        let editOrderId = null;
+        let editOrderProductList = [];
+
+        async function openEditOrderModal(orderId) {
+            editOrderId = orderId;
+
+            // Sipariş detayını çek
+            const orders = await fetch('/api/orders/history').then(r=>r.json());
+            const order  = orders.find(o=>o.id===orderId);
+            if (!order) { alert('Sipariş bulunamadı'); return; }
+
+            // Tüm ürünleri yükle
+            editOrderProductList = await fetch('/api/products').then(r=>r.json());
+
+            document.getElementById('editOrderInfo').textContent  = `${order.table_name} (${order.zone_name})`;
+            document.getElementById('editOrderDate').textContent  = new Date(order.closed_at).toLocaleString('tr-TR');
+            document.getElementById('editCash').value = order.payment_cash || 0;
+            document.getElementById('editCard').value = order.payment_card || 0;
+            document.getElementById('editTip').value  = order.tip_amount   || 0;
+
+            // Ürün dropdown
+            const sel = document.getElementById('editAddProduct');
+            sel.innerHTML = '<option value="">Ürün seç...</option>' +
+                editOrderProductList.map(p=>`<option value="${p.id}" data-price="${p.price}">${p.name} — ${p.price.toFixed(2)} ₺</option>`).join('');
+
+            renderEditItems(order.items, order.total);
+            document.getElementById('editOrderModal').style.display = 'block';
+        }
+
+        function renderEditItems(items, total) {
+            document.getElementById('editOrderTotal').textContent = Number(total||0).toFixed(2) + ' ₺';
+            document.getElementById('editOrderItems').innerHTML = items.length ? items.map(item=>`
+                <div style="display:flex;align-items:center;gap:.5rem;padding:.55rem .25rem;border-bottom:1px solid #f0f0f0;">
+                    <span style="flex:1;font-weight:600;font-size:.9rem;">${item.product_name||item.name}</span>
+                    <input type="number" value="${item.quantity}" min="0" step="1"
+                        style="width:60px;padding:.4rem;border:2px solid #e2e8f0;border-radius:6px;text-align:center;"
+                        onchange="updateEditItemQty(${item.id},this.value)">
+                    <span style="width:75px;text-align:right;font-size:.9rem;color:#2d6a4f;font-weight:600;">${Number(item.price).toFixed(2)} ₺</span>
+                    <button onclick="removeEditItem(${item.id})"
+                        style="border:none;background:none;color:#e53e3e;font-size:1.1rem;cursor:pointer;padding:0 .25rem;">✕</button>
+                </div>`).join('') : '<div style="text-align:center;color:#a0aec0;padding:1.5rem;">Ürün yok</div>';
+        }
+
+        async function updateEditItemQty(itemId, qty) {
+            qty = parseInt(qty);
+            if (qty <= 0) { removeEditItem(itemId); return; }
+            await fetch(`/api/order-items/${itemId}`, {
+                method:'PATCH', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({quantity: qty})
+            });
+            await refreshEditOrder();
+        }
+
+        async function removeEditItem(itemId) {
+            await fetch(`/api/order-items/${itemId}`, {method:'DELETE'});
+            await refreshEditOrder();
+        }
+
+        async function addItemToEditOrder() {
+            const sel   = document.getElementById('editAddProduct');
+            const pid   = parseInt(sel.value);
+            const qty   = parseInt(document.getElementById('editAddQty').value) || 1;
+            const price = parseFloat(sel.selectedOptions[0]?.dataset.price || 0);
+            const name  = sel.selectedOptions[0]?.text.split(' — ')[0] || '';
+            if (!pid) return;
+
+            await fetch(`/api/orders/${editOrderId}/items`, {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({product_id:pid, product_name:name, quantity:qty, price})
+            });
+            await refreshEditOrder();
+        }
+
+        async function refreshEditOrder() {
+            const orders = await fetch('/api/orders/history').then(r=>r.json());
+            const order  = orders.find(o=>o.id===editOrderId);
+            if (order) renderEditItems(order.items, order.total);
+        }
+
+        async function saveEditOrder() {
+            const cash = parseFloat(document.getElementById('editCash').value)||0;
+            const card = parseFloat(document.getElementById('editCard').value)||0;
+            const tip  = parseFloat(document.getElementById('editTip').value)||0;
+            await fetch(`/api/orders/${editOrderId}/reclose`, {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({payment_cash:cash, payment_card:card, tip_amount:tip})
+            });
+            closeEditOrderModal();
+            loadOrderHistory();
+        }
+
+        function closeEditOrderModal() {
+            document.getElementById('editOrderModal').style.display = 'none';
+            editOrderId = null;
         }
 
         async function deleteOrder(orderId) {
@@ -1435,6 +1600,45 @@
     <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
         Fırınna POS &mdash; TA1XTA &copy; 2026
     </footer>
+    <script>
+    (function(){
+        async function loadAlerts() {
+            try {
+                const items = await fetch("/api/stock/alerts").then(r=>r.json());
+                const badge = document.getElementById("alertBadge");
+                const body  = document.getElementById("alertPanelBody");
+                if (!badge || !body) return;
+                if (items.length > 0) {
+                    badge.textContent = items.length;
+                    badge.style.display = "flex";
+                    body.innerHTML = items.map(i => `
+                        <div class="alert-item">
+                            <span class="alert-item-name">${i.name}</span>
+                            <span class="alert-item-qty">
+                                <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
+                                <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
+                            </span>
+                        </div>`).join("");
+                } else {
+                    badge.style.display = "none";
+                    body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
+                }
+            } catch(e) {}
+        }
+        function toggleAlertPanel() {
+            const p = document.getElementById("alertPanel");
+            if (p) p.classList.toggle("open");
+        }
+        document.addEventListener("click", function(e) {
+            const p  = document.getElementById("alertPanel");
+            const b  = document.getElementById("alertBtn");
+            const dd = document.getElementById("navDropdown");
+            if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove("open");
+        });
+        loadAlerts();
+        setInterval(loadAlerts, 60000);
+    })();
+    </script>
 </body>
 </html>
 <script>

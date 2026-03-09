@@ -349,7 +349,7 @@ def api_cleanup_empty_orders():
     return jsonify({'success': True, 'deleted': deleted})
 
 @app.route('/api/orders/<int:order_id>/items', methods=['POST'])
-def api_add_order_item(order_id):
+def api_append_order_item(order_id):
     data = request.json
     db.add_order_item(
         order_id,
@@ -783,6 +783,7 @@ def api_preview_note():
         restaurant_name=restaurant_name,
         restaurant_address=db.get_setting('restaurant_address', ''),
         restaurant_phone=db.get_setting('restaurant_phone', ''),
+        restaurant_web=db.get_setting('restaurant_web', ''),
         logo_url=db.get_setting('logo_url', ''),
         qr_image_url=db.get_setting('note_qr_image_url', ''),
         qr_label=db.get_setting('note_qr_label', ''),
@@ -874,6 +875,52 @@ def api_send_telegram_note():
     if ok:
         return jsonify({'success': True})
     return jsonify({'success': False, 'error': 'Mesaj gönderilemedi. Chat ID veya token hatalı olabilir.'})
+
+# ===== ORDER ITEMS CRUD (#düzenleme) =====
+
+@app.route('/api/order-items/<int:item_id>', methods=['PATCH'])
+def api_edit_order_item_qty(item_id):
+    d = request.json
+    conn = db.get_db()
+    conn.execute('UPDATE order_items SET quantity=? WHERE id=?', (d['quantity'], item_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+@app.route('/api/order-items/<int:item_id>', methods=['DELETE'])
+def api_remove_order_item(item_id):
+    conn = db.get_db()
+    conn.execute('DELETE FROM order_items WHERE id=?', (item_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+# ===== STOK UYARI API =====
+
+@app.route('/api/stock/alerts')
+def api_stock_alerts():
+    items = db.get_low_stock_items()
+    return jsonify(items)
+
+# ===== KAPALI SİPARİŞ DÜZENLEME =====
+
+@app.route('/api/orders/<int:order_id>/reclose', methods=['POST'])
+def api_reclose_order(order_id):
+    """Düzenlenen siparişi yeniden kapat"""
+    d = request.json or {}
+    conn = db.get_db()
+    # Toplam yeniden hesapla
+    total = conn.execute('''
+        SELECT COALESCE(SUM(CASE WHEN is_complimentary=0 THEN quantity*price ELSE 0 END),0) as t
+        FROM order_items WHERE order_id=?
+    ''', (order_id,)).fetchone()['t']
+    conn.execute('''UPDATE orders SET status='closed', total=?, closed_at=CURRENT_TIMESTAMP,
+        payment_cash=?, payment_card=?, tip_amount=?
+        WHERE id=?''',
+        (total, d.get('payment_cash',0), d.get('payment_card',0), d.get('tip_amount',0), order_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'total': total})
 
 # ===== ÖN MUHASEBE (#50) =====
 
@@ -969,6 +1016,7 @@ def api_preview_receipt(order_id):
         restaurant_name=db.get_setting('restaurant_name', 'Fırınna'),
         restaurant_address=db.get_setting('restaurant_address', ''),
         restaurant_phone=db.get_setting('restaurant_phone', ''),
+        restaurant_web=db.get_setting('restaurant_web', ''),
         footer_note=db.get_setting('receipt_footer', 'Afiyet olsun!'),
         logo_url=db.get_setting('logo_url', ''),
         qr_image_url=db.get_setting('receipt_qr_image_url', ''),
@@ -1001,6 +1049,7 @@ def api_pdf_receipt(order_id):
         restaurant_name=db.get_setting('restaurant_name', 'Fırınna'),
         restaurant_address=db.get_setting('restaurant_address', ''),
         restaurant_phone=db.get_setting('restaurant_phone', ''),
+        restaurant_web=db.get_setting('restaurant_web', ''),
         footer_note=db.get_setting('receipt_footer', 'Afiyet olsun!'),
         logo_url=db.get_setting('logo_url', '')
     )
@@ -1038,8 +1087,6 @@ def api_pdf_kitchen(order_id):
                      download_name=f'mutfak_{order_id}.pdf')
 
 # Muhasebe tablolarını başlat ve migrasyonu çalıştır
-db.init_muhasebe_tables()
-db.migrate_orders_to_transactions()
 
 @app.route('/debug/transactions')
 def debug_transactions():
@@ -1394,6 +1441,8 @@ def api_auto_push_set():
 
 if __name__ == '__main__':
     db.init_db()
+    db.init_muhasebe_tables()
+    db.migrate_orders_to_transactions()
     db.init_telegram_contacts()
     # Auto-pull başlat (local config'e göre)
     try:

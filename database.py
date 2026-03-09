@@ -1027,50 +1027,53 @@ def init_muhasebe_tables():
 
 def migrate_orders_to_transactions():
     """Mevcut kapalı siparişleri transactions tablosuna aktar (bir kez çalışır)"""
-    conn = get_db()
-    existing = conn.execute('SELECT COUNT(*) as c FROM transactions WHERE related_order_id IS NOT NULL').fetchone()
-    if existing['c'] > 0:
+    try:
+        conn = get_db()
+        existing = conn.execute('SELECT COUNT(*) as c FROM transactions WHERE related_order_id IS NOT NULL').fetchone()
+        if existing['c'] > 0:
+            conn.close()
+            return 0
+
+        orders = conn.execute('''
+            SELECT id, closed_at, payment_cash, payment_card, tip_amount, tip_method, total
+            FROM orders WHERE status = 'closed' AND closed_at IS NOT NULL
+        ''').fetchall()
+
+        count = 0
+        for o in orders:
+            date = o['closed_at'][:10] if o['closed_at'] else datetime.now().strftime('%Y-%m-%d')
+            if o['payment_cash'] and o['payment_cash'] > 0:
+                conn.execute('''INSERT INTO transactions
+                    (date, type, amount, category, payment_method, description, related_order_id, created_at)
+                    VALUES (?, 'in', ?, 'satis', 'cash', 'Sipariş #' || ?, ?, ?)''',
+                    (date, o['payment_cash'], o['id'], o['id'], o['closed_at']))
+            if o['payment_card'] and o['payment_card'] > 0:
+                conn.execute('''INSERT INTO transactions
+                    (date, type, amount, category, payment_method, description, related_order_id, created_at)
+                    VALUES (?, 'in', ?, 'satis', 'card', 'Sipariş #' || ?, ?, ?)''',
+                    (date, o['payment_card'], o['id'], o['id'], o['closed_at']))
+            if o['tip_amount'] and o['tip_amount'] > 0:
+                method = o['tip_method'] or 'cash'
+                conn.execute('''INSERT INTO transactions
+                    (date, type, amount, category, payment_method, description, related_order_id, created_at)
+                    VALUES (?, 'in', ?, 'bahsis', ?, 'Bahşiş - Sipariş #' || ?, ?, ?)''',
+                    (date, o['tip_amount'], method, o['id'], o['id'], o['closed_at']))
+            count += 1
+
+        expenses = conn.execute('SELECT * FROM expenses').fetchall()
+        for e in expenses:
+            date = e['created_at'][:10] if e['created_at'] else datetime.now().strftime('%Y-%m-%d')
+            conn.execute('''INSERT INTO transactions
+                (date, type, amount, category, payment_method, description, created_at)
+                VALUES (?, 'out', ?, 'masraf', 'cash', ?, ?)''',
+                (date, e['amount'], e['description'] + ' (' + (e['category'] or 'Genel') + ')', e['created_at']))
+
+        conn.commit()
         conn.close()
-        return 0  # Zaten migrasyon yapılmış
-
-    orders = conn.execute('''
-        SELECT id, closed_at, payment_cash, payment_card, tip_amount, tip_method, total
-        FROM orders WHERE status = 'closed' AND closed_at IS NOT NULL
-    ''').fetchall()
-
-    count = 0
-    for o in orders:
-        date = o['closed_at'][:10] if o['closed_at'] else datetime.now().strftime('%Y-%m-%d')
-        if o['payment_cash'] and o['payment_cash'] > 0:
-            conn.execute('''INSERT INTO transactions
-                (date, type, amount, category, payment_method, description, related_order_id, created_at)
-                VALUES (?, 'in', ?, 'satis', 'cash', 'Sipariş #' || ?, ?, ?)''',
-                (date, o['payment_cash'], o['id'], o['id'], o['closed_at']))
-        if o['payment_card'] and o['payment_card'] > 0:
-            conn.execute('''INSERT INTO transactions
-                (date, type, amount, category, payment_method, description, related_order_id, created_at)
-                VALUES (?, 'in', ?, 'satis', 'card', 'Sipariş #' || ?, ?, ?)''',
-                (date, o['payment_card'], o['id'], o['id'], o['closed_at']))
-        if o['tip_amount'] and o['tip_amount'] > 0:
-            method = o['tip_method'] or 'cash'
-            conn.execute('''INSERT INTO transactions
-                (date, type, amount, category, payment_method, description, related_order_id, created_at)
-                VALUES (?, 'in', ?, 'bahsis', ?, 'Bahşiş - Sipariş #' || ?, ?, ?)''',
-                (date, o['tip_amount'], method, o['id'], o['id'], o['closed_at']))
-        count += 1
-
-    # Mevcut masrafları da transactions'a aktar
-    expenses = conn.execute('SELECT * FROM expenses').fetchall()
-    for e in expenses:
-        date = e['created_at'][:10] if e['created_at'] else datetime.now().strftime('%Y-%m-%d')
-        conn.execute('''INSERT INTO transactions
-            (date, type, amount, category, payment_method, description, created_at)
-            VALUES (?, 'out', ?, 'masraf', 'cash', ?, ?)''',
-            (date, e['amount'], e['description'] + ' (' + (e['category'] or 'Genel') + ')', e['created_at']))
-
-    conn.commit()
-    conn.close()
-    return count
+        return count
+    except Exception as e:
+        print(f"migrate_orders_to_transactions atlandı: {e}")
+        return 0
 
 def record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amount, tip_method, closed_at):
     """Sipariş kapanışında otomatik transaction kaydı"""
@@ -1209,6 +1212,24 @@ def delete_telegram_contact(contact_id):
     conn.execute('DELETE FROM telegram_contacts WHERE id=?', (contact_id,))
     conn.commit()
     conn.close()
+
+def get_low_stock_items():
+    """Minimum stok altına düşmüş kalemleri döndür"""
+    conn = get_db()
+    items = conn.execute('''
+        SELECT s.*,
+               COALESCE((SELECT SUM(CASE WHEN movement_type='in' THEN quantity
+                                        WHEN movement_type='out' THEN -quantity
+                                        ELSE quantity END)
+                FROM stock_movements WHERE stock_item_id = s.id), 0) as current_qty
+        FROM stock_items s
+        WHERE s.active = 1
+          AND s.min_quantity > 0
+        HAVING current_qty <= s.min_quantity
+        ORDER BY (current_qty - s.min_quantity) ASC
+    ''').fetchall()
+    conn.close()
+    return [dict(i) for i in items]
 
 def get_stock_items():
     conn = get_db()

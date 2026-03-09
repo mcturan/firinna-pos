@@ -35,7 +35,12 @@ class ThermalPrinter:
         """Müşteri adisyonu yazdır"""
         ESC = b'\x1B'
         INIT = ESC + b'@'
-        CODEPAGE = ESC + b't\x21'   # Code Page 857/Turkish (0x21=33)
+        CODEPAGE = b''   # Codepage komutu gönderilmiyor — yazıcı desteklemiyor
+
+        def tr(text):
+            """Türkçe karakterleri CP437-uyumlu ASCII'ye çevir"""
+            table = str.maketrans('ğüşıöçĞÜŞİÖÇ', 'gusiocGUSIOC')
+            return str(text).translate(table)
         CENTER = ESC + b'a\x01'
         LEFT = ESC + b'a\x00'
         BOLD_ON = ESC + b'E\x01'
@@ -63,25 +68,25 @@ class ThermalPrinter:
         # Header
         data += CENTER
         data += BOLD_ON
-        data += f"{restaurant_name}\n".encode('cp1254', errors='replace')
+        data += tr(f"{restaurant_name}\n").encode('ascii', errors='replace')
         data += BOLD_OFF
         
         if restaurant_address:
-            data += f"{restaurant_address}\n".encode('cp1254', errors='replace')
+            data += tr(f"{restaurant_address}\n").encode('ascii', errors='replace')
         if restaurant_phone:
-            data += f"Tel: {restaurant_phone}\n".encode('cp1254', errors='replace')
+            data += tr(f"Tel: {restaurant_phone}\n").encode('ascii', errors='replace')
         if restaurant_web:
-            data += f"{restaurant_web}\n".encode('cp1254', errors='replace')
+            data += tr(f"{restaurant_web}\n").encode('ascii', errors='replace')
         
-        data += "================================\n".encode('cp1254', errors='replace')
+        data += "==========================================\n".encode('ascii', errors='replace')
         data += LEFT
         
         # Tarih/Saat
         now = datetime.now().strftime('%d.%m.%Y %H:%M')
-        data += f"Tarih: {now}\n".encode('cp1254', errors='replace')
-        data += f"Masa: {order_data.get('table_name', '-')}\n".encode('cp1254', errors='replace')
-        data += f"Siparis No: {order_data.get('order_id', '-')}\n".encode('cp1254', errors='replace')
-        data += "================================\n".encode('cp1254', errors='replace')
+        data += tr(f"Tarih: {now}\n").encode('ascii', errors='replace')
+        data += tr(f"Masa: {order_data.get('table_name', '-')}\n").encode('ascii', errors='replace')
+        data += tr(f"Siparis No: {order_data.get('order_id', '-')}\n").encode('ascii', errors='replace')
+        data += "==========================================\n".encode('ascii', errors='replace')
         
         # Ürünler
         for item in order_data.get('items', []):
@@ -91,45 +96,53 @@ class ThermalPrinter:
             total = qty * price
             
             if item.get('is_complimentary'):
-                data += f"{qty}x {name}".encode('cp1254', errors='replace')
-                data += " (IKRAM)\n".encode('cp1254', errors='replace')
+                data += tr(f"{qty}x {name}").encode('ascii', errors='replace')
+                data += " (IKRAM)\n".encode('ascii', errors='replace')
             else:
                 line = f"{qty}x {name}"
                 price_str = f"{total:.2f} TL"
-                spaces = 32 - len(line) - len(price_str)
-                data += f"{line}{' ' * spaces}{price_str}\n".encode('cp1254', errors='replace')
+                LINE_WIDTH = 42
+                spaces = LINE_WIDTH - len(line) - len(price_str)
+                if spaces < 1: spaces = 1
+                data += tr(f"{line}{' ' * spaces}{price_str}\n").encode('ascii', errors='replace')
             
-        data += "================================\n".encode('cp1254', errors='replace')
+        data += "==========================================\n".encode('ascii', errors='replace')
         
         # Toplam
         subtotal = order_data.get('subtotal', 0)
         discount = order_data.get('discount_value', 0)
         total = order_data.get('total', 0)
         
-        data += f"Ara Toplam:            {subtotal:.2f} TL\n".encode('cp1254', errors='replace')
+        LW = 42
+        def rjust_row(label, value):
+            spaces = LW - len(label) - len(value)
+            if spaces < 1: spaces = 1
+            return tr(label + ' ' * spaces + value + '\n').encode('ascii', errors='replace')
+
+        data += rjust_row('Ara Toplam:', f'{subtotal:.2f} TL')
         
         if discount > 0:
             discount_text = order_data.get('discount_reason', 'Indirim')
-            data += f"{discount_text}:           -{discount:.2f} TL\n".encode('cp1254', errors='replace')
+            data += rjust_row(f'{discount_text}:', f'-{discount:.2f} TL')
         
         data += BOLD_ON
-        data += f"TOPLAM:                {total:.2f} TL\n".encode('cp1254', errors='replace')
+        data += rjust_row('TOPLAM:', f'{total:.2f} TL')
         data += BOLD_OFF
-        data += "================================\n".encode('cp1254', errors='replace')
+        data += "==========================================\n".encode('ascii', errors='replace')
         
         # Ödeme bilgisi
         if order_data.get('payment_cash', 0) > 0:
-            data += f"Nakit:                 {order_data['payment_cash']:.2f} TL\n".encode('cp1254', errors='replace')
+            data += rjust_row('Nakit:', f"{order_data['payment_cash']:.2f} TL")
         if order_data.get('payment_card', 0) > 0:
-            data += f"Kart:                  {order_data['payment_card']:.2f} TL\n".encode('cp1254', errors='replace')
+            data += rjust_row('Kart:', f"{order_data['payment_card']:.2f} TL")
         if order_data.get('tip_amount', 0) > 0:
-            data += f"Bahsis:                {order_data['tip_amount']:.2f} TL\n".encode('cp1254', errors='replace')
+            data += rjust_row('Bahsis:', f"{order_data['tip_amount']:.2f} TL")
         
         # Footer
-        data += "\n".encode('cp1254', errors='replace')
+        data += "\n".encode('ascii', errors='replace')
         data += CENTER
         for line in footer_note.split('\n'):
-            data += f"{line}\n".encode('cp1254', errors='replace')
+            data += tr(f"{line}\n").encode('ascii', errors='replace')
         
         # QR Kod
         qr_url = db.get_setting('receipt_qr_image_url', '')
@@ -140,9 +153,9 @@ class ThermalPrinter:
                 data += qr_bytes
             if qr_label:
                 data += CENTER
-                data += qr_label.encode('cp1254', errors='replace') + b'\n'
+                data += tr(qr_label).encode('ascii', errors='replace') + b'\n'
 
-        data += "\n\n".encode('cp1254', errors='replace')
+        data += "\n\n".encode('ascii', errors='replace')
         data += CUT
         
         return self.send_command(data)
@@ -151,7 +164,12 @@ class ThermalPrinter:
         """Mutfak fişi yazdır (sadece ürünler + notlar)"""
         ESC = b'\x1B'
         INIT = ESC + b'@'
-        CODEPAGE = ESC + b't\x21'   # Code Page 857/Turkish (0x21=33)
+        CODEPAGE = b''   # Codepage komutu gönderilmiyor — yazıcı desteklemiyor
+
+        def tr(text):
+            """Türkçe karakterleri CP437-uyumlu ASCII'ye çevir"""
+            table = str.maketrans('ğüşıöçĞÜŞİÖÇ', 'gusiocGUSIOC')
+            return str(text).translate(table)
         CENTER = ESC + b'a\x01'
         LEFT = ESC + b'a\x00'
         BOLD_ON = ESC + b'E\x01'
@@ -164,18 +182,18 @@ class ThermalPrinter:
         data += CODEPAGE
         data += CENTER
         data += BOLD_ON + DOUBLE_HEIGHT
-        data += "MUTFAK SIPARIS\n".encode('cp1254', errors='replace')
+        data += "MUTFAK SIPARIS\n".encode('ascii', errors='replace')
         data += NORMAL + BOLD_OFF
-        data += "================================\n".encode('cp1254', errors='replace')
+        data += "==========================================\n".encode('ascii', errors='replace')
         data += LEFT
         
         # Tarih/Saat
         now = datetime.now().strftime('%d.%m.%Y %H:%M')
         data += BOLD_ON
-        data += f"MASA: {order_data.get('table_name', '-')}\n".encode('cp1254', errors='replace')
-        data += f"Saat: {now}\n".encode('cp1254', errors='replace')
+        data += tr(f"MASA: {order_data.get('table_name', '-')}\n").encode('ascii', errors='replace')
+        data += tr(f"Saat: {now}\n").encode('ascii', errors='replace')
         data += BOLD_OFF
-        data += "================================\n".encode('cp1254', errors='replace')
+        data += "==========================================\n".encode('ascii', errors='replace')
         
         # Ürünler (ikramlar hariç)
         for item in order_data.get('items', []):
@@ -186,15 +204,15 @@ class ThermalPrinter:
             qty = item.get('quantity', 1)
             
             data += BOLD_ON + DOUBLE_HEIGHT
-            data += f"{qty}x {name}\n".encode('cp1254', errors='replace')
+            data += tr(f"{qty}x {name}\n").encode('ascii', errors='replace')
             data += NORMAL + BOLD_OFF
             
             if item.get('kitchen_notes'):
-                data += f">>> {item.get('kitchen_notes')}\n".encode('cp1254', errors='replace')
+                data += tr(f">>> {item.get('kitchen_notes')}\n").encode('ascii', errors='replace')
             
-            data += "--------------------------------\n".encode('cp1254', errors='replace')
+            data += "--------------------------------\n".encode('ascii', errors='replace')
         
-        data += "\n\n".encode('cp1254', errors='replace')
+        data += "\n\n".encode('ascii', errors='replace')
         data += CUT
         
         return self.send_command(data)
@@ -286,7 +304,7 @@ class ThermalPrinter:
         data += b'FIRINNA POS\n'
         data += BOLD_OFF
         data += b'================================\n'
-        data += f'Test: {now}\n'.encode('cp1254', errors='replace')
+        data += tr(f'Test: {now}\n').encode('ascii', errors='replace')
         data += b'================================\n'
         data += b'Yazici baglantisi basarili!\n'
         data += b'\n\n'
@@ -324,23 +342,23 @@ class ThermalPrinter:
         # Restoran başlık
         data += CENTER
         data += BOLD_ON
-        data += f"{restaurant_name}\n".encode('cp1254', errors='replace')
+        data += tr(f"{restaurant_name}\n").encode('ascii', errors='replace')
         data += BOLD_OFF
         if restaurant_address:
-            data += restaurant_address.encode('cp1254', errors='replace') + b'\n'
+            data += tr(restaurant_address).encode('ascii', errors='replace') + b'\n'
         if restaurant_phone:
-            data += f"Tel: {restaurant_phone}\n".encode('cp1254', errors='replace')
-        data += "================================\n".encode('cp1254', errors='replace')
+            data += tr(f"Tel: {restaurant_phone}\n").encode('ascii', errors='replace')
+        data += "==========================================\n".encode('ascii', errors='replace')
         data += BOLD_ON
-        data += f"--- {title} ---\n".encode('cp1254', errors='replace')
+        data += tr(f"--- {title} ---\n").encode('ascii', errors='replace')
         data += BOLD_OFF
-        data += f"{now}\n".encode('cp1254', errors='replace')
-        data += "================================\n".encode('cp1254', errors='replace')
+        data += tr(f"{now}\n").encode('ascii', errors='replace')
+        data += "==========================================\n".encode('ascii', errors='replace')
         data += LEFT
-        data += "\n".encode('cp1254', errors='replace')
+        data += "\n".encode('ascii', errors='replace')
         for line in note_text.split('\n'):
-            data += f"{line}\n".encode('cp1254', errors='replace')
-        data += "\n================================\n".encode('cp1254', errors='replace')
+            data += tr(f"{line}\n").encode('ascii', errors='replace')
+        data += "\n================================\n".encode('ascii', errors='replace')
 
         # QR Kod
         if qr_url:
@@ -350,9 +368,9 @@ class ThermalPrinter:
                 data += qr_bytes
             if qr_label:
                 data += CENTER
-                data += qr_label.encode('cp1254', errors='replace') + b'\n'
+                data += tr(qr_label).encode('ascii', errors='replace') + b'\n'
 
-        data += "\n\n".encode('cp1254', errors='replace')
+        data += "\n\n".encode('ascii', errors='replace')
         data += CUT
 
         return self.send_command(data)

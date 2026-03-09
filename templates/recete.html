@@ -2,6 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reçete - Fırınna POS</title>
     <link rel="stylesheet" href="/static/css/style.css">
@@ -26,6 +27,7 @@
         <div class="nav-brand">🍽️ Fırınna POS</div>
         <div class="nav-links">
             <a href="/">Masalar</a>
+                        <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">🔔<span class="alert-badge" id="alertBadge" style="display:none">0</span></button>
             <div class="nav-dropdown" id="navDropdown">
                 <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
                 <div class="nav-dropdown-menu">
@@ -43,6 +45,16 @@
             </div>
         </div>
     </nav>
+    <!-- Stok Uyarı Paneli -->
+    <div class="alert-panel" id="alertPanel">
+        <div class="alert-panel-header">
+            <span>⚠️ Düşük Stok Uyarıları</span>
+            <a href="/stok" style="color:white;font-size:.8rem;text-decoration:underline;">Stoka Git →</a>
+        </div>
+        <div class="alert-panel-body" id="alertPanelBody">
+            <div class="alert-empty">Yükleniyor...</div>
+        </div>
+    </div>
     <script>
         function toggleNav() {
             document.getElementById('navDropdown').classList.toggle('open');
@@ -166,5 +178,44 @@
     <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
         Fırınna POS &mdash; TA1XTA &copy; 2026
     </footer>
+    <script>
+    (function(){
+        async function loadAlerts() {
+            try {
+                const items = await fetch("/api/stock/alerts").then(r=>r.json());
+                const badge = document.getElementById("alertBadge");
+                const body  = document.getElementById("alertPanelBody");
+                if (!badge || !body) return;
+                if (items.length > 0) {
+                    badge.textContent = items.length;
+                    badge.style.display = "flex";
+                    body.innerHTML = items.map(i => `
+                        <div class="alert-item">
+                            <span class="alert-item-name">${i.name}</span>
+                            <span class="alert-item-qty">
+                                <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
+                                <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
+                            </span>
+                        </div>`).join("");
+                } else {
+                    badge.style.display = "none";
+                    body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
+                }
+            } catch(e) {}
+        }
+        function toggleAlertPanel() {
+            const p = document.getElementById("alertPanel");
+            if (p) p.classList.toggle("open");
+        }
+        document.addEventListener("click", function(e) {
+            const p  = document.getElementById("alertPanel");
+            const b  = document.getElementById("alertBtn");
+            const dd = document.getElementById("navDropdown");
+            if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove("open");
+        });
+        loadAlerts();
+        setInterval(loadAlerts, 60000);
+    })();
+    </script>
 </body>
 </html>
