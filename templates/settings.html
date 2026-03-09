@@ -83,6 +83,7 @@
             <button class="settings-tab" onclick="switchTab('yazici',this)">🖨️ Yazıcı</button>
             <button class="settings-tab" onclick="switchTab('logo',this)">🖼️ Logo & Fiş</button>
             <button class="settings-tab" onclick="switchTab('github',this)">🔗 GitHub Sync</button>
+            <button class="settings-tab" onclick="switchTab('not',this)">📝 Not</button>
         </div>
 
         <!-- İşletme Bilgileri -->
@@ -166,23 +167,12 @@
                 <div class="save-row" style="width:100%;">
                     <button class="btn btn-secondary" onclick="document.getElementById('qr-file-input').click()">📁 QR Görsel Seç</button>
                     <button class="btn btn-primary" onclick="uploadQr()" id="btn-upload-qr" disabled style="opacity:.5;">⬆️ Yükle</button>
+                    <button class="btn btn-primary" onclick="saveQrLabel()" style="background:#38a169;">💾 Yazıyı Kaydet</button>
                     <button class="btn" style="background:#ef4444;color:white;" onclick="deleteQr()">🗑️ Sil</button>
                 </div>
             </div>
         </div>
 
-        <!-- Not Fişi -->
-        <div class="settings-card">
-            <h3>📝 Not Fişi</h3>
-            <div class="field-group">
-                <div><label>Başlık</label><input type="text" id="note-title" value="NOT" placeholder="NOT"></div>
-                <div><label>Not İçeriği</label><textarea id="note-content" rows="5" placeholder="Yazdırmak istediğiniz notu buraya girin..."></textarea></div>
-                <div class="save-row">
-                    <button class="btn btn-secondary" onclick="previewNote()">👁️ Önizle</button>
-                    <button class="btn btn-primary" onclick="printNote()">🖨️ Yazdır</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -294,6 +284,67 @@
             else toast('\u274c Hata: ' + d.error, false);
         }
 
+        // --- Note QR ---
+        let pendingNoteQrFile = null;
+
+        function previewNoteQrFile(event) {
+            pendingNoteQrFile = event.target.files[0];
+            if (!pendingNoteQrFile) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('note-qr-img').src = e.target.result;
+                document.getElementById('note-qr-img').style.display = 'block';
+                document.getElementById('note-qr-placeholder').style.display = 'none';
+                const btn = document.getElementById('btn-upload-note-qr');
+                btn.disabled = false; btn.style.opacity = '1';
+            };
+            reader.readAsDataURL(pendingNoteQrFile);
+        }
+
+        async function uploadNoteQr() {
+            if (!pendingNoteQrFile) return;
+            const formData = new FormData();
+            formData.append('file', pendingNoteQrFile);
+            formData.append('label', document.getElementById('note-qr-label').value);
+            const res = await fetch('/api/settings/note-qr', {method:'POST', body: formData});
+            const d = await res.json();
+            if (d.success) toast('✅ Not QR kodu kaydedildi!');
+            else toast('❌ Hata: ' + d.error, false);
+            pendingNoteQrFile = null;
+            document.getElementById('btn-upload-note-qr').disabled = true;
+            document.getElementById('btn-upload-note-qr').style.opacity = '.5';
+        }
+
+        async function saveNoteQrLabel() {
+            const label = document.getElementById('note-qr-label').value;
+            const res = await fetch('/api/settings/note-qr/label', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({label})
+            });
+            const d = await res.json();
+            if (d.success) toast('✅ Not QR yazısı kaydedildi!');
+            else toast('❌ Hata', false);
+        }
+
+        async function deleteNoteQr() {
+            await fetch('/api/settings/note-qr', {method:'DELETE'});
+            document.getElementById('note-qr-img').style.display = 'none';
+            document.getElementById('note-qr-placeholder').style.display = 'block';
+            toast('🗑️ Not QR silindi');
+        }
+
+        async function saveQrLabel() {
+            const label = document.getElementById('qr-label').value;
+            const res = await fetch('/api/settings/qr/label', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({label: label})
+            });
+            const d = await res.json();
+            if (d.success) toast('✅ QR yazısı kaydedildi!');
+            else toast('❌ Hata: ' + d.error, false);
+        }
+
         async function deleteQr() {
             await fetch('/api/settings/qr', {method:'DELETE'});
             document.getElementById('qr-preview-img').style.display = 'none';
@@ -321,6 +372,15 @@
                     document.getElementById('qr-placeholder-text').style.display = 'none';
                 }
                 if (qr.label) document.getElementById('qr-label').value = qr.label;
+
+                // Note QR yükle
+                const noteQr = await fetch('/api/settings/note-qr').then(r=>r.json()).catch(()=>({}));
+                if (noteQr.url) {
+                    document.getElementById('note-qr-img').src = noteQr.url;
+                    document.getElementById('note-qr-img').style.display = 'block';
+                    document.getElementById('note-qr-placeholder').style.display = 'none';
+                }
+                if (noteQr.label) document.getElementById('note-qr-label').value = noteQr.label;
             } catch(e) {}
         }
         function previewLogoFile(event) {
@@ -376,6 +436,47 @@
     </script>
 
         </div><!-- /tab-logo -->
+
+        <!-- Not -->
+        <div id="tab-not" class="settings-panel" style="display:none;">
+        <div class="settings-card">
+            <h3>📝 Not Fişi</h3>
+            <div class="field-group">
+                <div><label>Başlık</label><input type="text" id="note-title" value="NOT" placeholder="NOT"></div>
+                <div><label>Not İçeriği</label><textarea id="note-content" rows="6" placeholder="Yazdırmak istediğiniz notu buraya girin..."></textarea></div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h3>📍 Not Fişi QR Kodu</h3>
+            <p style="font-size:.85rem;color:#718096;margin-bottom:1rem;">
+                WiFi QR, Google Haritalar, Instagram vb. — not fişinin altında basılır.
+            </p>
+            <div class="logo-area">
+                <div id="note-qr-preview-box" style="width:120px;height:120px;border:2px dashed #cbd5e1;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f8fafc;">
+                    <span id="note-qr-placeholder" style="color:#94a3b8;font-size:.8rem;text-align:center;">QR yüklenmemiş</span>
+                    <img id="note-qr-img" src="" alt="QR" style="display:none;width:110px;height:110px;object-fit:contain;">
+                </div>
+                <div style="width:100%;">
+                    <label style="font-size:.85rem;color:#4a5568;font-weight:600;">QR Altı Yazı</label>
+                    <input type="text" id="note-qr-label" placeholder="WiFi: Firinna_Guest" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;margin-top:.3rem;">
+                </div>
+                <input type="file" id="note-qr-file-input" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewNoteQrFile(event)">
+                <div class="save-row" style="width:100%;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('note-qr-file-input').click()">📁 QR Görsel Seç</button>
+                    <button class="btn btn-primary" onclick="uploadNoteQr()" id="btn-upload-note-qr" disabled style="opacity:.5;">⬆️ Yükle</button>
+                    <button class="btn btn-primary" onclick="saveNoteQrLabel()" style="background:#38a169;">💾 Yazıyı Kaydet</button>
+                    <button class="btn" style="background:#ef4444;color:white;" onclick="deleteNoteQr()">🗑️ Sil</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card" style="display:flex;gap:.75rem;">
+            <button class="btn btn-secondary" onclick="previewNote()" style="flex:1;">👁️ Önizle</button>
+            <button class="btn btn-primary" onclick="printNote()" style="flex:1;">🖨️ Yazdır</button>
+        </div>
+
+        </div><!-- /tab-not -->
 
         <!-- GitHub Sync -->
         <div id="tab-github" class="settings-panel" style="display:none;">

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Fiş #{{ order['order_id'] }}</title>
+    <title>Fis #{{ order['order_id'] }}</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -14,20 +14,20 @@
             border: 1px solid #ccc;
             background: #fff;
         }
-        .center  { text-align: center; }
-        .bold    { font-weight: bold; }
-        .large   { font-size: 15px; }
-        .small   { font-size: 11px; color: #444; }
+        .center   { text-align: center; }
+        .bold     { font-weight: bold; }
+        .large    { font-size: 15px; }
+        .small    { font-size: 11px; color: #444; }
         .sep-dash { border: none; border-top: 1px dashed #555; margin: 8px 0; }
         .sep-solid{ border: none; border-top: 1px solid #000; margin: 8px 0; }
-        .row     { display: flex; justify-content: space-between; padding: 3px 0; }
-        .row .name { flex: 1; padding-right: 8px; }
-        .row .price { white-space: nowrap; }
-        .total-row { font-size: 15px; font-weight: bold; padding: 5px 0; }
-        .ikram   { color: #555; font-style: italic; }
-        .logo-wrap { text-align: center; margin-bottom: 10px; }
+        .row      { display: flex; justify-content: space-between; padding: 3px 0; }
+        .row .name{ flex: 1; padding-right: 8px; }
+        .row .price{ white-space: nowrap; }
+        .total-row{ font-size: 15px; font-weight: bold; padding: 5px 0; }
+        .ikram    { color: #555; font-style: italic; }
+        .logo-wrap{ text-align: center; margin-bottom: 10px; }
         .logo-wrap img { max-width: 180px; max-height: 90px; object-fit: contain; }
-        .qr-wrap { text-align: center; margin-top: 10px; }
+        .qr-wrap  { text-align: center; margin-top: 10px; }
         .qr-wrap img { width: 80px; height: 80px; }
         .qr-label { font-size: 10px; color: #666; margin-top: 4px; }
         @media print {
@@ -37,61 +37,63 @@
 </head>
 <body>
 
-    {% if logo_url %}
-    <div class="logo-wrap">
-        <img src="{{ logo_url }}" alt="Logo">
-    </div>
+{% if logo_url %}
+<div class="logo-wrap">
+    <img src="{{ logo_url }}" alt="Logo">
+</div>
+{% endif %}
+
+<div class="center bold large">{{ restaurant_name }}</div>
+{% if restaurant_address %}<div class="center small">{{ restaurant_address }}</div>{% endif %}
+{% if restaurant_phone %}<div class="center small">Tel: {{ restaurant_phone }}</div>{% endif %}
+
+<hr class="sep-solid" style="margin-top:8px;">
+
+<div class="small">Tarih: {{ order['closed_at'] or order['created_at'] }}</div>
+<div class="small">Masa: <strong>{{ order['table_name'] }}</strong> &nbsp;|&nbsp; No: {{ order['order_id'] }}</div>
+
+<hr class="sep-dash">
+
+{% for item in order['items'] %}
+<div class="row{% if item.is_complimentary %} ikram{% endif %}">
+    <span class="name">{{ item.quantity }}x {{ item.product_name }}{% if item.is_complimentary %} (IKRAM){% endif %}</span>
+    {% if not item.is_complimentary %}
+    <span class="price">{{ "%.2f"|format(item.quantity * item.price) }} TL</span>
     {% endif %}
+</div>
+{% endfor %}
 
-    <div class="center bold large">{{ restaurant_name }}</div>
-    {% if restaurant_address %}<div class="center small">{{ restaurant_address }}</div>{% endif %}
-    {% if restaurant_phone %}<div class="center small">Tel: {{ restaurant_phone }}</div>{% endif %}
+<hr class="sep-dash">
 
-    <hr class="sep-solid" style="margin-top:8px;">
+<div class="row"><span>Ara Toplam</span><span>{{ "%.2f"|format(order['subtotal']) }} TL</span></div>
+{% if order.get('discount_value', 0) > 0 %}
+<div class="row small"><span>{{ order['discount_reason'] or 'Indirim' }}</span><span>-{{ "%.2f"|format(order['discount_value']) }} TL</span></div>
+{% endif %}
 
-    <div class="small">Tarih: {{ order['closed_at'] or order['created_at'] }}</div>
-    <div class="small">Masa: <strong>{{ order['table_name'] }}</strong> &nbsp;|&nbsp; Sipariş No: {{ order['order_id'] }}</div>
+<hr class="sep-solid">
+<div class="row total-row"><span>TOPLAM</span><span>{{ "%.2f"|format(order['total']) }} TL</span></div>
+<hr class="sep-solid">
 
-    <hr class="sep-dash">
+{% if order.get('payment_cash', 0) > 0 %}
+<div class="row small"><span>Nakit</span><span>{{ "%.2f"|format(order['payment_cash']) }} TL</span></div>
+{% endif %}
+{% if order.get('payment_card', 0) > 0 %}
+<div class="row small"><span>Kredi Karti</span><span>{{ "%.2f"|format(order['payment_card']) }} TL</span></div>
+{% endif %}
+{% if order.get('tip_amount', 0) > 0 %}
+<div class="row small"><span>Bahsis</span><span>{{ "%.2f"|format(order['tip_amount']) }} TL</span></div>
+{% endif %}
 
-    {% for item in order['items'] %}
-    <div class="row {% if item.is_complimentary %}ikram{% endif %}">
-        <span class="name">{{ item.quantity }}x {{ item.product_name or 'Ürün' }}{% if item.is_complimentary %} <em>(İKRAM)</em>{% endif %}</span>
-        {% if not item.is_complimentary %}
-        <span class="price">{{ "%.2f"|format(item.quantity * item.price) }} TL</span>
-        {% endif %}
-    </div>
-    {% endfor %}
+<hr class="sep-dash" style="margin-top:8px;">
+<div class="center" style="white-space:pre-line;font-size:12px;line-height:1.6;">{{ footer_note }}</div>
 
-    <hr class="sep-dash">
-
-    <div class="row"><span>Ara Toplam</span><span>{{ "%.2f"|format(order['subtotal']) }} TL</span></div>
-    {% if order.get('discount_value', 0) > 0 %}
-    <div class="row small"><span>{{ order['discount_reason'] or 'İndirim' }}</span><span>-{{ "%.2f"|format(order['discount_value']) }} TL</span></div>
-    {% endif %}
-
-    <hr class="sep-solid">
-    <div class="row total-row"><span>TOPLAM</span><span>{{ "%.2f"|format(order['total']) }} TL</span></div>
-    <hr class="sep-solid">
-
-    {% if order.get('payment_cash', 0) > 0 %}
-    <div class="row small"><span>Nakit</span><span>{{ "%.2f"|format(order['payment_cash']) }} TL</span></div>{% endif %}
-    {% if order.get('payment_card', 0) > 0 %}
-    <div class="row small"><span>Kredi Kartı</span><span>{{ "%.2f"|format(order['payment_card']) }} TL</span></div>{% endif %}
-    {% if order.get('tip_amount', 0) > 0 %}
-    <div class="row small"><span>Bahşiş</span><span>{{ "%.2f"|format(order['tip_amount']) }} TL</span></div>{% endif %}
-
-    <hr class="sep-dash" style="margin-top:8px;">
-
-    <div class="center" style="white-space: pre-line; font-size:12px; line-height:1.6;">{{ footer_note }}</div>
-
-    {% if qr_image_url %}
-    <hr class="sep-dash" style="margin-top:10px;">
-    <div class="qr-wrap">
-        <img src="{{ qr_image_url }}" alt="QR">
-        <div class="qr-label">{{ qr_label or 'Bizi Google Haritalar'\''da bulun' }}</div>
-    </div>
-    {% endif %}
+{% if qr_image_url %}
+<hr class="sep-dash" style="margin-top:10px;">
+<div class="qr-wrap">
+    <img src="{{ qr_image_url }}" alt="QR">
+    <div class="qr-label">{{ qr_label }}</div>
+</div>
+{% endif %}
 
 </body>
 </html>

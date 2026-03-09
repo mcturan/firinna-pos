@@ -285,7 +285,15 @@ def api_cleanup_empty_orders():
 @app.route('/api/orders/<int:order_id>/items', methods=['POST'])
 def api_add_order_item(order_id):
     data = request.json
-    db.add_order_item(order_id, data['product_id'], data['quantity'], data['price'])
+    db.add_order_item(
+        order_id,
+        data['product_id'],
+        data['quantity'],
+        data['price'],
+        product_name=data.get('product_name'),
+        kitchen_notes=data.get('kitchen_notes'),
+        is_complimentary=int(data.get('is_complimentary', 0))
+    )
     return jsonify({'success': True})
 
 @app.route('/api/orders/items/<int:item_id>', methods=['DELETE'])
@@ -547,6 +555,13 @@ def api_qr_upload():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/api/settings/qr/label', methods=['POST'])
+def api_save_qr_label():
+    data = request.get_json()
+    label = data.get('label', '')
+    db.set_setting('receipt_qr_label', label)
+    return jsonify({'success': True})
+
 @app.route('/api/settings/qr', methods=['DELETE'])
 def api_qr_delete():
     db.set_setting('receipt_qr_image_url', '')
@@ -698,9 +713,61 @@ def api_preview_note():
         note=note_text,
         title=title,
         restaurant_name=restaurant_name,
+        restaurant_address=db.get_setting('restaurant_address', ''),
+        restaurant_phone=db.get_setting('restaurant_phone', ''),
+        logo_url=db.get_setting('logo_url', ''),
+        qr_image_url=db.get_setting('note_qr_image_url', ''),
+        qr_label=db.get_setting('note_qr_label', ''),
         timestamp=datetime.now().strftime('%d.%m.%Y %H:%M')
     )
 
+
+# ===== NOT QR =====
+
+@app.route('/api/settings/note-qr', methods=['POST'])
+def api_upload_note_qr():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'Dosya yok'}), 400
+    file = request.files['file']
+    if not allowed_file(file.filename):
+        return jsonify({'success': False, 'error': 'Desteklenmeyen format'}), 400
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    filename = f'note_qr.{ext}'
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+    for old_ext in ALLOWED_EXTENSIONS:
+        old_path = os.path.join(UPLOAD_FOLDER, f'note_qr.{old_ext}')
+        if os.path.exists(old_path) and old_ext != ext:
+            os.remove(old_path)
+    file.save(filepath)
+    qr_url = f'/static/uploads/{filename}'
+    db.set_setting('note_qr_image_url', qr_url)
+    label = request.form.get('label', '')
+    if label:
+        db.set_setting('note_qr_label', label)
+    return jsonify({'success': True, 'url': qr_url})
+
+@app.route('/api/settings/note-qr/label', methods=['POST'])
+def api_save_note_qr_label():
+    data = request.get_json()
+    db.set_setting('note_qr_label', data.get('label', ''))
+    return jsonify({'success': True})
+
+@app.route('/api/settings/note-qr', methods=['GET'])
+def api_get_note_qr():
+    return jsonify({
+        'url': db.get_setting('note_qr_image_url', ''),
+        'label': db.get_setting('note_qr_label', '')
+    })
+
+@app.route('/api/settings/note-qr', methods=['DELETE'])
+def api_delete_note_qr():
+    qr_url = db.get_setting('note_qr_image_url', '')
+    if qr_url:
+        filepath = os.path.join(os.path.dirname(__file__), qr_url.lstrip('/'))
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        db.set_setting('note_qr_image_url', '')
+    return jsonify({'success': True})
 
 # ===== FİŞ ÖNİZLEME =====
 

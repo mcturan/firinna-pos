@@ -255,13 +255,17 @@ def create_order(table_id):
     conn.close()
     return order_id
 
-def add_order_item(order_id, product_id, quantity, price):
+def add_order_item(order_id, product_id, quantity, price, product_name=None, kitchen_notes=None, is_complimentary=0):
     """Siparişe ürün ekle"""
     conn = get_db()
+    # product_name yoksa products tablosundan al
+    if not product_name:
+        row = conn.execute('SELECT name FROM products WHERE id = ?', (product_id,)).fetchone()
+        product_name = row['name'] if row else 'Ürün'
     conn.execute('''
-        INSERT INTO order_items (order_id, product_id, quantity, price) 
-        VALUES (?, ?, ?, ?)
-    ''', (order_id, product_id, quantity, price))
+        INSERT INTO order_items (order_id, product_id, product_name, quantity, price, kitchen_notes, is_complimentary) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (order_id, product_id, product_name, quantity, price, kitchen_notes, is_complimentary))
     
     # Toplam tutarı güncelle
     conn.execute('''

@@ -2,39 +2,80 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Mutfak Fişi - {{ order['table_name'] }}</title>
+    <title>Mutfak - {{ order['table_name'] }}</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            max-width: 300px; 
-            margin: 20px auto; 
-            padding: 20px;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            width: 300px;
+            margin: 20px auto;
+            padding: 16px;
             border: 2px solid #000;
         }
-        .header { text-align: center; font-size: 1.5em; font-weight: bold; margin-bottom: 10px; }
-        .table { font-size: 1.8em; font-weight: bold; text-align: center; margin: 15px 0; }
-        .separator { border-top: 2px solid #000; margin: 10px 0; }
-        .item { margin: 15px 0; padding: 10px; border: 1px solid #ccc; }
-        .qty { font-size: 1.5em; font-weight: bold; }
-        .note { margin-top: 5px; padding: 5px; background: #ffffcc; font-weight: bold; }
+        .header {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .sep { border: none; border-top: 2px solid #000; margin: 8px 0; }
+        .sep-light { border: none; border-top: 1px dashed #666; margin: 6px 0; }
+        .table-name {
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            margin: 8px 0 4px;
+        }
+        .time {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            margin-bottom: 4px;
+        }
+        .item {
+            margin: 8px 0;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .qty {
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+        .item-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .note {
+            margin-top: 6px;
+            padding: 4px 6px;
+            background: #ffffcc;
+            font-size: 13px;
+            font-weight: bold;
+            border-left: 3px solid #f0c040;
+        }
         @media print {
-            body { border: 2px solid #000; }
+            body { border: 2px solid #000; margin: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="header">MUTFAK SİPARİŞ</div>
-    <div class="separator"></div>
-    <div class="table">MASA: {{ order['table_name'] }}</div>
-    <div style="text-align: center;">{{ order['closed_at'] or order['created_at'] }}</div>
-    <div class="separator"></div>
-    
+    <div class="header">MUTFAK SIPARIS</div>
+    <hr class="sep">
+    <div class="table-name">MASA: {{ order['table_name'] }}</div>
+    <div class="time">{{ order['closed_at'] or order['created_at'] }}</div>
+    <hr class="sep">
+
     {% for item in order['items'] %}
     {% if not item.is_complimentary %}
     <div class="item">
-        <div class="qty">{{ item.quantity }}x {{ item.product_name }}</div>
+        <span class="qty">{{ item.quantity }}x</span>
+        <span class="item-name">{{ item.product_name }}</span>
         {% if item.kitchen_notes %}
-        <div class="note">>>> {{ item.kitchen_notes }}</div>
+        <div class="note">{{ item.kitchen_notes }}</div>
         {% endif %}
     </div>
     {% endif %}
