@@ -24,6 +24,24 @@
         #logo-preview-box { width:200px; height:100px; border:2px dashed #cbd5e1; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#f8fafc; }
         .toast { position:fixed; bottom:2rem; right:2rem; background:#2d6a4f; color:white; padding:1rem 1.5rem; border-radius:10px; font-weight:600; z-index:9999; opacity:0; transition:opacity .3s; }
         .toast.show { opacity:1; }
+
+        /* GitHub Sync */
+        .sync-status-box { background:#f8fafc; border-radius:12px; padding:1.25rem; margin-bottom:1rem; }
+        .sync-row { display:flex; justify-content:space-between; align-items:center; padding:.5rem 0; border-bottom:1px solid #e2e8f0; font-size:.88rem; }
+        .sync-row:last-child { border-bottom:none; }
+        .sync-row label { color:#718096; font-weight:600; min-width:130px; }
+        .sync-row span  { color:#2d3748; font-family:monospace; font-size:.82rem; }
+        .badge-ahead  { background:#d1fae5; color:#065f46; padding:.15rem .55rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .badge-behind { background:#fee2e2; color:#991b1b; padding:.15rem .55rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .badge-ok     { background:#e0f2fe; color:#0369a1; padding:.15rem .55rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .diff-box { background:#1e293b; color:#94a3b8; border-radius:10px; padding:1rem; font-family:monospace; font-size:.78rem; line-height:1.6; max-height:200px; overflow-y:auto; white-space:pre-wrap; }
+        .diff-box .add { color:#4ade80; }
+        .diff-box .del { color:#f87171; }
+        .commit-input { width:100%; padding:.55rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.88rem; font-family:inherit; margin-bottom:.75rem; }
+        .commit-input:focus { outline:none; border-color:#667eea; }
+        .auto-pull-row { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+        .auto-pull-row select { padding:.45rem .7rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.85rem; font-family:inherit; }
+        .git-log-box { background:#f8fafc; border-radius:10px; padding:.85rem; font-size:.78rem; font-family:monospace; color:#475569; line-height:1.7; max-height:150px; overflow-y:auto; white-space:pre-wrap; }
     </style>
 </head>
 <body>
@@ -57,9 +75,18 @@
     </script>
 
     <div class="container">
-        <h1 style="margin-bottom:1.5rem;">⚙️ Ayarlar</h1>
+        <h1 style="margin-bottom:1.25rem;">⚙️ Ayarlar</h1>
+
+        <!-- Sekme Nav -->
+        <div style="display:flex;gap:0;border-bottom:2px solid #e2e8f0;margin-bottom:1.5rem;overflow-x:auto;">
+            <button class="settings-tab active" onclick="switchTab('isletme',this)">🏪 İşletme</button>
+            <button class="settings-tab" onclick="switchTab('yazici',this)">🖨️ Yazıcı</button>
+            <button class="settings-tab" onclick="switchTab('logo',this)">🖼️ Logo & Fiş</button>
+            <button class="settings-tab" onclick="switchTab('github',this)">🔗 GitHub Sync</button>
+        </div>
 
         <!-- İşletme Bilgileri -->
+        <div id="tab-isletme" class="settings-panel">
         <div class="settings-card">
             <h3>🏪 İşletme Bilgileri</h3>
             <div class="field-group">
@@ -74,7 +101,10 @@
             </div>
         </div>
 
-        <!-- Yazıcı Ayarları -->
+        </div><!-- /tab-isletme -->
+
+        <!-- Yazıcı -->
+        <div id="tab-yazici" class="settings-panel" style="display:none;">
         <div class="settings-card">
             <h3>🖨️ Yazıcı Ayarları</h3>
             <div class="printer-box">
@@ -97,7 +127,10 @@
             </div>
         </div>
 
-        <!-- Logo -->
+        </div><!-- /tab-yazici -->
+
+        <!-- Logo & Fiş -->
+        <div id="tab-logo" class="settings-panel" style="display:none;">
         <div class="settings-card">
             <h3>🖼️ Logo</h3>
             <div class="logo-area">
@@ -144,6 +177,7 @@
             await loadBusinessSettings();
             await loadPrinterSettings();
             await loadLogoSettings();
+            await loadAutoPullSetting();
         });
 
         async function loadBusinessSettings() {
@@ -267,6 +301,176 @@
                 body: JSON.stringify({title, note})
             }).then(r => r.json());
             toast(d.success ? '✅ Not fişi yazdırıldı!' : '❌ ' + (d.error||'Hata'), d.success);
+        }
+    </script>
+
+        </div><!-- /tab-logo -->
+
+        <!-- GitHub Sync -->
+        <div id="tab-github" class="settings-panel" style="display:none;">
+        <div class="settings-card">
+            <h3>🔗 GitHub Senkronizasyonu</h3>
+
+            <!-- Durum -->
+            <div class="sync-status-box" id="git-status-box">
+                <div style="color:#94a3b8;font-size:.85rem;text-align:center;padding:1rem;">Durum yükleniyor...</div>
+            </div>
+            <div style="display:flex;gap:.5rem;margin-bottom:1.5rem;">
+                <button class="btn btn-secondary" onclick="loadGitStatus()" id="btn-refresh-status">🔄 Yenile</button>
+            </div>
+
+            <!-- Push -->
+            <h4 style="margin:0 0 .75rem;color:#4a5568;font-size:.9rem;">⬆️ Push — Yerel → GitHub</h4>
+            <input type="text" class="commit-input" id="commit-message" placeholder="Commit mesajı (boş bırakılırsa otomatik)">
+            <button class="btn btn-primary" onclick="gitPush()" id="btn-push" style="width:100%;margin-bottom:1.5rem;">
+                ⬆️ GitHub'a Yükle (Push)
+            </button>
+
+            <!-- Pull -->
+            <h4 style="margin:0 0 .75rem;color:#4a5568;font-size:.9rem;">⬇️ Pull — GitHub → PC</h4>
+            <p style="font-size:.82rem;color:#718096;margin-bottom:.75rem;">
+                GitHub'daki son sürümü bu PC'ye çeker. Yeni dosyalar varsa uygulama otomatik yeniden başlar.
+            </p>
+            <button class="btn btn-success" onclick="gitPull()" id="btn-pull" style="width:100%;margin-bottom:1.5rem;">
+                ⬇️ GitHub'dan Güncelle (Pull)
+            </button>
+
+            <!-- Auto-pull -->
+            <h4 style="margin:0 0 .75rem;color:#4a5568;font-size:.9rem;">⏱️ Otomatik Pull</h4>
+            <p style="font-size:.82rem;color:#718096;margin-bottom:.75rem;">
+                GitHub'ta değişiklik olunca bu PC otomatik güncellenir. Push tetiklemez — sonsuz döngü olmaz.
+            </p>
+            <div class="auto-pull-row">
+                <select id="auto-pull-interval">
+                    <option value="0">Kapalı</option>
+                    <option value="5">Her 5 dakika</option>
+                    <option value="15">Her 15 dakika</option>
+                    <option value="30">Her 30 dakika</option>
+                    <option value="60">Her 1 saat</option>
+                </select>
+                <button class="btn btn-primary" onclick="saveAutoPull()">💾 Kaydet</button>
+            </div>
+
+            <!-- İşlem Logu -->
+            <div id="git-log" class="git-log-box" style="margin-top:1.25rem;display:none;"></div>
+        </div>
+        </div><!-- /tab-github -->
+
+    </div><!-- /container -->
+
+    <script>
+        // ===== SEKME SİSTEMİ =====
+        function switchTab(name, btn) {
+            document.querySelectorAll('.settings-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.settings-tab').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + name).style.display = 'block';
+            btn.classList.add('active');
+            if (name === 'github') { loadGitStatus(); loadAutoPullSetting(); }
+        }
+
+        // ===== GİTHUB SYNC =====
+        async function loadGitStatus() {
+            const box = document.getElementById('git-status-box');
+            box.innerHTML = '<div style="color:#94a3b8;font-size:.85rem;text-align:center;padding:1rem;">⏳ GitHub kontrol ediliyor...</div>';
+            document.getElementById('btn-refresh-status').disabled = true;
+            try {
+                const d = await fetch('/api/git/status').then(r => r.json());
+                let aheadBadge  = d.ahead  > 0 ? `<span class="badge-ahead">↑ ${d.ahead} commit ileride</span>` : '';
+                let behindBadge = d.behind > 0 ? `<span class="badge-behind">↓ ${d.behind} commit geride</span>` : '';
+                let syncBadge   = (!d.ahead && !d.behind) ? '<span class="badge-ok">✓ Senkronize</span>' : '';
+                let dirtyBadge  = d.dirty_count > 0
+                    ? `<span class="badge-behind">${d.dirty_count} commit edilmemiş dosya</span>`
+                    : '<span class="badge-ok">Temiz</span>';
+                let diffHtml = '';
+                if (d.diff_stat) {
+                    const lines = d.diff_stat.split('\n').map(l => {
+                        if (l.match(/\+/)) return `<span style="color:#4ade80">${l}</span>`;
+                        if (l.match(/-/))   return `<span style="color:#f87171">${l}</span>`;
+                        return l;
+                    }).join('\n');
+                    diffHtml = `<div style="margin-top:.75rem;"><div style="font-size:.78rem;font-weight:600;color:#64748b;margin-bottom:.4rem;">Değişen dosyalar:</div><div class="diff-box">${lines}</div></div>`;
+                }
+                box.innerHTML = `
+                    <div class="sync-row"><label>Senkronizasyon</label><span>${aheadBadge}${behindBadge}${syncBadge}</span></div>
+                    <div class="sync-row"><label>Yerel değişiklikler</label><span>${dirtyBadge}</span></div>
+                    <div class="sync-row"><label>Son yerel commit</label><span>${d.last_local}</span></div>
+                    <div class="sync-row"><label>Son GitHub commit</label><span>${d.last_remote}</span></div>
+                    ${diffHtml}`;
+            } catch(e) {
+                box.innerHTML = `<div style="color:#e53e3e;font-size:.85rem;padding:.5rem;">❌ ${e.message}</div>`;
+            }
+            document.getElementById('btn-refresh-status').disabled = false;
+        }
+
+        async function gitPush() {
+            const btn = document.getElementById('btn-push');
+            const msg = document.getElementById('commit-message').value.trim();
+            btn.disabled = true; btn.textContent = '⏳ Yükleniyor...';
+            showGitLog('Push başlatılıyor...');
+            try {
+                const d = await fetch('/api/git/push', {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({message: msg})
+                }).then(r => r.json());
+                if (d.success) {
+                    showGitLog(d.had_changes ? '✅ Push başarılı!\n' + d.output : '✅ Değişiklik yok, push gerekmedi.\n' + d.output);
+                    toast('✅ GitHub\'a yüklendi!');
+                    document.getElementById('commit-message').value = '';
+                    setTimeout(loadGitStatus, 1500);
+                } else {
+                    showGitLog('❌ Push hatası:\n' + d.error);
+                    toast('❌ Push başarısız', false);
+                }
+            } catch(e) { showGitLog('❌ ' + e.message); }
+            btn.disabled = false; btn.textContent = '⬆️ GitHub\'a Yükle (Push)';
+        }
+
+        async function gitPull() {
+            const btn = document.getElementById('btn-pull');
+            btn.disabled = true; btn.textContent = '⏳ Çekiliyor...';
+            showGitLog('Pull başlatılıyor...');
+            try {
+                const d = await fetch('/api/git/pull', {method:'POST'}).then(r => r.json());
+                if (d.success) {
+                    if (d.already_up) {
+                        showGitLog('✅ Zaten güncel.'); toast('✅ Zaten güncel');
+                    } else {
+                        showGitLog('✅ Pull tamam! Uygulama yeniden başlıyor...\n' + d.output);
+                        toast('✅ Güncellendi! Sayfa yenilenecek...');
+                        setTimeout(() => location.reload(), 4000);
+                    }
+                    setTimeout(loadGitStatus, 1500);
+                } else {
+                    showGitLog('❌ Pull hatası:\n' + d.error); toast('❌ Pull başarısız', false);
+                }
+            } catch(e) { showGitLog('❌ ' + e.message); }
+            btn.disabled = false; btn.textContent = '⬇️ GitHub\'dan Güncelle (Pull)';
+        }
+
+        async function saveAutoPull() {
+            const interval = parseInt(document.getElementById('auto-pull-interval').value);
+            const d = await fetch('/api/git/auto-pull/set', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({interval})
+            }).then(r => r.json());
+            toast(d.success
+                ? (interval > 0 ? `✅ Otomatik pull: her ${interval} dk` : '✅ Otomatik pull kapalı')
+                : '❌ Kaydedilemedi', d.success);
+        }
+
+        async function loadAutoPullSetting() {
+            try {
+                const d = await fetch('/api/git/auto-pull/status').then(r => r.json());
+                const sel = document.getElementById('auto-pull-interval');
+                if (sel) sel.value = String(d.interval || 0);
+            } catch(e) {}
+        }
+
+        function showGitLog(text) {
+            const box = document.getElementById('git-log');
+            box.style.display = 'block';
+            box.textContent = text;
+            box.scrollTop = box.scrollHeight;
         }
     </script>
 

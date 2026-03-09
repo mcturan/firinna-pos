@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 import database as db
 from printer import ThermalPrinter
 import os
+import subprocess
+import threading
+import time
 from datetime import datetime
 from werkzeug.utils import secure_filename
 
@@ -778,6 +781,164 @@ def debug_transactions():
         return jsonify({'error': str(e), 'trace': traceback.format_exc()})
 
 
+# ===== GİTHUB SYNC (#40) =====
+
+GIT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def run_git(args, timeout=30):
+    """Git komutunu çalıştır, (success, output) döndür"""
+    try:
+        result = subprocess.run(
+            ['/usr/bin/git'] + args,
+            cwd=GIT_DIR,
+            capture_output=True, text=True, timeout=timeout
+        )
+        out = (result.stdout + result.stderr).strip()
+        return result.returncode == 0, out
+    except subprocess.TimeoutExpired:
+        return False, 'Zaman aşımı (30s)'
+    except Exception as e:
+        return False, str(e)
+
+@app.route('/api/git/status', methods=['GET'])
+def api_git_status():
+    """Yerel ile GitHub arasındaki farkı göster"""
+    # Önce fetch yap
+    run_git(['fetch', 'origin', 'main'])
+    
+    # Kaç commit geride/ileride?
+    ok, ahead = run_git(['rev-list', '--count', 'origin/main..HEAD'])
+    ok2, behind = run_git(['rev-list', '--count', 'HEAD..origin/main'])
+    ahead = int(ahead) if ok and ahead.isdigit() else 0
+    behind = int(behind) if ok2 and behind.isdigit() else 0
+    
+    # Değişen dosyalar (local vs origin)
+    ok3, diff_stat = run_git(['diff', '--stat', 'origin/main'])
+    
+    # Son yerel commit
+    ok4, last_local = run_git(['log', '-1', '--pretty=%h %s (%ar)', 'HEAD'])
+    
+    # Son uzak commit
+    ok5, last_remote = run_git(['log', '-1', '--pretty=%h %s (%ar)', 'origin/main'])
+    
+    # Kirli dosyalar (commit edilmemiş değişiklikler)
+    ok6, dirty = run_git(['status', '--short'])
+    
+    return jsonify({
+        'ahead': ahead,
+        'behind': behind,
+        'diff_stat': diff_stat if ok3 else '',
+        'last_local': last_local if ok4 else '?',
+        'last_remote': last_remote if ok5 else '?',
+        'dirty': dirty if ok6 else '',
+        'dirty_count': len([l for l in dirty.split('\n') if l.strip()]) if dirty else 0
+    })
+
+@app.route('/api/git/push', methods=['POST'])
+def api_git_push():
+    """Tüm değişiklikleri commit + push"""
+    data = request.json or {}
+    msg = data.get('message', '').strip()
+    if not msg:
+        now = datetime.now().strftime('%d.%m.%Y %H:%M')
+        msg = f'Güncelleme — {now}'
+    
+    # Commit edilmemiş değişiklik var mı?
+    ok, status = run_git(['status', '--short'])
+    has_changes = bool(status.strip())
+    
+    if has_changes:
+        ok1, out1 = run_git(['add', '-A'])
+        if not ok1:
+            return jsonify({'success': False, 'error': 'git add hatası: ' + out1})
+        
+        ok2, out2 = run_git(['commit', '-m', msg])
+        if not ok2:
+            return jsonify({'success': False, 'error': 'git commit hatası: ' + out2})
+    
+    ok3, out3 = run_git(['push', 'origin', 'main'], timeout=60)
+    if not ok3:
+        return jsonify({'success': False, 'error': 'git push hatası: ' + out3})
+    
+    return jsonify({
+        'success': True,
+        'had_changes': has_changes,
+        'output': out3
+    })
+
+@app.route('/api/git/pull', methods=['POST'])
+def api_git_pull():
+    """GitHub'tan en son sürümü çek"""
+    ok, out = run_git(['pull', 'origin', 'main'], timeout=60)
+    if not ok:
+        return jsonify({'success': False, 'error': out})
+    
+    already_up = 'Already up to date' in out or 'Zaten güncel' in out
+    
+    if not already_up:
+        # Servis restart et (değişiklikler aktif olsun)
+        try:
+            subprocess.Popen(['sudo', 'systemctl', 'restart', 'firinna-pos'])
+        except:
+            pass
+    
+    return jsonify({
+        'success': True,
+        'already_up': already_up,
+        'output': out
+    })
+
+@app.route('/api/git/auto-pull/status', methods=['GET'])
+def api_auto_pull_status():
+    interval = db.get_setting('git_auto_pull_interval', '0')
+    return jsonify({'interval': int(interval)})
+
+@app.route('/api/git/auto-pull/set', methods=['POST'])
+def api_auto_pull_set():
+    data = request.json or {}
+    interval = int(data.get('interval', 0))  # dakika, 0 = kapalı
+    db.set_setting('git_auto_pull_interval', str(interval))
+    if interval > 0:
+        start_auto_pull(interval)
+    return jsonify({'success': True, 'interval': interval})
+
+# --- Auto-pull arka plan iş parçacığı ---
+_auto_pull_timer = None
+
+def start_auto_pull(interval_minutes):
+    global _auto_pull_timer
+    if _auto_pull_timer:
+        _auto_pull_timer.cancel()
+    if interval_minutes <= 0:
+        return
+    
+    def do_pull():
+        global _auto_pull_timer
+        ok, out = run_git(['fetch', 'origin', 'main'])
+        ok2, behind = run_git(['rev-list', '--count', 'HEAD..origin/main'])
+        if ok2 and behind.strip().isdigit() and int(behind.strip()) > 0:
+            run_git(['pull', 'origin', 'main'])
+            # Sadece gerçekten pull yapılırsa restart
+            try:
+                subprocess.Popen(['sudo', 'systemctl', 'restart', 'firinna-pos'])
+            except:
+                pass
+        # Bir sonraki kontrol
+        _auto_pull_timer = threading.Timer(interval_minutes * 60, do_pull)
+        _auto_pull_timer.daemon = True
+        _auto_pull_timer.start()
+    
+    _auto_pull_timer = threading.Timer(interval_minutes * 60, do_pull)
+    _auto_pull_timer.daemon = True
+    _auto_pull_timer.start()
+
 if __name__ == '__main__':
     db.init_db()
+    # Auto-pull başlat (eğer ayarlıysa)
+    try:
+        interval = int(db.get_setting('git_auto_pull_interval', '0'))
+        if interval > 0:
+            start_auto_pull(interval)
+    except:
+        pass
     app.run(host='0.0.0.0', port=5000, debug=True)
