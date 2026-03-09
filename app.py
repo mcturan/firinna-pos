@@ -1313,21 +1313,87 @@ def debug_transactions():
 # ===== GİTHUB SYNC (#40) =====
 
 GIT_DIR = os.path.dirname(os.path.abspath(__file__))
+GIT_CRED_FILE = os.path.join(GIT_DIR, '.git_credentials.json')
+
+def get_git_credentials():
+    """Kayıtlı GitHub kullanıcı adı ve token'ı oku"""
+    try:
+        if os.path.exists(GIT_CRED_FILE):
+            with open(GIT_CRED_FILE) as f:
+                return json.load(f)
+    except:
+        pass
+    return {'username': '', 'token': ''}
+
+def get_git_remote_url():
+    """Credential varsa URL'ye göm, yoksa düz URL döndür"""
+    cred = get_git_credentials()
+    if cred.get('username') and cred.get('token'):
+        return f"https://{cred['username']}:{cred['token']}@github.com/{cred['username']}/firinna-pos.git"
+    return None
 
 def run_git(args, timeout=30):
     """Git komutunu çalıştır, (success, output) döndür"""
     try:
+        # push/pull/fetch komutlarında credential URL kullan
+        actual_args = list(args)
+        if args and args[0] in ('push', 'pull', 'fetch'):
+            url = get_git_remote_url()
+            if url:
+                # origin yerine doğrudan URL ile çalış
+                new_args = [args[0]]
+                for a in args[1:]:
+                    if a == 'origin':
+                        new_args.append(url)
+                    else:
+                        new_args.append(a)
+                actual_args = new_args
         result = subprocess.run(
-            ['/usr/bin/git'] + args,
+            ['/usr/bin/git'] + actual_args,
             cwd=GIT_DIR,
             capture_output=True, text=True, timeout=timeout
         )
         out = (result.stdout + result.stderr).strip()
+        # Token'ı log'dan gizle
+        cred = get_git_credentials()
+        if cred.get('token'):
+            out = out.replace(cred['token'], '***')
         return result.returncode == 0, out
     except subprocess.TimeoutExpired:
         return False, 'Zaman aşımı (30s)'
     except Exception as e:
         return False, str(e)
+
+@app.route('/api/git/credentials', methods=['GET'])
+def api_git_credentials_get():
+    cred = get_git_credentials()
+    return jsonify({'username': cred.get('username',''), 'has_token': bool(cred.get('token',''))})
+
+@app.route('/api/git/credentials', methods=['POST'])
+def api_git_credentials_set():
+    data = request.json or {}
+    username = data.get('username','').strip()
+    token    = data.get('token','').strip()
+    existing = get_git_credentials()
+    # Token boş gelirse eskisini koru
+    if not token:
+        token = existing.get('token','')
+    try:
+        with open(GIT_CRED_FILE, 'w') as f:
+            json.dump({'username': username, 'token': token}, f)
+        # .gitignore'a ekle
+        gi = os.path.join(GIT_DIR, '.gitignore')
+        gi_content = open(gi).read() if os.path.exists(gi) else ''
+        if '.git_credentials.json' not in gi_content:
+            with open(gi, 'a') as f:
+                f.write('\n.git_credentials.json\n')
+        # remote URL'yi de güncelle
+        if username and token:
+            url = f"https://{username}:{token}@github.com/{username}/firinna-pos.git"
+            subprocess.run(['/usr/bin/git', 'remote', 'set-url', 'origin', url], cwd=GIT_DIR)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/api/git/status', methods=['GET'])
 def api_git_status():
