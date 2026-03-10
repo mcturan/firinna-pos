@@ -1,5 +1,5 @@
 -- Fırınna POS DB Dump
--- 2026-03-10 03:22:12
+-- 2026-03-10 10:01:48
 
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
@@ -109,6 +109,11 @@ INSERT INTO "order_items" VALUES(80,24,28,6,100.0,'2026-03-10 00:03:17',0,'','Ma
 INSERT INTO "order_items" VALUES(81,24,22,2,40.0,'2026-03-10 00:03:17',0,'','Madensuyu');
 INSERT INTO "order_items" VALUES(82,24,11,1,250.0,'2026-03-10 00:03:17',0,'','Omlet Kavurmalı');
 INSERT INTO "order_items" VALUES(83,24,23,1,70.0,'2026-03-10 00:03:17',0,'','Sarıyer Kola');
+INSERT INTO "order_items" VALUES(84,25,6,2,250.0,'2026-03-10 00:30:46',0,'','Menemen');
+INSERT INTO "order_items" VALUES(85,25,14,3,300.0,'2026-03-10 00:30:46',0,'','Bazlama Kavurmalı');
+INSERT INTO "order_items" VALUES(86,25,15,6,40.0,'2026-03-10 00:30:46',0,'','Çay');
+INSERT INTO "order_items" VALUES(87,25,18,1,120.0,'2026-03-10 00:30:46',0,'','Kahve Americano');
+INSERT INTO "order_items" VALUES(88,25,23,1,70.0,'2026-03-10 00:30:46',0,'','Sarıyer Kola');
 CREATE TABLE orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         table_id INTEGER,
@@ -137,6 +142,7 @@ INSERT INTO "orders" VALUES(21,1,620.0,'closed','2026-01-28T23:41','2026-01-28T2
 INSERT INTO "orders" VALUES(22,1,270.0,'closed','2026-01-28T23:42','2026-01-28T23:42',NULL,0.0,'',270.0,0.0,0.0,'cash');
 INSERT INTO "orders" VALUES(23,1,2720.0,'closed','2026-01-30T23:44','2026-01-30T23:44',NULL,0.0,'',2720.0,0.0,0.0,'cash');
 INSERT INTO "orders" VALUES(24,1,20650.0,'closed','2026-02-01T23:48','2026-02-01T23:48',NULL,0.0,'',20650.0,0.0,0.0,'cash');
+INSERT INTO "orders" VALUES(25,1,1830.0,'closed','2026-02-24T00:28','2026-02-24T00:28',NULL,0.0,'',1830.0,0.0,0.0,'cash');
 CREATE TABLE products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -311,8 +317,8 @@ INSERT INTO "sqlite_sequence" VALUES('zones',3);
 INSERT INTO "sqlite_sequence" VALUES('tables',9);
 INSERT INTO "sqlite_sequence" VALUES('categories',10);
 INSERT INTO "sqlite_sequence" VALUES('products',28);
-INSERT INTO "sqlite_sequence" VALUES('orders',24);
-INSERT INTO "sqlite_sequence" VALUES('order_items',83);
+INSERT INTO "sqlite_sequence" VALUES('orders',25);
+INSERT INTO "sqlite_sequence" VALUES('order_items',88);
 INSERT INTO "sqlite_sequence" VALUES('telegram_contacts',4);
 INSERT INTO "sqlite_sequence" VALUES('transactions',3);
 INSERT INTO "sqlite_sequence" VALUES('stock_items',16);
