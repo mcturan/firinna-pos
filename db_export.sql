@@ -1,5 +1,5 @@
 -- Fırınna POS DB Dump
--- 2026-03-10 10:01:48
+-- 2026-03-10 10:43:33
 
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
@@ -304,6 +304,23 @@ CREATE TABLE transactions (
 INSERT INTO "transactions" VALUES(1,'2026-03-09','in',750.0,'satis','card','Sipariş #4',4,'2026-03-09 19:17:52');
 INSERT INTO "transactions" VALUES(2,'2026-03-09','in',260.0,'satis','card','Sipariş #5',5,'2026-03-09 19:50:27');
 INSERT INTO "transactions" VALUES(3,'2026-03-09','in',760.0,'satis','cash','Sipariş #6',6,'2026-03-09 20:07:07');
+INSERT INTO "transactions" VALUES(4,'2026-01-17','in',500.0,'satis','cash','Sipariş #11',11,'2026-01-17T23:31');
+INSERT INTO "transactions" VALUES(5,'2026-01-17','in',650.0,'satis','cash','Sipariş #13',13,'2026-01-17T23:33');
+INSERT INTO "transactions" VALUES(6,'2026-01-17','in',160.0,'satis','cash','Sipariş #14',14,'2026-01-17T23:34');
+INSERT INTO "transactions" VALUES(7,'2026-01-18','in',160.0,'satis','cash','Sipariş #15',15,'2026-01-18T23:34');
+INSERT INTO "transactions" VALUES(8,'2026-01-20','in',430.0,'satis','cash','Sipariş #16',16,'2026-01-20T23:36');
+INSERT INTO "transactions" VALUES(9,'2026-01-20','in',250.0,'satis','cash','Sipariş #17',17,'2026-01-20T23:36');
+INSERT INTO "transactions" VALUES(10,'2026-01-23','in',960.0,'satis','cash','Sipariş #18',18,'2026-01-23T23:37');
+INSERT INTO "transactions" VALUES(11,'2026-01-25','in',1200.0,'satis','cash','Sipariş #20',20,'2026-01-25T23:40');
+INSERT INTO "transactions" VALUES(12,'2026-01-28','in',620.0,'satis','cash','Sipariş #21',21,'2026-01-28T23:41');
+INSERT INTO "transactions" VALUES(13,'2026-01-28','in',270.0,'satis','cash','Sipariş #22',22,'2026-01-28T23:42');
+INSERT INTO "transactions" VALUES(14,'2026-01-30','in',2720.0,'satis','cash','Sipariş #23',23,'2026-01-30T23:44');
+INSERT INTO "transactions" VALUES(15,'2026-02-01','in',20650.0,'satis','cash','Sipariş #24',24,'2026-02-01T23:48');
+INSERT INTO "transactions" VALUES(16,'2026-02-23','in',330.0,'satis','cash','Sipariş #9',9,'2026-02-23T23:28');
+INSERT INTO "transactions" VALUES(17,'2026-02-23','in',990.0,'satis','cash','Sipariş #10',10,'2026-02-23T23:30');
+INSERT INTO "transactions" VALUES(18,'2026-02-24','in',1830.0,'satis','cash','Sipariş #25',25,'2026-02-24T00:28');
+INSERT INTO "transactions" VALUES(19,'2026-03-09','in',420.0,'satis','cash','Sipariş #12',12,'2026-03-09T23:32');
+INSERT INTO "transactions" VALUES(20,'2026-03-09','in',580.0,'satis','cash','Sipariş #19',19,'2026-03-09T23:39');
 CREATE TABLE zones (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -320,7 +337,7 @@ INSERT INTO "sqlite_sequence" VALUES('products',28);
 INSERT INTO "sqlite_sequence" VALUES('orders',25);
 INSERT INTO "sqlite_sequence" VALUES('order_items',88);
 INSERT INTO "sqlite_sequence" VALUES('telegram_contacts',4);
-INSERT INTO "sqlite_sequence" VALUES('transactions',3);
+INSERT INTO "sqlite_sequence" VALUES('transactions',20);
 INSERT INTO "sqlite_sequence" VALUES('stock_items',16);
 INSERT INTO "sqlite_sequence" VALUES('recipes',16);
 COMMIT;
