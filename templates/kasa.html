@@ -169,8 +169,8 @@
 
     <div class="alert-panel" id="alertPanel">
         <div class="alert-panel-header">
-            <span>⚠️ Düşük Stok Uyarıları</span>
-            <a href="/stok" style="color:white;font-size:.8rem;text-decoration:underline;">Stoka Git →</a>
+            <span>⚠️ Stok Uyarıları</span>
+            <a href="/stok" style="color:white;font-size:.82rem;font-weight:700;text-decoration:none;background:rgba(255,255,255,.2);padding:.2rem .65rem;border-radius:12px;">📦 Stoka Git →</a>
         </div>
         <div class="alert-panel-body" id="alertPanelBody">
             <div class="alert-empty">Yükleniyor...</div>
@@ -509,14 +509,22 @@
             if (items.length > 0) {
                 badge.textContent = items.length;
                 badge.style.display = 'flex';
-                body.innerHTML = items.map(i=>`
-                    <div class="alert-item">
-                        <span class="alert-item-name">${i.name}</span>
+                body.innerHTML = items.map(i => {
+                    const isNeg = i.current_qty < 0;
+                    const negBadge = isNeg
+                        ? ' <span style="background:#ede9fe;color:#6d28d9;padding:.1rem .4rem;border-radius:10px;font-size:.7rem;font-weight:700;">EKSİ</span>'
+                        : '';
+                    const minText = i.min_quantity > 0
+                        ? `<span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>`
+                        : '';
+                    return `<div class="alert-item" style="${isNeg ? 'border-left:3px solid #7c3aed;padding-left:.5rem;' : ''}">
+                        <span class="alert-item-name">${isNeg ? '📉' : '⚠️'} ${i.name}${negBadge}</span>
                         <span class="alert-item-qty">
-                            <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
-                            <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
+                            <span class="cur" style="${isNeg ? 'color:#7c3aed;font-weight:700;' : ''}">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
+                            ${minText}
                         </span>
-                    </div>`).join('');
+                    </div>`;
+                }).join('');
             } else {
                 badge.style.display = 'none';
                 body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';

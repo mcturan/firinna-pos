@@ -64,8 +64,11 @@
                          color:#4a5568; font-weight:600; border-bottom:2px solid #e2e8f0; }
         .stok-table td { padding:.65rem .9rem; border-bottom:1px solid #f0f0f0; }
         .stok-table tr:hover td { background:#fafafa; }
-        .qty-low { color:#dc2626; font-weight:700; }
-        .qty-ok  { color:#2d6a4f; font-weight:700; }
+        .qty-low  { color:#dc2626; font-weight:700; }
+        .qty-ok   { color:#2d6a4f; font-weight:700; }
+        .qty-neg  { color:#7c3aed; font-weight:800; }
+        .neg-tag  { background:#ede9fe; color:#6d28d9; padding:.15rem .5rem;
+                    border-radius:20px; font-size:.7rem; font-weight:700; margin-left:.3rem; }
 
         .badge { padding:.2rem .6rem; border-radius:20px; font-size:.72rem; font-weight:700; }
         .badge-in  { background:#d1fae5; color:#065f46; }
@@ -134,8 +137,8 @@
 
     <div class="alert-panel" id="alertPanel">
         <div class="alert-panel-header">
-            <span>⚠️ Düşük Stok Uyarıları</span>
-            <a href="/stok" style="color:white;font-size:.8rem;text-decoration:underline;">Stoka Git →</a>
+            <span>⚠️ Stok Uyarıları</span>
+            <a href="/stok" style="color:white;font-size:.82rem;font-weight:700;text-decoration:none;background:rgba(255,255,255,.2);padding:.2rem .65rem;border-radius:12px;">📦 Stoka Git →</a>
         </div>
         <div class="alert-panel-body" id="alertPanelBody">
             <div class="alert-empty">Yükleniyor...</div>
@@ -160,6 +163,7 @@
             <div class="durum-grid" id="durumGrid">
                 <div class="dur-item"><div class="dur-val" id="dt-toplam">...</div><div class="dur-lbl">Toplam Kalem</div></div>
                 <div class="dur-item"><div class="dur-val" style="color:#dc2626" id="dt-kritik">...</div><div class="dur-lbl">⚠️ Kritik Stok</div></div>
+                <div class="dur-item"><div class="dur-val" style="color:#7c3aed" id="dt-negatif">...</div><div class="dur-lbl">📉 Eksi Stok</div></div>
                 <div class="dur-item"><div class="dur-val" style="color:#2d6a4f" id="dt-kategori">...</div><div class="dur-lbl">Kategori</div></div>
                 <div class="dur-item"><div class="dur-val" style="color:#7c3aed" id="dt-maliyet">...</div><div class="dur-lbl">Toplam Maliyet</div></div>
             </div>
@@ -287,24 +291,35 @@
     // ── Anlık Durum ──
     function updateDurum() {
         const toplam  = stockItems.length;
-        const kritik  = stockItems.filter(s=>(s.current_qty||0)<=s.min_quantity && s.min_quantity>0);
+        const negatif = stockItems.filter(s=>(s.current_qty||0)<0);
+        const kritik  = stockItems.filter(s=>{
+            const q = s.current_qty||0;
+            return q<0 || (q<=s.min_quantity && s.min_quantity>0);
+        });
         const katSet  = new Set(stockItems.map(s=>s.category));
         const maliyet = stockItems.reduce((sum,s)=>{
-            return sum + ((s.current_qty||0) * (s.cost_per_unit||0));
+            return sum + Math.max(0,(s.current_qty||0)) * (s.cost_per_unit||0);
         }, 0);
 
         document.getElementById('dt-toplam').textContent   = toplam;
         document.getElementById('dt-kritik').textContent   = kritik.length || '✅ 0';
+        document.getElementById('dt-negatif').textContent  = negatif.length ? '❗'+negatif.length : '✅ 0';
         document.getElementById('dt-kategori').textContent = katSet.size;
         document.getElementById('dt-maliyet').textContent  =
             maliyet.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₺';
 
+        // Kritik şerit — eksi olanlar + düşük olanlar
         const serit = document.getElementById('kritikSerit');
         if (kritik.length > 0) {
             serit.classList.add('show');
-            document.getElementById('kritikItems').innerHTML = kritik.map(s=>`
-                <span class="kritik-tag">${s.name} — ${Number(s.current_qty||0).toFixed(1)} ${s.unit}</span>
-            `).join('');
+            document.getElementById('kritikItems').innerHTML = kritik.map(s=>{
+                const qty = s.current_qty||0;
+                const isNeg = qty < 0;
+                return `<span class="kritik-tag" style="${isNeg?'background:#ede9fe;color:#6d28d9;':''}">
+                    ${isNeg?'📉':'⚠️'} ${s.name} — ${qty.toFixed(2)} ${s.unit}
+                    ${isNeg?'<strong>(EKSİ)</strong>':''}
+                </span>`;
+            }).join('');
         } else {
             serit.classList.remove('show');
         }
@@ -313,7 +328,8 @@
         document.getElementById('durumZaman').textContent =
             now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})+' güncellendi';
         document.getElementById('stokSubtitle').textContent =
-            toplam+' kalem, '+kritik.length+' kritik';
+            toplam+' kalem | '+kritik.length+' kritik'+
+            (negatif.length?' | '+negatif.length+' eksi stok':'');
     }
 
     // ── Stok Yükle ──
@@ -337,17 +353,27 @@
         let rows = '';
         stockItems.forEach(s=>{
             const qty = s.current_qty||0;
-            const low = qty<=s.min_quantity && s.min_quantity>0;
-            rows += `<tr>
-                <td><strong>${s.name}</strong></td>
+            const isNeg = qty < 0;
+            const isLow = !isNeg && qty<=s.min_quantity && s.min_quantity>0;
+            const qtyClass = isNeg ? 'qty-neg' : isLow ? 'qty-low' : 'qty-ok';
+            const qtyIcon  = isNeg ? '📉' : isLow ? '⚠️' : '';
+            const negHint  = isNeg
+                ? `<div style="font-size:.72rem;color:#7c3aed;margin-top:.2rem;">
+                     Düzeltme için <strong>+${Math.abs(qty).toFixed(2)} ${s.unit}</strong> giriş yapın
+                   </div>`
+                : '';
+            rows += `<tr style="${isNeg?'background:#faf5ff;':''}">
+                <td><strong>${s.name}</strong>${negHint}</td>
                 <td><span style="color:#718096;font-size:.84rem;">${s.category}</span></td>
                 <td>${s.unit}</td>
-                <td class="${low?'qty-low':'qty-ok'}">${qty.toFixed(2)} ${s.unit} ${low?'⚠️':''}</td>
+                <td class="${qtyClass}">${qtyIcon} ${qty.toFixed(2)} ${s.unit}
+                    ${isNeg?'<span class="neg-tag">EKSİ</span>':''}</td>
                 <td style="color:#94a3b8;">${s.min_quantity>0?s.min_quantity+' '+s.unit:'—'}</td>
                 <td style="color:#718096;">${s.cost_per_unit?s.cost_per_unit.toFixed(2)+' ₺':'—'}</td>
                 <td style="white-space:nowrap;">
-                    <button class="btn btn-secondary" style="padding:.3rem .7rem;font-size:.83rem;"
-                        onclick="openMoveModal(${s.id},'${s.name.replace(/'/g,"\\'")}','${s.unit}')">📥 Hareket</button>
+                    <button class="btn ${isNeg?'btn-warning':'btn-secondary'}" style="padding:.3rem .7rem;font-size:.83rem;"
+                        onclick="openMoveModal(${s.id},'${s.name.replace(/'/g,"\\'")}','${s.unit}')">
+                        ${isNeg?'📥 Düzelt':'📥 Hareket'}</button>
                     <button style="background:none;border:none;cursor:pointer;font-size:.95rem;padding:0 .3rem;"
                         onclick="editStokItem(${s.id})" data-name="${s.name}" data-unit="${s.unit}"
                         data-cat="${s.category}" data-min="${s.min_quantity||0}" data-cost="${s.cost_per_unit||0}"
@@ -636,14 +662,22 @@
             if (items.length>0) {
                 badge.textContent   = items.length;
                 badge.style.display = 'flex';
-                body.innerHTML = items.map(i=>`
-                    <div class="alert-item">
-                        <span class="alert-item-name">${i.name}</span>
+                body.innerHTML = items.map(i => {
+                    const isNeg = i.current_qty < 0;
+                    const negBadge = isNeg
+                        ? ' <span style="background:#ede9fe;color:#6d28d9;padding:.1rem .4rem;border-radius:10px;font-size:.7rem;font-weight:700;">EKSİ</span>'
+                        : '';
+                    const minText = i.min_quantity > 0
+                        ? `<span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>`
+                        : '';
+                    return `<div class="alert-item" style="${isNeg ? 'border-left:3px solid #7c3aed;padding-left:.5rem;' : ''}">
+                        <span class="alert-item-name">${isNeg ? '📉' : '⚠️'} ${i.name}${negBadge}</span>
                         <span class="alert-item-qty">
-                            <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
-                            <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
+                            <span class="cur" style="${isNeg ? 'color:#7c3aed;font-weight:700;' : ''}">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
+                            ${minText}
                         </span>
-                    </div>`).join('');
+                    </div>`;
+                }).join('');
             } else {
                 badge.style.display = 'none';
                 body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';

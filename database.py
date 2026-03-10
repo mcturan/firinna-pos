@@ -1310,10 +1310,12 @@ def delete_telegram_contact(contact_id):
     conn.close()
 
 def get_low_stock_items():
-    """Minimum stok altına düşmüş kalemleri döndür"""
+    """Minimum stok altına düşmüş veya eksi olan kalemleri döndür"""
     conn = get_db()
     items = conn.execute('''
-        SELECT * FROM (
+        SELECT *,
+               CASE WHEN current_qty < 0 THEN 1 ELSE 0 END as is_negative
+        FROM (
             SELECT s.*,
                    COALESCE((SELECT SUM(CASE WHEN movement_type='in' THEN quantity
                                             WHEN movement_type='out' THEN -quantity
@@ -1321,10 +1323,10 @@ def get_low_stock_items():
                     FROM stock_movements WHERE stock_item_id = s.id), 0) as current_qty
             FROM stock_items s
             WHERE s.active = 1
-              AND s.min_quantity > 0
         )
-        WHERE current_qty <= min_quantity
-        ORDER BY (current_qty - min_quantity) ASC
+        WHERE current_qty < 0
+           OR (min_quantity > 0 AND current_qty <= min_quantity)
+        ORDER BY current_qty ASC
     ''').fetchall()
     conn.close()
     return [dict(i) for i in items]
