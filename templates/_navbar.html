@@ -1,0 +1,103 @@
+<!-- ═══════════════════════════════════════════════
+     Fırınna POS — Ortak Navbar
+     Tüm sayfalarda: {% include '_navbar.html' %}
+     ═══════════════════════════════════════════════ -->
+<nav class="navbar">
+    <a href="/" class="nav-brand" style="text-decoration:none;color:inherit;">🍽️ Fırınna POS</a>
+    <div class="nav-links">
+        <a href="/" {% if request.path == '/' %}class="active"{% endif %}>Masalar</a>
+        <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">
+            🔔<span class="alert-badge" id="alertBadge" style="display:none">0</span>
+        </button>
+        <div class="nav-dropdown" id="navDropdown">
+            <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
+            <div class="nav-dropdown-menu">
+                <a href="/kasa"     {% if request.path == '/kasa'     %}class="active"{% endif %}>💰 Kasa</a>
+                <a href="/muhasebe" {% if request.path == '/muhasebe' %}class="active"{% endif %}>📒 Muhasebe</a>
+                <hr>
+                <a href="/products" {% if request.path == '/products' %}class="active"{% endif %}>🍞 Ürünler</a>
+                <a href="/stok"     {% if request.path == '/stok'     %}class="active"{% endif %}>📦 Stok</a>
+                <a href="/recete"   {% if request.path == '/recete'   %}class="active"{% endif %}>🧾 Reçete</a>
+                <a href="/expenses" {% if request.path == '/expenses' %}class="active"{% endif %}>📤 Masraflar</a>
+                <a href="/tables"   {% if request.path == '/tables'   %}class="active"{% endif %}>🪑 Masa Yönetimi</a>
+                <hr>
+                <a href="/backup"   {% if request.path == '/backup'   %}class="active"{% endif %}>💾 Yedek</a>
+                <a href="/settings" {% if request.path == '/settings' %}class="active"{% endif %}>⚙️ Ayarlar</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Stok Uyarı Paneli -->
+<div class="alert-panel" id="alertPanel">
+    <div class="alert-panel-header">
+        <span>⚠️ Stok Uyarıları</span>
+        <a href="/stok" style="color:white;font-size:.82rem;font-weight:700;text-decoration:none;
+           background:rgba(255,255,255,.2);padding:.2rem .65rem;border-radius:12px;">📦 Stoka Git →</a>
+    </div>
+    <div class="alert-panel-body" id="alertPanelBody">
+        <div class="alert-empty">Yükleniyor...</div>
+    </div>
+</div>
+
+<script>
+// ── Navbar ──────────────────────────────────────────────
+function toggleNav() {
+    document.getElementById('navDropdown').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+    var dd = document.getElementById('navDropdown');
+    var p  = document.getElementById('alertPanel');
+    var b  = document.getElementById('alertBtn');
+    if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+    if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove('open');
+});
+
+// ── Stok Uyarı Çanı ─────────────────────────────────────
+function toggleAlertPanel() {
+    var badge = document.getElementById('alertBadge');
+    // Uyarı varsa → direkt stok sayfasına git
+    if (badge && badge.style.display !== 'none' && parseInt(badge.textContent) > 0) {
+        window.location.href = '/stok';
+        return;
+    }
+    // Uyarı yoksa → paneli aç/kapat
+    var p = document.getElementById('alertPanel');
+    if (p) p.classList.toggle('open');
+}
+
+async function loadAlerts() {
+    try {
+        var items = await fetch('/api/stock/alerts').then(r => r.json());
+        var badge = document.getElementById('alertBadge');
+        var body  = document.getElementById('alertPanelBody');
+        if (!badge || !body) return;
+        if (items.length > 0) {
+            badge.textContent   = items.length;
+            badge.style.display = 'flex';
+            body.innerHTML = items.map(function(i) {
+                var isNeg = i.current_qty < 0;
+                var negBadge = isNeg
+                    ? ' <span style="background:#ede9fe;color:#6d28d9;padding:.1rem .4rem;border-radius:10px;font-size:.7rem;font-weight:700;">EKSİ</span>'
+                    : '';
+                var minText = i.min_quantity > 0
+                    ? '<span class="min"> / min ' + Number(i.min_quantity).toFixed(1) + '</span>'
+                    : '';
+                return '<div class="alert-item" style="' + (isNeg ? 'border-left:3px solid #7c3aed;padding-left:.5rem;' : '') + '">'
+                    + '<span class="alert-item-name">' + (isNeg ? '📉' : '⚠️') + ' ' + i.name + negBadge + '</span>'
+                    + '<span class="alert-item-qty">'
+                    + '<span class="cur" style="' + (isNeg ? 'color:#7c3aed;font-weight:700;' : '') + '">'
+                    + Number(i.current_qty).toFixed(1) + ' ' + i.unit + '</span>'
+                    + minText + '</span></div>';
+            }).join('');
+        } else {
+            badge.style.display = 'none';
+            body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
+        }
+    } catch(e) {}
+}
+
+// Sayfa yüklenince ve her 60 sn'de yenile
+loadAlerts();
+setInterval(loadAlerts, 60000);
+</script>

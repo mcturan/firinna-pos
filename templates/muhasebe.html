@@ -4,446 +4,398 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhasebe - Fırınna POS</title>
+    <title>Ön Muhasebe - Fırınna POS</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <style>
         :root {
-            --green: #2d6a4f; --green2: #40916c; --red: #dc2626;
-            --blue: #3b82f6; --gold: #d97706; --bg: #f0f4f1;
+            --green:  #2d6a4f;
+            --green2: #40916c;
+            --red:    #e53e3e;
+            --blue:   #3b82f6;
+            --gold:   #d97706;
+            --bg:     #f0f4f1;
         }
         body { background: var(--bg); }
 
         .page-header {
             background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 60%, #40916c 100%);
-            color: white; padding: 1.4rem 2rem 1.2rem;
-            border-radius: 0 0 20px 20px; margin-bottom: 1.5rem;
-            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem;
+            color: white;
+            padding: 1.5rem 2rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 0 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
-        .page-header h1 { margin: 0; font-size: 1.4rem; font-weight: 700; }
-        .header-actions { display: flex; gap: .5rem; }
-        .hbtn { background: rgba(255,255,255,.2); color: white; border: 1px solid rgba(255,255,255,.4);
-                padding: .45rem .9rem; border-radius: 8px; font-weight: 600; cursor: pointer;
-                font-size: .82rem; }
+        .page-header h1 { margin: 0; font-size: 1.4rem; font-weight: 700; letter-spacing: .5px; }
+        .page-header p  { margin: .2rem 0 0; font-size: .85rem; opacity: .8; }
 
-        /* ── Genel Durum Paneli ── */
-        .durum-panel {
-            background: white; border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,.09); margin-bottom: 1.5rem; overflow: hidden;
+        /* Zaman sekmeler */
+        .period-bar {
+            display: flex;
+            gap: .4rem;
+            background: white;
+            border-radius: 12px;
+            padding: .4rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
-        .durum-header {
-            background: #1b4332; color: white; padding: .85rem 1.5rem;
-            font-weight: 700; font-size: .9rem; letter-spacing: .5px;
+        .period-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: .55rem .5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: .9rem;
+            font-weight: 600;
+            color: #718096;
+            background: none;
+            cursor: pointer;
+            transition: all .2s;
+            text-align: center;
         }
-        .durum-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            padding: 1.25rem 1.5rem; gap: 1rem;
-        }
-        .dur-item { text-align: center; padding: .85rem .5rem; }
-        .dur-val { font-size: 1.5rem; font-weight: 800; line-height: 1.1; }
-        .dur-lbl { font-size: .72rem; color: #94a3b8; font-weight: 600;
-                   text-transform: uppercase; letter-spacing: .4px; margin-top: .3rem; }
-        .dur-sub { font-size: .78rem; color: #a0aec0; margin-top: .15rem; }
+        .period-btn:hover { background: #f0f4f1; color: var(--green); }
+        .period-btn.active { background: var(--green); color: white; }
 
-        /* ── Bu Ay Şeridi ── */
-        .ay-panel {
-            background: white; border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,.09); margin-bottom: 1.5rem; overflow: hidden;
+        .date-range-row {
+            display: none;
+            gap: .75rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.25rem;
         }
-        .ay-header {
-            background: #0f4c2a; color: white; padding: .85rem 1.5rem;
-            font-weight: 700; font-size: .9rem;
+        .date-range-row.show { display: flex; }
+        .date-range-row input {
+            padding: .5rem .75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: .9rem;
+            font-family: inherit;
         }
-        .ay-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            padding: 1rem 1.5rem; gap: .75rem;
+        .date-range-row button {
+            padding: .5rem 1.25rem;
+            background: var(--green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: .9rem;
         }
-        .ay-item { text-align: center; background: #f8fafc; border-radius: 10px; padding: .75rem .5rem; }
-        .ay-val { font-size: 1.15rem; font-weight: 700; }
-        .ay-lbl { font-size: .71rem; color: #94a3b8; margin-top: .2rem;
-                  font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
 
-        /* ── Dönem Seçici ── */
-        .filter-bar {
-            background: white; border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,.09); margin-bottom: 1.5rem;
-            padding: 1.25rem 1.5rem;
+        /* Özet kartlar */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
-        .filter-title { font-weight: 700; color: #374151; margin-bottom: 1rem;
-                        font-size: .95rem; display: flex; align-items: center; gap: .4rem; }
-        .period-btns { display: flex; gap: .4rem; flex-wrap: wrap; }
-        .pb { padding: .45rem .9rem; border: 2px solid #e2e8f0; border-radius: 8px;
-              font-size: .85rem; font-weight: 600; color: #6b7280; background: white;
-              cursor: pointer; transition: all .18s; }
-        .pb:hover { border-color: var(--green); color: var(--green); }
-        .pb.active { border-color: var(--green); background: var(--green); color: white; }
-        .custom-range { display: none; gap: .6rem; align-items: center; flex-wrap: wrap; margin-top: .75rem; }
-        .custom-range.show { display: flex; }
-        .custom-range input { padding: .45rem .75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: .88rem; }
-        .btn-getir { padding: .45rem 1.1rem; background: var(--green); color: white; border: none;
-                     border-radius: 8px; font-weight: 600; cursor: pointer; font-size: .88rem; }
+        .sum-card {
+            background: white;
+            border-radius: 14px;
+            padding: 1.25rem 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .sum-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--accent, #e2e8f0);
+        }
+        .sum-card.green  { --accent: var(--green); }
+        .sum-card.red    { --accent: var(--red); }
+        .sum-card.blue   { --accent: var(--blue); }
+        .sum-card.gold   { --accent: var(--gold); }
+        .sum-card.teal   { --accent: #0891b2; }
+        .sum-card.purple { --accent: #7c3aed; }
 
-        /* ── Analiz Kartları ── */
+        .sum-icon  { font-size: 1.6rem; margin-bottom: .3rem; }
+        .sum-value { font-size: 1.5rem; font-weight: 800; color: #1a202c; line-height: 1; }
+        .sum-value.positive { color: var(--green); }
+        .sum-value.negative { color: var(--red); }
+        .sum-label { font-size: .75rem; color: #718096; margin-top: .35rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+
+        /* Bölüm kartlar */
         .card {
-            background: white; border-radius: 14px; padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,.07); margin-bottom: 1.25rem;
+            background: white;
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+            margin-bottom: 1.25rem;
         }
-        .card h3 { margin: 0 0 1.25rem; font-size: 1rem; color: #2d3748;
-                   display: flex; align-items: center; gap: .5rem; }
-
-        /* Dönem özet kartları */
-        .sum-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: .85rem; margin-bottom: 1.5rem; }
-        .sc { background: white; border-radius: 12px; padding: 1.1rem 1rem;
-              box-shadow: 0 2px 8px rgba(0,0,0,.07); text-align: center; position: relative; overflow: hidden; }
-        .sc::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background: var(--accent,#e2e8f0); }
-        .sc.green  { --accent: var(--green); }
-        .sc.red    { --accent: var(--red); }
-        .sc.blue   { --accent: var(--blue); }
-        .sc.gold   { --accent: var(--gold); }
-        .sc.teal   { --accent: #0891b2; }
-        .sc.purple { --accent: #7c3aed; }
-        .sc-icon  { font-size: 1.4rem; margin-bottom: .25rem; }
-        .sc-val   { font-size: 1.35rem; font-weight: 800; color: #1a202c; line-height: 1; }
-        .sc-lbl   { font-size: .72rem; color: #94a3b8; margin-top: .3rem;
-                    font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+        .card h3 { margin: 0 0 1.25rem; font-size: 1rem; color: #2d3748; display: flex; align-items: center; gap: .5rem; }
 
         /* Grafik */
         .chart-wrap { position: relative; height: 220px; }
 
-        /* Ödeme */
-        .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .pay-item { background: #f8fafc; border-radius: 10px; padding: 1rem; text-align: center; }
-        .pay-amount { font-size: 1.2rem; font-weight: 700; }
-        .pay-label  { font-size: .77rem; color: #94a3b8; margin-top: .2rem; }
-        .pay-bar-wrap { height: 5px; background: #e2e8f0; border-radius: 3px; margin-top: .5rem; }
+        /* Ödeme dağılımı */
+        .pay-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .pay-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .pay-amount { font-size: 1.3rem; font-weight: 700; }
+        .pay-label  { font-size: .78rem; color: #718096; margin-top: .2rem; }
+        .pay-bar-wrap { height: 6px; background: #e2e8f0; border-radius: 3px; margin-top: .5rem; }
         .pay-bar { height: 100%; border-radius: 3px; transition: width .6s; }
 
         /* Masraf kategoriler */
-        .exp-row { display: flex; justify-content: space-between; align-items: center;
-                   padding: .55rem 0; border-bottom: 1px solid #f0f4f1; }
-        .exp-row:last-child { border-bottom: none; }
-        .exp-name { font-weight: 600; font-size: .88rem; }
-        .exp-bar-wrap { flex:1; margin: 0 .75rem; height: 5px; background: #e2e8f0; border-radius: 3px; }
+        .expense-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .6rem 0;
+            border-bottom: 1px solid #f0f4f1;
+        }
+        .expense-row:last-child { border-bottom: none; }
+        .exp-name  { font-weight: 600; font-size: .9rem; }
+        .exp-bar-wrap { flex: 1; margin: 0 1rem; height: 6px; background: #e2e8f0; border-radius: 3px; }
         .exp-bar { height: 100%; background: var(--red); border-radius: 3px; transition: width .6s; }
-        .exp-amount { font-weight: 700; color: var(--red); font-size: .88rem; white-space: nowrap; }
+        .exp-amount { font-weight: 700; color: var(--red); font-size: .9rem; white-space: nowrap; }
 
         /* Top ürünler */
-        .prod-row { display: flex; align-items: center; gap: .65rem; padding: .55rem 0;
-                    border-bottom: 1px solid #f0f4f1; }
+        .prod-row {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .6rem 0;
+            border-bottom: 1px solid #f0f4f1;
+        }
         .prod-row:last-child { border-bottom: none; }
-        .prod-rank { width: 22px; height: 22px; border-radius: 50%; background: var(--green);
-                     color: white; font-size: .72rem; font-weight: 700; display: flex;
-                     align-items: center; justify-content: center; flex-shrink: 0; }
-        .prod-name { flex:1; font-weight: 600; font-size: .88rem; }
-        .prod-qty  { color: #94a3b8; font-size: .8rem; }
-        .prod-total{ font-weight: 700; color: var(--green); font-size: .88rem; white-space: nowrap; }
+        .prod-rank { width: 24px; height: 24px; border-radius: 50%; background: var(--green); color: white; font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .prod-name { flex: 1; font-weight: 600; font-size: .9rem; }
+        .prod-qty  { color: #718096; font-size: .82rem; }
+        .prod-total{ font-weight: 700; color: var(--green); font-size: .9rem; white-space: nowrap; }
 
-        .loading  { text-align: center; padding: 2.5rem; color: #a0aec0; }
+        /* Net renk */
+        .net-positive { color: var(--green) !important; }
+        .net-negative { color: var(--red) !important; }
+
+        .loading { text-align: center; padding: 3rem; color: #a0aec0; font-size: 1rem; }
         .no-data  { text-align: center; padding: 2rem; color: #a0aec0; font-size: .9rem; }
-        #periodLabel { font-size: .82rem; color: #94a3b8; margin-top: .3rem; }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">🍽️ Fırınna POS</div>
-        <div class="nav-links">
-            <a href="/">Masalar</a>
-            <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">🔔<span class="alert-badge" id="alertBadge" style="display:none">0</span></button>
-            <div class="nav-dropdown" id="navDropdown">
-                <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
-                <div class="nav-dropdown-menu">
-                    <a href="/kasa">💰 Kasa</a>
-                    <a href="/muhasebe" class="active">📒 Muhasebe</a>
-                    <hr>
-                    <a href="/products">🍞 Ürünler</a>
-                    <a href="/stok">📦 Stok</a>
-                    <a href="/recete">🧾 Reçete</a>
-                    <a href="/expenses">📤 Masraflar</a>
-                    <a href="/tables">🪑 Masa Yönetimi</a>
-                    <hr>
-                    <a href="/backup">💾 Yedek</a>
-                    <a href="/settings">⚙️ Ayarlar</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="alert-panel" id="alertPanel">
-        <div class="alert-panel-header">
-            <span>⚠️ Stok Uyarıları</span>
-            <a href="/stok" style="color:white;font-size:.82rem;font-weight:700;text-decoration:none;background:rgba(255,255,255,.2);padding:.2rem .65rem;border-radius:12px;">📦 Stoka Git →</a>
-        </div>
-        <div class="alert-panel-body" id="alertPanelBody">
-            <div class="alert-empty">Yükleniyor...</div>
-        </div>
-    </div>
+    {% include '_navbar.html' %}
 
     <div class="container">
         <div class="page-header">
             <div>
                 <h1>📒 Ön Muhasebe</h1>
-                <div style="font-size:.82rem;opacity:.8;margin-top:.2rem;" id="pageSubtitle">Yükleniyor...</div>
+                <p id="period-label">Yükleniyor...</p>
             </div>
-            <div class="header-actions">
-                <button class="hbtn" onclick="exportExcel()">📥 Excel</button>
-                <button class="hbtn" onclick="printReport()">🖨️ Yazdır</button>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                <button onclick="exportExcel()" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.4);padding:.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">📥 Excel</button>
+                <button onclick="printDailyReport()" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.4);padding:.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">🖨️ Yazdır</button>
             </div>
         </div>
 
-        <!-- ── GENEL DURUM (tüm zaman) ── -->
-        <div class="durum-panel">
-            <div class="durum-header">📊 İşletme Genel Durumu — Tüm Zamanlar</div>
-            <div class="durum-grid">
-                <div class="dur-item">
-                    <div class="dur-val" style="color:#2d6a4f" id="gt-ciro">...</div>
-                    <div class="dur-lbl">💰 Toplam Ciro</div>
-                    <div class="dur-sub" id="gt-siparis"></div>
+        <!-- Dönem Seçimi -->
+        <div class="period-bar">
+            <button class="period-btn active" onclick="setPeriod('today',this)">Bugün</button>
+            <button class="period-btn" onclick="setPeriod('week',this)">Bu Hafta</button>
+            <button class="period-btn" onclick="setPeriod('month',this)">Bu Ay</button>
+            <button class="period-btn" onclick="setPeriod('custom',this)">Tarih Seç</button>
+        </div>
+
+        <div class="date-range-row" id="custom-range">
+            <input type="date" id="date-from">
+            <span style="color:#718096;">—</span>
+            <input type="date" id="date-to">
+            <button onclick="loadCustom()">Göster</button>
+        </div>
+
+        <!-- Özet Kartlar -->
+        <div class="summary-grid" id="summary-grid">
+            <div class="loading">Yükleniyor...</div>
+        </div>
+
+        <!-- Grafik + Ödeme Dağılımı -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;" id="mid-row">
+            <div class="card" style="grid-column:1/-1;">
+                <h3>📈 Günlük Gelir</h3>
+                <div class="chart-wrap">
+                    <canvas id="dailyChart"></canvas>
                 </div>
-                <div class="dur-item">
-                    <div class="dur-val" style="color:#dc2626" id="gt-masraf">...</div>
-                    <div class="dur-lbl">📤 Toplam Masraf</div>
-                </div>
-                <div class="dur-item">
-                    <div class="dur-val" id="gt-net">...</div>
-                    <div class="dur-lbl">📈 Net Kar/Zarar</div>
-                </div>
-                <div class="dur-item">
-                    <div class="dur-val" style="color:#d97706" id="gt-bahsis">...</div>
-                    <div class="dur-lbl">🎁 Toplam Bahşiş</div>
-                </div>
-                <div class="dur-item">
-                    <div class="dur-val" style="color:#7c3aed" id="gt-indirim">...</div>
-                    <div class="dur-lbl">🏷️ Toplam İndirim</div>
-                </div>
             </div>
         </div>
 
-        <!-- ── BU AY ── -->
-        <div class="ay-panel">
-            <div class="ay-header">📅 Bu Ay — <span id="ayBaslik"></span></div>
-            <div class="ay-grid">
-                <div class="ay-item"><div class="ay-val" style="color:#2d6a4f" id="ay-ciro">...</div><div class="ay-lbl">Ciro</div></div>
-                <div class="ay-item"><div class="ay-val" style="color:#dc2626" id="ay-masraf">...</div><div class="ay-lbl">Masraf</div></div>
-                <div class="ay-item"><div class="ay-val" id="ay-net">...</div><div class="ay-lbl">Net</div></div>
-                <div class="ay-item"><div class="ay-val" style="color:#0891b2" id="ay-siparis">...</div><div class="ay-lbl">Sipariş</div></div>
-                <div class="ay-item"><div class="ay-val" style="color:#d97706" id="ay-bahsis">...</div><div class="ay-lbl">Bahşiş</div></div>
-            </div>
-        </div>
-
-        <!-- ── DÖNEMLİ ANALİZ ── -->
-        <div class="filter-bar">
-            <div class="filter-title">🔍 Dönemli Analiz</div>
-            <div class="period-btns">
-                <button class="pb" onclick="setPeriod('today',this)">Bugün</button>
-                <button class="pb active" onclick="setPeriod('month',this)">Bu Ay</button>
-                <button class="pb" onclick="setPeriod('quarter',this)">Son 3 Ay</button>
-                <button class="pb" onclick="setPeriod('year',this)">Bu Yıl</button>
-                <button class="pb" onclick="setPeriod('all',this)">Tüm Zamanlar</button>
-                <button class="pb" onclick="setPeriod('custom',this)">Özel</button>
-            </div>
-            <div class="custom-range" id="customRange">
-                <input type="date" id="dateFrom">
-                <span style="color:#94a3b8">—</span>
-                <input type="date" id="dateTo">
-                <button class="btn-getir" onclick="loadCustom()">Göster</button>
-            </div>
-            <div id="periodLabel"></div>
-        </div>
-
-        <!-- Dönem özet kartları -->
-        <div class="sum-grid" id="sumGrid">
-            <div class="loading" style="grid-column:1/-1">⏳ Yükleniyor...</div>
-        </div>
-
-        <!-- Grafik -->
-        <div class="card" id="chartCard" style="display:none;">
-            <h3>📈 Günlük Satış</h3>
-            <div class="chart-wrap"><canvas id="dailyChart"></canvas></div>
-        </div>
-
-        <!-- Ödeme + Masraf -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;" id="midRow">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;">
+            <!-- Ödeme Yöntemi -->
             <div class="card">
                 <h3>💳 Ödeme Yöntemi</h3>
-                <div id="paySection"><div class="loading">...</div></div>
+                <div id="payment-section"><div class="loading">...</div></div>
             </div>
+            <!-- Masraf Kategorileri -->
             <div class="card">
                 <h3>📤 Masraf Kategorileri</h3>
-                <div id="expSection"><div class="loading">...</div></div>
+                <div id="expense-section"><div class="loading">...</div></div>
             </div>
         </div>
 
-        <!-- Top ürünler -->
+        <!-- En Çok Satanlar -->
         <div class="card">
             <h3>🏆 En Çok Satan Ürünler</h3>
-            <div id="prodsSection"><div class="loading">...</div></div>
+            <div id="products-section"><div class="loading">...</div></div>
         </div>
 
-        <!-- Günlük tablo -->
-        <div class="card" id="dailyTableCard" style="display:none;">
+        <!-- Günlük Dağılım Tablosu -->
+        <div class="card" id="daily-table-card" style="display:none;">
             <h3>📅 Günlük Dağılım</h3>
-            <div id="dailyTableSection"></div>
+            <div id="daily-table-section"></div>
         </div>
     </div>
-
-    <footer style="text-align:center;padding:2rem 1rem 1.5rem;color:#a0aec0;font-size:.78rem;margin-top:3rem;border-top:1px solid #f0f0f0;">
-        Fırınna POS &mdash; TA1XTA &copy; 2026
-    </footer>
 
     <script>
     let chartInstance = null;
     let currentStart = '', currentEnd = '';
-    let lastData = null;
-    let currentPeriod = 'month';
 
-    function localDate(d) {
-        d = d || new Date();
-        return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    }
-    function fmt(n) {
-        return Number(n||0).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₺';
+    function localToday() {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     }
 
-    // ── Tüm Zaman Genel Durum ──
-    async function loadAllTime() {
-        try {
-            const today = localDate();
-            const d = await fetch('/api/muhasebe?start=2000-01-01&end='+today).then(r=>r.json());
-            document.getElementById('gt-ciro').textContent    = fmt(d.total_sales);
-            document.getElementById('gt-masraf').textContent  = fmt(d.total_expenses);
-            document.getElementById('gt-bahsis').textContent  = fmt(d.total_tips);
-            document.getElementById('gt-indirim').textContent = fmt(d.total_discount);
-            const netEl = document.getElementById('gt-net');
-            netEl.textContent = fmt(d.net);
-            netEl.style.color = d.net >= 0 ? '#2d6a4f' : '#dc2626';
-            document.getElementById('gt-siparis').textContent = d.order_count + ' sipariş';
-            document.getElementById('pageSubtitle').textContent =
-                'Toplam ' + d.order_count + ' sipariş | ' + fmt(d.total_sales) + ' ciro';
-        } catch(e) { console.error('AllTime muhasebe hata:', e); }
-    }
-
-    // ── Bu Ay ──
-    async function loadThisMonth() {
-        const today = new Date();
-        const m = String(today.getMonth()+1).padStart(2,'0');
-        const start = today.getFullYear()+'-'+m+'-01';
-        const end   = localDate();
-        const ayAdi = today.toLocaleString('tr-TR',{month:'long',year:'numeric'});
-        document.getElementById('ayBaslik').textContent = ayAdi;
-        try {
-            const d = await fetch('/api/muhasebe?start='+start+'&end='+end).then(r=>r.json());
-            document.getElementById('ay-ciro').textContent   = fmt(d.total_sales);
-            document.getElementById('ay-masraf').textContent = fmt(d.total_expenses);
-            document.getElementById('ay-siparis').textContent= d.order_count;
-            document.getElementById('ay-bahsis').textContent = fmt(d.total_tips);
-            const ayNet = document.getElementById('ay-net');
-            ayNet.textContent  = fmt(d.net);
-            ayNet.style.color  = d.net >= 0 ? '#2d6a4f' : '#dc2626';
-        } catch(e) {}
-    }
-
-    // ── Dönemli Analiz ──
-    function setPeriod(p, btn) {
-        currentPeriod = p;
-        document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));
+    function setPeriod(period, btn) {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        document.getElementById('customRange').classList.toggle('show', p==='custom');
-        if (p !== 'custom') loadPeriodData();
-    }
+        document.getElementById('custom-range').classList.toggle('show', period === 'custom');
 
-    function getPeriodDates() {
-        const today = new Date(); const ts = localDate();
-        if (currentPeriod==='today')   return {start:ts, end:ts};
-        if (currentPeriod==='month') {
-            const m = String(today.getMonth()+1).padStart(2,'0');
-            return {start: today.getFullYear()+'-'+m+'-01', end: ts};
+        const today = new Date();
+        let start, end;
+
+        if (period === 'today') {
+            start = end = localToday();
+        } else if (period === 'week') {
+            const day = today.getDay() || 7;
+            const mon = new Date(today); mon.setDate(today.getDate() - day + 1);
+            start = mon.toISOString().slice(0,10);
+            end = localToday();
+        } else if (period === 'month') {
+            start = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-01';
+            end = localToday();
+        } else {
+            return;
         }
-        if (currentPeriod==='quarter') {
-            const q = new Date(today); q.setMonth(q.getMonth()-3);
-            return {start: localDate(q), end: ts};
-        }
-        if (currentPeriod==='year') {
-            return {start: today.getFullYear()+'-01-01', end: ts};
-        }
-        if (currentPeriod==='all') return {start:'2000-01-01', end:ts};
-        return {start:ts, end:ts};
+        loadData(start, end);
     }
 
     function loadCustom() {
-        const s = document.getElementById('dateFrom').value;
-        const e = document.getElementById('dateTo').value;
+        const s = document.getElementById('date-from').value;
+        const e = document.getElementById('date-to').value;
         if (!s || !e) { alert('Tarih seçin'); return; }
-        loadPeriodData(s, e);
+        loadData(s, e);
     }
 
-    async function loadPeriodData(s, e) {
-        const {start, end} = s ? {start:s,end:e} : getPeriodDates();
+    async function loadData(start, end) {
         currentStart = start; currentEnd = end;
-        document.getElementById('periodLabel').textContent =
-            start===end ? '📅 '+start : '📅 '+start+' — '+end;
-        document.getElementById('sumGrid').innerHTML =
-            '<div class="loading" style="grid-column:1/-1">⏳ Yükleniyor...</div>';
+
+        // Etiket güncelle
+        document.getElementById('period-label').textContent =
+            start === end ? start : start + '  →  ' + end;
+
+        // Loading
+        document.getElementById('summary-grid').innerHTML = '<div class="loading" style="grid-column:1/-1">Yükleniyor...</div>';
+
         try {
-            const d = await fetch('/api/muhasebe?start='+start+'&end='+end).then(r=>r.json());
-            lastData = d;
-            renderSumGrid(d);
-            renderChart(d.daily);
-            renderPayment(d);
-            renderExpenses(d.expense_categories||[]);
-            renderProducts(d.top_products||[]);
-            renderDailyTable(d.daily||[]);
-        } catch(e2) {
-            document.getElementById('sumGrid').innerHTML =
-                '<div class="no-data" style="grid-column:1/-1">⚠️ Veri yüklenemedi: '+e2.message+'</div>';
+            const data = await fetch(`/api/muhasebe?start=${start}&end=${end}`).then(r => r.json());
+            lastData = data;
+            renderSummary(data);
+            renderChart(data.daily);
+            renderPayment(data);
+            renderExpenses(data.expense_categories || []);
+            renderProducts(data.top_products || []);
+            renderDailyTable(data.daily || []);
+        } catch(e) {
+            document.getElementById('summary-grid').innerHTML = '<div class="no-data" style="grid-column:1/-1">Veri yüklenemedi.</div>';
         }
     }
 
-    function renderSumGrid(d) {
-        document.getElementById('sumGrid').innerHTML = `
-            <div class="sc green"><div class="sc-icon">💰</div>
-                <div class="sc-val" style="color:#2d6a4f">${fmt(d.total_sales)}</div>
-                <div class="sc-lbl">Toplam Satış</div></div>
-            <div class="sc red"><div class="sc-icon">📤</div>
-                <div class="sc-val" style="color:#dc2626">${fmt(d.total_expenses)}</div>
-                <div class="sc-lbl">Toplam Masraf</div></div>
-            <div class="sc ${d.net>=0?'green':'red'}"><div class="sc-icon">${d.net>=0?'📈':'📉'}</div>
-                <div class="sc-val" style="color:${d.net>=0?'#2d6a4f':'#dc2626'}">${fmt(d.net)}</div>
-                <div class="sc-lbl">Net Kar/Zarar</div></div>
-            <div class="sc gold"><div class="sc-icon">🎁</div>
-                <div class="sc-val" style="color:#d97706">${fmt(d.total_tips)}</div>
-                <div class="sc-lbl">Bahşiş</div></div>
-            <div class="sc teal"><div class="sc-icon">🧾</div>
-                <div class="sc-val" style="color:#0891b2">${d.order_count}</div>
-                <div class="sc-lbl">Sipariş</div></div>
-            <div class="sc purple"><div class="sc-icon">🏷️</div>
-                <div class="sc-val" style="color:#7c3aed">${fmt(d.total_discount)}</div>
-                <div class="sc-lbl">İndirim</div></div>
+    function fmt(n) {
+        return Number(n).toLocaleString('tr-TR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' ₺';
+    }
+
+    function renderSummary(d) {
+        const netClass = d.net >= 0 ? 'positive' : 'negative';
+        document.getElementById('summary-grid').innerHTML = `
+            <div class="sum-card green">
+                <div class="sum-icon">💰</div>
+                <div class="sum-value positive">${fmt(d.total_sales)}</div>
+                <div class="sum-label">Toplam Satış</div>
+            </div>
+            <div class="sum-card red">
+                <div class="sum-icon">📤</div>
+                <div class="sum-value negative">${fmt(d.total_expenses)}</div>
+                <div class="sum-label">Toplam Masraf</div>
+            </div>
+            <div class="sum-card ${d.net >= 0 ? 'green' : 'red'}">
+                <div class="sum-icon">${d.net >= 0 ? '📈' : '📉'}</div>
+                <div class="sum-value ${netClass}">${fmt(d.net)}</div>
+                <div class="sum-label">Net Kar/Zarar</div>
+            </div>
+            <div class="sum-card gold">
+                <div class="sum-icon">🎁</div>
+                <div class="sum-value" style="color:var(--gold)">${fmt(d.total_tips)}</div>
+                <div class="sum-label">Bahşiş</div>
+            </div>
+            <div class="sum-card teal">
+                <div class="sum-icon">🧾</div>
+                <div class="sum-value" style="color:#0891b2">${d.order_count}</div>
+                <div class="sum-label">Sipariş</div>
+            </div>
+            <div class="sum-card purple">
+                <div class="sum-icon">🏷️</div>
+                <div class="sum-value" style="color:#7c3aed">${fmt(d.total_discount)}</div>
+                <div class="sum-label">İndirim</div>
+            </div>
         `;
     }
 
     function renderChart(daily) {
-        const card = document.getElementById('chartCard');
-        if (!daily || daily.length <= 1) { card.style.display='none'; return; }
-        card.style.display = 'block';
         const ctx = document.getElementById('dailyChart').getContext('2d');
         if (chartInstance) chartInstance.destroy();
+
+        if (!daily || !daily.length) {
+            ctx.canvas.parentElement.innerHTML = '<div class="no-data">Bu dönemde veri yok.</div>';
+            return;
+        }
+
         chartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: daily.map(d=>d.day.slice(5)),
+                labels: daily.map(d => d.day.slice(5)),
                 datasets: [{
-                    label: 'Satış (₺)', data: daily.map(d=>d.total_sales),
-                    backgroundColor: 'rgba(45,106,79,.75)', borderColor: '#2d6a4f',
-                    borderWidth: 2, borderRadius: 5,
+                    label: 'Satış (₺)',
+                    data: daily.map(d => d.total_sales),
+                    backgroundColor: 'rgba(45,106,79,.75)',
+                    borderColor: '#2d6a4f',
+                    borderWidth: 2,
+                    borderRadius: 6,
                 }]
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: true,
-                         ticks: { callback: v=>v.toLocaleString('tr-TR')+' ₺', font:{size:11} },
-                         grid: { color: '#f0f4f1' } },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: v => v.toLocaleString('tr-TR') + ' ₺', font: {size:11} },
+                        grid: { color: '#f0f4f1' }
+                    },
                     x: { grid: { display: false }, ticks: { font: {size:11} } }
                 }
             }
@@ -451,181 +403,185 @@
     }
 
     function renderPayment(d) {
-        const total = (d.total_cash + d.total_card) || 1;
-        const cashPct = Math.round(d.total_cash/total*100);
-        const cardPct = 100-cashPct;
-        document.getElementById('paySection').innerHTML = `
+        const total = d.total_cash + d.total_card || 1;
+        const cashPct = Math.round(d.total_cash / total * 100);
+        const cardPct = 100 - cashPct;
+        document.getElementById('payment-section').innerHTML = `
             <div class="pay-grid">
                 <div class="pay-item">
                     <div class="pay-amount" style="color:#2d6a4f">${fmt(d.total_cash)}</div>
                     <div class="pay-label">💵 Nakit</div>
                     <div class="pay-bar-wrap"><div class="pay-bar" style="width:${cashPct}%;background:#2d6a4f;"></div></div>
-                    <div style="font-size:.73rem;color:#94a3b8;margin-top:.3rem;">${cashPct}%</div>
+                    <div style="font-size:.75rem;color:#94a3b8;margin-top:.3rem;">${cashPct}%</div>
                 </div>
                 <div class="pay-item">
                     <div class="pay-amount" style="color:#3b82f6">${fmt(d.total_card)}</div>
                     <div class="pay-label">💳 Kart</div>
                     <div class="pay-bar-wrap"><div class="pay-bar" style="width:${cardPct}%;background:#3b82f6;"></div></div>
-                    <div style="font-size:.73rem;color:#94a3b8;margin-top:.3rem;">${cardPct}%</div>
+                    <div style="font-size:.75rem;color:#94a3b8;margin-top:.3rem;">${cardPct}%</div>
                 </div>
-            </div>`;
+            </div>
+        `;
     }
 
     function renderExpenses(cats) {
-        if (!cats.length) { document.getElementById('expSection').innerHTML='<div class="no-data">Bu dönemde masraf yok.</div>'; return; }
-        const max = Math.max(...cats.map(c=>c.total));
-        document.getElementById('expSection').innerHTML = cats.map(c=>`
-            <div class="exp-row">
+        if (!cats.length) {
+            document.getElementById('expense-section').innerHTML = '<div class="no-data">Bu dönemde masraf yok.</div>';
+            return;
+        }
+        const max = Math.max(...cats.map(c => c.total));
+        document.getElementById('expense-section').innerHTML = cats.map(c => `
+            <div class="expense-row">
                 <span class="exp-name">${c.category}</span>
                 <div class="exp-bar-wrap"><div class="exp-bar" style="width:${Math.round(c.total/max*100)}%"></div></div>
                 <span class="exp-amount">${fmt(c.total)}</span>
-            </div>`).join('');
+            </div>
+        `).join('');
     }
 
     function renderProducts(prods) {
-        if (!prods.length) { document.getElementById('prodsSection').innerHTML='<div class="no-data">Bu dönemde satış yok.</div>'; return; }
-        document.getElementById('prodsSection').innerHTML = `
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem 1.25rem;">
-            ${prods.slice(0,20).map((p,i)=>`
+        if (!prods.length) {
+            document.getElementById('products-section').innerHTML = '<div class="no-data">Bu dönemde satış yok.</div>';
+            return;
+        }
+        document.getElementById('products-section').innerHTML = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem 1.5rem;">
+            ${prods.slice(0,20).map((p,i) => `
                 <div class="prod-row">
                     <div class="prod-rank">${i+1}</div>
                     <span class="prod-name">${p.name}</span>
-                    <span class="prod-qty">${p.quantity}×</span>
+                    <span class="prod-qty">${p.quantity} adet</span>
                     <span class="prod-total">${fmt(p.total)}</span>
-                </div>`).join('')}
-            </div>`;
+                </div>
+            `).join('')}
+            </div>
+        `;
     }
 
     function renderDailyTable(daily) {
-        const card = document.getElementById('dailyTableCard');
-        if (!daily || daily.length <= 1) { card.style.display='none'; return; }
+        const card = document.getElementById('daily-table-card');
+        if (!daily || daily.length <= 1) { card.style.display = 'none'; return; }
         card.style.display = 'block';
-        document.getElementById('dailyTableSection').innerHTML = `
+        document.getElementById('daily-table-section').innerHTML = `
             <table style="width:100%;border-collapse:collapse;">
-                <thead><tr style="background:#f7fafc;">
-                    <th style="padding:.65rem .7rem;text-align:left;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Tarih</th>
-                    <th style="padding:.65rem .7rem;text-align:center;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Sipariş</th>
-                    <th style="padding:.65rem .7rem;text-align:right;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Satış</th>
-                    <th style="padding:.65rem .7rem;text-align:right;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Bahşiş</th>
-                </tr></thead>
-                <tbody>${daily.map(d=>`
+                <thead>
+                    <tr style="background:#f7fafc;">
+                        <th style="padding:.7rem;text-align:left;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Tarih</th>
+                        <th style="padding:.7rem;text-align:center;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Sipariş</th>
+                        <th style="padding:.7rem;text-align:right;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Satış</th>
+                        <th style="padding:.7rem;text-align:right;color:#4a5568;font-weight:600;border-bottom:2px solid #e2e8f0;">Bahşiş</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${daily.map(d => `
                     <tr style="border-bottom:1px solid #f0f0f0;">
-                        <td style="padding:.6rem .7rem;">${d.day}</td>
-                        <td style="padding:.6rem .7rem;text-align:center;">${d.order_count}</td>
-                        <td style="padding:.6rem .7rem;text-align:right;font-weight:600;">${fmt(d.total_sales)}</td>
-                        <td style="padding:.6rem .7rem;text-align:right;color:#d97706;">${fmt(d.tips)}</td>
+                        <td style="padding:.65rem .7rem;">${d.day}</td>
+                        <td style="padding:.65rem .7rem;text-align:center;">${d.order_count}</td>
+                        <td style="padding:.65rem .7rem;text-align:right;font-weight:600;">${fmt(d.total_sales)}</td>
+                        <td style="padding:.65rem .7rem;text-align:right;color:var(--gold);">${fmt(d.tips)}</td>
                     </tr>`).join('')}
                 </tbody>
-            </table>`;
+            </table>
+        `;
     }
 
-    // ── Excel Export ──
+    let lastData = null;
+
     function exportExcel() {
-        if (!lastData) { alert('Önce dönem seçin.'); return; }
+        if (!lastData) { alert('Önce veri yükleyin.'); return; }
         const r = lastData;
         let csv = '\uFEFF';
         csv += `Firinna POS - On Muhasebe\n`;
         csv += `Donem;${currentStart} - ${currentEnd}\n\n`;
-        csv += `OZET\nToplam Siparis;${r.order_count}\nToplam Satis;${r.total_sales}\n`;
-        csv += `Nakit;${r.total_cash}\nKart;${r.total_card}\n`;
-        csv += `Bahsis;${r.total_tips}\nIndirim;${r.total_discount}\n`;
-        csv += `Masraf;${r.total_expenses}\nNet;${r.net}\n\n`;
-        if (r.expense_categories&&r.expense_categories.length) {
-            csv += `MASRAF KATEGORILERI\nKategori;Tutar\n`;
-            r.expense_categories.forEach(c=>{csv+=`${c.category};${c.total}\n`;});
+        csv += `OZET\n`;
+        csv += `Toplam Siparis;${r.order_count}\n`;
+        csv += `Toplam Satis;${r.total_sales}\n`;
+        csv += `Nakit;${r.total_cash}\n`;
+        csv += `Kart;${r.total_card}\n`;
+        csv += `Bahsis;${r.total_tips}\n`;
+        csv += `Indirim;${r.total_discount}\n`;
+        csv += `Masraf;${r.total_expenses}\n`;
+        csv += `Net;${r.net}\n\n`;
+        if (r.expense_categories && r.expense_categories.length) {
+            csv += `MASRAF KATEGORILERI\n`;
+            csv += `Kategori;Tutar\n`;
+            r.expense_categories.forEach(c => { csv += `${c.category};${c.total}\n`; });
             csv += `\n`;
         }
-        csv += `EN COK SATAN URUNLER\nSira;Urun;Adet;Tutar\n`;
-        (r.top_products||[]).forEach((p,i)=>{csv+=`${i+1};${p.name};${p.quantity};${p.total}\n`;});
-        if (r.daily&&r.daily.length>1) {
-            csv += `\nGUNLUK DAGILIM\nTarih;Siparis;Satis;Bahsis\n`;
-            r.daily.forEach(d=>{csv+=`${d.day};${d.order_count};${d.total_sales};${d.tips}\n`;});
+        csv += `EN COK SATAN URUNLER\n`;
+        csv += `Sira;Urun;Adet;Tutar\n`;
+        (r.top_products||[]).forEach((p,i) => { csv += `${i+1};${p.name};${p.quantity};${p.total}\n`; });
+        if (r.daily && r.daily.length > 1) {
+            csv += `\nGUNLUK DAGILIM\n`;
+            csv += `Tarih;Siparis;Satis;Bahsis\n`;
+            r.daily.forEach(d => { csv += `${d.day};${d.order_count};${d.total_sales};${d.tips}\n`; });
         }
-        const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
+        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
         a.href = url;
-        a.download = `firinna_muhasebe_${currentStart}_${currentEnd}.csv`;
+        a.download = `firinna_${currentStart}_${currentEnd}.csv`;
         a.click();
         URL.revokeObjectURL(url);
     }
 
-    async function printReport() {
-        if (!currentStart) { alert('Önce dönem seçin.'); return; }
+    async function printDailyReport() {
+        if (!currentStart) { alert('Önce tarih seçin.'); return; }
         try {
-            await fetch('/api/print/daily-report',{
+            await fetch('/api/print/daily-report', {
                 method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({date:currentStart})
+                body: JSON.stringify({date: currentStart})
             });
             alert('Rapor yazıcıya gönderildi.');
-        } catch(e) { alert('Yazıcı hatası: '+e.message); }
+        } catch(e) { alert('Yazıcı hatası: ' + e.message); }
     }
 
-    // ── Nav ──
-    function toggleNav() { document.getElementById('navDropdown').classList.toggle('open'); }
-    document.addEventListener('click', e => {
-        const dd = document.getElementById('navDropdown');
-        if (dd && !dd.contains(e.target)) dd.classList.remove('open');
-    });
-
-    // ── Stok Uyarı ── (GLOBAL - IIFE değil)
-    function toggleAlertPanel() {
-        const badge = document.getElementById('alertBadge');
-        if (badge && badge.style.display !== 'none' && parseInt(badge.textContent) > 0) {
-            window.location.href = '/stok';
-            return;
-        }
-        const p = document.getElementById('alertPanel');
-        if (p) p.classList.toggle('open');
-    }
-    document.addEventListener('click', function(e) {
-        const p = document.getElementById('alertPanel');
-        const b = document.getElementById('alertBtn');
-        if (p&&b&&!p.contains(e.target)&&!b.contains(e.target)) p.classList.remove('open');
-    });
-    async function loadAlerts() {
-        try {
-            const items = await fetch('/api/stock/alerts').then(r=>r.json());
-            const badge = document.getElementById('alertBadge');
-            const body  = document.getElementById('alertPanelBody');
-            if (!badge||!body) return;
-            if (items.length>0) {
-                badge.textContent   = items.length;
-                badge.style.display = 'flex';
-                body.innerHTML = items.map(i => {
-                    const isNeg = i.current_qty < 0;
-                    const negBadge = isNeg
-                        ? ' <span style="background:#ede9fe;color:#6d28d9;padding:.1rem .4rem;border-radius:10px;font-size:.7rem;font-weight:700;">EKSİ</span>'
-                        : '';
-                    const minText = i.min_quantity > 0
-                        ? `<span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>`
-                        : '';
-                    return `<div class="alert-item" style="${isNeg ? 'border-left:3px solid #7c3aed;padding-left:.5rem;' : ''}">
-                        <span class="alert-item-name">${isNeg ? '📉' : '⚠️'} ${i.name}${negBadge}</span>
-                        <span class="alert-item-qty">
-                            <span class="cur" style="${isNeg ? 'color:#7c3aed;font-weight:700;' : ''}">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
-                            ${minText}
-                        </span>
-                    </div>`;
-                }).join('');
-            } else {
-                badge.style.display = 'none';
-                body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
-            }
-        } catch(e) {}
-    }
-
-    // ── İlk Yükleme ──
+    // İlk yükle
     document.addEventListener('DOMContentLoaded', () => {
-        const today = localDate();
-        document.getElementById('dateFrom').value = today;
-        document.getElementById('dateTo').value   = today;
-        loadAllTime();
-        loadThisMonth();
-        loadPeriodData(); // varsayılan = bu ay
+        const today = localToday();
+        document.getElementById('date-from').value = today;
+        document.getElementById('date-to').value = today;
+        loadData(today, today);
+    });
+    </script>
+    <script>
+    (function(){
+        async function loadAlerts() {
+            try {
+                const items = await fetch("/api/stock/alerts").then(r=>r.json());
+                const badge = document.getElementById("alertBadge");
+                const body  = document.getElementById("alertPanelBody");
+                if (!badge || !body) return;
+                if (items.length > 0) {
+                    badge.textContent = items.length;
+                    badge.style.display = "flex";
+                    body.innerHTML = items.map(i => `
+                        <div class="alert-item">
+                            <span class="alert-item-name">${i.name}</span>
+                            <span class="alert-item-qty">
+                                <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
+                                <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
+                            </span>
+                        </div>`).join("");
+                } else {
+                    badge.style.display = "none";
+                    body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
+                }
+            } catch(e) {}
+        }
+        function toggleAlertPanel() {
+            const p = document.getElementById("alertPanel");
+            if (p) p.classList.toggle("open");
+        }
+        document.addEventListener("click", function(e) {
+            const p  = document.getElementById("alertPanel");
+            const b  = document.getElementById("alertBtn");
+            const dd = document.getElementById("navDropdown");
+            if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove("open");
+        });
         loadAlerts();
         setInterval(loadAlerts, 60000);
-    });
+    })();
     </script>
 </body>
 </html>

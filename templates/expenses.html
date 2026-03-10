@@ -46,45 +46,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">🍽️ Fırınna POS</div>
-        <div class="nav-links">
-            <a href="/">Masalar</a>
-                        <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">🔔<span class="alert-badge" id="alertBadge" style="display:none">0</span></button>
-            <div class="nav-dropdown" id="navDropdown">
-                <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
-                <div class="nav-dropdown-menu">
-            <a href="/kasa">💰 Kasa</a>
-            <a href="/muhasebe">📒 Muhasebe</a>
-            <hr>
-            <a href="/products">🍞 Ürünler</a>
-            <a href="/stok">📦 Stok</a>
-            <a href="/recete">🧾 Reçete</a>
-            <a href="/expenses" class="active">📤 Masraflar</a>
-            <a href="/tables">🪑 Masa Yönetimi</a>
-            <hr>
-            <a href="/backup">💾 Yedek</a>
-            <a href="/settings">⚙️ Ayarlar</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <script>
-        function localDate(d) {
-            d = d || new Date();
-            return d.getFullYear() + '-' +
-                String(d.getMonth()+1).padStart(2,'0') + '-' +
-                String(d.getDate()).padStart(2,'0');
-        }
-
-        function toggleNav() {
-            document.getElementById('navDropdown').classList.toggle('open');
-        }
-        document.addEventListener('click', function(e) {
-            const dd = document.getElementById('navDropdown');
-            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
-        });
-    </script>
+    {% include '_navbar.html' %}
 
     <div class="container">
         <h1 style="margin-bottom:1.5rem;">📤 Masraf Yönetimi</h1>

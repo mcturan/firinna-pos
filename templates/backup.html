@@ -49,28 +49,7 @@
     </style>
 </head>
 <body>
-<nav class="navbar">
-    <div class="nav-brand">🍽️ Fırınna POS</div>
-    <div class="nav-links">
-        <a href="/">Masalar</a>
-        <div class="nav-dropdown" id="navDropdown">
-            <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
-            <div class="nav-dropdown-menu">
-                <a href="/kasa">💰 Kasa</a>
-                <a href="/muhasebe">📒 Muhasebe</a>
-                <hr>
-                <a href="/products">🍞 Ürünler</a>
-                <a href="/stok">📦 Stok</a>
-                <a href="/recete">🧾 Reçete</a>
-                <a href="/expenses">📤 Masraflar</a>
-                <a href="/tables">🪑 Masa Yönetimi</a>
-                <hr>
-                <a href="/backup" class="active">💾 Yedek</a>
-                <a href="/settings">⚙️ Ayarlar</a>
-            </div>
-        </div>
-    </div>
-</nav>
+    {% include '_navbar.html' %}
 
 <div class="container" style="max-width:860px;">
     <h1 style="font-size:1.3rem;margin:0 0 .25rem;color:#1a202c;">💾 Yedekleme & Senkronizasyon</h1>
@@ -177,7 +156,6 @@
             <div style="text-align:center;color:#94a3b8;padding:1.5rem;font-size:.8rem;">Yükleniyor...</div>
         </div>
     </div>
-</div>
 
 <!-- FABRİKA AYARLARI -->
 <div class="sec-title" style="color:#c53030;">⚠️ Tehlikeli Bölge</div>
@@ -185,63 +163,34 @@
     <h3 style="color:#c53030;">🔴 Fabrika Ayarlarına Dön</h3>
     <p>Bu bölümdeki işlemler <strong>geri alınamaz.</strong> Dikkatli kullan.</p>
 
-    <!-- 1. GitHub'dan Sıfırla -->
     <div style="background:#fff5f5;border-radius:10px;padding:1rem;margin-bottom:.85rem;border:1px solid #fed7d7;">
-        <div style="font-weight:700;font-size:.88rem;color:#c53030;margin-bottom:.3rem;">
-            🔄 GitHub'dan Tam Yeniden Kur
-        </div>
-        <div style="font-size:.78rem;color:#718096;margin-bottom:.7rem;line-height:1.5;">
-            GitHub'daki son sürüm çekilir. Tüm kod dosyaları ve <strong>veritabanı</strong> GitHub'daki ile değiştirilir.
-            Yerel değişiklikler silinir. Servis yeniden başlatılır.
-        </div>
+        <div style="font-weight:700;font-size:.88rem;color:#c53030;margin-bottom:.3rem;">🔄 GitHub'dan Tam Yeniden Kur</div>
+        <div style="font-size:.78rem;color:#718096;margin-bottom:.7rem;line-height:1.5;">GitHub'daki son sürüm çekilir. Tüm kod ve <strong>veritabanı</strong> GitHub'dakiyle değiştirilir. Servis yeniden başlatılır.</div>
         <button class="btn-w c-red" onclick="githubReset()">🔄 GitHub'dan Sıfırla (Reinstall)</button>
     </div>
 
-    <!-- 2. DB Sıfırla + Yedekten Yükle -->
     <div style="background:#fff5f5;border-radius:10px;padding:1rem;margin-bottom:.85rem;border:1px solid #fed7d7;">
-        <div style="font-weight:700;font-size:.88rem;color:#c53030;margin-bottom:.3rem;">
-            🗑️ Veritabanını Sıfırla + Yedekten Yükle
-        </div>
-        <div style="font-size:.78rem;color:#718096;margin-bottom:.7rem;line-height:1.5;">
-            Mevcut veritabanı tamamen silinir, tüm tablolar sıfırlanır. Ardından seçtiğin yedek dosyasından geri yüklenir.
-        </div>
-        <div class="file-drop" id="reset-drop" onclick="document.getElementById('reset-file').click()">
+        <div style="font-weight:700;font-size:.88rem;color:#c53030;margin-bottom:.3rem;">🗑️ Veritabanını Sıfırla + Yedekten Yükle</div>
+        <div style="font-size:.78rem;color:#718096;margin-bottom:.7rem;line-height:1.5;">Mevcut veritabanı tamamen silinir. Seçtiğin yedek dosyasından geri yüklenir.</div>
+        <div class="file-drop" onclick="document.getElementById('reset-file').click()">
             <input type="file" id="reset-file" accept=".db,.sqlite" onchange="resetFileSelected(this)">
             <div class="lbl">📂 .db yedek dosyasını seç</div>
             <div class="sel" id="reset-file-lbl"></div>
         </div>
-        <button class="btn-w c-red" onclick="dbResetRestore()" id="btn-db-reset" disabled>
-            🗑️ Sıfırla ve Yedekten Yükle
-        </button>
+        <button class="btn-w c-red" onclick="dbResetRestore()" id="btn-db-reset" disabled>🗑️ Sıfırla ve Yedekten Yükle</button>
     </div>
 
-    <!-- 3. Sadece DB Sıfırla (boş başla) -->
     <div style="background:#fff5f5;border-radius:10px;padding:1rem;border:1px solid #fed7d7;">
-        <div style="font-weight:700;font-size:.88rem;color:#c53030;margin-bottom:.3rem;">
-            💣 Tüm Verileri Sil (Boş Başla)
-        </div>
-        <div style="font-size:.78rem;color:#718096;margin-bottom:.7rem;line-height:1.5;">
-            Veritabanındaki tüm siparişler, ürünler, kategoriler, stok ve işlemler silinir.
-            Tablolar boş ama yapı korunur. Geri alma yok.
-        </div>
-        <button class="btn-w" onclick="dbWipe()"
-            style="background:#7c3aed;color:white;font-weight:700;">
-            💣 Her Şeyi Sil — Sıfırdan Başla
-        </button>
+        <div style="font-weight:700;font-size:.88rem;color:#c53030;margin-bottom:.3rem;">💣 Tüm Verileri Sil (Boş Başla)</div>
+        <div style="font-size:.78rem;color:#718096;margin-bottom:.7rem;line-height:1.5;">Tüm siparişler, ürünler, kategoriler, stok ve işlemler silinir. Geri alma yok.</div>
+        <button class="btn-w" onclick="dbWipe()" style="background:#7c3aed;color:white;font-weight:700;">💣 Her Şeyi Sil — Sıfırdan Başla</button>
     </div>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-function toggleNav() {
-    document.getElementById('navDropdown').classList.toggle('open');
-}
-document.addEventListener('click', function(e) {
-    var d = document.getElementById('navDropdown');
-    if (d && !d.contains(e.target)) d.classList.remove('open');
-});
-
 function toast(msg, type) {
     type = type || 'ok';
     var t = document.getElementById('toast');
@@ -463,80 +412,53 @@ async function saveAutoPush() {
     toast(d.success ? '✅ Kaydedildi!' : '❌ Hata', d.success ? 'ok' : 'err');
 }
 
+
+// ── FABRİKA AYARLARI ───────────────────────────────────
+function resetFileSelected(input) {
+    var lbl = document.getElementById('reset-file-lbl');
+    var btn = document.getElementById('btn-db-reset');
+    if (input.files.length > 0) { lbl.textContent = '✅ ' + input.files[0].name; btn.disabled = false; }
+    else { lbl.textContent = ''; btn.disabled = true; }
+}
+async function githubReset() {
+    if (!confirm('⚠️ DİKKAT!\n\nGitHub\'daki son sürüm çekilecek.\nTüm yerel dosyalar ve veritabanı değiştirilecek.\nDevam?')) return;
+    if (!confirm('Son onay: Bu işlem geri alınamaz. Emin misin?')) return;
+    toast('🔄 GitHub\'dan çekiliyor...', 'ok');
+    try {
+        var r = await fetch('/api/factory/github-reset', {method:'POST'}).then(r => r.json());
+        if (r.success) { toast('✅ Tamamlandı! Sayfa yenileniyor...', 'ok'); setTimeout(() => window.location.reload(), 3000); }
+        else toast('❌ Hata: ' + r.error, 'err');
+    } catch(e) { toast('❌ ' + e.message, 'err'); }
+}
+async function dbResetRestore() {
+    var file = document.getElementById('reset-file').files[0];
+    if (!file) { toast('❌ Dosya seç', 'err'); return; }
+    if (!confirm('⚠️ Mevcut tüm veriler silinecek!\n"' + file.name + '" yüklenecek.\nDevam?')) return;
+    toast('🗑️ Sıfırlanıyor...', 'ok');
+    var fd = new FormData(); fd.append('file', file);
+    try {
+        var r = await fetch('/api/factory/db-reset-restore', {method:'POST', body:fd}).then(r => r.json());
+        if (r.success) { toast('✅ Yüklendi!', 'ok'); setTimeout(() => window.location.reload(), 2000); }
+        else toast('❌ ' + r.error, 'err');
+    } catch(e) { toast('❌ ' + e.message, 'err'); }
+}
+async function dbWipe() {
+    if (!confirm('⚠️ Tüm veriler silinecek. GERİ ALINAMAZ.\nDevam?')) return;
+    var gir = prompt('Onaylamak için "SİL" yazın:');
+    if (gir !== 'SİL') { toast('İptal.', 'ok'); return; }
+    toast('💣 Siliniyor...', 'err');
+    try {
+        var r = await fetch('/api/factory/db-wipe', {method:'POST'}).then(r => r.json());
+        if (r.success) { toast('✅ Tüm veriler silindi.', 'ok'); setTimeout(() => window.location.reload(), 2000); }
+        else toast('❌ ' + r.error, 'err');
+    } catch(e) { toast('❌ ' + e.message, 'err'); }
+}
+
 // ── BAŞLANGIÇ ──────────────────────────────────────────
 loadBackupList();
 loadGitStatus();
 loadAutoPullSetting();
 loadAutoPushSetting();
-
-// ── FABRİKA AYARLARI ───────────────────────────────────
-
-function resetFileSelected(input) {
-    var lbl = document.getElementById('reset-file-lbl');
-    var btn = document.getElementById('btn-db-reset');
-    if (input.files.length > 0) {
-        lbl.textContent = '✅ ' + input.files[0].name;
-        btn.disabled = false;
-    } else {
-        lbl.textContent = '';
-        btn.disabled = true;
-    }
-}
-
-async function githubReset() {
-    if (!confirm('⚠️ DİKKAT!\n\nGitHub\'daki son sürüm çekilecek.\nTüm yerel dosyalar ve veritabanı GitHub sürümüyle değiştirilecek.\nServis yeniden başlatılacak.\n\nDevam etmek istiyor musun?')) return;
-    if (!confirm('Son onay: Bu işlem geri alınamaz. Emin misin?')) return;
-    toast('🔄 GitHub\'dan çekiliyor...', 'ok');
-    try {
-        var r = await fetch('/api/factory/github-reset', {method: 'POST'}).then(r => r.json());
-        if (r.success) {
-            toast('✅ Yeniden kurulum tamamlandı! Sayfa yenileniyor...', 'ok');
-            setTimeout(() => window.location.reload(), 3000);
-        } else {
-            toast('❌ Hata: ' + r.error, 'err');
-        }
-    } catch(e) {
-        toast('❌ Sunucu hatası: ' + e.message, 'err');
-    }
-}
-
-async function dbResetRestore() {
-    var file = document.getElementById('reset-file').files[0];
-    if (!file) { toast('❌ Dosya seç', 'err'); return; }
-    if (!confirm('⚠️ DİKKAT!\n\nMevcut tüm veriler silinecek!\n"' + file.name + '" dosyasından geri yüklenecek.\n\nDevam?')) return;
-    toast('🗑️ Sıfırlanıyor ve yükleniyor...', 'ok');
-    var fd = new FormData();
-    fd.append('file', file);
-    try {
-        var r = await fetch('/api/factory/db-reset-restore', {method: 'POST', body: fd}).then(r => r.json());
-        if (r.success) {
-            toast('✅ Veritabanı sıfırlandı ve yüklendi!', 'ok');
-            setTimeout(() => window.location.reload(), 2000);
-        } else {
-            toast('❌ Hata: ' + r.error, 'err');
-        }
-    } catch(e) {
-        toast('❌ Sunucu hatası: ' + e.message, 'err');
-    }
-}
-
-async function dbWipe() {
-    if (!confirm('⚠️ UYARI!\n\nTüm siparişler, ürünler, kategoriler, stok ve işlemler silinecek.\nBu işlem GERİ ALINAMAZ.\n\nDevam etmek istiyor musun?')) return;
-    var gir = prompt('Onaylamak için "SİL" yazın:');
-    if (gir !== 'SİL') { toast('İptal edildi.', 'ok'); return; }
-    toast('💣 Siliniyor...', 'err');
-    try {
-        var r = await fetch('/api/factory/db-wipe', {method: 'POST'}).then(r => r.json());
-        if (r.success) {
-            toast('✅ Tüm veriler silindi. Sistem hazır.', 'ok');
-            setTimeout(() => window.location.reload(), 2000);
-        } else {
-            toast('❌ Hata: ' + r.error, 'err');
-        }
-    } catch(e) {
-        toast('❌ Sunucu hatası: ' + e.message, 'err');
-    }
-}
 </script>
 </body>
 </html>
