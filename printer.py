@@ -321,6 +321,10 @@ class ThermalPrinter:
         BOLD_OFF = ESC + b'E\x00'
         CUT = ESC + b'd\x05' + ESC + b'm'
 
+        def tr(text):
+            table = str.maketrans('ğüşıöçĞÜŞİÖÇ', 'gusiocGUSIOC')
+            return str(text).translate(table)
+
         restaurant_name = db.get_setting('restaurant_name', 'Fırınna')
         now = datetime.now().strftime('%d.%m.%Y %H:%M')
 

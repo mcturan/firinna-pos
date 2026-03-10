@@ -4,178 +4,203 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reçete - Fırınna POS</title>
+    <title>Reçete — Fırınna POS</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
-        .recete-card { background:white; border-radius:12px; padding:1.5rem; box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.25rem; }
-        .recete-card h4 { margin:0 0 1rem; color:#2d3748; display:flex; justify-content:space-between; align-items:center; }
-        .ingredient-row { display:flex; align-items:center; gap:.75rem; padding:.5rem 0; border-bottom:1px solid #f0f0f0; font-size:.9rem; }
+        .progress-bar { background:#e2e8f0; border-radius:20px; height:10px; overflow:hidden; margin:.4rem 0 .8rem; }
+        .progress-fill { height:100%; background:linear-gradient(90deg,#2d6a4f,#52b788); border-radius:20px; transition:width .5s; }
+        .stat-row { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+        .stat-box { background:white; border-radius:10px; padding:.75rem 1.1rem; flex:1; min-width:120px;
+                    box-shadow:0 1px 4px rgba(0,0,0,.07); border:1px solid #e2e8f0; text-align:center; }
+        .stat-box .val { font-size:1.5rem; font-weight:800; }
+        .stat-box .lbl { font-size:.75rem; color:#718096; margin-top:.1rem; }
+        .filter-bar { display:flex; gap:.75rem; margin-bottom:1.25rem; flex-wrap:wrap; align-items:center; }
+        .filter-bar input { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; flex:1; min-width:180px; }
+        .filter-btn { padding:.45rem 1rem; border:2px solid #e2e8f0; border-radius:8px; background:white;
+                      cursor:pointer; font-size:.83rem; font-weight:600; color:#4a5568; white-space:nowrap; }
+        .filter-btn.active { background:#2d6a4f; color:white; border-color:#2d6a4f; }
+        .recete-card { background:white; border-radius:12px; padding:1.25rem 1.5rem; box-shadow:0 2px 8px rgba(0,0,0,.07);
+                       margin-bottom:1rem; border-left:4px solid #e2e8f0; }
+        .recete-card.has-recipe { border-left-color:#2d6a4f; }
+        .recete-card.no-recipe  { border-left-color:#f6ad55; }
+        .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:.75rem; }
+        .card-header h4 { margin:0; color:#2d3748; font-size:.95rem; }
+        .card-header .meta { font-size:.78rem; color:#a0aec0; display:flex; gap:.6rem; align-items:center; }
+        .badge-ok  { background:#e0f2fe; color:#065f46; padding:.15rem .5rem; border-radius:20px; font-size:.72rem; font-weight:700; }
+        .badge-no  { background:#fef3c7; color:#92400e; padding:.15rem .5rem; border-radius:20px; font-size:.72rem; font-weight:700; }
+        .ingredient-row { display:flex; align-items:center; gap:.75rem; padding:.4rem 0; border-bottom:1px solid #f0f0f0; font-size:.88rem; }
         .ingredient-row:last-child { border-bottom:none; }
-        .add-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:flex-end; margin-top:1rem; padding-top:1rem; border-top:2px dashed #e2e8f0; }
-        .add-row select, .add-row input { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; }
-        .add-row select { flex:2; min-width:140px; }
-        .add-row input { flex:1; min-width:90px; }
-        .no-data { color:#a0aec0; font-size:.9rem; padding:.5rem 0; }
-        .btn-del { background:none; border:none; cursor:pointer; color:#cbd5e0; font-size:.9rem; }
+        .add-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-top:.75rem;
+                   padding-top:.75rem; border-top:2px dashed #e2e8f0; }
+        .add-row select { flex:2; min-width:140px; padding:.45rem .65rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.85rem; }
+        .add-row input  { flex:1; min-width:80px;  padding:.45rem .65rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.85rem; }
+        .add-row .unit-lbl { color:#718096; font-size:.82rem; min-width:28px; }
+        .btn-del { background:none; border:none; cursor:pointer; color:#cbd5e0; }
         .btn-del:hover { color:#e53e3e; }
-        .filter-bar { display:flex; gap:.75rem; margin-bottom:1.5rem; flex-wrap:wrap; align-items:center; }
-        .filter-bar input { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; flex:1; min-width:200px; }
+        .no-stock-warn { background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:.6rem 1rem;
+                         font-size:.8rem; color:#9a3412; margin-bottom:1rem; }
     </style>
 </head>
 <body>
     {% include '_navbar.html' %}
 
     <div class="container">
-        <h1 style="margin-bottom:.5rem;">🧾 Reçete Yönetimi</h1>
-        <p style="color:#718096;margin-bottom:1.5rem;">Her menü ürünü için hangi stok malzemelerinin kullanıldığını tanımlayın. Sipariş kapandığında stok otomatik düşülür.</p>
+        <h1 style="margin-bottom:.25rem;">🧾 Reçete Yönetimi</h1>
+        <p style="color:#718096;font-size:.82rem;margin:.2rem 0 1rem;">
+            Her ürün için stok malzemelerini tanımlayın. Sipariş kapandığında stok otomatik düşülür.</p>
 
+        <!-- İlerleme -->
+        <div id="progressBox" style="margin-bottom:1.25rem;"></div>
+
+        <!-- Stok kalemi yoksa uyarı -->
+        <div class="no-stock-warn" id="noStockWarn" style="display:none;">
+            ⚠️ Henüz stok kalemi tanımlanmamış. Reçete eklemek için önce
+            <a href="/stok" style="color:#9a3412;font-weight:700;">Stok</a> sayfasından kalem ekleyin.
+        </div>
+
+        <!-- Filtre -->
         <div class="filter-bar">
-            <input type="text" id="searchProduct" placeholder="🔍 Ürün ara..." oninput="filterProducts()">
+            <input type="text" id="searchProduct" placeholder="🔍 Ürün ara..." oninput="renderAll()">
+            <button class="filter-btn active" id="btn-all"      onclick="setFilter('all')">Tümü</button>
+            <button class="filter-btn"        id="btn-missing"  onclick="setFilter('missing')">⚠️ Reçetesiz</button>
+            <button class="filter-btn"        id="btn-complete" onclick="setFilter('complete')">✅ Reçeteli</button>
         </div>
 
         <div id="receteList"><div style="text-align:center;padding:2rem;color:#a0aec0;">⏳ Yükleniyor...</div></div>
     </div>
 
-    <script>
-        let products = [];
-        let stockItems = [];
-        let recipes = {};
+<script>
+let products   = [];
+let stockItems = [];
+let recipes    = {};
+let viewFilter = 'all';
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const [prods, stocks, recs] = await Promise.all([
-                fetch('/api/products').then(r => r.json()),
-                fetch('/api/stock').then(r => r.json()),
-                fetch('/api/recipes').then(r => r.json()),
-            ]);
-            products = prods.filter(p => p.active);
-            stockItems = stocks;
-            // recipes: group by product_id
-            recs.forEach(r => {
-                if (!recipes[r.product_id]) recipes[r.product_id] = [];
-                recipes[r.product_id].push(r);
-            });
-            renderAll();
-        });
+document.addEventListener('DOMContentLoaded', async () => {
+    const [prods, stocks, recs] = await Promise.all([
+        fetch('/api/products').then(r => r.json()),
+        fetch('/api/stock').then(r => r.json()),
+        fetch('/api/recipes').then(r => r.json()),
+    ]);
+    products   = prods.filter(p => p.active);
+    stockItems = stocks;
+    recs.forEach(r => {
+        if (!recipes[r.product_id]) recipes[r.product_id] = [];
+        recipes[r.product_id].push(r);
+    });
+    if (stockItems.length === 0) document.getElementById('noStockWarn').style.display = 'block';
+    updateProgress();
+    renderAll();
+});
 
-        function filterProducts() {
-            renderAll(document.getElementById('searchProduct').value.toLowerCase());
-        }
+function setFilter(f) {
+    viewFilter = f;
+    ['all','missing','complete'].forEach(k => {
+        document.getElementById('btn-'+k).classList.toggle('active', k === f);
+    });
+    renderAll();
+}
 
-        function renderAll(filter = '') {
-            const filtered = products.filter(p => p.name.toLowerCase().includes(filter));
-            if (filtered.length === 0) {
-                document.getElementById('receteList').innerHTML = '<div style="text-align:center;padding:2rem;color:#a0aec0;">Ürün bulunamadı.</div>';
-                return;
-            }
-            document.getElementById('receteList').innerHTML = filtered.map(p => renderProduct(p)).join('');
-        }
+function updateProgress() {
+    const total    = products.length;
+    const complete = products.filter(p => (recipes[p.id]||[]).length > 0).length;
+    const pct      = total ? Math.round(complete/total*100) : 0;
+    document.getElementById('progressBox').innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;">
+            <span style="font-size:.85rem;font-weight:700;color:#2d3748;">Reçete Tamamlanma Durumu</span>
+            <span style="font-size:.82rem;color:#718096;">${complete} / ${total} ürün (${pct}%)</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div style="display:flex;gap:1rem;margin-top:.4rem;">
+            <span style="font-size:.78rem;color:#2d6a4f;font-weight:700;">✅ ${complete} reçeteli</span>
+            <span style="font-size:.78rem;color:#d97706;font-weight:700;">⚠️ ${total-complete} reçetesiz</span>
+        </div>`;
+}
 
-        function renderProduct(p) {
-            const recs = recipes[p.id] || [];
-            const ingredientRows = recs.length === 0
-                ? '<div class="no-data">Henüz malzeme tanımlanmamış.</div>'
-                : recs.map(r => `
-                    <div class="ingredient-row">
-                        <span style="flex:1;font-weight:600;">${r.stock_name}</span>
-                        <span style="color:#718096;">${r.quantity} ${r.unit}</span>
-                        <button class="btn-del" onclick="deleteRecipe(${r.id}, ${p.id})">🗑️</button>
-                    </div>`).join('');
+function renderAll() {
+    const q = document.getElementById('searchProduct').value.toLowerCase();
+    let list = products.filter(p => p.name.toLowerCase().includes(q));
+    if (viewFilter === 'missing')  list = list.filter(p => !(recipes[p.id]||[]).length);
+    if (viewFilter === 'complete') list = list.filter(p =>  (recipes[p.id]||[]).length > 0);
+    if (!list.length) {
+        document.getElementById('receteList').innerHTML =
+            '<div style="text-align:center;padding:2rem;color:#a0aec0;">Ürün bulunamadı.</div>';
+        return;
+    }
+    document.getElementById('receteList').innerHTML = list.map(p => renderCard(p)).join('');
+}
 
-            const stockOptions = stockItems.map(s =>
-                `<option value="${s.id}" data-unit="${s.unit}">${s.name} (${s.unit})</option>`).join('');
+function renderCard(p) {
+    const recs    = recipes[p.id] || [];
+    const hasRec  = recs.length > 0;
+    const rows    = recs.length === 0
+        ? '<div style="color:#a0aec0;font-size:.85rem;padding:.4rem 0;">Henüz malzeme tanımlanmamış.</div>'
+        : recs.map(r => `
+            <div class="ingredient-row">
+                <span style="flex:1;font-weight:600;">${r.stock_name}</span>
+                <span style="color:#718096;">${r.quantity} ${r.unit || ''}</span>
+                <button class="btn-del" onclick="deleteRecipe(${r.id},${p.id})" title="Sil">🗑️</button>
+            </div>`).join('');
 
-            return `<div class="recete-card" id="card-${p.id}">
-                <h4>
-                    <span>🍽️ ${p.name}</span>
-                    <span style="font-size:.85rem;color:#a0aec0;font-weight:400;">${p.price.toFixed(2)} ₺</span>
-                </h4>
-                ${ingredientRows}
-                <div class="add-row">
-                    <select id="si-${p.id}">${stockOptions}</select>
-                    <input type="number" id="qty-${p.id}" placeholder="Miktar" step="0.001" min="0">
-                    <span id="unit-${p.id}" style="color:#718096;font-size:.9rem;min-width:30px;"></span>
-                    <button class="btn btn-primary" style="padding:.5rem 1rem;" onclick="addRecipe(${p.id})">➕ Ekle</button>
-                </div>
-            </div>`;
-        }
+    const stockOpts = stockItems.map(s =>
+        `<option value="${s.id}" data-unit="${s.unit}">${s.name} (${s.unit})</option>`).join('');
 
-        // Birim göster seçim değişince
-        document.addEventListener('change', e => {
-            if (e.target.id && e.target.id.startsWith('si-')) {
-                const pid = e.target.id.split('-')[1];
-                const opt = e.target.options[e.target.selectedIndex];
-                document.getElementById('unit-' + pid).textContent = opt.dataset.unit || '';
-            }
-        });
+    return `<div class="recete-card ${hasRec?'has-recipe':'no-recipe'}" id="card-${p.id}">
+        <div class="card-header">
+            <h4>🍽️ ${p.name}</h4>
+            <div class="meta">
+                <span>${p.price.toFixed(2)} ₺</span>
+                <span class="${hasRec?'badge-ok':'badge-no'}">${hasRec?'✅ '+recs.length+' malzeme':'⚠️ Reçete Yok'}</span>
+            </div>
+        </div>
+        ${rows}
+        <div class="add-row">
+            <select id="si-${p.id}" onchange="updateUnit(${p.id})">${stockOpts}</select>
+            <input type="number" id="qty-${p.id}" placeholder="Miktar" step="0.001" min="0.001">
+            <span class="unit-lbl" id="unit-${p.id}"></span>
+            <button class="btn btn-primary" style="padding:.45rem 1rem;font-size:.85rem;" onclick="addRecipe(${p.id})">➕ Ekle</button>
+        </div>
+    </div>`;
+}
 
-        async function addRecipe(productId) {
-            const stockItemId = parseInt(document.getElementById('si-' + productId).value);
-            const quantity = parseFloat(document.getElementById('qty-' + productId).value);
-            if (!stockItemId || isNaN(quantity) || quantity <= 0) { alert('Malzeme ve miktar seçin.'); return; }
-            await fetch('/api/recipes', {
-                method: 'POST', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({product_id: productId, stock_item_id: stockItemId, quantity})
-            });
-            // Refresh recipes for this product
-            const recs = await fetch('/api/recipes?product_id=' + productId).then(r => r.json());
-            recipes[productId] = recs;
-            document.getElementById('qty-' + productId).value = '';
-            const card = document.getElementById('card-' + productId);
-            const p = products.find(x => x.id === productId);
-            card.outerHTML = renderProduct(p);
-        }
+function updateUnit(pid) {
+    const sel = document.getElementById('si-' + pid);
+    const opt = sel.options[sel.selectedIndex];
+    document.getElementById('unit-' + pid).textContent = opt ? opt.dataset.unit || '' : '';
+}
 
-        async function deleteRecipe(recipeId, productId) {
-            if (!confirm('Bu malzemeyi reçeteden çıkar?')) return;
-            await fetch('/api/recipes/' + recipeId, {method: 'DELETE'});
-            const recs = await fetch('/api/recipes?product_id=' + productId).then(r => r.json());
-            recipes[productId] = recs;
-            const p = products.find(x => x.id === productId);
-            document.getElementById('card-' + productId).outerHTML = renderProduct(p);
-        }
-    </script>
+// Sayfa render sonrası unit etiketlerini güncelle
+document.addEventListener('change', e => {
+    if (e.target.id && e.target.id.startsWith('si-')) {
+        updateUnit(e.target.id.split('-')[1]);
+    }
+});
 
-    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
-        Fırınna POS &mdash; TA1XTA &copy; 2026
-    </footer>
-    <script>
-    (function(){
-        async function loadAlerts() {
-            try {
-                const items = await fetch("/api/stock/alerts").then(r=>r.json());
-                const badge = document.getElementById("alertBadge");
-                const body  = document.getElementById("alertPanelBody");
-                if (!badge || !body) return;
-                if (items.length > 0) {
-                    badge.textContent = items.length;
-                    badge.style.display = "flex";
-                    body.innerHTML = items.map(i => `
-                        <div class="alert-item">
-                            <span class="alert-item-name">${i.name}</span>
-                            <span class="alert-item-qty">
-                                <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
-                                <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
-                            </span>
-                        </div>`).join("");
-                } else {
-                    badge.style.display = "none";
-                    body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
-                }
-            } catch(e) {}
-        }
-        function toggleAlertPanel() {
-            const p = document.getElementById("alertPanel");
-            if (p) p.classList.toggle("open");
-        }
-        document.addEventListener("click", function(e) {
-            const p  = document.getElementById("alertPanel");
-            const b  = document.getElementById("alertBtn");
-            const dd = document.getElementById("navDropdown");
-            if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove("open");
-        });
-        loadAlerts();
-        setInterval(loadAlerts, 60000);
-    })();
-    </script>
+async function addRecipe(pid) {
+    const stockId  = parseInt(document.getElementById('si-'+pid).value);
+    const quantity = parseFloat(document.getElementById('qty-'+pid).value);
+    if (!stockId || isNaN(quantity) || quantity <= 0) { alert('Malzeme seçin ve miktar girin.'); return; }
+    const btn = document.querySelector(`#card-${pid} .btn-primary`);
+    btn.disabled = true; btn.textContent = '⏳';
+    await fetch('/api/recipes', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({product_id: pid, stock_item_id: stockId, quantity})
+    });
+    const recs = await fetch('/api/recipes?product_id=' + pid).then(r => r.json());
+    recipes[pid] = recs;
+    updateProgress();
+    const p = products.find(x => x.id === pid);
+    document.getElementById('card-'+pid).outerHTML = renderCard(p);
+}
+
+async function deleteRecipe(recipeId, pid) {
+    if (!confirm('Bu malzemeyi reçeteden çıkar?')) return;
+    await fetch('/api/recipes/' + recipeId, {method:'DELETE'});
+    const recs = await fetch('/api/recipes?product_id=' + pid).then(r => r.json());
+    recipes[pid] = recs;
+    updateProgress();
+    const p = products.find(x => x.id === pid);
+    document.getElementById('card-'+pid).outerHTML = renderCard(p);
+}
+</script>
 </body>
 </html>

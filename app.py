@@ -347,6 +347,43 @@ def api_delete_table(table_id):
     ok, msg = db.delete_table_safe(table_id)
     return jsonify({'success': ok, 'error': msg})
 
+@app.route('/api/tables/<int:table_id>', methods=['GET'])
+def api_get_single_table(table_id):
+    """Tek masa bilgisi — QR sipariş için"""
+    tables = db.get_tables()
+    table  = next((t for t in tables if t['id'] == table_id), None)
+    if not table:
+        return jsonify({'error': 'Masa bulunamadı'}), 404
+    order = db.get_table_order(table_id)
+    return jsonify({
+        'id':               table['id'],
+        'name':             table.get('name', 'Masa ' + str(table_id)),
+        'current_order_id': order['id'] if order else None,
+    })
+
+# ── QR Self-Servis Sipariş ──
+@app.route('/siparis/<int:table_id>')
+def qr_order_page(table_id):
+    """QR kod ile müşteri sipariş sayfası"""
+    return render_template('qr_order.html', table_id=table_id)
+
+@app.route('/api/qr-code/<int:table_id>')
+def api_qr_code(table_id):
+    """Masa için QR kod PNG üret"""
+    try:
+        import qrcode
+        import io
+        url = request.host_url.rstrip('/') + f'/siparis/{table_id}'
+        img = qrcode.make(url)
+        buf = io.BytesIO()
+        img.save(buf, format='PNG')
+        buf.seek(0)
+        from flask import send_file
+        return send_file(buf, mimetype='image/png',
+                         download_name=f'masa-{table_id}-qr.png')
+    except ImportError:
+        return jsonify({'error': 'qrcode kütüphanesi yüklü değil. pip install qrcode[pil]'}), 500
+
 # API: Siparişler
 @app.route('/api/orders/table/<int:table_id>', methods=['GET'])
 def api_get_table_order(table_id):
@@ -408,11 +445,18 @@ def api_print_receipt(order_id):
     order = db.get_table_order_by_id(order_id)
     if not order:
         return jsonify({"success": False, "error": "Sipariş bulunamadı"})
-    
     from printer import ThermalPrinter
-    printer = ThermalPrinter(printer_type="receipt")
-    success = printer.print_receipt(order)
-    return jsonify({"success": success})
+    try:
+        printer = ThermalPrinter(printer_type="receipt")
+        success = printer.print_receipt(order)
+        if not success:
+            ip = db.get_setting('printer_ip', '192.168.1.99')
+            port = db.get_setting('printer_port', '9100')
+            return jsonify({"success": False,
+                "error": f"Yazıcıya bağlanılamadı ({ip}:{port}). Ayarlar → Yazıcı menüsünden IP'yi kontrol edin."})
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 # API: Masraflar
 @app.route('/api/expenses', methods=['GET', 'POST'])
@@ -1340,7 +1384,32 @@ def run_git(args, timeout=30):
     except Exception as e:
         return False, str(e)
 
-@app.route('/api/git/credentials', methods=['GET'])
+# ── Local config (makine başına ayarlar — git'e gitmez) ──
+_LOCAL_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'firinna_local.json')
+
+def read_local_config():
+    """Bu cihaza özel ayarları oku (git'e gitmez)"""
+    try:
+        if os.path.exists(_LOCAL_CONFIG_PATH):
+            with open(_LOCAL_CONFIG_PATH, 'r') as f:
+                import json
+                return json.load(f)
+    except Exception:
+        pass
+    return {}
+
+def write_local_config(updates: dict):
+    """Local config'i güncelle (mevcut değerleri koru)"""
+    cfg = read_local_config()
+    cfg.update(updates)
+    try:
+        import json
+        with open(_LOCAL_CONFIG_PATH, 'w') as f:
+            json.dump(cfg, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f'[local_config] Yazma hatası: {e}')
+
+
 def api_git_credentials_get():
     cred = get_git_credentials()
     return jsonify({'username': cred.get('username',''), 'has_token': bool(cred.get('token',''))})
@@ -1675,73 +1744,121 @@ def api_auto_push_set():
     return jsonify({'success': True, 'mode': mode})
 
 
-# ===== FABRİKA AYARLARI =====
+# ── Fabrika Ayarları ──
 
 @app.route('/api/factory/github-reset', methods=['POST'])
 def api_factory_github_reset():
-    """GitHub'daki son sürümü zorla çek — kod + DB dahil. Servis yeniden başlar."""
-    try:
-        base = os.path.dirname(os.path.abspath(__file__))
-        # Yerel değişiklikleri at, GitHub'ı zorla uygula
-        subprocess.run(['git', '-C', base, 'fetch', 'origin', 'main'],
-                       capture_output=True, timeout=30)
-        r = subprocess.run(['git', '-C', base, 'reset', '--hard', 'origin/main'],
-                           capture_output=True, text=True, timeout=30)
-        if r.returncode != 0:
-            return jsonify({'success': False, 'error': r.stderr})
-        # Servisi yeniden başlat (arka planda — yanıt döndükten sonra)
-        def restart():
-            import time
-            time.sleep(1.5)
-            subprocess.run(['sudo', 'systemctl', 'restart', 'firinna-pos'])
-        threading.Thread(target=restart, daemon=True).start()
-        return jsonify({'success': True, 'output': r.stdout})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+    """GitHub'tan tam yeniden kurulum — git yoksa clone, varsa hard reset"""
+    cred = get_git_credentials()
+    username = cred.get('username', '')
+    token    = cred.get('token', '')
+    if not username or not token:
+        return jsonify({'success': False, 'error': 'GitHub kimlik bilgileri eksik. Ayarlar → Yedek & Senkron sayfasından token girin.'})
+
+    repo_url = f'https://{username}:{token}@github.com/{username}/firinna-pos.git'
+    app_dir  = GIT_DIR
+
+    # .git klasörü var mı?
+    has_git = os.path.isdir(os.path.join(app_dir, '.git'))
+
+    if not has_git:
+        # Mevcut dosyaları geçici yere taşı, clone yap
+        import tempfile, shutil
+        tmp = tempfile.mkdtemp()
+        # Kritik dosyaları koru
+        preserve = ['pos_data.db', 'firinna_local.json', 'static']
+        for f in preserve:
+            src = os.path.join(app_dir, f)
+            if os.path.exists(src):
+                dst = os.path.join(tmp, f)
+                try:
+                    if os.path.isdir(src):
+                        shutil.copytree(src, dst)
+                    else:
+                        shutil.copy2(src, dst)
+                except Exception:
+                    pass
+        # Clone
+        result = subprocess.run(
+            ['git', 'clone', repo_url, app_dir + '_clone'],
+            capture_output=True, text=True, timeout=120
+        )
+        if result.returncode != 0:
+            return jsonify({'success': False, 'error': 'git clone hatası: ' + result.stderr[:300]})
+        # Klonlanan dosyaları ana dizine kopyala (db ve local hariç)
+        clone_dir = app_dir + '_clone'
+        for item in os.listdir(clone_dir):
+            if item in preserve:
+                continue
+            src = os.path.join(clone_dir, item)
+            dst = os.path.join(app_dir, item)
+            try:
+                if os.path.isdir(src):
+                    if os.path.exists(dst):
+                        shutil.rmtree(dst)
+                    shutil.copytree(src, dst)
+                else:
+                    shutil.copy2(src, dst)
+            except Exception as e:
+                pass
+        # .git klasörünü taşı
+        shutil.copytree(os.path.join(clone_dir, '.git'), os.path.join(app_dir, '.git'))
+        shutil.rmtree(clone_dir)
+        # Remote URL'i güncelle (plain url)
+        subprocess.run(['git', '-C', app_dir, 'remote', 'set-url', 'origin', repo_url],
+                       capture_output=True)
+        return jsonify({'success': True, 'message': 'git clone tamamlandı. Sunucuyu yeniden başlatın.'})
+    else:
+        # Remote URL'i güncelle (token dahil)
+        subprocess.run(['git', '-C', app_dir, 'remote', 'set-url', 'origin', repo_url],
+                       capture_output=True, timeout=10)
+        ok_fetch, out_fetch = run_git(['fetch', 'origin', 'main'], timeout=60)
+        if not ok_fetch:
+            return jsonify({'success': False, 'error': 'fetch hatası: ' + out_fetch})
+        ok_reset, out_reset = run_git(['reset', '--hard', 'origin/main'], timeout=30)
+        if not ok_reset:
+            return jsonify({'success': False, 'error': 'reset hatası: ' + out_reset})
+        return jsonify({'success': True, 'message': 'Hard reset tamamlandı. Sunucuyu yeniden başlatın.'})
 
 
 @app.route('/api/factory/db-reset-restore', methods=['POST'])
 def api_factory_db_reset_restore():
-    """Mevcut DB'yi sil, yüklenen .db dosyasını yerine koy."""
+    """DB'yi sıfırla ve yüklenen yedeği geri yükle"""
+    import shutil
+    f = request.files.get('db_file')
+    if not f:
+        return jsonify({'success': False, 'error': 'db_file gönderilmedi'})
+    ext = os.path.splitext(f.filename or '')[1].lower()
+    if ext not in ('.db', '.sqlite', '.sqlite3'):
+        return jsonify({'success': False, 'error': 'Sadece .db dosyası kabul edilir'})
+    db_path = db.DB_PATH
+    backup_path = db_path + '.factory_backup'
     try:
-        if 'file' not in request.files:
-            return jsonify({'success': False, 'error': 'Dosya yok'})
-        f = request.files['file']
-        if not f.filename.endswith(('.db', '.sqlite')):
-            return jsonify({'success': False, 'error': 'Geçersiz dosya türü (.db veya .sqlite)'})
-        base    = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(base, 'pos_data.db')
-        # Mevcut DB'yi yedekle (güvenlik)
-        backup_path = db_path + '.bak'
-        if os.path.exists(db_path):
-            import shutil
-            shutil.copy2(db_path, backup_path)
-        # Yeni DB'yi yaz
+        shutil.copy2(db_path, backup_path)
         f.save(db_path)
-        return jsonify({'success': True})
+        return jsonify({'success': True, 'message': 'DB değiştirildi. Sunucuyu yeniden başlatın.'})
     except Exception as e:
+        # Geri al
+        try:
+            shutil.copy2(backup_path, db_path)
+        except Exception:
+            pass
         return jsonify({'success': False, 'error': str(e)})
 
 
 @app.route('/api/factory/db-wipe', methods=['POST'])
 def api_factory_db_wipe():
-    """Tüm tabloları truncate et — yapı korunur, veriler silinir."""
+    """Tüm verileri sil — DB'yi sıfırdan oluştur"""
+    import shutil
+    db_path = db.DB_PATH
+    backup_path = db_path + '.wipe_backup_' + datetime.now().strftime('%Y%m%d_%H%M%S')
     try:
-        conn = db.get_db()
-        tables = [
-            'order_items', 'orders', 'transactions', 'expenses',
-            'stock_movements', 'recipes', 'products', 'categories',
-            'stock_items', 'zones', 'notes'
-        ]
-        for t in tables:
-            try:
-                conn.execute(f'DELETE FROM {t}')
-            except Exception:
-                pass  # Tablo yoksa atla
-        conn.execute('DELETE FROM sqlite_sequence WHERE 1=1')
-        conn.commit()
-        conn.close()
-        return jsonify({'success': True})
+        shutil.copy2(db_path, backup_path)
+        os.remove(db_path)
+        db.init_db()
+        db.init_muhasebe_tables()
+        return jsonify({'success': True,
+                        'message': f'DB tamamen silindi ve yeniden oluşturuldu. Yedek: {os.path.basename(backup_path)}'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 

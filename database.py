@@ -172,6 +172,24 @@ def set_product_stock_link(product_id, stock_item_id):
     conn.commit()
     conn.close()
 
+def deduct_stock_for_order(order_id):
+    """Sipariş kapanınca direkt bağlı ürünlerin stoğunu düş"""
+    conn = get_db()
+    items = conn.execute('''
+        SELECT oi.product_id, oi.quantity, p.stock_item_id, p.name
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ? AND oi.is_complimentary = 0 AND p.stock_item_id IS NOT NULL
+    ''', (order_id,)).fetchall()
+    for item in items:
+        conn.execute('''INSERT INTO stock_movements
+            (stock_item_id, movement_type, quantity, cost, reason, description)
+            VALUES (?, 'out', ?, 0, 'satis', ?)''',
+            (item['stock_item_id'], item['quantity'], f'Sipariş #{order_id} — {item["name"]}'))
+    conn.commit()
+    conn.close()
+    return len(items)
+
 def add_product(name, category_id, price):
     conn = get_db()
     conn.execute('INSERT INTO products (name, category_id, price) VALUES (?, ?, ?)', 
@@ -958,6 +976,18 @@ def get_report(start_date, end_date):
 
     conn.close()
 
+    # İkram toplamı (ayrı sorgu — order_items complimentary)
+    conn2 = get_db()
+    ikram_row = conn2.execute('''
+        SELECT COALESCE(SUM(oi.quantity * oi.price), 0) as total_ikram
+        FROM order_items oi
+        JOIN orders o ON oi.order_id = o.id
+        WHERE DATE(o.closed_at) BETWEEN ? AND ?
+          AND o.status = 'closed'
+          AND oi.is_complimentary = 1
+    ''', (start_date, end_date)).fetchone()
+    conn2.close()
+
     s = dict(summary)
     net = s['total_sales'] + s['total_tips'] - expenses['total']
 
@@ -970,6 +1000,7 @@ def get_report(start_date, end_date):
         'total_card': round(s['total_card'], 2),
         'total_tips': round(s['total_tips'], 2),
         'total_discount': round(s['total_discount'], 2),
+        'total_ikram': round(ikram_row['total_ikram'], 2),
         'total_expenses': round(expenses['total'], 2),
         'net': round(net, 2),
         'top_products': [dict(p) for p in top_products],
@@ -1245,6 +1276,23 @@ def get_kasa_data(start_date, end_date, payment_method=None):
 
     conn.close()
     net = income['total'] - outcome['total']
+
+    # İndirim ve ikram — orders tablosundan (transactions'ta değil)
+    conn2 = get_db()
+    order_extras = conn2.execute('''
+        SELECT
+            COALESCE(SUM(discount_value), 0) as total_discount,
+            COALESCE(SUM(
+                (SELECT COALESCE(SUM(quantity * price),0)
+                 FROM order_items oi
+                 WHERE oi.order_id = o.id AND oi.is_complimentary = 1)
+            ), 0) as total_ikram
+        FROM orders o
+        WHERE DATE(closed_at) BETWEEN ? AND ?
+          AND status = 'closed'
+    ''', (start_date, end_date)).fetchone()
+    conn2.close()
+
     return {
         'income': round(income['total'],2),
         'satis': round(income['satis'],2),
@@ -1255,6 +1303,8 @@ def get_kasa_data(start_date, end_date, payment_method=None):
         'stok_alim': round(outcome['stok_alim'],2),
         'sarf': round(outcome['sarf'],2),
         'net': round(net,2),
+        'indirim': round(order_extras['total_discount'], 2),
+        'ikram': round(order_extras['total_ikram'], 2),
         'movements': [dict(m) for m in movements],
     }
 
@@ -1398,39 +1448,23 @@ def delete_recipe(recipe_id):
     conn.close()
 
 def deduct_stock_for_order(order_id):
-    """Sipariş kapanışında stoktan düş.
-    Öncelik: reçete varsa malzemeleri düş.
-    Reçete yoksa ürünün direkt stock_item_id bağlantısını kullan.
-    """
+    """Sipariş kapanışında reçetedeki malzemeleri stoktan düş"""
     conn = get_db()
     items = conn.execute('''
-        SELECT oi.product_id, oi.quantity as sold_qty,
-               p.stock_item_id as direct_stock_id, p.name as product_name
-        FROM order_items oi
-        JOIN products p ON oi.product_id = p.id
-        WHERE oi.order_id = ? AND oi.is_complimentary = 0
+        SELECT oi.product_id, oi.quantity as sold_qty
+        FROM order_items oi WHERE oi.order_id = ? AND oi.is_complimentary = 0
     ''', (order_id,)).fetchall()
     for item in items:
         recipes = conn.execute('''
             SELECT r.stock_item_id, r.quantity as recipe_qty
             FROM recipes r WHERE r.product_id = ?
         ''', (item['product_id'],)).fetchall()
-        if recipes:
-            # Reçete bazlı düşüm
-            for r in recipes:
-                total_deduct = r['recipe_qty'] * item['sold_qty']
-                conn.execute('''INSERT INTO stock_movements
-                    (stock_item_id, movement_type, quantity, reason, description)
-                    VALUES (?, 'out', ?, 'satis', ?)''',
-                    (r['stock_item_id'], total_deduct,
-                     f'Sipariş #{order_id} — {item["product_name"]}'))
-        elif item['direct_stock_id']:
-            # Fallback: direkt bağlantı
+        for r in recipes:
+            total_deduct = r['recipe_qty'] * item['sold_qty']
             conn.execute('''INSERT INTO stock_movements
                 (stock_item_id, movement_type, quantity, reason, description)
-                VALUES (?, 'out', ?, 'satis', ?)''',
-                (item['direct_stock_id'], item['sold_qty'],
-                 f'Sipariş #{order_id} — {item["product_name"]} (direkt)'))
+                VALUES (?, 'out', ?, 'satis', 'Sipariş #' || ?)''',
+                (r['stock_item_id'], total_deduct, order_id))
     conn.commit()
     conn.close()
 

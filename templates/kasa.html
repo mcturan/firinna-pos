@@ -159,6 +159,8 @@
                     <div class="sum-card"><div class="sum-val green">${fmt(d.income)}</div><div class="sum-label">Toplam Giriş</div></div>
                     <div class="sum-card"><div class="sum-val">${fmt(d.satis)}</div><div class="sum-label">Satış</div></div>
                     <div class="sum-card"><div class="sum-val orange">${fmt(d.bahsis)}</div><div class="sum-label">Bahşiş</div></div>
+                    ${(d.indirim||0)>0 ? `<div class="sum-card"><div class="sum-val" style="color:#d97706;">${fmt(d.indirim)}</div><div class="sum-label">🏷️ İndirim (Kaybedilen)</div></div>` : ''}
+                    ${(d.ikram||0)>0  ? `<div class="sum-card"><div class="sum-val" style="color:#9f7aea;">${fmt(d.ikram)}</div><div class="sum-label">🎁 İkram Değeri</div></div>` : ''}
                     <div class="sum-card"><div class="sum-val red">${fmt(d.outcome)}</div><div class="sum-label">Toplam Çıkış</div></div>
                     <div class="sum-card"><div class="sum-val red">${fmt(d.masraf)}</div><div class="sum-label">Masraf</div></div>
                     <div class="sum-card"><div class="sum-val red">${fmt(d.stok_alim)}</div><div class="sum-label">Stok Alım</div></div>
