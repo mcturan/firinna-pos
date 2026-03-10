@@ -52,21 +52,6 @@ def api_version():
 def index():
     return render_template('index.html')
 
-# ── PWA Dosyaları ──
-@app.route('/manifest.json')
-def pwa_manifest():
-    return send_from_directory(app.root_path, 'manifest.json',
-                               mimetype='application/manifest+json')
-
-@app.route('/sw.js')
-def pwa_sw():
-    return send_from_directory(app.root_path, 'sw.js',
-                               mimetype='application/javascript')
-
-@app.route('/offline.html')
-def pwa_offline():
-    return send_from_directory(app.root_path, 'offline.html')
-
 # Yönetim sayfaları
 @app.route('/products')
 def products_page():
@@ -1113,27 +1098,10 @@ def api_reclose_order(order_id):
         SELECT COALESCE(SUM(CASE WHEN is_complimentary=0 THEN quantity*price ELSE 0 END),0) as t
         FROM order_items WHERE order_id=?
     ''', (order_id,)).fetchone()['t']
-    payment_cash = d.get('payment_cash', 0)
-    payment_card = d.get('payment_card', 0)
-    tip_amount   = d.get('tip_amount', 0)
     conn.execute('''UPDATE orders SET status='closed', total=?, closed_at=CURRENT_TIMESTAMP,
         payment_cash=?, payment_card=?, tip_amount=?
         WHERE id=?''',
-        (total, payment_cash, payment_card, tip_amount, order_id))
-    # Eski transaction kayıtlarını sil, yenilerini ekle
-    conn.execute("DELETE FROM transactions WHERE related_order_id=?", (order_id,))
-    if payment_cash > 0:
-        conn.execute('''INSERT INTO transactions (type, amount, payment_method, description, related_order_id)
-            VALUES ('income', ?, 'cash', ?, ?)''',
-            (payment_cash, f'Sipariş #{order_id} (nakit)', order_id))
-    if payment_card > 0:
-        conn.execute('''INSERT INTO transactions (type, amount, payment_method, description, related_order_id)
-            VALUES ('income', ?, 'card', ?, ?)''',
-            (payment_card, f'Sipariş #{order_id} (kart)', order_id))
-    if tip_amount > 0:
-        conn.execute('''INSERT INTO transactions (type, amount, payment_method, description, related_order_id)
-            VALUES ('tip', ?, 'cash', ?, ?)''',
-            (tip_amount, f'Sipariş #{order_id} bahşiş', order_id))
+        (total, d.get('payment_cash',0), d.get('payment_card',0), d.get('tip_amount',0), order_id))
     conn.commit()
     conn.close()
     return jsonify({'success': True, 'total': total})
@@ -1147,6 +1115,10 @@ def backup_page():
 @app.route('/muhasebe')
 def page_muhasebe():
     return render_template('muhasebe.html')
+
+@app.route('/reports')
+def page_reports_redirect():
+    return redirect('/muhasebe')
 
 @app.route('/api/muhasebe')
 def api_muhasebe():
@@ -1701,6 +1673,78 @@ def api_auto_push_set():
         'auto_push_time': push_time
     })
     return jsonify({'success': True, 'mode': mode})
+
+
+# ===== FABRİKA AYARLARI =====
+
+@app.route('/api/factory/github-reset', methods=['POST'])
+def api_factory_github_reset():
+    """GitHub'daki son sürümü zorla çek — kod + DB dahil. Servis yeniden başlar."""
+    try:
+        base = os.path.dirname(os.path.abspath(__file__))
+        # Yerel değişiklikleri at, GitHub'ı zorla uygula
+        subprocess.run(['git', '-C', base, 'fetch', 'origin', 'main'],
+                       capture_output=True, timeout=30)
+        r = subprocess.run(['git', '-C', base, 'reset', '--hard', 'origin/main'],
+                           capture_output=True, text=True, timeout=30)
+        if r.returncode != 0:
+            return jsonify({'success': False, 'error': r.stderr})
+        # Servisi yeniden başlat (arka planda — yanıt döndükten sonra)
+        def restart():
+            import time
+            time.sleep(1.5)
+            subprocess.run(['sudo', 'systemctl', 'restart', 'firinna-pos'])
+        threading.Thread(target=restart, daemon=True).start()
+        return jsonify({'success': True, 'output': r.stdout})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+
+@app.route('/api/factory/db-reset-restore', methods=['POST'])
+def api_factory_db_reset_restore():
+    """Mevcut DB'yi sil, yüklenen .db dosyasını yerine koy."""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'Dosya yok'})
+        f = request.files['file']
+        if not f.filename.endswith(('.db', '.sqlite')):
+            return jsonify({'success': False, 'error': 'Geçersiz dosya türü (.db veya .sqlite)'})
+        base    = os.path.dirname(os.path.abspath(__file__))
+        db_path = os.path.join(base, 'pos_data.db')
+        # Mevcut DB'yi yedekle (güvenlik)
+        backup_path = db_path + '.bak'
+        if os.path.exists(db_path):
+            import shutil
+            shutil.copy2(db_path, backup_path)
+        # Yeni DB'yi yaz
+        f.save(db_path)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+
+@app.route('/api/factory/db-wipe', methods=['POST'])
+def api_factory_db_wipe():
+    """Tüm tabloları truncate et — yapı korunur, veriler silinir."""
+    try:
+        conn = db.get_db()
+        tables = [
+            'order_items', 'orders', 'transactions', 'expenses',
+            'stock_movements', 'recipes', 'products', 'categories',
+            'stock_items', 'zones', 'notes'
+        ]
+        for t in tables:
+            try:
+                conn.execute(f'DELETE FROM {t}')
+            except Exception:
+                pass  # Tablo yoksa atla
+        conn.execute('DELETE FROM sqlite_sequence WHERE 1=1')
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 
 if __name__ == '__main__':
     db.init_db()
