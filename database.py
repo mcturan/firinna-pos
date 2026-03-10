@@ -787,10 +787,16 @@ def create_past_order(table_id, created_at, closed_at, items, payment_cash=0, pa
               item.get('kitchen_notes', '')))
     
     update_order_total(conn, order_id)
-    
+
+    # Kasaya işle (normal sipariş kapanışıyla aynı)
+    record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amount, tip_method, closed_at)
+
     conn.commit()
     conn.close()
-    
+
+    # Stok düşümü (normal sipariş kapanışıyla aynı)
+    deduct_stock_for_order(order_id)
+
     return order_id
 
 # ===== İSİM DÜZENLEME FONKSİYONLARI =====
@@ -1307,16 +1313,18 @@ def get_low_stock_items():
     """Minimum stok altına düşmüş kalemleri döndür"""
     conn = get_db()
     items = conn.execute('''
-        SELECT s.*,
-               COALESCE((SELECT SUM(CASE WHEN movement_type='in' THEN quantity
-                                        WHEN movement_type='out' THEN -quantity
-                                        ELSE quantity END)
-                FROM stock_movements WHERE stock_item_id = s.id), 0) as current_qty
-        FROM stock_items s
-        WHERE s.active = 1
-          AND s.min_quantity > 0
-        HAVING current_qty <= s.min_quantity
-        ORDER BY (current_qty - s.min_quantity) ASC
+        SELECT * FROM (
+            SELECT s.*,
+                   COALESCE((SELECT SUM(CASE WHEN movement_type='in' THEN quantity
+                                            WHEN movement_type='out' THEN -quantity
+                                            ELSE quantity END)
+                    FROM stock_movements WHERE stock_item_id = s.id), 0) as current_qty
+            FROM stock_items s
+            WHERE s.active = 1
+              AND s.min_quantity > 0
+        )
+        WHERE current_qty <= min_quantity
+        ORDER BY (current_qty - min_quantity) ASC
     ''').fetchall()
     conn.close()
     return [dict(i) for i in items]
