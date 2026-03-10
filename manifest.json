@@ -1,0 +1,43 @@
+{
+  "name": "Fırınna POS",
+  "short_name": "Fırınna",
+  "description": "Fırınna Cafe Sipariş ve Yönetim Sistemi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#2d6a4f",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "/static/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Masalar",
+      "short_name": "Masalar",
+      "description": "Masa yönetimi",
+      "url": "/",
+      "icons": [{ "src": "/static/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Kasa",
+      "short_name": "Kasa",
+      "description": "Kasa özeti",
+      "url": "/kasa",
+      "icons": [{ "src": "/static/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Stok",
+      "short_name": "Stok",
+      "description": "Stok durumu",
+      "url": "/stok",
+      "icons": [{ "src": "/static/favicon.svg", "sizes": "any" }]
+    }
+  ]
+}

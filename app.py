@@ -52,6 +52,21 @@ def api_version():
 def index():
     return render_template('index.html')
 
+# ── PWA Dosyaları ──
+@app.route('/manifest.json')
+def pwa_manifest():
+    return send_from_directory(app.root_path, 'manifest.json',
+                               mimetype='application/manifest+json')
+
+@app.route('/sw.js')
+def pwa_sw():
+    return send_from_directory(app.root_path, 'sw.js',
+                               mimetype='application/javascript')
+
+@app.route('/offline.html')
+def pwa_offline():
+    return send_from_directory(app.root_path, 'offline.html')
+
 # Yönetim sayfaları
 @app.route('/products')
 def products_page():
@@ -1090,7 +1105,7 @@ def api_stock_alerts():
 
 @app.route('/api/orders/<int:order_id>/reclose', methods=['POST'])
 def api_reclose_order(order_id):
-    """Düzenlenen siparişi yeniden kapat + transactions güncelle"""
+    """Düzenlenen siparişi yeniden kapat"""
     d = request.json or {}
     conn = db.get_db()
     # Toplam yeniden hesapla
@@ -1101,28 +1116,24 @@ def api_reclose_order(order_id):
     payment_cash = d.get('payment_cash', 0)
     payment_card = d.get('payment_card', 0)
     tip_amount   = d.get('tip_amount', 0)
-    tip_method   = d.get('tip_method', 'cash')
     conn.execute('''UPDATE orders SET status='closed', total=?, closed_at=CURRENT_TIMESTAMP,
-        payment_cash=?, payment_card=?, tip_amount=?, tip_method=?
+        payment_cash=?, payment_card=?, tip_amount=?
         WHERE id=?''',
-        (total, payment_cash, payment_card, tip_amount, tip_method, order_id))
+        (total, payment_cash, payment_card, tip_amount, order_id))
     # Eski transaction kayıtlarını sil, yenilerini ekle
-    conn.execute('DELETE FROM transactions WHERE related_order_id=?', (order_id,))
-    from datetime import datetime as _dt
-    closed_at = _dt.now().strftime('%Y-%m-%d %H:%M:%S')
-    date_str  = _dt.now().strftime('%Y-%m-%d')
+    conn.execute("DELETE FROM transactions WHERE related_order_id=?", (order_id,))
     if payment_cash > 0:
-        conn.execute('''INSERT INTO transactions (date,type,amount,category,payment_method,description,related_order_id)
-            VALUES (?,'in',?,'satis','cash','Satış #' || ?,?)''',
-            (date_str, payment_cash, order_id, order_id))
+        conn.execute('''INSERT INTO transactions (type, amount, payment_method, description, related_order_id)
+            VALUES ('income', ?, 'cash', ?, ?)''',
+            (payment_cash, f'Sipariş #{order_id} (nakit)', order_id))
     if payment_card > 0:
-        conn.execute('''INSERT INTO transactions (date,type,amount,category,payment_method,description,related_order_id)
-            VALUES (?,'in',?,'satis','card','Satış #' || ?,?)''',
-            (date_str, payment_card, order_id, order_id))
+        conn.execute('''INSERT INTO transactions (type, amount, payment_method, description, related_order_id)
+            VALUES ('income', ?, 'card', ?, ?)''',
+            (payment_card, f'Sipariş #{order_id} (kart)', order_id))
     if tip_amount > 0:
-        conn.execute('''INSERT INTO transactions (date,type,amount,category,payment_method,description,related_order_id)
-            VALUES (?,'in',?,'bahsis',?,'Bahşiş #' || ?,?)''',
-            (date_str, tip_amount, tip_method, order_id, order_id))
+        conn.execute('''INSERT INTO transactions (type, amount, payment_method, description, related_order_id)
+            VALUES ('tip', ?, 'cash', ?, ?)''',
+            (tip_amount, f'Sipariş #{order_id} bahşiş', order_id))
     conn.commit()
     conn.close()
     return jsonify({'success': True, 'total': total})

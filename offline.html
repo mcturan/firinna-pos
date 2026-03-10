@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bağlantı Yok — Fırınna POS</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#f8f9fa;
+           display:flex; align-items:center; justify-content:center;
+           min-height:100vh; margin:0; }
+    .box { text-align:center; padding:2rem; }
+    .icon { font-size:4rem; }
+    h1 { color:#2d6a4f; margin:.5rem 0; }
+    p  { color:#718096; margin:.5rem 0 1.5rem; }
+    button { background:#2d6a4f; color:white; border:none; padding:.75rem 1.5rem;
+             border-radius:8px; cursor:pointer; font-size:1rem; }
+    button:hover { background:#1e4d38; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="icon">📡</div>
+    <h1>Bağlantı Yok</h1>
+    <p>Fırınna POS'a ulaşmak için ağ bağlantısı gerekiyor.<br>
+       Lütfen internet bağlantınızı kontrol edin.</p>
+    <button onclick="window.location.reload()">🔄 Tekrar Dene</button>
+  </div>
+</body>
+</html>

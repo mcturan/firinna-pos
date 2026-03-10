@@ -172,24 +172,6 @@ def set_product_stock_link(product_id, stock_item_id):
     conn.commit()
     conn.close()
 
-def deduct_stock_for_order(order_id):
-    """Sipariş kapanınca direkt bağlı ürünlerin stoğunu düş"""
-    conn = get_db()
-    items = conn.execute('''
-        SELECT oi.product_id, oi.quantity, p.stock_item_id, p.name
-        FROM order_items oi
-        JOIN products p ON oi.product_id = p.id
-        WHERE oi.order_id = ? AND oi.is_complimentary = 0 AND p.stock_item_id IS NOT NULL
-    ''', (order_id,)).fetchall()
-    for item in items:
-        conn.execute('''INSERT INTO stock_movements
-            (stock_item_id, movement_type, quantity, cost, reason, description)
-            VALUES (?, 'out', ?, 0, 'satis', ?)''',
-            (item['stock_item_id'], item['quantity'], f'Sipariş #{order_id} — {item["name"]}'))
-    conn.commit()
-    conn.close()
-    return len(items)
-
 def add_product(name, category_id, price):
     conn = get_db()
     conn.execute('INSERT INTO products (name, category_id, price) VALUES (?, ?, ?)', 
@@ -1310,12 +1292,10 @@ def delete_telegram_contact(contact_id):
     conn.close()
 
 def get_low_stock_items():
-    """Minimum stok altına düşmüş veya eksi olan kalemleri döndür"""
+    """Minimum stok altına düşmüş kalemleri döndür"""
     conn = get_db()
     items = conn.execute('''
-        SELECT *,
-               CASE WHEN current_qty < 0 THEN 1 ELSE 0 END as is_negative
-        FROM (
+        SELECT * FROM (
             SELECT s.*,
                    COALESCE((SELECT SUM(CASE WHEN movement_type='in' THEN quantity
                                             WHEN movement_type='out' THEN -quantity
@@ -1323,10 +1303,10 @@ def get_low_stock_items():
                     FROM stock_movements WHERE stock_item_id = s.id), 0) as current_qty
             FROM stock_items s
             WHERE s.active = 1
+              AND s.min_quantity > 0
         )
-        WHERE current_qty < 0
-           OR (min_quantity > 0 AND current_qty <= min_quantity)
-        ORDER BY current_qty ASC
+        WHERE current_qty <= min_quantity
+        ORDER BY (current_qty - min_quantity) ASC
     ''').fetchall()
     conn.close()
     return [dict(i) for i in items]
@@ -1418,23 +1398,39 @@ def delete_recipe(recipe_id):
     conn.close()
 
 def deduct_stock_for_order(order_id):
-    """Sipariş kapanışında reçetedeki malzemeleri stoktan düş"""
+    """Sipariş kapanışında stoktan düş.
+    Öncelik: reçete varsa malzemeleri düş.
+    Reçete yoksa ürünün direkt stock_item_id bağlantısını kullan.
+    """
     conn = get_db()
     items = conn.execute('''
-        SELECT oi.product_id, oi.quantity as sold_qty
-        FROM order_items oi WHERE oi.order_id = ? AND oi.is_complimentary = 0
+        SELECT oi.product_id, oi.quantity as sold_qty,
+               p.stock_item_id as direct_stock_id, p.name as product_name
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ? AND oi.is_complimentary = 0
     ''', (order_id,)).fetchall()
     for item in items:
         recipes = conn.execute('''
             SELECT r.stock_item_id, r.quantity as recipe_qty
             FROM recipes r WHERE r.product_id = ?
         ''', (item['product_id'],)).fetchall()
-        for r in recipes:
-            total_deduct = r['recipe_qty'] * item['sold_qty']
+        if recipes:
+            # Reçete bazlı düşüm
+            for r in recipes:
+                total_deduct = r['recipe_qty'] * item['sold_qty']
+                conn.execute('''INSERT INTO stock_movements
+                    (stock_item_id, movement_type, quantity, reason, description)
+                    VALUES (?, 'out', ?, 'satis', ?)''',
+                    (r['stock_item_id'], total_deduct,
+                     f'Sipariş #{order_id} — {item["product_name"]}'))
+        elif item['direct_stock_id']:
+            # Fallback: direkt bağlantı
             conn.execute('''INSERT INTO stock_movements
                 (stock_item_id, movement_type, quantity, reason, description)
-                VALUES (?, 'out', ?, 'satis', 'Sipariş #' || ?)''',
-                (r['stock_item_id'], total_deduct, order_id))
+                VALUES (?, 'out', ?, 'satis', ?)''',
+                (item['direct_stock_id'], item['sold_qty'],
+                 f'Sipariş #{order_id} — {item["product_name"]} (direkt)'))
     conn.commit()
     conn.close()
 
