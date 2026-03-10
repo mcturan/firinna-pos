@@ -7,35 +7,104 @@
     <title>Stok - Fırınna POS</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
+        :root { --green: #2d6a4f; --red: #dc2626; --gold: #d97706; --bg: #f0f4f1; }
+        body { background: var(--bg); }
+
+        .page-header {
+            background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 60%, #40916c 100%);
+            color: white; padding: 1.4rem 2rem 1.2rem;
+            border-radius: 0 0 20px 20px; margin-bottom: 1.5rem;
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem;
+        }
+        .page-header h1 { margin:0; font-size:1.4rem; font-weight:700; }
+
+        /* ── Anlık Stok Durumu ── */
+        .durum-panel {
+            background: white; border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.09); margin-bottom: 1.5rem; overflow: hidden;
+        }
+        .durum-header {
+            background: #1b4332; color: white; padding: .85rem 1.5rem;
+            font-weight: 700; font-size: .9rem; letter-spacing: .5px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .durum-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+            padding: 1.1rem 1.5rem; gap: .75rem;
+        }
+        .dur-item { text-align: center; padding: .75rem .5rem;
+                    background: #f8fafc; border-radius: 10px; }
+        .dur-val { font-size: 1.35rem; font-weight: 800; line-height: 1; }
+        .dur-lbl { font-size: .71rem; color: #94a3b8; font-weight: 600;
+                   text-transform: uppercase; letter-spacing: .4px; margin-top: .3rem; }
+
+        /* Kritik stok uyarı şeridi */
+        .kritik-serit {
+            margin: 0 1.5rem 1.25rem; padding: .85rem 1rem;
+            background: #fff5f5; border: 1.5px solid #fed7d7;
+            border-radius: 10px; display: none;
+        }
+        .kritik-serit.show { display: block; }
+        .kritik-title { color: #c53030; font-weight: 700; font-size: .85rem; margin-bottom: .5rem; }
+        .kritik-items { display: flex; flex-wrap: wrap; gap: .4rem; }
+        .kritik-tag { background: #fed7d7; color: #c53030; padding: .25rem .65rem;
+                      border-radius: 20px; font-size: .78rem; font-weight: 600; }
+
+        /* ── Sekmeler ── */
         .stok-tabs { display:flex; gap:0; border-bottom:2px solid #e2e8f0; margin-bottom:1.5rem; }
-        .stok-tab { padding:.75rem 1.5rem; border:none; background:none; font-size:1rem; font-weight:600; color:#718096; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; }
-        .stok-tab.active { color:#2d6a4f; border-bottom-color:#2d6a4f; }
+        .stok-tab { padding:.7rem 1.4rem; border:none; background:none; font-size:.92rem;
+                    font-weight:600; color:#718096; cursor:pointer;
+                    border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .18s; }
+        .stok-tab:hover { color:var(--green); }
+        .stok-tab.active { color:var(--green); border-bottom-color:var(--green); }
 
-        .stok-table { width:100%; border-collapse:collapse; font-size:.9rem; }
-        .stok-table th { background:#f7fafc; padding:.7rem .75rem; text-align:left; color:#4a5568; font-weight:600; border-bottom:2px solid #e2e8f0; }
-        .stok-table td { padding:.65rem .75rem; border-bottom:1px solid #f0f0f0; }
+        /* ── Tablolar ── */
+        .stok-table { width:100%; border-collapse:collapse; font-size:.88rem; }
+        .stok-table th { background:#f7fafc; padding:.7rem .9rem; text-align:left;
+                         color:#4a5568; font-weight:600; border-bottom:2px solid #e2e8f0; }
+        .stok-table td { padding:.65rem .9rem; border-bottom:1px solid #f0f0f0; }
         .stok-table tr:hover td { background:#fafafa; }
-        .qty-low { color:#e53e3e; font-weight:700; }
-        .qty-ok { color:#2d6a4f; font-weight:700; }
+        .qty-low { color:#dc2626; font-weight:700; }
+        .qty-ok  { color:#2d6a4f; font-weight:700; }
 
-        .add-form-card { background:white; border-radius:12px; padding:1.25rem; box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.5rem; }
-        .add-form-card h4 { margin:0 0 1rem; color:#4a5568; }
+        .badge { padding:.2rem .6rem; border-radius:20px; font-size:.72rem; font-weight:700; }
+        .badge-in  { background:#d1fae5; color:#065f46; }
+        .badge-out { background:#fee2e2; color:#991b1b; }
+        .badge-adj { background:#fef3c7; color:#92400e; }
+
+        /* Yeni kalem formu */
+        .add-form-card { background:white; border-radius:14px; padding:1.25rem 1.5rem;
+                         box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.5rem; }
+        .add-form-title { font-weight:700; color:#374151; margin-bottom:1rem;
+                          font-size:.95rem; display:flex; align-items:center; gap:.4rem; }
         .form-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:flex-end; }
-        .form-row input, .form-row select { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; }
+        .form-row input, .form-row select {
+            padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.88rem; }
         .form-row input[type=text] { flex:2; min-width:130px; }
         .form-row input[type=number] { flex:1; min-width:90px; }
         .form-row select { flex:1; min-width:90px; }
 
-        .move-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1000; align-items:center; justify-content:center; }
+        /* Hareketler filtre */
+        .filter-bar { background:white; border-radius:14px; padding:1.1rem 1.5rem;
+                      box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.25rem;
+                      display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; }
+        .filter-bar label { font-weight:600; color:#4a5568; font-size:.87rem; }
+        .filter-bar select, .filter-bar input {
+            padding:.45rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.87rem; }
+        .btn-filtrele { padding:.45rem 1rem; background:var(--green); color:white;
+                        border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:.87rem; }
+
+        /* Hareket modal */
+        .move-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);
+                      z-index:1000; align-items:center; justify-content:center; }
         .move-modal.open { display:flex; }
-        .move-box { background:white; border-radius:14px; padding:2rem; min-width:360px; max-width:95vw; }
+        .move-box { background:white; border-radius:16px; padding:2rem;
+                    min-width:360px; max-width:95vw; }
         .move-box h3 { margin:0 0 1.5rem; }
 
         .no-data { text-align:center; color:#a0aec0; padding:2rem; }
-        .badge { padding:.2rem .6rem; border-radius:20px; font-size:.75rem; font-weight:700; }
-        .badge-in { background:#d1fae5; color:#065f46; }
-        .badge-out { background:#fee2e2; color:#991b1b; }
-        .badge-adj { background:#fef3c7; color:#92400e; }
+        .card { background:white; border-radius:14px; padding:1.5rem;
+                box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.25rem; }
     </style>
 </head>
 <body>
@@ -43,26 +112,26 @@
         <div class="nav-brand">🍽️ Fırınna POS</div>
         <div class="nav-links">
             <a href="/">Masalar</a>
-                        <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">🔔<span class="alert-badge" id="alertBadge" style="display:none">0</span></button>
+            <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">🔔<span class="alert-badge" id="alertBadge" style="display:none">0</span></button>
             <div class="nav-dropdown" id="navDropdown">
                 <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
                 <div class="nav-dropdown-menu">
-            <a href="/kasa">💰 Kasa</a>
-            <a href="/muhasebe">📒 Muhasebe</a>
-            <hr>
-            <a href="/products">🍞 Ürünler</a>
-            <a href="/stok" class="active">📦 Stok</a>
-            <a href="/recete">🧾 Reçete</a>
-            <a href="/expenses">📤 Masraflar</a>
-            <a href="/tables">🪑 Masa Yönetimi</a>
-            <hr>
-            <a href="/backup">💾 Yedek</a>
-            <a href="/settings">⚙️ Ayarlar</a>
+                    <a href="/kasa">💰 Kasa</a>
+                    <a href="/muhasebe">📒 Muhasebe</a>
+                    <hr>
+                    <a href="/products">🍞 Ürünler</a>
+                    <a href="/stok" class="active">📦 Stok</a>
+                    <a href="/recete">🧾 Reçete</a>
+                    <a href="/expenses">📤 Masraflar</a>
+                    <a href="/tables">🪑 Masa Yönetimi</a>
+                    <hr>
+                    <a href="/backup">💾 Yedek</a>
+                    <a href="/settings">⚙️ Ayarlar</a>
                 </div>
             </div>
         </div>
     </nav>
-    <!-- Stok Uyarı Paneli -->
+
     <div class="alert-panel" id="alertPanel">
         <div class="alert-panel-header">
             <span>⚠️ Düşük Stok Uyarıları</span>
@@ -72,64 +141,90 @@
             <div class="alert-empty">Yükleniyor...</div>
         </div>
     </div>
-    <script>
-        function toggleNav() {
-            document.getElementById('navDropdown').classList.toggle('open');
-        }
-        document.addEventListener('click', function(e) {
-            const dd = document.getElementById('navDropdown');
-            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
-        });
-    </script>
 
     <div class="container">
-        <h1 style="margin-bottom:1.5rem;">📦 Stok Yönetimi</h1>
+        <div class="page-header">
+            <div>
+                <h1>📦 Stok Yönetimi</h1>
+                <div style="font-size:.82rem;opacity:.8;margin-top:.2rem;" id="stokSubtitle">Yükleniyor...</div>
+            </div>
+            <button onclick="loadStock()" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.4);padding:.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">🔄 Yenile</button>
+        </div>
 
+        <!-- ── ANI STOK DURUMU ── -->
+        <div class="durum-panel">
+            <div class="durum-header">
+                <span>📊 Anlık Stok Durumu</span>
+                <span id="durumZaman" style="font-weight:400;font-size:.8rem;opacity:.8;"></span>
+            </div>
+            <div class="durum-grid" id="durumGrid">
+                <div class="dur-item"><div class="dur-val" id="dt-toplam">...</div><div class="dur-lbl">Toplam Kalem</div></div>
+                <div class="dur-item"><div class="dur-val" style="color:#dc2626" id="dt-kritik">...</div><div class="dur-lbl">⚠️ Kritik Stok</div></div>
+                <div class="dur-item"><div class="dur-val" style="color:#2d6a4f" id="dt-kategori">...</div><div class="dur-lbl">Kategori</div></div>
+                <div class="dur-item"><div class="dur-val" style="color:#7c3aed" id="dt-maliyet">...</div><div class="dur-lbl">Toplam Maliyet</div></div>
+            </div>
+            <!-- Kritik stok şeridi -->
+            <div class="kritik-serit" id="kritikSerit">
+                <div class="kritik-title">⚠️ Kritik Stok Kalemleri</div>
+                <div class="kritik-items" id="kritikItems"></div>
+            </div>
+        </div>
+
+        <!-- ── SEKMELER ── -->
         <div class="stok-tabs">
-            <button class="stok-tab" onclick="switchTab('ozet')" id="tab-ozet">📊 Stok Özeti</button>
-            <button class="stok-tab active" onclick="switchTab('stok')" id="tab-stok">📦 Kalemler</button>
+            <button class="stok-tab active" onclick="switchTab('stok')" id="tab-stok">📦 Stok Kalemleri</button>
+            <button class="stok-tab" onclick="switchTab('ozet')" id="tab-ozet">📊 Kategori Özeti</button>
             <button class="stok-tab" onclick="switchTab('hareketler')" id="tab-hareketler">📋 Hareketler</button>
         </div>
-        <!-- ÖZET PANELİ -->
-        <div id="panel-ozet" style="display:none;"></div>
 
         <!-- STOK KALEMLERİ -->
         <div id="panel-stok">
             <div class="add-form-card">
-                <h4>➕ Yeni Stok Kalemi</h4>
+                <div class="add-form-title">➕ Yeni Stok Kalemi</div>
                 <div class="form-row">
                     <input type="text" id="sName" placeholder="Ürün adı (örn: Domates)">
                     <select id="sUnit">
-                        <option value="kg">kg</option>
-                        <option value="gr">gr</option>
-                        <option value="lt">lt</option>
-                        <option value="ml">ml</option>
-                        <option value="adet">adet</option>
-                        <option value="paket">paket</option>
+                        <option value="kg">kg</option><option value="gr">gr</option>
+                        <option value="lt">lt</option><option value="ml">ml</option>
+                        <option value="adet">adet</option><option value="paket">paket</option>
                         <option value="dilim">dilim</option>
                     </select>
                     <select id="sCat">
-                        <option>Sebze/Meyve</option>
-                        <option>Et/Tavuk</option>
-                        <option>Süt Ürünleri</option>
-                        <option>Tahıl/Un</option>
-                        <option>Baharat</option>
-                        <option>İçecek</option>
-                        <option>Temizlik</option>
-                        <option>Genel</option>
+                        <option>Sebze/Meyve</option><option>Et/Tavuk</option>
+                        <option>Süt Ürünleri</option><option>Tahıl/Un</option>
+                        <option>Baharat</option><option>İçecek</option>
+                        <option>Temizlik</option><option>Genel</option>
                     </select>
                     <input type="number" id="sMinQty" placeholder="Min stok" step="0.01" min="0">
                     <input type="number" id="sCost" placeholder="Birim maliyet ₺" step="0.01" min="0">
                     <button class="btn btn-primary" onclick="addStockItem()">Ekle</button>
                 </div>
             </div>
-
-            <div id="stockList"><div class="no-data">⏳ Yükleniyor...</div></div>
+            <div class="card" style="padding:0;overflow:hidden;">
+                <div id="stockList"><div class="no-data">⏳ Yükleniyor...</div></div>
+            </div>
         </div>
+
+        <!-- KATEGORİ ÖZETİ -->
+        <div id="panel-ozet" style="display:none;"></div>
 
         <!-- HAREKETLER -->
         <div id="panel-hareketler" style="display:none;">
-            <div id="movementList"><div class="no-data">⏳ Yükleniyor...</div></div>
+            <div class="filter-bar">
+                <label>📅 Tarih Aralığı:</label>
+                <input type="date" id="mvStart">
+                <span style="color:#94a3b8">—</span>
+                <input type="date" id="mvEnd">
+                <label>Ürün:</label>
+                <select id="mvItem" style="min-width:140px;">
+                    <option value="">Tümü</option>
+                </select>
+                <button class="btn-filtrele" onclick="loadMovements()">Filtrele</button>
+                <button class="btn-filtrele" style="background:#64748b;" onclick="clearMvFilter()">Tümü</button>
+            </div>
+            <div class="card" style="padding:0;overflow:hidden;">
+                <div id="movementList"><div class="no-data">⏳ Yükleniyor...</div></div>
+            </div>
         </div>
     </div>
 
@@ -159,7 +254,9 @@
                     <input type="number" id="moveQty" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0">
                 </div>
                 <div>
-                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Tutar ₺ <span id="costRequired" style="color:#e53e3e;font-size:.82rem;">(Alım için zorunlu)</span></label>
+                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">
+                        Tutar ₺ <span id="costRequired" style="color:#dc2626;font-size:.82rem;">(Alım için zorunlu)</span>
+                    </label>
                     <input type="number" id="moveCost" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0.00">
                 </div>
                 <div>
@@ -174,312 +271,395 @@
         </div>
     </div>
 
+    <footer style="text-align:center;padding:2rem 1rem 1.5rem;color:#a0aec0;font-size:.78rem;margin-top:3rem;border-top:1px solid #f0f0f0;">
+        Fırınna POS &mdash; TA1XTA &copy; 2026
+    </footer>
+
     <script>
-        let stockItems = [];
+    let stockItems = [];
+    let currentTab = 'stok';
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadStock();
-        });
+    function localDate(d) {
+        d = d||new Date();
+        return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    }
 
-        function switchTab(tab) {
-            document.querySelectorAll('.stok-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-            document.getElementById('panel-ozet').style.display = tab === 'ozet' ? 'block' : 'none';
-            document.getElementById('panel-stok').style.display = tab === 'stok' ? 'block' : 'none';
-            document.getElementById('panel-hareketler').style.display = tab === 'hareketler' ? 'block' : 'none';
-            if (tab === 'hareketler') loadMovements();
-            if (tab === 'ozet') renderOzet();
+    // ── Anlık Durum ──
+    function updateDurum() {
+        const toplam  = stockItems.length;
+        const kritik  = stockItems.filter(s=>(s.current_qty||0)<=s.min_quantity && s.min_quantity>0);
+        const katSet  = new Set(stockItems.map(s=>s.category));
+        const maliyet = stockItems.reduce((sum,s)=>{
+            return sum + ((s.current_qty||0) * (s.cost_per_unit||0));
+        }, 0);
+
+        document.getElementById('dt-toplam').textContent   = toplam;
+        document.getElementById('dt-kritik').textContent   = kritik.length || '✅ 0';
+        document.getElementById('dt-kategori').textContent = katSet.size;
+        document.getElementById('dt-maliyet').textContent  =
+            maliyet.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₺';
+
+        const serit = document.getElementById('kritikSerit');
+        if (kritik.length > 0) {
+            serit.classList.add('show');
+            document.getElementById('kritikItems').innerHTML = kritik.map(s=>`
+                <span class="kritik-tag">${s.name} — ${Number(s.current_qty||0).toFixed(1)} ${s.unit}</span>
+            `).join('');
+        } else {
+            serit.classList.remove('show');
         }
 
-        function renderOzet() {
-            if (stockItems.length === 0) {
-                document.getElementById('panel-ozet').innerHTML = '<div class="no-data">Henüz stok kalemi yok.</div>';
-                return;
-            }
-            const cats = {};
-            stockItems.forEach(s => { if (!cats[s.category]) cats[s.category] = []; cats[s.category].push(s); });
+        const now = new Date();
+        document.getElementById('durumZaman').textContent =
+            now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})+' güncellendi';
+        document.getElementById('stokSubtitle').textContent =
+            toplam+' kalem, '+kritik.length+' kritik';
+    }
 
-            let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem;">';
-            Object.entries(cats).forEach(([cat, items]) => {
-                html += `<div style="background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.07);">
-                    <h4 style="margin:0 0 1rem;color:#4a5568;border-bottom:2px solid #e2e8f0;padding-bottom:.5rem;">${cat}</h4>`;
-                items.forEach(s => {
-                    const qty = s.current_qty || 0;
-                    const low = qty <= s.min_quantity;
-                    const pct = s.min_quantity > 0 ? Math.min(100, Math.round(qty / (s.min_quantity * 2) * 100)) : 50;
-                    html += `<div style="margin-bottom:.9rem;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;">
-                            <span style="font-weight:600;font-size:.9rem;">${s.name}</span>
-                            <span style="font-weight:700;font-size:.95rem;color:${low?'#e53e3e':'#2d6a4f'};">
-                                ${qty.toFixed(2)} ${s.unit} ${low?'⚠️':''}
-                            </span>
-                        </div>
-                        <div style="height:6px;background:#e2e8f0;border-radius:3px;">
-                            <div style="height:100%;width:${pct}%;background:${low?'#fc8181':'#48bb78'};border-radius:3px;transition:width .4s;"></div>
-                        </div>
-                        ${s.min_quantity > 0 ? `<div style="font-size:.72rem;color:#a0aec0;margin-top:.2rem;">Min: ${s.min_quantity} ${s.unit}</div>` : ''}
-                    </div>`;
-                });
-                html += '</div>';
+    // ── Stok Yükle ──
+    async function loadStock() {
+        stockItems = await fetch('/api/stock').then(r=>r.json());
+        updateDurum();
+        renderStockTable();
+        // Hareket filtre dropdown güncelle
+        const sel = document.getElementById('mvItem');
+        sel.innerHTML = '<option value="">Tümü</option>' +
+            stockItems.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+        if (currentTab==='ozet') renderOzet();
+    }
+
+    // ── Stok Tablosu ──
+    function renderStockTable() {
+        const list = document.getElementById('stockList');
+        if (stockItems.length===0) {
+            list.innerHTML='<div class="no-data">Henüz stok kalemi yok.</div>'; return;
+        }
+        let rows = '';
+        stockItems.forEach(s=>{
+            const qty = s.current_qty||0;
+            const low = qty<=s.min_quantity && s.min_quantity>0;
+            rows += `<tr>
+                <td><strong>${s.name}</strong></td>
+                <td><span style="color:#718096;font-size:.84rem;">${s.category}</span></td>
+                <td>${s.unit}</td>
+                <td class="${low?'qty-low':'qty-ok'}">${qty.toFixed(2)} ${s.unit} ${low?'⚠️':''}</td>
+                <td style="color:#94a3b8;">${s.min_quantity>0?s.min_quantity+' '+s.unit:'—'}</td>
+                <td style="color:#718096;">${s.cost_per_unit?s.cost_per_unit.toFixed(2)+' ₺':'—'}</td>
+                <td style="white-space:nowrap;">
+                    <button class="btn btn-secondary" style="padding:.3rem .7rem;font-size:.83rem;"
+                        onclick="openMoveModal(${s.id},'${s.name.replace(/'/g,"\\'")}','${s.unit}')">📥 Hareket</button>
+                    <button style="background:none;border:none;cursor:pointer;font-size:.95rem;padding:0 .3rem;"
+                        onclick="editStokItem(${s.id})" data-name="${s.name}" data-unit="${s.unit}"
+                        data-cat="${s.category}" data-min="${s.min_quantity||0}" data-cost="${s.cost_per_unit||0}"
+                        id="stok-btn-${s.id}" title="Düzenle">✏️</button>
+                    <button style="background:none;border:none;cursor:pointer;font-size:.95rem;padding:0 .3rem;"
+                        onclick="deleteStokItem(${s.id})" data-name="${s.name}" id="stok-del-${s.id}">🗑️</button>
+                </td>
+            </tr>`;
+        });
+        list.innerHTML = `
+            <table class="stok-table">
+                <thead><tr><th>Ürün</th><th>Kategori</th><th>Birim</th><th>Güncel Stok</th><th>Min</th><th>Birim Maliyet</th><th></th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>`;
+    }
+
+    // ── Kategori Özeti ──
+    function renderOzet() {
+        if (stockItems.length===0) {
+            document.getElementById('panel-ozet').innerHTML='<div class="no-data">Stok kalemi yok.</div>'; return;
+        }
+        const cats = {};
+        stockItems.forEach(s=>{ if(!cats[s.category]) cats[s.category]=[]; cats[s.category].push(s); });
+        let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem;">';
+        Object.entries(cats).forEach(([cat,items])=>{
+            html += `<div class="card"><h3 style="border-bottom:2px solid #e2e8f0;padding-bottom:.5rem;">${cat}</h3>`;
+            items.forEach(s=>{
+                const qty = s.current_qty||0;
+                const low = qty<=s.min_quantity && s.min_quantity>0;
+                const pct = s.min_quantity>0 ? Math.min(100,Math.round(qty/(s.min_quantity*2)*100)) : 50;
+                html += `<div style="margin-bottom:.85rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;">
+                        <span style="font-weight:600;font-size:.9rem;">${s.name}</span>
+                        <span style="font-weight:700;color:${low?'#dc2626':'#2d6a4f'};">
+                            ${qty.toFixed(2)} ${s.unit} ${low?'⚠️':''}
+                        </span>
+                    </div>
+                    <div style="height:6px;background:#e2e8f0;border-radius:3px;">
+                        <div style="height:100%;width:${pct}%;background:${low?'#fc8181':'#48bb78'};border-radius:3px;transition:width .4s;"></div>
+                    </div>
+                    ${s.min_quantity>0?`<div style="font-size:.71rem;color:#a0aec0;margin-top:.2rem;">Min: ${s.min_quantity} ${s.unit}</div>`:''}
+                </div>`;
             });
             html += '</div>';
-            document.getElementById('panel-ozet').innerHTML = html;
-        }
+        });
+        html += '</div>';
+        document.getElementById('panel-ozet').innerHTML = html;
+    }
 
-        function editStokItem(id) {
-            const btn = document.getElementById('stok-btn-' + id);
-            const name = btn.dataset.name;
-            const unit = btn.dataset.unit;
-            const cat = btn.dataset.cat;
-            const minQty = parseFloat(btn.dataset.min) || 0;
-            const cost = parseFloat(btn.dataset.cost) || 0;
-            const units = ['kg','gr','lt','ml','adet','paket','dilim'];
-            const cats = ['Sebze/Meyve','Et/Tavuk','Süt Ürünleri','Tahıl/Un','Baharat','İçecek','Temizlik','Genel'];
-            const unitOpts = units.map(u => `<option ${u===unit?'selected':''}>${u}</option>`).join('');
-            const catOpts = cats.map(c => `<option ${c===cat?'selected':''}>${c}</option>`).join('');
-            const modal = document.createElement('div');
-            modal.id = 'editStokModal';
-            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `
-                <div style="background:white;border-radius:14px;padding:2rem;min-width:340px;max-width:95vw;">
-                    <h3 style="margin:0 0 1.5rem;">✏️ Düzenle: ${name}</h3>
-                    <div style="display:flex;flex-direction:column;gap:1rem;">
-                        <div><label style="font-weight:600;display:block;margin-bottom:.3rem;">İsim</label>
-                            <input type="text" id="ei-name" value="${name}" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;box-sizing:border-box;"></div>
-                        <div style="display:flex;gap:.75rem;">
-                            <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Birim</label>
-                                <select id="ei-unit" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;">${unitOpts}</select></div>
-                            <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Kategori</label>
-                                <select id="ei-cat" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;">${catOpts}</select></div>
-                        </div>
-                        <div style="display:flex;gap:.75rem;">
-                            <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Min Stok</label>
-                                <input type="number" id="ei-min" value="${minQty}" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;box-sizing:border-box;"></div>
-                            <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Birim Maliyet ₺</label>
-                                <input type="number" id="ei-cost" value="${cost}" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;box-sizing:border-box;"></div>
-                        </div>
-                        <div style="display:flex;gap:.75rem;justify-content:flex-end;margin-top:.5rem;">
-                            <button class="btn btn-secondary" onclick="document.getElementById('editStokModal').remove()">İptal</button>
-                            <button class="btn btn-primary" onclick="saveStokEdit(${id})">Kaydet</button>
-                        </div>
-                    </div>
-                </div>`;
-            document.body.appendChild(modal);
-        }
+    // ── Sekmeler ──
+    function switchTab(tab) {
+        currentTab = tab;
+        ['stok','ozet','hareketler'].forEach(t=>{
+            document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+            document.getElementById('panel-'+t).style.display = t===tab?'block':'none';
+        });
+        if (tab==='hareketler') loadMovements();
+        if (tab==='ozet') renderOzet();
+    }
 
-        async function saveStokEdit(id) {
-            const name = document.getElementById('ei-name').value.trim();
-            const unit = document.getElementById('ei-unit').value;
-            const cat = document.getElementById('ei-cat').value;
-            const minQty = parseFloat(document.getElementById('ei-min').value) || 0;
-            const cost = parseFloat(document.getElementById('ei-cost').value) || 0;
-            if (!name) { alert('İsim gerekli.'); return; }
-            await fetch('/api/stock/' + id, {
-                method: 'PATCH', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({name, unit, category:cat, min_quantity:minQty, cost_per_unit:cost})
-            });
-            document.getElementById('editStokModal').remove();
-            loadStock();
-        }
+    // ── Hareketler ──
+    async function loadMovements() {
+        const itemId = document.getElementById('mvItem').value;
+        const start  = document.getElementById('mvStart').value;
+        const end    = document.getElementById('mvEnd').value;
+        let url = '/api/stock/movements';
+        const params = [];
+        if (itemId) params.push('item_id='+itemId);
+        if (params.length) url += '?'+params.join('&');
+        const moves = await fetch(url).then(r=>r.json());
 
-        async function deleteStokItem(id) {
-            const name = document.getElementById('stok-del-' + id).dataset.name;
-            if (!confirm(`"${name}" silinsin mi?\nReçete veya harekette kullanılıyorsa silinmez.`)) return;
-            const res = await fetch('/api/stock/' + id, {method: 'DELETE'});
-            const data = await res.json();
-            if (!data.success) { alert('⚠️ ' + data.error); return; }
-            loadStock();
-        }
+        // Tarih filtresi frontend'de
+        const filtered = (start||end) ? moves.filter(m=>{
+            const d = (m.created_at||'').slice(0,10);
+            if (start && d < start) return false;
+            if (end   && d > end)   return false;
+            return true;
+        }) : moves;
 
-        async function loadStock() {
-            stockItems = await fetch('/api/stock').then(r => r.json());
-            const list = document.getElementById('stockList');
-            if (stockItems.length === 0) {
-                list.innerHTML = '<div class="no-data">Henüz stok kalemi yok. Yukarıdan ekleyin.</div>';
-                return;
-            }
-            let bycat = {};
-            stockItems.forEach(s => { if (!bycat[s.category]) bycat[s.category] = []; bycat[s.category].push(s); });
-            let html = '<table class="stok-table"><thead><tr><th>Ürün</th><th>Kategori</th><th>Birim</th><th>Güncel Stok</th><th>Min</th><th>Birim Maliyet</th><th></th></tr></thead><tbody>';
-            Object.entries(bycat).forEach(([cat, items]) => {
-                items.forEach(s => {
-                    const qty = s.current_qty || 0;
-                    const low = qty <= s.min_quantity;
-                    html += `<tr>
-                        <td><strong>${s.name}</strong></td>
-                        <td><span style="color:#718096;font-size:.85rem;">${s.category}</span></td>
-                        <td>${s.unit}</td>
-                        <td class="${low ? 'qty-low' : 'qty-ok'}">${qty.toFixed(2)} ${s.unit} ${low ? '⚠️' : ''}</td>
-                        <td style="color:#a0aec0;">${s.min_quantity} ${s.unit}</td>
-                        <td style="color:#718096;">${s.cost_per_unit ? s.cost_per_unit.toFixed(2) + ' ₺' : '—'}</td>
-                        <td style="white-space:nowrap;">
-                            <button class="btn btn-secondary" style="padding:.35rem .75rem;font-size:.85rem;" onclick="openMoveModal(${s.id},'${s.name}','${s.unit}')">📥 Hareket</button>
-                            <button style="background:none;border:none;cursor:pointer;font-size:1rem;padding:0 .3rem;" onclick="editStokItem(${s.id})" data-name="${s.name}" data-unit="${s.unit}" data-cat="${s.category}" data-min="${s.min_quantity||0}" data-cost="${s.cost_per_unit||0}" id="stok-btn-${s.id}" title="Düzenle">✏️</button>
-                            <button style="background:none;border:none;cursor:pointer;font-size:1rem;padding:0 .3rem;" onclick="deleteStokItem(${s.id})" data-name="${s.name}" id="stok-del-${s.id}">🗑️</button>
-                        </td>
-                    </tr>`;
-                });
-            });
-            html += '</tbody></table>';
-            list.innerHTML = html;
-        }
-
-        function editMovement(id, qty, cost) {
-            const row = document.getElementById('mrow-' + id);
-            const cells = row.querySelectorAll('td');
-            cells[3].innerHTML = `<input type="number" id="mq-${id}" value="${qty}" step="0.001" min="0" style="width:75px;padding:.3rem;border:2px solid #4299e1;border-radius:6px;">`;
-            cells[4].innerHTML = `<input type="number" id="mc-${id}" value="${cost}" step="0.01" min="0" style="width:75px;padding:.3rem;border:2px solid #4299e1;border-radius:6px;">`;
-            cells[6].innerHTML = `
-                <button class="btn btn-primary" style="padding:.3rem .6rem;font-size:.82rem;" onclick="saveMovement2(${id})">✓</button>
-                <button class="btn btn-secondary" style="padding:.3rem .6rem;font-size:.82rem;" onclick="loadMovements()">✕</button>`;
-        }
-        async function saveMovement2(id) {
-            const qty = parseFloat(document.getElementById('mq-' + id).value);
-            const cost = parseFloat(document.getElementById('mc-' + id).value) || 0;
-            if (isNaN(qty) || qty <= 0) { alert('Geçerli miktar girin.'); return; }
-            await fetch('/api/stock/movements/' + id, {
-                method: 'PATCH', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({quantity: qty, cost, description: ''})
-            });
-            loadMovements(); loadStock();
-        }
-        async function deleteMovement(id) {
-            if (!confirm('Bu hareketi silmek istiyor musun?')) return;
-            const res = await fetch('/api/stock/movements/' + id, {method: 'DELETE'});
-            const d = await res.json();
-            if (!d.success) { alert('⚠️ ' + d.error); return; }
-            loadMovements(); loadStock();
-        }
-
-        async function loadMovements() {
-            const moves = await fetch('/api/stock/movements').then(r => r.json());
-            const list = document.getElementById('movementList');
-            if (moves.length === 0) { list.innerHTML = '<div class="no-data">Hareket yok.</div>'; return; }
-            const typeLabel = { in: 'Giriş', out: 'Çıkış', adjust: 'Düzeltme' };
-            const typeBadge = { in: 'badge-in', out: 'badge-out', adjust: 'badge-adj' };
-            list.innerHTML = `<table class="stok-table">
+        const list = document.getElementById('movementList');
+        if (!filtered.length) { list.innerHTML='<div class="no-data">Hareket bulunamadı.</div>'; return; }
+        const typeLabel  = {in:'Giriş',out:'Çıkış',adjust:'Düzeltme'};
+        const typeBadge  = {in:'badge-in',out:'badge-out',adjust:'badge-adj'};
+        list.innerHTML = `
+            <table class="stok-table">
                 <thead><tr><th>Tarih</th><th>Ürün</th><th>İşlem</th><th>Miktar</th><th>Maliyet</th><th>Açıklama</th><th></th></tr></thead>
-                <tbody>${moves.map(m => {
-                    const dt = new Date(m.created_at).toLocaleDateString('tr-TR');
+                <tbody>${filtered.map(m=>{
+                    const dt = (m.created_at||'').slice(0,10);
                     const canEdit = m.reason !== 'satis';
                     return `<tr id="mrow-${m.id}">
-                        <td style="color:#718096;font-size:.82rem;">${dt}</td>
+                        <td style="color:#94a3b8;font-size:.81rem;">${dt}</td>
                         <td><strong>${m.item_name}</strong></td>
-                        <td><span class="badge ${typeBadge[m.movement_type]}">${typeLabel[m.movement_type]}</span></td>
+                        <td><span class="badge ${typeBadge[m.movement_type]||'badge-adj'}">${typeLabel[m.movement_type]||m.movement_type}</span></td>
                         <td>${m.quantity} ${m.unit}</td>
-                        <td>${m.cost ? m.cost.toFixed(2) + ' ₺' : '—'}</td>
-                        <td style="color:#4a5568;">${m.description || m.reason || '—'}</td>
-                        <td>${canEdit ? `<button style="background:none;border:none;cursor:pointer;" onclick="editMovement(${m.id},${m.quantity},${m.cost||0})">✏️</button><button style="background:none;border:none;cursor:pointer;" onclick="deleteMovement(${m.id})">🗑️</button>` : ''}</td>
+                        <td>${m.cost?m.cost.toFixed(2)+' ₺':'—'}</td>
+                        <td style="color:#4a5568;">${m.description||m.reason||'—'}</td>
+                        <td>${canEdit?`
+                            <button style="background:none;border:none;cursor:pointer;" onclick="editMovement(${m.id},${m.quantity},${m.cost||0})">✏️</button>
+                            <button style="background:none;border:none;cursor:pointer;" onclick="deleteMovement(${m.id})">🗑️</button>`:''}
+                        </td>
                     </tr>`;
                 }).join('')}</tbody>
             </table>`;
-        }
+    }
 
-        async function addStockItem() {
-            const name = document.getElementById('sName').value.trim();
-            const unit = document.getElementById('sUnit').value;
-            const cat = document.getElementById('sCat').value;
-            const minQty = parseFloat(document.getElementById('sMinQty').value) || 0;
-            const cost = parseFloat(document.getElementById('sCost').value) || 0;
-            if (!name) { alert('Ürün adı gerekli.'); return; }
-            await fetch('/api/stock', {
-                method: 'POST', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({name, unit, category:cat, min_quantity:minQty, cost_per_unit:cost})
-            });
-            document.getElementById('sName').value = '';
-            document.getElementById('sMinQty').value = '';
-            document.getElementById('sCost').value = '';
-            loadStock();
-        }
+    function clearMvFilter() {
+        document.getElementById('mvStart').value = '';
+        document.getElementById('mvEnd').value   = '';
+        document.getElementById('mvItem').value  = '';
+        loadMovements();
+    }
 
-        function openMoveModal(id, name, unit) {
-            document.getElementById('moveItemId').value = id;
-            document.getElementById('moveTitle').textContent = '📥 ' + name;
-            document.getElementById('moveUnit').textContent = unit;
-            document.getElementById('moveQty').value = '';
-            document.getElementById('moveCost').value = '';
-            document.getElementById('moveDesc').value = '';
-            document.getElementById('moveType').value = 'in';
-            document.getElementById('movePaymentDiv').style.display = 'block';
-            document.getElementById('moveModal').classList.add('open');
-        }
-        function closeMoveModal() { document.getElementById('moveModal').classList.remove('open'); }
-
-        function onMoveTypeChange() {
-            const type = document.getElementById('moveType').value;
-            document.getElementById('movePaymentDiv').style.display = type === 'in' ? 'block' : 'none';
-            document.getElementById('costRequired').style.display = type === 'in' ? 'inline' : 'none';
-        }
-
-        async function saveMovement() {
-            const id = document.getElementById('moveItemId').value;
-            const type = document.getElementById('moveType').value;
-            const qty = parseFloat(document.getElementById('moveQty').value);
-            const cost = parseFloat(document.getElementById('moveCost').value) || 0;
-            const desc = document.getElementById('moveDesc').value.trim();
-            const payment = document.getElementById('movePayment').value;
-            if (isNaN(qty) || qty <= 0) { alert('Geçerli bir miktar girin.'); return; }
-            if (type === 'in' && (!cost || cost <= 0)) { alert('Alım işlemi için tutar zorunludur.'); return; }
-            const res = await fetch(`/api/stock/${id}/movement`, {
-                method: 'POST', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({
-                    movement_type: type, quantity: qty, cost,
-                    payment_method: payment,
-                    reason: type==='adjust'?'duzeltme':type==='in'?'alim':'manuel',
-                    description: desc
-                })
-            });
-            const result = await res.json();
-            if (!result.success) {
-                alert('Hata: ' + (result.error || 'Bilinmeyen hata'));
-                return;
-            }
-            closeMoveModal();
-            loadStock();
-        }
-    </script>
-
-    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
-        Fırınna POS &mdash; TA1XTA &copy; 2026
-    </footer>
-    <script>
-    (function(){
-        async function loadAlerts() {
-            try {
-                const items = await fetch("/api/stock/alerts").then(r=>r.json());
-                const badge = document.getElementById("alertBadge");
-                const body  = document.getElementById("alertPanelBody");
-                if (!badge || !body) return;
-                if (items.length > 0) {
-                    badge.textContent = items.length;
-                    badge.style.display = "flex";
-                    body.innerHTML = items.map(i => `
-                        <div class="alert-item">
-                            <span class="alert-item-name">${i.name}</span>
-                            <span class="alert-item-qty">
-                                <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
-                                <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
-                            </span>
-                        </div>`).join("");
-                } else {
-                    badge.style.display = "none";
-                    body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
-                }
-            } catch(e) {}
-        }
-        function toggleAlertPanel() {
-            const p = document.getElementById("alertPanel");
-            if (p) p.classList.toggle("open");
-        }
-        document.addEventListener("click", function(e) {
-            const p  = document.getElementById("alertPanel");
-            const b  = document.getElementById("alertBtn");
-            const dd = document.getElementById("navDropdown");
-            if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove("open");
+    // ── Hareket düzenleme ──
+    function editMovement(id, qty, cost) {
+        const row = document.getElementById('mrow-'+id);
+        const cells = row.querySelectorAll('td');
+        cells[3].innerHTML = `<input type="number" id="mq-${id}" value="${qty}" step="0.001" min="0" style="width:75px;padding:.3rem;border:2px solid #4299e1;border-radius:6px;">`;
+        cells[4].innerHTML = `<input type="number" id="mc-${id}" value="${cost}" step="0.01" min="0" style="width:75px;padding:.3rem;border:2px solid #4299e1;border-radius:6px;">`;
+        cells[6].innerHTML = `
+            <button class="btn btn-primary" style="padding:.3rem .6rem;font-size:.82rem;" onclick="saveMovement2(${id})">✓</button>
+            <button class="btn btn-secondary" style="padding:.3rem .6rem;font-size:.82rem;" onclick="loadMovements()">✕</button>`;
+    }
+    async function saveMovement2(id) {
+        const qty  = parseFloat(document.getElementById('mq-'+id).value);
+        const cost = parseFloat(document.getElementById('mc-'+id).value)||0;
+        if (isNaN(qty)||qty<=0) { alert('Geçerli miktar girin.'); return; }
+        await fetch('/api/stock/movements/'+id,{
+            method:'PATCH', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({quantity:qty,cost,description:''})
         });
+        loadMovements(); loadStock();
+    }
+    async function deleteMovement(id) {
+        if (!confirm('Bu hareketi silmek istiyor musun?')) return;
+        const res = await fetch('/api/stock/movements/'+id,{method:'DELETE'});
+        const d = await res.json();
+        if (!d.success) { alert('⚠️ '+d.error); return; }
+        loadMovements(); loadStock();
+    }
+
+    // ── Stok Kalem İşlemleri ──
+    async function addStockItem() {
+        const name   = document.getElementById('sName').value.trim();
+        const unit   = document.getElementById('sUnit').value;
+        const cat    = document.getElementById('sCat').value;
+        const minQty = parseFloat(document.getElementById('sMinQty').value)||0;
+        const cost   = parseFloat(document.getElementById('sCost').value)||0;
+        if (!name) { alert('Ürün adı gerekli.'); return; }
+        await fetch('/api/stock',{
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({name,unit,category:cat,min_quantity:minQty,cost_per_unit:cost})
+        });
+        document.getElementById('sName').value   = '';
+        document.getElementById('sMinQty').value = '';
+        document.getElementById('sCost').value   = '';
+        loadStock();
+    }
+
+    function editStokItem(id) {
+        const btn = document.getElementById('stok-btn-'+id);
+        const name=btn.dataset.name, unit=btn.dataset.unit, cat=btn.dataset.cat;
+        const minQty=parseFloat(btn.dataset.min)||0, cost=parseFloat(btn.dataset.cost)||0;
+        const units = ['kg','gr','lt','ml','adet','paket','dilim'];
+        const cats  = ['Sebze/Meyve','Et/Tavuk','Süt Ürünleri','Tahıl/Un','Baharat','İçecek','Temizlik','Genel'];
+        const modal = document.createElement('div');
+        modal.id = 'editStokModal';
+        modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:flex;align-items:center;justify-content:center;';
+        modal.innerHTML=`
+            <div style="background:white;border-radius:16px;padding:2rem;min-width:340px;max-width:95vw;">
+                <h3 style="margin:0 0 1.5rem;">✏️ Düzenle: ${name}</h3>
+                <div style="display:flex;flex-direction:column;gap:1rem;">
+                    <div><label style="font-weight:600;display:block;margin-bottom:.3rem;">İsim</label>
+                        <input type="text" id="ei-name" value="${name}" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;box-sizing:border-box;"></div>
+                    <div style="display:flex;gap:.75rem;">
+                        <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Birim</label>
+                            <select id="ei-unit" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;">
+                                ${units.map(u=>`<option ${u===unit?'selected':''}>${u}</option>`).join('')}</select></div>
+                        <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Kategori</label>
+                            <select id="ei-cat" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;">
+                                ${cats.map(c=>`<option ${c===cat?'selected':''}>${c}</option>`).join('')}</select></div>
+                    </div>
+                    <div style="display:flex;gap:.75rem;">
+                        <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Min Stok</label>
+                            <input type="number" id="ei-min" value="${minQty}" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;box-sizing:border-box;"></div>
+                        <div style="flex:1"><label style="font-weight:600;display:block;margin-bottom:.3rem;">Birim Maliyet ₺</label>
+                            <input type="number" id="ei-cost" value="${cost}" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;box-sizing:border-box;"></div>
+                    </div>
+                    <div style="display:flex;gap:.75rem;justify-content:flex-end;margin-top:.5rem;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('editStokModal').remove()">İptal</button>
+                        <button class="btn btn-primary" onclick="saveStokEdit(${id})">Kaydet</button>
+                    </div>
+                </div>
+            </div>`;
+        document.body.appendChild(modal);
+    }
+    async function saveStokEdit(id) {
+        const name   = document.getElementById('ei-name').value.trim();
+        const unit   = document.getElementById('ei-unit').value;
+        const cat    = document.getElementById('ei-cat').value;
+        const minQty = parseFloat(document.getElementById('ei-min').value)||0;
+        const cost   = parseFloat(document.getElementById('ei-cost').value)||0;
+        if (!name) { alert('İsim gerekli.'); return; }
+        await fetch('/api/stock/'+id,{
+            method:'PATCH', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({name,unit,category:cat,min_quantity:minQty,cost_per_unit:cost})
+        });
+        document.getElementById('editStokModal').remove();
+        loadStock();
+    }
+    async function deleteStokItem(id) {
+        const name = document.getElementById('stok-del-'+id).dataset.name;
+        if (!confirm(`"${name}" silinsin mi?\nReçete veya harekette kullanılıyorsa silinmez.`)) return;
+        const res = await fetch('/api/stock/'+id,{method:'DELETE'});
+        const data = await res.json();
+        if (!data.success) { alert('⚠️ '+data.error); return; }
+        loadStock();
+    }
+
+    // ── Hareket Modal ──
+    function openMoveModal(id, name, unit) {
+        document.getElementById('moveItemId').value  = id;
+        document.getElementById('moveTitle').textContent = '📥 '+name;
+        document.getElementById('moveUnit').textContent  = unit;
+        document.getElementById('moveQty').value  = '';
+        document.getElementById('moveCost').value = '';
+        document.getElementById('moveDesc').value = '';
+        document.getElementById('moveType').value = 'in';
+        document.getElementById('movePaymentDiv').style.display = 'block';
+        document.getElementById('costRequired').style.display = 'inline';
+        document.getElementById('moveModal').classList.add('open');
+    }
+    function closeMoveModal() { document.getElementById('moveModal').classList.remove('open'); }
+    function onMoveTypeChange() {
+        const type = document.getElementById('moveType').value;
+        document.getElementById('movePaymentDiv').style.display = type==='in'?'block':'none';
+        document.getElementById('costRequired').style.display   = type==='in'?'inline':'none';
+    }
+    async function saveMovement() {
+        const id      = document.getElementById('moveItemId').value;
+        const type    = document.getElementById('moveType').value;
+        const qty     = parseFloat(document.getElementById('moveQty').value);
+        const cost    = parseFloat(document.getElementById('moveCost').value)||0;
+        const desc    = document.getElementById('moveDesc').value.trim();
+        const payment = document.getElementById('movePayment').value;
+        if (isNaN(qty)||qty<=0) { alert('Geçerli bir miktar girin.'); return; }
+        if (type==='in'&&(!cost||cost<=0)) { alert('Alım işlemi için tutar zorunludur.'); return; }
+        const res = await fetch('/api/stock/'+id+'/movement',{
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({
+                movement_type:type, quantity:qty, cost,
+                payment_method:payment,
+                reason: type==='adjust'?'duzeltme':type==='in'?'alim':'manuel',
+                description:desc
+            })
+        });
+        const result = await res.json();
+        if (!result.success) { alert('Hata: '+(result.error||'Bilinmeyen hata')); return; }
+        closeMoveModal();
+        loadStock();
+        if (currentTab==='hareketler') loadMovements();
+    }
+
+    // ── Nav ──
+    function toggleNav() { document.getElementById('navDropdown').classList.toggle('open'); }
+    document.addEventListener('click', e=>{
+        const dd = document.getElementById('navDropdown');
+        if (dd&&!dd.contains(e.target)) dd.classList.remove('open');
+    });
+
+    // ── Stok Uyarı ── (GLOBAL)
+    function toggleAlertPanel() {
+        const p = document.getElementById('alertPanel');
+        if (p) p.classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+        const p = document.getElementById('alertPanel');
+        const b = document.getElementById('alertBtn');
+        if (p&&b&&!p.contains(e.target)&&!b.contains(e.target)) p.classList.remove('open');
+    });
+    async function loadAlerts() {
+        try {
+            const items = await fetch('/api/stock/alerts').then(r=>r.json());
+            const badge = document.getElementById('alertBadge');
+            const body  = document.getElementById('alertPanelBody');
+            if (!badge||!body) return;
+            if (items.length>0) {
+                badge.textContent   = items.length;
+                badge.style.display = 'flex';
+                body.innerHTML = items.map(i=>`
+                    <div class="alert-item">
+                        <span class="alert-item-name">${i.name}</span>
+                        <span class="alert-item-qty">
+                            <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
+                            <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
+                        </span>
+                    </div>`).join('');
+            } else {
+                badge.style.display = 'none';
+                body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
+            }
+        } catch(e) {}
+    }
+
+    // ── İlk Yükleme ──
+    document.addEventListener('DOMContentLoaded', ()=>{
+        const today = localDate();
+        document.getElementById('mvStart').value = today;
+        document.getElementById('mvEnd').value   = today;
+        loadStock();
         loadAlerts();
         setInterval(loadAlerts, 60000);
-    })();
+    });
     </script>
 </body>
 </html>

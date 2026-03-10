@@ -1090,7 +1090,7 @@ def api_stock_alerts():
 
 @app.route('/api/orders/<int:order_id>/reclose', methods=['POST'])
 def api_reclose_order(order_id):
-    """Düzenlenen siparişi yeniden kapat"""
+    """Düzenlenen siparişi yeniden kapat + transactions güncelle"""
     d = request.json or {}
     conn = db.get_db()
     # Toplam yeniden hesapla
@@ -1098,10 +1098,31 @@ def api_reclose_order(order_id):
         SELECT COALESCE(SUM(CASE WHEN is_complimentary=0 THEN quantity*price ELSE 0 END),0) as t
         FROM order_items WHERE order_id=?
     ''', (order_id,)).fetchone()['t']
+    payment_cash = d.get('payment_cash', 0)
+    payment_card = d.get('payment_card', 0)
+    tip_amount   = d.get('tip_amount', 0)
+    tip_method   = d.get('tip_method', 'cash')
     conn.execute('''UPDATE orders SET status='closed', total=?, closed_at=CURRENT_TIMESTAMP,
-        payment_cash=?, payment_card=?, tip_amount=?
+        payment_cash=?, payment_card=?, tip_amount=?, tip_method=?
         WHERE id=?''',
-        (total, d.get('payment_cash',0), d.get('payment_card',0), d.get('tip_amount',0), order_id))
+        (total, payment_cash, payment_card, tip_amount, tip_method, order_id))
+    # Eski transaction kayıtlarını sil, yenilerini ekle
+    conn.execute('DELETE FROM transactions WHERE related_order_id=?', (order_id,))
+    from datetime import datetime as _dt
+    closed_at = _dt.now().strftime('%Y-%m-%d %H:%M:%S')
+    date_str  = _dt.now().strftime('%Y-%m-%d')
+    if payment_cash > 0:
+        conn.execute('''INSERT INTO transactions (date,type,amount,category,payment_method,description,related_order_id)
+            VALUES (?,'in',?,'satis','cash','Satış #' || ?,?)''',
+            (date_str, payment_cash, order_id, order_id))
+    if payment_card > 0:
+        conn.execute('''INSERT INTO transactions (date,type,amount,category,payment_method,description,related_order_id)
+            VALUES (?,'in',?,'satis','card','Satış #' || ?,?)''',
+            (date_str, payment_card, order_id, order_id))
+    if tip_amount > 0:
+        conn.execute('''INSERT INTO transactions (date,type,amount,category,payment_method,description,related_order_id)
+            VALUES (?,'in',?,'bahsis',?,'Bahşiş #' || ?,?)''',
+            (date_str, tip_amount, tip_method, order_id, order_id))
     conn.commit()
     conn.close()
     return jsonify({'success': True, 'total': total})
@@ -1115,10 +1136,6 @@ def backup_page():
 @app.route('/muhasebe')
 def page_muhasebe():
     return render_template('muhasebe.html')
-
-@app.route('/reports')
-def page_reports_redirect():
-    return redirect('/muhasebe')
 
 @app.route('/api/muhasebe')
 def api_muhasebe():
