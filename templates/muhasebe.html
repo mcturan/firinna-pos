@@ -570,6 +570,11 @@
 
     // ── Stok Uyarı ── (GLOBAL - IIFE değil)
     function toggleAlertPanel() {
+        const badge = document.getElementById('alertBadge');
+        if (badge && badge.style.display !== 'none' && parseInt(badge.textContent) > 0) {
+            window.location.href = '/stok';
+            return;
+        }
         const p = document.getElementById('alertPanel');
         if (p) p.classList.toggle('open');
     }
