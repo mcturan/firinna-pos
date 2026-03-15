@@ -1954,6 +1954,31 @@ def api_profitability():
         })
     return jsonify(result)
 
+
+@app.route("/api/orders/<int:order_id>/note", methods=["GET", "POST"])
+def order_note(order_id):
+    """Sipariş notu: GET döner, POST kaydeder."""
+    import sqlite3 as _sq
+    conn = _sq.connect('pos_data.db')
+    conn.row_factory = _sq.Row
+    if request.method == "GET":
+        row = conn.execute(
+            "SELECT note FROM orders WHERE id = ?", (order_id,)
+        ).fetchone()
+        conn.close()
+        if row is None:
+            return jsonify({"error": "Sipariş bulunamadı"}), 404
+        return jsonify({"note": row["note"] or ""})
+    else:
+        data = request.get_json(silent=True) or {}
+        note = data.get("note", "").strip()
+        conn.execute(
+            "UPDATE orders SET note = ? WHERE id = ?", (note, order_id)
+        )
+        conn.commit()
+        conn.close()
+        return jsonify({"ok": True, "note": note})
+
 if __name__ == '__main__':
     db.init_db()
     try: db.init_muhasebe_tables()
