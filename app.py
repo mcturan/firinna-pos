@@ -1754,106 +1754,17 @@ def api_auto_push_set():
 
 @app.route('/api/factory/github-reset', methods=['POST'])
 def api_factory_github_reset():
-    """GitHub'tan tam yeniden kurulum — git yoksa clone, varsa hard reset"""
-    cred = get_git_credentials()
-    username = cred.get('username', 'mcturan')
-    token    = cred.get('token', '')
-
-    # Public repo: token opsiyonel; varsa kimlik doğrulamalı URL kullan
-    if token:
-        repo_url = f'https://{username}:{token}@github.com/{username}/firinna-pos.git'
-    else:
-        repo_url = f'https://github.com/{username}/firinna-pos.git'
-    app_dir  = GIT_DIR
-
-    # .git klasörü var mı?
-    has_git = os.path.isdir(os.path.join(app_dir, '.git'))
-
-    if has_git:
-        # .git zaten var — hard reset yap, servisi yeniden başlat
-        import subprocess as _sp
-        fetch = _sp.run(
-            ['git', '-C', app_dir, 'fetch', 'origin'],
-            capture_output=True, text=True, timeout=60
-        )
-        reset = _sp.run(
-            ['git', '-C', app_dir, 'reset', '--hard', 'origin/main'],
-            capture_output=True, text=True, timeout=60
-        )
-        clean = _sp.run(
-            ['git', '-C', app_dir, 'clean', '-fd'],
-            capture_output=True, text=True, timeout=30
-        )
-        if reset.returncode != 0:
-            return jsonify({'success': False, 'error': 'git reset hatası: ' + reset.stderr[:300]})
-        # pyc temizle
-        for root, dirs, files in os.walk(app_dir):
-            for f in files:
-                if f.endswith('.pyc'):
-                    try: os.remove(os.path.join(root, f))
-                    except: pass
-        # servisi yeniden başlat
-        _sp.Popen(['sudo', 'systemctl', 'restart', 'firinna-pos'])
-        return jsonify({'success': True, 'message': 'GitHub hard reset tamam. Servis yeniden başlatılıyor...'})
-
-    if not has_git:
-        # Mevcut dosyaları geçici yere taşı, clone yap
-        import tempfile, shutil
-        tmp = tempfile.mkdtemp()
-        # Kritik dosyaları koru
-        preserve = ['pos_data.db', 'firinna_local.json', 'static']
-        for f in preserve:
-            src = os.path.join(app_dir, f)
-            if os.path.exists(src):
-                dst = os.path.join(tmp, f)
-                try:
-                    if os.path.isdir(src):
-                        shutil.copytree(src, dst)
-                    else:
-                        shutil.copy2(src, dst)
-                except Exception:
-                    pass
-        # Clone
-        result = subprocess.run(
-            ['git', 'clone', repo_url, app_dir + '_clone'],
-            capture_output=True, text=True, timeout=120
-        )
-        if result.returncode != 0:
-            return jsonify({'success': False, 'error': 'git clone hatası: ' + result.stderr[:300]})
-        # Klonlanan dosyaları ana dizine kopyala (db ve local hariç)
-        clone_dir = app_dir + '_clone'
-        for item in os.listdir(clone_dir):
-            if item in preserve:
-                continue
-            src = os.path.join(clone_dir, item)
-            dst = os.path.join(app_dir, item)
-            try:
-                if os.path.isdir(src):
-                    if os.path.exists(dst):
-                        shutil.rmtree(dst)
-                    shutil.copytree(src, dst)
-                else:
-                    shutil.copy2(src, dst)
-            except Exception as e:
-                pass
-        # .git klasörünü taşı
-        shutil.copytree(os.path.join(clone_dir, '.git'), os.path.join(app_dir, '.git'))
-        shutil.rmtree(clone_dir)
-        # Remote URL'i güncelle (plain url)
-        subprocess.run(['git', '-C', app_dir, 'remote', 'set-url', 'origin', repo_url],
-                       capture_output=True)
-        return jsonify({'success': True, 'message': 'git clone tamamlandı. Sunucuyu yeniden başlatın.'})
-    else:
-        # Remote URL'i güncelle (token dahil)
-        subprocess.run(['git', '-C', app_dir, 'remote', 'set-url', 'origin', repo_url],
-                       capture_output=True, timeout=10)
-        ok_fetch, out_fetch = run_git(['fetch', 'origin', 'main'], timeout=60)
-        if not ok_fetch:
-            return jsonify({'success': False, 'error': 'fetch hatası: ' + out_fetch})
-        ok_reset, out_reset = run_git(['reset', '--hard', 'origin/main'], timeout=30)
-        if not ok_reset:
-            return jsonify({'success': False, 'error': 'reset hatası: ' + out_reset})
-        return jsonify({'success': True, 'message': 'Hard reset tamamlandı. Sunucuyu yeniden başlatın.'})
+    import subprocess as _sp, threading
+    def _do():
+        import time
+        _sp.run('git -C /opt/firinna-pos fetch origin', shell=True)
+        _sp.run('git -C /opt/firinna-pos reset --hard origin/main', shell=True)
+        _sp.run('git -C /opt/firinna-pos clean -fd', shell=True)
+        _sp.run('find /opt/firinna-pos -name "*.pyc" -delete', shell=True)
+        time.sleep(1)
+        _sp.run('systemctl restart firinna-pos', shell=True)
+    threading.Thread(target=_do, daemon=True).start()
+    return jsonify({'success': True, 'message': 'Reset başlatıldı, sayfa yenileniyor...'})
 
 
 @app.route('/api/factory/db-reset-restore', methods=['POST'])
