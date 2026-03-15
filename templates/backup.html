@@ -207,6 +207,17 @@
 </div>
 </div>
 
+<!-- İŞLEM LOGU -->
+<div style="margin-top:1.5rem;margin-bottom:2rem;">
+    <div class="sec-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>📋 İşlem Logu</span>
+        <button onclick="clearOpLog()" style="background:none;border:1px solid #e2e8f0;border-radius:7px;padding:.22rem .65rem;cursor:pointer;font-size:.75rem;color:#4a5568;">Temizle</button>
+    </div>
+    <div id="op-log" style="background:#0F172A;border-radius:10px;padding:1rem 1.1rem;font-family:monospace;font-size:.76rem;line-height:1.7;min-height:120px;max-height:320px;overflow-y:auto;color:#94A3B8;white-space:pre-wrap;border:1px solid #1E293B;">
+        <span style="color:#475569;">— hazır —</span>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -229,7 +240,27 @@ function showLog(text) {
     b.style.display = 'block';
     b.textContent = text;
     b.scrollTop = b.scrollHeight;
+    appendOpLog(text);
 }
+
+// ── İŞLEM LOGU ─────────────────────────────────────────
+function appendOpLog(msg, type) {
+    var el = document.getElementById('op-log');
+    if (!el) return;
+    var now = new Date().toLocaleTimeString('tr-TR');
+    var color = type === 'ok'  ? '#4ADE80' :
+                type === 'err' ? '#F87171' :
+                type === 'hd'  ? '#F59E0B' : '#94A3B8';
+    var first = el.querySelector('span[style*="475569"]');
+    if (first) el.innerHTML = '';
+    el.innerHTML += '<span style="color:' + color + '">[' + now + '] ' + msg.replace(/</g,'&lt;') + '</span>\n';
+    el.scrollTop = el.scrollHeight;
+}
+function clearOpLog() {
+    var el = document.getElementById('op-log');
+    if (el) el.innerHTML = '<span style="color:#475569;">— temizlendi —</span>';
+}
+
 
 // ── YEDEK LİSTESİ ──────────────────────────────────────
 async function loadBackupList() {
@@ -442,10 +473,10 @@ function resetFileSelected(input) {
 async function githubReset() {
     if (!confirm('⚠️ DİKKAT!\n\nGitHub\'daki son sürüm çekilecek.\nTüm yerel dosyalar ve veritabanı değiştirilecek.\nDevam?')) return;
     if (!confirm('Son onay: Bu işlem geri alınamaz. Emin misin?')) return;
-    toast('🔄 GitHub\'dan çekiliyor...', 'ok');
+    toast('🔄 GitHub\'dan çekiliyor...', 'ok'); appendOpLog('── RESET başlatıldı ──', 'hd');
     try {
         var r = await fetch('/api/factory/github-reset', {method:'POST'}).then(r => r.json());
-        if (r.success) { toast('✅ Tamamlandı! Sayfa yenileniyor...', 'ok'); setTimeout(() => window.location.reload(), 3000); }
+        if (r.success) { appendOpLog('✓ Reset tamamlandı, yeniden başlatılıyor...', 'ok'); toast('✅ Tamamlandı! Sayfa yenileniyor...', 'ok'); setTimeout(() => window.location.reload(), 3000); }
         else toast('❌ Hata: ' + r.error, 'err');
     } catch(e) { toast('❌ ' + e.message, 'err'); }
 }
