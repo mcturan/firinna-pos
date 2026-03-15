@@ -1366,28 +1366,59 @@
         }
 
         async function viewOrderModal(orderId) {
-            const orders = await fetch('/api/orders/history').then(r => r.json());
-            const order  = orders.find(o => o.id === orderId);
-            if (!order) return;
-            const meth = m => m === 'cash' ? '💵 Nakit' : '💳 Kart';
-            const rows = order.items.map(i =>
-                '<div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem;">'
-                + '<span>' + i.quantity + '× ' + i.product_name + (i.is_complimentary ? ' <span style="background:#e9d5ff;color:#6b21a8;padding:.1rem .3rem;border-radius:10px;font-size:.72rem;">İkram</span>' : '') + '</span>'
-                + '<span style="font-weight:600;color:#2d6a4f;">' + (i.quantity * i.price).toFixed(2) + ' ₺</span></div>'
-            ).join('');
-            document.getElementById('viewOrderContent').innerHTML =
-                '<div style="background:#f7fafc;border-radius:10px;padding:1rem;margin-bottom:1rem;">'
-                + '<div style="font-weight:700;font-size:1rem;">' + order.table_name + ' — ' + order.zone_name + '</div>'
-                + '<div style="font-size:.82rem;color:#718096;">' + new Date(order.closed_at).toLocaleString('tr-TR') + '</div></div>'
-                + '<div style="margin-bottom:1rem;">' + rows + '</div>'
-                + '<div style="background:#f0fdf4;border-radius:10px;padding:1rem;display:flex;flex-direction:column;gap:.4rem;">'
-                + '<div style="display:flex;justify-content:space-between;"><span style="color:#718096;">Toplam</span><strong>' + order.total.toFixed(2) + ' ₺</strong></div>'
-                + (order.payment_cash > 0 ? '<div style="display:flex;justify-content:space-between;"><span style="color:#718096;">💵 Nakit</span><span>' + order.payment_cash.toFixed(2) + ' ₺</span></div>' : '')
-                + (order.payment_card > 0 ? '<div style="display:flex;justify-content:space-between;"><span style="color:#718096;">💳 Kart</span><span>' + order.payment_card.toFixed(2) + ' ₺</span></div>' : '')
-                + (order.tip_amount > 0  ? '<div style="display:flex;justify-content:space-between;"><span style="color:#718096;">🎁 Bahşiş (' + meth(order.tip_method) + ')</span><span>' + order.tip_amount.toFixed(2) + ' ₺</span></div>' : '')
-                + (order.discount_value > 0 ? '<div style="display:flex;justify-content:space-between;"><span style="color:#f56565;">🏷️ İndirim</span><span style="color:#f56565;">-' + order.discount_value.toFixed(2) + ' ₺</span></div>' : '')
-                + '</div>';
-            document.getElementById('viewOrderModal').style.display = 'block';
+            try {
+                const order = await fetch(`/api/orders/${orderId}`).then(r => r.json());
+                const dateStr = order.closed_at
+                    ? new Date(order.closed_at).toLocaleString('tr-TR')
+                    : (order.created_at ? new Date(order.created_at).toLocaleString('tr-TR') : '—');
+                const items = (order.items || []).map(i => {
+                    const total = i.is_complimentary ? 'İkram' : `${(i.quantity * i.price).toFixed(2)} ₺`;
+                    return `<div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.84rem;">
+                        <span style="flex:1;">${i.quantity}× ${i.product_name||i.name}${i.is_complimentary ? ' <span style="background:#ede9fe;color:#6b21a8;padding:.1rem .35rem;border-radius:8px;font-size:.7rem;">İkram</span>' : ''}</span>
+                        <span style="font-weight:600;flex-shrink:0;margin-left:.75rem;">${total}</span>
+                    </div>`;
+                }).join('');
+
+                const payRows = [
+                    order.payment_cash > 0 ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Nakit</span><span style="font-weight:600;">${Number(order.payment_cash).toFixed(2)} ₺</span></div>` : '',
+                    order.payment_card > 0 ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Kart</span><span style="font-weight:600;">${Number(order.payment_card).toFixed(2)} ₺</span></div>` : '',
+                    order.tip_amount > 0  ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Bahşiş (${order.tip_method==='card'?'Kart':'Nakit'})</span><span style="font-weight:600;color:var(--green);">${Number(order.tip_amount).toFixed(2)} ₺</span></div>` : '',
+                ].filter(Boolean).join('');
+
+                const discountRow = (order.discount_value > 0)
+                    ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;color:var(--orange);"><span>İndirim (${order.discount_type==='percent'?'%'+order.discount_value:order.discount_value+' ₺'})</span><span style="font-weight:600;">-${Number(order.discount_value).toFixed(2)} ₺</span></div>`
+                    : '';
+
+                document.getElementById('viewOrderContent').innerHTML = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.1rem;">
+                        <div style="background:var(--bg);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border);">
+                            <div style="font-size:.68rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:.25rem;">Sipariş #${order.id}</div>
+                            <div style="font-weight:700;font-size:.9rem;">${order.table_name || '—'}</div>
+                        </div>
+                        <div style="background:var(--bg);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border);">
+                            <div style="font-size:.68rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:.25rem;">Tarih</div>
+                            <div style="font-weight:600;font-size:.84rem;">${dateStr}</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:.4rem;">Kalemler</div>
+                        ${items || '<div style="color:var(--ink-4);font-size:.84rem;padding:.5rem 0;">Kalem bulunamadı</div>'}
+                    </div>
+
+                    <div style="background:var(--bg);border-radius:var(--r-sm);padding:.85rem;border:1px solid var(--border);">
+                        <div style="font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:.5rem;">Ödeme Özeti</div>
+                        ${discountRow}
+                        <div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:800;padding:.4rem 0 .3rem;border-top:1px solid var(--border);margin-top:.3rem;">
+                            <span>Toplam</span><span>${Number(order.total||0).toFixed(2)} ₺</span>
+                        </div>
+                        ${payRows}
+                    </div>
+                `;
+                document.getElementById('viewOrderModal').style.display = 'block';
+            } catch(e) {
+                console.error(e);
+            }
         }
 
         async function deleteOrder(orderId) {
