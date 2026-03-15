@@ -1750,45 +1750,16 @@ def api_auto_push_set():
 def api_factory_github_reset():
     """GitHub'tan tam yeniden kurulum — git yoksa clone, varsa hard reset"""
     cred = get_git_credentials()
-    username = cred.get('username', 'mcturan')
+    username = cred.get('username', '')
     token    = cred.get('token', '')
+    if not username or not token:
+        return jsonify({'success': False, 'error': 'GitHub kimlik bilgileri eksik. Ayarlar → Yedek & Senkron sayfasından token girin.'})
 
-    # Public repo: token opsiyonel; varsa kimlik doğrulamalı URL kullan
-    if token:
-        repo_url = f'https://{username}:{token}@github.com/{username}/firinna-pos.git'
-    else:
-        repo_url = f'https://github.com/{username}/firinna-pos.git'
+    repo_url = f'https://{username}:{token}@github.com/{username}/firinna-pos.git'
     app_dir  = GIT_DIR
 
     # .git klasörü var mı?
     has_git = os.path.isdir(os.path.join(app_dir, '.git'))
-
-    if has_git:
-        # .git zaten var — hard reset yap, servisi yeniden başlat
-        import subprocess as _sp
-        fetch = _sp.run(
-            ['git', '-C', app_dir, 'fetch', 'origin'],
-            capture_output=True, text=True, timeout=60
-        )
-        reset = _sp.run(
-            ['git', '-C', app_dir, 'reset', '--hard', 'origin/main'],
-            capture_output=True, text=True, timeout=60
-        )
-        clean = _sp.run(
-            ['git', '-C', app_dir, 'clean', '-fd'],
-            capture_output=True, text=True, timeout=30
-        )
-        if reset.returncode != 0:
-            return jsonify({'success': False, 'error': 'git reset hatası: ' + reset.stderr[:300]})
-        # pyc temizle
-        for root, dirs, files in os.walk(app_dir):
-            for f in files:
-                if f.endswith('.pyc'):
-                    try: os.remove(os.path.join(root, f))
-                    except: pass
-        # servisi yeniden başlat
-        _sp.Popen(['sudo', 'systemctl', 'restart', 'firinna-pos'])
-        return jsonify({'success': True, 'message': 'GitHub hard reset tamam. Servis yeniden başlatılıyor...'})
 
     if not has_git:
         # Mevcut dosyaları geçici yere taşı, clone yap
@@ -1891,30 +1862,6 @@ def api_factory_db_wipe():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-
-
-@app.route('/api/settings/git-credentials', methods=['GET'])
-def api_get_git_credentials():
-    """GitHub kullanıcı adı ve token oku"""
-    cred = get_git_credentials()
-    return jsonify({
-        'username': cred.get('username', ''),
-        'has_token': bool(cred.get('token', ''))
-    })
-
-@app.route('/api/settings/git-credentials', methods=['POST'])
-def api_set_git_credentials():
-    """GitHub token kaydet"""
-    data = request.get_json() or {}
-    username = data.get('username', '').strip()
-    token    = data.get('token', '')
-    if not username:
-        return jsonify({'success': False, 'error': 'Kullanıcı adı boş'})
-    updates = {'github_username': username}
-    if token:
-        updates['github_token'] = token
-    write_local_config(updates)
-    return jsonify({'success': True})
 
 if __name__ == '__main__':
     db.init_db()

@@ -33,3 +33,6 @@ Thumbs.db
 # Geçici
 *.tmp
 *.swp
+firinna_local.json
+*.bak_faza_*
+*.bak_2026*

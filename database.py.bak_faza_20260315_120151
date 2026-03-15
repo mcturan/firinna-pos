@@ -472,8 +472,7 @@ def dump_database_sql():
     for line in conn.iterdump():
         lines.append(line)
     conn.close()
-    import tempfile as _tmp
-    dump_path = _tmp.mktemp(prefix='firinna_dump_', suffix='.sql')
+    dump_path = os.path.join(os.path.dirname(DB_PATH), 'db_export.sql')
     with open(dump_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(lines))
     return dump_path

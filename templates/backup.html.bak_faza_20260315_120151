@@ -77,24 +77,6 @@
         </div>
     </div>
 
-
-    <!-- GITHUB TOKEN -->
-    <div class="sec-title">🔑 GitHub Kimlik Bilgileri</div>
-    <div class="card" style="margin-bottom:1.25rem;">
-        <div class="grid2">
-            <div>
-                <label style="font-size:.82rem;color:#4a5568;font-weight:600;display:block;margin-bottom:.3rem;">Kullanıcı Adı</label>
-                <input type="text" id="git-username" class="commit-input" placeholder="GitHub kullanıcı adı">
-            </div>
-            <div>
-                <label style="font-size:.82rem;color:#4a5568;font-weight:600;display:block;margin-bottom:.3rem;">Personal Access Token</label>
-                <input type="password" id="git-token" class="commit-input" placeholder="ghp_...">
-            </div>
-        </div>
-        <button class="btn-w c-purple" onclick="saveGitToken()" style="max-width:200px;">💾 Token Kaydet</button>
-        <p style="font-size:.75rem;color:#718096;margin:.4rem 0 0;">Token <code>firinna_local.json</code> içinde saklanır, git'e gitmez.</p>
-    </div>
-
     <!-- GITHUB SYNC -->
     <div class="sec-title">🔄 GitHub Senkronizasyonu</div>
     <div class="card" style="margin-bottom:1.25rem;">
@@ -472,33 +454,11 @@ async function dbWipe() {
     } catch(e) { toast('❌ ' + e.message, 'err'); }
 }
 
-
-// ── GIT TOKEN ──────────────────────────────────────────
-async function loadGitToken() {
-    try {
-        var d = await fetch('/api/settings/git-credentials').then(r => r.json());
-        if (d.username) document.getElementById('git-username').value = d.username;
-        if (d.has_token) document.getElementById('git-token').placeholder = '(kayıtlı — değiştirmek için yaz)';
-    } catch(e) {}
-}
-async function saveGitToken() {
-    var u = document.getElementById('git-username').value.trim();
-    var t = document.getElementById('git-token').value.trim();
-    if (!u) { toast('❌ Kullanıcı adı boş', 'err'); return; }
-    var r = await fetch('/api/settings/git-credentials', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username: u, token: t || null})
-    }).then(r => r.json());
-    toast(r.success ? '✅ Token kaydedildi!' : '❌ ' + r.error, r.success ? 'ok' : 'err');
-}
-
 // ── BAŞLANGIÇ ──────────────────────────────────────────
 loadBackupList();
 loadGitStatus();
 loadAutoPullSetting();
 loadAutoPushSetting();
-loadGitToken();
 </script>
 </body>
 </html>
