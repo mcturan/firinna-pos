@@ -1204,10 +1204,11 @@ def record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amo
             VALUES (?, 'in', ?, 'bahsis', ?, 'Bahşiş - Sipariş #' || ?, ?, ?)''',
             (date, tip_amount, tip_method or 'cash', order_id, order_id, closed_at))
 
-def add_transaction(type_, amount, category, payment_method, description, related_order_id=None):
-    """Manuel transaction ekle"""
+def add_transaction(type_, amount, category, payment_method, description, related_order_id=None, date=None):
+    """Manuel transaction ekle — date verilmezse bugün kullanılır"""
     conn = get_db()
-    date = datetime.now().strftime('%Y-%m-%d')
+    if not date:
+        date = datetime.now().strftime('%Y-%m-%d')
     conn.execute('''INSERT INTO transactions
         (date, type, amount, category, payment_method, description, related_order_id)
         VALUES (?, ?, ?, ?, ?, ?, ?)''',
@@ -1382,13 +1383,19 @@ def add_stock_item(name, unit, min_quantity, cost_per_unit, category):
     conn.commit()
     conn.close()
 
-def add_stock_movement(stock_item_id, movement_type, quantity, cost, reason, description, transaction_id=None):
-    """Stok hareketi ekle"""
+def add_stock_movement(stock_item_id, movement_type, quantity, cost, reason, description, transaction_id=None, date=None):
+    """Stok hareketi ekle — date verilmezse şu an kullanılır"""
     conn = get_db()
-    conn.execute('''INSERT INTO stock_movements
-        (stock_item_id, movement_type, quantity, cost, reason, description, related_transaction_id)
-        VALUES (?,?,?,?,?,?,?)''',
-        (stock_item_id, movement_type, quantity, cost, reason, description, transaction_id))
+    if date:
+        conn.execute('''INSERT INTO stock_movements
+            (stock_item_id, movement_type, quantity, cost, reason, description, related_transaction_id, created_at)
+            VALUES (?,?,?,?,?,?,?,?)''',
+            (stock_item_id, movement_type, quantity, cost, reason, description, transaction_id, date + ' 00:00:00'))
+    else:
+        conn.execute('''INSERT INTO stock_movements
+            (stock_item_id, movement_type, quantity, cost, reason, description, related_transaction_id)
+            VALUES (?,?,?,?,?,?,?)''',
+            (stock_item_id, movement_type, quantity, cost, reason, description, transaction_id))
     conn.commit()
     conn.close()
 
@@ -1584,7 +1591,7 @@ def delete_stock_movement(movement_id):
     conn.close()
     return True, ''
 
-def add_stock_purchase(stock_item_id, quantity, cost, payment_method, description):
+def add_stock_purchase(stock_item_id, quantity, cost, payment_method, description, date=None):
     """Stok alımı: hem stok hareketi hem transaction kaydı"""
     conn = get_db()
     # transactions tablosu yoksa oluştur

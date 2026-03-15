@@ -92,7 +92,8 @@
             </div>
         </div>
         <button class="btn-w c-purple" onclick="saveGitToken()" style="max-width:200px;">💾 Token Kaydet</button>
-        <p style="font-size:.75rem;color:#718096;margin:.4rem 0 0;">Token <code>firinna_local.json</code> içinde saklanır, git'e gitmez.</p>
+        <div id="git-token-status" style="font-size:.75rem;color:#718096;margin:.3rem 0 0;"></div>
+        <p style="font-size:.75rem;color:#718096;margin:.2rem 0 0;">Token <code>~/.firinna_git_credentials.json</code> içinde, sadece bu makinede saklanır.</p>
     </div>
 
     <!-- GITHUB SYNC -->
@@ -476,21 +477,33 @@ async function dbWipe() {
 // ── GIT TOKEN ──────────────────────────────────────────
 async function loadGitToken() {
     try {
-        var d = await fetch('/api/settings/git-credentials').then(r => r.json());
+        var d = await fetch('/api/git/credentials').then(r => r.json());
         if (d.username) document.getElementById('git-username').value = d.username;
-        if (d.has_token) document.getElementById('git-token').placeholder = '(kayıtlı — değiştirmek için yaz)';
+        if (d.has_token) {
+            document.getElementById('git-token').placeholder = '(kayıtlı — değiştirmek için yaz)';
+            document.getElementById('git-token-status').textContent = '✓ Token kayıtlı';
+            document.getElementById('git-token-status').style.color = '#2d6a4f';
+        }
     } catch(e) {}
 }
 async function saveGitToken() {
     var u = document.getElementById('git-username').value.trim();
     var t = document.getElementById('git-token').value.trim();
     if (!u) { toast('❌ Kullanıcı adı boş', 'err'); return; }
-    var r = await fetch('/api/settings/git-credentials', {
+    var r = await fetch('/api/git/credentials', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({username: u, token: t || null})
     }).then(r => r.json());
-    toast(r.success ? '✅ Token kaydedildi!' : '❌ ' + r.error, r.success ? 'ok' : 'err');
+    if (r.success) {
+        toast('✅ Token kaydedildi!');
+        document.getElementById('git-token').value = '';
+        document.getElementById('git-token').placeholder = '(kayıtlı — değiştirmek için yaz)';
+        document.getElementById('git-token-status').textContent = '✓ Token kayıtlı';
+        document.getElementById('git-token-status').style.color = '#2d6a4f';
+    } else {
+        toast('❌ ' + r.error, 'err');
+    }
 }
 
 // ── BAŞLANGIÇ ──────────────────────────────────────────

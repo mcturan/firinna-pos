@@ -113,6 +113,7 @@ def api_add_transaction():
     db.add_transaction(
         data['type'], data['amount'], data.get('category','masraf'),
         data.get('payment_method','cash'), data.get('description',''),
+        date=data.get('date', None)
     )
     return jsonify({'success': True})
 
@@ -163,12 +164,15 @@ def api_stock_movement(item_id):
     d = request.json
     mtype = d['movement_type']
     try:
+        movement_date = d.get('date', None)
         if mtype == 'in':
             db.add_stock_purchase(item_id, d['quantity'], d.get('cost', 0),
-                                  d.get('payment_method', 'cash'), d.get('description', ''))
+                                  d.get('payment_method', 'cash'), d.get('description', ''),
+                                  date=movement_date)
         else:
             db.add_stock_movement(item_id, mtype, d['quantity'],
-                                  d.get('cost', 0), d.get('reason', 'manuel'), d.get('description', ''))
+                                  d.get('cost', 0), d.get('reason', 'manuel'), d.get('description', ''),
+                                  date=movement_date)
         return jsonify({'success': True})
     except Exception as e:
         import traceback
@@ -1410,6 +1414,7 @@ def write_local_config(updates: dict):
         print(f'[local_config] Yazma hatası: {e}')
 
 
+@app.route("/api/git/credentials", methods=["GET"])
 def api_git_credentials_get():
     cred = get_git_credentials()
     return jsonify({'username': cred.get('username',''), 'has_token': bool(cred.get('token',''))})
@@ -1892,29 +1897,6 @@ def api_factory_db_wipe():
         return jsonify({'success': False, 'error': str(e)})
 
 
-
-@app.route('/api/settings/git-credentials', methods=['GET'])
-def api_get_git_credentials():
-    """GitHub kullanıcı adı ve token oku"""
-    cred = get_git_credentials()
-    return jsonify({
-        'username': cred.get('username', ''),
-        'has_token': bool(cred.get('token', ''))
-    })
-
-@app.route('/api/settings/git-credentials', methods=['POST'])
-def api_set_git_credentials():
-    """GitHub token kaydet"""
-    data = request.get_json() or {}
-    username = data.get('username', '').strip()
-    token    = data.get('token', '')
-    if not username:
-        return jsonify({'success': False, 'error': 'Kullanıcı adı boş'})
-    updates = {'github_username': username}
-    if token:
-        updates['github_token'] = token
-    write_local_config(updates)
-    return jsonify({'success': True})
 
 if __name__ == '__main__':
     db.init_db()
