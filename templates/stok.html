@@ -164,6 +164,10 @@
                     <input type="number" id="moveCost" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0.00">
                 </div>
                 <div>
+                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Tarih <span style="color:#a0aec0;font-size:.8rem;">(boş = bugün)</span></label>
+                    <input type="date" id="moveDate" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;">
+                </div>
+                <div>
                     <label style="font-weight:600;display:block;margin-bottom:.4rem;">Açıklama</label>
                     <input type="text" id="moveDesc" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="örn: Migros alımı">
                 </div>
@@ -319,6 +323,7 @@
                         <td style="color:#718096;">${s.cost_per_unit ? s.cost_per_unit.toFixed(2) + ' ₺' : '—'}</td>
                         <td style="white-space:nowrap;">
                             <button class="btn ${isNeg?'btn-primary':'btn-secondary'}" style="padding:.35rem .75rem;font-size:.85rem;" onclick="openMoveModal(${s.id},'${s.name}','${s.unit}')">${isNeg?'📥 Düzelt':'📥 Hareket'}</button>
+                            <button class="btn btn-secondary" style="padding:.35rem .75rem;font-size:.85rem;" onclick="filterByItem(${s.id},'${s.name}')" title="Hareketleri gör">📋</button>
                             <button style="background:none;border:none;cursor:pointer;font-size:1rem;padding:0 .3rem;" onclick="editStokItem(${s.id})" data-name="${s.name}" data-unit="${s.unit}" data-cat="${s.category}" data-min="${s.min_quantity||0}" data-cost="${s.cost_per_unit||0}" id="stok-btn-${s.id}" title="Düzenle">✏️</button>
                             <button style="background:none;border:none;cursor:pointer;font-size:1rem;padding:0 .3rem;" onclick="deleteStokItem(${s.id})" data-name="${s.name}" id="stok-del-${s.id}">🗑️</button>
                         </td>
@@ -356,28 +361,56 @@
             loadMovements(); loadStock();
         }
 
-        async function loadMovements() {
-            const moves = await fetch('/api/stock/movements').then(r => r.json());
+        let movFilterItemId = null;
+        let movFilterName = null;
+
+        async function loadMovements(itemId, itemName) {
+            if (itemId !== undefined) { movFilterItemId = itemId; movFilterName = itemName; }
+            const url = '/api/stock/movements' + (movFilterItemId ? '?item_id=' + movFilterItemId : '');
+            const moves = await fetch(url).then(r => r.json());
             const list = document.getElementById('movementList');
-            if (moves.length === 0) { list.innerHTML = '<div class="no-data">Hareket yok.</div>'; return; }
+            const filterBar = movFilterItemId
+                ? `<div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;padding:.5rem .75rem;background:#ebf8ff;border-radius:8px;font-size:.85rem;">
+                       <strong>Filtre:</strong> ${movFilterName}
+                       <button onclick="clearMovFilter()" style="margin-left:auto;background:none;border:1px solid #bee3f8;border-radius:6px;padding:.2rem .6rem;cursor:pointer;font-size:.8rem;">✕ Tümünü Göster</button>
+                   </div>` : '';
+            if (moves.length === 0) {
+                list.innerHTML = filterBar + '<div class="no-data">Hareket yok.</div>';
+                return;
+            }
             const typeLabel = { in: 'Giriş', out: 'Çıkış', adjust: 'Düzeltme' };
             const typeBadge = { in: 'badge-in', out: 'badge-out', adjust: 'badge-adj' };
-            list.innerHTML = `<table class="stok-table">
-                <thead><tr><th>Tarih</th><th>Ürün</th><th>İşlem</th><th>Miktar</th><th>Maliyet</th><th>Açıklama</th><th></th></tr></thead>
+            list.innerHTML = filterBar + `<table class="stok-table">
+                <thead><tr><th>Tarih</th><th>Ürün</th><th>İşlem</th><th>Miktar</th><th>Maliyet</th><th>Açıklama</th><th>Sipariş No</th><th></th></tr></thead>
                 <tbody>${moves.map(m => {
                     const dt = new Date(m.created_at).toLocaleDateString('tr-TR');
                     const canEdit = m.reason !== 'satis';
+                    const orderNo = m.related_order_id
+                        ? `<span style="background:#e2e8f0;padding:.15rem .45rem;border-radius:6px;font-size:.78rem;font-family:monospace;">#${m.related_order_id}</span>`
+                        : '—';
                     return `<tr id="mrow-${m.id}">
                         <td style="color:#718096;font-size:.82rem;">${dt}</td>
-                        <td><strong>${m.item_name}</strong></td>
+                        <td><strong style="cursor:pointer;color:#2b6cb0;" onclick="filterByItem(${m.stock_item_id},'${m.item_name}')" title="${m.item_name} hareketlerini filtrele">${m.item_name}</strong></td>
                         <td><span class="badge ${typeBadge[m.movement_type]}">${typeLabel[m.movement_type]}</span></td>
                         <td>${m.quantity} ${m.unit}</td>
                         <td>${m.cost ? m.cost.toFixed(2) + ' ₺' : '—'}</td>
                         <td style="color:#4a5568;">${m.description || m.reason || '—'}</td>
+                        <td>${orderNo}</td>
                         <td>${canEdit ? `<button style="background:none;border:none;cursor:pointer;" onclick="editMovement(${m.id},${m.quantity},${m.cost||0})">✏️</button><button style="background:none;border:none;cursor:pointer;" onclick="deleteMovement(${m.id})">🗑️</button>` : ''}</td>
                     </tr>`;
                 }).join('')}</tbody>
             </table>`;
+        }
+
+        function filterByItem(itemId, itemName) {
+            switchTab('hareketler');
+            loadMovements(itemId, itemName);
+        }
+
+        function clearMovFilter() {
+            movFilterItemId = null;
+            movFilterName = null;
+            loadMovements();
         }
 
         async function addStockItem() {
@@ -397,6 +430,10 @@
             loadStock();
         }
 
+        function localDateStr() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        }
         function openMoveModal(id, name, unit) {
             document.getElementById('moveItemId').value = id;
             document.getElementById('moveTitle').textContent = '📥 ' + name;
@@ -404,6 +441,7 @@
             document.getElementById('moveQty').value = '';
             document.getElementById('moveCost').value = '';
             document.getElementById('moveDesc').value = '';
+            document.getElementById('moveDate').value = localDateStr();
             document.getElementById('moveType').value = 'in';
             document.getElementById('movePaymentDiv').style.display = 'block';
             document.getElementById('moveModal').classList.add('open');
@@ -425,13 +463,15 @@
             const payment = document.getElementById('movePayment').value;
             if (isNaN(qty) || qty <= 0) { alert('Geçerli bir miktar girin.'); return; }
             if (type === 'in' && (!cost || cost <= 0)) { alert('Alım işlemi için tutar zorunludur.'); return; }
+            const moveDate = document.getElementById('moveDate').value || null;
             const res = await fetch(`/api/stock/${id}/movement`, {
                 method: 'POST', headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({
                     movement_type: type, quantity: qty, cost,
                     payment_method: payment,
                     reason: type==='adjust'?'duzeltme':type==='in'?'alim':'manuel',
-                    description: desc
+                    description: desc,
+                    date: moveDate
                 })
             });
             const result = await res.json();

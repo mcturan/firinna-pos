@@ -123,6 +123,7 @@
 
         let currentPeriod = 'monthly';
 
+        function localDate(d) { d=d||new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
         document.addEventListener('DOMContentLoaded', () => {
             const today = localDate();
             document.getElementById('customStart').value = today;

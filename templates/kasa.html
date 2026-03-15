@@ -93,6 +93,7 @@
             document.getElementById('dateInput').value = today;
             document.getElementById('customStart').value = today;
             document.getElementById('customEnd').value = today;
+            const txDateEl = document.getElementById('txDate'); if(txDateEl) txDateEl.value = today;
             loadAll();
         });
 
@@ -142,16 +143,23 @@
             if (!d) { document.getElementById('kasaContent').innerHTML = '<div class="no-data">Veri yok</div>'; return; }
 
             const isAna = currentKasa === 'ana';
-            const txRows = d.movements.map(m => `
+            // Kümülatif bakiye hesapla (eskiden yeniye sıralı geldiği varsayılır)
+            let running = 0;
+            const txRows = d.movements.slice().reverse().map(m => {
+                running += m.type === 'in' ? m.amount : -m.amount;
+                const bal = running;
+                return `
                 <tr>
                     <td style="color:#718096;font-size:.82rem;">${m.date}</td>
                     <td><span class="${m.type==='in'?'badge-in':'badge-out'}">${m.type==='in'?'▲ GİRİŞ':'▼ ÇIKIŞ'}</span></td>
                     <td>${m.description || '—'}</td>
                     <td><span class="cat-badge">${catLabel[m.category]||m.category}</span></td>
                     ${isAna ? `<td><span class="cat-badge">${methodLabel[m.payment_method]||m.payment_method}</span></td>` : ''}
-                    <td style="font-weight:700;color:${m.type==='in'?'#2d6a4f':'#e53e3e'};">${m.type==='in'?'+':'−'}${m.amount.toFixed(2)} ₺</td>
+                    <td style="font-weight:700;color:${m.type==='in'?'#2d6a4f':'#e53e3e'};text-align:right;">${m.type==='in'?'+':'−'}${m.amount.toFixed(2)} ₺</td>
+                    <td style="font-weight:700;color:${bal>=0?'#1a56db':'#e53e3e'};text-align:right;">${bal.toFixed(2)} ₺</td>
                     <td>${m.related_order_id ? '' : `<button class="btn-del" onclick="delTx(${m.id})">🗑️</button>`}</td>
-                </tr>`).join('');
+                </tr>`;
+            }).reverse().join('');
 
             document.getElementById('kasaContent').innerHTML = `
                 <!-- Özet kartlar -->
@@ -184,6 +192,7 @@
                         </select>
                         <select id="txStokItem" style="display:none;flex:2;min-width:150px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;"></select>
                         <input type="text" id="txDesc" placeholder="Açıklama">
+                        <input type="date" id="txDate" style="padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
                         <select id="txMethod">
                             <option value="cash">Nakit</option>
                             <option value="card">Kart</option>
@@ -201,7 +210,9 @@
                         <thead><tr>
                             <th>Tarih</th><th>Tür</th><th>Açıklama</th><th>Kategori</th>
                             ${isAna ? '<th>Kasa</th>' : ''}
-                            <th>Tutar</th><th></th>
+                            <th style="text-align:right;">Tutar</th>
+                            <th style="text-align:right;">Bakiye</th>
+                            <th></th>
                         </tr></thead>
                         <tbody>${txRows}</tbody>
                     </table>`}
@@ -244,10 +255,11 @@
                 desc = document.getElementById('txDesc').value.trim();
             }
             if (!desc || isNaN(amount) || amount <= 0) { alert('Açıklama ve tutar gerekli.'); return; }
+            const txDate = document.getElementById('txDate').value || null;
             await fetch('/api/transactions', {
                 method: 'POST',
                 headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({type, amount, category:cat, payment_method:method, description:desc})
+                body: JSON.stringify({type, amount, category:cat, payment_method:method, description:desc, date:txDate})
             });
             document.getElementById('txDesc').value = '';
             document.getElementById('txAmount').value = '';
