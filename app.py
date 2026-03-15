@@ -1898,6 +1898,61 @@ def api_factory_db_wipe():
 
 
 
+
+@app.route('/api/reports/profitability', methods=['GET'])
+def api_profitability():
+    """Ürün bazlı karlılık raporu — tüm zamanlar"""
+    import sqlite3 as _sq
+    conn = _sq.connect(db.DB_PATH)
+    conn.row_factory = _sq.Row
+    # Satış verileri
+    sales = conn.execute('''
+        SELECT
+            COALESCE(oi.product_id, 0) as pid,
+            COALESCE(oi.product_name, p.name, 'Silinmiş') as name,
+            SUM(CASE WHEN oi.is_complimentary=0 THEN oi.quantity ELSE 0 END) as sold_qty,
+            SUM(CASE WHEN oi.is_complimentary=0 THEN oi.quantity * oi.price ELSE 0 END) as revenue,
+            AVG(CASE WHEN oi.is_complimentary=0 THEN oi.price ELSE NULL END) as avg_price
+        FROM order_items oi
+        LEFT JOIN products p ON oi.product_id = p.id
+        JOIN orders o ON oi.order_id = o.id
+        WHERE o.status = 'closed'
+        GROUP BY oi.product_id
+        ORDER BY revenue DESC
+    ''').fetchall()
+    # Reçete maliyet hesabı
+    recipes = conn.execute('''
+        SELECT r.product_id, SUM(r.quantity * s.cost_per_unit) as unit_cost
+        FROM recipes r
+        JOIN stock_items s ON r.stock_item_id = s.id
+        GROUP BY r.product_id
+    ''').fetchall()
+    conn.close()
+    cost_map = {r['product_id']: float(r['unit_cost'] or 0) for r in recipes}
+    result = []
+    for s in sales:
+        pid      = s['pid']
+        revenue  = float(s['revenue'] or 0)
+        sold_qty = float(s['sold_qty'] or 0)
+        avg_price= float(s['avg_price'] or 0)
+        unit_cost= cost_map.get(pid, 0)
+        total_cost = unit_cost * sold_qty
+        profit   = revenue - total_cost
+        margin   = (profit / revenue * 100) if revenue > 0 else 0
+        result.append({
+            'product_id':  pid,
+            'name':        s['name'],
+            'sold_qty':    round(sold_qty, 2),
+            'avg_price':   round(avg_price, 2),
+            'unit_cost':   round(unit_cost, 2),
+            'revenue':     round(revenue, 2),
+            'total_cost':  round(total_cost, 2),
+            'profit':      round(profit, 2),
+            'margin':      round(margin, 1),
+            'has_recipe':  pid in cost_map
+        })
+    return jsonify(result)
+
 if __name__ == '__main__':
     db.init_db()
     try: db.init_muhasebe_tables()
