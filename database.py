@@ -245,7 +245,8 @@ def get_tables(zone_id=None):
     if zone_id:
         tables = conn.execute('''
             SELECT t.*, z.name as zone_name,
-                   (SELECT COUNT(*) FROM orders WHERE table_id = t.id AND status = 'open') as has_order
+                   (SELECT COUNT(*) FROM orders WHERE table_id = t.id AND status = 'open') as has_order,
+                   (SELECT COALESCE(total,0) FROM orders WHERE table_id = t.id AND status = 'open' LIMIT 1) as order_total
             FROM tables t 
             LEFT JOIN zones z ON t.zone_id = z.id 
             WHERE t.zone_id = ?
@@ -254,7 +255,8 @@ def get_tables(zone_id=None):
     else:
         tables = conn.execute('''
             SELECT t.*, z.name as zone_name,
-                   (SELECT COUNT(*) FROM orders WHERE table_id = t.id AND status = 'open') as has_order
+                   (SELECT COUNT(*) FROM orders WHERE table_id = t.id AND status = 'open') as has_order,
+                   (SELECT COALESCE(total,0) FROM orders WHERE table_id = t.id AND status = 'open' LIMIT 1) as order_total
             FROM tables t 
             LEFT JOIN zones z ON t.zone_id = z.id 
             ORDER BY t.name

@@ -1,38 +1,50 @@
-<!-- ═══════════════════════════════════════════════
-     Fırınna POS — Ortak Navbar
-     ═══════════════════════════════════════════════ -->
+<!-- Fırınna POS — Ortak Navbar -->
 <nav class="navbar">
-    <a href="/" class="nav-brand" style="text-decoration:none;color:inherit;">🍽️ Fırınna POS</a>
+    <a href="/" class="nav-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="26" height="26" style="flex-shrink:0;border-radius:7px;">
+            <rect width="64" height="64" rx="14" fill="#2d6a4f"/>
+            <line x1="18" y1="10" x2="18" y2="28" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <line x1="13" y1="10" x2="13" y2="22" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <line x1="23" y1="10" x2="23" y2="22" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <path d="M13 22 Q13 28 18 28 Q23 28 23 22" fill="none" stroke="white" stroke-width="3"/>
+            <line x1="18" y1="28" x2="18" y2="54" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <path d="M46 10 Q52 16 52 26 L46 28 Z" fill="white"/>
+            <line x1="46" y1="28" x2="46" y2="54" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        Fırınna POS
+    </a>
     <div class="nav-links">
         <a href="/" {% if request.path == '/' %}class="active"{% endif %}>Masalar</a>
         <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">
-            🔔<span class="alert-badge" id="alertBadge" style="display:none">0</span>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="alert-badge" id="alertBadge" style="display:none">0</span>
         </button>
         <div class="nav-dropdown" id="navDropdown">
-            <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
+            <button class="nav-dropdown-btn" onclick="toggleNav()">Yönetim ▾</button>
             <div class="nav-dropdown-menu">
-                <a href="/kasa"     {% if request.path == '/kasa'     %}class="active"{% endif %}>💰 Kasa</a>
-                <a href="/muhasebe" {% if request.path == '/muhasebe' %}class="active"{% endif %}>📒 Muhasebe</a>
+                <a href="/kasa"     {% if request.path == '/kasa'     %}class="active"{% endif %}>Kasa</a>
+                <a href="/muhasebe" {% if request.path == '/muhasebe' %}class="active"{% endif %}>Muhasebe</a>
                 <hr>
-                <a href="/products" {% if request.path == '/products' %}class="active"{% endif %}>🍞 Ürünler</a>
-                <a href="/stok"     {% if request.path == '/stok'     %}class="active"{% endif %}>📦 Stok</a>
-                <a href="/recete"   {% if request.path == '/recete'   %}class="active"{% endif %}>🧾 Reçete</a>
-                <a href="/expenses" {% if request.path == '/expenses' %}class="active"{% endif %}>📤 Masraflar</a>
-                <a href="/tables"   {% if request.path == '/tables'   %}class="active"{% endif %}>🪑 Masa Yönetimi</a>
+                <a href="/products" {% if request.path == '/products' %}class="active"{% endif %}>Ürünler</a>
+                <a href="/stok"     {% if request.path == '/stok'     %}class="active"{% endif %}>Stok</a>
+                <a href="/recete"   {% if request.path == '/recete'   %}class="active"{% endif %}>Reçete</a>
+                <a href="/expenses" {% if request.path == '/expenses' %}class="active"{% endif %}>Masraflar</a>
+                <a href="/tables"   {% if request.path == '/tables'   %}class="active"{% endif %}>Masa Yönetimi</a>
                 <hr>
-                <a href="/backup"   {% if request.path == '/backup'   %}class="active"{% endif %}>💾 Yedek</a>
-                <a href="/settings" {% if request.path == '/settings' %}class="active"{% endif %}>⚙️ Ayarlar</a>
+                <a href="/backup"   {% if request.path == '/backup'   %}class="active"{% endif %}>Yedek</a>
+                <a href="/settings" {% if request.path == '/settings' %}class="active"{% endif %}>Ayarlar</a>
             </div>
         </div>
     </div>
 </nav>
 
-<!-- Stok Uyarı Paneli -->
 <div class="alert-panel" id="alertPanel">
     <div class="alert-panel-header">
-        <span>⚠️ Stok Uyarıları</span>
-        <a href="/stok" style="color:white;font-size:.82rem;font-weight:700;text-decoration:none;
-           background:rgba(255,255,255,.2);padding:.2rem .65rem;border-radius:12px;">📦 Stoka Git →</a>
+        <span>Stok Uyarıları</span>
+        <a href="/stok" style="color:white;font-size:.82rem;font-weight:700;text-decoration:none;background:rgba(255,255,255,.2);padding:.2rem .65rem;border-radius:12px;">Stoka Git →</a>
     </div>
     <div class="alert-panel-body" id="alertPanelBody">
         <div class="alert-empty">Yükleniyor...</div>
@@ -40,10 +52,7 @@
 </div>
 
 <script>
-// ── Navbar ──────────────────────────────────────────────
-function toggleNav() {
-    document.getElementById('navDropdown').classList.toggle('open');
-}
+function toggleNav() { document.getElementById('navDropdown').classList.toggle('open'); }
 document.addEventListener('click', function(e) {
     var dd = document.getElementById('navDropdown');
     var p  = document.getElementById('alertPanel');
@@ -51,20 +60,11 @@ document.addEventListener('click', function(e) {
     if (dd && !dd.contains(e.target)) dd.classList.remove('open');
     if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove('open');
 });
-
-// ── Stok Uyarı Çanı ─────────────────────────────────────
 function toggleAlertPanel() {
     var badge = document.getElementById('alertBadge');
-    // Uyarı varsa → direkt stok sayfasına git
-    if (badge && badge.style.display !== 'none' && parseInt(badge.textContent) > 0) {
-        window.location.href = '/stok';
-        return;
-    }
-    // Uyarı yoksa → paneli aç/kapat
-    var p = document.getElementById('alertPanel');
-    if (p) p.classList.toggle('open');
+    if (badge && badge.style.display !== 'none' && parseInt(badge.textContent) > 0) { window.location.href = '/stok'; return; }
+    document.getElementById('alertPanel').classList.toggle('open');
 }
-
 async function loadAlerts() {
     try {
         var items = await fetch('/api/stock/alerts').then(r => r.json());
@@ -72,31 +72,19 @@ async function loadAlerts() {
         var body  = document.getElementById('alertPanelBody');
         if (!badge || !body) return;
         if (items.length > 0) {
-            badge.textContent   = items.length;
+            badge.textContent = items.length;
             badge.style.display = 'flex';
             body.innerHTML = items.map(function(i) {
-                var isNeg = i.current_qty < 0;
-                var negBadge = isNeg
-                    ? ' <span style="background:#ede9fe;color:#6d28d9;padding:.1rem .4rem;border-radius:10px;font-size:.7rem;font-weight:700;">EKSİ</span>'
-                    : '';
-                var minText = i.min_quantity > 0
-                    ? '<span class="min"> / min ' + Number(i.min_quantity).toFixed(1) + '</span>'
-                    : '';
-                return '<div class="alert-item" style="' + (isNeg ? 'border-left:3px solid #7c3aed;padding-left:.5rem;' : '') + '">'
-                    + '<span class="alert-item-name">' + (isNeg ? '📉' : '⚠️') + ' ' + i.name + negBadge + '</span>'
-                    + '<span class="alert-item-qty">'
-                    + '<span class="cur" style="' + (isNeg ? 'color:#7c3aed;font-weight:700;' : '') + '">'
-                    + Number(i.current_qty).toFixed(1) + ' ' + i.unit + '</span>'
-                    + minText + '</span></div>';
+                var minText = i.min_quantity > 0 ? '<span class="min"> / min ' + Number(i.min_quantity).toFixed(1) + '</span>' : '';
+                return '<div class="alert-item"><span class="alert-item-name">' + i.name + '</span>'
+                    + '<span class="alert-item-qty"><span class="cur">' + Number(i.current_qty).toFixed(1) + ' ' + i.unit + '</span>' + minText + '</span></div>';
             }).join('');
         } else {
             badge.style.display = 'none';
-            body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
+            body.innerHTML = '<div class="alert-empty">Tüm stoklar yeterli</div>';
         }
     } catch(e) {}
 }
-
-// Sayfa yüklenince ve her 60 sn'de yenile
 loadAlerts();
 setInterval(loadAlerts, 60000);
 </script>

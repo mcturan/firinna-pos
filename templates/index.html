@@ -14,7 +14,7 @@
         <div class="zone-tabs" id="zoneTabs"></div>
         <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap;">
             <button onclick="openOrderHistory()" style="padding:.45rem 1rem;background:#4a5568;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">📜 Geçmiş Siparişler</button>
-            <button onclick="openPastOrderModal()" style="padding:.45rem 1rem;background:#667eea;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">➕ Geçmiş Sipariş Ekle</button>
+            <button onclick="openPastOrderModal()" class="btn btn-secondary">➕ Geçmiş Sipariş Ekle</button>
         </div>
         <div class="tables-grid" id="tablesGrid"></div>
     </div>
@@ -266,83 +266,194 @@
     </div>
 
     <!-- Ödeme Modal -->
+    <!-- ═══════ ÖDEME MODALI ═══════ -->
     <div id="paymentModal" class="modal">
-        <div class="modal-content" style="max-width:520px;">
+        <div class="modal-content" style="max-width:860px;">
             <div class="modal-header">
-                <h2>💰 Ödeme Al</h2>
+                <h2 id="paymentModalTitle">Ödeme Al</h2>
                 <span class="close" onclick="closePaymentModal()">&times;</span>
             </div>
-            <div style="padding:1.5rem;">
+            <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr;min-height:480px;">
 
-                <!-- Toplam + Kalan -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem;">
-                    <div style="background:#f0fdf4;border-radius:10px;padding:1rem;text-align:center;">
-                        <div style="font-size:.75rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Toplam</div>
-                        <div id="paymentTotal" style="font-size:1.6rem;font-weight:800;color:#2d6a4f;">0.00 ₺</div>
-                    </div>
-                    <div style="background:#fff5f5;border-radius:10px;padding:1rem;text-align:center;">
-                        <div style="font-size:.75rem;color:#718096;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Kalan</div>
-                        <div id="payRemainingDisplay" style="font-size:1.6rem;font-weight:800;color:#e53e3e;">0.00 ₺</div>
-                    </div>
-                </div>
-
-                <!-- Ödeme girişleri listesi -->
-                <div id="payEntries" style="margin-bottom:1rem;"></div>
-
-                <!-- Yeni giriş satırı -->
-                <div style="display:flex;gap:.5rem;align-items:center;background:#f8fafc;border-radius:10px;padding:.75rem;margin-bottom:.5rem;">
-                    <input type="number" id="payEntryAmount" placeholder="Tutar" step="0.01" min="0"
-                        style="flex:1;padding:.6rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;font-weight:600;"
-                        onkeydown="if(event.key==='Enter')addPayEntry()">
-                    <button onclick="setEntryType('cash')" id="btnCash"
-                        style="padding:.6rem .9rem;border:2px solid #2d6a4f;border-radius:8px;font-weight:700;background:#2d6a4f;color:white;cursor:pointer;font-size:.85rem;">
-                        💵 Nakit
-                    </button>
-                    <button onclick="setEntryType('card')" id="btnCard"
-                        style="padding:.6rem .9rem;border:2px solid #3b82f6;border-radius:8px;font-weight:700;background:white;color:#3b82f6;cursor:pointer;font-size:.85rem;">
-                        💳 Kart
-                    </button>
-                    <button onclick="addPayEntry()"
-                        style="padding:.6rem .9rem;border:none;border-radius:8px;background:#667eea;color:white;font-weight:700;cursor:pointer;font-size:.85rem;">
-                        ＋ Ekle
-                    </button>
-                </div>
-                <!-- Hesap makinesi hızlı butonları -->
-                <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem;padding:0 .25rem;">
-                    <span style="font-size:.78rem;color:#a0aec0;align-self:center;white-space:nowrap;">Hızlı:</span>
-                    <button onclick="quickAmount(10)"  style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">10 ₺</button>
-                    <button onclick="quickAmount(20)"  style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">20 ₺</button>
-                    <button onclick="quickAmount(50)"  style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">50 ₺</button>
-                    <button onclick="quickAmount(100)" style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">100 ₺</button>
-                    <button onclick="quickAmount(200)" style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">200 ₺</button>
-                    <button onclick="quickAmount(500)" style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">500 ₺</button>
-                    <button onclick="quickExact()"     style="padding:.35rem .65rem;border:1.5px solid #2d6a4f;border-radius:7px;background:#f0fdf4;cursor:pointer;font-size:.82rem;font-weight:700;color:#2d6a4f;">Tam ₺</button>
-                </div>
-
-                <!-- Hesabı böl -->
-                <div style="margin-bottom:1rem;">
-                    <button class="btn btn-warning" style="width:100%;font-size:.9rem;padding:.6rem;" onclick="toggleSplitSection()">➗ Hesabı Böl</button>
-                    <div id="splitSection" style="display:none;margin-top:.75rem;padding:1rem;background:#fff5f5;border-radius:8px;">
-                        <label>Kişi Sayısı:</label>
-                        <input type="number" id="numPeople" value="2" min="2" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;margin:.5rem 0;">
-                        <button class="btn btn-secondary" style="width:100%;" onclick="calculateSplit()">Hesapla</button>
-                        <div id="splitResult" style="margin-top:.75rem;font-weight:bold;text-align:center;font-size:1.1rem;"></div>
+                <!-- SOL: Sipariş kalemleri -->
+                <div style="border-right:1px solid var(--border);padding:1.1rem;display:flex;flex-direction:column;gap:.5rem;overflow-y:auto;max-height:520px;">
+                    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:.25rem;">Kalemler</div>
+                    <div id="payItemsList" style="display:flex;flex-direction:column;gap:.4rem;"></div>
+                    <div style="margin-top:auto;padding-top:.75rem;border-top:1px solid var(--border);">
+                        <div style="display:flex;justify-content:space-between;font-size:.82rem;color:var(--ink-3);margin-bottom:.3rem;">
+                            <span>Ara Toplam</span>
+                            <span id="paymentTotal">0.00 ₺</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:.82rem;color:var(--red);margin-bottom:.3rem;" id="payTipRow" style="display:none;">
+                            <span>Bahşiş</span>
+                            <span id="payTipDisplay">0.00 ₺</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:800;color:var(--ink);">
+                            <span>Toplam</span>
+                            <span id="payGrandTotal">0.00 ₺</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Bahşiş -->
-                <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.25rem;background:#fffbeb;border-radius:10px;padding:.75rem;">
-                    <span style="font-size:.9rem;font-weight:600;color:#92400e;white-space:nowrap;">🎁 Bahşiş</span>
-                    <input type="number" id="tipAmount" value="0" step="0.01" placeholder="0.00"
-                        style="flex:1;padding:.6rem;border:2px solid #fde68a;border-radius:8px;font-size:.95rem;">
-                    <label style="font-size:.85rem;"><input type="radio" name="tipMethod" value="cash" checked> Nakit</label>
-                    <label style="font-size:.85rem;"><input type="radio" name="tipMethod" value="card"> Kart</label>
+                <!-- ORTA: Tutar girişi -->
+                <div style="padding:1.1rem;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:.75rem;">
+
+                    <!-- Toplam / Kalan -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+                        <div style="background:var(--bg);border-radius:8px;padding:.75rem;text-align:center;border:1px solid var(--border);">
+                            <div style="font-size:.68rem;color:var(--ink-3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;">Toplam</div>
+                            <div id="payTotalBig" style="font-size:1.4rem;font-weight:800;color:var(--ink);">0.00 ₺</div>
+                        </div>
+                        <div style="background:var(--red-bg);border-radius:8px;padding:.75rem;text-align:center;border:1px solid #FECACA;">
+                            <div style="font-size:.68rem;color:var(--ink-3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;">Kalan</div>
+                            <div id="payRemainingDisplay" style="font-size:1.4rem;font-weight:800;color:var(--red);">0.00 ₺</div>
+                        </div>
+                    </div>
+
+                    <!-- Girilen ödemeler -->
+                    <div id="payEntries" style="display:flex;flex-direction:column;gap:.35rem;min-height:40px;"></div>
+
+                    <!-- Tutar + Nakit/Kart + Ekle -->
+                    <div style="display:flex;gap:.4rem;align-items:stretch;">
+                        <input type="number" id="payEntryAmount" placeholder="Tutar" step="0.01" min="0"
+                            style="flex:1;padding:.55rem .7rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.95rem;font-weight:600;font-family:inherit;"
+                            onkeydown="if(event.key==='Enter')addPayEntry()">
+                        <button id="btnCash" onclick="setEntryType('cash')"
+                            style="padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.8rem;font-weight:700;cursor:pointer;background:var(--ink);color:#fff;transition:all .14s;font-family:inherit;">
+                            Nakit
+                        </button>
+                        <button id="btnCard" onclick="setEntryType('card')"
+                            style="padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.8rem;font-weight:700;cursor:pointer;background:var(--surface);color:var(--ink-2);transition:all .14s;font-family:inherit;">
+                            Kart
+                        </button>
+                        <button onclick="addPayEntry()"
+                            style="padding:.55rem .8rem;border:none;border-radius:var(--r-sm);background:var(--green);color:#fff;font-weight:700;cursor:pointer;font-size:.82rem;font-family:inherit;">
+                            Ekle
+                        </button>
+                    </div>
+
+                    <!-- Numpad -->
+                    <div class="pay-numpad">
+                        <button class="pay-numpad-btn" onclick="numpadPress('1')">1</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('2')">2</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('3')">3</button>
+                        <button class="pay-numpad-btn pay-numpad-action" onclick="numpadTam()">Tam</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('4')">4</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('5')">5</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('6')">6</button>
+                        <button class="pay-numpad-btn pay-numpad-action" onclick="numpadClear()">C</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('7')">7</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('8')">8</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('9')">9</button>
+                        <button class="pay-numpad-btn pay-numpad-del" onclick="numpadDel()">⌫</button>
+                        <button class="pay-numpad-btn pay-numpad-zero" onclick="numpadPress('0')">0</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('.')">.</button>
+                    </div>
+
+                    <!-- Hesabı böl -->
+                    <div>
+                        <button class="btn btn-secondary" style="width:100%;font-size:.82rem;" onclick="toggleSplitSection()">Hesabı Böl</button>
+                        <div id="splitSection" style="display:none;margin-top:.5rem;padding:.75rem;background:var(--bg);border-radius:var(--r-sm);border:1px solid var(--border);">
+                            <div style="display:flex;gap:.4rem;align-items:center;">
+                                <label style="font-size:.82rem;white-space:nowrap;">Kişi sayısı:</label>
+                                <input type="number" id="numPeople" value="2" min="2"
+                                    style="flex:1;padding:.45rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.88rem;font-family:inherit;">
+                                <button class="btn btn-secondary" onclick="calculateSplit()">Hesapla</button>
+                            </div>
+                            <div id="splitResult" style="margin-top:.5rem;font-weight:700;text-align:center;font-size:.95rem;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Bahşiş -->
+                    <div style="background:var(--bg);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border);">
+                        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);margin-bottom:.5rem;">Bahşiş</div>
+                        <div style="display:flex;gap:.5rem;align-items:center;">
+                            <input type="number" id="tipAmount" value="0" step="0.01" placeholder="0.00"
+                                style="flex:1;padding:.5rem .65rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.9rem;font-family:inherit;"
+                                oninput="updateTipDisplay()">
+                            <label style="display:flex;align-items:center;gap:.3rem;font-size:.82rem;cursor:pointer;white-space:nowrap;">
+                                <input type="radio" name="tipMethod" value="cash" checked> Nakit
+                            </label>
+                            <label style="display:flex;align-items:center;gap:.3rem;font-size:.82rem;cursor:pointer;white-space:nowrap;">
+                                <input type="radio" name="tipMethod" value="card"> Kart
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Ödemeyi Tamamla -->
+                    <button class="btn btn-success" style="width:100%;font-size:.95rem;padding:.7rem;" onclick="completePayment()">
+                        Ödemeyi Tamamla
+                    </button>
                 </div>
 
-                <button class="btn btn-success" style="width:100%;font-size:1.1rem;padding:.85rem;" onclick="completePayment()">
-                    ✅ Ödemeyi Tamamla
+                <!-- SAĞ: Ödeme tipleri + Quick Pay -->
+                <div style="padding:1.1rem;display:flex;flex-direction:column;gap:.75rem;">
+                    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:.1rem;">Ödeme Tipi</div>
+
+                    <!-- Nakit -->
+                    <button onclick="setEntryType('cash');quickExact();addPayEntry();"
+                        style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:1.1rem .75rem;border:1.5px solid var(--border);border-radius:var(--r-lg);background:var(--surface);cursor:pointer;transition:all .14s;font-family:inherit;">
+                        <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                            <rect x="4" y="10" width="40" height="28" rx="5" fill="#E8F5E9" stroke="#16A34A" stroke-width="2"/>
+                            <rect x="18" y="18" width="12" height="12" rx="6" fill="#16A34A"/>
+                            <rect x="8" y="14" width="6" height="6" rx="3" fill="#A7F3D0"/>
+                            <rect x="34" y="28" width="6" height="6" rx="3" fill="#A7F3D0"/>
+                        </svg>
+                        <span style="font-weight:700;font-size:.85rem;color:var(--ink);">NAKİT</span>
+                    </button>
+
+                    <!-- Kredi Kartı -->
+                    <button onclick="setEntryType('card');quickExact();addPayEntry();"
+                        style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:1.1rem .75rem;border:1.5px solid var(--border);border-radius:var(--r-lg);background:var(--surface);cursor:pointer;transition:all .14s;font-family:inherit;">
+                        <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                            <rect x="4" y="10" width="40" height="28" rx="5" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+                            <rect x="4" y="17" width="40" height="7" fill="#BFDBFE"/>
+                            <rect x="8" y="28" width="10" height="4" rx="2" fill="#3B82F6"/>
+                            <circle cx="34" cy="30" r="4" fill="#FCA5A5"/>
+                            <circle cx="38" cy="30" r="4" fill="#F87171"/>
+                        </svg>
+                        <span style="font-weight:700;font-size:.85rem;color:var(--ink);">KREDİ KARTI</span>
+                    </button>
+
+                    <!-- Hızlı Ödeme -->
+                    <div style="margin-top:auto;">
+                        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:.5rem;">Hızlı Ödeme</div>
+                        <button onclick="openQuickPay()"
+                            style="width:100%;padding:.85rem;border:none;border-radius:var(--r-lg);background:var(--ink);color:#fff;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;transition:all .14s;">
+                            Hızlı Ödeme
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Pay Mini Modal -->
+    <div id="quickPayModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+        <div style="background:var(--surface);border-radius:var(--r-xl);padding:1.75rem;width:100%;max-width:340px;box-shadow:var(--s-lg);border:1px solid var(--border);">
+            <div style="font-size:1rem;font-weight:700;margin-bottom:.3rem;">Hızlı Ödeme</div>
+            <div id="quickPayAmount" style="font-size:1.8rem;font-weight:800;color:var(--ink);margin-bottom:1.25rem;">0.00 ₺</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;">
+                <button onclick="doQuickPay('cash')"
+                    style="display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.25rem;border:1.5px solid var(--border);border-radius:var(--r-lg);background:var(--surface);cursor:pointer;font-family:inherit;transition:all .14s;">
+                    <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                        <rect x="4" y="10" width="40" height="28" rx="5" fill="#E8F5E9" stroke="#16A34A" stroke-width="2"/>
+                        <rect x="18" y="18" width="12" height="12" rx="6" fill="#16A34A"/>
+                    </svg>
+                    <span style="font-weight:700;font-size:.88rem;">NAKİT</span>
+                </button>
+                <button onclick="doQuickPay('card')"
+                    style="display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.25rem;border:1.5px solid var(--border);border-radius:var(--r-lg);background:var(--surface);cursor:pointer;font-family:inherit;transition:all .14s;">
+                    <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                        <rect x="4" y="10" width="40" height="28" rx="5" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+                        <rect x="4" y="17" width="40" height="7" fill="#BFDBFE"/>
+                        <circle cx="34" cy="30" r="4" fill="#FCA5A5"/>
+                        <circle cx="38" cy="30" r="4" fill="#F87171"/>
+                    </svg>
+                    <span style="font-weight:700;font-size:.88rem;">KART</span>
                 </button>
             </div>
+            <button onclick="closeQuickPay()" style="width:100%;padding:.6rem;border:1.5px solid var(--border);border-radius:var(--r-sm);background:none;cursor:pointer;font-size:.84rem;font-weight:600;font-family:inherit;color:var(--ink-2);">İptal</button>
         </div>
     </div>
 
@@ -645,13 +756,13 @@
             tablesGrid.innerHTML = tables.map(table => {
                 const hasOrder = table.has_order > 0;
                 const status = hasOrder ? 'occupied' : 'empty';
-                const icon = hasOrder ? '🔴' : '✅';
+                
                 const noteIcon = table.table_note ? '📝' : '';
                 
                 return `
                     <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
-                        <div class="table-icon">${icon}</div>
                         <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
+                        ${hasOrder ? `<div class="table-total">₺${Number(table.order_total||0).toFixed(2)}</div>` : ''}
                         <div class="table-status">${hasOrder ? 'Dolu' : 'Boş'}</div>
                     </div>
                 `;
@@ -984,12 +1095,82 @@
             document.getElementById('payEntries').innerHTML = '';
             document.getElementById('payEntryAmount').value = '';
             document.getElementById('tipAmount').value = '0';
-            document.getElementById('paymentTotal').textContent = currentOrder.total.toFixed(2) + ' ₺';
+            const total = currentOrder.total.toFixed(2) + ' ₺';
+            document.getElementById('paymentTotal').textContent  = total;
+            document.getElementById('payTotalBig').textContent   = total;
+            document.getElementById('payGrandTotal').textContent = total;
+            document.getElementById('paymentModalTitle').textContent = 'Ödeme Al — ' + (currentOrder.table_name || '');
+            const list = document.getElementById('payItemsList');
+            if (list && currentOrder.items) {
+                list.innerHTML = currentOrder.items.map(i =>
+                    `<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid var(--border);">
+                        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.quantity}x ${i.product_name||i.name||''}</span>
+                        <span style="font-weight:600;flex-shrink:0;margin-left:.5rem;">${i.is_complimentary ? 'İkram' : (i.quantity * (i.price||0)).toFixed(2) + ' ₺'}</span>
+                    </div>`
+                ).join('');
+            }
+            document.getElementById('payTipRow').style.display = 'none';
             updatePayRemaining();
             document.getElementById('paymentModal').style.display = 'block';
             setTimeout(() => document.getElementById('payEntryAmount').focus(), 100);
         }
 
+        function updateTipDisplay() {
+            const tip   = parseFloat(document.getElementById('tipAmount').value) || 0;
+            const total = currentOrder ? currentOrder.total : 0;
+            document.getElementById('payTipDisplay').textContent   = tip.toFixed(2) + ' ₺';
+            document.getElementById('payGrandTotal').textContent   = (total + tip).toFixed(2) + ' ₺';
+            document.getElementById('payTipRow').style.display     = tip > 0 ? 'flex' : 'none';
+        }
+
+        function openQuickPay() {
+            const total = currentOrder ? currentOrder.total : 0;
+            document.getElementById('quickPayAmount').textContent = total.toFixed(2) + ' ₺';
+            document.getElementById('quickPayModal').style.display = 'flex';
+        }
+        function closeQuickPay() {
+            document.getElementById('quickPayModal').style.display = 'none';
+        }
+        async function doQuickPay(method) {
+            closeQuickPay();
+            const total = currentOrder.total;
+            const tip   = parseFloat(document.getElementById('tipAmount').value) || 0;
+            const tipMethod = document.querySelector('input[name="tipMethod"]:checked').value;
+            await fetch(`/api/orders/${currentOrder.id}/close-with-payment`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    payment_cash: method === 'cash' ? total : 0,
+                    payment_card: method === 'card' ? total : 0,
+                    tip_amount: tip,
+                    tip_method: tipMethod
+                })
+            });
+            alert('Hesap kapatıldı!');
+            document.getElementById('paymentModal').style.display = 'none';
+            document.getElementById('orderModal').style.display   = 'none';
+            refreshZone();
+        }
+
+
+        function numpadPress(val) {
+            const inp = document.getElementById('payEntryAmount');
+            if (!inp) return;
+            if (val === '.' && inp.value.includes('.')) return;
+            if (inp.value === '0' && val !== '.') inp.value = val;
+            else inp.value += val;
+        }
+        function numpadClear() {
+            const inp = document.getElementById('payEntryAmount');
+            if (inp) inp.value = '';
+        }
+        function numpadDel() {
+            const inp = document.getElementById('payEntryAmount');
+            if (inp) inp.value = inp.value.slice(0, -1);
+        }
+        function numpadTam() {
+            quickExact();
+        }
         function closePaymentModal() {
             document.getElementById('paymentModal').style.display = 'none';
         }
@@ -1794,10 +1975,10 @@ async function refreshZone() {
     tablesGrid.innerHTML = tables.map(table => {
         const hasOrder = table.has_order > 0;
         const status = hasOrder ? 'occupied' : 'empty';
-        const icon = hasOrder ? '🔴' : '✅';
+        
         return `
             <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
-                <div class="table-icon">${icon}</div>
+                
                 <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
                 <div class="table-status">${hasOrder ? 'Dolu' : 'Boş'}</div>
             </div>
