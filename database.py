@@ -151,6 +151,23 @@ def get_products(category_id=None):
     conn.close()
     return [dict(prod) for prod in products]
 
+def migrate_expenses_columns():
+    """expenses tablosuna eksik kolonları ekle"""
+    conn = get_db()
+    for col, typedef in [
+        ('subcategory', 'TEXT DEFAULT ""'),
+        ('payment_method', 'TEXT DEFAULT "cash"'),
+        ('receipt_no', 'TEXT DEFAULT ""'),
+        ('vendor', 'TEXT DEFAULT ""'),
+        ('notes', 'TEXT DEFAULT ""'),
+    ]:
+        try:
+            conn.execute(f'ALTER TABLE expenses ADD COLUMN {col} {typedef}')
+            conn.commit()
+        except:
+            pass
+    conn.close()
+
 def migrate_product_stock_link():
     """products tablosuna stock_item_id kolonu ekle (bir kez)"""
     conn = get_db()

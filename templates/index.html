@@ -26,6 +26,7 @@
                 <h2>Sipariş - <span id="modalTableName"></span></h2>
                 <span class="close">&times;</span>
             </div>
+            <div id="tableNoteBanner" style="display:none;padding:.4rem 1.5rem;background:#fef9c3;border-bottom:1px solid #fde047;font-size:.85rem;font-weight:600;color:#854d0e;cursor:pointer;" onclick="openTableNote(currentTable, document.getElementById('modalTableName').textContent, event)"></div>
             <div style="padding: 0.5rem 1.5rem; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                 <input type="text" id="orderNoteText" placeholder="📝 Not: müşteri adı, özel istek..."
                     style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;
@@ -689,6 +690,12 @@
                 document.getElementById('orderNoteText').value = '';
             }
             
+            // Masa notu banner
+            fetch(`/api/tables?zone_id=${currentZone}`).then(r=>r.json()).then(tables=>{
+                const t=tables.find(t=>t.id===tableId);
+                const b=document.getElementById('tableNoteBanner');
+                if(t&&t.table_note){b.textContent='📝 Masa Notu: '+t.table_note;b.style.display='block';}else{b.style.display='none';}
+            });
             document.getElementById('orderModal').style.display = 'block';
         }
 
@@ -1160,7 +1167,9 @@
                         <div style="text-align:right;flex-shrink:0;">
                             <div style="font-size:1rem;font-weight:700;color:#2d6a4f;">${order.total.toFixed(2)} ₺</div>
                             <div style="display:flex;gap:.3rem;margin-top:.4rem;justify-content:flex-end;">
-                                ${isToday ? `<button class="btn btn-secondary" onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.3rem .6rem;font-size:.8rem;">✏️</button>` : ''}
+                                ${isToday
+                                    ? `<button class="btn btn-secondary" onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.3rem .6rem;font-size:.8rem;">✏️</button>`
+                                    : `<button class="btn" onclick="viewOrderModal(${order.id})" title="Görüntüle" style="background:#667eea;color:white;padding:.3rem .6rem;font-size:.8rem;">👁️</button>`}
                                 <button class="btn" onclick="printHistoryReceipt(${order.id})" title="Fiş Yazdır" style="background:#48bb78;color:white;padding:.3rem .6rem;font-size:.8rem;">🖨️</button>
                                 <button class="btn" onclick="deleteOrder(${order.id})" title="Sil" style="background:#f56565;color:white;padding:.3rem .6rem;font-size:.8rem;">🗑️</button>
                             </div>
@@ -1173,6 +1182,32 @@
         function clearHistoryFilter() {
             document.getElementById('historyDate').value = '';
             loadOrderHistory();
+        }
+
+        async function viewOrderModal(orderId) {
+            const orders = await fetch('/api/orders/history').then(r => r.json());
+            const order  = orders.find(o => o.id === orderId);
+            if (!order) return;
+            const meth = m => m === 'cash' ? '💵 Nakit' : '💳 Kart';
+            const rows = order.items.map(i =>
+                '<div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem;">'
+                + '<span>' + i.quantity + '× ' + i.product_name + (i.is_complimentary ? ' <span style="background:#e9d5ff;color:#6b21a8;padding:.1rem .3rem;border-radius:10px;font-size:.72rem;">İkram</span>' : '') + '</span>'
+                + '<span style="font-weight:600;color:#2d6a4f;">' + (i.quantity * i.price).toFixed(2) + ' ₺</span></div>'
+            ).join('');
+            document.getElementById('viewOrderContent').innerHTML =
+                '<div style="background:#f7fafc;border-radius:10px;padding:1rem;margin-bottom:1rem;">'
+                + '<div style="font-weight:700;font-size:1rem;">' + order.table_name + ' — ' + order.zone_name + '</div>'
+                + '<div style="font-size:.82rem;color:#718096;">' + new Date(order.closed_at).toLocaleString('tr-TR') + '</div></div>'
+                + '<div style="margin-bottom:1rem;">' + rows + '</div>'
+                + '<div style="background:#f0fdf4;border-radius:10px;padding:1rem;display:flex;flex-direction:column;gap:.4rem;">'
+                + '<div style="display:flex;justify-content:space-between;"><span style="color:#718096;">Toplam</span><strong>' + order.total.toFixed(2) + ' ₺</strong></div>'
+                + (order.payment_cash > 0 ? '<div style="display:flex;justify-content:space-between;"><span style="color:#718096;">💵 Nakit</span><span>' + order.payment_cash.toFixed(2) + ' ₺</span></div>' : '')
+                + (order.payment_card > 0 ? '<div style="display:flex;justify-content:space-between;"><span style="color:#718096;">💳 Kart</span><span>' + order.payment_card.toFixed(2) + ' ₺</span></div>' : '')
+                + (order.tip_amount > 0  ? '<div style="display:flex;justify-content:space-between;"><span style="color:#718096;">🎁 Bahşiş (' + meth(order.tip_method) + ')</span><span>' + order.tip_amount.toFixed(2) + ' ₺</span></div>' : '')
+                + (order.discount_value > 0 ? '<div style="display:flex;justify-content:space-between;"><span style="color:#f56565;">🏷️ İndirim</span><span style="color:#f56565;">-' + order.discount_value.toFixed(2) + ' ₺</span></div>' : '')
+                + '</div>';
+            document.getElementById('viewOrderModal').style.display = 'block';
+        }
 
         async function deleteOrder(orderId) {
             if (!confirm('Bu siparişi kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz!')) return;
@@ -1188,7 +1223,6 @@
             } catch (error) {
                 alert('Hata oluştu: ' + error.message);
             }
-        }
         }
 
         async function reopenOrder(orderId) {
@@ -1663,6 +1697,16 @@
         document.getElementById('footer-dbsize').textContent = d.db_size_kb+' KB';
     }).catch(()=>{});
     </script>
+
+    <div id="viewOrderModal" class="modal">
+        <div class="modal-content" style="max-width:540px;">
+            <div class="modal-header">
+                <h2>👁️ Sipariş Detayı</h2>
+                <span class="close" onclick="document.getElementById('viewOrderModal').style.display='none'">&times;</span>
+            </div>
+            <div style="padding:1.5rem;" id="viewOrderContent"></div>
+        </div>
+    </div>
 </body>
 </html>
 <script>

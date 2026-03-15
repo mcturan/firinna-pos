@@ -19,6 +19,7 @@ APP_BUILD   = "2026-03-09"
 try:
     db.init_db()
     db.migrate_product_stock_link()
+    db.migrate_expenses_columns()
 except Exception as _e:
     print(f"Startup migration warning: {_e}")
 
