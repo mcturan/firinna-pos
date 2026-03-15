@@ -163,6 +163,10 @@
                         <div>
                             <label>🎁 Bahşiş (TL):</label>
                             <input type="number" id="pastTipAmount" value="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                            <div style="display:flex;gap:1rem;margin-top:.5rem;">
+                                <label style="font-size:.85rem;cursor:pointer;"><input type="radio" name="pastTipMethod" value="cash" checked> 💵 Nakit</label>
+                                <label style="font-size:.85rem;cursor:pointer;"><input type="radio" name="pastTipMethod" value="card"> 💳 Kart</label>
+                            </div>
                         </div>
                     </div>
 
@@ -285,7 +289,7 @@
                 <div id="payEntries" style="margin-bottom:1rem;"></div>
 
                 <!-- Yeni giriş satırı -->
-                <div style="display:flex;gap:.5rem;align-items:center;background:#f8fafc;border-radius:10px;padding:.75rem;margin-bottom:1rem;">
+                <div style="display:flex;gap:.5rem;align-items:center;background:#f8fafc;border-radius:10px;padding:.75rem;margin-bottom:.5rem;">
                     <input type="number" id="payEntryAmount" placeholder="Tutar" step="0.01" min="0"
                         style="flex:1;padding:.6rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;font-weight:600;"
                         onkeydown="if(event.key==='Enter')addPayEntry()">
@@ -301,6 +305,17 @@
                         style="padding:.6rem .9rem;border:none;border-radius:8px;background:#667eea;color:white;font-weight:700;cursor:pointer;font-size:.85rem;">
                         ＋ Ekle
                     </button>
+                </div>
+                <!-- Hesap makinesi hızlı butonları -->
+                <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem;padding:0 .25rem;">
+                    <span style="font-size:.78rem;color:#a0aec0;align-self:center;white-space:nowrap;">Hızlı:</span>
+                    <button onclick="quickAmount(10)"  style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">10 ₺</button>
+                    <button onclick="quickAmount(20)"  style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">20 ₺</button>
+                    <button onclick="quickAmount(50)"  style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">50 ₺</button>
+                    <button onclick="quickAmount(100)" style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">100 ₺</button>
+                    <button onclick="quickAmount(200)" style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">200 ₺</button>
+                    <button onclick="quickAmount(500)" style="padding:.35rem .65rem;border:1.5px solid #e2e8f0;border-radius:7px;background:white;cursor:pointer;font-size:.82rem;font-weight:600;">500 ₺</button>
+                    <button onclick="quickExact()"     style="padding:.35rem .65rem;border:1.5px solid #2d6a4f;border-radius:7px;background:#f0fdf4;cursor:pointer;font-size:.82rem;font-weight:700;color:#2d6a4f;">Tam ₺</button>
                 </div>
 
                 <!-- Hesabı böl -->
@@ -882,6 +897,18 @@
         // === YENİ ÖDEME SİSTEMİ ===
         let payEntries = [];   // [{type:'cash'|'card', amount:float}]
         let payEntryType = 'cash';
+
+        function quickAmount(amt) {
+            const el = document.getElementById('payEntryAmount');
+            el.value = amt;
+            el.focus();
+        }
+        function quickExact() {
+            const rem = getRemainingAmount();
+            if (rem > 0) {
+                document.getElementById('payEntryAmount').value = rem.toFixed(2);
+            }
+        }
 
         function setEntryType(type) {
             payEntryType = type;
@@ -1562,7 +1589,7 @@
                     discount_value: pastOrderDiscount.value,
                     discount_reason: pastOrderDiscount.reason,
                     tip_amount: tip,
-                    tip_method: cash > 0 ? 'cash' : 'card'
+                    tip_method: (document.querySelector('input[name="pastTipMethod"]:checked')?.value || (cash > 0 ? 'cash' : 'card'))
                 })
             });
             
