@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-APP_VERSION = "1.3.0"
+APP_VERSION = "1.4.0"
 APP_BUILD   = "2026-03-15"
 
 # DB migration — __name__ kontrolü olmadan her başlangıçta çalışır
