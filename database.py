@@ -177,6 +177,14 @@ def migrate_product_stock_link():
         conn.commit()
     conn.close()
 
+def migrate_kitchen_ready():
+    conn = get_db()
+    cols = [r[1] for r in conn.execute('PRAGMA table_info(orders)').fetchall()]
+    if 'kitchen_ready' not in cols:
+        conn.execute('ALTER TABLE orders ADD COLUMN kitchen_ready INTEGER DEFAULT 0')
+        conn.commit()
+    conn.close()
+
 def get_product_stock_link(product_id):
     conn = get_db()
     row = conn.execute('SELECT stock_item_id FROM products WHERE id=?', (product_id,)).fetchone()
@@ -329,6 +337,9 @@ def add_order_item(order_id, product_id, quantity, price, product_name=None, kit
         INSERT INTO order_items (order_id, product_id, product_name, quantity, price, kitchen_notes, is_complimentary)
         VALUES (?, ?, ?, ?, ?, ?, ?)
     ''', (order_id, product_id, product_name, quantity, price, kitchen_notes, is_complimentary))
+
+    # Yeni kalem eklenince mutfak hazır durumunu sıfırla
+    conn.execute('UPDATE orders SET kitchen_ready=0 WHERE id=?', (order_id,))
 
     # Toplam tutarı güncelle (indirim ve ikramlar dahil)
     update_order_total(conn, order_id)
@@ -1744,5 +1755,84 @@ def add_stock_purchase(stock_item_id, quantity, cost, payment_method, descriptio
             (date, type, amount, category, payment_method, description)
             VALUES (?, 'out', ?, 'stok_alim', ?, ?)''',
             (date, cost, payment_method, desc))
+    conn.commit()
+    conn.close()
+
+# MUTFAK EKRANI (KDS)
+def get_kitchen_orders():
+    conn = get_db()
+    orders = conn.execute('''
+        SELECT o.id, o.table_id, o.created_at, o.kitchen_ready, o.total,
+               t.name as table_name, z.name as zone_name
+        FROM orders o
+        JOIN tables t ON o.table_id = t.id
+        LEFT JOIN zones z ON t.zone_id = z.id
+        WHERE o.status = 'open' AND o.kitchen_ready = 0
+        ORDER BY o.created_at ASC
+    ''').fetchall()
+    result = []
+    for order in orders:
+        od = dict(order)
+        items = conn.execute('''
+            SELECT oi.id, oi.quantity, oi.kitchen_notes, oi.is_complimentary,
+                   COALESCE(oi.product_name, p.name, 'Ürün') as product_name,
+                   oi.created_at
+            FROM order_items oi
+            LEFT JOIN products p ON oi.product_id = p.id
+            WHERE oi.order_id = ?
+            ORDER BY oi.created_at
+        ''', (od['id'],)).fetchall()
+        od['items'] = [dict(i) for i in items]
+        result.append(od)
+    conn.close()
+    return result
+
+def set_kitchen_ready(order_id, ready=1):
+    conn = get_db()
+    conn.execute('UPDATE orders SET kitchen_ready=? WHERE id=? AND status="open"', (ready, order_id))
+    conn.commit()
+    conn.close()
+
+# GÜNLÜK KAPANIŞ RAPORU
+def get_daily_close_report(date):
+    data = get_report(date, date)
+    conn = get_db()
+    open_orders = conn.execute('''
+        SELECT o.id, t.name as table_name, o.total, o.created_at
+        FROM orders o JOIN tables t ON o.table_id = t.id
+        WHERE o.status = 'open'
+        ORDER BY o.created_at
+    ''').fetchall()
+    conn.close()
+    data['open_orders'] = [dict(o) for o in open_orders]
+    data['open_orders_count'] = len(data['open_orders'])
+    data['date'] = date
+    return data
+
+# MASA TRANSFER / BİRLEŞTİRME
+def transfer_order(order_id, new_table_id):
+    conn = get_db()
+    src = conn.execute("SELECT id FROM orders WHERE id=? AND status='open'", (order_id,)).fetchone()
+    if not src:
+        conn.close()
+        raise ValueError('Kaynak sipariş bulunamadı.')
+    dst = conn.execute("SELECT id FROM orders WHERE table_id=? AND status='open'", (new_table_id,)).fetchone()
+    if dst:
+        conn.close()
+        raise ValueError('Hedef masada zaten açık sipariş var.')
+    conn.execute("UPDATE orders SET table_id=? WHERE id=?", (new_table_id, order_id))
+    conn.commit()
+    conn.close()
+
+def merge_orders(source_order_id, target_order_id):
+    conn = get_db()
+    src = conn.execute("SELECT id FROM orders WHERE id=? AND status='open'", (source_order_id,)).fetchone()
+    tgt = conn.execute("SELECT id FROM orders WHERE id=? AND status='open'", (target_order_id,)).fetchone()
+    if not src or not tgt:
+        conn.close()
+        raise ValueError('Her iki sipariş de açık olmalı.')
+    conn.execute("UPDATE order_items SET order_id=? WHERE order_id=?", (target_order_id, source_order_id))
+    conn.execute("DELETE FROM orders WHERE id=?", (source_order_id,))
+    update_order_total(conn, target_order_id)
     conn.commit()
     conn.close()

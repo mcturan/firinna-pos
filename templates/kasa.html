@@ -92,6 +92,18 @@
         <!-- Özet + işlem formu -->
         <div id="kasaContent"><div class="no-data">⏳ Yükleniyor...</div></div>
 
+        <!-- Günlük Kapanış Raporu -->
+        <div id="dailyCloseCard" style="background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:1.5rem;display:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;">
+                <h3 style="margin:0;font-size:.95rem;color:#2d3748;">📋 Günlük Kapanış Raporu</h3>
+                <div style="display:flex;gap:.5rem;">
+                    <button onclick="loadDailyClose()" style="padding:.38rem .8rem;background:#e2e8f0;color:#2d3748;border:none;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;">🔄 Yenile</button>
+                    <button onclick="sendTelegramClose()" style="padding:.38rem .8rem;background:#2d6a4f;color:white;border:none;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;">✈️ Telegram</button>
+                </div>
+            </div>
+            <div id="dailyCloseReport" style="color:#a0aec0;font-size:.85rem;">Yükleniyor...</div>
+        </div>
+
         <!-- F2: İşlem listesi (filtre + sayfalama) -->
         <div id="txSection"></div>
     </div>
@@ -330,6 +342,10 @@
             data = { nakit, kart, ana };
             renderKasa();
             loadTransactions(1);
+            if (currentKasa === 'ana') {
+                document.getElementById('dailyCloseCard').style.display = '';
+                loadDailyClose();
+            }
         }
 
         function switchKasa(tab) {
@@ -338,6 +354,13 @@
             document.getElementById('tab-' + tab).classList.add('active');
             renderKasa();
             loadTransactions(1);
+            const dcc = document.getElementById('dailyCloseCard');
+            if (tab === 'ana') {
+                dcc.style.display = '';
+                loadDailyClose();
+            } else {
+                dcc.style.display = 'none';
+            }
         }
 
         function fmt(n) { return (n||0).toFixed(2) + ' ₺'; }
@@ -526,6 +549,41 @@
             } else {
                 showToast('Güncellenemedi.', 'error');
             }
+        }
+
+        async function loadDailyClose() {
+            const dateInp = document.getElementById('dateInput');
+            const date = (dateInp && currentPeriod === 'daily') ? (dateInp.value || new Date().toISOString().slice(0,10)) : new Date().toISOString().slice(0,10);
+            const r = await fetch('/api/reports/daily-close?date=' + date).then(res => res.json());
+            const el = document.getElementById('dailyCloseReport');
+            const fmt2 = n => Number(n||0).toFixed(2) + ' ₺';
+            let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.6rem;margin-bottom:.75rem;">';
+            html += `<div class="sum-card"><div class="sum-val green">${fmt2(r.total_sales)}</div><div class="sum-label">Satış</div></div>`;
+            html += `<div class="sum-card"><div class="sum-val">${fmt2(r.total_cash)}</div><div class="sum-label">Nakit</div></div>`;
+            html += `<div class="sum-card"><div class="sum-val blue">${fmt2(r.total_card)}</div><div class="sum-label">Kart</div></div>`;
+            html += `<div class="sum-card"><div class="sum-val orange">${fmt2(r.total_tips)}</div><div class="sum-label">Bahşiş</div></div>`;
+            if (r.total_discount > 0) html += `<div class="sum-card"><div class="sum-val red">${fmt2(r.total_discount)}</div><div class="sum-label">İndirim</div></div>`;
+            if (r.total_expenses > 0) html += `<div class="sum-card"><div class="sum-val red">${fmt2(r.total_expenses)}</div><div class="sum-label">Masraf</div></div>`;
+            html += `<div class="sum-card" style="border:2px solid #d1fae5;"><div class="sum-val green" style="font-size:1.2rem;font-weight:800;">${fmt2(r.net)}</div><div class="sum-label">Net Kasa</div></div>`;
+            html += '</div>';
+            if ((r.top_products||[]).length) {
+                html += '<div style="font-size:.8rem;font-weight:700;color:#4a5568;margin-bottom:.35rem;">🏆 En Çok Satan Ürünler</div>';
+                html += '<div style="font-size:.82rem;">' + r.top_products.slice(0,5).map((p,i) => `<div style="padding:.22rem 0;border-bottom:1px solid #f0f0f0;">${i+1}. ${p.name} <span style="color:#a0aec0;">× ${p.quantity}</span> <span style="float:right;color:#2d6a4f;font-weight:600;">${Number(p.total||0).toFixed(2)} ₺</span></div>`).join('') + '</div>';
+            }
+            if (r.open_orders_count > 0) {
+                html += `<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:.6rem .85rem;margin-top:.6rem;font-size:.82rem;color:#92400e;">⚠️ ${r.open_orders_count} masa hâlâ açık: ${r.open_orders.map(o => o.table_name).join(', ')}</div>`;
+            }
+            el.innerHTML = html;
+        }
+
+        async function sendTelegramClose() {
+            const dateInp = document.getElementById('dateInput');
+            const date = (dateInp && currentPeriod === 'daily') ? (dateInp.value || new Date().toISOString().slice(0,10)) : new Date().toISOString().slice(0,10);
+            const r = await fetch('/api/reports/daily-close/send-telegram', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({date})
+            }).then(res => res.json());
+            showToast(r.success ? '✅ Rapor Telegram\'a gönderildi!' : '❌ Gönderim başarısız. Bot token/chat ID kontrol et.', r.success ? 'success' : 'error', 4000);
         }
     </script>
 

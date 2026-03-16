@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutfak — Fırınna POS</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <style>
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { background:#111827; color:#f9fafb; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; min-height:100vh; }
+        .kds-header { display:flex; justify-content:space-between; align-items:center; padding:.85rem 1.5rem; background:#1f2937; border-bottom:2px solid #374151; }
+        .kds-title { font-size:1.25rem; font-weight:800; color:#f87171; letter-spacing:.3px; }
+        .kds-meta { display:flex; gap:1.25rem; align-items:center; font-size:.82rem; color:#9ca3af; }
+        .kds-meta a { color:#6b7280; text-decoration:none; }
+        .kds-meta a:hover { color:#d1d5db; }
+        .kds-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:1rem; padding:1.25rem; align-items:start; }
+        .kds-card { background:#1f2937; border-radius:14px; border:2px solid #374151; padding:1.1rem; display:flex; flex-direction:column; }
+        .kds-card.urgent-card { border-color:#ef4444; }
+        .kds-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:.85rem; gap:.5rem; }
+        .kds-table { font-size:1.05rem; font-weight:800; color:#f87171; }
+        .kds-elapsed { font-size:.78rem; font-weight:700; padding:.22rem .6rem; border-radius:20px; background:#374151; color:#9ca3af; white-space:nowrap; }
+        .kds-elapsed.urgent { background:#991b1b; color:#fca5a5; }
+        .kds-items { flex:1; }
+        .kds-item { display:flex; gap:.5rem; align-items:flex-start; padding:.45rem 0; border-bottom:1px solid #374151; }
+        .kds-item:last-child { border-bottom:none; }
+        .kds-qty { font-weight:800; color:#fcd34d; min-width:26px; font-size:.95rem; }
+        .kds-name { font-size:.92rem; color:#e5e7eb; line-height:1.3; }
+        .kds-note { font-size:.74rem; color:#f87171; font-style:italic; margin-top:.15rem; }
+        .kds-ready-btn { margin-top:1rem; width:100%; padding:.8rem; background:#065f46; color:white; border:none; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer; transition:background .15s; font-family:inherit; }
+        .kds-ready-btn:hover { background:#064e3b; }
+        .kds-empty { grid-column:1/-1; text-align:center; padding:5rem 2rem; color:#4b5563; font-size:1.1rem; }
+        .kds-empty span { display:block; font-size:3rem; margin-bottom:1rem; }
+    </style>
+</head>
+<body>
+<div class="kds-header">
+    <div class="kds-title">👨‍🍳 Mutfak Ekranı</div>
+    <div class="kds-meta">
+        <span id="orderCount"></span>
+        <span id="lastRefresh"></span>
+        <span id="clockEl"></span>
+        <a href="/">← POS</a>
+    </div>
+</div>
+<div id="kdsGrid" class="kds-grid"></div>
+
+<script>
+function elapsedStr(created_at) {
+    const ts = created_at.includes('T') ? created_at : created_at.replace(' ','T') + 'Z';
+    const diff = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
+    if (diff < 0) return '0s';
+    const m = Math.floor(diff / 60), s = diff % 60;
+    return m > 0 ? m + 'dk ' + s + 's' : s + 's';
+}
+function isUrgent(created_at) {
+    const ts = created_at.includes('T') ? created_at : created_at.replace(' ','T') + 'Z';
+    return (Date.now() - new Date(ts).getTime()) > 15 * 60 * 1000;
+}
+
+let _orders = [];
+
+async function loadKitchen() {
+    try {
+        _orders = await fetch('/api/kitchen/orders').then(r => r.json());
+    } catch(e) { return; }
+    renderKitchen();
+    document.getElementById('lastRefresh').textContent = 'Güncellendi: ' + new Date().toLocaleTimeString('tr-TR');
+    document.getElementById('orderCount').textContent = _orders.length ? _orders.length + ' sipariş bekliyor' : '';
+}
+
+function renderKitchen() {
+    const grid = document.getElementById('kdsGrid');
+    if (!_orders.length) {
+        grid.innerHTML = '<div class="kds-empty"><span>✅</span>Hazırlanacak sipariş yok</div>';
+        return;
+    }
+    grid.innerHTML = _orders.map(o => `
+        <div class="kds-card${isUrgent(o.created_at) ? ' urgent-card' : ''}">
+            <div class="kds-card-header">
+                <span class="kds-table">🍽️ ${o.table_name}</span>
+                <span class="kds-elapsed${isUrgent(o.created_at) ? ' urgent' : ''}" data-ts="${o.created_at}">${elapsedStr(o.created_at)}</span>
+            </div>
+            <div class="kds-items">
+                ${o.items.map(i => `
+                    <div class="kds-item">
+                        <span class="kds-qty">${i.quantity}×</span>
+                        <div>
+                            <div class="kds-name">${i.product_name}</div>
+                            ${i.kitchen_notes ? '<div class="kds-note">📝 ' + i.kitchen_notes + '</div>' : ''}
+                        </div>
+                    </div>`).join('')}
+            </div>
+            <button class="kds-ready-btn" onclick="markReady(${o.id})">✓ Hazırlandı</button>
+        </div>`).join('');
+}
+
+async function markReady(orderId) {
+    await fetch('/api/kitchen/orders/' + orderId + '/ready', {method:'POST'});
+    _orders = _orders.filter(o => o.id !== orderId);
+    renderKitchen();
+}
+
+function updateElapsed() {
+    document.querySelectorAll('.kds-elapsed[data-ts]').forEach(el => {
+        const ts = el.getAttribute('data-ts');
+        el.textContent = elapsedStr(ts);
+        el.className = 'kds-elapsed' + (isUrgent(ts) ? ' urgent' : '');
+    });
+}
+
+function updateClock() {
+    document.getElementById('clockEl').textContent = new Date().toLocaleTimeString('tr-TR');
+}
+
+loadKitchen();
+setInterval(loadKitchen, 30000);
+setInterval(updateElapsed, 5000);
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+</body>
+</html>

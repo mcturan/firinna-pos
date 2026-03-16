@@ -1,22 +1,142 @@
 [
-  {"id": 1,  "text": "B1: Kasa indirim hesabı yanlış — gelir 1690, indirim 40, net 1690 gösteriyor (brüt/net ayrımı yapılacak)", "done": true,  "date": "2026-03-16", "cat": "bug"},
-  {"id": 2,  "text": "B2: Muhasebe hafta/ay tıklayınca yükleniyor takılıyor (AbortController ile düzeltildi)", "done": true,  "date": "2026-03-16", "cat": "bug"},
-  {"id": 3,  "text": "B3: Satılan ürünlerin stoğu düşmüyor — reçete bağlantısı, MAX(0,...) bug", "done": true,  "date": "2026-03-16", "cat": "bug"},
-  {"id": 4,  "text": "K1: Kasa sekmelerine basınca otomatik yüklensin", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 5,  "text": "K2: İşlem listesi 30/sayfa + sayfalama + filtre + Excel indirme", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 6,  "text": "K3: Kasaya nakit girişi/çıkışı ekleme", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 7,  "text": "K4: İşlem eklerken tarih girişi (geçmiş kayıt)", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 8,  "text": "M1: Masalar → Sipariş Noktaları yeniden adlandırma", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 9,  "text": "M2: Sipariş modalına tarih/saat seçimi — geçmiş sipariş oluşturabilme", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 10, "text": "M3: Sipariş listesi ana sayfanın altında (bugün/geçmiş sekmeleri, tarih aralığı, Excel)", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 11, "text": "S1: Stok sayımında ortalama birim maliyet girişi (sayım sırasında maliyet güncellensin)", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 12, "text": "S3: Stok ürün bazlı hareket filtreleme", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 13, "text": "G1: Logo ana sayfada watermark olarak gösterilsin", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 14, "text": "Y1: Geliştirici talep sekmesi (yedek sayfasına, dosya export, geçmiş takibi)", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 15, "text": "FAZ2/I1: Ana sayfada masa süre göstergesi (yeşil/turuncu/kırmızı badge)", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 16, "text": "FAZ2/M1: Muhasebe'ye KDV kartı + gelir/gider trend grafiği", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 17, "text": "FAZ2/T1: Global toast bildirimleri (alert() yerine)", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 18, "text": "FAZ2/R1: Raporlar sayfasına saatlik satış dağılımı grafiği", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 19, "text": "Sipariş geçmişini collapsible/sekme içine al — müşteriler geçerken görmesin", "done": true,  "date": "2026-03-16", "cat": "özellik"},
-  {"id": 20, "text": "Geçmiş sipariş ekleme butonunu ana sayfadan kaldır", "done": true,  "date": "2026-03-16", "cat": "özellik"}
+  {
+    "id": 1,
+    "text": "B1: Kasa indirim hesabı yanlış — gelir 1690, indirim 40, net 1690 gösteriyor (brüt/net ayrımı yapılacak)",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "bug"
+  },
+  {
+    "id": 2,
+    "text": "B2: Muhasebe hafta/ay tıklayınca yükleniyor takılıyor (AbortController ile düzeltildi)",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "bug"
+  },
+  {
+    "id": 3,
+    "text": "B3: Satılan ürünlerin stoğu düşmüyor — reçete bağlantısı, MAX(0,...) bug",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "bug"
+  },
+  {
+    "id": 4,
+    "text": "K1: Kasa sekmelerine basınca otomatik yüklensin",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 5,
+    "text": "K2: İşlem listesi 30/sayfa + sayfalama + filtre + Excel indirme",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 6,
+    "text": "K3: Kasaya nakit girişi/çıkışı ekleme",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 7,
+    "text": "K4: İşlem eklerken tarih girişi (geçmiş kayıt)",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 8,
+    "text": "M1: Masalar → Sipariş Noktaları yeniden adlandırma",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 9,
+    "text": "M2: Sipariş modalına tarih/saat seçimi — geçmiş sipariş oluşturabilme",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 10,
+    "text": "M3: Sipariş listesi ana sayfanın altında (bugün/geçmiş sekmeleri, tarih aralığı, Excel)",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 11,
+    "text": "S1: Stok sayımında ortalama birim maliyet girişi (sayım sırasında maliyet güncellensin)",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 12,
+    "text": "S3: Stok ürün bazlı hareket filtreleme",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 13,
+    "text": "G1: Logo ana sayfada watermark olarak gösterilsin",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 14,
+    "text": "Y1: Geliştirici talep sekmesi (yedek sayfasına, dosya export, geçmiş takibi)",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 15,
+    "text": "FAZ2/I1: Ana sayfada masa süre göstergesi (yeşil/turuncu/kırmızı badge)",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 16,
+    "text": "FAZ2/M1: Muhasebe'ye KDV kartı + gelir/gider trend grafiği",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 17,
+    "text": "FAZ2/T1: Global toast bildirimleri (alert() yerine)",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 18,
+    "text": "FAZ2/R1: Raporlar sayfasına saatlik satış dağılımı grafiği",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 19,
+    "text": "Sipariş geçmişini collapsible/sekme içine al — müşteriler geçerken görmesin",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 20,
+    "text": "Geçmiş sipariş ekleme butonunu ana sayfadan kaldır",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  }
 ]

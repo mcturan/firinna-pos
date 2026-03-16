@@ -129,6 +129,10 @@
                             <button class="btn" onclick="sendToPhone()" style="background:#9f7aea;color:white;">📱</button>
                         </div>
                         <button class="btn" onclick="cancelOrder()" style="background:#f56565;color:white;width:100%;">🗑️ Fiş İptal</button>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                            <button class="btn" onclick="openTransferModal()" style="background:#667eea;color:white;">↔ Taşı</button>
+                            <button class="btn" onclick="openMergeModal()" style="background:#ed8936;color:white;">⊕ Birleştir</button>
+                        </div>
 
                         </div>
                     </div>
@@ -2024,6 +2028,99 @@
                 <span class="close" onclick="document.getElementById('viewOrderModal').style.display='none'">&times;</span>
             </div>
             <div style="padding:1.5rem;" id="viewOrderContent"></div>
+        </div>
+    </div>
+
+    <script>
+async function openTransferModal() {
+    if (!currentOrder || !currentOrder.id) return;
+    const tables = await fetch('/api/tables').then(r => r.json());
+    const empty = tables.filter(t => !t.has_order && t.id !== currentTable);
+    const list = document.getElementById('transferTableList');
+    list.innerHTML = empty.length ? empty.map(t => `
+        <button onclick="doTransfer(${t.id},'${t.name}')"
+            style="padding:.7rem 1rem;border:2px solid #e2e8f0;border-radius:8px;background:white;cursor:pointer;text-align:left;font-family:inherit;font-weight:600;font-size:.9rem;">
+            🍽️ ${t.name}<span style="color:#a0aec0;font-weight:400;"> — ${t.zone_name||''}</span>
+        </button>`).join('') : '<p style="color:#a0aec0;font-size:.85rem;">Boş masa yok.</p>';
+    document.getElementById('transferModal').style.display = 'flex';
+}
+
+async function doTransfer(newTableId, newTableName) {
+    showConfirm('"' + newTableName + '" masasına taşınsın mı?', async () => {
+        const r = await fetch('/api/orders/' + currentOrder.id + '/transfer', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({new_table_id: newTableId})
+        }).then(res => res.json());
+        document.getElementById('transferModal').style.display = 'none';
+        if (r.success) {
+            document.getElementById('orderModal').style.display = 'none';
+            refreshZone();
+            showToast('Sipariş ' + newTableName + ' masasına taşındı.', 'success');
+        } else {
+            showToast('Hata: ' + r.error, 'error');
+        }
+    }, 'Taşı', '#667eea');
+}
+
+async function openMergeModal() {
+    if (!currentOrder || !currentOrder.id) return;
+    const tables = await fetch('/api/tables').then(r => r.json());
+    const occupied = tables.filter(t => t.has_order && t.id !== currentTable);
+    const list = document.getElementById('mergeTableList');
+    list.innerHTML = occupied.length ? occupied.map(t => `
+        <button onclick="doMerge(${t.id},'${t.name}')"
+            style="padding:.7rem 1rem;border:2px solid #ed8936;border-radius:8px;background:white;cursor:pointer;text-align:left;font-family:inherit;font-weight:600;font-size:.9rem;">
+            🟠 ${t.name} <span style="float:right;color:#2d6a4f;">${Number(t.order_total||0).toFixed(2)} ₺</span>
+        </button>`).join('') : '<p style="color:#a0aec0;font-size:.85rem;">Birleştirilecek açık masa yok.</p>';
+    document.getElementById('mergeModal').style.display = 'flex';
+}
+
+async function doMerge(targetTableId, targetTableName) {
+    const srcName = document.getElementById('modalTableName').textContent;
+    showConfirm(srcName + ' siparişi "' + targetTableName + '" masasına eklensin mi?\nBu masa kapatılacak.', async () => {
+        const targetOrder = await fetch('/api/orders/table/' + targetTableId).then(r => r.json());
+        if (!targetOrder.id) { showToast('Hedef sipariş bulunamadı.', 'error'); return; }
+        const r = await fetch('/api/orders/' + currentOrder.id + '/merge', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({target_order_id: targetOrder.id})
+        }).then(res => res.json());
+        document.getElementById('mergeModal').style.display = 'none';
+        if (r.success) {
+            document.getElementById('orderModal').style.display = 'none';
+            refreshZone();
+            showToast('Siparişler "' + targetTableName + '" masasında birleştirildi.', 'success');
+        } else {
+            showToast('Hata: ' + r.error, 'error');
+        }
+    }, 'Birleştir', '#ed8936');
+}
+    </script>
+
+    <!-- Masa Taşıma Modali -->
+    <div id="transferModal" class="modal">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header">
+                <h2>↔ Masayı Taşı</h2>
+                <span class="close" onclick="document.getElementById('transferModal').style.display='none'">&times;</span>
+            </div>
+            <div style="padding:1.5rem;">
+                <p style="color:#718096;font-size:.85rem;margin-bottom:1rem;">Sipariş hangi boş masaya taşınsın?</p>
+                <div id="transferTableList" style="display:flex;flex-direction:column;gap:.5rem;max-height:320px;overflow-y:auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sipariş Birleştirme Modali -->
+    <div id="mergeModal" class="modal">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header">
+                <h2>⊕ Siparişi Birleştir</h2>
+                <span class="close" onclick="document.getElementById('mergeModal').style.display='none'">&times;</span>
+            </div>
+            <div style="padding:1.5rem;">
+                <p style="color:#718096;font-size:.85rem;margin-bottom:1rem;">Bu siparişin kalemleri hangi masaya eklensin? (Bu masa silinir.)</p>
+                <div id="mergeTableList" style="display:flex;flex-direction:column;gap:.5rem;max-height:320px;overflow-y:auto;"></div>
+            </div>
         </div>
     </div>
 </body>

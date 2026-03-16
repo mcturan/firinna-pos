@@ -20,6 +20,7 @@ try:
     db.init_db()
     db.migrate_product_stock_link()
     db.migrate_expenses_columns()
+    db.migrate_kitchen_ready()
 except Exception as _e:
     print(f"Startup migration warning: {_e}")
 
@@ -582,6 +583,81 @@ def api_reports_hourly():
     else:
         start = end = request.args.get('date', today)
     return jsonify(db.get_hourly_sales(start, end))
+
+@app.route('/api/reports/daily-close', methods=['GET'])
+def api_daily_close_report():
+    date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
+    return jsonify(db.get_daily_close_report(date))
+
+@app.route('/api/reports/daily-close/send-telegram', methods=['POST'])
+def api_send_daily_close_telegram():
+    data = request.json or {}
+    date = data.get('date', datetime.now().strftime('%Y-%m-%d'))
+    report = db.get_daily_close_report(date)
+    restaurant = db.get_setting('restaurant_name', 'Fırınna')
+    top = report.get('top_products', [])[:5]
+    open_warn = ''
+    if report.get('open_orders_count', 0) > 0:
+        open_warn = f"\n\n⚠️ {report['open_orders_count']} masa hâlâ açık!"
+    top_lines = ''
+    if top:
+        top_lines = '\n\n🏆 En Çok Satan 5 Ürün:\n' + '\n'.join(
+            f"  {i+1}. {p['name']} × {p['quantity']} adet — {p['total']:.2f} ₺"
+            for i, p in enumerate(top)
+        )
+    msg = (
+        f"🏪 <b>{restaurant} — Günlük Rapor</b>\n"
+        f"📅 {date}\n"
+        f"─────────────────\n"
+        f"💰 Toplam Satış:  <b>{report['total_sales']:.2f} ₺</b>\n"
+        f"💵 Nakit:         {report['total_cash']:.2f} ₺\n"
+        f"💳 Kart:          {report['total_card']:.2f} ₺\n"
+        f"🎁 Bahşiş:        {report['total_tips']:.2f} ₺\n"
+        f"🏷️ İndirim:       {report['total_discount']:.2f} ₺\n"
+        f"📦 Masraf:        {report['total_expenses']:.2f} ₺\n"
+        f"─────────────────\n"
+        f"✅ Net Kasa:      <b>{report['net']:.2f} ₺</b>"
+        f"{top_lines}{open_warn}"
+    )
+    ok = telegram_notify.send_message(msg)
+    return jsonify({'success': ok, 'message': msg if not ok else ''})
+
+@app.route('/kitchen')
+def kitchen_page():
+    return render_template('kitchen.html')
+
+@app.route('/api/kitchen/orders', methods=['GET'])
+def api_kitchen_orders():
+    return jsonify(db.get_kitchen_orders())
+
+@app.route('/api/kitchen/orders/<int:order_id>/ready', methods=['POST'])
+def api_kitchen_set_ready(order_id):
+    db.set_kitchen_ready(order_id, ready=1)
+    return jsonify({'success': True})
+
+@app.route('/api/orders/<int:order_id>/transfer', methods=['POST'])
+def api_transfer_order(order_id):
+    data = request.json or {}
+    new_table_id = data.get('new_table_id')
+    if not new_table_id:
+        return jsonify({'success': False, 'error': 'new_table_id gerekli'}), 400
+    try:
+        db.transfer_order(order_id, new_table_id)
+        return jsonify({'success': True})
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/orders/<int:order_id>/merge', methods=['POST'])
+def api_merge_orders(order_id):
+    data = request.json or {}
+    target_order_id = data.get('target_order_id')
+    if not target_order_id:
+        return jsonify({'success': False, 'error': 'target_order_id gerekli'}), 400
+    try:
+        db.merge_orders(order_id, target_order_id)
+        return jsonify({'success': True})
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
 @app.route('/api/print/daily-report', methods=['POST'])
 def api_print_daily_report():
