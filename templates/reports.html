@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raporlar - Fırınna POS</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         .report-tabs { display: flex; gap: 0; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.5rem; }
         .report-tab { padding: 0.75rem 1.5rem; border: none; background: none; font-size: 1rem; font-weight: 600; color: #718096; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
@@ -96,6 +97,12 @@
             <button class="export-btn" onclick="exportExcel()">📥 Excel İndir</button>
         </div>
         <div id="reportContent"><div class="loading">⏳ Yükleniyor...</div></div>
+        <div id="hourly-card" style="background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-top:1.5rem;display:none;">
+            <div class="section-title" style="margin-top:0;">⏱️ Saatlik Satış Dağılımı</div>
+            <div style="position:relative;height:220px;">
+                <canvas id="hourlyChart"></canvas>
+            </div>
+        </div>
     </div>
     <script>
         let currentTab = 'daily';
@@ -133,6 +140,7 @@
             const report = await fetch(url).then(r => r.json());
             currentReport = report;
             renderReport(report);
+            loadHourly();
         }
 
         function renderReport(r) {
@@ -190,6 +198,44 @@
                 body: JSON.stringify({date})
             });
             alert('Rapor yazıcıya gönderildi.');
+        }
+
+        let hourlyChartInstance = null;
+
+        async function loadHourly() {
+            let period = currentTab === 'daily' ? 'daily' : (currentTab === 'weekly' ? 'weekly' : (currentTab === 'monthly' ? 'monthly' : 'daily'));
+            let url = `/api/reports/hourly?period=${period}`;
+            if (currentTab === 'daily') url += '&date=' + document.getElementById('dailyDate').value;
+            const data = await fetch(url).then(r => r.json());
+            const card = document.getElementById('hourly-card');
+            const hasData = data.some(d => d.total_sales > 0);
+            if (!hasData) { card.style.display = 'none'; return; }
+            card.style.display = '';
+            const canvas = document.getElementById('hourlyChart');
+            if (hourlyChartInstance) { hourlyChartInstance.destroy(); hourlyChartInstance = null; }
+            hourlyChartInstance = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => String(d.hour).padStart(2,'0') + ':00'),
+                    datasets: [{
+                        label: 'Satış (₺)',
+                        data: data.map(d => d.total_sales),
+                        backgroundColor: 'rgba(45,106,79,.75)',
+                        borderColor: '#2d6a4f',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('tr-TR') + ' ₺', font:{size:10} }, grid: { color:'#f0f4f1' } },
+                        x: { grid: { display: false }, ticks: { font:{size:10} } }
+                    }
+                }
+            });
         }
 
         function exportExcel() {

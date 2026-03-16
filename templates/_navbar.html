@@ -27,6 +27,7 @@
             <div class="nav-dropdown-menu">
                 <a href="/kasa"     {% if request.path == '/kasa'     %}class="active"{% endif %}>Kasa</a>
                 <a href="/muhasebe" {% if request.path == '/muhasebe' %}class="active"{% endif %}>Muhasebe</a>
+                <a href="/reports"  {% if request.path == '/reports'  %}class="active"{% endif %}>Raporlar</a>
                 <hr>
                 <a href="/products" {% if request.path == '/products' %}class="active"{% endif %}>Ürünler</a>
                 <a href="/stok"     {% if request.path == '/stok'     %}class="active"{% endif %}>Stok</a>
@@ -87,4 +88,22 @@ async function loadAlerts() {
 }
 loadAlerts();
 setInterval(loadAlerts, 60000);
+</script>
+
+<div id="toast-container"></div>
+<script>
+function showToast(msg, type, duration) {
+    type = type || 'success';
+    duration = duration || 3000;
+    var c = document.getElementById('toast-container');
+    var t = document.createElement('div');
+    t.className = 'toast toast-' + type;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(function() {
+        t.style.opacity = '0';
+        t.style.transition = 'opacity .3s';
+        setTimeout(function() { t.remove(); }, 300);
+    }, duration);
+}
 </script>

@@ -246,9 +246,10 @@ def get_tables(zone_id=None):
         tables = conn.execute('''
             SELECT t.*, z.name as zone_name,
                    (SELECT COUNT(*) FROM orders WHERE table_id = t.id AND status = 'open') as has_order,
-                   (SELECT COALESCE(total,0) FROM orders WHERE table_id = t.id AND status = 'open' LIMIT 1) as order_total
-            FROM tables t 
-            LEFT JOIN zones z ON t.zone_id = z.id 
+                   (SELECT COALESCE(total,0) FROM orders WHERE table_id = t.id AND status = 'open' LIMIT 1) as order_total,
+                   (SELECT MIN(created_at) FROM orders WHERE table_id = t.id AND status = 'open') as order_started_at
+            FROM tables t
+            LEFT JOIN zones z ON t.zone_id = z.id
             WHERE t.zone_id = ?
             ORDER BY t.name
         ''', (zone_id,)).fetchall()
@@ -256,9 +257,10 @@ def get_tables(zone_id=None):
         tables = conn.execute('''
             SELECT t.*, z.name as zone_name,
                    (SELECT COUNT(*) FROM orders WHERE table_id = t.id AND status = 'open') as has_order,
-                   (SELECT COALESCE(total,0) FROM orders WHERE table_id = t.id AND status = 'open' LIMIT 1) as order_total
-            FROM tables t 
-            LEFT JOIN zones z ON t.zone_id = z.id 
+                   (SELECT COALESCE(total,0) FROM orders WHERE table_id = t.id AND status = 'open' LIMIT 1) as order_total,
+                   (SELECT MIN(created_at) FROM orders WHERE table_id = t.id AND status = 'open') as order_started_at
+            FROM tables t
+            LEFT JOIN zones z ON t.zone_id = z.id
             ORDER BY t.name
         ''').fetchall()
     conn.close()
@@ -978,12 +980,21 @@ def get_report(start_date, end_date):
         ORDER BY day
     ''', (start_date, end_date)).fetchall()
 
-    # Masraf
+    # Masraf (toplam)
     expenses = conn.execute('''
         SELECT COALESCE(SUM(amount), 0) as total
         FROM expenses
         WHERE DATE(created_at) BETWEEN ? AND ?
     ''', (start_date, end_date)).fetchone()
+
+    # Günlük gider dağılımı (trend grafik için)
+    daily_expenses = conn.execute('''
+        SELECT DATE(created_at) as day, COALESCE(SUM(amount), 0) as total
+        FROM expenses
+        WHERE DATE(created_at) BETWEEN ? AND ?
+        GROUP BY DATE(created_at)
+        ORDER BY day
+    ''', (start_date, end_date)).fetchall()
 
     conn.close()
 
@@ -1016,7 +1027,27 @@ def get_report(start_date, end_date):
         'net': round(net, 2),
         'top_products': [dict(p) for p in top_products],
         'daily': [dict(d) for d in daily],
+        'daily_expenses': [dict(r) for r in daily_expenses],
     }
+
+def get_hourly_sales(start_date, end_date):
+    """Saatlik satış dağılımı (0-23)"""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT
+            CAST(strftime('%H', closed_at) AS INTEGER) as hour,
+            COUNT(*) as order_count,
+            COALESCE(SUM(total), 0) as total_sales
+        FROM orders
+        WHERE DATE(closed_at) BETWEEN ? AND ?
+          AND status = 'closed'
+        GROUP BY hour
+        ORDER BY hour
+    ''', (start_date, end_date)).fetchall()
+    conn.close()
+    result = {r['hour']: dict(r) for r in rows}
+    return [result.get(h, {'hour': h, 'order_count': 0, 'total_sales': 0.0}) for h in range(24)]
+
 
 # ===== KASA (#8) =====
 
@@ -1259,6 +1290,28 @@ def get_transactions_paginated(start, end, type_=None, category=None,
     return {'rows': [dict(r) for r in rows], 'total': total,
             'page': page, 'per_page': per_page,
             'pages': max(1, (total + per_page - 1) // per_page)}
+
+def update_transaction(transaction_id, amount, description, category, payment_method, date, created_at=None):
+    """Manuel transaction güncelle — sipariş kaynağından gelenler güncellenemez"""
+    conn = get_db()
+    tx = conn.execute('SELECT * FROM transactions WHERE id=?', (transaction_id,)).fetchone()
+    if not tx or tx['related_order_id']:
+        conn.close()
+        return False
+    if not date:
+        date = datetime.now().strftime('%Y-%m-%d')
+    if created_at:
+        conn.execute('''UPDATE transactions
+            SET amount=?, description=?, category=?, payment_method=?, date=?, created_at=?
+            WHERE id=?''', (amount, description, category, payment_method, date, created_at, transaction_id))
+    else:
+        conn.execute('''UPDATE transactions
+            SET amount=?, description=?, category=?, payment_method=?, date=?
+            WHERE id=?''', (amount, description, category, payment_method, date, transaction_id))
+    conn.commit()
+    conn.close()
+    return True
+
 
 def delete_transaction(transaction_id):
     conn = get_db()

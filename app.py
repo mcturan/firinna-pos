@@ -153,6 +153,17 @@ def api_kasa_transactions():
     return jsonify(db.get_transactions_paginated(start, end, type_, category,
                                                  method, page, per_page))
 
+@app.route('/api/transactions/<int:tid>', methods=['PUT'])
+def api_update_transaction(tid):
+    data = request.json
+    ok = db.update_transaction(
+        tid,
+        data['amount'], data.get('description', ''),
+        data.get('category', 'masraf'), data.get('payment_method', 'cash'),
+        data.get('date'), data.get('datetime')
+    )
+    return jsonify({'success': ok})
+
 @app.route('/api/transactions/<int:tid>', methods=['DELETE'])
 def api_delete_transaction(tid):
     db.delete_transaction(tid)
@@ -555,6 +566,22 @@ def api_report_range():
         end = str(today)
     report = db.get_report(start, end)
     return jsonify(report)
+
+@app.route('/api/reports/hourly', methods=['GET'])
+def api_reports_hourly():
+    from datetime import date as _date, timedelta
+    today = datetime.now().strftime('%Y-%m-%d')
+    period = request.args.get('period', 'daily')
+    d = _date.today()
+    if period == 'weekly':
+        start = str(d - timedelta(days=d.weekday()))
+        end = str(d)
+    elif period == 'monthly':
+        start = str(d.replace(day=1))
+        end = str(d)
+    else:
+        start = end = request.args.get('date', today)
+    return jsonify(db.get_hourly_sales(start, end))
 
 @app.route('/api/print/daily-report', methods=['POST'])
 def api_print_daily_report():
@@ -1225,6 +1252,11 @@ def api_muhasebe():
     ''', (start, end)).fetchall()
     conn.close()
     data['expense_categories'] = [dict(r) for r in cats]
+
+    vat_rate = float(db.get_setting('vat_rate', '18'))
+    data['vat_rate'] = vat_rate
+    data['vat_amount'] = round(data['total_sales'] * vat_rate / (100 + vat_rate), 2)
+    data['sales_excl_vat'] = round(data['total_sales'] - data['vat_amount'], 2)
 
     return jsonify(data)
 

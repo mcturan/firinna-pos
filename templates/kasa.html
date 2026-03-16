@@ -211,7 +211,12 @@
                         <td><span class="cat-badge">${catLabelMap[m.category]||m.category}</span></td>
                         ${isAna ? `<td><span class="cat-badge">${methodLabelMap[m.payment_method]||m.payment_method}</span></td>` : ''}
                         <td style="font-weight:700;color:${m.type==='in'?'#2d6a4f':'#e53e3e'};text-align:right;">${m.type==='in'?'+':'−'}${Number(m.amount).toFixed(2)} ₺</td>
-                        <td>${m.related_order_id ? '' : `<button class="btn-del" onclick="delTx(${m.id})">🗑️</button>`}</td>
+                        <td style="white-space:nowrap;">
+                            ${m.related_order_id ? '' : `
+                                <button class="btn-del" onclick="editTx(${m.id},'${(m.description||'').replace(/'/g,"\\'")}',${m.amount},'${m.category}','${m.payment_method}','${m.date}','${(m.created_at||'').slice(0,16)}')" title="Düzenle" style="margin-right:.2rem;">✏️</button>
+                                <button class="btn-del" onclick="delTx(${m.id})" title="Sil">🗑️</button>
+                            `}
+                        </td>
                     </tr>`).join('');
 
             // CSV link parametreleri
@@ -445,7 +450,7 @@
             } else {
                 desc = document.getElementById('txDesc').value.trim();
             }
-            if (!desc || isNaN(amount) || amount <= 0) { alert('Açıklama ve tutar gerekli.'); return; }
+            if (!desc || isNaN(amount) || amount <= 0) { showToast('Açıklama ve tutar gerekli.', 'warn'); return; }
 
             // F4: datetime-local → date + datetime ayrıştır
             const dtVal      = document.getElementById('txDate').value; // '2026-03-10T14:30'
@@ -474,7 +479,86 @@
             await fetch(`/api/transactions/${id}`, {method:'DELETE'});
             loadAll();
         }
+
+        let editingTxId = null;
+
+        function editTx(id, desc, amount, category, method, date, createdAt) {
+            editingTxId = id;
+            document.getElementById('editTxDesc').value    = desc;
+            document.getElementById('editTxAmount').value  = amount;
+            document.getElementById('editTxCat').value     = category;
+            document.getElementById('editTxMethod').value  = method;
+            // Tarihi datetime-local formatına çevir: "2026-03-16 14:30" → "2026-03-16T14:30"
+            const dt = createdAt ? createdAt.replace(' ', 'T') : (date ? date + 'T00:00' : '');
+            document.getElementById('editTxDate').value = dt;
+            document.getElementById('editTxModal').style.display = 'flex';
+        }
+
+        function closeEditTxModal() {
+            document.getElementById('editTxModal').style.display = 'none';
+            editingTxId = null;
+        }
+
+        async function saveEditTx() {
+            const desc   = document.getElementById('editTxDesc').value.trim();
+            const amount = parseFloat(document.getElementById('editTxAmount').value);
+            const cat    = document.getElementById('editTxCat').value;
+            const method = document.getElementById('editTxMethod').value;
+            const dtVal  = document.getElementById('editTxDate').value;
+            if (!desc || isNaN(amount) || amount <= 0) { showToast('Açıklama ve tutar gerekli.', 'warn'); return; }
+            const txDate     = dtVal ? dtVal.slice(0, 10) : null;
+            const txDatetime = dtVal ? dtVal.replace('T', ' ') + ':00' : null;
+            const res = await fetch(`/api/transactions/${editingTxId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ amount, description: desc, category: cat, payment_method: method, date: txDate, datetime: txDatetime })
+            }).then(r => r.json());
+            if (res.success) {
+                closeEditTxModal();
+                showToast('İşlem güncellendi.', 'success');
+                loadAll();
+            } else {
+                showToast('Güncellenemedi.', 'error');
+            }
+        }
     </script>
+
+    <!-- Edit Transaction Modal -->
+    <div id="editTxModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:14px;padding:1.75rem;width:min(420px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.18);">
+            <h3 style="margin:0 0 1.25rem;color:#2d3748;">✏️ İşlemi Düzenle</h3>
+            <div style="display:flex;flex-direction:column;gap:.75rem;">
+                <label style="font-size:.85rem;font-weight:600;color:#4a5568;">Açıklama
+                    <input type="text" id="editTxDesc" style="width:100%;margin-top:.3rem;padding:.55rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </label>
+                <label style="font-size:.85rem;font-weight:600;color:#4a5568;">Tutar (₺)
+                    <input type="number" id="editTxAmount" step="0.01" min="0" style="width:100%;margin-top:.3rem;padding:.55rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </label>
+                <label style="font-size:.85rem;font-weight:600;color:#4a5568;">Kategori
+                    <select id="editTxCat" style="width:100%;margin-top:.3rem;padding:.55rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                        <option value="stok_alim">Stok Alım</option>
+                        <option value="sarf">Sarf Malzeme</option>
+                        <option value="duzeltme">Düzeltme</option>
+                        <option value="in_transfer">Nakit</option>
+                        <option value="Genel">Diğer</option>
+                    </select>
+                </label>
+                <label style="font-size:.85rem;font-weight:600;color:#4a5568;">Kasa
+                    <select id="editTxMethod" style="width:100%;margin-top:.3rem;padding:.55rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                        <option value="cash">Nakit</option>
+                        <option value="card">Kart</option>
+                    </select>
+                </label>
+                <label style="font-size:.85rem;font-weight:600;color:#4a5568;">Tarih / Saat
+                    <input type="datetime-local" id="editTxDate" style="width:100%;margin-top:.3rem;padding:.55rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </label>
+            </div>
+            <div style="display:flex;gap:.75rem;margin-top:1.5rem;justify-content:flex-end;">
+                <button onclick="closeEditTxModal()" style="padding:.6rem 1.25rem;border:2px solid #e2e8f0;background:white;border-radius:8px;font-weight:600;cursor:pointer;color:#4a5568;">İptal</button>
+                <button onclick="saveEditTx()" style="padding:.6rem 1.5rem;background:#2d6a4f;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Kaydet</button>
+            </div>
+        </div>
+    </div>
 
     <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
         Fırınna POS &mdash; TA1XTA &copy; 2026

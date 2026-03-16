@@ -698,8 +698,20 @@
         let pastOrderCart = [];
         let pastOrderDiscount = { type: null, value: 0, reason: '' };
 
+        function calcDuration(startedAt) {
+            if (!startedAt) return null;
+            // SQLite CURRENT_TIMESTAMP is UTC — append Z so JS parses correctly
+            const ts = startedAt.includes('Z') ? startedAt : startedAt.replace(' ', 'T') + 'Z';
+            const mins = Math.floor((Date.now() - new Date(ts).getTime()) / 60000);
+            if (mins < 0) return null;
+            if (mins < 60) return { text: mins + ' dk', cls: mins < 45 ? 'dur-green' : 'dur-orange' };
+            const h = Math.floor(mins / 60), m = mins % 60;
+            return { text: h + 'sa ' + m + 'dk', cls: 'dur-red' };
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             loadZones();
+            setInterval(function() { if (typeof currentZone !== 'undefined' && currentZone) refreshZone(); }, 60000);
             
             document.querySelectorAll('.close').forEach(el => {
                 el.onclick = function() {
@@ -756,14 +768,15 @@
             tablesGrid.innerHTML = tables.map(table => {
                 const hasOrder = table.has_order > 0;
                 const status = hasOrder ? 'occupied' : 'empty';
-                
-                const noteIcon = table.table_note ? '📝' : '';
-                
+                const dur = hasOrder ? calcDuration(table.order_started_at) : null;
                 return `
                     <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
                         <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
                         ${hasOrder ? `<div class="table-total">₺${Number(table.order_total||0).toFixed(2)}</div>` : ''}
-                        <div class="table-status">${hasOrder ? 'Dolu' : 'Boş'}</div>
+                        <div class="table-status">
+                            ${hasOrder ? 'Dolu' : 'Boş'}
+                            ${dur ? `<span class="dur-badge ${dur.cls}" style="margin-left:.4rem;">${dur.text}</span>` : ''}
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -957,7 +970,7 @@
             const price = parseFloat(document.getElementById('customItemPrice').value);
             
             if (!name || !price) {
-                alert('Lütfen ürün adı ve fiyat girin!');
+                showToast('Lütfen ürün adı ve fiyat girin!', 'warn');
                 return;
             }
             
@@ -986,7 +999,7 @@
             const reason = document.getElementById('discountReason').value;
             
             if (!value) {
-                alert('Lütfen indirim değeri girin!');
+                showToast('Lütfen indirim değeri girin!', 'warn');
                 return;
             }
             
@@ -1146,7 +1159,7 @@
                     tip_method: tipMethod
                 })
             });
-            alert('Hesap kapatıldı!');
+            showToast('Hesap kapatıldı!', 'success');
             document.getElementById('paymentModal').style.display = 'none';
             document.getElementById('orderModal').style.display   = 'none';
             refreshZone();
@@ -1180,7 +1193,7 @@
         async function completePayment() {
             const remaining = getRemainingAmount();
             if (remaining > 0.01) {
-                alert(`Henüz ${remaining.toFixed(2)} ₺ ödenmedi!`);
+                showToast(`Henüz ${remaining.toFixed(2)} ₺ ödenmedi!`, 'warn');
                 return;
             }
             let tip = parseFloat(document.getElementById('tipAmount').value) || 0;
@@ -1211,7 +1224,7 @@
                 })
             });
 
-            alert('Hesap kapatıldı!');
+            showToast('Hesap kapatıldı!', 'success');
             document.getElementById('paymentModal').style.display = 'none';
             document.getElementById('orderModal').style.display   = 'none';
             refreshZone();
@@ -1300,9 +1313,9 @@
             const result = await fetch(`/api/print/receipt/${currentOrder.id}`, {method: 'POST'}).then(r => r.json());
             
             if (result.success) {
-                alert('Adisyon yazdırıldı!');
+                showToast('Adisyon yazdırıldı!', 'success');
             } else {
-                alert('Yazıcı bağlantısı başarısız! Ayarları kontrol edin.');
+                showToast('Yazıcı bağlantısı başarısız! Ayarları kontrol edin.', 'error');
             }
         }
 
@@ -1313,7 +1326,7 @@
 
         async function printHistoryReceipt(orderId) {
             const result = await fetch(`/api/print/receipt/${orderId}`, {method: 'POST'}).then(r => r.json());
-            if (!result.success) alert('Yazıcı hatası: ' + (result.error || 'bilinmiyor'));
+            if (!result.success) showToast('Yazıcı hatası: ' + (result.error || 'bilinmiyor'), 'error');
         }
 
         function closeOrderHistory() {
@@ -1427,20 +1440,20 @@
             try {
                 const response = await fetch(`/api/orders/${orderId}`, {method: 'DELETE'});
                 if (response.ok) {
-                    alert('Sipariş silindi!');
+                    showToast('Sipariş silindi!', 'success');
                     loadOrderHistory();
                 } else {
-                    alert('Sipariş silinemedi!');
+                    showToast('Sipariş silinemedi!', 'error');
                 }
             } catch (error) {
-                alert('Hata oluştu: ' + error.message);
+                showToast('Hata oluştu: ' + error.message, 'error');
             }
         }
 
         async function reopenOrder(orderId) {
             if (!confirm('Bu siparişi tekrar açmak istediğinize emin misiniz?')) return;
             await fetch(`/api/orders/${orderId}/reopen`, {method: 'POST'});
-            alert('Sipariş tekrar açıldı!');
+            showToast('Sipariş tekrar açıldı!', 'success');
             closeOrderHistory();
             refreshZone();
         }
@@ -1455,7 +1468,7 @@
             // Sipariş detayını çek
             const orders = await fetch('/api/orders/history').then(r=>r.json());
             const order  = orders.find(o=>o.id===orderId);
-            if (!order) { alert('Sipariş bulunamadı'); return; }
+            if (!order) { showToast('Sipariş bulunamadı', 'warn'); return; }
 
             // Tüm ürünleri yükle
             editOrderProductList = await fetch('/api/products').then(r=>r.json());
@@ -1548,13 +1561,13 @@
             try {
                 const response = await fetch(`/api/orders/${orderId}`, {method: "DELETE"});
                 if (response.ok) {
-                    alert("Sipariş silindi!");
+                    showToast('Sipariş silindi!', 'success');
                     loadOrderHistory();
                 } else {
-                    alert("Sipariş silinemedi!");
+                    showToast('Sipariş silinemedi!', 'error');
                 }
             } catch (error) {
-                alert("Hata oluştu: " + error.message);
+                showToast('Hata oluştu: ' + error.message, 'error');
             }
         }
 
@@ -1585,7 +1598,7 @@
                 body: JSON.stringify({note})
             });
             
-            alert('Masa notu kaydedildi!');
+            showToast('Masa notu kaydedildi!', 'success');
             closeTableNoteModal();
             refreshZone();
         }
@@ -1768,7 +1781,7 @@
             const reason = document.getElementById('pastDiscountReason').value;
             
             if (!value) {
-                alert('Lütfen indirim değeri girin!');
+                showToast('Lütfen indirim değeri girin!', 'warn');
                 return;
             }
             
@@ -1790,17 +1803,17 @@
             const tip = parseFloat(document.getElementById('pastTipAmount').value) || 0;
             
             if (!tableId) {
-                alert('Lütfen masa seçin!');
+                showToast('Lütfen masa seçin!', 'warn');
                 return;
             }
             
             if (!datetime) {
-                alert('Lütfen tarih ve saat seçin!');
+                showToast('Lütfen tarih ve saat seçin!', 'warn');
                 return;
             }
             
             if (pastOrderCart.length === 0) {
-                alert('Lütfen en az bir ürün ekleyin!');
+                showToast('Lütfen en az bir ürün ekleyin!', 'warn');
                 return;
             }
             
@@ -1817,7 +1830,7 @@
             }
             
             if (Math.abs(cash + card - total) > 0.01) {
-                alert('Ödeme tutarı toplam ile eşleşmiyor!');
+                showToast('Ödeme tutarı toplam ile eşleşmiyor!', 'warn');
                 return;
             }
             
@@ -1840,10 +1853,10 @@
             });
             
             if (response.ok) {
-                alert('Geçmiş sipariş başarıyla kaydedildi!');
+                showToast('Geçmiş sipariş başarıyla kaydedildi!', 'success');
                 closePastOrderModal();
             } else {
-                alert('Hata oluştu! Lütfen tekrar deneyin.');
+                showToast('Hata oluştu! Lütfen tekrar deneyin.', 'error');
             }
         }
     </script>
@@ -1925,7 +1938,7 @@
 // Fiş önizleme fonksiyonları
 function previewReceipt() {
     if (!currentOrder || !currentOrder.id) {
-        alert('Önce siparişi kaydedin!');
+        showToast('Önce siparişi kaydedin!', 'warn');
         return;
     }
     window.open(`/api/print/receipt/${currentOrder.id}/preview`, '_blank');
@@ -1933,7 +1946,7 @@ function previewReceipt() {
 
 function previewKitchen() {
     if (!currentOrder || !currentOrder.id) {
-        alert('Önce siparişi kaydedin!');
+        showToast('Önce siparişi kaydedin!', 'warn');
         return;
     }
     window.open(`/api/print/kitchen/${currentOrder.id}/preview`, '_blank');
@@ -1941,28 +1954,28 @@ function previewKitchen() {
 
 function printKitchen() {
     if (!currentOrder || !currentOrder.id) {
-        alert("Önce siparişi kaydedin!");
+        showToast('Önce siparişi kaydedin!', 'warn');
         return;
     }
     fetch(`/api/print/kitchen/${currentOrder.id}`, {method: "POST"})
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                alert("Mutfak fişi yazıcıya gönderildi!");
+                showToast('Mutfak fişi yazıcıya gönderildi!', 'success');
             } else {
-                alert("Yazıcı hatası: " + (data.error || "Bilinmeyen hata"));
+                showToast('Yazıcı hatası: ' + (data.error || 'Bilinmeyen hata'), 'error');
             }
         });
 }
 
 function sendToPhone() {
     if (!currentOrder || !currentOrder.id) {
-        alert("Önce siparişi kaydedin!");
+        showToast('Önce siparişi kaydedin!', 'warn');
         return;
     }
     const phone = prompt("Telefon numarası (5XX XXX XX XX):");
     if (!phone) return;
-    alert("WhatsApp entegrasyonu yakında eklenecek!");
+    showToast('WhatsApp entegrasyonu yakında eklenecek!', 'info');
 }
 
 async function cancelOrder() {
@@ -1973,9 +1986,9 @@ async function cancelOrder() {
         try {
             const r = await fetch(`/api/orders/${currentOrder.id}`, { method: 'DELETE' });
             const d = await r.json();
-            if (!d.success) { alert('Silme hatası: ' + (d.error||'bilinmeyen')); return; }
+            if (!d.success) { showToast('Silme hatası: ' + (d.error||'bilinmeyen'), 'error'); return; }
         } catch(e) {
-            alert('Bağlantı hatası: ' + e.message);
+            showToast('Bağlantı hatası: ' + e.message, 'error');
             return;
         }
     }
@@ -2006,12 +2019,15 @@ async function refreshZone() {
     tablesGrid.innerHTML = tables.map(table => {
         const hasOrder = table.has_order > 0;
         const status = hasOrder ? 'occupied' : 'empty';
-        
+        const dur = hasOrder ? calcDuration(table.order_started_at) : null;
         return `
             <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
-                
                 <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
-                <div class="table-status">${hasOrder ? 'Dolu' : 'Boş'}</div>
+                ${hasOrder ? `<div class="table-total">₺${Number(table.order_total||0).toFixed(2)}</div>` : ''}
+                <div class="table-status">
+                    ${hasOrder ? 'Dolu' : 'Boş'}
+                    ${dur ? `<span class="dur-badge ${dur.cls}" style="margin-left:.4rem;">${dur.text}</span>` : ''}
+                </div>
             </div>
         `;
     }).join('');
@@ -2019,7 +2035,7 @@ async function refreshZone() {
 
 function previewReceiptPDF() {
     if (!currentOrder || !currentOrder.id) {
-        alert('Önce sipariş oluşturun!');
+        showToast('Önce sipariş oluşturun!', 'warn');
         return;
     }
     window.open(`/api/print/receipt/${currentOrder.id}/preview`, '_blank');
@@ -2074,7 +2090,7 @@ async function saveBusinessSettings() {
             body: JSON.stringify({ value: document.getElementById(f.id).value })
         });
     }
-    alert('✅ İşletme bilgileri kaydedildi!');
+    showToast('İşletme bilgileri kaydedildi!', 'success');
 }
 
 // --- Yazıcı ---
@@ -2110,13 +2126,13 @@ async function savePrinterSettings() {
             body: JSON.stringify({ value: document.getElementById(f.id).value })
         });
     }
-    alert('✅ Yazıcı ayarları kaydedildi!');
+    showToast('Yazıcı ayarları kaydedildi!', 'success');
 }
 
 async function testPrinter() {
     const res = await fetch('/api/printer/test', { method: 'POST' });
     const data = await res.json();
-    alert(data.success ? '✅ Test fişi gönderildi!' : '❌ Yazıcıya ulaşılamadı. IP/Port kontrol edin.');
+    showToast(data.success ? 'Test fişi gönderildi!' : 'Yazıcıya ulaşılamadı. IP/Port kontrol edin.', data.success ? 'success' : 'error');
 }
 
 // --- Logo (#15) ---
@@ -2157,12 +2173,12 @@ async function uploadLogo() {
     const res = await fetch('/api/settings/logo', { method: 'POST', body: formData });
     const data = await res.json();
     if (data.success) {
-        alert('✅ Logo yüklendi!');
+        showToast('Logo yüklendi!', 'success');
         pendingLogoFile = null;
         document.getElementById('btn-upload-logo').disabled = true;
         document.getElementById('btn-upload-logo').style.opacity = '0.5';
     } else {
-        alert('❌ Hata: ' + data.error);
+        showToast('Hata: ' + data.error, 'error');
     }
 }
 
@@ -2173,14 +2189,14 @@ async function deleteLogo() {
     document.getElementById('logo-placeholder-text').style.display = 'block';
     document.getElementById('logo-file-input').value = '';
     pendingLogoFile = null;
-    alert('✅ Logo silindi.');
+    showToast('Logo silindi.', 'success');
 }
 
 // --- Not Fişi (#17) ---
 async function previewNote() {
     const title = document.getElementById('note-title').value || 'NOT';
     const note = document.getElementById('note-content').value.trim();
-    if (!note) { alert('Not içeriği boş!'); return; }
+    if (!note) { showToast('Not içeriği boş!', 'warn'); return; }
     const res = await fetch('/api/print/note/preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2195,13 +2211,13 @@ async function previewNote() {
 async function printNote() {
     const title = document.getElementById('note-title').value || 'NOT';
     const note = document.getElementById('note-content').value.trim();
-    if (!note) { alert('Not içeriği boş!'); return; }
+    if (!note) { showToast('Not içeriği boş!', 'warn'); return; }
     const res = await fetch('/api/print/note', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, note })
     });
     const data = await res.json();
-    alert(data.success ? '✅ Not fişi yazdırıldı!' : '❌ Yazıcı hatası: ' + (data.error || 'Bilinmeyen'));
+    showToast(data.success ? 'Not fişi yazdırıldı!' : 'Yazıcı hatası: ' + (data.error || 'Bilinmeyen'), data.success ? 'success' : 'error');
 }
 </script>

@@ -273,6 +273,14 @@
             </div>
         </div>
 
+        <!-- Gelir/Gider Trend Grafiği (M1) -->
+        <div class="card" style="margin-bottom:1.25rem;" id="trend-card">
+            <h3>📊 Gelir / Gider Trendi</h3>
+            <div class="chart-wrap" style="min-height:180px;">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;">
             <!-- Ödeme Yöntemi -->
             <div class="card">
@@ -301,6 +309,7 @@
 
     <script>
     let chartInstance = null;
+    let trendInstance = null;
     let currentStart = '', currentEnd = '';
 
     function localToday() {
@@ -354,6 +363,7 @@
             lastData = data;
             renderSummary(data);
             renderChart(data.daily);
+            renderTrendChart(data);
             renderPayment(data);
             renderExpenses(data.expense_categories || []);
             renderProducts(data.top_products || []);
@@ -406,6 +416,12 @@
                 <div class="sum-value" style="color:#9f7aea">${fmt(d.total_ikram)}</div>
                 <div class="sum-label">İkram Değeri</div>
             </div>` : ''}
+            <div class="sum-card" style="--accent:#6366f1;">
+                <div class="sum-icon">🧮</div>
+                <div class="sum-value" style="color:#6366f1;">${fmt(d.vat_amount||0)}</div>
+                <div class="sum-label">KDV (%${d.vat_rate||18})</div>
+                <div style="font-size:.75rem;color:#a0aec0;margin-top:.25rem;">KDV hariç: ${fmt(d.sales_excl_vat||0)}</div>
+            </div>
         `;
     }
 
@@ -453,6 +469,51 @@
                         grid: { color: '#f0f4f1' }
                     },
                     x: { grid: { display: false }, ticks: { font: {size:11} } }
+                }
+            }
+        });
+    }
+
+    function renderTrendChart(data) {
+        const canvasEl = document.getElementById('trendChart');
+        if (!canvasEl) return;
+        const trendCard = document.getElementById('trend-card');
+        if (trendInstance) { trendInstance.destroy(); trendInstance = null; }
+
+        const daily = data.daily || [];
+        const dailyExpenses = data.daily_expenses || [];
+
+        if (!daily.length) {
+            if (trendCard) trendCard.style.display = 'none';
+            return;
+        }
+        if (trendCard) trendCard.style.display = '';
+
+        // Tüm günleri birleştir
+        const allDays = Array.from(new Set([...daily.map(d => d.day), ...dailyExpenses.map(d => d.day)])).sort();
+        const incomeMap = Object.fromEntries(daily.map(d => [d.day, d.total_sales]));
+        const expenseMap = Object.fromEntries(dailyExpenses.map(d => [d.day, d.total]));
+
+        const labels = allDays.map(d => d.slice(5));
+        const incomes  = allDays.map(d => incomeMap[d]  || 0);
+        const expenses = allDays.map(d => expenseMap[d] || 0);
+
+        trendInstance = new Chart(canvasEl.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    { label: 'Gelir', data: incomes,  borderColor: '#2d6a4f', backgroundColor: 'rgba(45,106,79,.12)', tension:.35, fill:true, pointRadius:3 },
+                    { label: 'Gider', data: expenses, borderColor: '#e53e3e', backgroundColor: 'rgba(229,62,62,.08)',  tension:.35, fill:true, pointRadius:3 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: true, position: 'top', labels: { font: {size:11} } } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('tr-TR') + ' ₺', font:{size:11} }, grid: { color:'#f0f4f1' } },
+                    x: { grid: { display: false }, ticks: { font:{size:11} } }
                 }
             }
         });
