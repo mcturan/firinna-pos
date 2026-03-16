@@ -321,17 +321,13 @@ def add_order_item(order_id, product_id, quantity, price, product_name=None, kit
         row = conn.execute('SELECT name FROM products WHERE id = ?', (product_id,)).fetchone()
         product_name = row['name'] if row else 'Ürün'
     conn.execute('''
-        INSERT INTO order_items (order_id, product_id, product_name, quantity, price, kitchen_notes, is_complimentary) 
+        INSERT INTO order_items (order_id, product_id, product_name, quantity, price, kitchen_notes, is_complimentary)
         VALUES (?, ?, ?, ?, ?, ?, ?)
     ''', (order_id, product_id, product_name, quantity, price, kitchen_notes, is_complimentary))
-    
-    # Toplam tutarı güncelle
-    conn.execute('''
-        UPDATE orders SET total = (
-            SELECT SUM(quantity * price) FROM order_items WHERE order_id = ?
-        ) WHERE id = ?
-    ''', (order_id, order_id))
-    
+
+    # Toplam tutarı güncelle (indirim ve ikramlar dahil)
+    update_order_total(conn, order_id)
+
     conn.commit()
     conn.close()
 
@@ -357,13 +353,9 @@ def delete_order_item(item_id):
         
         # Kalemi sil
         conn.execute('DELETE FROM order_items WHERE id = ?', (item_id,))
-        
-        # Toplam tutarı güncelle
-        conn.execute('''
-            UPDATE orders SET total = (
-                SELECT COALESCE(SUM(quantity * price), 0) FROM order_items WHERE order_id = ?
-            ) WHERE id = ?
-        ''', (order_id, order_id))
+
+        # Toplam tutarı güncelle (indirim ve ikramlar dahil)
+        update_order_total(conn, order_id)
     
     conn.commit()
     conn.close()
@@ -663,7 +655,6 @@ def close_order_with_payment(order_id, payment_cash=0, payment_card=0, tip_amoun
     record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amount, tip_method, closed_at)
     conn.commit()
     conn.close()
-    deduct_stock_for_order(order_id)
 
 def split_order_equal(order_id, num_people):
     """Hesabı eşit böl (#11)"""
@@ -1482,6 +1473,8 @@ def deduct_stock_for_order(order_id):
         FROM order_items oi WHERE oi.order_id = ? AND oi.is_complimentary = 0
     ''', (order_id,)).fetchall()
     for item in items:
+        if not item['product_id']:
+            continue
         recipes = conn.execute('''
             SELECT r.stock_item_id, r.quantity as recipe_qty
             FROM recipes r WHERE r.product_id = ?
@@ -1492,6 +1485,8 @@ def deduct_stock_for_order(order_id):
                 (stock_item_id, movement_type, quantity, reason, description)
                 VALUES (?, 'out', ?, 'satis', 'Sipariş #' || ?)''',
                 (r['stock_item_id'], total_deduct, order_id))
+            conn.execute('''UPDATE stock_items SET quantity = MAX(0, quantity - ?) WHERE id = ?''',
+                (total_deduct, r['stock_item_id']))
     conn.commit()
     conn.close()
 

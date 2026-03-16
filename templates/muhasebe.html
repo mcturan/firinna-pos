@@ -410,13 +410,24 @@
     }
 
     function renderChart(daily) {
-        const ctx = document.getElementById('dailyChart').getContext('2d');
-        if (chartInstance) chartInstance.destroy();
+        const canvasEl = document.getElementById('dailyChart');
+        if (!canvasEl) return;
+        const ctx = canvasEl.getContext('2d');
+        if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+        // Önceki "veri yok" mesajını temizle
+        const oldMsg = canvasEl.parentElement.querySelector('.chart-nodata-msg');
+        if (oldMsg) oldMsg.remove();
 
         if (!daily || !daily.length) {
-            ctx.canvas.parentElement.innerHTML = '<div class="no-data">Bu dönemde veri yok.</div>';
+            canvasEl.style.display = 'none';
+            const msg = document.createElement('div');
+            msg.className = 'no-data chart-nodata-msg';
+            msg.textContent = 'Bu dönemde veri yok.';
+            canvasEl.parentElement.appendChild(msg);
             return;
         }
+        canvasEl.style.display = '';
 
         chartInstance = new Chart(ctx, {
             type: 'bar',
