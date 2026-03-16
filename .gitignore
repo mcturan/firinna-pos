@@ -44,3 +44,4 @@ firinna_local.json
 gitignore
 CHANGELOG.md
 ROADMAP.md
+.claude/worktrees/
