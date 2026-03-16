@@ -272,6 +272,7 @@
     let chartInstance = null;
     let trendInstance = null;
     let currentStart = '', currentEnd = '';
+    let _loadCtrl = null;
 
     function localToday() {
         const d = new Date();
@@ -310,6 +311,10 @@
     }
 
     async function loadData(start, end) {
+        if (_loadCtrl) { try { _loadCtrl.abort(); } catch(_) {} }
+        _loadCtrl = new AbortController();
+        const signal = _loadCtrl.signal;
+
         currentStart = start; currentEnd = end;
 
         // Etiket güncelle
@@ -320,7 +325,10 @@
         document.getElementById('summary-grid').innerHTML = '<div class="loading" style="grid-column:1/-1">Yükleniyor...</div>';
 
         try {
-            const data = await fetch(`/api/muhasebe?start=${start}&end=${end}`).then(r => r.json());
+            const resp = await fetch(`/api/muhasebe?start=${start}&end=${end}`, { signal });
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            const data = await resp.json();
+            if (signal.aborted) return;
             lastData = data;
             renderSummary(data);
             renderChart(data.daily);
@@ -330,7 +338,8 @@
             renderProducts(data.top_products || []);
             renderDailyTable(data.daily || []);
         } catch(e) {
-            document.getElementById('summary-grid').innerHTML = '<div class="no-data" style="grid-column:1/-1">Veri yüklenemedi.</div>';
+            if (e.name === 'AbortError') return;
+            document.getElementById('summary-grid').innerHTML = '<div class="no-data" style="grid-column:1/-1">Veri yüklenemedi: ' + e.message + '</div>';
         }
     }
 

@@ -119,7 +119,7 @@
                     <input type="number" id="moveQty" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0">
                 </div>
                 <div>
-                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Tutar ₺ <span id="costRequired" style="color:#e53e3e;font-size:.82rem;">(Alım için zorunlu)</span></label>
+                    <label style="font-weight:600;display:block;margin-bottom:.4rem;"><span id="costLabel">Tutar ₺</span> <span id="costRequired" style="color:#e53e3e;font-size:.82rem;">(Alım için zorunlu)</span></label>
                     <input type="number" id="moveCost" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0.00">
                 </div>
                 <div>
@@ -413,6 +413,10 @@
             const type = document.getElementById('moveType').value;
             document.getElementById('movePaymentDiv').style.display = type === 'in' ? 'block' : 'none';
             document.getElementById('costRequired').style.display = type === 'in' ? 'inline' : 'none';
+            const costLbl = document.getElementById('costLabel');
+            if (costLbl) costLbl.textContent = type === 'adjust'
+                ? 'Ortalama Birim Maliyet ₺ (günceller)'
+                : 'Tutar ₺';
         }
 
         async function saveMovement() {

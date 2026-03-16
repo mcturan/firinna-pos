@@ -1392,9 +1392,12 @@ def get_kasa_data(start_date, end_date, payment_method=None):
     ''', (start_date, end_date)).fetchone()
     conn2.close()
 
+    indirim = round(order_extras['total_discount'], 2)
+    satis   = round(income['satis'], 2)
     return {
         'income': round(income['total'],2),
-        'satis': round(income['satis'],2),
+        'satis': satis,
+        'brut_satis': round(satis + indirim, 2),
         'bahsis': round(income['bahsis'],2),
         'siparis_count': income['siparis_count'],
         'outcome': round(outcome['total'],2),
@@ -1402,7 +1405,7 @@ def get_kasa_data(start_date, end_date, payment_method=None):
         'stok_alim': round(outcome['stok_alim'],2),
         'sarf': round(outcome['sarf'],2),
         'net': round(net,2),
-        'indirim': round(order_extras['total_discount'], 2),
+        'indirim': indirim,
         'ikram': round(order_extras['total_ikram'], 2),
         'movements': [dict(m) for m in movements],
     }
@@ -1493,6 +1496,9 @@ def add_stock_movement(stock_item_id, movement_type, quantity, cost, reason, des
             (stock_item_id, movement_type, quantity, cost, reason, description, related_transaction_id)
             VALUES (?,?,?,?,?,?,?)''',
             (stock_item_id, movement_type, quantity, cost, reason, description, transaction_id))
+    # Sayım (adjust) veya alım sırasında ortalama birim maliyet güncelle
+    if movement_type in ('adjust', 'in') and cost and cost > 0:
+        conn.execute('UPDATE stock_items SET cost_per_unit = ? WHERE id = ?', (cost, stock_item_id))
     conn.commit()
     conn.close()
 
@@ -1572,7 +1578,7 @@ def deduct_stock_for_order(order_id):
                 (stock_item_id, movement_type, quantity, reason, description)
                 VALUES (?, 'out', ?, 'satis', 'Sipariş #' || ?)''',
                 (r['stock_item_id'], total_deduct, order_id))
-            conn.execute('''UPDATE stock_items SET quantity = MAX(0, quantity - ?) WHERE id = ?''',
+            conn.execute('''UPDATE stock_items SET quantity = quantity - ? WHERE id = ?''',
                 (total_deduct, r['stock_item_id']))
     conn.commit()
     conn.close()
@@ -1707,12 +1713,14 @@ def add_stock_purchase(stock_item_id, quantity, cost, payment_method, descriptio
         related_order_id INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
-    date = datetime.now().strftime('%Y-%m-%d')
+    if not date:
+        date = datetime.now().strftime('%Y-%m-%d')
     # Stok hareketi
+    created_at = date + ' 00:00:00'
     conn.execute('''INSERT INTO stock_movements
-        (stock_item_id, movement_type, quantity, cost, reason, description)
-        VALUES (?, 'in', ?, ?, 'alim', ?)''',
-        (stock_item_id, quantity, cost, description))
+        (stock_item_id, movement_type, quantity, cost, reason, description, created_at)
+        VALUES (?, 'in', ?, ?, 'alim', ?, ?)''',
+        (stock_item_id, quantity, cost, description, created_at))
     # Kasadan çıkış
     if cost and cost > 0:
         item = conn.execute('SELECT name FROM stock_items WHERE id=?', (stock_item_id,)).fetchone()

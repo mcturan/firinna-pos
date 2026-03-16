@@ -14,7 +14,7 @@
         Fırınna POS
     </a>
     <div class="nav-links">
-        <a href="/" {% if request.path == '/' %}class="active"{% endif %}>Masalar</a>
+        <a href="/" {% if request.path == '/' %}class="active"{% endif %}>Siparişler</a>
         <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -33,7 +33,7 @@
                 <a href="/stok"     {% if request.path == '/stok'     %}class="active"{% endif %}>Stok</a>
                 <a href="/recete"   {% if request.path == '/recete'   %}class="active"{% endif %}>Reçete</a>
                 <a href="/expenses" {% if request.path == '/expenses' %}class="active"{% endif %}>Masraflar</a>
-                <a href="/tables"   {% if request.path == '/tables'   %}class="active"{% endif %}>Masa Yönetimi</a>
+                <a href="/tables"   {% if request.path == '/tables'   %}class="active"{% endif %}>Sipariş Noktaları</a>
                 <hr>
                 <a href="/backup"   {% if request.path == '/backup'   %}class="active"{% endif %}>Yedek</a>
                 <a href="/settings" {% if request.path == '/settings' %}class="active"{% endif %}>Ayarlar</a>
