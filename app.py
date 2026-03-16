@@ -1967,6 +1967,59 @@ def order_note(order_id):
         conn.close()
         return jsonify({"ok": True, "note": note})
 
+# ===== GELİŞTİRİCİ TALEPLERİ =====
+DEV_REQUESTS_FILE = os.path.join(os.path.dirname(__file__), 'static', 'dev_requests.json')
+
+def _load_dev_requests():
+    if not os.path.exists(DEV_REQUESTS_FILE):
+        return []
+    with open(DEV_REQUESTS_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def _save_dev_requests(items):
+    with open(DEV_REQUESTS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(items, f, ensure_ascii=False, indent=2)
+
+@app.route('/api/dev-requests', methods=['GET'])
+def api_dev_requests_get():
+    return jsonify(_load_dev_requests())
+
+@app.route('/api/dev-requests', methods=['POST'])
+def api_dev_requests_add():
+    data = request.json
+    items = _load_dev_requests()
+    new_id = max((i['id'] for i in items), default=0) + 1
+    items.append({
+        'id': new_id,
+        'text': data.get('text', ''),
+        'done': False,
+        'date': data.get('date', datetime.now().strftime('%Y-%m-%d')),
+        'cat': data.get('cat', 'istek')
+    })
+    _save_dev_requests(items)
+    return jsonify({'success': True, 'id': new_id})
+
+@app.route('/api/dev-requests/<int:req_id>', methods=['PATCH'])
+def api_dev_requests_patch(req_id):
+    data = request.json
+    items = _load_dev_requests()
+    for item in items:
+        if item['id'] == req_id:
+            if 'done' in data:
+                item['done'] = data['done']
+            if 'text' in data:
+                item['text'] = data['text']
+            break
+    _save_dev_requests(items)
+    return jsonify({'success': True})
+
+@app.route('/api/dev-requests/<int:req_id>', methods=['DELETE'])
+def api_dev_requests_delete(req_id):
+    items = _load_dev_requests()
+    items = [i for i in items if i['id'] != req_id]
+    _save_dev_requests(items)
+    return jsonify({'success': True})
+
 if __name__ == '__main__':
     db.init_db()
     try: db.init_muhasebe_tables()

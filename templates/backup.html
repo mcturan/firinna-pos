@@ -46,14 +46,39 @@
         .sub{font-size:.82rem;font-weight:700;color:#4a5568;margin:.85rem 0 .4rem;}
         .toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:.65rem 1.1rem;border-radius:10px;font-size:.85rem;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transition:opacity .3s;pointer-events:none;}
         .toast.show{opacity:1;} .toast.ok{background:#2d6a4f;color:white;} .toast.err{background:#e53e3e;color:white;}
+        /* Sayfa sekmeleri */
+        .page-tabs{display:flex;gap:0;border-bottom:2px solid #e2e8f0;margin-bottom:1.5rem;}
+        .page-tab{padding:.55rem 1.3rem;border:none;background:none;font-size:.88rem;font-weight:600;color:#718096;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;font-family:inherit;}
+        .page-tab:hover{color:#2d6a4f;}
+        .page-tab.active{color:#2d6a4f;border-bottom-color:#2d6a4f;}
+        /* Talep listesi */
+        .req-item{display:flex;align-items:flex-start;gap:.6rem;padding:.6rem .7rem;background:white;border-radius:9px;border:1px solid #e2e8f0;margin-bottom:.4rem;transition:background .15s;}
+        .req-item.done-item{opacity:.6;}
+        .req-item .req-check{width:17px;height:17px;accent-color:#2d6a4f;cursor:pointer;flex-shrink:0;margin-top:.1rem;}
+        .req-item .req-text{flex:1;font-size:.83rem;line-height:1.5;color:#2d3748;}
+        .req-item.done-item .req-text{text-decoration:line-through;color:#a0aec0;}
+        .req-item .req-meta{font-size:.7rem;color:#a0aec0;white-space:nowrap;margin-top:.15rem;text-align:right;}
+        .req-item .req-del{border:none;background:none;cursor:pointer;color:#cbd5e0;font-size:.82rem;padding:0 .15rem;line-height:1;flex-shrink:0;}
+        .req-item .req-del:hover{color:#e53e3e;}
+        .cat-pill{font-size:.68rem;font-weight:700;padding:.1rem .4rem;border-radius:20px;margin-right:.3rem;}
+        .cat-bug{background:#fee2e2;color:#991b1b;}
+        .cat-istek,.cat-özellik{background:#dbeafe;color:#1e40af;}
+        .filter-bar{display:flex;gap:.4rem;margin-bottom:.85rem;flex-wrap:wrap;}
+        .filter-btn{padding:.32rem .75rem;border:2px solid #e2e8f0;border-radius:20px;background:white;font-size:.78rem;font-weight:600;color:#718096;cursor:pointer;font-family:inherit;transition:all .15s;}
+        .filter-btn.active{border-color:#2d6a4f;color:#2d6a4f;background:#f0fdf4;}
     </style>
 </head>
 <body>
     {% include '_navbar.html' %}
 
 <div class="container" style="max-width:860px;">
-    <h1 style="font-size:1.3rem;margin:0 0 .25rem;color:#1a202c;">💾 Yedekleme & Senkronizasyon</h1>
-    <p style="color:#718096;font-size:.82rem;margin:0 0 1rem;">Veritabanını yedekle, geri yükle. GitHub ile iki lokasyon arası senkronizasyon.</p>
+    <div class="page-tabs">
+        <button class="page-tab active" id="btab-backup"   onclick="switchBackupTab('backup')">💾 Yedekleme</button>
+        <button class="page-tab"        id="btab-requests" onclick="switchBackupTab('requests')">💬 Talepler</button>
+    </div>
+
+    <!-- ═══ YEDEKLEME SEKMESİ ═══ -->
+    <div id="tab-backup">
     <div class="warn">⚠️ Geri yükleme mevcut verilerin üzerine yazar. İşlem öncesinde otomatik yedek alınır.</div>
 
     <!-- YEDEK İNDİR / YÜKLE -->
@@ -218,6 +243,9 @@
     </div>
 </div>
 
+    </div><!-- /tab-backup -->
+
+</div><!-- /container -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -544,63 +572,146 @@ loadAutoPullSetting();
 loadAutoPushSetting();
 loadGitToken();
 
-// ── GELİŞTİRİCİ TALEPLERİ ──────────────────────────────
-function loadRequests() {
-    const items = JSON.parse(localStorage.getItem('dev_requests') || '[]');
+// ── TALEPLER SEKMESİ ──────────────────────────────────
+let _reqFilter = 'all';
+let _reqItems  = [];
+
+function switchBackupTab(tab) {
+    document.getElementById('tab-backup').style.display   = tab === 'backup'   ? '' : 'none';
+    document.getElementById('tab-requests').style.display = tab === 'requests' ? '' : 'none';
+    document.getElementById('btab-backup').classList.toggle('active',   tab === 'backup');
+    document.getElementById('btab-requests').classList.toggle('active', tab === 'requests');
+    if (tab === 'requests') loadRequests();
+}
+
+async function loadRequests() {
+    _reqItems = await fetch('/api/dev-requests').then(r => r.json());
+    renderRequests();
+}
+
+function renderRequests() {
     const list = document.getElementById('reqList');
+    const stats = document.getElementById('reqStats');
+    const done  = _reqItems.filter(i => i.done).length;
+    const total = _reqItems.length;
+    stats.textContent = `${done} / ${total} tamamlandı`;
+
+    let items = _reqItems;
+    if (_reqFilter === 'done')    items = items.filter(i => i.done);
+    if (_reqFilter === 'pending') items = items.filter(i => !i.done);
+
     if (!items.length) {
-        list.innerHTML = '<div style="color:#a0aec0;font-size:.82rem;padding:.75rem 0;">Henüz talep yok.</div>';
+        list.innerHTML = '<div style="color:#a0aec0;font-size:.83rem;padding:1.5rem;text-align:center;">Görüntülenecek talep yok.</div>';
         return;
     }
-    list.innerHTML = items.map((r, i) => `
-        <div style="display:flex;align-items:flex-start;gap:.5rem;padding:.55rem .6rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:.4rem;">
-            <span style="flex:1;font-size:.83rem;line-height:1.5;color:#2d3748;">${r.text.replace(/</g,'&lt;')}</span>
-            <span style="font-size:.7rem;color:#a0aec0;white-space:nowrap;margin-top:.1rem;">${r.date}</span>
-            <button onclick="deleteRequest(${i})" style="border:none;background:none;cursor:pointer;color:#cbd5e0;font-size:.85rem;padding:0 .2rem;" title="Sil">✕</button>
+    const catCls = c => ({bug:'cat-bug', istek:'cat-istek', özellik:'cat-özellik'}[c] || 'cat-istek');
+    list.innerHTML = items.map(r => `
+        <div class="req-item ${r.done ? 'done-item' : ''}">
+            <input type="checkbox" class="req-check" ${r.done ? 'checked' : ''} onchange="toggleDone(${r.id}, this.checked)">
+            <div style="flex:1;min-width:0;">
+                <div class="req-text">${r.text.replace(/</g,'&lt;')}</div>
+                <div style="margin-top:.25rem;">
+                    <span class="cat-pill ${catCls(r.cat)}">${r.cat||'istek'}</span>
+                </div>
+            </div>
+            <div class="req-meta">${r.date}<br><button class="req-del" onclick="deleteRequest(${r.id})" title="Sil">✕</button></div>
         </div>`).join('');
 }
-function addRequest() {
+
+function setReqFilter(f) {
+    _reqFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('fbtn-' + f).classList.add('active');
+    renderRequests();
+}
+
+async function toggleDone(id, done) {
+    await fetch(`/api/dev-requests/${id}`, {
+        method: 'PATCH', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({done})
+    });
+    await loadRequests();
+}
+
+async function addRequest() {
     const inp = document.getElementById('reqInput');
+    const cat = document.getElementById('reqCat').value;
     const txt = inp.value.trim();
     if (!txt) return;
-    const items = JSON.parse(localStorage.getItem('dev_requests') || '[]');
-    items.unshift({ text: txt, date: new Date().toLocaleDateString('tr-TR') });
-    localStorage.setItem('dev_requests', JSON.stringify(items));
+    await fetch('/api/dev-requests', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({text: txt, cat})
+    });
     inp.value = '';
-    loadRequests();
+    await loadRequests();
 }
-function deleteRequest(i) {
-    const items = JSON.parse(localStorage.getItem('dev_requests') || '[]');
-    items.splice(i, 1);
-    localStorage.setItem('dev_requests', JSON.stringify(items));
-    loadRequests();
+
+async function deleteRequest(id) {
+    if (!confirm('Bu talebi silmek istediğinize emin misiniz?')) return;
+    await fetch(`/api/dev-requests/${id}`, {method: 'DELETE'});
+    await loadRequests();
 }
-function copyRequests() {
-    const items = JSON.parse(localStorage.getItem('dev_requests') || '[]');
-    if (!items.length) { toast('Talep yok', 'err'); return; }
-    const txt = items.map((r,i) => `${i+1}. [${r.date}] ${r.text}`).join('\n');
-    navigator.clipboard.writeText(txt).then(() => toast('Kopyalandı!', 'ok')).catch(() => toast('Kopyalanamadı', 'err'));
+
+function exportReqJSON() {
+    const blob = new Blob([JSON.stringify(_reqItems, null, 2)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `talepler_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
 }
-loadRequests();
+
+function exportReqTXT() {
+    if (!_reqItems.length) { toast('Talep yok', 'err'); return; }
+    const lines = _reqItems.map(r => `[${r.done ? '✓' : ' '}] [${r.date}] [${r.cat}] ${r.text}`);
+    const blob = new Blob([lines.join('\n')], {type: 'text/plain;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `talepler_${new Date().toISOString().slice(0,10)}.txt`;
+    a.click();
+}
 </script>
 
-<!-- GELİŞTİRİCİ TALEPLERİ -->
-<div style="margin-top:2rem;background:white;border-radius:14px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #e2e8f0;" id="devRequests">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;">
-        <div>
-            <h3 style="margin:0;font-size:.95rem;color:#1a202c;">💬 Geliştirici Talepleri</h3>
-            <p style="margin:.2rem 0 0;font-size:.78rem;color:#718096;">Özellik istekleri ve hata bildirimleri. Tarayıcıda saklanır.</p>
+    <!-- ═══ TALEPLER SEKMESİ ═══ -->
+    <div id="tab-requests" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem;">
+            <div>
+                <div style="font-size:1rem;font-weight:700;color:#1a202c;">Geliştirici Talepleri & Geçmiş</div>
+                <div style="font-size:.78rem;color:#718096;margin-top:.15rem;">Özellik istekleri, hata bildirimleri ve yapılan işler.</div>
+            </div>
+            <div style="display:flex;gap:.4rem;">
+                <button onclick="exportReqTXT()" style="padding:.38rem .8rem;background:#4a5568;color:white;border:none;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;">📄 TXT</button>
+                <button onclick="exportReqJSON()" style="padding:.38rem .8rem;background:#667eea;color:white;border:none;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;">📦 JSON</button>
+            </div>
         </div>
-        <button onclick="copyRequests()" style="padding:.38rem .8rem;background:#667eea;color:white;border:none;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;">📋 Kopyala</button>
+
+        <!-- Yeni talep formu -->
+        <div style="background:white;border-radius:12px;padding:1rem;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #e2e8f0;margin-bottom:1rem;">
+            <div style="font-size:.82rem;font-weight:700;color:#4a5568;margin-bottom:.6rem;">➕ Yeni Talep</div>
+            <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+                <input id="reqInput" type="text" placeholder="Özellik isteği veya hata bildirimi..."
+                    style="flex:1;min-width:200px;padding:.48rem .7rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.85rem;font-family:inherit;"
+                    onkeydown="if(event.key==='Enter')addRequest()">
+                <select id="reqCat" style="padding:.48rem .65rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.84rem;font-family:inherit;">
+                    <option value="istek">İstek</option>
+                    <option value="bug">Hata</option>
+                    <option value="özellik">Özellik</option>
+                </select>
+                <button onclick="addRequest()" style="padding:.48rem 1rem;background:#2d6a4f;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;font-family:inherit;">Ekle</button>
+            </div>
+        </div>
+
+        <!-- Filtreler + istatistik -->
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem;">
+            <div class="filter-bar" style="margin-bottom:0;">
+                <button class="filter-btn active" id="fbtn-all"     onclick="setReqFilter('all')">Tümü</button>
+                <button class="filter-btn"        id="fbtn-pending" onclick="setReqFilter('pending')">Bekleyenler</button>
+                <button class="filter-btn"        id="fbtn-done"    onclick="setReqFilter('done')">Tamamlananlar</button>
+            </div>
+            <span id="reqStats" style="font-size:.78rem;color:#718096;font-weight:600;"></span>
+        </div>
+
+        <div id="reqList"></div>
     </div>
-    <div style="display:flex;gap:.5rem;margin-bottom:.75rem;">
-        <input id="reqInput" type="text" placeholder="Özellik isteği veya hata bildirimi yaz..."
-            style="flex:1;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.85rem;font-family:inherit;"
-            onkeydown="if(event.key==='Enter')addRequest()">
-        <button onclick="addRequest()" style="padding:.5rem 1rem;background:#2d6a4f;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">Ekle</button>
-    </div>
-    <div id="reqList"></div>
-</div>
 
 </body>
 </html>
