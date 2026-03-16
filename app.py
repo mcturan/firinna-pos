@@ -114,9 +114,44 @@ def api_add_transaction():
     db.add_transaction(
         data['type'], data['amount'], data.get('category','masraf'),
         data.get('payment_method','cash'), data.get('description',''),
-        date=data.get('date', None)
+        date=data.get('date', None),
+        created_at=data.get('datetime', None)
     )
     return jsonify({'success': True})
+
+
+@app.route('/api/kasa/transactions', methods=['GET'])
+def api_kasa_transactions():
+    today = datetime.now().strftime('%Y-%m-%d')
+    start    = request.args.get('date_from', today)
+    end      = request.args.get('date_to', today)
+    type_    = request.args.get('type', None)
+    category = request.args.get('category', None)
+    method   = request.args.get('method', None)
+    page     = int(request.args.get('page', 1))
+    per_page = int(request.args.get('per_page', 30))
+    fmt      = request.args.get('format', 'json')
+
+    if fmt == 'csv':
+        from flask import Response
+        data = db.get_transactions_paginated(start, end, type_, category, method,
+                                             page=1, per_page=100000)
+        lines = ['\uFEFFTarih,Tür,Kategori,Kasa,Açıklama,Tutar']
+        for r in data['rows']:
+            lines.append(','.join([
+                r['date'],
+                'Giriş' if r['type'] == 'in' else 'Çıkış',
+                r['category'] or '',
+                r['payment_method'] or '',
+                (r['description'] or '').replace(',', ';'),
+                str(r['amount'])
+            ]))
+        csv_text = '\n'.join(lines)
+        return Response(csv_text, mimetype='text/csv',
+                        headers={'Content-Disposition':
+                                 f'attachment; filename=kasa_{start}_{end}.csv'})
+    return jsonify(db.get_transactions_paginated(start, end, type_, category,
+                                                 method, page, per_page))
 
 @app.route('/api/transactions/<int:tid>', methods=['DELETE'])
 def api_delete_transaction(tid):

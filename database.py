@@ -1214,17 +1214,51 @@ def record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amo
             VALUES (?, 'in', ?, 'bahsis', ?, 'Bahşiş - Sipariş #' || ?, ?, ?)''',
             (date, tip_amount, tip_method or 'cash', order_id, order_id, closed_at))
 
-def add_transaction(type_, amount, category, payment_method, description, related_order_id=None, date=None):
+def add_transaction(type_, amount, category, payment_method, description,
+                    related_order_id=None, date=None, created_at=None):
     """Manuel transaction ekle — date verilmezse bugün kullanılır"""
     conn = get_db()
     if not date:
         date = datetime.now().strftime('%Y-%m-%d')
-    conn.execute('''INSERT INTO transactions
-        (date, type, amount, category, payment_method, description, related_order_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)''',
-        (date, type_, amount, category, payment_method, description, related_order_id))
+    if created_at:
+        conn.execute('''INSERT INTO transactions
+            (date, type, amount, category, payment_method, description,
+             related_order_id, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+            (date, type_, amount, category, payment_method,
+             description, related_order_id, created_at))
+    else:
+        conn.execute('''INSERT INTO transactions
+            (date, type, amount, category, payment_method,
+             description, related_order_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)''',
+            (date, type_, amount, category, payment_method,
+             description, related_order_id))
     conn.commit()
     conn.close()
+
+
+def get_transactions_paginated(start, end, type_=None, category=None,
+                               payment_method=None, page=1, per_page=30):
+    conn = get_db()
+    filters = ['date BETWEEN ? AND ?']
+    params = [start, end]
+    if type_:          filters.append('type = ?');           params.append(type_)
+    if category:       filters.append('category = ?');       params.append(category)
+    if payment_method: filters.append('payment_method = ?'); params.append(payment_method)
+    where = ' AND '.join(filters)
+    total = conn.execute(f'SELECT COUNT(*) FROM transactions WHERE {where}', params).fetchone()[0]
+    offset = (page - 1) * per_page
+    rows = conn.execute(f'''
+        SELECT id, date, type, amount, category, payment_method, description,
+               related_order_id, created_at
+        FROM transactions WHERE {where}
+        ORDER BY created_at DESC LIMIT ? OFFSET ?
+    ''', params + [per_page, offset]).fetchall()
+    conn.close()
+    return {'rows': [dict(r) for r in rows], 'total': total,
+            'page': page, 'per_page': per_page,
+            'pages': max(1, (total + per_page - 1) // per_page)}
 
 def delete_transaction(transaction_id):
     conn = get_db()
