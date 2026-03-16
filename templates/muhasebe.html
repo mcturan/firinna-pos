@@ -190,46 +190,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">🍽️ Fırınna POS</div>
-        <div class="nav-links">
-            <a href="/">Masalar</a>
-                        <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">🔔<span class="alert-badge" id="alertBadge" style="display:none">0</span></button>
-            <div class="nav-dropdown" id="navDropdown">
-                <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
-                <div class="nav-dropdown-menu">
-                    <a href="/kasa">💰 Kasa</a>
-                    <a href="/muhasebe" class="active">📒 Muhasebe</a>
-                    <hr>
-                    <a href="/products">🍞 Ürünler</a>
-                    <a href="/stok">📦 Stok</a>
-                    <a href="/recete">🧾 Reçete</a>
-                    <a href="/expenses">📤 Masraflar</a>
-                    <a href="/tables">🪑 Masa Yönetimi</a>
-                    <hr>
-                    <a href="/backup">💾 Yedek</a>
-            <a href="/settings">⚙️ Ayarlar</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <!-- Stok Uyarı Paneli -->
-    <div class="alert-panel" id="alertPanel">
-        <div class="alert-panel-header">
-            <span>⚠️ Düşük Stok Uyarıları</span>
-            <a href="/stok" style="color:white;font-size:.8rem;text-decoration:underline;">Stoka Git →</a>
-        </div>
-        <div class="alert-panel-body" id="alertPanelBody">
-            <div class="alert-empty">Yükleniyor...</div>
-        </div>
-    </div>
-    <script>
-        function toggleNav() { document.getElementById('navDropdown').classList.toggle('open'); }
-        document.addEventListener('click', e => {
-            const dd = document.getElementById('navDropdown');
-            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
-        });
-    </script>
+    {% include '_navbar.html' %}
 
     <div class="container">
         <div class="page-header">
@@ -344,7 +305,7 @@
     function loadCustom() {
         const s = document.getElementById('date-from').value;
         const e = document.getElementById('date-to').value;
-        if (!s || !e) { alert('Tarih seçin'); return; }
+        if (!s || !e) { showToast('Başlangıç ve bitiş tarihi seçin.', 'warn'); return; }
         loadData(s, e);
     }
 
@@ -605,7 +566,7 @@
     let lastData = null;
 
     function exportExcel() {
-        if (!lastData) { alert('Önce veri yükleyin.'); return; }
+        if (!lastData) { showToast('Önce veri yükleyin.', 'warn'); return; }
         const r = lastData;
         let csv = '\uFEFF';
         csv += `Firinna POS - On Muhasebe\n`;
@@ -643,14 +604,14 @@
     }
 
     async function printDailyReport() {
-        if (!currentStart) { alert('Önce tarih seçin.'); return; }
+        if (!currentStart) { showToast('Önce tarih seçin.', 'warn'); return; }
         try {
             await fetch('/api/print/daily-report', {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({date: currentStart})
             });
-            alert('Rapor yazıcıya gönderildi.');
-        } catch(e) { alert('Yazıcı hatası: ' + e.message); }
+            showToast('Rapor yazıcıya gönderildi!', 'success');
+        } catch(e) { showToast('Yazıcı hatası: ' + e.message, 'error'); }
     }
 
     // İlk yükle
@@ -660,45 +621,6 @@
         document.getElementById('date-to').value = today;
         loadData(today, today);
     });
-    </script>
-    <script>
-    (function(){
-        async function loadAlerts() {
-            try {
-                const items = await fetch("/api/stock/alerts").then(r=>r.json());
-                const badge = document.getElementById("alertBadge");
-                const body  = document.getElementById("alertPanelBody");
-                if (!badge || !body) return;
-                if (items.length > 0) {
-                    badge.textContent = items.length;
-                    badge.style.display = "flex";
-                    body.innerHTML = items.map(i => `
-                        <div class="alert-item">
-                            <span class="alert-item-name">${i.name}</span>
-                            <span class="alert-item-qty">
-                                <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
-                                <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
-                            </span>
-                        </div>`).join("");
-                } else {
-                    badge.style.display = "none";
-                    body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
-                }
-            } catch(e) {}
-        }
-        function toggleAlertPanel() {
-            const p = document.getElementById("alertPanel");
-            if (p) p.classList.toggle("open");
-        }
-        document.addEventListener("click", function(e) {
-            const p  = document.getElementById("alertPanel");
-            const b  = document.getElementById("alertBtn");
-            const dd = document.getElementById("navDropdown");
-            if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove("open");
-        });
-        loadAlerts();
-        setInterval(loadAlerts, 60000);
-    })();
     </script>
 </body>
 </html>

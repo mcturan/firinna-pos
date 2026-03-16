@@ -91,7 +91,25 @@ setInterval(loadAlerts, 60000);
 </script>
 
 <div id="toast-container"></div>
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:14px;padding:1.75rem;min-width:300px;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.18);">
+        <p id="confirm-msg" style="margin:0 0 1.5rem;font-size:1rem;color:#2d3748;line-height:1.5;white-space:pre-line;"></p>
+        <div style="display:flex;gap:.75rem;justify-content:flex-end;">
+            <button id="confirm-no"  onclick="document.getElementById('confirm-modal').style.display='none'" style="padding:.55rem 1.25rem;border:2px solid #e2e8f0;background:white;border-radius:8px;font-weight:600;cursor:pointer;color:#4a5568;">İptal</button>
+            <button id="confirm-yes" style="padding:.55rem 1.5rem;background:#e53e3e;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Sil</button>
+        </div>
+    </div>
+</div>
 <script>
+function showConfirm(msg, fn, yesTxt, yesCls) {
+    var m = document.getElementById('confirm-modal');
+    document.getElementById('confirm-msg').textContent = msg;
+    var yesBtn = document.getElementById('confirm-yes');
+    yesBtn.textContent = yesTxt || 'Sil';
+    yesBtn.style.background = yesCls || '#e53e3e';
+    m.style.display = 'flex';
+    yesBtn.onclick = function() { m.style.display = 'none'; fn(); };
+}
 function showToast(msg, type, duration) {
     type = type || 'success';
     duration = duration || 3000;

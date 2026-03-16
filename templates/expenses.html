@@ -266,7 +266,7 @@
             const desc = document.getElementById('expDesc').value.trim();
             const pm = document.getElementById('expPayment').value;
             const amount = parseFloat(document.getElementById('expAmount').value);
-            if (!desc || isNaN(amount) || amount <= 0) { alert('Açıklama ve tutar gerekli.'); return; }
+            if (!desc || isNaN(amount) || amount <= 0) { showToast('Açıklama ve tutar gerekli.', 'warn'); return; }
             await fetch('/api/expenses', {
                 method: 'POST', headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({description:desc, amount, category:cat, subcategory:sub, payment_method:pm})
@@ -319,11 +319,12 @@
         }
 
         async function deleteExpense(id) {
-            if (!confirm('Bu masrafı silmek istiyor musun?')) return;
-            const res = await fetch(`/api/expenses/${id}`, {method: 'DELETE'});
-            const d = await res.json();
-            if (!d.success) { alert('⚠️ ' + d.error); return; }
-            loadAll();
+            showConfirm('Bu masrafı silmek istiyor musun?', async () => {
+                const res = await fetch(`/api/expenses/${id}`, {method: 'DELETE'});
+                const d = await res.json();
+                if (!d.success) { showToast(d.error, 'error'); return; }
+                loadAll();
+            });
         }
     </script>
 

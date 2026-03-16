@@ -475,9 +475,10 @@
         }
 
         async function delTx(id) {
-            if (!confirm('Bu işlemi silmek istediğine emin misin?')) return;
-            await fetch(`/api/transactions/${id}`, {method:'DELETE'});
-            loadAll();
+            showConfirm('Bu işlemi silmek istediğine emin misin?', async () => {
+                await fetch(`/api/transactions/${id}`, {method:'DELETE'});
+                loadAll();
+            });
         }
 
         let editingTxId = null;

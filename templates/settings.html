@@ -23,8 +23,6 @@
         .save-row button { flex:1; }
         .logo-area { display:flex; flex-direction:column; align-items:center; gap:1rem; }
         #logo-preview-box { width:200px; height:100px; border:2px dashed #cbd5e1; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#f8fafc; }
-        .toast { position:fixed; bottom:2rem; right:2rem; background:#2d6a4f; color:white; padding:1rem 1.5rem; border-radius:10px; font-weight:600; z-index:9999; opacity:0; transition:opacity .3s; }
-        .toast.show { opacity:1; }
 
         /* GitHub Sync */
         .sync-status-box { background:#f8fafc; border-radius:12px; padding:1.25rem; margin-bottom:1rem; }
@@ -151,16 +149,8 @@
 
     </div>
 
-    <div class="toast" id="toast"></div>
-
     <script>
-        function toast(msg, ok=true) {
-            const el = document.getElementById('toast');
-            el.textContent = msg;
-            el.style.background = ok ? '#2d6a4f' : '#e53e3e';
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 2500);
-        }
+
 
         document.addEventListener('DOMContentLoaded', async () => {
             await loadBusinessSettings();
@@ -195,7 +185,7 @@
                     body: JSON.stringify({value: document.getElementById(f.id).value})
                 });
             }
-            toast('✅ İşletme bilgileri kaydedildi!');
+            showToast('İşletme bilgileri kaydedildi!', 'success');
         }
 
         async function loadPrinterSettings() {
@@ -222,13 +212,13 @@
                     body: JSON.stringify({value: document.getElementById(f.id).value})
                 });
             }
-            toast('✅ Yazıcı ayarları kaydedildi!');
+            showToast('Yazıcı ayarları kaydedildi!', 'success');
         }
 
         async function testPrinter() {
             const res = await fetch('/api/printer/test', {method:'POST'});
             const d = await res.json();
-            toast(d.success ? '✅ Test fişi gönderildi!' : '❌ Yazıcıya ulaşılamadı', d.success);
+            showToast(d.success ? 'Test fişi gönderildi!' : 'Yazıcıya ulaşılamadı', d.success ? 'success' : 'error');
         }
 
         let pendingLogoFile = null;
@@ -257,8 +247,8 @@
             formData.append('label', label);
             const res = await fetch('/api/settings/qr', {method:'POST', body: formData});
             const d = await res.json();
-            if (d.success) toast('\u2705 QR kodu kaydedildi!');
-            else toast('\u274c Hata: ' + d.error, false);
+            if (d.success) showToast('\u2705 QR kodu kaydedildi!', 'success');
+            else showToast(d.error || 'Hata', 'error');
         }
 
         // --- Telegram ---
@@ -271,8 +261,8 @@
                 body: JSON.stringify({token, chat_id})
             });
             const d = await res.json();
-            if (d.success) toast('✅ Telegram ayarları kaydedildi!');
-            else toast('❌ Kayıt hatası', false);
+            if (d.success) showToast('Telegram ayarları kaydedildi!', 'success');
+            else showToast('Kayıt hatası', 'error');
         }
 
         async function testTelegram() {
@@ -379,8 +369,8 @@
         async function addContact() {
             const name = document.getElementById('new-contact-name').value.trim();
             const chat_id = document.getElementById('new-contact-chatid').value.trim();
-            if (!name || !chat_id) { toast('İsim ve Chat ID zorunlu!', false); return; }
-            if (!/^-?[0-9]+$/.test(chat_id)) { toast('❌ Chat ID sadece sayı olmalı (örn: 1326104090)', false); return; }
+            if (!name || !chat_id) { showToast('İsim ve Chat ID zorunlu!', 'warn'); return; }
+            if (!/^-?[0-9]+$/.test(chat_id)) { showToast('Chat ID sadece sayı olmalı (örn: 1326104090)', 'warn'); return; }
             const res = await fetch('/api/telegram/contacts', {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({name, chat_id})
@@ -389,21 +379,21 @@
             if (d.success) {
                 document.getElementById('new-contact-name').value = '';
                 document.getElementById('new-contact-chatid').value = '';
-                toast('✅ Kişi eklendi!');
+                showToast('Kişi eklendi!', 'success');
                 loadContacts();
-            } else toast('❌ ' + (d.error||'Hata'), false);
+            } else showToast(d.error || 'Hata', 'error');
         }
 
         async function deleteContact(id) {
             await fetch('/api/telegram/contacts/' + id, {method:'DELETE'});
-            toast('🗑️ Kişi silindi');
+            showToast('Kişi silindi', 'success');
             loadContacts();
         }
 
         // --- Telegram Mesaj Gönder ---
         async function sendTelegramNote() {
             const note = document.getElementById('tg-manual-note').value.trim();
-            if (!note) { toast('Mesaj boş olamaz!', false); return; }
+            if (!note) { showToast('Mesaj boş olamaz!', 'warn'); return; }
             const chat_id = document.getElementById('tg-recipient').value || null;
             const statusEl = document.getElementById('tg-note-status');
             statusEl.style.display = 'none';
@@ -448,8 +438,8 @@
             formData.append('label', document.getElementById('note-qr-label').value);
             const res = await fetch('/api/settings/note-qr', {method:'POST', body: formData});
             const d = await res.json();
-            if (d.success) toast('✅ Not QR kodu kaydedildi!');
-            else toast('❌ Hata: ' + d.error, false);
+            if (d.success) showToast('Not QR kodu kaydedildi!', 'success');
+            else showToast(d.error || 'Hata', 'error');
             pendingNoteQrFile = null;
             document.getElementById('btn-upload-note-qr').disabled = true;
             document.getElementById('btn-upload-note-qr').style.opacity = '.5';
@@ -462,15 +452,15 @@
                 body: JSON.stringify({label})
             });
             const d = await res.json();
-            if (d.success) toast('✅ Not QR yazısı kaydedildi!');
-            else toast('❌ Hata', false);
+            if (d.success) showToast('Not QR yazısı kaydedildi!', 'success');
+            else showToast('Hata', 'error');
         }
 
         async function deleteNoteQr() {
             await fetch('/api/settings/note-qr', {method:'DELETE'});
             document.getElementById('note-qr-img').style.display = 'none';
             document.getElementById('note-qr-placeholder').style.display = 'block';
-            toast('🗑️ Not QR silindi');
+            showToast('Not QR silindi', 'success');
         }
 
         async function saveQrLabel() {
@@ -481,8 +471,8 @@
                 body: JSON.stringify({label: label})
             });
             const d = await res.json();
-            if (d.success) toast('✅ QR yazısı kaydedildi!');
-            else toast('❌ Hata: ' + d.error, false);
+            if (d.success) showToast('QR yazısı kaydedildi!', 'success');
+            else showToast(d.error || 'Hata', 'error');
         }
 
         async function deleteQr() {
@@ -491,7 +481,7 @@
             document.getElementById('qr-placeholder-text').style.display = 'block';
             document.getElementById('btn-upload-qr').disabled = true;
             document.getElementById('btn-upload-qr').style.opacity = '.5';
-            toast('\u2705 QR kodu silindi!');
+            showToast('\u2705 QR kodu silindi!', 'success');
         }
 
         async function loadLogoSettings() {
@@ -548,21 +538,22 @@
             if (!pendingLogoFile) return;
             const fd = new FormData(); fd.append('logo', pendingLogoFile);
             const d = await fetch('/api/settings/logo', {method:'POST', body:fd}).then(r => r.json());
-            if (d.success) { toast('✅ Logo yüklendi!'); pendingLogoFile = null; }
-            else toast('❌ Hata: ' + d.error, false);
+            if (d.success) { showToast('Logo yüklendi!', 'success'); pendingLogoFile = null; }
+            else showToast(d.error || 'Hata', 'error');
         }
         async function deleteLogo() {
-            if (!confirm('Logo silinsin mi?')) return;
-            await fetch('/api/settings/logo', {method:'DELETE'});
-            document.getElementById('logo-preview-img').style.display = 'none';
-            document.getElementById('logo-placeholder-text').style.display = 'block';
-            toast('✅ Logo silindi.');
+            showConfirm('Logo silinsin mi?', async () => {
+                await fetch('/api/settings/logo', {method:'DELETE'});
+                document.getElementById('logo-preview-img').style.display = 'none';
+                document.getElementById('logo-placeholder-text').style.display = 'block';
+                showToast('Logo silindi.', 'success');
+            }, 'Sil', '#e53e3e');
         }
 
         async function previewNote() {
             const title = document.getElementById('note-title').value || 'NOT';
             const note = document.getElementById('note-content').value.trim();
-            if (!note) { toast('Not içeriği boş!', false); return; }
+            if (!note) { showToast('Not içeriği boş!', 'warn'); return; }
             const res = await fetch('/api/print/note/preview', {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({title, note})
@@ -574,12 +565,12 @@
         async function printNote() {
             const title = document.getElementById('note-title').value || 'NOT';
             const note = document.getElementById('note-content').value.trim();
-            if (!note) { toast('Not içeriği boş!', false); return; }
+            if (!note) { showToast('Not içeriği boş!', 'warn'); return; }
             const d = await fetch('/api/print/note', {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({title, note})
             }).then(r => r.json());
-            toast(d.success ? '✅ Not fişi yazdırıldı!' : '❌ ' + (d.error||'Hata'), d.success);
+            showToast(d.success ? 'Not fişi yazdırıldı!' : (d.error||'Hata'), d.success ? 'success' : 'error');
         }
     </script>
 
@@ -757,12 +748,12 @@
                             showGitLog('✅ Zaten güncel, gönderilecek bir şey yok.');
                         }
                     })();
-                    toast('✅ GitHub\'a yüklendi!');
+                    showToast('GitHub\'a yüklendi!', 'success');
                     document.getElementById('commit-message').value = '';
                     setTimeout(loadGitStatus, 1500);
                 } else {
                     showGitLog('❌ Push hatası:\n' + d.error);
-                    toast('❌ Push başarısız', false);
+                    showToast('Push başarısız', 'error');
                 }
             } catch(e) { showGitLog('❌ ' + e.message); }
             btn.disabled = false; btn.textContent = '⬆️ GitHub\'a Yükle (Push)';
@@ -776,15 +767,15 @@
                 const d = await fetch('/api/git/pull', {method:'POST'}).then(r => r.json());
                 if (d.success) {
                     if (d.already_up) {
-                        showGitLog('✅ Zaten güncel.'); toast('✅ Zaten güncel');
+                        showGitLog('✅ Zaten güncel.'); showToast('Zaten güncel', 'success');
                     } else {
                         showGitLog('✅ Pull tamam! Uygulama yeniden başlıyor...\n' + d.output);
-                        toast('✅ Güncellendi! Sayfa yenilenecek...');
+                        showToast('Güncellendi! Sayfa yenilenecek...', 'success');
                         setTimeout(() => location.reload(), 4000);
                     }
                     setTimeout(loadGitStatus, 1500);
                 } else {
-                    showGitLog('❌ Pull hatası:\n' + d.error); toast('❌ Pull başarısız', false);
+                    showGitLog('❌ Pull hatası:\n' + d.error); showToast('Pull başarısız', 'error');
                 }
             } catch(e) { showGitLog('❌ ' + e.message); }
             btn.disabled = false; btn.textContent = '⬇️ GitHub\'dan Güncelle (Pull)';
@@ -805,7 +796,7 @@
                 else if (mode === 'time') status.textContent = "Her gun " + payload.time + "'de pull aktif";
                 else status.textContent = 'Otomatik pull kapali';
             }
-            toast(d.success ? '\u2705 Kaydedildi!' : '\u274c Hata', d.success);
+            showToast(d.success ? 'Kaydedildi!' : 'Hata', d.success ? 'success' : 'error');
         }
 
         function togglePullMode() {
@@ -877,7 +868,7 @@
                 else if (mode === 'time') status.textContent = "Her gun " + payload.time + "'de push aktif";
                 else status.textContent = 'Otomatik push kapali';
             }
-            toast(d.success ? '✅ Kaydedildi!' : '❌ Hata', d.success);
+            showToast(d.success ? 'Kaydedildi!' : 'Hata', d.success ? 'success' : 'error');
         }
 
 

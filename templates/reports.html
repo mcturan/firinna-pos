@@ -2,6 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raporlar - Fırınna POS</title>
     <link rel="stylesheet" href="/static/css/style.css">
@@ -33,27 +34,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">🍽️ Fırınna POS</div>
-        <div class="nav-links">
-            <a href="/">Masalar</a>
-            <div class="nav-dropdown" id="navDropdown">
-                <button class="nav-dropdown-btn" onclick="toggleNav()">⚙️ Yönetim ▾</button>
-                <div class="nav-dropdown-menu">
-            <a href="/kasa">💰 Kasa</a>
-            <a href="/reports" class="active">📊 Raporlar</a>
-            <hr>
-            <a href="/products">🍞 Ürünler</a>
-            <a href="/stok">📦 Stok</a>
-            <a href="/recete">🧾 Reçete</a>
-            <a href="/expenses">📤 Masraflar</a>
-            <a href="/tables">🪑 Masa Yönetimi</a>
-            <hr>
-            <a href="/settings">⚙️ Ayarlar</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    {% include '_navbar.html' %}
     <script>
         function localDate(d) {
             d = d || new Date();
@@ -61,14 +42,6 @@
                 String(d.getMonth()+1).padStart(2,'0') + '-' +
                 String(d.getDate()).padStart(2,'0');
         }
-
-        function toggleNav() {
-            document.getElementById('navDropdown').classList.toggle('open');
-        }
-        document.addEventListener('click', function(e) {
-            const dd = document.getElementById('navDropdown');
-            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
-        });
     </script>
     <div class="container">
         <h1 style="margin-bottom:1.5rem;">📊 Raporlar</h1>
@@ -197,7 +170,7 @@
                 method: 'POST', headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({date})
             });
-            alert('Rapor yazıcıya gönderildi.');
+            showToast('Rapor yazıcıya gönderildi!', 'success');
         }
 
         let hourlyChartInstance = null;
@@ -239,7 +212,7 @@
         }
 
         function exportExcel() {
-            if (!currentReport) { alert('Önce rapor yükleyin.'); return; }
+            if (!currentReport) { showToast('Önce rapor yükleyin.', 'warn'); return; }
             const r = currentReport;
             let csv = '\uFEFF';
             csv += `Firinna POS Rapor\n`;
