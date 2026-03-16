@@ -543,6 +543,64 @@ loadGitStatus();
 loadAutoPullSetting();
 loadAutoPushSetting();
 loadGitToken();
+
+// ── GELİŞTİRİCİ TALEPLERİ ──────────────────────────────
+function loadRequests() {
+    const items = JSON.parse(localStorage.getItem('dev_requests') || '[]');
+    const list = document.getElementById('reqList');
+    if (!items.length) {
+        list.innerHTML = '<div style="color:#a0aec0;font-size:.82rem;padding:.75rem 0;">Henüz talep yok.</div>';
+        return;
+    }
+    list.innerHTML = items.map((r, i) => `
+        <div style="display:flex;align-items:flex-start;gap:.5rem;padding:.55rem .6rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:.4rem;">
+            <span style="flex:1;font-size:.83rem;line-height:1.5;color:#2d3748;">${r.text.replace(/</g,'&lt;')}</span>
+            <span style="font-size:.7rem;color:#a0aec0;white-space:nowrap;margin-top:.1rem;">${r.date}</span>
+            <button onclick="deleteRequest(${i})" style="border:none;background:none;cursor:pointer;color:#cbd5e0;font-size:.85rem;padding:0 .2rem;" title="Sil">✕</button>
+        </div>`).join('');
+}
+function addRequest() {
+    const inp = document.getElementById('reqInput');
+    const txt = inp.value.trim();
+    if (!txt) return;
+    const items = JSON.parse(localStorage.getItem('dev_requests') || '[]');
+    items.unshift({ text: txt, date: new Date().toLocaleDateString('tr-TR') });
+    localStorage.setItem('dev_requests', JSON.stringify(items));
+    inp.value = '';
+    loadRequests();
+}
+function deleteRequest(i) {
+    const items = JSON.parse(localStorage.getItem('dev_requests') || '[]');
+    items.splice(i, 1);
+    localStorage.setItem('dev_requests', JSON.stringify(items));
+    loadRequests();
+}
+function copyRequests() {
+    const items = JSON.parse(localStorage.getItem('dev_requests') || '[]');
+    if (!items.length) { toast('Talep yok', 'err'); return; }
+    const txt = items.map((r,i) => `${i+1}. [${r.date}] ${r.text}`).join('\n');
+    navigator.clipboard.writeText(txt).then(() => toast('Kopyalandı!', 'ok')).catch(() => toast('Kopyalanamadı', 'err'));
+}
+loadRequests();
 </script>
+
+<!-- GELİŞTİRİCİ TALEPLERİ -->
+<div style="margin-top:2rem;background:white;border-radius:14px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #e2e8f0;" id="devRequests">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;">
+        <div>
+            <h3 style="margin:0;font-size:.95rem;color:#1a202c;">💬 Geliştirici Talepleri</h3>
+            <p style="margin:.2rem 0 0;font-size:.78rem;color:#718096;">Özellik istekleri ve hata bildirimleri. Tarayıcıda saklanır.</p>
+        </div>
+        <button onclick="copyRequests()" style="padding:.38rem .8rem;background:#667eea;color:white;border:none;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;">📋 Kopyala</button>
+    </div>
+    <div style="display:flex;gap:.5rem;margin-bottom:.75rem;">
+        <input id="reqInput" type="text" placeholder="Özellik isteği veya hata bildirimi yaz..."
+            style="flex:1;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.85rem;font-family:inherit;"
+            onkeydown="if(event.key==='Enter')addRequest()">
+        <button onclick="addRequest()" style="padding:.5rem 1rem;background:#2d6a4f;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">Ekle</button>
+    </div>
+    <div id="reqList"></div>
+</div>
+
 </body>
 </html>

@@ -455,7 +455,7 @@ def api_create_order():
     existing = db.get_table_order(table_id)
     if existing:
         return jsonify({'id': existing['id']})
-    order_id = db.create_order(table_id)
+    order_id = db.create_order(table_id, data.get('created_at'))
     return jsonify({'id': order_id})
 
 @app.route('/api/orders/cleanup-empty', methods=['POST'])
@@ -813,7 +813,8 @@ def api_close_with_payment(order_id):
         data.get('payment_cash', 0),
         data.get('payment_card', 0),
         data.get('tip_amount', 0),
-        data.get('tip_method', 'cash')
+        data.get('tip_method', 'cash'),
+        data.get('closed_at')
     )
     db.deduct_stock_for_order(order_id)
     telegram_notify.check_low_stock_after_order(order_id)
@@ -848,11 +849,20 @@ def api_search_products():
     products = db.search_products(query)
     return jsonify(products)
 
+@app.route('/api/orders/<int:order_id>', methods=['GET'])
+def api_get_order(order_id):
+    order = db.get_table_order_by_id(order_id)
+    if not order:
+        return jsonify({'error': 'bulunamadı'}), 404
+    return jsonify(order)
+
 @app.route('/api/orders/history', methods=['GET'])
 def api_order_history():
-    date = request.args.get('date')
-    limit = int(request.args.get('limit', 50))
-    orders = db.get_closed_orders(date, limit)
+    date  = request.args.get('date')
+    start = request.args.get('start')
+    end   = request.args.get('end')
+    limit = int(request.args.get('limit', 200))
+    orders = db.get_closed_orders(date=date, start=start, end=end, limit=limit)
     return jsonify(orders)
 
 @app.route('/api/orders/<int:order_id>/reopen', methods=['POST'])

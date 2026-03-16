@@ -305,11 +305,14 @@ def get_table_order(table_id):
     conn.close()
     return order_dict
 
-def create_order(table_id):
+def create_order(table_id, created_at=None):
     """Yeni sipariş oluştur"""
     conn = get_db()
     c = conn.cursor()
-    c.execute('INSERT INTO orders (table_id) VALUES (?)', (table_id,))
+    if created_at:
+        c.execute('INSERT INTO orders (table_id, created_at) VALUES (?, ?)', (table_id, created_at))
+    else:
+        c.execute('INSERT INTO orders (table_id) VALUES (?)', (table_id,))
     order_id = c.lastrowid
     conn.commit()
     conn.close()
@@ -640,10 +643,11 @@ def set_order_discount(order_id, discount_type, discount_value, discount_reason=
     conn.commit()
     conn.close()
 
-def close_order_with_payment(order_id, payment_cash=0, payment_card=0, tip_amount=0, tip_method='cash'):
+def close_order_with_payment(order_id, payment_cash=0, payment_card=0, tip_amount=0, tip_method='cash', closed_at=None):
     """Sipariş kapat ve ödeme kaydet (#5, #10)"""
     conn = get_db()
-    closed_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    if not closed_at:
+        closed_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     conn.execute('''
         UPDATE orders 
         SET status = 'closed', 
@@ -709,10 +713,20 @@ def search_products(query):
     conn.close()
     return [dict(p) for p in products]
 
-def get_closed_orders(date=None, limit=50):
+def get_closed_orders(date=None, start=None, end=None, limit=200):
     """Kapalı siparişleri getir"""
     conn = get_db()
-    if date:
+    if start and end:
+        orders = conn.execute('''
+            SELECT o.*, t.name as table_name, z.name as zone_name
+            FROM orders o
+            JOIN tables t ON o.table_id = t.id
+            JOIN zones z ON t.zone_id = z.id
+            WHERE o.status = 'closed' AND DATE(o.closed_at) BETWEEN ? AND ?
+            ORDER BY o.closed_at DESC
+            LIMIT ?
+        ''', (start, end, limit)).fetchall()
+    elif date:
         orders = conn.execute('''
             SELECT o.*, t.name as table_name, z.name as zone_name
             FROM orders o
