@@ -138,5 +138,26 @@
     "done": true,
     "date": "2026-03-16",
     "cat": "özellik"
+  },
+  {
+    "id": 21,
+    "text": "Mutfak ekranı (KDS) — /kitchen, karanlık tema, 30s yenileme, urgent kırmızı, Hazırlandı butonu",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 22,
+    "text": "Günlük kapanış raporu — Kasa Ana sekmesinde otomatik, Telegram gönder butonu",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 23,
+    "text": "Masa transfer ve birleştirme — sipariş modalında ↔ Taşı ve ⊕ Birleştir",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
   }
 ]
