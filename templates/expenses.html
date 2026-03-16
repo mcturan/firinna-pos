@@ -176,7 +176,7 @@
             renderOzet(summary);
 
             const total = expenses.reduce((s, e) => s + e.amount, 0);
-            document.getElementById('totalAmount').textContent = total.toFixed(2) + ' ₺';
+            document.getElementById('totalAmount').textContent = fmtTL(total);
             document.getElementById('totalBar').style.display = expenses.length > 0 ? 'flex' : 'none';
         }
 
@@ -203,7 +203,7 @@
                     <td><strong>${e.category}</strong>${e.subcategory ? ' / <span style="color:#718096;">'+e.subcategory+'</span>' : ''}</td>
                     <td>${e.description}</td>
                     <td>${pm}</td>
-                    <td style="font-weight:700;color:#e53e3e;">${e.amount.toFixed(2)} ₺</td>
+                    <td style="font-weight:700;color:#e53e3e;">${fmtTL(e.amount)}</td>
                     <td>
                         <button style="background:none;border:none;cursor:pointer;" onclick="editExpense(${e.id})"
                             data-desc="${e.description}" data-amount="${e.amount}"
@@ -243,12 +243,12 @@
                 const subRows = data.items.map(i => `
                     <div class="cat-row">
                         <span>${i.subcategory || '—'} <span class="${i.payment_method==='card'?'badge-card':'badge-cash'}">${i.payment_method==='card'?'Kart':'Nakit'}</span></span>
-                        <span>${i.count} işlem · <strong>${i.total.toFixed(2)} ₺</strong></span>
+                        <span>${i.count} işlem · <strong>${fmtTL(i.total)}</strong></span>
                     </div>`).join('');
                 html += `<div class="cat-card">
                     <h4>
                         <span>${cat}</span>
-                        <span class="cat-total">${data.total.toFixed(2)} ₺ <span style="color:#a0aec0;font-weight:400;font-size:.82rem;">(${pct}%)</span></span>
+                        <span class="cat-total">${fmtTL(data.total)} <span style="color:#a0aec0;font-weight:400;font-size:.82rem;">(${pct}%)</span></span>
                     </h4>
                     <div style="height:6px;background:#e2e8f0;border-radius:3px;margin-bottom:.75rem;">
                         <div style="height:100%;width:${barPct}%;background:#e53e3e;border-radius:3px;"></div>

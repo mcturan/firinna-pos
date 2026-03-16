@@ -187,7 +187,7 @@ function renderCard(p) {
         <div class="card-header">
             <h4>🍽️ ${p.name}</h4>
             <div class="meta">
-                <span>${p.price.toFixed(2)} ₺</span>
+                <span>${fmtTL(p.price)}</span>
                 <span class="${hasRec?'badge-ok':'badge-no'}">${hasRec?'✅ '+recs.length+' malzeme':'⚠️ Reçete Yok'}</span>
             </div>
         </div>
@@ -288,10 +288,10 @@ function renderKarlilik() {
     const totProf = totRev - totCost;
     const avgMar  = rec.length ? rec.reduce((s,r)=>s+r.margin,0)/rec.length : 0;
     document.getElementById('karTotals').innerHTML = [
-        ['Toplam Ciro',    totRev.toFixed(2) + ' ₺',  '#2d6a4f'],
-        ['Toplam Maliyet', totCost.toFixed(2) + ' ₺', '#e53e3e'],
-        ['Net Kâr',        totProf.toFixed(2) + ' ₺', totProf>=0?'#2d6a4f':'#e53e3e'],
-        ['Ort. Marj',      avgMar.toFixed(1) + '%',    avgMar>=40?'#2d6a4f':avgMar>=20?'#d97706':'#e53e3e'],
+        ['Toplam Ciro',    fmtTL(totRev),  '#2d6a4f'],
+        ['Toplam Maliyet', fmtTL(totCost), '#e53e3e'],
+        ['Net Kâr',        fmtTL(totProf), totProf>=0?'#2d6a4f':'#e53e3e'],
+        ['Ort. Marj',      fmtN(avgMar,1) + '%',    avgMar>=40?'#2d6a4f':avgMar>=20?'#d97706':'#e53e3e'],
     ].map(([lbl,val,clr]) => `<div style="background:white;border-radius:10px;padding:.85rem 1rem;
         box-shadow:0 2px 6px rgba(0,0,0,.07);border:1px solid #e2e8f0;text-align:center;">
         <div style="font-size:1.25rem;font-weight:800;color:${clr};">${val}</div>
@@ -323,12 +323,12 @@ function renderKarlilik() {
             return `<tr>
                 <td><strong>${r.name}</strong>${noRec ? ' <span style="font-size:.72rem;background:#fef3c7;color:#92400e;padding:.1rem .35rem;border-radius:20px;">Reçetesiz</span>' : ''}</td>
                 <td style="text-align:right;">${r.sold_qty}</td>
-                <td style="text-align:right;">${r.avg_price.toFixed(2)} ₺</td>
-                <td style="text-align:right;">${noRec ? '<span class="kar-na">—</span>' : r.unit_cost.toFixed(2) + ' ₺'}</td>
-                <td style="text-align:right;font-weight:600;">${r.revenue.toFixed(2)} ₺</td>
-                <td style="text-align:right;" class="${profCls}">${noRec ? '—' : (r.profit >= 0 ? '+' : '') + r.profit.toFixed(2) + ' ₺'}</td>
+                <td style="text-align:right;">${fmtTL(r.avg_price)}</td>
+                <td style="text-align:right;">${noRec ? '<span class="kar-na">—</span>' : fmtTL(r.unit_cost)}</td>
+                <td style="text-align:right;font-weight:600;">${fmtTL(r.revenue)}</td>
+                <td style="text-align:right;" class="${profCls}">${noRec ? '—' : (r.profit >= 0 ? '+' : '') + fmtTL(r.profit)}</td>
                 <td style="text-align:right;min-width:80px;">
-                    ${noRec ? '<span class="kar-na">—</span>' : `<span class="${profCls}">${r.margin.toFixed(1)}%</span>
+                    ${noRec ? '<span class="kar-na">—</span>' : `<span class="${profCls}">${fmtN(r.margin,1)}%</span>
                     <div class="margin-bar"><div class="margin-fill" style="width:${barW}%;background:${barC};"></div></div>`}
                 </td>
             </tr>`;

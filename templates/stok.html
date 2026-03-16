@@ -175,13 +175,13 @@
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;">
                             <span style="font-weight:600;font-size:.9rem;">${s.name}</span>
                             <span style="font-weight:700;font-size:.95rem;color:${low?'#e53e3e':'#2d6a4f'};">
-                                ${qty.toFixed(2)} ${s.unit} ${low?'⚠️':''}
+                                ${fmtN(qty)} ${s.unit} ${low?'⚠️':''}
                             </span>
                         </div>
                         <div style="height:6px;background:#e2e8f0;border-radius:3px;">
                             <div style="height:100%;width:${pct}%;background:${low?'#fc8181':'#48bb78'};border-radius:3px;transition:width .4s;"></div>
                         </div>
-                        ${s.min_quantity > 0 ? `<div style="font-size:.72rem;color:#a0aec0;margin-top:.2rem;">Min: ${s.min_quantity} ${s.unit}</div>` : ''}
+                        ${s.min_quantity > 0 ? `<div style="font-size:.72rem;color:#a0aec0;margin-top:.2rem;">Min: ${fmtN(s.min_quantity)} ${s.unit}</div>` : ''}
                     </div>`;
                 });
                 html += '</div>';
@@ -278,9 +278,9 @@
                         <td><strong>${s.name}</strong></td>
                         <td><span style="color:#718096;font-size:.85rem;">${s.category}</span></td>
                         <td>${s.unit}</td>
-                        <td class="${qtyClass}">${qty.toFixed(2)} ${s.unit} ${qtyIcon}${isNeg?'<br><small style="color:#805ad5;font-weight:400;">Hareket ekle: +'+(Math.abs(qty).toFixed(2))+'</small>':''}</td>
-                        <td style="color:#a0aec0;">${s.min_quantity} ${s.unit}</td>
-                        <td style="color:#718096;">${s.cost_per_unit ? s.cost_per_unit.toFixed(2) + ' ₺' : '—'}</td>
+                        <td class="${qtyClass}">${fmtN(qty)} ${s.unit} ${qtyIcon}${isNeg?'<br><small style="color:#805ad5;font-weight:400;">Hareket ekle: +'+fmtN(Math.abs(qty))+'</small>':''}</td>
+                        <td style="color:#a0aec0;">${fmtN(s.min_quantity)} ${s.unit}</td>
+                        <td style="color:#718096;">${s.cost_per_unit ? fmtTL(s.cost_per_unit) : '—'}</td>
                         <td style="white-space:nowrap;">
                             <button class="btn ${isNeg?'btn-primary':'btn-secondary'}" style="padding:.35rem .75rem;font-size:.85rem;" onclick="openMoveModal(${s.id},'${s.name}','${s.unit}')">${isNeg?'📥 Düzelt':'📥 Hareket'}</button>
                             <button class="btn btn-secondary" style="padding:.35rem .75rem;font-size:.85rem;" onclick="filterByItem(${s.id},'${s.name}')" title="Hareketleri gör">📋</button>
@@ -353,8 +353,8 @@
                         <td style="color:#718096;font-size:.82rem;">${dt}</td>
                         <td><strong style="cursor:pointer;color:#2b6cb0;" onclick="filterByItem(${m.stock_item_id},'${m.item_name}')" title="${m.item_name} hareketlerini filtrele">${m.item_name}</strong></td>
                         <td><span class="badge ${typeBadge[m.movement_type]}">${typeLabel[m.movement_type]}</span></td>
-                        <td>${m.quantity} ${m.unit}</td>
-                        <td>${m.cost ? m.cost.toFixed(2) + ' ₺' : '—'}</td>
+                        <td>${fmtN(m.quantity)} ${m.unit}</td>
+                        <td>${m.cost ? fmtTL(m.cost) : '—'}</td>
                         <td style="color:#4a5568;">${m.description || m.reason || '—'}</td>
                         <td>${orderNo}</td>
                         <td>${canEdit ? `<button style="background:none;border:none;cursor:pointer;" onclick="editMovement(${m.id},${m.quantity},${m.cost||0})">✏️</button><button style="background:none;border:none;cursor:pointer;" onclick="deleteMovement(${m.id})">🗑️</button>` : ''}</td>

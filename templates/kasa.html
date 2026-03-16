@@ -96,9 +96,14 @@
         <div id="dailyCloseCard" style="background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:1.5rem;display:none;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;">
                 <h3 style="margin:0;font-size:.95rem;color:#2d3748;">📋 Günlük Kapanış Raporu</h3>
-                <div style="display:flex;gap:.5rem;">
+                <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
                     <button onclick="loadDailyClose()" style="padding:.38rem .8rem;background:#e2e8f0;color:#2d3748;border:none;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;">🔄 Yenile</button>
                     <button onclick="sendTelegramClose()" style="padding:.38rem .8rem;background:#2d6a4f;color:white;border:none;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;">✈️ Telegram</button>
+                    <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:#4a5568;cursor:pointer;">
+                        <input type="checkbox" id="tgAutoEnabled" onchange="saveTgAutoSettings()" style="cursor:pointer;">
+                        Otomatik
+                    </label>
+                    <input type="time" id="tgAutoTime" onchange="saveTgAutoSettings()" style="padding:.3rem .5rem;border:1px solid #e2e8f0;border-radius:6px;font-size:.8rem;font-family:inherit;" title="Günlük gönderim saati">
                 </div>
             </div>
             <div id="dailyCloseReport" style="color:#a0aec0;font-size:.85rem;">Yükleniyor...</div>
@@ -222,7 +227,7 @@
                         <td>${m.description || '—'}</td>
                         <td><span class="cat-badge">${catLabelMap[m.category]||m.category}</span></td>
                         ${isAna ? `<td><span class="cat-badge">${methodLabelMap[m.payment_method]||m.payment_method}</span></td>` : ''}
-                        <td style="font-weight:700;color:${m.type==='in'?'#2d6a4f':'#e53e3e'};text-align:right;">${m.type==='in'?'+':'−'}${Number(m.amount).toFixed(2)} ₺</td>
+                        <td style="font-weight:700;color:${m.type==='in'?'#2d6a4f':'#e53e3e'};text-align:right;">${m.type==='in'?'+':'−'}${fmtTL(m.amount)}</td>
                         <td style="white-space:nowrap;">
                             ${m.related_order_id ? '' : `
                                 <button class="btn-del" onclick="editTx(${m.id},'${(m.description||'').replace(/'/g,"\\'")}',${m.amount},'${m.category}','${m.payment_method}','${m.date}','${(m.created_at||'').slice(0,16)}')" title="Düzenle" style="margin-right:.2rem;">✏️</button>
@@ -363,7 +368,7 @@
             }
         }
 
-        function fmt(n) { return (n||0).toFixed(2) + ' ₺'; }
+        function fmt(n) { return fmtTL(n); }
         const catLabel    = { satis:'Satış', bahsis:'Bahşiş', masraf:'Masraf', stok_alim:'Stok Alım', sarf:'Sarf', duzeltme:'Düzeltme', in_transfer:'Nakit', Genel:'Genel' };
         const methodLabel = { cash:'Nakit', card:'Kart' };
 
@@ -556,7 +561,7 @@
             const date = (dateInp && currentPeriod === 'daily') ? (dateInp.value || new Date().toISOString().slice(0,10)) : new Date().toISOString().slice(0,10);
             const r = await fetch('/api/reports/daily-close?date=' + date).then(res => res.json());
             const el = document.getElementById('dailyCloseReport');
-            const fmt2 = n => Number(n||0).toFixed(2) + ' ₺';
+            const fmt2 = n => fmtTL(n);
             let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.6rem;margin-bottom:.75rem;">';
             html += `<div class="sum-card"><div class="sum-val green">${fmt2(r.total_sales)}</div><div class="sum-label">Satış</div></div>`;
             html += `<div class="sum-card"><div class="sum-val">${fmt2(r.total_cash)}</div><div class="sum-label">Nakit</div></div>`;
@@ -568,7 +573,7 @@
             html += '</div>';
             if ((r.top_products||[]).length) {
                 html += '<div style="font-size:.8rem;font-weight:700;color:#4a5568;margin-bottom:.35rem;">🏆 En Çok Satan Ürünler</div>';
-                html += '<div style="font-size:.82rem;">' + r.top_products.slice(0,5).map((p,i) => `<div style="padding:.22rem 0;border-bottom:1px solid #f0f0f0;">${i+1}. ${p.name} <span style="color:#a0aec0;">× ${p.quantity}</span> <span style="float:right;color:#2d6a4f;font-weight:600;">${Number(p.total||0).toFixed(2)} ₺</span></div>`).join('') + '</div>';
+                html += '<div style="font-size:.82rem;">' + r.top_products.slice(0,5).map((p,i) => `<div style="padding:.22rem 0;border-bottom:1px solid #f0f0f0;">${i+1}. ${p.name} <span style="color:#a0aec0;">× ${p.quantity}</span> <span style="float:right;color:#2d6a4f;font-weight:600;">${fmtTL(p.total||0)}</span></div>`).join('') + '</div>';
             }
             if (r.open_orders_count > 0) {
                 html += `<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:.6rem .85rem;margin-top:.6rem;font-size:.82rem;color:#92400e;">⚠️ ${r.open_orders_count} masa hâlâ açık: ${r.open_orders.map(o => o.table_name).join(', ')}</div>`;
@@ -585,6 +590,33 @@
             }).then(res => res.json());
             showToast(r.success ? '✅ Rapor Telegram\'a gönderildi!' : '❌ Gönderim başarısız. Bot token/chat ID kontrol et.', r.success ? 'success' : 'error', 4000);
         }
+
+        async function loadTgAutoSettings() {
+            try {
+                const [en, t] = await Promise.all([
+                    fetch('/api/settings/telegram_daily_close_enabled').then(r=>r.json()),
+                    fetch('/api/settings/telegram_daily_close_time').then(r=>r.json())
+                ]);
+                document.getElementById('tgAutoEnabled').checked = (en.value === '1');
+                document.getElementById('tgAutoTime').value = t.value || '';
+            } catch(e) {}
+        }
+
+        async function saveTgAutoSettings() {
+            const enabled = document.getElementById('tgAutoEnabled').checked ? '1' : '0';
+            const time = document.getElementById('tgAutoTime').value || '';
+            await Promise.all([
+                fetch('/api/settings/telegram_daily_close_enabled', {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:enabled})}),
+                fetch('/api/settings/telegram_daily_close_time', {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:time})})
+            ]);
+            showToast(enabled==='1' && time ? `✅ Telegram otomatik gönderim: ${time}` : '⏸ Telegram otomatik gönderim kapatıldı.', 'info');
+        }
+
+        // Ana sekme yüklendiğinde Telegram ayarlarını da yükle
+        const _origLoadKasa = typeof loadKasa !== 'undefined' ? loadKasa : null;
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTgAutoSettings();
+        });
     </script>
 
     <!-- Edit Transaction Modal -->

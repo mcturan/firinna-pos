@@ -7,34 +7,46 @@
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <style>
         * { box-sizing:border-box; margin:0; padding:0; }
-        body { background:#111827; color:#f9fafb; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; min-height:100vh; }
-        .kds-header { display:flex; justify-content:space-between; align-items:center; padding:.85rem 1.5rem; background:#1f2937; border-bottom:2px solid #374151; }
-        .kds-title { font-size:1.25rem; font-weight:800; color:#f87171; letter-spacing:.3px; }
-        .kds-meta { display:flex; gap:1.25rem; align-items:center; font-size:.82rem; color:#9ca3af; }
-        .kds-meta a { color:#6b7280; text-decoration:none; }
-        .kds-meta a:hover { color:#d1d5db; }
-        .kds-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:1rem; padding:1.25rem; align-items:start; }
-        .kds-card { background:#1f2937; border-radius:14px; border:2px solid #374151; padding:1.1rem; display:flex; flex-direction:column; }
-        .kds-card.urgent-card { border-color:#ef4444; }
+        body { background:#f0fdf4; color:#1a202c; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; min-height:100vh; }
+        .kds-header { display:flex; justify-content:space-between; align-items:center; padding:.85rem 1.5rem; background:#2d6a4f; border-bottom:3px solid #1b4332; box-shadow:0 2px 8px rgba(45,106,79,.25); }
+        .kds-title { font-size:1.2rem; font-weight:800; color:#fff; letter-spacing:.2px; }
+        .kds-meta { display:flex; gap:1.25rem; align-items:center; font-size:.82rem; color:#d1fae5; }
+        .kds-meta a { color:#a7f3d0; text-decoration:none; font-weight:600; padding:.25rem .6rem; background:rgba(255,255,255,.15); border-radius:8px; }
+        .kds-meta a:hover { background:rgba(255,255,255,.25); }
+        .kds-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1.1rem; padding:1.25rem; align-items:start; }
+        .kds-card { background:#fff; border-radius:14px; border:2px solid #d1fae5; padding:1.1rem; display:flex; flex-direction:column; box-shadow:0 2px 8px rgba(45,106,79,.08); }
+        .kds-card.urgent-card { border-color:#fca5a5; background:#fff5f5; box-shadow:0 2px 12px rgba(239,68,68,.15); }
         .kds-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:.85rem; gap:.5rem; }
-        .kds-table { font-size:1.05rem; font-weight:800; color:#f87171; }
-        .kds-elapsed { font-size:.78rem; font-weight:700; padding:.22rem .6rem; border-radius:20px; background:#374151; color:#9ca3af; white-space:nowrap; }
-        .kds-elapsed.urgent { background:#991b1b; color:#fca5a5; }
+        .kds-table { font-size:1.05rem; font-weight:800; color:#2d6a4f; }
+        .kds-card.urgent-card .kds-table { color:#dc2626; }
+        .kds-elapsed { font-size:.78rem; font-weight:700; padding:.22rem .6rem; border-radius:20px; background:#d1fae5; color:#065f46; white-space:nowrap; }
+        .kds-elapsed.urgent { background:#fee2e2; color:#991b1b; }
         .kds-items { flex:1; }
-        .kds-item { display:flex; gap:.5rem; align-items:flex-start; padding:.45rem 0; border-bottom:1px solid #374151; }
+        .kds-item { display:flex; gap:.5rem; align-items:flex-start; padding:.45rem 0; border-bottom:1px solid #f0fdf4; }
         .kds-item:last-child { border-bottom:none; }
-        .kds-qty { font-weight:800; color:#fcd34d; min-width:26px; font-size:.95rem; }
-        .kds-name { font-size:.92rem; color:#e5e7eb; line-height:1.3; }
-        .kds-note { font-size:.74rem; color:#f87171; font-style:italic; margin-top:.15rem; }
-        .kds-ready-btn { margin-top:1rem; width:100%; padding:.8rem; background:#065f46; color:white; border:none; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer; transition:background .15s; font-family:inherit; }
-        .kds-ready-btn:hover { background:#064e3b; }
-        .kds-empty { grid-column:1/-1; text-align:center; padding:5rem 2rem; color:#4b5563; font-size:1.1rem; }
+        .kds-qty { font-weight:800; color:#2d6a4f; min-width:26px; font-size:.95rem; }
+        .kds-card.urgent-card .kds-qty { color:#dc2626; }
+        .kds-name { font-size:.92rem; color:#2d3748; line-height:1.3; font-weight:600; }
+        .kds-note { font-size:.74rem; color:#e53e3e; font-style:italic; margin-top:.15rem; }
+        .kds-ready-btn { margin-top:1rem; width:100%; padding:.8rem; background:#2d6a4f; color:white; border:none; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer; transition:background .15s; font-family:inherit; }
+        .kds-ready-btn:hover { background:#1b4332; }
+        .kds-card.urgent-card .kds-ready-btn { background:#dc2626; }
+        .kds-card.urgent-card .kds-ready-btn:hover { background:#b91c1c; }
+        .kds-empty { grid-column:1/-1; text-align:center; padding:5rem 2rem; color:#a0aec0; font-size:1.1rem; }
         .kds-empty span { display:block; font-size:3rem; margin-bottom:1rem; }
+        @media(max-width:640px) {
+            .kds-grid { grid-template-columns:1fr; padding:.75rem; gap:.75rem; }
+            .kds-header { padding:.7rem 1rem; }
+            .kds-title { font-size:1rem; }
+        }
     </style>
 </head>
 <body>
 <div class="kds-header">
-    <div class="kds-title">👨‍🍳 Mutfak Ekranı</div>
+    <div style="display:flex;align-items:center;gap:.75rem;">
+        <img id="kdsLogo" src="" alt="" style="display:none;max-height:36px;max-width:80px;object-fit:contain;border-radius:6px;background:rgba(255,255,255,.15);padding:2px;" onerror="this.style.display='none'">
+        <div class="kds-title" id="kdsTitle">👨‍🍳 Mutfak Ekranı</div>
+    </div>
     <div class="kds-meta">
         <span id="orderCount"></span>
         <span id="lastRefresh"></span>
@@ -112,7 +124,24 @@ function updateClock() {
     document.getElementById('clockEl').textContent = new Date().toLocaleTimeString('tr-TR');
 }
 
+async function loadKitchenHeader() {
+    try {
+        const [logoData, nameData] = await Promise.all([
+            fetch('/api/settings/logo').then(r=>r.json()).catch(()=>({})),
+            fetch('/api/settings/restaurant_name').then(r=>r.json()).catch(()=>({}))
+        ]);
+        const name = nameData.value || 'Mutfak';
+        document.getElementById('kdsTitle').textContent = '👨\u200d🍳 ' + name + ' — Mutfak';
+        if (logoData.url) {
+            const img = document.getElementById('kdsLogo');
+            img.src = logoData.url;
+            img.style.display = 'block';
+        }
+    } catch(e) {}
+}
+
 loadKitchen();
+loadKitchenHeader();
 setInterval(loadKitchen, 30000);
 setInterval(updateElapsed, 5000);
 setInterval(updateClock, 1000);

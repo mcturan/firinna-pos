@@ -919,6 +919,11 @@ def api_toggle_favorite(product_id):
     new_value = db.toggle_product_favorite(product_id)
     return jsonify({'success': True, 'is_favorite': new_value})
 
+@app.route('/api/products/<int:product_id>/availability', methods=['PATCH'])
+def api_toggle_availability(product_id):
+    new_value = db.toggle_product_availability(product_id)
+    return jsonify({'success': True, 'is_available': new_value})
+
 @app.route('/api/products/search', methods=['GET'])
 def api_search_products():
     query = request.args.get('q', '')
@@ -1765,6 +1770,59 @@ def start_auto_pull_smart():
             _auto_pull_timer.cancel()
         _auto_pull_time_running = False
 
+_telegram_auto_send_running = False
+_telegram_auto_send_thread = None
+
+def start_telegram_auto_send():
+    """Her gün belirli saatte günlük kapanış raporunu Telegram'a gönder"""
+    global _telegram_auto_send_running, _telegram_auto_send_thread
+    _telegram_auto_send_running = True
+
+    def loop():
+        import time as _time
+        last_sent = None
+        while _telegram_auto_send_running:
+            try:
+                enabled = db.get_setting('telegram_daily_close_enabled', '0')
+                t = db.get_setting('telegram_daily_close_time', '')
+                if enabled == '1' and t:
+                    now = datetime.now()
+                    h, m = map(int, t.split(':'))
+                    today = now.strftime('%Y-%m-%d')
+                    if now.hour == h and now.minute == m and last_sent != today:
+                        report = db.get_daily_close_report(today)
+                        restaurant = db.get_setting('restaurant_name', 'Fırınna')
+                        top = report.get('top_products', [])[:5]
+                        open_warn = ''
+                        if report.get('open_orders_count', 0) > 0:
+                            open_warn = f"\n⚠️ {report['open_orders_count']} masa hâlâ açık!"
+                        top_txt = '\n'.join([f"  {i+1}. {p['name']} — {p['quantity']} adet" for i, p in enumerate(top)]) if top else '  —'
+                        text = (
+                            f"📋 <b>{restaurant} — Günlük Kapanış</b> ({today})\n\n"
+                            f"💰 Toplam Satış: <b>{report.get('total_sales',0):.2f} ₺</b>\n"
+                            f"💵 Nakit: {report.get('total_cash',0):.2f} ₺\n"
+                            f"💳 Kart: {report.get('total_card',0):.2f} ₺\n"
+                            f"🧾 Sipariş Sayısı: {report.get('order_count',0)}\n"
+                            f"📦 En Çok Satanlar:\n{top_txt}"
+                            f"{open_warn}"
+                        )
+                        try:
+                            import telegram_notify
+                            telegram_notify.send_message(text)
+                        except Exception as te:
+                            print(f"Telegram auto-send hatasi: {te}")
+                        last_sent = today
+                        _time.sleep(70)
+                        continue
+            except Exception as e:
+                import traceback
+                print(f"Telegram auto-send loop hatasi: {e}")
+                traceback.print_exc()
+            _time.sleep(30)
+
+    _telegram_auto_send_thread = threading.Thread(target=loop, daemon=True)
+    _telegram_auto_send_thread.start()
+
 def start_auto_pull_at_time(pull_time_str):
     """Her gün belirli saatte pull yap"""
     global _auto_pull_time_running, _auto_pull_time_thread
@@ -2113,4 +2171,13 @@ if __name__ == '__main__':
         pass
     # Auto-push başlat
     start_auto_push()
+    # Telegram günlük otomatik gönderim
+    try:
+        db.migrate_is_available()
+    except:
+        pass
+    try:
+        start_telegram_auto_send()
+    except:
+        pass
     app.run(host='0.0.0.0', port=5000, debug=True)

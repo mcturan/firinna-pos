@@ -11,8 +11,8 @@
     {% include '_navbar.html' %}
 
     <!-- Logo Watermark -->
-    <div id="logoWatermark" style="display:none;position:fixed;bottom:2.5rem;right:2rem;z-index:0;pointer-events:none;opacity:.07;">
-        <img id="logoWatermarkImg" src="" alt="" style="max-width:160px;max-height:80px;object-fit:contain;">
+    <div id="logoWatermark" style="display:none;position:fixed;bottom:1.5rem;left:1.5rem;z-index:1;pointer-events:none;opacity:.13;">
+        <img id="logoWatermarkImg" src="" alt="" style="max-width:120px;max-height:60px;object-fit:contain;" onerror="document.getElementById('logoWatermark').style.display='none'">
     </div>
 
     <div class="container">
@@ -800,7 +800,7 @@
                 return `
                     <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
                         <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
-                        ${hasOrder ? `<div class="table-total">₺${Number(table.order_total||0).toFixed(2)}</div>` : ''}
+                        ${hasOrder ? `<div class="table-total">${fmtTL(table.order_total||0)}</div>` : ''}
                         <div class="table-status">
                             ${hasOrder ? 'Dolu' : 'Boş'}
                             ${dur ? `<span class="dur-badge ${dur.cls}" style="margin-left:.4rem;">${dur.text}</span>` : ''}
@@ -911,16 +911,18 @@
                 return;
             }
             
-            productsGrid.innerHTML = products.map(product => `
-                <div class="product-card" onclick="addProduct(${product.id}, '${product.name}', ${product.price})">
-                    <div style="position: absolute; top: 0.5rem; right: 0.5rem; font-size: 1.5rem; cursor: pointer;" 
-                         onclick="toggleFavorite(${product.id}, event)">
+            productsGrid.innerHTML = products.map(product => {
+                const avail = product.is_available !== 0;
+                return `
+                <div class="product-card${avail ? '' : ' product-soldout'}" ${avail ? `onclick="addProduct(${product.id}, '${product.name}', ${product.price})"` : 'title="Tükendi"'}>
+                    <div style="position: absolute; top: 0.5rem; right: 0.5rem; font-size: 1.5rem; cursor: pointer;"
+                         onclick="${avail ? `toggleFavorite(${product.id}, event)` : 'event.stopPropagation()'}">
                         ${product.is_favorite ? '⭐' : '☆'}
                     </div>
-                    <div class="product-name">${product.name}</div>
-                    <div class="product-price">${product.price.toFixed(2)} TL</div>
-                </div>
-            `).join('');
+                    <div class="product-name">${product.name}${avail ? '' : '<br><span style="font-size:.65rem;color:#ef4444;font-weight:700;letter-spacing:.3px;">TÜKENDI</span>'}</div>
+                    <div class="product-price">${fmtTL(product.price)}</div>
+                </div>`;
+            }).join('');
         }
 
         async function searchProducts(query) {
@@ -1129,7 +1131,7 @@
                             padding:.5rem .75rem;background:${e.type==='cash'?'#f0fdf4':'#eff6ff'};
                             border-radius:8px;margin-bottom:.4rem;">
                     <span style="font-size:1rem;">${e.type==='cash'?'💵 Nakit':'💳 Kart'}</span>
-                    <span style="font-weight:700;font-size:1rem;">${e.amount.toFixed(2)} ₺</span>
+                    <span style="font-weight:700;font-size:1rem;">${fmtTL(e.amount)}</span>
                     <button onclick="removePayEntry(${i})"
                         style="border:none;background:none;color:#e53e3e;font-size:1.1rem;cursor:pointer;padding:0 .25rem;">✕</button>
                 </div>`).join('');
@@ -1144,7 +1146,7 @@
         function updatePayRemaining() {
             const rem = getRemainingAmount();
             const el  = document.getElementById('payRemainingDisplay');
-            el.textContent = rem.toFixed(2) + ' ₺';
+            el.textContent = fmtTL(rem);
             el.style.color = rem > 0.01 ? '#e53e3e' : '#2d6a4f';
             // Kalan kadar tutar kutusuna yaz
             if (rem > 0.01) {
@@ -1161,7 +1163,7 @@
             document.getElementById('payEntries').innerHTML = '';
             document.getElementById('payEntryAmount').value = '';
             document.getElementById('tipAmount').value = '0';
-            const total = currentOrder.total.toFixed(2) + ' ₺';
+            const total = fmtTL(currentOrder.total);
             document.getElementById('paymentTotal').textContent  = total;
             document.getElementById('payTotalBig').textContent   = total;
             document.getElementById('payGrandTotal').textContent = total;
@@ -1171,7 +1173,7 @@
                 list.innerHTML = currentOrder.items.map(i =>
                     `<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid var(--border);">
                         <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.quantity}x ${i.product_name||i.name||''}</span>
-                        <span style="font-weight:600;flex-shrink:0;margin-left:.5rem;">${i.is_complimentary ? 'İkram' : (i.quantity * (i.price||0)).toFixed(2) + ' ₺'}</span>
+                        <span style="font-weight:600;flex-shrink:0;margin-left:.5rem;">${i.is_complimentary ? 'İkram' : fmtTL(i.quantity * (i.price||0))}</span>
                     </div>`
                 ).join('');
             }
@@ -1184,14 +1186,14 @@
         function updateTipDisplay() {
             const tip   = parseFloat(document.getElementById('tipAmount').value) || 0;
             const total = currentOrder ? currentOrder.total : 0;
-            document.getElementById('payTipDisplay').textContent   = tip.toFixed(2) + ' ₺';
-            document.getElementById('payGrandTotal').textContent   = (total + tip).toFixed(2) + ' ₺';
+            document.getElementById('payTipDisplay').textContent   = fmtTL(tip);
+            document.getElementById('payGrandTotal').textContent   = fmtTL(total + tip);
             document.getElementById('payTipRow').style.display     = tip > 0 ? 'flex' : 'none';
         }
 
         function openQuickPay() {
             const total = currentOrder ? currentOrder.total : 0;
-            document.getElementById('quickPayAmount').textContent = total.toFixed(2) + ' ₺';
+            document.getElementById('quickPayAmount').textContent = fmtTL(total);
             document.getElementById('quickPayModal').style.display = 'flex';
         }
         function closeQuickPay() {
@@ -1247,7 +1249,7 @@
         async function completePayment() {
             const remaining = getRemainingAmount();
             if (remaining > 0.01) {
-                showToast(`Henüz ${remaining.toFixed(2)} ₺ ödenmedi!`, 'warn');
+                showToast(`Henüz ${fmtTL(remaining)} ödenmedi!`, 'warn');
                 return;
             }
             let tip = parseFloat(document.getElementById('tipAmount').value) || 0;
@@ -1256,7 +1258,7 @@
             // Fazla ödeme → bahşiş
             if (remaining < -0.01) {
                 const extra = Math.abs(remaining);
-                if (confirm(`${extra.toFixed(2)} ₺ fazla ödendi. Bahşiş olarak eklensin mi?`)) {
+                if (confirm(`${fmtTL(extra)} fazla ödendi. Bahşiş olarak eklensin mi?`)) {
                     tip += extra;
                     // Son girişi düzelt
                     const last = payEntries[payEntries.length - 1];
@@ -1297,8 +1299,8 @@
                 body: JSON.stringify({num_people: numPeople})
             }).then(r => r.json());
             
-            document.getElementById('splitResult').textContent = 
-                `Kişi başı: ${response.per_person.toFixed(2)} TL`;
+            document.getElementById('splitResult').textContent =
+                `Kişi başı: ${fmtTL(response.per_person)}`;
         }
 
         function updateOrderSummary() {
@@ -1334,15 +1336,15 @@
                         ${item.kitchen_notes ? `<div style="font-size: 0.85rem; color: #718096; margin-top: 0.25rem;">📝 ${item.kitchen_notes}</div>` : ''}
                     </div>
                     <div class="order-item-price">
-                        ${itemTotal.toFixed(2)} TL
+                        ${fmtTL(itemTotal)}
                         <button class="btn-delete" onclick="openEditItem(${item.id}, '${item.product_name || 'Özel Ürün'}')" style="background: #667eea;">✏️</button>
                         <button class="btn-delete" onclick="deleteItem(${item.id})">🗑️</button>
                     </div>
                 </div>
             `}).join('');
-            
-            orderSubtotal.textContent = subtotal.toFixed(2) + ' TL';
-            orderTotal.textContent = currentOrder.total.toFixed(2) + ' TL';
+
+            orderSubtotal.textContent = fmtTL(subtotal);
+            orderTotal.textContent = fmtTL(currentOrder.total);
             
             if (currentOrder.discount_value && currentOrder.discount_value > 0) {
                 const discountText = currentOrder.discount_type === 'percent' 
@@ -1419,10 +1421,10 @@
             const tip     = _histOrders.reduce((s,o) => s + (o.tip_amount||0), 0);
             summary.innerHTML = `
                 <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:700;color:#065f46;">${_histOrders.length} sipariş</div>
-                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:700;color:#065f46;">Toplam: ${total.toFixed(2)} ₺</div>
-                ${cash > 0 ? `<div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#78350f;">Nakit: ${cash.toFixed(2)} ₺</div>` : ''}
-                ${card > 0 ? `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#1e40af;">Kart: ${card.toFixed(2)} ₺</div>` : ''}
-                ${tip  > 0 ? `<div style="background:#fdf4ff;border:1px solid #e9d5ff;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#6b21a8;">Bahşiş: ${tip.toFixed(2)} ₺</div>` : ''}
+                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:700;color:#065f46;">Toplam: ${fmtTL(total)}</div>
+                ${cash > 0 ? `<div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#78350f;">Nakit: ${fmtTL(cash)}</div>` : ''}
+                ${card > 0 ? `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#1e40af;">Kart: ${fmtTL(card)}</div>` : ''}
+                ${tip  > 0 ? `<div style="background:#fdf4ff;border:1px solid #e9d5ff;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#6b21a8;">Bahşiş: ${fmtTL(tip)}</div>` : ''}
             `;
             if (_histOrders.length === 0) {
                 list.innerHTML = '<p class="no-data">Sipariş bulunamadı.</p>';
@@ -1442,7 +1444,7 @@
                             ${order.discount_value ? `<div style="font-size:.73rem;color:#f56565;margin-top:.1rem;">İndirim: ${order.discount_value} ₺</div>` : ''}
                         </div>
                         <div style="text-align:right;flex-shrink:0;">
-                            <div style="font-size:.95rem;font-weight:700;color:#2d6a4f;">${Number(order.total||0).toFixed(2)} ₺</div>
+                            <div style="font-size:.95rem;font-weight:700;color:#2d6a4f;">${fmtTL(order.total||0)}</div>
                             <div style="display:flex;gap:.25rem;margin-top:.35rem;justify-content:flex-end;">
                                 ${isToday
                                     ? `<button onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.28rem .55rem;background:#e2e8f0;color:#2d3748;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;">✏️</button>`
@@ -1501,7 +1503,7 @@
                     ? new Date(order.closed_at).toLocaleString('tr-TR')
                     : (order.created_at ? new Date(order.created_at).toLocaleString('tr-TR') : '—');
                 const items = (order.items || []).map(i => {
-                    const total = i.is_complimentary ? 'İkram' : `${(i.quantity * i.price).toFixed(2)} ₺`;
+                    const total = i.is_complimentary ? 'İkram' : fmtTL(i.quantity * i.price);
                     return `<div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.84rem;">
                         <span style="flex:1;">${i.quantity}× ${i.product_name||i.name}${i.is_complimentary ? ' <span style="background:#ede9fe;color:#6b21a8;padding:.1rem .35rem;border-radius:8px;font-size:.7rem;">İkram</span>' : ''}</span>
                         <span style="font-weight:600;flex-shrink:0;margin-left:.75rem;">${total}</span>
@@ -1509,13 +1511,13 @@
                 }).join('');
 
                 const payRows = [
-                    order.payment_cash > 0 ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Nakit</span><span style="font-weight:600;">${Number(order.payment_cash).toFixed(2)} ₺</span></div>` : '',
-                    order.payment_card > 0 ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Kart</span><span style="font-weight:600;">${Number(order.payment_card).toFixed(2)} ₺</span></div>` : '',
-                    order.tip_amount > 0  ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Bahşiş (${order.tip_method==='card'?'Kart':'Nakit'})</span><span style="font-weight:600;color:var(--green);">${Number(order.tip_amount).toFixed(2)} ₺</span></div>` : '',
+                    order.payment_cash > 0 ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Nakit</span><span style="font-weight:600;">${fmtTL(order.payment_cash)}</span></div>` : '',
+                    order.payment_card > 0 ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Kart</span><span style="font-weight:600;">${fmtTL(order.payment_card)}</span></div>` : '',
+                    order.tip_amount > 0  ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Bahşiş (${order.tip_method==='card'?'Kart':'Nakit'})</span><span style="font-weight:600;color:var(--green);">${fmtTL(order.tip_amount)}</span></div>` : '',
                 ].filter(Boolean).join('');
 
                 const discountRow = (order.discount_value > 0)
-                    ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;color:var(--orange);"><span>İndirim (${order.discount_type==='percent'?'%'+order.discount_value:order.discount_value+' ₺'})</span><span style="font-weight:600;">-${Number(order.discount_value).toFixed(2)} ₺</span></div>`
+                    ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;color:var(--orange);"><span>İndirim (${order.discount_type==='percent'?'%'+order.discount_value:order.discount_value+' ₺'})</span><span style="font-weight:600;">-${fmtTL(order.discount_value)}</span></div>`
                     : '';
 
                 document.getElementById('viewOrderContent').innerHTML = `
@@ -1539,7 +1541,7 @@
                         <div style="font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:.5rem;">Ödeme Özeti</div>
                         ${discountRow}
                         <div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:800;padding:.4rem 0 .3rem;border-top:1px solid var(--border);margin-top:.3rem;">
-                            <span>Toplam</span><span>${Number(order.total||0).toFixed(2)} ₺</span>
+                            <span>Toplam</span><span>${fmtTL(order.total||0)}</span>
                         </div>
                         ${payRows}
                     </div>
@@ -1597,21 +1599,21 @@
             // Ürün dropdown
             const sel = document.getElementById('editAddProduct');
             sel.innerHTML = '<option value="">Ürün seç...</option>' +
-                editOrderProductList.map(p=>`<option value="${p.id}" data-price="${p.price}">${p.name} — ${p.price.toFixed(2)} ₺</option>`).join('');
+                editOrderProductList.map(p=>`<option value="${p.id}" data-price="${p.price}">${p.name} — ${fmtTL(p.price)}</option>`).join('');
 
             renderEditItems(order.items, order.total);
             document.getElementById('editOrderModal').style.display = 'block';
         }
 
         function renderEditItems(items, total) {
-            document.getElementById('editOrderTotal').textContent = Number(total||0).toFixed(2) + ' ₺';
+            document.getElementById('editOrderTotal').textContent = fmtTL(total||0);
             document.getElementById('editOrderItems').innerHTML = items.length ? items.map(item=>`
                 <div style="display:flex;align-items:center;gap:.5rem;padding:.55rem .25rem;border-bottom:1px solid #f0f0f0;">
                     <span style="flex:1;font-weight:600;font-size:.9rem;">${item.product_name||item.name}</span>
                     <input type="number" value="${item.quantity}" min="0" step="1"
                         style="width:60px;padding:.4rem;border:2px solid #e2e8f0;border-radius:6px;text-align:center;"
                         onchange="updateEditItemQty(${item.id},this.value)">
-                    <span style="width:75px;text-align:right;font-size:.9rem;color:#2d6a4f;font-weight:600;">${Number(item.price).toFixed(2)} ₺</span>
+                    <span style="width:75px;text-align:right;font-size:.9rem;color:#2d6a4f;font-weight:600;">${fmtTL(item.price)}</span>
                     <button onclick="removeEditItem(${item.id})"
                         style="border:none;background:none;color:#e53e3e;font-size:1.1rem;cursor:pointer;padding:0 .25rem;">✕</button>
                 </div>`).join('') : '<div style="text-align:center;color:#a0aec0;padding:1.5rem;">Ürün yok</div>';
@@ -1767,7 +1769,7 @@
             productsGrid.innerHTML = products.map(product => `
                 <div class="product-card" onclick="addToPastCart(${product.id}, '${product.name}', ${product.price})">
                     <div class="product-name">${product.name}</div>
-                    <div class="product-price">${product.price.toFixed(2)} TL</div>
+                    <div class="product-price">${fmtTL(product.price)}</div>
                 </div>
             `).join('');
         }
@@ -1845,14 +1847,14 @@
                         </div>
                     </div>
                     <div class="order-item-price">
-                        ${itemTotal.toFixed(2)} TL
+                        ${fmtTL(itemTotal)}
                         <button class="btn-delete" onclick="removePastItem(${index})">🗑️</button>
                     </div>
                 </div>
             `}).join('');
-            
-            orderSubtotal.textContent = subtotal.toFixed(2) + ' TL';
-            orderTotal.textContent = total.toFixed(2) + ' TL';
+
+            orderSubtotal.textContent = fmtTL(subtotal);
+            orderTotal.textContent = fmtTL(total);
             
             if (pastOrderDiscount.value > 0) {
                 const discountText = pastOrderDiscount.type === 'percent' 
@@ -2070,7 +2072,7 @@ async function openMergeModal() {
     list.innerHTML = occupied.length ? occupied.map(t => `
         <button onclick="doMerge(${t.id},'${t.name}')"
             style="padding:.7rem 1rem;border:2px solid #ed8936;border-radius:8px;background:white;cursor:pointer;text-align:left;font-family:inherit;font-weight:600;font-size:.9rem;">
-            🟠 ${t.name} <span style="float:right;color:#2d6a4f;">${Number(t.order_total||0).toFixed(2)} ₺</span>
+            🟠 ${t.name} <span style="float:right;color:#2d6a4f;">${fmtTL(t.order_total||0)}</span>
         </button>`).join('') : '<p style="color:#a0aec0;font-size:.85rem;">Birleştirilecek açık masa yok.</p>';
     document.getElementById('mergeModal').style.display = 'flex';
 }
@@ -2214,7 +2216,7 @@ async function refreshZone() {
         return `
             <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
                 <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
-                ${hasOrder ? `<div class="table-total">₺${Number(table.order_total||0).toFixed(2)}</div>` : ''}
+                ${hasOrder ? `<div class="table-total">${fmtTL(table.order_total||0)}</div>` : ''}
                 <div class="table-status">
                     ${hasOrder ? 'Dolu' : 'Boş'}
                     ${dur ? `<span class="dur-badge ${dur.cls}" style="margin-left:.4rem;">${dur.text}</span>` : ''}

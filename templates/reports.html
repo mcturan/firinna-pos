@@ -130,25 +130,25 @@
                         <strong>${p.quantity}</strong>
                         <div class="bar"><div class="bar-fill" style="width:${Math.round(p.quantity/maxQty*100)}%"></div></div>
                     </td>
-                    <td style="text-align:right;">${p.total.toFixed(2)} ₺</td>
+                    <td style="text-align:right;">${fmtTL(p.total)}</td>
                 </tr>`).join('');
             const dailyRows = r.daily.map(d => `
                 <tr>
                     <td>${d.day}</td>
                     <td>${d.order_count}</td>
-                    <td><strong>${d.total_sales.toFixed(2)} ₺</strong></td>
-                    <td>${d.tips.toFixed(2)} ₺</td>
+                    <td><strong>${fmtTL(d.total_sales)}</strong></td>
+                    <td>${fmtTL(d.tips)}</td>
                 </tr>`).join('');
             document.getElementById('reportContent').innerHTML = `
                 <div class="stat-grid">
                     <div class="stat-card"><div class="stat-value">${r.order_count}</div><div class="stat-label">Toplam Sipariş</div></div>
-                    <div class="stat-card"><div class="stat-value">${r.total_sales.toFixed(2)} ₺</div><div class="stat-label">Toplam Satış</div></div>
-                    <div class="stat-card"><div class="stat-value blue">${r.total_cash.toFixed(2)} ₺</div><div class="stat-label">💵 Nakit</div></div>
-                    <div class="stat-card"><div class="stat-value blue">${r.total_card.toFixed(2)} ₺</div><div class="stat-label">💳 Kart</div></div>
-                    <div class="stat-card"><div class="stat-value orange">${r.total_tips.toFixed(2)} ₺</div><div class="stat-label">🎁 Bahşiş</div></div>
-                    <div class="stat-card"><div class="stat-value orange">${r.total_discount.toFixed(2)} ₺</div><div class="stat-label">🏷️ İndirim</div></div>
-                    <div class="stat-card"><div class="stat-value red">${r.total_expenses.toFixed(2)} ₺</div><div class="stat-label">📤 Masraf</div></div>
-                    <div class="stat-card"><div class="stat-value ${r.net >= 0 ? '' : 'red'}">${r.net.toFixed(2)} ₺</div><div class="stat-label">📊 Net Kazanç</div></div>
+                    <div class="stat-card"><div class="stat-value">${fmtTL(r.total_sales)}</div><div class="stat-label">Toplam Satış</div></div>
+                    <div class="stat-card"><div class="stat-value blue">${fmtTL(r.total_cash)}</div><div class="stat-label">💵 Nakit</div></div>
+                    <div class="stat-card"><div class="stat-value blue">${fmtTL(r.total_card)}</div><div class="stat-label">💳 Kart</div></div>
+                    <div class="stat-card"><div class="stat-value orange">${fmtTL(r.total_tips)}</div><div class="stat-label">🎁 Bahşiş</div></div>
+                    <div class="stat-card"><div class="stat-value orange">${fmtTL(r.total_discount)}</div><div class="stat-label">🏷️ İndirim</div></div>
+                    <div class="stat-card"><div class="stat-value red">${fmtTL(r.total_expenses)}</div><div class="stat-label">📤 Masraf</div></div>
+                    <div class="stat-card"><div class="stat-value ${r.net >= 0 ? '' : 'red'}">${fmtTL(r.net)}</div><div class="stat-label">📊 Net Kazanç</div></div>
                 </div>
                 <div class="section-title">🏆 En Çok Satan Ürünler</div>
                 ${r.top_products.length === 0 ? '<div class="no-data">Veri yok.</div>' :

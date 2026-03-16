@@ -1,7 +1,7 @@
 <!-- Fırınna POS — Ortak Navbar -->
 <nav class="navbar">
     <a href="/" class="nav-brand">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="26" height="26" style="flex-shrink:0;border-radius:7px;">
+        <svg id="navLogoFallback" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="26" height="26" style="flex-shrink:0;border-radius:7px;">
             <rect width="64" height="64" rx="14" fill="#2d6a4f"/>
             <line x1="18" y1="10" x2="18" y2="28" stroke="white" stroke-width="3" stroke-linecap="round"/>
             <line x1="13" y1="10" x2="13" y2="22" stroke="white" stroke-width="3" stroke-linecap="round"/>
@@ -11,6 +11,7 @@
             <path d="M46 10 Q52 16 52 26 L46 28 Z" fill="white"/>
             <line x1="46" y1="28" x2="46" y2="54" stroke="white" stroke-width="3" stroke-linecap="round"/>
         </svg>
+        <img id="navLogoImg" src="" alt="" style="display:none;max-height:28px;max-width:72px;object-fit:contain;flex-shrink:0;border-radius:5px;" onerror="this.style.display='none';document.getElementById('navLogoFallback').style.display='block'">
         Fırınna POS
     </a>
     <div class="nav-links">
@@ -89,6 +90,19 @@ async function loadAlerts() {
 }
 loadAlerts();
 setInterval(loadAlerts, 60000);
+(function loadNavLogo() {
+    fetch('/api/settings/logo').then(function(r){ return r.json(); }).then(function(d) {
+        if (d.url) {
+            var img = document.getElementById('navLogoImg');
+            var svg = document.getElementById('navLogoFallback');
+            if (img && svg) {
+                img.src = d.url;
+                img.style.display = 'block';
+                svg.style.display = 'none';
+            }
+        }
+    }).catch(function(){});
+})();
 </script>
 
 <div id="toast-container"></div>
@@ -111,6 +125,11 @@ function showConfirm(msg, fn, yesTxt, yesCls) {
     m.style.display = 'flex';
     yesBtn.onclick = function() { m.style.display = 'none'; fn(); };
 }
+function fmtN(n, dec) {
+    dec = (dec === undefined) ? 2 : dec;
+    return Number(n||0).toLocaleString('tr-TR', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+function fmtTL(n) { return fmtN(n) + ' ₺'; }
 function showToast(msg, type, duration) {
     type = type || 'success';
     duration = duration || 3000;

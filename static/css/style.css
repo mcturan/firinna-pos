@@ -200,6 +200,9 @@ body {
 .product-card { background: var(--surface); padding: .8rem .5rem; border-radius: var(--r); text-align: center; cursor: pointer; transition: all var(--t); border: 1.5px solid var(--border); user-select: none; box-shadow: var(--s-sm); }
 .product-card:hover  { border-color: var(--border-h); box-shadow: var(--s); }
 .product-card:active { transform: scale(.96); }
+.product-soldout { opacity: .45; cursor: not-allowed; border-color: #fca5a5 !important; }
+.product-soldout:hover { box-shadow: var(--s-sm) !important; border-color: #fca5a5 !important; }
+.product-soldout:active { transform: none !important; }
 .product-name  { font-weight: 600; margin-bottom: .2rem; font-size: .79rem; line-height: 1.3; color: var(--ink); }
 .product-price { color: var(--green); font-weight: 700; font-size: .9rem; }
 .order-summary { background: var(--bg); padding: .9rem; border-radius: var(--r); display: flex; flex-direction: column; gap: .6rem; border: 1.5px solid var(--border); }

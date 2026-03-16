@@ -185,6 +185,28 @@ def migrate_kitchen_ready():
         conn.commit()
     conn.close()
 
+def migrate_is_available():
+    """products tablosuna is_available kolonu ekle (bir kez)"""
+    conn = get_db()
+    cols = [r[1] for r in conn.execute('PRAGMA table_info(products)').fetchall()]
+    if 'is_available' not in cols:
+        conn.execute('ALTER TABLE products ADD COLUMN is_available INTEGER DEFAULT 1')
+        conn.commit()
+    conn.close()
+
+def toggle_product_availability(product_id):
+    """Ürünü tükendi/mevcut olarak işaretle"""
+    conn = get_db()
+    product = conn.execute('SELECT is_available FROM products WHERE id = ?', (product_id,)).fetchone()
+    if product:
+        new_value = 0 if product['is_available'] else 1
+        conn.execute('UPDATE products SET is_available = ? WHERE id = ?', (new_value, product_id))
+        conn.commit()
+        conn.close()
+        return new_value
+    conn.close()
+    return 1
+
 def get_product_stock_link(product_id):
     conn = get_db()
     row = conn.execute('SELECT stock_item_id FROM products WHERE id=?', (product_id,)).fetchone()

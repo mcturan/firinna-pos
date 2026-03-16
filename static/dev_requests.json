@@ -159,5 +159,26 @@
     "done": true,
     "date": "2026-03-16",
     "cat": "özellik"
+  },
+  {
+    "id": 24,
+    "text": "Telegram otomatik gönderim saati — Kasa Ana sekmesinde zaman picker + aktif/pasif toggle",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 25,
+    "text": "Tükendi butonu — Ürünler sayfasında toggle, ana sayfada greyed-out + tıklanamaz",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
+  },
+  {
+    "id": 26,
+    "text": "Logo watermark iyileştirme — onerror ile güvenli yükleme, mutfak ekranına logo + şirket adı",
+    "done": true,
+    "date": "2026-03-16",
+    "cat": "özellik"
   }
 ]
