@@ -180,5 +180,40 @@
     "done": true,
     "date": "2026-03-16",
     "cat": "özellik"
+  },
+  {
+    "id": 27,
+    "text": "uygulamadaki tüm kullanıcı girişleri düzenlenebilir olsun. ama bağlantılarını iyi kur. çünkü bir defa ürün ismini değiştirdiğimde siparişlerde vs ürünün isminin değişmediğini gördüm. bunu bilinçli mi öyle bıraktın bilmiyorum ama aynı ID'den çekilen verilerin hepsi değişmeli. ama diyelim ki o ID ile bağlantılı 37 sipariş ve 23 stok kaydı var, bununla ilgili uyarı verebilir. ya da diyelim ki satın alı yapıp kasadan çıkış yapmışım... günler sonra fark ettim ki domates yerine domtes yazmışım, bunu düzelttiğimde yine bağlantılı verilerin uyarısını versin ve fakat evet dediğimde düzeltsin.",
+    "done": false,
+    "date": "2026-03-17",
+    "cat": "istek"
+  },
+  {
+    "id": 28,
+    "text": "talepler sayfasında en son talep en üstte olsun. yapılanların üstünü çizme, okunmuyor, sadece yeşil tik koy.",
+    "done": false,
+    "date": "2026-03-17",
+    "cat": "istek"
+  },
+  {
+    "id": 29,
+    "text": "dropdown menüler harf sırasına göre olsun",
+    "done": false,
+    "date": "2026-03-17",
+    "cat": "istek"
+  },
+  {
+    "id": 30,
+    "text": "sayfalarda listenen bilgiler hem filtrelenebilsin hem de mesela hangi özelliğe tıkladıysam o özelliğe göre a-z/z-a sıralamasına dönüşsün. mesela tarihe basarsam tarih, isme basarsam isim, kategoriye basarsam kategoriye göre listelensin. ya da filtrelensin. hangisi daha kullanışlı olursa.",
+    "done": false,
+    "date": "2026-03-17",
+    "cat": "istek"
+  },
+  {
+    "id": 31,
+    "text": "sistemin tamamını çok dilli yapabilir misin? navbarda mevcut dillere ait bayrak tıklandığında o dile dönebilir mi? veriler şimdilik girildiği gibi kalabilir.",
+    "done": false,
+    "date": "2026-03-17",
+    "cat": "istek"
   }
 ]
