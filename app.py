@@ -1413,25 +1413,21 @@ def api_muhasebe():
 
 @app.route('/api/settings/note-qr', methods=['POST'])
 def api_upload_note_qr():
-    if 'file' not in request.files:
-        return jsonify({'success': False, 'error': 'Dosya yok'}), 400
-    file = request.files['file']
-    if not allowed_file(file.filename):
-        return jsonify({'success': False, 'error': 'Desteklenmeyen format'}), 400
-    ext = file.filename.rsplit('.', 1)[1].lower()
-    filename = f'note_qr.{ext}'
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    for old_ext in ALLOWED_EXTENSIONS:
-        old_path = os.path.join(UPLOAD_FOLDER, f'note_qr.{old_ext}')
-        if os.path.exists(old_path) and old_ext != ext:
-            os.remove(old_path)
-    file.save(filepath)
-    qr_url = f'/static/uploads/{filename}'
-    db.set_setting('note_qr_image_url', qr_url)
+    import base64
+    file = request.files.get('file')
     label = request.form.get('label', '')
-    if label:
+    if not file:
+        return jsonify({'success': False, 'error': 'Dosya yok'})
+    try:
+        data = file.read()
+        b64 = base64.b64encode(data).decode()
+        mime = file.content_type or 'image/png'
+        data_url = f'data:{mime};base64,{b64}'
+        db.set_setting('note_qr_image_url', data_url)
         db.set_setting('note_qr_label', label)
-    return jsonify({'success': True, 'url': qr_url})
+        return jsonify({'success': True, 'url': data_url})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/api/settings/note-qr/label', methods=['POST'])
 def api_save_note_qr_label():
@@ -1448,12 +1444,8 @@ def api_get_note_qr():
 
 @app.route('/api/settings/note-qr', methods=['DELETE'])
 def api_delete_note_qr():
-    qr_url = db.get_setting('note_qr_image_url', '')
-    if qr_url:
-        filepath = os.path.join(os.path.dirname(__file__), qr_url.lstrip('/'))
-        if os.path.exists(filepath):
-            os.remove(filepath)
-        db.set_setting('note_qr_image_url', '')
+    db.set_setting('note_qr_image_url', '')
+    db.set_setting('note_qr_label', '')
     return jsonify({'success': True})
 
 # ===== FİŞ ÖNİZLEME =====
