@@ -148,7 +148,7 @@ class ThermalPrinter:
         qr_url = db.get_setting('receipt_qr_image_url', '')
         qr_label = db.get_setting('receipt_qr_label', '')
         if qr_url:
-            qr_bytes = self._image_to_escpos(qr_url, target_width=150)
+            qr_bytes = self._image_to_escpos(qr_url, target_width=200)
             if qr_bytes:
                 data += qr_bytes
             if qr_label:
@@ -462,7 +462,7 @@ class ThermalPrinter:
 
         # QR Kod
         if qr_url:
-            qr_bytes = self._image_to_escpos(qr_url, target_width=150)
+            qr_bytes = self._image_to_escpos(qr_url, target_width=200)
             if qr_bytes:
                 data += CENTER
                 data += qr_bytes
