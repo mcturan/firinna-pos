@@ -34,5 +34,14 @@
     <div class="separator"></div>
     <div class="note-content">{{ note }}</div>
     <div class="separator"></div>
+    {% if qr_image_url %}
+    <div class="center" style="margin-top:8px;">
+        <img src="{{ qr_image_url }}" style="max-width:140px;max-height:140px;">
+        {% if qr_label %}
+        <div style="font-size:0.8em;margin-top:4px;">{{ qr_label }}</div>
+        {% endif %}
+    </div>
+    <div class="separator"></div>
+    {% endif %}
 </body>
 </html>

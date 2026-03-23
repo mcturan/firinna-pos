@@ -115,8 +115,21 @@
                     </select>
                 </div>
                 <div>
-                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Miktar (<span id="moveUnit"></span>)</label>
-                    <input type="number" id="moveQty" step="0.01" min="0" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0">
+                    <label style="font-weight:600;display:block;margin-bottom:.4rem;">Miktar</label>
+                    <div style="display:flex;gap:.5rem;align-items:center;">
+                        <input type="number" id="moveQty" step="0.01" min="0" style="flex:1;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;" placeholder="0">
+                        <select id="moveUnit" style="width:100px;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem;">
+                            <option value="adet">adet</option>
+                            <option value="kg">kg</option>
+                            <option value="gr">gr</option>
+                            <option value="lt">lt</option>
+                            <option value="ml">ml</option>
+                            <option value="paket">paket</option>
+                            <option value="dilim">dilim</option>
+                            <option value="kutu">kutu</option>
+                            <option value="şişe">şişe</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <label style="font-weight:600;display:block;margin-bottom:.4rem;"><span id="costLabel">Tutar ₺</span> <span id="costRequired" style="color:#e53e3e;font-size:.82rem;">(Alım için zorunlu)</span></label>
@@ -398,7 +411,7 @@
         function openMoveModal(id, name, unit) {
             document.getElementById('moveItemId').value = id;
             document.getElementById('moveTitle').textContent = '📥 ' + name;
-            document.getElementById('moveUnit').textContent = unit;
+            document.getElementById('moveUnit').value = unit || 'adet';
             document.getElementById('moveQty').value = '';
             document.getElementById('moveCost').value = '';
             document.getElementById('moveDesc').value = '';
@@ -429,11 +442,13 @@
             if (isNaN(qty) || qty <= 0) { showToast('Geçerli bir miktar girin.', 'warn'); return; }
             if (type === 'in' && (!cost || cost <= 0)) { showToast('Alım işlemi için tutar zorunludur.', 'warn'); return; }
             const moveDate = document.getElementById('moveDate').value || null;
+            const unit = document.getElementById('moveUnit').value;
             const res = await fetch(`/api/stock/${id}/movement`, {
                 method: 'POST', headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({
                     movement_type: type, quantity: qty, cost,
                     payment_method: payment,
+                    unit: unit,
                     reason: type==='adjust'?'duzeltme':type==='in'?'alim':'manuel',
                     description: desc,
                     date: moveDate

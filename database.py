@@ -412,7 +412,7 @@ def get_expenses(start_date=None, end_date=None):
     conn.close()
     return [dict(exp) for exp in expenses]
 
-def add_expense(description, amount, category='Genel', payment_method='cash', subcategory=''):
+def add_expense(description, amount, category='Genel', payment_method='cash', subcategory='', date=None):
     conn = get_db()
     # Migration: kolonlar yoksa ekle
     cols = [r[1] for r in conn.execute("PRAGMA table_info(expenses)").fetchall()]
@@ -420,10 +420,11 @@ def add_expense(description, amount, category='Genel', payment_method='cash', su
         conn.execute("ALTER TABLE expenses ADD COLUMN payment_method TEXT DEFAULT 'cash'")
     if 'subcategory' not in cols:
         conn.execute("ALTER TABLE expenses ADD COLUMN subcategory TEXT DEFAULT ''")
-    conn.execute('INSERT INTO expenses (description, amount, category, payment_method, subcategory) VALUES (?, ?, ?, ?, ?)',
-                 (description, amount, category, payment_method, subcategory))
-    # Transaction kaydı
-    date = datetime.now().strftime('%Y-%m-%d')
+    if not date:
+        date = datetime.now().strftime('%Y-%m-%d')
+    created_at = date + ' 00:00:00'
+    conn.execute('INSERT INTO expenses (description, amount, category, payment_method, subcategory, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+                 (description, amount, category, payment_method, subcategory, created_at))
     conn.execute('''INSERT INTO transactions
         (date, type, amount, category, payment_method, description)
         VALUES (?, 'out', ?, 'masraf', ?, ?)''',
@@ -1220,6 +1221,12 @@ def init_muhasebe_tables():
         FOREIGN KEY (stock_item_id) REFERENCES stock_items(id)
     )''')
 
+    # Migrasyon: stock_movements tablosuna unit kolonu ekle
+    try:
+        c.execute('ALTER TABLE stock_movements ADD COLUMN unit TEXT')
+    except:
+        pass
+
     conn.commit()
     conn.close()
 
@@ -1530,19 +1537,19 @@ def add_stock_item(name, unit, min_quantity, cost_per_unit, category):
     conn.commit()
     conn.close()
 
-def add_stock_movement(stock_item_id, movement_type, quantity, cost, reason, description, transaction_id=None, date=None):
+def add_stock_movement(stock_item_id, movement_type, quantity, cost, reason, description, transaction_id=None, date=None, unit=None):
     """Stok hareketi ekle — date verilmezse şu an kullanılır"""
     conn = get_db()
     if date:
         conn.execute('''INSERT INTO stock_movements
-            (stock_item_id, movement_type, quantity, cost, reason, description, related_transaction_id, created_at)
-            VALUES (?,?,?,?,?,?,?,?)''',
-            (stock_item_id, movement_type, quantity, cost, reason, description, transaction_id, date + ' 00:00:00'))
+            (stock_item_id, movement_type, quantity, cost, reason, description, related_transaction_id, created_at, unit)
+            VALUES (?,?,?,?,?,?,?,?,?)''',
+            (stock_item_id, movement_type, quantity, cost, reason, description, transaction_id, date + ' 00:00:00', unit))
     else:
         conn.execute('''INSERT INTO stock_movements
-            (stock_item_id, movement_type, quantity, cost, reason, description, related_transaction_id)
-            VALUES (?,?,?,?,?,?,?)''',
-            (stock_item_id, movement_type, quantity, cost, reason, description, transaction_id))
+            (stock_item_id, movement_type, quantity, cost, reason, description, related_transaction_id, unit)
+            VALUES (?,?,?,?,?,?,?,?)''',
+            (stock_item_id, movement_type, quantity, cost, reason, description, transaction_id, unit))
     # Sayım (adjust) veya alım sırasında ortalama birim maliyet güncelle
     if movement_type in ('adjust', 'in') and cost and cost > 0:
         conn.execute('UPDATE stock_items SET cost_per_unit = ? WHERE id = ?', (cost, stock_item_id))
@@ -1745,7 +1752,7 @@ def delete_stock_movement(movement_id):
     conn.close()
     return True, ''
 
-def add_stock_purchase(stock_item_id, quantity, cost, payment_method, description, date=None):
+def add_stock_purchase(stock_item_id, quantity, cost, payment_method, description, date=None, unit=None):
     """Stok alımı: hem stok hareketi hem transaction kaydı"""
     conn = get_db()
     # transactions tablosu yoksa oluştur
@@ -1765,9 +1772,9 @@ def add_stock_purchase(stock_item_id, quantity, cost, payment_method, descriptio
     # Stok hareketi
     created_at = date + ' 00:00:00'
     conn.execute('''INSERT INTO stock_movements
-        (stock_item_id, movement_type, quantity, cost, reason, description, created_at)
-        VALUES (?, 'in', ?, ?, 'alim', ?, ?)''',
-        (stock_item_id, quantity, cost, description, created_at))
+        (stock_item_id, movement_type, quantity, cost, reason, description, created_at, unit)
+        VALUES (?, 'in', ?, ?, 'alim', ?, ?, ?)''',
+        (stock_item_id, quantity, cost, description, created_at, unit))
     # Kasadan çıkış
     if cost and cost > 0:
         item = conn.execute('SELECT name FROM stock_items WHERE id=?', (stock_item_id,)).fetchone()

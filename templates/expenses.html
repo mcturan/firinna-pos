@@ -51,6 +51,19 @@
     <div class="container">
         <h1 style="margin-bottom:1.5rem;">📤 Masraf Yönetimi</h1>
 
+        <!-- Toplu Excel İmport -->
+        <div class="add-card" style="margin-bottom:1rem;">
+            <h4 style="margin-bottom:.75rem;">📊 Toplu Masraf Girişi (Excel/CSV)</h4>
+            <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+                <a href="/api/expenses/template" class="btn btn-secondary" style="text-decoration:none;">⬇️ Şablon İndir</a>
+                <label class="btn btn-secondary" style="cursor:pointer;margin:0;">
+                    📂 Excel/CSV Yükle
+                    <input type="file" id="expImportFile" accept=".csv,.xlsx" style="display:none;" onchange="importExpenses(this)">
+                </label>
+                <span id="importStatus" style="font-size:.9rem;color:#718096;"></span>
+            </div>
+        </div>
+
         <!-- Masraf Ekle -->
         <div class="add-card">
             <h4>➕ Masraf Ekle</h4>
@@ -258,6 +271,24 @@
             });
             html += '</div>';
             document.getElementById('panel-ozet').innerHTML = html;
+        }
+
+        async function importExpenses(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const status = document.getElementById('importStatus');
+            status.textContent = 'Yükleniyor...';
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch('/api/expenses/import', { method: 'POST', body: formData });
+            const result = await res.json();
+            input.value = '';
+            if (result.success) {
+                status.textContent = `✅ ${result.imported} kayıt eklendi.`;
+                loadAll();
+            } else {
+                status.textContent = '❌ ' + (result.error || 'Hata oluştu.');
+            }
         }
 
         async function addExpense() {

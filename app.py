@@ -213,14 +213,15 @@ def api_stock_movement(item_id):
     mtype = d['movement_type']
     try:
         movement_date = d.get('date', None)
+        movement_unit = d.get('unit', None)
         if mtype == 'in':
             db.add_stock_purchase(item_id, d['quantity'], d.get('cost', 0),
                                   d.get('payment_method', 'cash'), d.get('description', ''),
-                                  date=movement_date)
+                                  date=movement_date, unit=movement_unit)
         else:
             db.add_stock_movement(item_id, mtype, d['quantity'],
                                   d.get('cost', 0), d.get('reason', 'manuel'), d.get('description', ''),
-                                  date=movement_date)
+                                  date=movement_date, unit=movement_unit)
         return jsonify({'success': True})
     except Exception as e:
         import traceback
@@ -526,6 +527,62 @@ def api_expenses():
             data.get('subcategory', '')
         )
         return jsonify({'success': True})
+
+@app.route('/api/expenses/template', methods=['GET'])
+def api_expenses_template():
+    """Toplu masraf girişi için CSV şablonu indir"""
+    import io
+    output = io.StringIO()
+    output.write('\ufeff')  # BOM — Excel'de Türkçe için
+    output.write('Tarih,Kategori,Alt Kategori,Açıklama,Tutar,Ödeme Yöntemi\n')
+    output.write('2026-03-23,Malzeme,Un/Tahıl,Buğday unu 25kg,450.00,cash\n')
+    output.write('2026-03-23,Malzeme,Süt Ürünleri,Tereyağı 5kg,320.00,cash\n')
+    output.write('2026-03-24,Faturalar,Elektrik,Mart elektrik faturası,1200.00,card\n')
+    output.write('# Ödeme Yöntemi: cash = Nakit Kasa  |  card = Banka Kasa\n')
+    output.write('# Kategori seçenekleri: Faturalar / Kira / Personel / Malzeme / Temizlik / Tamir-Bakım / Demirbaş / Pazarlama / Diğer\n')
+    content = output.getvalue()
+    from flask import Response
+    return Response(
+        content,
+        mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': 'attachment; filename=masraf_sablonu.csv'}
+    )
+
+@app.route('/api/expenses/import', methods=['POST'])
+def api_expenses_import():
+    """CSV ile toplu masraf yükle"""
+    import io, csv
+    file = request.files.get('file')
+    if not file:
+        return jsonify({'success': False, 'error': 'Dosya yok'})
+    try:
+        content = file.read().decode('utf-8-sig')  # BOM'u atla
+        reader = csv.DictReader(io.StringIO(content))
+        imported = 0
+        errors = []
+        for i, row in enumerate(reader, 2):
+            # Yorum satırlarını atla
+            tarih = (row.get('Tarih') or '').strip()
+            if tarih.startswith('#') or not tarih:
+                continue
+            try:
+                aciklama = row.get('Açıklama', '').strip()
+                tutar_str = row.get('Tutar', '0').strip().replace(',', '.')
+                tutar = float(tutar_str)
+                if not aciklama or tutar <= 0:
+                    continue
+                kategori = row.get('Kategori', 'Genel').strip()
+                alt_kat = row.get('Alt Kategori', '').strip()
+                odeme = row.get('Ödeme Yöntemi', 'cash').strip()
+                if odeme not in ('cash', 'card'):
+                    odeme = 'cash'
+                db.add_expense(aciklama, tutar, kategori, odeme, alt_kat, date=tarih)
+                imported += 1
+            except Exception as e:
+                errors.append(f'Satır {i}: {e}')
+        return jsonify({'success': True, 'imported': imported, 'errors': errors})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/api/expenses/summary', methods=['GET'])
 def api_expense_summary():
