@@ -582,7 +582,7 @@
                 <div class="saved-note-row" id="snrow-${n.id}">
                     <div class="sn-view" id="snview-${n.id}">
                         <div class="sn-title">${escHtml(n.title)}</div>
-                        <div class="sn-preview">${escHtml(n.content.substring(0,80))}${n.content.length>80?'…':''}</div>
+                        <div class="sn-preview">${escHtml(n.content.substring(0,160))}${n.content.length>160?'…':''}</div>
                         <div class="sn-actions">
                             <button class="btn btn-secondary" style="padding:.3rem .8rem;font-size:.82rem;" onclick="loadNoteIntoEditor(${n.id})">📄 Yükle</button>
                             <button class="btn btn-secondary" style="padding:.3rem .8rem;font-size:.82rem;" onclick="startEditNote(${n.id})">✏️ Düzenle</button>
@@ -591,7 +591,7 @@
                     </div>
                     <div class="sn-edit" id="snedit-${n.id}" style="display:none;">
                         <input type="text" id="snedit-title-${n.id}" value="${escAttr(n.title)}" style="width:100%;padding:.5rem;border:2px solid #e2e8f0;border-radius:7px;font-size:.95rem;margin-bottom:.4rem;">
-                        <textarea id="snedit-content-${n.id}" rows="4" style="width:100%;padding:.5rem;border:2px solid #e2e8f0;border-radius:7px;font-size:.9rem;resize:vertical;">${escHtml(n.content)}</textarea>
+                        <textarea id="snedit-content-${n.id}" rows="8" style="width:100%;padding:.5rem;border:2px solid #e2e8f0;border-radius:7px;font-size:.9rem;resize:vertical;">${escHtml(n.content)}</textarea>
                         <div class="sn-actions" style="margin-top:.4rem;">
                             <button class="btn btn-primary" style="padding:.3rem .9rem;font-size:.82rem;background:#38a169;" onclick="saveEditNote(${n.id})">💾 Kaydet</button>
                             <button class="btn btn-secondary" style="padding:.3rem .8rem;font-size:.82rem;" onclick="cancelEditNote(${n.id})">İptal</button>
@@ -694,7 +694,7 @@
             <h3>📝 Not Fişi Editörü</h3>
             <div class="field-group">
                 <div><label>Başlık</label><input type="text" id="note-title" value="NOT" placeholder="NOT"></div>
-                <div><label>Not İçeriği</label><textarea id="note-content" rows="6" placeholder="Yazdırmak istediğiniz notu buraya girin..."></textarea></div>
+                <div><label>Not İçeriği</label><textarea id="note-content" rows="12" placeholder="Yazdırmak istediğiniz notu buraya girin..."></textarea></div>
             </div>
             <div style="margin-top:.75rem;">
                 <button class="btn btn-secondary" onclick="saveCurrentNote()" style="width:100%;">💾 Bu Notu Kayıtlı Notlara Ekle</button>
