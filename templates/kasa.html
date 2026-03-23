@@ -415,7 +415,19 @@
                             <option value="in_transfer">Nakit</option>
                             <option value="Genel">Diğer</option>
                         </select>
-                        <select id="txStokItem" style="display:none;flex:2;min-width:150px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;"></select>
+                        <select id="txStokItem" style="display:none;flex:2;min-width:150px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;" onchange="onStokItemChange()"></select>
+                        <input type="number" id="txQty" placeholder="Miktar" step="0.01" min="0" style="display:none;width:90px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                        <select id="txQtyUnit" style="display:none;width:90px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                            <option value="adet">adet</option>
+                            <option value="kg">kg</option>
+                            <option value="gr">gr</option>
+                            <option value="lt">lt</option>
+                            <option value="ml">ml</option>
+                            <option value="paket">paket</option>
+                            <option value="dilim">dilim</option>
+                            <option value="kutu">kutu</option>
+                            <option value="şişe">şişe</option>
+                        </select>
                         <input type="text" id="txDesc" placeholder="Açıklama">
                         <input type="datetime-local" id="txDate" style="padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
                         <select id="txMethod">
@@ -443,6 +455,8 @@
             const catEl    = document.getElementById('txCat');
             const toggleEl = document.getElementById('typeToggle');
             const stokSel  = document.getElementById('txStokItem');
+            const qtyEl    = document.getElementById('txQty');
+            const unitEl   = document.getElementById('txQtyUnit');
             const descEl   = document.getElementById('txDesc');
             if (!catEl) return;
             const cat = catEl.value;
@@ -454,22 +468,36 @@
                     loadStockItems().then(() => {
                         if (stokSel) {
                             stokSel.innerHTML = stockItemsCache.map(s =>
-                                `<option value="${s.name}">${s.name} (${s.unit})</option>`).join('');
+                                `<option value="${s.id}" data-unit="${s.unit}">${s.name} (${s.unit})</option>`).join('');
                             stokSel.style.display = 'block';
+                            onStokItemChange();
                         }
+                        if (qtyEl)  qtyEl.style.display  = 'block';
+                        if (unitEl) unitEl.style.display = 'block';
                         if (descEl) descEl.style.display = 'none';
                     });
                 } else {
                     if (stokSel) stokSel.style.display = 'none';
-                    if (descEl)  descEl.style.display = 'block';
+                    if (qtyEl)   qtyEl.style.display   = 'none';
+                    if (unitEl)  unitEl.style.display  = 'none';
+                    if (descEl)  descEl.style.display  = 'block';
                 }
             } else {
                 if (toggleEl) toggleEl.style.display = 'flex';
-                if (stokSel)  stokSel.style.display = 'none';
-                if (descEl)   descEl.style.display = 'block';
-                // in_transfer için varsayılan giriş
+                if (stokSel)  stokSel.style.display  = 'none';
+                if (qtyEl)    qtyEl.style.display    = 'none';
+                if (unitEl)   unitEl.style.display   = 'none';
+                if (descEl)   descEl.style.display   = 'block';
                 if (cat === 'in_transfer') setTxType('in');
             }
+        }
+
+        function onStokItemChange() {
+            const stokSel = document.getElementById('txStokItem');
+            const unitEl  = document.getElementById('txQtyUnit');
+            if (!stokSel || !unitEl) return;
+            const selected = stokSel.options[stokSel.selectedIndex];
+            if (selected) unitEl.value = selected.dataset.unit || 'adet';
         }
 
         // F3 + F4: İşlem ekle
@@ -477,18 +505,33 @@
             const cat    = document.getElementById('txCat').value;
             const method = currentKasa === 'kart' ? 'card' : document.getElementById('txMethod').value;
             const amount = parseFloat(document.getElementById('txAmount').value);
-            let desc;
-            if (cat === 'stok_alim') {
-                desc = document.getElementById('txStokItem').value;
-            } else {
-                desc = document.getElementById('txDesc').value.trim();
-            }
-            if (!desc || isNaN(amount) || amount <= 0) { showToast('Açıklama ve tutar gerekli.', 'warn'); return; }
-
-            // F4: datetime-local → date + datetime ayrıştır
-            const dtVal      = document.getElementById('txDate').value; // '2026-03-10T14:30'
+            const dtVal      = document.getElementById('txDate').value;
             const txDate     = dtVal ? dtVal.slice(0, 10) : null;
             const txDatetime = dtVal ? dtVal.replace('T', ' ') + ':00' : null;
+
+            if (cat === 'stok_alim') {
+                const stokSel = document.getElementById('txStokItem');
+                const itemId  = stokSel ? stokSel.value : null;
+                const qty     = parseFloat(document.getElementById('txQty').value);
+                const unit    = document.getElementById('txQtyUnit').value;
+                if (!itemId || isNaN(amount) || amount <= 0) { showToast('Ürün ve tutar gerekli.', 'warn'); return; }
+                if (isNaN(qty) || qty <= 0) { showToast('Geçerli bir miktar girin.', 'warn'); return; }
+                await fetch(`/api/stock/${itemId}/movement`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        movement_type: 'in', quantity: qty, cost: amount,
+                        payment_method: method, unit, reason: 'alim',
+                        description: '', date: txDate
+                    })
+                });
+                document.getElementById('txQty').value    = '';
+                document.getElementById('txAmount').value = '';
+                loadAll();
+                return;
+            }
+
+            let desc = document.getElementById('txDesc').value.trim();
+            if (!desc || isNaN(amount) || amount <= 0) { showToast('Açıklama ve tutar gerekli.', 'warn'); return; }
 
             await fetch('/api/transactions', {
                 method: 'POST',
