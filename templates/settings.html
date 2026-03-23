@@ -433,15 +433,17 @@
             const formData = new FormData();
             formData.append('file', file);
             formData.append('label', document.getElementById('note-qr-label').value);
+            let ok = false;
             try {
                 const res = await fetch('/api/settings/note-qr', {method:'POST', body: formData});
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const d = await res.json();
-                if (d.success) showToast('Not QR kodu kaydedildi!', 'success');
+                if (d.success) { showToast('Not QR kodu kaydedildi!', 'success'); ok = true; }
                 else showToast(d.error || 'Yükleme hatası', 'error');
             } catch(e) {
-                showToast('Sunucuya bağlanılamadı', 'error');
+                showToast('Yükleme başarısız: ' + e.message, 'error');
             }
-            btn.disabled = false; btn.textContent = '✅ Yüklendi';
+            btn.disabled = false; btn.textContent = ok ? '✅ Yüklendi' : '⬆️ Tekrar Dene';
             // input'u sıfırla ki aynı dosya tekrar seçilebilsin
             event.target.value = '';
         }
