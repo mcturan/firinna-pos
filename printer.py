@@ -226,7 +226,7 @@ class ThermalPrinter:
 
         img = img.convert('L')
         max_width = target_width if target_width else 384
-        if img.width > max_width:
+        if img.width != max_width:
             ratio = max_width / img.width
             img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
         img = img.point(lambda x: 0 if x < 128 else 255, '1')
