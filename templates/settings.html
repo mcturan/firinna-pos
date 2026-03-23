@@ -23,6 +23,7 @@
         .save-row button { flex:1; }
         .logo-area { display:flex; flex-direction:column; align-items:center; gap:1rem; }
         #logo-preview-box { width:200px; height:100px; border:2px dashed #cbd5e1; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#f8fafc; }
+        #qr-preview-box { width:120px; height:120px; min-width:120px; border:2px dashed #cbd5e1; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#f8fafc; }
 
         /* GitHub Sync */
         .sync-status-box { background:#f8fafc; border-radius:12px; padding:1.25rem; margin-bottom:1rem; }
@@ -138,10 +139,12 @@
             <div class="logo-area">
                 <div id="qr-preview-box">
                     <span id="qr-placeholder-text" style="color:#94a3b8;font-size:.9rem;">QR kod yüklenmemiş</span>
-                    <img id="qr-preview-img" src="" alt="QR" style="display:none;width:100px;height:100px;object-fit:contain;">
+                    <img id="qr-preview-img" src="" alt="QR" style="display:none;width:110px;height:110px;object-fit:contain;">
                 </div>
-                <div><label style="font-size:.85rem;color:#4a5568;">QR Altı Yazı</label>
-                    <input type="text" id="qr-label" placeholder="Bizi Google Haritalarda bulun"></div>
+                <div style="width:100%;">
+                    <label style="font-size:.85rem;color:#4a5568;font-weight:600;">QR Altı Yazı</label>
+                    <input type="text" id="qr-label" placeholder="Bizi Google Haritalarda bulun" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;margin-top:.3rem;">
+                </div>
                 <input type="file" id="qr-file-input" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewQrFile(event)">
                 <div class="save-row" style="width:100%;">
                     <button class="btn btn-secondary" onclick="document.getElementById('qr-file-input').click()">📁 QR Görsel Seç</button>
