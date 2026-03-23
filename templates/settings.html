@@ -416,34 +416,45 @@
         }
 
         // --- Note QR ---
-        let pendingNoteQrFile = null;
-
-        function previewNoteQrFile(event) {
-            pendingNoteQrFile = event.target.files[0];
-            if (!pendingNoteQrFile) return;
+        async function noteQrFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            // Önce önizle
             const reader = new FileReader();
             reader.onload = e => {
                 document.getElementById('note-qr-img').src = e.target.result;
                 document.getElementById('note-qr-img').style.display = 'block';
                 document.getElementById('note-qr-placeholder').style.display = 'none';
-                const btn = document.getElementById('btn-upload-note-qr');
-                btn.disabled = false; btn.style.opacity = '1';
             };
-            reader.readAsDataURL(pendingNoteQrFile);
+            reader.readAsDataURL(file);
+            // Hemen yükle
+            const btn = document.getElementById('btn-upload-note-qr');
+            btn.disabled = true; btn.textContent = '⏳ Yükleniyor...';
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('label', document.getElementById('note-qr-label').value);
+            try {
+                const res = await fetch('/api/settings/note-qr', {method:'POST', body: formData});
+                const d = await res.json();
+                if (d.success) showToast('Not QR kodu kaydedildi!', 'success');
+                else showToast(d.error || 'Yükleme hatası', 'error');
+            } catch(e) {
+                showToast('Sunucuya bağlanılamadı', 'error');
+            }
+            btn.disabled = false; btn.textContent = '✅ Yüklendi';
+            // input'u sıfırla ki aynı dosya tekrar seçilebilsin
+            event.target.value = '';
         }
 
-        async function uploadNoteQr() {
-            if (!pendingNoteQrFile) return;
-            const formData = new FormData();
-            formData.append('file', pendingNoteQrFile);
-            formData.append('label', document.getElementById('note-qr-label').value);
-            const res = await fetch('/api/settings/note-qr', {method:'POST', body: formData});
+        async function saveNoteQrLabel() {
+            const label = document.getElementById('note-qr-label').value;
+            const res = await fetch('/api/settings/note-qr/label', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({label})
+            });
             const d = await res.json();
-            if (d.success) showToast('Not QR kodu kaydedildi!', 'success');
-            else showToast(d.error || 'Hata', 'error');
-            pendingNoteQrFile = null;
-            document.getElementById('btn-upload-note-qr').disabled = true;
-            document.getElementById('btn-upload-note-qr').style.opacity = '.5';
+            if (d.success) showToast('Not QR yazısı kaydedildi!', 'success');
+            else showToast('Hata', 'error');
         }
 
         async function saveNoteQrLabel() {
@@ -601,11 +612,10 @@
                     <label style="font-size:.85rem;color:#4a5568;font-weight:600;">QR Altı Yazı</label>
                     <input type="text" id="note-qr-label" placeholder="WiFi: Firinna_Guest" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;margin-top:.3rem;">
                 </div>
-                <input type="file" id="note-qr-file-input" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewNoteQrFile(event)">
+                <input type="file" id="note-qr-file-input" accept="image/*" style="display:none;" onchange="noteQrFileSelected(event)">
                 <div class="save-row" style="width:100%;">
-                    <button class="btn btn-secondary" onclick="document.getElementById('note-qr-file-input').click()">📁 QR Görsel Seç</button>
-                    <button class="btn btn-primary" onclick="uploadNoteQr()" id="btn-upload-note-qr" disabled style="opacity:.5;">⬆️ Yükle</button>
-                    <button class="btn btn-primary" onclick="saveNoteQrLabel()" style="background:#38a169;">💾 Yazıyı Kaydet</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('note-qr-file-input').click()">📁 Görsel Seç &amp; Yükle</button>
+                    <button class="btn btn-primary" id="btn-upload-note-qr" onclick="saveNoteQrLabel()" style="background:#38a169;">💾 Yazıyı Kaydet</button>
                     <button class="btn" style="background:#ef4444;color:white;" onclick="deleteNoteQr()">🗑️ Sil</button>
                 </div>
             </div>
