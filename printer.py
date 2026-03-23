@@ -217,76 +217,164 @@ class ThermalPrinter:
         
         return self.send_command(data)
 
+    def _pil_to_escpos(self, img):
+        """PIL Image nesnesini ESC/POS raster bitmap komutuna çevir"""
+        from PIL import Image
+        ESC = b'\x1B'
+        GS  = b'\x1D'
+        LEFT = ESC + b'a\x00'
+
+        img = img.convert('L')
+        max_width = 384
+        if img.width > max_width:
+            ratio = max_width / img.width
+            img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
+        img = img.point(lambda x: 0 if x < 128 else 255, '1')
+        img = img.convert('1')
+
+        width, height = img.size
+        width_bytes  = (width + 7) // 8
+        width_padded = width_bytes * 8
+
+        xL = width_bytes & 0xFF
+        xH = (width_bytes >> 8) & 0xFF
+        yL = height & 0xFF
+        yH = (height >> 8) & 0xFF
+        data = GS + b'v0' + bytes([0, xL, xH, yL, yH])
+
+        pixels = img.load()
+        for y in range(height):
+            byte_val = 0
+            for x in range(width_padded):
+                bit = 0
+                if x < width:
+                    pixel = pixels[x, y]
+                    bit = 0 if pixel else 1
+                byte_val = (byte_val << 1) | bit
+                if (x + 1) % 8 == 0:
+                    data += bytes([byte_val])
+                    byte_val = 0
+
+        data += LEFT
+        return data
+
     def _image_to_escpos(self, image_path):
         """Görseli ESC/POS raster bitmap komutuna çevir"""
         try:
             from PIL import Image
             import os
 
-            # URL veya path'i çöz
             if image_path.startswith('/static/'):
                 base = os.path.dirname(os.path.abspath(__file__))
                 image_path = os.path.join(base, image_path.lstrip('/'))
-            elif image_path.startswith('data:'):
+
+            if image_path.startswith('data:'):
                 import base64, io
-                header, data = image_path.split(',', 1)
-                img = Image.open(io.BytesIO(base64.b64decode(data)))
-            
-            if not image_path.startswith('data:'):
+                header, b64data = image_path.split(',', 1)
+                img = Image.open(io.BytesIO(base64.b64decode(b64data)))
+            else:
                 if not os.path.exists(image_path):
                     return b''
                 img = Image.open(image_path)
 
-            # Gri tona çevir, yeniden boyutlandır (max 384px genişlik - 80mm yazıcı)
-            img = img.convert('L')  # Gri ton
-            max_width = 384
-            if img.width > max_width:
-                ratio = max_width / img.width
-                img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
-
-            # Siyah-beyaza çevir (eşik: 128)
-            img = img.point(lambda x: 0 if x < 128 else 255, '1')
-            img = img.convert('1')
-
-            width, height = img.size
-            # Genişliği 8'in katına tamamla
-            width_bytes = (width + 7) // 8
-            width_padded = width_bytes * 8
-
-            # ESC/POS raster bitmap: GS v 0
             ESC = b'\x1B'
-            GS = b'\x1D'
             CENTER = ESC + b'a\x01'
-            LEFT = ESC + b'a\x00'
-
-            data = CENTER
-            # GS v 0: m=0 (normal), xL xH = width_bytes, yL yH = height
-            xL = width_bytes & 0xFF
-            xH = (width_bytes >> 8) & 0xFF
-            yL = height & 0xFF
-            yH = (height >> 8) & 0xFF
-            data += GS + b'v0' + bytes([0, xL, xH, yL, yH])
-
-            # Piksel verisi
-            pixels = img.load()
-            for y in range(height):
-                row = 0
-                byte_val = 0
-                for x in range(width_padded):
-                    bit = 0
-                    if x < width:
-                        pixel = pixels[x, y]
-                        bit = 0 if pixel else 1  # 1=siyah
-                    byte_val = (byte_val << 1) | bit
-                    if (x + 1) % 8 == 0:
-                        data += bytes([byte_val])
-                        byte_val = 0
-
-            data += LEFT
-            return data
+            LEFT   = ESC + b'a\x00'
+            return CENTER + self._pil_to_escpos(img) + LEFT
         except Exception as e:
             print(f"Logo bitmap hatası: {e}")
             return b''
+
+    def _render_text_image(self, text, font_size=22):
+        """Metni bitmap görsele çevir — Rusça/Arapça/Farsça dahil çok dilli destek"""
+        try:
+            from PIL import Image, ImageDraw, ImageFont
+            import unicodedata
+
+            FONT_PATH  = '/usr/share/fonts/truetype/freefont/FreeSerif.ttf'
+            IMG_WIDTH  = 376   # 384'ten biraz dar, kenar boşluğu
+            PADDING    = 4
+            LINE_GAP   = 6
+
+            font = ImageFont.truetype(FONT_PATH, font_size)
+
+            def _has_rtl(s):
+                for ch in s:
+                    if unicodedata.bidirectional(ch) in ('R', 'AL', 'RLE', 'RLO'):
+                        return True
+                return False
+
+            def _reshape_arabic(s):
+                try:
+                    import arabic_reshaper
+                    from bidi.algorithm import get_display
+                    return get_display(arabic_reshaper.reshape(s))
+                except Exception:
+                    return s
+
+            def _text_width(s):
+                bb = font.getbbox(s)
+                return bb[2] - bb[0]
+
+            def _wrap_ltr(line):
+                """Kelime sınırından sar — kelime ortasından kesme"""
+                words = line.split(' ')
+                rows, cur = [], ''
+                for word in words:
+                    test = (cur + ' ' + word).strip()
+                    if _text_width(test) <= IMG_WIDTH - 2 * PADDING:
+                        cur = test
+                    else:
+                        if cur:
+                            rows.append(cur)
+                        # Tek kelime satıra sığmıyorsa karakter bazında sar
+                        if _text_width(word) > IMG_WIDTH - 2 * PADDING:
+                            partial = ''
+                            for ch in word:
+                                if _text_width(partial + ch) <= IMG_WIDTH - 2 * PADDING:
+                                    partial += ch
+                                else:
+                                    rows.append(partial)
+                                    partial = ch
+                            cur = partial
+                        else:
+                            cur = word
+                if cur:
+                    rows.append(cur)
+                return rows or ['']
+
+            # Satırları işle
+            rendered = []   # list of (text, is_rtl)
+            for raw in text.split('\n'):
+                if not raw.strip():
+                    rendered.append(('', False))
+                    continue
+                if _has_rtl(raw):
+                    rendered.append((_reshape_arabic(raw), True))
+                else:
+                    for wl in _wrap_ltr(raw):
+                        rendered.append((wl, False))
+
+            line_h = font_size + LINE_GAP
+            img_h  = len(rendered) * line_h + 2 * PADDING
+            img    = Image.new('L', (IMG_WIDTH, img_h), 255)
+            draw   = ImageDraw.Draw(img)
+
+            y = PADDING
+            for txt, rtl in rendered:
+                if txt:
+                    if rtl:
+                        x = IMG_WIDTH - PADDING - _text_width(txt)
+                        x = max(PADDING, x)
+                    else:
+                        x = PADDING
+                    draw.text((x, y), txt, font=font, fill=0)
+                y += line_h
+
+            return self._pil_to_escpos(img)
+        except Exception as e:
+            print(f"Metin görsel render hatası: {e}")
+            return None
 
     def test_print(self):
         """Bağlantı ve yazdırma testi"""
@@ -359,10 +447,18 @@ class ThermalPrinter:
         data += tr(f"{now}\n").encode('ascii', errors='replace')
         data += "==========================================\n".encode('ascii', errors='replace')
         data += LEFT
-        data += "\n".encode('ascii', errors='replace')
-        for line in note_text.split('\n'):
-            data += tr(f"{line}\n").encode('ascii', errors='replace')
-        data += "\n================================\n".encode('ascii', errors='replace')
+        data += b'\n'
+        # Metin görsel olarak render et (çok dilli + doğru kelime sarma)
+        note_img_bytes = self._render_text_image(note_text)
+        if note_img_bytes:
+            data += note_img_bytes
+        else:
+            # Yedek: textwrap ile ASCII
+            import textwrap
+            for line in note_text.split('\n'):
+                for wl in (textwrap.wrap(tr(line), 42) or ['']):
+                    data += (wl + '\n').encode('ascii', errors='replace')
+        data += b'\n================================\n'
 
         # QR Kod
         if qr_url:
