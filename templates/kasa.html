@@ -466,6 +466,7 @@
                 <div class="add-tx-form">
                     <h4>➕ İşlem Ekle</h4>
                     <div class="tx-inputs">
+                        <input type="datetime-local" id="txDate" style="padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
                         <div id="typeToggle" class="type-toggle">
                             <button class="toggle-btn ${currentTxType==='out'?'active':''}" data-type="out" onclick="setTxType('out')">▼ Çıkış</button>
                             <button class="toggle-btn ${currentTxType==='in' ?'active':''}" data-type="in"  onclick="setTxType('in')">▲ Giriş</button>
@@ -491,6 +492,8 @@
                             </optgroup>
                         </select>
                         <select id="txStokItem" style="display:none;flex:2;min-width:150px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;" onchange="onStokItemChange()"></select>
+                        <select id="txSubcat" style="display:none;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;min-width:130px;"></select>
+                        <input type="text" id="txDesc" placeholder="Açıklama">
                         <input type="number" id="txQty" placeholder="Miktar" step="0.01" min="0" style="display:none;width:90px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
                         <select id="txQtyUnit" style="display:none;width:90px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
                             <option value="adet">adet</option>
@@ -503,9 +506,6 @@
                             <option value="kutu">kutu</option>
                             <option value="şişe">şişe</option>
                         </select>
-                        <select id="txSubcat" style="display:none;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;min-width:130px;"></select>
-                        <input type="text" id="txDesc" placeholder="Açıklama">
-                        <input type="datetime-local" id="txDate" style="padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
                         <select id="txMethod">
                             <option value="cash">Nakit</option>
                             <option value="card">Kart</option>
