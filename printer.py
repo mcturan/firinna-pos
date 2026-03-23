@@ -148,7 +148,7 @@ class ThermalPrinter:
         qr_url = db.get_setting('receipt_qr_image_url', '')
         qr_label = db.get_setting('receipt_qr_label', '')
         if qr_url:
-            qr_bytes = self._image_to_escpos(qr_url)
+            qr_bytes = self._image_to_escpos(qr_url, target_width=150)
             if qr_bytes:
                 data += qr_bytes
             if qr_label:
@@ -217,7 +217,7 @@ class ThermalPrinter:
         
         return self.send_command(data)
 
-    def _pil_to_escpos(self, img):
+    def _pil_to_escpos(self, img, target_width=None):
         """PIL Image nesnesini ESC/POS raster bitmap komutuna çevir"""
         from PIL import Image
         ESC = b'\x1B'
@@ -225,7 +225,7 @@ class ThermalPrinter:
         LEFT = ESC + b'a\x00'
 
         img = img.convert('L')
-        max_width = 384
+        max_width = target_width if target_width else 384
         if img.width > max_width:
             ratio = max_width / img.width
             img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
@@ -258,7 +258,7 @@ class ThermalPrinter:
         data += LEFT
         return data
 
-    def _image_to_escpos(self, image_path):
+    def _image_to_escpos(self, image_path, target_width=None):
         """Görseli ESC/POS raster bitmap komutuna çevir"""
         try:
             from PIL import Image
@@ -280,7 +280,7 @@ class ThermalPrinter:
             ESC = b'\x1B'
             CENTER = ESC + b'a\x01'
             LEFT   = ESC + b'a\x00'
-            return CENTER + self._pil_to_escpos(img) + LEFT
+            return CENTER + self._pil_to_escpos(img, target_width=target_width) + LEFT
         except Exception as e:
             print(f"Logo bitmap hatası: {e}")
             return b''
@@ -462,7 +462,7 @@ class ThermalPrinter:
 
         # QR Kod
         if qr_url:
-            qr_bytes = self._image_to_escpos(qr_url)
+            qr_bytes = self._image_to_escpos(qr_url, target_width=150)
             if qr_bytes:
                 data += CENTER
                 data += qr_bytes
