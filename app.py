@@ -1448,6 +1448,37 @@ def api_delete_note_qr():
     db.set_setting('note_qr_label', '')
     return jsonify({'success': True})
 
+# ===== KAYITLI NOTLAR =====
+
+@app.route('/api/notes/saved', methods=['GET'])
+def api_saved_notes_list():
+    return jsonify(db.get_saved_notes())
+
+@app.route('/api/notes/saved', methods=['POST'])
+def api_saved_notes_create():
+    data = request.get_json()
+    title = data.get('title', 'NOT').strip() or 'NOT'
+    content = data.get('content', '').strip()
+    if not content:
+        return jsonify({'success': False, 'error': 'İçerik boş'}), 400
+    note_id = db.add_saved_note(title, content)
+    return jsonify({'success': True, 'id': note_id})
+
+@app.route('/api/notes/saved/<int:note_id>', methods=['PUT'])
+def api_saved_notes_update(note_id):
+    data = request.get_json()
+    title = data.get('title', 'NOT').strip() or 'NOT'
+    content = data.get('content', '').strip()
+    if not content:
+        return jsonify({'success': False, 'error': 'İçerik boş'}), 400
+    db.update_saved_note(note_id, title, content)
+    return jsonify({'success': True})
+
+@app.route('/api/notes/saved/<int:note_id>', methods=['DELETE'])
+def api_saved_notes_delete(note_id):
+    db.delete_saved_note(note_id)
+    return jsonify({'success': True})
+
 # ===== FİŞ ÖNİZLEME =====
 
 @app.route('/api/print/receipt/<int:order_id>/preview', methods=['GET'])

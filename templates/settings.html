@@ -41,6 +41,11 @@
         .auto-pull-row { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
         .auto-pull-row select { padding:.45rem .7rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.85rem; font-family:inherit; }
         .git-log-box { background:#f8fafc; border-radius:10px; padding:.85rem; font-size:.78rem; font-family:monospace; color:#475569; line-height:1.7; max-height:150px; overflow-y:auto; white-space:pre-wrap; }
+        /* Kayıtlı Notlar */
+        .saved-note-row { background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:.85rem 1rem; }
+        .sn-title { font-weight:700; color:#2d3748; font-size:.95rem; margin-bottom:.2rem; }
+        .sn-preview { color:#718096; font-size:.83rem; line-height:1.4; white-space:pre-line; margin-bottom:.5rem; }
+        .sn-actions { display:flex; gap:.4rem; flex-wrap:wrap; }
     </style>
 </head>
 <body>
@@ -157,6 +162,7 @@
             await loadPrinterSettings();
             await loadLogoSettings();
             await loadAutoPullSetting();
+            loadSavedNotes();
         });
 
         async function loadBusinessSettings() {
@@ -564,6 +570,89 @@
             }, 'Sil', '#e53e3e');
         }
 
+        // ===== KAYITLI NOTLAR =====
+        async function loadSavedNotes() {
+            const notes = await fetch('/api/notes/saved').then(r => r.json()).catch(() => []);
+            const list = document.getElementById('saved-notes-list');
+            if (!notes.length) {
+                list.innerHTML = '<div style="color:#94a3b8;font-size:.85rem;padding:.5rem 0;">Henüz kayıtlı not yok.</div>';
+                return;
+            }
+            list.innerHTML = notes.map(n => `
+                <div class="saved-note-row" id="snrow-${n.id}">
+                    <div class="sn-view" id="snview-${n.id}">
+                        <div class="sn-title">${escHtml(n.title)}</div>
+                        <div class="sn-preview">${escHtml(n.content.substring(0,80))}${n.content.length>80?'…':''}</div>
+                        <div class="sn-actions">
+                            <button class="btn btn-secondary" style="padding:.3rem .8rem;font-size:.82rem;" onclick="loadNoteIntoEditor(${n.id})">📄 Yükle</button>
+                            <button class="btn btn-secondary" style="padding:.3rem .8rem;font-size:.82rem;" onclick="startEditNote(${n.id})">✏️ Düzenle</button>
+                            <button class="btn" style="padding:.3rem .8rem;font-size:.82rem;background:#fed7d7;color:#c53030;" onclick="deleteSavedNote(${n.id})">🗑️ Sil</button>
+                        </div>
+                    </div>
+                    <div class="sn-edit" id="snedit-${n.id}" style="display:none;">
+                        <input type="text" id="snedit-title-${n.id}" value="${escAttr(n.title)}" style="width:100%;padding:.5rem;border:2px solid #e2e8f0;border-radius:7px;font-size:.95rem;margin-bottom:.4rem;">
+                        <textarea id="snedit-content-${n.id}" rows="4" style="width:100%;padding:.5rem;border:2px solid #e2e8f0;border-radius:7px;font-size:.9rem;resize:vertical;">${escHtml(n.content)}</textarea>
+                        <div class="sn-actions" style="margin-top:.4rem;">
+                            <button class="btn btn-primary" style="padding:.3rem .9rem;font-size:.82rem;background:#38a169;" onclick="saveEditNote(${n.id})">💾 Kaydet</button>
+                            <button class="btn btn-secondary" style="padding:.3rem .8rem;font-size:.82rem;" onclick="cancelEditNote(${n.id})">İptal</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            // notları hafızaya al (loadNoteIntoEditor için)
+            window._savedNotes = {};
+            notes.forEach(n => window._savedNotes[n.id] = n);
+        }
+        function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+        function loadNoteIntoEditor(id) {
+            const n = window._savedNotes && window._savedNotes[id];
+            if (!n) return;
+            document.getElementById('note-title').value = n.title;
+            document.getElementById('note-content').value = n.content;
+            showToast('"' + n.title + '" editöre yüklendi', 'success');
+        }
+        function startEditNote(id) {
+            document.getElementById('snview-' + id).style.display = 'none';
+            document.getElementById('snedit-' + id).style.display = 'block';
+        }
+        function cancelEditNote(id) {
+            document.getElementById('snedit-' + id).style.display = 'none';
+            document.getElementById('snview-' + id).style.display = 'block';
+        }
+        async function saveEditNote(id) {
+            const title = document.getElementById('snedit-title-' + id).value.trim() || 'NOT';
+            const content = document.getElementById('snedit-content-' + id).value.trim();
+            if (!content) { showToast('İçerik boş olamaz', 'error'); return; }
+            const d = await fetch('/api/notes/saved/' + id, {
+                method:'PUT', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({title, content})
+            }).then(r => r.json());
+            if (d.success) { showToast('Not güncellendi', 'success'); loadSavedNotes(); }
+            else showToast(d.error || 'Hata', 'error');
+        }
+        async function deleteSavedNote(id) {
+            const n = window._savedNotes && window._savedNotes[id];
+            const name = n ? n.title : 'bu not';
+            showConfirm('"' + name + '" silinsin mi?', async () => {
+                await fetch('/api/notes/saved/' + id, {method:'DELETE'});
+                showToast('Not silindi', 'success');
+                loadSavedNotes();
+            }, 'Sil', '#e53e3e');
+        }
+        async function saveCurrentNote() {
+            const title = document.getElementById('note-title').value.trim() || 'NOT';
+            const content = document.getElementById('note-content').value.trim();
+            if (!content) { showToast('Not içeriği boş!', 'warn'); return; }
+            const d = await fetch('/api/notes/saved', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({title, content})
+            }).then(r => r.json());
+            if (d.success) { showToast('Not kaydedildi!', 'success'); loadSavedNotes(); }
+            else showToast(d.error || 'Hata', 'error');
+        }
+        // ===========================
+
         async function previewNote() {
             const title = document.getElementById('note-title').value || 'NOT';
             const note = document.getElementById('note-content').value.trim();
@@ -592,11 +681,23 @@
 
         <!-- Not -->
         <div id="tab-not" class="settings-panel" style="display:none;">
+
+        <!-- Kayıtlı Notlar -->
         <div class="settings-card">
-            <h3>📝 Not Fişi</h3>
+            <h3>🗂️ Kayıtlı Notlar</h3>
+            <div id="saved-notes-list" style="display:flex;flex-direction:column;gap:.5rem;">
+                <div style="color:#94a3b8;font-size:.85rem;padding:.5rem 0;">Yükleniyor...</div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h3>📝 Not Fişi Editörü</h3>
             <div class="field-group">
                 <div><label>Başlık</label><input type="text" id="note-title" value="NOT" placeholder="NOT"></div>
                 <div><label>Not İçeriği</label><textarea id="note-content" rows="6" placeholder="Yazdırmak istediğiniz notu buraya girin..."></textarea></div>
+            </div>
+            <div style="margin-top:.75rem;">
+                <button class="btn btn-secondary" onclick="saveCurrentNote()" style="width:100%;">💾 Bu Notu Kayıtlı Notlara Ekle</button>
             </div>
         </div>
 

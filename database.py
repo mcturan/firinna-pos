@@ -101,6 +101,13 @@ def init_db():
     except:
         pass
     
+    c.execute('''CREATE TABLE IF NOT EXISTS saved_notes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL DEFAULT 'NOT',
+        content TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+
     conn.commit()
     conn.close()
 
@@ -819,6 +826,34 @@ def set_setting(key, value):
         VALUES (?, ?, CURRENT_TIMESTAMP)
         ON CONFLICT(key) DO UPDATE SET value = ?, updated_at = CURRENT_TIMESTAMP
     ''', (key, value, value))
+    conn.commit()
+    conn.close()
+
+# ===== KAYITLI NOTLAR =====
+
+def get_saved_notes():
+    conn = get_db()
+    rows = conn.execute('SELECT id, title, content, created_at FROM saved_notes ORDER BY id DESC').fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def add_saved_note(title, content):
+    conn = get_db()
+    cur = conn.execute('INSERT INTO saved_notes (title, content) VALUES (?, ?)', (title, content))
+    conn.commit()
+    note_id = cur.lastrowid
+    conn.close()
+    return note_id
+
+def update_saved_note(note_id, title, content):
+    conn = get_db()
+    conn.execute('UPDATE saved_notes SET title = ?, content = ? WHERE id = ?', (title, content, note_id))
+    conn.commit()
+    conn.close()
+
+def delete_saved_note(note_id):
+    conn = get_db()
+    conn.execute('DELETE FROM saved_notes WHERE id = ?', (note_id,))
     conn.commit()
     conn.close()
 
