@@ -524,7 +524,8 @@ def api_expenses():
             data['description'], data['amount'],
             data.get('category', 'Genel'),
             data.get('payment_method', 'cash'),
-            data.get('subcategory', '')
+            data.get('subcategory', ''),
+            date=data.get('date', None)
         )
         return jsonify({'success': True})
 
