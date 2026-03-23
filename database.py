@@ -1335,10 +1335,15 @@ def get_transactions_paginated(start, end, type_=None, category=None,
     total = conn.execute(f'SELECT COUNT(*) FROM transactions WHERE {where}', params).fetchone()[0]
     offset = (page - 1) * per_page
     rows = conn.execute(f'''
-        SELECT id, date, type, amount, category, payment_method, description,
-               related_order_id, created_at
-        FROM transactions WHERE {where}
-        ORDER BY created_at DESC LIMIT ? OFFSET ?
+        SELECT t.id, t.date, t.type, t.amount, t.category, t.payment_method,
+               t.description, t.related_order_id, t.created_at,
+               sm.quantity AS sm_qty, sm.unit AS sm_unit,
+               si.name AS sm_item_name
+        FROM transactions t
+        LEFT JOIN stock_movements sm ON sm.related_transaction_id = t.id AND sm.reason = 'alim'
+        LEFT JOIN stock_items si ON si.id = sm.stock_item_id
+        WHERE {where}
+        ORDER BY t.created_at DESC LIMIT ? OFFSET ?
     ''', params + [per_page, offset]).fetchall()
     conn.close()
     return {'rows': [dict(r) for r in rows], 'total': total,
@@ -1769,21 +1774,23 @@ def add_stock_purchase(stock_item_id, quantity, cost, payment_method, descriptio
     )''')
     if not date:
         date = datetime.now().strftime('%Y-%m-%d')
-    # Stok hareketi
     created_at = date + ' 00:00:00'
-    conn.execute('''INSERT INTO stock_movements
-        (stock_item_id, movement_type, quantity, cost, reason, description, created_at, unit)
-        VALUES (?, 'in', ?, ?, 'alim', ?, ?, ?)''',
-        (stock_item_id, quantity, cost, description, created_at, unit))
-    # Kasadan çıkış
+    item = conn.execute('SELECT name FROM stock_items WHERE id=?', (stock_item_id,)).fetchone()
+    item_name = item['name'] if item else 'Stok'
+    desc = description or item_name
+    # Önce transaction'ı ekle, ID'yi al
+    tx_id = None
     if cost and cost > 0:
-        item = conn.execute('SELECT name FROM stock_items WHERE id=?', (stock_item_id,)).fetchone()
-        item_name = item['name'] if item else 'Stok'
-        desc = description or item_name + ' alımı'
-        conn.execute('''INSERT INTO transactions
-            (date, type, amount, category, payment_method, description)
-            VALUES (?, 'out', ?, 'stok_alim', ?, ?)''',
-            (date, cost, payment_method, desc))
+        cur = conn.execute('''INSERT INTO transactions
+            (date, type, amount, category, payment_method, description, created_at)
+            VALUES (?, 'out', ?, 'stok_alim', ?, ?, ?)''',
+            (date, cost, payment_method, desc, created_at))
+        tx_id = cur.lastrowid
+    # Stok hareketi — transaction ID ile ilişkilendir
+    conn.execute('''INSERT INTO stock_movements
+        (stock_item_id, movement_type, quantity, cost, reason, description, created_at, unit, related_transaction_id)
+        VALUES (?, 'in', ?, ?, 'alim', ?, ?, ?, ?)''',
+        (stock_item_id, quantity, cost, desc, created_at, unit, tx_id))
     conn.commit()
     conn.close()
 

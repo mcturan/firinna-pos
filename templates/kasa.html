@@ -220,11 +220,21 @@
 
             let rows = d.rows.length === 0
                 ? `<tr><td colspan="${isAna ? 6 : 5}" class="no-data">Bu dönemde işlem yok.</td></tr>`
-                : d.rows.map(m => `
+                : d.rows.map(m => {
+                const isStokAlim = m.category === 'stok_alim' && m.sm_qty;
+                const unitPrice  = isStokAlim ? (m.amount / m.sm_qty) : null;
+                const descCell   = isStokAlim
+                    ? `<strong>${m.sm_item_name || m.description || '—'}</strong>
+                       <br><span style="font-size:.8rem;color:#718096;">
+                         ${m.sm_qty} ${m.sm_unit || ''}
+                         &nbsp;×&nbsp; ${fmtTL(unitPrice)}/${m.sm_unit || 'br'}
+                       </span>`
+                    : (m.description || '—');
+                return `
                     <tr>
                         <td style="color:#718096;font-size:.82rem;">${m.date}${m.created_at ? '<br><span style="font-size:.72rem;color:#cbd5e0;">' + (m.created_at||'').slice(11,16) + '</span>' : ''}</td>
                         <td><span class="${m.type==='in'?'badge-in':'badge-out'}">${m.type==='in'?'▲ GİRİŞ':'▼ ÇIKIŞ'}</span></td>
-                        <td>${m.description || '—'}</td>
+                        <td>${descCell}</td>
                         <td><span class="cat-badge">${catLabelMap[m.category]||m.category}</span></td>
                         ${isAna ? `<td><span class="cat-badge">${methodLabelMap[m.payment_method]||m.payment_method}</span></td>` : ''}
                         <td style="font-weight:700;color:${m.type==='in'?'#2d6a4f':'#e53e3e'};text-align:right;">${m.type==='in'?'+':'−'}${fmtTL(m.amount)}</td>
@@ -234,7 +244,8 @@
                                 <button class="btn-del" onclick="delTx(${m.id})" title="Sil">🗑️</button>
                             `}
                         </td>
-                    </tr>`).join('');
+                    </tr>`;
+            }).join('');
 
             // CSV link parametreleri
             let csvParams = `date_from=${from}&date_to=${to}&per_page=100000&format=csv`;
