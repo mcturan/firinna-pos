@@ -1200,6 +1200,20 @@ def api_print_note():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/print/photo', methods=['POST'])
+def api_print_photo():
+    if 'photo' not in request.files:
+        return jsonify({'success': False, 'error': 'Fotoğraf seçilmedi'}), 400
+    photo = request.files['photo']
+    paper_width = request.form.get('paper_width', '80')
+    max_width = 576 if paper_width == '80' else 384
+    try:
+        p = ThermalPrinter(printer_type='receipt')
+        success = p.print_photo(photo.read(), max_width=max_width)
+        return jsonify({'success': success, 'error': None if success else 'Yazıcıya bağlanılamadı'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/print/note/preview', methods=['POST'])
 def api_preview_note():
     data = request.json

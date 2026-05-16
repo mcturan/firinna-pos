@@ -376,6 +376,30 @@ class ThermalPrinter:
             print(f"Metin görsel render hatası: {e}")
             return None
 
+    def print_photo(self, image_bytes, max_width=576):
+        """Fotoğraf yazdır — kağıt genişliğine tam sığacak şekilde ölçekler"""
+        try:
+            from PIL import Image
+            import io
+            ESC = b'\x1B'
+
+            img = Image.open(io.BytesIO(image_bytes))
+            # Tam genişliğe ölçekle (yanlardan taşmayı önle)
+            if img.width != max_width:
+                ratio = max_width / img.width
+                img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
+
+            data  = ESC + b'@'       # ESC @ — başlat
+            data += ESC + b'a\x01'   # Ortala
+            data += self._pil_to_escpos(img, target_width=max_width)
+            data += b'\n\n\n'
+            data += ESC + b'd\x05' + ESC + b'm'  # Kes
+
+            return self.send_command(data)
+        except Exception as e:
+            print(f"Fotograf yazdirilirken hata: {e}")
+            return False
+
     def test_print(self):
         """Bağlantı ve yazdırma testi"""
         ESC = b'\x1B'

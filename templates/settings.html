@@ -62,6 +62,7 @@
             <button class="settings-tab" onclick="switchTab('logo',this)">🖼️ Logo & Fiş</button>
             <button class="settings-tab" onclick="switchTab('not',this)">📝 Not</button>
             <button class="settings-tab" onclick="switchTab('telegram',this)">📲 Telegram</button>
+            <button class="settings-tab" onclick="switchTab('foto',this)">📸 Fotoğraf</button>
         </div>
 
         <!-- İşletme Bilgileri -->
@@ -799,6 +800,51 @@
 
         </div><!-- /tab-telegram -->
 
+        <!-- Fotoğraf Yazdır -->
+        <div id="tab-foto" class="settings-panel" style="display:none;">
+        <div class="settings-card">
+            <h3>📸 Fotoğraf Yazdır</h3>
+            <p style="font-size:.88rem;color:#64748b;margin-bottom:1.25rem;">
+                Seçtiğiniz fotoğrafı kağıt genişliğine tam sığacak şekilde ölçekleyip yazdırır.
+                Yazıcı IP'si Yazıcı sekmesinden ayarlanmalıdır.
+            </p>
+
+            <!-- Kağıt genişliği -->
+            <div style="margin-bottom:1.25rem;">
+                <label style="display:block;font-weight:600;color:#4a5568;font-size:.9rem;margin-bottom:.5rem;">Kağıt Genişliği</label>
+                <div style="display:flex;gap:.75rem;">
+                    <label style="flex:1;display:flex;align-items:center;gap:.5rem;padding:.6rem .9rem;border:2px solid #4299e1;border-radius:9px;cursor:pointer;font-weight:600;font-size:.88rem;" id="pw-label-80">
+                        <input type="radio" name="paper_width" value="80" checked onchange="updatePaperLabel()"> 80mm <span style="color:#94a3b8;font-weight:400;">(576 nokta)</span>
+                    </label>
+                    <label style="flex:1;display:flex;align-items:center;gap:.5rem;padding:.6rem .9rem;border:2px solid #e2e8f0;border-radius:9px;cursor:pointer;font-weight:600;font-size:.88rem;" id="pw-label-58">
+                        <input type="radio" name="paper_width" value="58" onchange="updatePaperLabel()"> 58mm <span style="color:#94a3b8;font-weight:400;">(384 nokta)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Görsel seçimi -->
+            <div style="margin-bottom:1.25rem;">
+                <label style="display:block;font-weight:600;color:#4a5568;font-size:.9rem;margin-bottom:.5rem;">Fotoğraf</label>
+                <input type="file" id="photo-file-input" accept="image/*" style="display:none;" onchange="previewPhotoFile(event)">
+                <div id="photo-preview-box" onclick="document.getElementById('photo-file-input').click()"
+                    style="width:100%;min-height:120px;border:2px dashed #cbd5e1;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f8fafc;overflow:hidden;cursor:pointer;margin-bottom:.75rem;">
+                    <span id="photo-placeholder" style="color:#94a3b8;font-size:.9rem;user-select:none;">📁 Tıklayın — fotoğraf seçin</span>
+                    <img id="photo-preview-img" src="" alt="" style="display:none;max-width:100%;max-height:320px;object-fit:contain;">
+                </div>
+                <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('photo-file-input').click()">📁 Dosya Seç</button>
+                    <button class="btn" id="btn-clear-photo" style="background:#f1f5f9;color:#475569;display:none;" onclick="clearPhoto()">✖ Temizle</button>
+                </div>
+            </div>
+
+            <!-- Yazdır -->
+            <div class="save-row">
+                <button class="btn btn-primary" id="btn-print-photo" onclick="printPhoto()" disabled style="opacity:.5;">🖨️ Fotoğrafı Yazdır</button>
+            </div>
+            <div id="photo-msg" style="margin-top:.75rem;display:none;"></div>
+        </div>
+        </div><!-- /tab-foto -->
+
     </div><!-- /container -->
 
     <script>
@@ -809,6 +855,78 @@
             document.getElementById('tab-' + name).style.display = 'block';
             btn.classList.add('active');
             
+        }
+
+        // ===== FOTOĞRAF YAZDIR =====
+        function previewPhotoFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('photo-placeholder').style.display = 'none';
+                const img = document.getElementById('photo-preview-img');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                const btn = document.getElementById('btn-print-photo');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                document.getElementById('btn-clear-photo').style.display = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearPhoto() {
+            document.getElementById('photo-file-input').value = '';
+            document.getElementById('photo-preview-img').src = '';
+            document.getElementById('photo-preview-img').style.display = 'none';
+            document.getElementById('photo-placeholder').style.display = '';
+            const btn = document.getElementById('btn-print-photo');
+            btn.disabled = true;
+            btn.style.opacity = '.5';
+            document.getElementById('btn-clear-photo').style.display = 'none';
+            document.getElementById('photo-msg').style.display = 'none';
+        }
+
+        function updatePaperLabel() {
+            const val = document.querySelector('input[name="paper_width"]:checked').value;
+            document.getElementById('pw-label-80').style.borderColor = val === '80' ? '#4299e1' : '#e2e8f0';
+            document.getElementById('pw-label-58').style.borderColor = val === '58' ? '#4299e1' : '#e2e8f0';
+        }
+
+        async function printPhoto() {
+            const fileInput = document.getElementById('photo-file-input');
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('Lütfen önce bir fotoğraf seçin.');
+                return;
+            }
+            const paperWidth = document.querySelector('input[name="paper_width"]:checked').value;
+            const btn = document.getElementById('btn-print-photo');
+            const msg = document.getElementById('photo-msg');
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Yazdırılıyor...';
+            msg.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('photo', fileInput.files[0]);
+            formData.append('paper_width', paperWidth);
+
+            try {
+                const res  = await fetch('/api/print/photo', { method: 'POST', body: formData });
+                const d    = await res.json();
+                msg.style.display = 'block';
+                if (d.success) {
+                    msg.innerHTML = '<div style="background:#f0fff4;border:1.5px solid #9ae6b4;border-radius:9px;padding:.75rem 1rem;color:#276749;font-weight:600;">✅ Fotoğraf başarıyla yazdırıldı!</div>';
+                } else {
+                    msg.innerHTML = `<div style="background:#fff5f5;border:1.5px solid #fc8181;border-radius:9px;padding:.75rem 1rem;color:#c53030;font-weight:600;">❌ Hata: ${d.error || 'Yazıcıya bağlanılamadı'}</div>`;
+                }
+            } catch(e) {
+                msg.style.display = 'block';
+                msg.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fc8181;border-radius:9px;padding:.75rem 1rem;color:#c53030;font-weight:600;">❌ Sunucu hatası</div>';
+            }
+
+            btn.disabled = false;
+            btn.textContent = '🖨️ Fotoğrafı Yazdır';
         }
 
         // ===== GİTHUB SYNC =====
