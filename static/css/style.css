@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
 /* ============================================================
-   FIRINNA POS — Design System v5  |  Açık Tema
+   FIRINNA POS — Design System v6  |  Açık ve Koyu Tema
    ============================================================ */
 :root {
     --ink:      #1A1A1A;
@@ -14,6 +16,8 @@
     --nav-bg:   #FFFFFF;
     --nav-border: #E5E5E5;
     --accent:   #18181B;   /* buton, aktif tab */
+    --accent-ink: #FFFFFF;
+    --accent-hover: #333335;
     --green:    #16A34A;
     --red:      #DC2626;
     --orange:   #EA580C;
@@ -30,10 +34,33 @@
     --t: .14s ease;
 }
 
+body.dark-mode {
+    --ink:      #F4F4F5;
+    --ink-2:    #E4E4E7;
+    --ink-3:    #A1A1AA;
+    --ink-4:    #71717A;
+    --border:   #27272A;
+    --border-h: #3F3F46;
+    --surface:  #18181B;
+    --bg:       #09090B;
+    --bg-2:     #121214;
+    --nav-bg:   #18181B;
+    --nav-border: #27272A;
+    --accent:   #F4F4F5;
+    --accent-ink: #09090B;
+    --accent-hover: #E4E4E7;
+    --green:    #22C55E;
+    --red:      #EF4444;
+    --orange:   #F97316;
+    --green-bg: rgba(34, 197, 94, 0.08);
+    --red-bg:   rgba(239, 68, 68, 0.08);
+    --orange-bg:rgba(249, 115, 22, 0.08);
+}
+
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
 html { font-size:15px; -webkit-text-size-adjust:100%; }
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg);
     color: var(--ink);
     min-height: 100vh;
@@ -118,8 +145,8 @@ body {
     transition: all var(--t); font-family: inherit; white-space: nowrap; line-height: 1.35;
 }
 .btn:active { transform: scale(.97); }
-.btn-primary   { background: var(--accent); color: #fff; }
-.btn-primary:hover  { background: #333; }
+.btn-primary   { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover  { background: var(--accent-hover); }
 .btn-secondary { background: var(--border); color: var(--ink-2); }
 .btn-secondary:hover { background: var(--border-h); color: var(--ink); }
 .btn-success   { background: var(--green);  color: #fff; }
@@ -157,9 +184,41 @@ body {
     align-items: center; justify-content: center;
     box-shadow: var(--s-sm);
 }
-.table-card:hover    { border-color: var(--border-h); box-shadow: var(--s); transform: translateY(-1px); }
-.table-card.empty    { border-color: #86EFAC; }
-.table-card.occupied { border-color: #FCA5A5; background: #FFFCFC; }
+.table-card:hover    { border-color: var(--border-h); box-shadow: var(--s-lg); transform: translateY(-3px); }
+.table-card::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transition: all var(--t);
+}
+.table-card.empty::after {
+    background-color: var(--green);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+.table-card.occupied::after {
+    background-color: var(--red);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+    animation: pulse-red 2s infinite;
+}
+.table-card.empty    { border-color: var(--border); }
+.table-card.occupied { border-color: rgba(220, 38, 38, 0.25); background: rgba(220, 38, 38, 0.02); }
+body.dark-mode .table-card.occupied { border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.04); }
+
+@keyframes pulse-red {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
 .table-icon   { display: none; }
 .table-name   { font-weight: 700; font-size: 1.05rem; margin-bottom: .18rem; color: var(--ink); }
 .table-total  { color: var(--red); font-weight: 800; font-size: 1rem; margin: .25rem 0 .1rem; }
