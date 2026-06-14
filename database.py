@@ -279,6 +279,15 @@ def delete_zone(zone_id):
 # MASA İŞLEMLERİ
 def get_tables(zone_id=None):
     conn = get_db()
+    # Açık siparişi olmayan geçici alt masaları otomatik olarak temizle
+    conn.execute('''
+        DELETE FROM tables 
+        WHERE name LIKE '%/%' AND id NOT IN (
+            SELECT DISTINCT table_id FROM orders WHERE status = 'open'
+        )
+    ''')
+    conn.commit()
+    
     if zone_id:
         tables = conn.execute('''
             SELECT t.*, z.name as zone_name,
@@ -376,6 +385,20 @@ def add_order_item(order_id, product_id, quantity, price, product_name=None, kit
     conn.commit()
     conn.close()
 
+def check_and_delete_temp_table(conn, order_id):
+    # Alt masaları temizlemek için yardımcı fonksiyon
+    row = conn.execute('''
+        SELECT t.id, t.name 
+        FROM tables t 
+        JOIN orders o ON o.table_id = t.id 
+        WHERE o.id = ?
+    ''', (order_id,)).fetchone()
+    
+    if row and '/' in row['name']:
+        open_orders = conn.execute("SELECT id FROM orders WHERE table_id = ? AND status = 'open'", (row['id'],)).fetchone()
+        if not open_orders:
+            conn.execute("DELETE FROM tables WHERE id = ?", (row['id'],))
+
 def close_order(order_id):
     """Siparişi kapat (ödeme al)"""
     conn = get_db()
@@ -384,6 +407,7 @@ def close_order(order_id):
         SET status = 'closed', closed_at = CURRENT_TIMESTAMP 
         WHERE id = ?
     ''', (order_id,))
+    check_and_delete_temp_table(conn, order_id)
     conn.commit()
     conn.close()
 
@@ -700,6 +724,7 @@ def close_order_with_payment(order_id, payment_cash=0, payment_card=0, tip_amoun
         WHERE id = ?
     ''', (closed_at, payment_cash, payment_card, tip_amount, tip_method, order_id))
     record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amount, tip_method, closed_at)
+    check_and_delete_temp_table(conn, order_id)
     conn.commit()
     conn.close()
 
@@ -1907,3 +1932,167 @@ def merge_orders(source_order_id, target_order_id):
     update_order_total(conn, target_order_id)
     conn.commit()
     conn.close()
+
+def pay_order_items(order_id, items_to_pay, payment_cash=0, payment_card=0, tip_amount=0, tip_method='cash'):
+    """
+    Siparişten seçilen ürünlerin ödemesini al (Masa içi bölme).
+    items_to_pay: list of dicts [{'id': order_item_id, 'quantity': qty}]
+    """
+    conn = get_db()
+    c = conn.cursor()
+    
+    # 1. Kaynak siparişi al
+    order = conn.execute("SELECT * FROM orders WHERE id=? AND status='open'", (order_id,)).fetchone()
+    if not order:
+        conn.close()
+        raise ValueError("Açık sipariş bulunamadı.")
+        
+    table_id = order['table_id']
+    
+    # 2. Yeni kapalı sipariş oluştur
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    c.execute('''
+        INSERT INTO orders (table_id, status, created_at, closed_at, payment_cash, payment_card, tip_amount, tip_method)
+        VALUES (?, 'closed', ?, ?, ?, ?, ?, ?)
+    ''', (table_id, order['created_at'], now_str, payment_cash, payment_card, tip_amount, tip_method))
+    new_order_id = c.lastrowid
+    
+    # 3. Ürünleri taşı veya kopyala
+    subtotal = 0
+    for it in items_to_pay:
+        item_id = it['id']
+        pay_qty = int(it['quantity'])
+        
+        # Orijinal kalemi sorgula
+        orig = conn.execute("SELECT * FROM order_items WHERE id=? AND order_id=?", (item_id, order_id)).fetchone()
+        if not orig:
+            continue
+            
+        orig_qty = orig['quantity']
+        if pay_qty > orig_qty or pay_qty <= 0:
+            continue
+            
+        price = orig['price']
+        is_comp = orig['is_complimentary']
+        if not is_comp:
+            subtotal += price * pay_qty
+            
+        if pay_qty == orig_qty:
+            # Tüm miktarı taşı
+            c.execute("UPDATE order_items SET order_id=? WHERE id=?", (new_order_id, item_id))
+        else:
+            # Kısmi miktarı kopyala ve orijinali azalt
+            c.execute('''
+                INSERT INTO order_items (order_id, product_id, product_name, quantity, price, kitchen_notes, is_complimentary, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (new_order_id, orig['product_id'], orig['product_name'], pay_qty, price, orig['kitchen_notes'], is_comp, orig['created_at']))
+            c.execute("UPDATE order_items SET quantity = quantity - ? WHERE id=?", (pay_qty, item_id))
+            
+    # Yeni siparişin toplamını güncelle (herhangi bir indirim uygulanmadıysa subtotal)
+    c.execute("UPDATE orders SET total = ? WHERE id = ?", (subtotal, new_order_id))
+    
+    # 4. İşlemi kaydet (kasa hareketleri için)
+    record_order_transaction(conn, new_order_id, payment_cash, payment_card, tip_amount, tip_method, now_str)
+    
+    # 5. Orijinal siparişin toplamını güncelle
+    update_order_total(conn, order_id)
+    
+    # 6. Orijinal siparişte hiç ürün kalıp kalmadığını kontrol et
+    remaining = conn.execute("SELECT COUNT(*) as cnt FROM order_items WHERE order_id=?", (order_id,)).fetchone()
+    if remaining['cnt'] == 0:
+        c.execute("DELETE FROM orders WHERE id=?", (order_id,))
+        original_closed = True
+    else:
+        original_closed = False
+        
+    check_and_delete_temp_table(conn, new_order_id)
+    conn.commit()
+    conn.close()
+    
+    return new_order_id, original_closed
+
+def transfer_order_items(source_order_id, target_table_id, items_to_move):
+    """
+    Siparişten seçilen ürünleri başka masaya aktar.
+    items_to_move: list of dicts [{'id': order_item_id, 'quantity': qty}]
+    """
+    conn = get_db()
+    c = conn.cursor()
+    
+    # 1. Kaynak siparişi al
+    src_order = conn.execute("SELECT * FROM orders WHERE id=? AND status='open'", (source_order_id,)).fetchone()
+    if not src_order:
+        conn.close()
+        raise ValueError("Kaynak sipariş bulunamadı.")
+        
+    # 2. Hedef masanın açık siparişi var mı?
+    dst_order = conn.execute("SELECT * FROM orders WHERE table_id=? AND status='open'", (target_table_id,)).fetchone()
+    if dst_order:
+        target_order_id = dst_order['id']
+    else:
+        # Yoksa yeni sipariş oluştur
+        c.execute("INSERT INTO orders (table_id, status) VALUES (?, 'open')", (target_table_id,))
+        target_order_id = c.lastrowid
+        
+    # 3. Ürünleri taşı
+    for it in items_to_move:
+        item_id = it['id']
+        move_qty = int(it['quantity'])
+        
+        orig = conn.execute("SELECT * FROM order_items WHERE id=? AND order_id=?", (item_id, source_order_id)).fetchone()
+        if not orig:
+            continue
+            
+        orig_qty = orig['quantity']
+        if move_qty > orig_qty or move_qty <= 0:
+            continue
+            
+        if move_qty == orig_qty:
+            c.execute("UPDATE order_items SET order_id=? WHERE id=?", (target_order_id, item_id))
+        else:
+            c.execute('''
+                INSERT INTO order_items (order_id, product_id, product_name, quantity, price, kitchen_notes, is_complimentary, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (target_order_id, orig['product_id'], orig['product_name'], move_qty, orig['price'], orig['kitchen_notes'], orig['is_complimentary'], orig['created_at']))
+            c.execute("UPDATE order_items SET quantity = quantity - ? WHERE id=?", (move_qty, item_id))
+            
+    # 4. Toplam tutarları güncelle
+    update_order_total(conn, source_order_id)
+    update_order_total(conn, target_order_id)
+    
+    # 5. Kaynak sipariş boşaldıysa sil
+    remaining = conn.execute("SELECT COUNT(*) as cnt FROM order_items WHERE order_id=?", (source_order_id,)).fetchone()
+    source_deleted = False
+    if remaining['cnt'] == 0:
+        c.execute("DELETE FROM orders WHERE id=?", (source_order_id,))
+        source_deleted = True
+        
+    conn.commit()
+    conn.close()
+    
+    return target_order_id, source_deleted
+
+def split_table(table_id, suffix):
+    """
+    Masayı bölerek yeni bir alt masa oluştur (örn: Masa 5/A).
+    """
+    conn = get_db()
+    tbl = conn.execute("SELECT * FROM tables WHERE id = ?", (table_id,)).fetchone()
+    if not tbl:
+        conn.close()
+        raise ValueError("Masa bulunamadı.")
+    
+    new_name = f"{tbl['name']}/{suffix}"
+    
+    # Aynı isimde masa var mı kontrol et
+    exist = conn.execute("SELECT id FROM tables WHERE name = ?", (new_name,)).fetchone()
+    if exist:
+        conn.close()
+        raise ValueError(f"'{new_name}' masası zaten mevcut.")
+        
+    # Yeni alt masayı ekle
+    conn.execute('INSERT INTO tables (name, zone_id) VALUES (?, ?)', (new_name, tbl['zone_id']))
+    new_table_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+    conn.commit()
+    conn.close()
+    return new_table_id

@@ -414,6 +414,18 @@ def api_get_single_table(table_id):
         'current_order_id': order['id'] if order else None,
     })
 
+@app.route('/api/tables/<int:table_id>/split', methods=['POST'])
+def api_split_table(table_id):
+    data = request.json or {}
+    suffix = data.get('suffix')
+    if not suffix:
+        return jsonify({'success': False, 'error': 'Alt masa eki (örn: A, B veya 2) gerekli'}), 400
+    try:
+        new_table_id = db.split_table(table_id, suffix)
+        return jsonify({'success': True, 'new_table_id': new_table_id})
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
 # ── QR Self-Servis Sipariş ──
 @app.route('/siparis/<int:table_id>')
 def qr_order_page(table_id):
@@ -959,6 +971,54 @@ def api_split_order(order_id):
     data = request.json
     per_person = db.split_order_equal(order_id, data['num_people'])
     return jsonify({'per_person': per_person})
+
+@app.route('/api/orders/<int:order_id>/pay-items', methods=['POST'])
+def api_pay_order_items(order_id):
+    data = request.json or {}
+    items_to_pay = data.get('items', [])
+    payment_cash = data.get('payment_cash', 0)
+    payment_card = data.get('payment_card', 0)
+    tip_amount = data.get('tip_amount', 0)
+    tip_method = data.get('tip_method', 'cash')
+    
+    if not items_to_pay:
+        return jsonify({'success': False, 'error': 'Ödenecek ürün seçilmedi.'}), 400
+        
+    try:
+        new_order_id, original_closed = db.pay_order_items(
+            order_id, items_to_pay, payment_cash, payment_card, tip_amount, tip_method
+        )
+        db.deduct_stock_for_order(new_order_id)
+        telegram_notify.check_low_stock_after_order(new_order_id)
+        
+        return jsonify({
+            'success': True,
+            'new_order_id': new_order_id,
+            'original_closed': original_closed
+        })
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/orders/<int:order_id>/transfer-items', methods=['POST'])
+def api_transfer_order_items(order_id):
+    data = request.json or {}
+    target_table_id = data.get('target_table_id')
+    items_to_move = data.get('items', [])
+    
+    if not target_table_id:
+        return jsonify({'success': False, 'error': 'Hedef masa seçilmedi.'}), 400
+    if not items_to_move:
+        return jsonify({'success': False, 'error': 'Aktarılacak ürün seçilmedi.'}), 400
+        
+    try:
+        target_order_id, source_deleted = db.transfer_order_items(order_id, target_table_id, items_to_move)
+        return jsonify({
+            'success': True,
+            'target_order_id': target_order_id,
+            'source_deleted': source_deleted
+        })
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
 @app.route('/api/categories/<int:category_id>/order', methods=['PATCH'])
 def api_update_category_order(category_id):

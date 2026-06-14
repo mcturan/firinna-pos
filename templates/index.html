@@ -124,14 +124,17 @@
                             <button class="btn" onclick="previewKitchen()" style="background:#48bb78;color:white;">👁️ Önizle</button>
                             <button class="btn" onclick="printKitchen()" style="background:#38a169;color:white;">🖨️ Yazdır</button>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                            <button class="btn" onclick="previewReceiptPDF()" style="background:#ed8936;color:white;" title="Müşteri fişi önizle / PDF kaydet">📄 PDF</button>
-                            <button class="btn" onclick="sendToPhone()" style="background:#9f7aea;color:white;">📱</button>
+                        <div style="margin-bottom: 1rem;">
+                            <button class="btn" onclick="previewReceiptPDF()" style="background:#ed8936;color:white;width:100%;" title="Müşteri fişi önizle / PDF kaydet">📄 PDF Fiş Kaydet</button>
                         </div>
                         <button class="btn" onclick="cancelOrder()" style="background:#f56565;color:white;width:100%;">🗑️ Fiş İptal</button>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
-                            <button class="btn" onclick="openTransferModal()" style="background:#667eea;color:white;">↔ Taşı</button>
-                            <button class="btn" onclick="openMergeModal()" style="background:#ed8936;color:white;">⊕ Birleştir</button>
+                            <button class="btn" onclick="openTransferModal()" style="background:#667eea;color:white;" title="Tüm masayı taşı">↔ Masayı Taşı</button>
+                            <button class="btn" onclick="openItemTransferModal()" style="background:#4c51bf;color:white;" title="Seçilen ürünleri taşı">↔ Ürün Aktar</button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                            <button class="btn" onclick="openMergeModal()" style="background:#ed8936;color:white;" title="Siparişleri Birleştir">⊕ Birleştir</button>
+                            <button class="btn" onclick="promptSplitTable()" style="background:#00b4d8;color:white;" title="Alt masa oluşturarak masayı böl">✂ Masayı Böl</button>
                         </div>
 
                         </div>
@@ -1218,6 +1221,11 @@
             }
         }
 
+        function setEntryAmount(val) {
+            document.getElementById('payEntryAmount').value = val.toFixed(2);
+            updatePayRemaining();
+        }
+
         function openPaymentModal() {
             payEntries = [];
             payEntryType = 'cash';
@@ -1354,12 +1362,13 @@
                 const extra = Math.abs(remaining);
                 tip += extra;
                 const last = payEntries[payEntries.length - 1];
-                last.amount -= extra;
+                if (last) last.amount -= extra;
             }
 
             const totalCash = payEntries.filter(e=>e.type==='cash').reduce((s,e)=>s+e.amount,0);
             const totalCard = payEntries.filter(e=>e.type==='card').reduce((s,e)=>s+e.amount,0);
 
+            // Normal tüm masayı kapatma
             await fetch(`/api/orders/${currentOrder.id}/close-with-payment`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -1390,8 +1399,8 @@
                 body: JSON.stringify({num_people: numPeople})
             }).then(r => r.json());
             
-            document.getElementById('splitResult').textContent =
-                `Kişi başı: ${fmtTL(response.per_person)}`;
+            document.getElementById('splitResult').innerHTML =
+                `Kişi başı: ${fmtTL(response.per_person)} <button class="btn btn-secondary" onclick="setEntryAmount(${response.per_person})" style="padding:.2rem .4rem;font-size:.7rem;margin-left:.5rem;border-radius:4px;display:inline-block;width:auto;height:auto;line-height:1;">Tutara Aktar</button>`;
         }
 
         function updateOrderSummary() {
@@ -2216,6 +2225,25 @@ async function doMerge(targetTableId, targetTableName) {
             </div>
         </div>
     </div>
+
+    <!-- Ürün Aktarma Modali -->
+    <div id="itemTransferModal" class="modal">
+        <div class="modal-content" style="max-width:480px;">
+            <div class="modal-header">
+                <h2>↔ Ürün Aktar</h2>
+                <span class="close" onclick="document.getElementById('itemTransferModal').style.display='none'">&times;</span>
+            </div>
+            <div style="padding:1.1rem; display:flex; flex-direction:column; gap:.75rem;">
+                <div style="font-weight:700; font-size:.78rem; color:var(--ink-3); text-transform:uppercase; letter-spacing:.05em;">1. Aktarılacak Ürünleri Seçin</div>
+                <div id="transferItemsList" style="display:flex; flex-direction:column; gap:.4rem; max-height:200px; overflow-y:auto; border:1px solid var(--border); padding:.5rem; border-radius:6px; background:var(--bg);"></div>
+                
+                <div style="font-weight:700; font-size:.78rem; color:var(--ink-3); text-transform:uppercase; letter-spacing:.05em; margin-top:.3rem;">2. Hedef Masayı Seçin</div>
+                <div id="transferTargetTableList" style="display:flex; flex-direction:column; gap:.4rem; max-height:180px; overflow-y:auto; border:1px solid var(--border); padding:.5rem; border-radius:6px; background:var(--bg);"></div>
+                
+                <button class="btn btn-success" style="width:100%; margin-top:.5rem; padding:.75rem;" onclick="doItemTransfer()">Aktarmayı Tamamla</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 <script>
@@ -2252,14 +2280,119 @@ function printKitchen() {
         });
 }
 
-function sendToPhone() {
-    if (!currentOrder || !currentOrder.id) {
-        showToast('Önce siparişi kaydedin!', 'warn');
+async function openItemTransferModal() {
+    if (!currentOrder || !currentOrder.id) return;
+    
+    // 1. Ürünleri Listele
+    const itemsList = document.getElementById('transferItemsList');
+    if (currentOrder.items && currentOrder.items.length > 0) {
+        itemsList.innerHTML = currentOrder.items.map(i => `
+            <div style="display:flex; gap:.5rem; align-items:center; font-size:.85rem; padding:.3rem 0; border-bottom:1px solid var(--border);">
+                <input type="checkbox" class="transfer-item-check" data-item-id="${i.id}" data-max-qty="${i.quantity}">
+                <input type="number" class="transfer-item-qty" value="${i.quantity}" min="1" max="${i.quantity}" data-item-id="${i.id}" style="width:45px; padding:2px; border:1px solid var(--border); border-radius:4px; text-align:center;" oninput="validatePayQty(this)">
+                <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-left:.25rem;">x ${i.product_name||i.name||''}</span>
+                <span style="font-weight:600; color:var(--ink-2);">${i.is_complimentary ? 'İkram' : fmtTL(i.quantity * (i.price||0))}</span>
+            </div>
+        `).join('');
+    } else {
+        itemsList.innerHTML = '<p style="color:#a0aec0; font-size:.85rem; text-align:center;">Siparişte ürün yok.</p>';
+    }
+    
+    // 2. Hedef Masaları Listele
+    const tables = await fetch('/api/tables').then(r => r.json());
+    const otherTables = tables.filter(t => t.id !== currentTable);
+    const targetList = document.getElementById('transferTargetTableList');
+    
+    targetList.innerHTML = otherTables.length ? otherTables.map(t => {
+        const statusText = t.has_order ? `Dolu (${fmtTL(t.order_total||0)})` : 'Boş';
+        const statusColor = t.has_order ? 'color:#c05621; font-weight:700;' : 'color:#2f855a; font-weight:600;';
+        return `
+            <label style="display:flex; align-items:center; gap:.5rem; padding:.5rem; border:1px solid var(--border); border-radius:6px; background:white; cursor:pointer; font-family:inherit; font-size:.88rem; margin-bottom:.2rem;">
+                <input type="radio" name="transferTargetTable" value="${t.id}" data-table-name="${t.name}">
+                <span style="font-weight:700;">🍽️ ${t.name}</span>
+                <span style="color:#a0aec0; font-size:.8rem; margin-left:.25rem;">— ${t.zone_name||''}</span>
+                <span style="margin-left:auto; font-size:.8rem; ${statusColor}">${statusText}</span>
+            </label>
+        `;
+    }).join('') : '<p style="color:#a0aec0; font-size:.85rem;">Hedef masa yok.</p>';
+    
+    document.getElementById('itemTransferModal').style.display = 'flex';
+}
+
+async function doItemTransfer() {
+    // 1. Seçilen ürünleri al
+    const selectedItems = [];
+    document.querySelectorAll('.transfer-item-check:checked').forEach(cb => {
+        const itemId = parseInt(cb.getAttribute('data-item-id'));
+        const qtyInput = document.querySelector(`.transfer-item-qty[data-item-id="${itemId}"]`);
+        const qty = qtyInput ? parseInt(qtyInput.value) : 1;
+        selectedItems.push({id: itemId, quantity: qty});
+    });
+    
+    if (selectedItems.length === 0) {
+        showToast('Lütfen aktarılacak en az bir ürün seçin.', 'warn');
         return;
     }
-    const phone = prompt("Telefon numarası (5XX XXX XX XX):");
-    if (!phone) return;
-    showToast('WhatsApp entegrasyonu yakında eklenecek!', 'info');
+    
+    // 2. Seçilen hedef masayı al
+    const targetRadio = document.querySelector('input[name="transferTargetTable"]:checked');
+    if (!targetRadio) {
+        showToast('Lütfen hedef masayı seçin.', 'warn');
+        return;
+    }
+    
+    const targetTableId = parseInt(targetRadio.value);
+    const targetTableName = targetRadio.getAttribute('data-table-name');
+    
+    showConfirm(`Seçilen ürünler "${targetTableName}" masasına aktarılsın mı?`, async () => {
+        const response = await fetch(`/api/orders/${currentOrder.id}/transfer-items`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                target_table_id: targetTableId,
+                items: selectedItems
+            })
+        }).then(r => r.json());
+        
+        if (response.success) {
+            document.getElementById('itemTransferModal').style.display = 'none';
+            if (response.source_deleted) {
+                showToast('Tüm ürünler aktarıldı ve kaynak masa boşaltıldı!', 'success');
+                document.getElementById('orderModal').style.display = 'none';
+            } else {
+                showToast('Ürünler başarıyla aktarıldı!', 'success');
+                // Sipariş detayını yenile
+                currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+                updateOrderSummary();
+            }
+            refreshZone();
+        } else {
+            showToast('Aktarım hatası: ' + response.error, 'error');
+        }
+    }, 'Aktar', '#667eea');
+}
+
+async function promptSplitTable() {
+    if (!currentTable) return;
+    const suffix = prompt("Alt masa ekini girin (örn: A, B, 2, 3):\n(Bu masa 'Masa Adı/Ek' şeklinde oluşturulacaktır)");
+    if (!suffix) return;
+    
+    const response = await fetch(`/api/tables/${currentTable}/split`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({suffix: suffix.trim()})
+    }).then(r => r.json());
+    
+    if (response.success) {
+        showToast(`Alt masa başarıyla oluşturuldu!`, 'success');
+        refreshZone();
+        // Ürün aktarma modalını doğrudan açalım
+        setTimeout(() => {
+            openItemTransferModal();
+        }, 300);
+    } else {
+        showToast('Hata: ' + response.error, 'error');
+    }
 }
 
 async function cancelOrder() {
