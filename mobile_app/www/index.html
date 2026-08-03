@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>Fırınna Garson</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px 20px; background: #f8fafc; }
+        input { padding: 10px; font-size: 16px; width: 80%; max-width: 300px; border-radius: 8px; border: 2px solid #ccc; margin-bottom: 20px; }
+        button { padding: 12px 24px; font-size: 16px; border-radius: 8px; border: none; background: #2d6a4f; color: white; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="setup" style="display:none;">
+        <h2>Sunucu IP Adresi</h2>
+        <p>Bilgisayarın IP adresini giriniz (Örn: 192.168.1.100)</p>
+        <input type="text" id="ipInput" placeholder="192.168.1.100" />
+        <br>
+        <button onclick="saveAndGo()">Kaydet ve Başla</button>
+    </div>
+    
+    <script>
+        function saveAndGo() {
+            var ip = document.getElementById('ipInput').value.trim();
+            if(ip) {
+                localStorage.setItem("server_ip", ip);
+                window.location.replace("http://" + ip + ":5000/?mode=garson");
+            }
+        }
+        
+        var savedIp = localStorage.getItem("server_ip");
+        if (savedIp) {
+            window.location.replace("http://" + savedIp + ":5000/?mode=garson");
+        } else {
+            document.getElementById('setup').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "appId": "com.firinna.posmobile",
+  "appName": "Fırınna Garson",
+  "webDir": "www",
+  "server": {
+    "allowNavigation": ["*"],
+    "cleartext": true
+  }
+}

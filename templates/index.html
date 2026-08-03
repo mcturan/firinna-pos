@@ -2244,6 +2244,24 @@ async function doMerge(targetTableId, targetTableName) {
             </div>
         </div>
     </div>
+<!-- Garson Mode Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'garson') {
+            // Navbar'ı gizle
+            const navbar = document.querySelector('.navbar');
+            if (navbar) navbar.style.display = 'none';
+            
+            // Geçmiş Sipariş panelini gizle
+            const histToggle = document.getElementById('histToggleBtn');
+            if (histToggle) histToggle.style.display = 'none';
+            
+            // Sayfa içeriğini tam ekran yapmak için margin sıfırlama (gerekirse)
+            document.body.style.paddingTop = '10px';
+        }
+    });
+</script>
 </body>
 </html>
 <script>
