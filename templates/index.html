@@ -2266,6 +2266,24 @@ async function doMerge(targetTableId, targetTableName) {
             return false;
         }
 
+        // Modal açıldığında tarayıcı geçmişine durum ekle (geri tuşu ile kapatmak için)
+        const modalObserver = new MutationObserver(mutations => {
+            mutations.forEach(m => {
+                if (m.type === 'attributes' && m.attributeName === 'style') {
+                    const target = m.target;
+                    if (target.classList.contains('modal') && target.style.display === 'block') {
+                        if (!target.dataset.isOpen) {
+                            target.dataset.isOpen = 'true';
+                            history.pushState({modal: target.id}, "", window.location.href);
+                        }
+                    } else if (target.classList.contains('modal') && target.style.display === 'none') {
+                        target.dataset.isOpen = '';
+                    }
+                }
+            });
+        });
+        document.querySelectorAll('.modal').forEach(m => modalObserver.observe(m, {attributes: true}));
+
         history.pushState({page: 'home'}, "", window.location.href);
         window.addEventListener('popstate', function(e) {
             if (closeTopModal()) {
