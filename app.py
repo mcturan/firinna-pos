@@ -2436,6 +2436,26 @@ def api_web_tables_status():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/api/web/contact', methods=['POST'])
+def api_web_contact():
+    try:
+        data = request.json
+        msg = f"📩 <b>Web'den Yeni Mesaj</b>\n\n👤 İsim: {data.get('name')}\n📞 Telefon: {data.get('phone')}\n💬 Mesaj: {data.get('message')}"
+        telegram_notify.send_async(msg)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/web/reservation', methods=['POST'])
+def api_web_reservation():
+    try:
+        data = request.json
+        msg = f"📅 <b>Web'den Masa Rezervasyonu Talebi</b>\n\n👤 İsim: {data.get('name')}\n📞 Telefon: {data.get('phone')}\n🗓 Tarih: {data.get('date')} - {data.get('time')}\n👥 Kişi: {data.get('guests')}\n📝 Not: {data.get('note', '-')}"
+        telegram_notify.send_async(msg)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 if __name__ == '__main__':
     db.init_db()
     try: db.init_muhasebe_tables()
