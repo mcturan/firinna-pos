@@ -2420,7 +2420,21 @@ def save_web_settings():
     data = request.json
     with open(SETTINGS_FILE, 'w') as f:
         json.dump(data, f, indent=4)
-    return jsonify({"success": True})
+    return jsonify(settings)
+
+@app.route('/api/web/tables-status', methods=['GET'])
+def api_web_tables_status():
+    try:
+        tables = db.get_tables()
+        empty_count = 0
+        total_count = len(tables)
+        for t in tables:
+            order = db.get_table_order(t['id'])
+            if not order:
+                empty_count += 1
+        return jsonify({'success': True, 'total': total_count, 'empty': empty_count})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == '__main__':
     db.init_db()
