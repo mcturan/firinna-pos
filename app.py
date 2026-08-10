@@ -2363,35 +2363,6 @@ def api_dev_requests_delete(req_id):
     items = [i for i in items if i['id'] != req_id]
     _save_dev_requests(items)
     return jsonify({'success': True})
-
-if __name__ == '__main__':
-    db.init_db()
-    try: db.init_muhasebe_tables()
-    except: pass
-    try: db.migrate_product_stock_link()
-    except: pass
-    try: db.migrate_orders_to_transactions()
-    except: pass
-    try: db.init_telegram_contacts()
-    except: pass
-    # Auto-pull başlat (local config'e göre)
-    try:
-        start_auto_pull_smart()
-    except:
-        pass
-    # Auto-push başlat
-    start_auto_push()
-    # Telegram günlük otomatik gönderim
-    try:
-        db.migrate_is_available()
-    except:
-        pass
-    try:
-        start_telegram_auto_send()
-    except:
-        pass
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
 # =========================================================================
 # WEB SITE INTEGRATION (API BRIDGES)
 # =========================================================================
@@ -2432,3 +2403,32 @@ def web_message():
     
     telegram_notify.send_async(msg)
     return jsonify({"success": True, "message": "Mesajınız iletildi."})
+
+if __name__ == '__main__':
+    db.init_db()
+    try: db.init_muhasebe_tables()
+    except: pass
+    try: db.migrate_product_stock_link()
+    except: pass
+    try: db.migrate_orders_to_transactions()
+    except: pass
+    try: db.init_telegram_contacts()
+    except: pass
+    # Auto-pull başlat (local config'e göre)
+    try:
+        start_auto_pull_smart()
+    except:
+        pass
+    # Auto-push başlat
+    start_auto_push()
+    # Telegram günlük otomatik gönderim
+    try:
+        db.migrate_is_available()
+    except:
+        pass
+    try:
+        start_telegram_auto_send()
+    except:
+        pass
+    app.run(host='0.0.0.0', port=5000, debug=True)
+
