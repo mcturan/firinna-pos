@@ -1457,7 +1457,7 @@ def api_reclose_order(order_id):
 
 @app.route('/backup')
 def backup_page():
-    return render_template('backup.html')
+    return render_template('backup.html', app_version=APP_VERSION)
 
 @app.route('/muhasebe')
 def page_muhasebe():

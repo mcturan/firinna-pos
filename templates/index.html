@@ -2298,14 +2298,15 @@ async function doMerge(targetTableId, targetTableName) {
                 } else {
                     alert('Çıkmak için tekrar geri tuşuna basın');
                 }
-                history.pushState({page: 'home'}, "", window.location.href);
-                setTimeout(() => { backPressCount = 0; }, 2000);
-            } else {
-                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
-                    window.Capacitor.Plugins.App.exitApp();
-                } else {
-                    history.back();
-                }
+                
+                // İlk basışta state eklemiyoruz, böylece 3 saniye içinde tekrar basılırsa 
+                // native olarak uygulamadan çıkılacak (çünkü popstate tetiklenmeyecek).
+                setTimeout(() => { 
+                    if (backPressCount > 0) {
+                        backPressCount = 0; 
+                        history.pushState({page: 'home'}, "", window.location.href);
+                    }
+                }, 2500);
             }
         });
     });

@@ -5,14 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <title>Fırınna Garson</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px 20px; background: #f8fafc; }
+        body { font-family: sans-serif; text-align: center; padding: 50px 20px; background: #f8fafc; margin: 0; }
         input { padding: 10px; font-size: 16px; width: 80%; max-width: 300px; border-radius: 8px; border: 2px solid #ccc; margin-bottom: 20px; }
         button { padding: 12px 24px; font-size: 16px; border-radius: 8px; border: none; background: #2d6a4f; color: white; cursor: pointer; font-weight: bold; }
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2d6a4f; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; z-index: 9999; }
+        #splash h1 { font-size: 3rem; margin: 0; letter-spacing: 2px; }
+        #splash p { margin: 5px 0 0; opacity: 0.8; font-size: 1.1rem; }
     </style>
 </head>
 <body>
-    <div id="setup" style="display:none;">
-        <h2>Sunucu IP Adresi</h2>
+    <div id="splash">
+        <h1>FIRINNA</h1>
+        <p>POS & Sipariş</p>
+    </div>
+
+    <div id="setup" style="display:none; padding-top: 50px;">
+        <h2 style="color:#2d6a4f;">Sunucu IP Adresi</h2>
         <p>Bilgisayarın IP adresini giriniz (Örn: 192.168.1.100)</p>
         <input type="text" id="ipInput" placeholder="192.168.1.100" />
         <br>
@@ -20,6 +28,17 @@
     </div>
     
     <script>
+        const splashStart = Date.now();
+        const MIN_SPLASH_TIME = 500; // Yarım saniye logo kalsın
+
+        function doRedirect(url) {
+            const elapsed = Date.now() - splashStart;
+            const remaining = Math.max(0, MIN_SPLASH_TIME - elapsed);
+            setTimeout(() => {
+                window.location.replace(url);
+            }, remaining);
+        }
+
         function saveAndGo() {
             var ip = document.getElementById('ipInput').value.trim();
             if(ip) {
@@ -39,17 +58,17 @@
                     if (parseFloat(data.version) > parseFloat(APP_VERSION)) {
                         alert("Yeni bir güncelleme mevcut. İndirme başlıyor. Lütfen indirme bitince kurunuz.");
                         window.location.href = serverUrl + data.apk_url;
-                        // Give user a button to proceed manually if they already updated but cache says otherwise or if they just want to skip for now
                         document.body.innerHTML = '<div style="padding: 50px;"><h3>Güncelleme İndiriliyor...</h3><p>Uygulamayı kurduktan sonra baştan başlatın.</p><button onclick="window.location.replace(\'' + serverUrl + '/?mode=garson\')">Geç ve Devam Et</button></div>';
                     } else {
-                        window.location.replace(serverUrl + "/?mode=garson");
+                        doRedirect(serverUrl + "/?mode=garson");
                     }
                 })
                 .catch(err => {
                     console.error("Versiyon kontrolü başarısız:", err);
-                    window.location.replace(serverUrl + "/?mode=garson");
+                    doRedirect(serverUrl + "/?mode=garson");
                 });
         } else {
+            document.getElementById('splash').style.display = 'none';
             document.getElementById('setup').style.display = 'block';
         }
     </script>
