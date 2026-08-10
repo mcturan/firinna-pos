@@ -2420,7 +2420,7 @@ def save_web_settings():
     data = request.json
     with open(SETTINGS_FILE, 'w') as f:
         json.dump(data, f, indent=4)
-    return jsonify(settings)
+    return jsonify({"success": True})
 
 @app.route('/api/web/tables-status', methods=['GET'])
 def api_web_tables_status():
