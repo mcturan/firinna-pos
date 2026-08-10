@@ -818,13 +818,13 @@
                 let m3 = tables.find(t => t.name === '3' || t.name === 'Masa 3');
                 let m4 = tables.find(t => t.name === '4' || t.name === 'Masa 4');
                 
-                const renderTable = (t) => {
-                    if(!t) return `<div class="blueprint-table" style="opacity:0.5;cursor:default;"><div>Boş Masa</div></div>`;
+                const renderTable = (t, extraCls) => {
+                    if(!t) return `<div class="blueprint-table ${extraCls}" style="opacity:0.5;cursor:default;"><div>Boş Masa</div></div>`;
                     const hasOrder = t.has_order > 0;
                     const status = hasOrder ? 'occupied' : 'empty';
                     const dur = hasOrder ? calcDuration(t.order_started_at) : null;
                     return `
-                        <div class="blueprint-table ${status}" onclick="openTable(${t.id}, '${t.name}')">
+                        <div class="blueprint-table ${status} ${extraCls}" onclick="openTable(${t.id}, '${t.name}')">
                             ${dur ? `<span class="dur-badge ${dur.cls}">${dur.text}</span>` : ''}
                             <div class="table-icon">💎</div>
                             <div class="table-name">MASA-${t.name.replace(/[^0-9]/g, '')}${t.table_note ? ' 📝' : ''}</div>
@@ -833,6 +833,13 @@
                     `;
                 };
 
+                // Fetch Takeaway table specifically (usually id=9 or zone=3)
+                const allTbls = await fetch('/api/tables').then(r => r.json());
+                const tkw = allTbls.find(t => t.id == 9 || t.name.toLowerCase() === 'takeaway');
+                const tkwHasOrder = tkw && tkw.has_order > 0;
+                const tkwDur = tkwHasOrder ? calcDuration(tkw.order_started_at) : null;
+                const tkwStatusStyle = tkwHasOrder ? 'background:#fed7d7; border-color:#e53e3e;' : '';
+
                 tablesGrid.innerHTML = `
                     <div class="blueprint-container">
                         <div class="blueprint-side" onclick="window.location.href='/kitchen'">
@@ -840,16 +847,18 @@
                             <div>Kitchen</div>
                         </div>
                         <div class="blueprint-center">
-                            <!-- Top Row: Masa-2 and Masa-3 -->
-                            ${renderTable(m2)}
-                            ${renderTable(m3)}
-                            <!-- Bottom Row: Masa-1 and Masa-4 -->
-                            ${renderTable(m1)}
-                            ${renderTable(m4)}
+                            <!-- Desktop Top Row: 2, 3 -->
+                            ${renderTable(m2, 'bp-table-2')}
+                            ${renderTable(m3, 'bp-table-3')}
+                            <!-- Desktop Bottom Row: 1, 4 -->
+                            ${renderTable(m1, 'bp-table-1')}
+                            ${renderTable(m4, 'bp-table-4')}
                         </div>
-                        <div class="blueprint-side" onclick="openTable(9, 'TakeAway')">
+                        <div class="blueprint-side" style="position:relative; ${tkwStatusStyle}" onclick="openTable(${tkw ? tkw.id : 9}, 'TakeAway')">
+                            ${tkwDur ? `<span class="dur-badge ${tkwDur.cls}" style="position:absolute; top:-10px; right:-10px; padding:4px 8px; border-radius:20px; font-size:0.8rem; font-weight:bold;">${tkwDur.text}</span>` : ''}
                             <div class="icon">🥡</div>
                             <div>TakeAway</div>
+                            ${tkwHasOrder ? `<div style="color:#e53e3e;font-size:1rem;margin-top:5px;">${fmtTL(tkw.order_total||0)}</div>` : ''}
                         </div>
                     </div>
                 `;

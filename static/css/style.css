@@ -697,4 +697,9 @@ footer { text-align: center; padding: 1.5rem 1rem; color: var(--ink-4); font-siz
     .blueprint-table .table-total {
         font-size: 1rem;
     }
+    /* Mobile specific table ordering */
+    .bp-table-1 { order: 1; }
+    .bp-table-2 { order: 2; }
+    .bp-table-4 { order: 3; }
+    .bp-table-3 { order: 4; }
 }
