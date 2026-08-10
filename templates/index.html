@@ -756,7 +756,7 @@
                     document.getElementById('logoWatermark').style.display = 'block';
                 }
             }).catch(()=>{});
-            setInterval(function() { if (typeof currentZone !== 'undefined' && currentZone) refreshZone(); }, 60000);
+            setInterval(function() { if (typeof currentZone !== 'undefined' && currentZone) refreshZone(); }, 3000); // 3 saniyede bir güncelle (Anlık hissiyatı için)
             
             document.querySelectorAll('.close').forEach(el => {
                 el.onclick = function() {
