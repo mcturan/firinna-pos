@@ -32,6 +32,17 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Ana sayfa (masalar görünümü)
+@app.route('/api/mobile_version')
+def api_mobile_version():
+    return jsonify({
+        'version': '1.1',
+        'apk_url': '/download_apk'
+    })
+
+@app.route('/download_apk')
+def download_apk():
+    return send_from_directory('mobile_app', 'Firinna-Garson.apk', as_attachment=True)
+
 @app.route('/api/version')
 def api_version():
     import sqlite3

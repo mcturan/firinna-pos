@@ -29,8 +29,26 @@
         }
         
         var savedIp = localStorage.getItem("server_ip");
+        const APP_VERSION = "1.0";
+
         if (savedIp) {
-            window.location.replace("http://" + savedIp + ":5000/?mode=garson");
+            var serverUrl = "http://" + savedIp + ":5000";
+            fetch(serverUrl + "/api/mobile_version")
+                .then(r => r.json())
+                .then(data => {
+                    if (parseFloat(data.version) > parseFloat(APP_VERSION)) {
+                        alert("Yeni bir güncelleme mevcut. İndirme başlıyor. Lütfen indirme bitince kurunuz.");
+                        window.location.href = serverUrl + data.apk_url;
+                        // Give user a button to proceed manually if they already updated but cache says otherwise or if they just want to skip for now
+                        document.body.innerHTML = '<div style="padding: 50px;"><h3>Güncelleme İndiriliyor...</h3><p>Uygulamayı kurduktan sonra baştan başlatın.</p><button onclick="window.location.replace(\'' + serverUrl + '/?mode=garson\')">Geç ve Devam Et</button></div>';
+                    } else {
+                        window.location.replace(serverUrl + "/?mode=garson");
+                    }
+                })
+                .catch(err => {
+                    console.error("Versiyon kontrolü başarısız:", err);
+                    window.location.replace(serverUrl + "/?mode=garson");
+                });
         } else {
             document.getElementById('setup').style.display = 'block';
         }
