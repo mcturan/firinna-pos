@@ -22,6 +22,17 @@
         <img id="navLogoImg" src="" alt="" style="display:none;max-height:28px;max-width:72px;object-fit:contain;flex-shrink:0;border-radius:5px;" onerror="this.style.display='none';document.getElementById('navLogoFallback').style.display='block'">
         Fırınna POS
     </a>
+    
+    <!-- Clock & Weather Widget -->
+    <div id="topWidget" style="flex:1; display:flex; justify-content:center; align-items:center; gap:2rem; text-align:center;">
+        <div id="clockWidget" style="color:#e53e3e; font-size:1.6rem; font-weight:800; font-family:monospace; letter-spacing:1px; background:rgba(229,62,62,0.1); padding:4px 12px; border-radius:10px; box-shadow:inset 0 1px 3px rgba(0,0,0,0.1);">
+            --:--:--
+        </div>
+        <div id="weatherWidget" style="display:flex; align-items:center;">
+            <div style="font-size:0.85rem; color:#718096;">Hava Durumu Yükleniyor...</div>
+        </div>
+    </div>
+
     <div class="nav-links">
         <a href="/" {% if request.path == '/' %}class="active"{% endif %}>Siparişler</a>
         <a href="/kitchen" {% if request.path == '/kitchen' %}class="active"{% endif %}>Mutfak</a>
@@ -150,6 +161,59 @@ setInterval(loadAlerts, 60000);
         }
     }).catch(function(){});
 })();
+
+// Clock Update
+setInterval(function() {
+    var d = new Date();
+    document.getElementById('clockWidget').innerText = d.toLocaleTimeString('tr-TR', {hour12:false});
+}, 1000);
+
+// Weather Update (Istanbul/Beyoglu)
+const wmoCodes = {
+    0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+    45: '🌫️', 48: '🌫️', 51: '🌧️', 53: '🌧️', 55: '🌧️',
+    61: '🌧️', 63: '🌧️', 65: '🌧️', 71: '❄️', 73: '❄️', 75: '❄️',
+    80: '🌧️', 81: '🌧️', 82: '🌧️', 95: '⛈️'
+};
+function getWmoIcon(code) { return wmoCodes[code] || '🌡️'; }
+
+async function fetchWeather() {
+    try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=41.0369&longitude=28.9775&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto');
+        const data = await res.json();
+        
+        const curTemp = Math.round(data.current.temperature_2m);
+        const curIcon = getWmoIcon(data.current.weather_code);
+        
+        let html = '<div style="display:flex; align-items:center; gap:12px;">' +
+            '<div style="font-size:1.1rem; display:flex; align-items:center; gap:6px; padding-right:12px; border-right:1px solid #cbd5e1;">' +
+                '<span style="font-size:1.5rem" title="Şu an">' + curIcon + '</span> <strong>' + curTemp + '°C</strong>' +
+            '</div>' +
+            '<div style="display:flex; gap:8px; font-size:0.75rem;">';
+            
+        // Next 3 days (index 1, 2, 3 in daily array)
+        for(let i=1; i<=3; i++) {
+            const date = new Date(data.daily.time[i]);
+            const dayName = date.toLocaleDateString('tr-TR', {weekday:'short'});
+            const maxT = Math.round(data.daily.temperature_2m_max[i]);
+            const minT = Math.round(data.daily.temperature_2m_min[i]);
+            const icon = getWmoIcon(data.daily.weather_code[i]);
+            
+            html += '<div style="display:flex; flex-direction:column; align-items:center; background:rgba(0,0,0,0.03); padding:4px 8px; border-radius:8px;">' +
+                '<span style="color:#718096; font-weight:700;">' + dayName + '</span>' +
+                '<span style="font-size:1.1rem; margin:2px 0;">' + icon + '</span>' +
+                '<span><span style="color:#e53e3e; font-weight:700;">' + maxT + '°</span><span style="color:#3182ce; font-weight:700;"> ' + minT + '°</span></span>' +
+            '</div>';
+        }
+        html += '</div></div>';
+        document.getElementById('weatherWidget').innerHTML = html;
+    } catch(e) {
+        document.getElementById('weatherWidget').innerHTML = '<span style="color:#e53e3e;font-size:0.8rem;">Hava Durumu Alınamadı</span>';
+    }
+}
+fetchWeather();
+setInterval(fetchWeather, 30 * 60 * 1000); // 30 min
+
 </script>
 
 <div id="toast-container"></div>

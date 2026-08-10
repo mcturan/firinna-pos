@@ -845,8 +845,8 @@
                         <img id="blueprintLogo" src="/static/uploads/logo.png" onerror="this.style.display='none'" alt="Logo" class="blueprint-logo">
                         <div class="blueprint-container">
                             <div class="blueprint-side" onclick="window.location.href='/kitchen'">
-                                <div class="icon">👨‍🍳</div>
-                                <div>Kitchen</div>
+                                <div class="icon">🍳</div>
+                                <div>Mutfak</div>
                             </div>
                             <div class="blueprint-center">
                                 <!-- Desktop Top Row: 2, 3 -->
@@ -858,8 +858,8 @@
                             </div>
                             <div class="blueprint-side" style="position:relative; ${tkwStatusStyle}" onclick="openTable(${tkw ? tkw.id : 9}, 'TakeAway')">
                                 ${tkwDur ? `<span class="dur-badge ${tkwDur.cls}" style="position:absolute; top:-10px; right:-10px; padding:4px 8px; border-radius:20px; font-size:0.8rem; font-weight:bold;">${tkwDur.text}</span>` : ''}
-                                <div class="icon">🥡</div>
-                                <div>TakeAway</div>
+                                <div class="icon">🛵</div>
+                                <div>Gel-Al</div>
                                 ${tkwHasOrder ? `<div style="color:#e53e3e;font-size:1rem;margin-top:5px;">${fmtTL(tkw.order_total||0)}</div>` : ''}
                             </div>
                         </div>
