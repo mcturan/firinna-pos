@@ -1053,7 +1053,10 @@ def get_report(start_date, end_date):
             COALESCE(SUM(payment_cash), 0) as total_cash,
             COALESCE(SUM(payment_card), 0) as total_card,
             COALESCE(SUM(tip_amount), 0) as total_tips,
-            COALESCE(SUM(discount_value), 0) as total_discount
+            COALESCE(SUM(discount_value), 0) as total_discount,
+            SUM(CASE WHEN payment_cash > 0 AND payment_card <= 0 THEN 1 ELSE 0 END) as cash_order_count,
+            SUM(CASE WHEN payment_card > 0 AND payment_cash <= 0 THEN 1 ELSE 0 END) as card_order_count,
+            SUM(CASE WHEN payment_cash > 0 AND payment_card > 0 THEN 1 ELSE 0 END) as mixed_order_count
         FROM orders
         WHERE DATE(closed_at) BETWEEN ? AND ?
           AND status = 'closed'
