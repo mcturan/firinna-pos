@@ -458,3 +458,101 @@ footer { text-align: center; padding: 1.5rem 1rem; color: var(--ink-4); font-siz
 .dur-green  { background:#d1fae5; color:#065f46; }
 .dur-orange { background:#fef3c7; color:#92400e; }
 .dur-red    { background:#fee2e2; color:#991b1b; }
+.blueprint-container {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: stretch;
+    padding: 10px;
+    height: calc(100vh - 120px);
+    max-height: 800px;
+}
+
+.blueprint-side {
+    width: 100px;
+    border: 3px solid #4299e1;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ebf8ff;
+    color: #2b6cb0;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.blueprint-side:hover {
+    background: #bee3f8;
+}
+
+.blueprint-side .icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.blueprint-center {
+    flex: 1;
+    border: 3px solid #4299e1;
+    border-radius: 8px;
+    position: relative;
+    background: white;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 20px;
+}
+
+.blueprint-table {
+    border: 2px solid #4299e1;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    position: relative;
+}
+
+.blueprint-table.occupied {
+    background: #fed7d7;
+    border-color: #e53e3e;
+}
+
+.blueprint-table:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.blueprint-table .table-icon {
+    font-size: 3rem;
+    margin-bottom: 5px;
+}
+
+.blueprint-table .table-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2d3748;
+}
+
+.blueprint-table .table-total {
+    font-size: 1.1rem;
+    color: #e53e3e;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.blueprint-table .dur-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}

@@ -809,22 +809,67 @@
                 tablesGrid.innerHTML = '<p class="no-data">Bu bölgede masa yok. <a href="/tables">Masa ekle</a></p>';
                 return;
             }
-            
-            tablesGrid.innerHTML = tables.map(table => {
-                const hasOrder = table.has_order > 0;
-                const status = hasOrder ? 'occupied' : 'empty';
-                const dur = hasOrder ? calcDuration(table.order_started_at) : null;
-                return `
-                    <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
-                        <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
-                        ${hasOrder ? `<div class="table-total">${fmtTL(table.order_total||0)}</div>` : ''}
-                        <div class="table-status">
-                            ${hasOrder ? 'Dolu' : 'Boş'}
-                            ${dur ? `<span class="dur-badge ${dur.cls}" style="margin-left:.4rem;">${dur.text}</span>` : ''}
+
+            // Blueprint layout for main zone (Cafe)
+            if (zoneId == 1 || tables.some(t => t.name === '1' || t.name.toLowerCase().includes('masa'))) {
+                let m1 = tables.find(t => t.name === '1' || t.name === 'Masa 1');
+                let m2 = tables.find(t => t.name === '2' || t.name === 'Masa 2');
+                let m3 = tables.find(t => t.name === '3' || t.name === 'Masa 3');
+                let m4 = tables.find(t => t.name === '4' || t.name === 'Masa 4');
+                
+                const renderTable = (t) => {
+                    if(!t) return `<div class="blueprint-table" style="opacity:0.5;cursor:default;"><div>Boş Masa</div></div>`;
+                    const hasOrder = t.has_order > 0;
+                    const status = hasOrder ? 'occupied' : 'empty';
+                    const dur = hasOrder ? calcDuration(t.order_started_at) : null;
+                    return `
+                        <div class="blueprint-table ${status}" onclick="openTable(${t.id}, '${t.name}')">
+                            ${dur ? `<span class="dur-badge ${dur.cls}">${dur.text}</span>` : ''}
+                            <div class="table-icon">💎</div>
+                            <div class="table-name">MASA-${t.name.replace(/[^0-9]/g, '')}${t.table_note ? ' 📝' : ''}</div>
+                            ${hasOrder ? `<div class="table-total">${fmtTL(t.order_total||0)}</div>` : ''}
+                        </div>
+                    `;
+                };
+
+                tablesGrid.innerHTML = `
+                    <div class="blueprint-container">
+                        <div class="blueprint-side" onclick="window.location.href='/kitchen'">
+                            <div class="icon">👨‍🍳</div>
+                            <div>Kitchen</div>
+                        </div>
+                        <div class="blueprint-center">
+                            <!-- Top Row: Masa-2 and Masa-3 -->
+                            ${renderTable(m2)}
+                            ${renderTable(m3)}
+                            <!-- Bottom Row: Masa-1 and Masa-4 -->
+                            ${renderTable(m1)}
+                            ${renderTable(m4)}
+                        </div>
+                        <div class="blueprint-side" onclick="openTable(9, 'TakeAway')">
+                            <div class="icon">🥡</div>
+                            <div>TakeAway</div>
                         </div>
                     </div>
                 `;
-            }).join('');
+            } else {
+                // Fallback for other zones
+                tablesGrid.innerHTML = tables.map(table => {
+                    const hasOrder = table.has_order > 0;
+                    const status = hasOrder ? 'occupied' : 'empty';
+                    const dur = hasOrder ? calcDuration(table.order_started_at) : null;
+                    return `
+                        <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
+                            <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
+                            ${hasOrder ? `<div class="table-total">${fmtTL(table.order_total||0)}</div>` : ''}
+                            <div class="table-status">
+                                ${hasOrder ? 'Dolu' : 'Boş'}
+                                ${dur ? `<span class="dur-badge ${dur.cls}" style="margin-left:.4rem;">${dur.text}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
         }
 
         let noteDebounce = null;
