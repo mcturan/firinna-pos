@@ -1978,7 +1978,8 @@ def start_telegram_auto_send():
                             f"🎁 İkramlar: {report.get('total_ikram',0):.2f} ₺\n"
                             f"📉 İndirimler: {report.get('total_discount',0):.2f} ₺\n"
                             f"🔻 Giderler: {report.get('total_expenses',0):.2f} ₺\n"
-                            f"🧾 Sipariş Sayısı: {report.get('order_count',0)}\n\n"
+                            f"💵 Net Kasa: <b>{report.get('net',0):.2f} ₺</b>\n\n"
+                            f"🧾 Masa Sayısı: {report.get('order_count',0)} ({report.get('cash_order_count',0)} Nakit, {report.get('card_order_count',0)} Kart, {report.get('mixed_order_count',0)} Parçalı)\n\n"
                             f"📦 En Çok Satanlar:\n{top_txt}"
                             f"{open_warn}"
                         )
