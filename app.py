@@ -2391,3 +2391,44 @@ if __name__ == '__main__':
     except:
         pass
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+# =========================================================================
+# WEB SITE INTEGRATION (API BRIDGES)
+# =========================================================================
+import telegram_notify
+
+@app.route('/api/web/reservations', methods=['POST'])
+def web_reservation():
+    data = request.json
+    name = data.get('name', 'Bilinmeyen')
+    phone = data.get('phone', '')
+    date = data.get('date', '')
+    time = data.get('time', '')
+    guests = data.get('guests', 2)
+    note = data.get('note', '')
+    
+    msg = f"📅 <b>YENİ REZERVASYON TALEBİ (Web'den)</b>\n\n"
+    msg += f"👤 <b>İsim:</b> {name}\n"
+    msg += f"📞 <b>Telefon:</b> {phone}\n"
+    msg += f"🗓 <b>Tarih/Saat:</b> {date} - {time}\n"
+    msg += f"👥 <b>Kişi Sayısı:</b> {guests}\n"
+    if note:
+        msg += f"📝 <b>Not:</b> {note}\n"
+    
+    telegram_notify.send_async(msg)
+    return jsonify({"success": True, "message": "Rezervasyon talebiniz alındı."})
+
+@app.route('/api/web/messages', methods=['POST'])
+def web_message():
+    data = request.json
+    name = data.get('name', 'Bilinmeyen')
+    phone = data.get('phone', '')
+    message = data.get('message', '')
+    
+    msg = f"💬 <b>YENİ İLETİŞİM MESAJI (Web'den)</b>\n\n"
+    msg += f"👤 <b>İsim:</b> {name}\n"
+    msg += f"📞 <b>Telefon:</b> {phone}\n"
+    msg += f"📝 <b>Mesaj:</b> {message}\n"
+    
+    telegram_notify.send_async(msg)
+    return jsonify({"success": True, "message": "Mesajınız iletildi."})
