@@ -1328,6 +1328,39 @@ def api_test_telegram():
     result = telegram_notify.test_connection()
     return jsonify(result)
 
+@app.route('/api/settings/telegram/instant_report', methods=['POST'])
+def api_instant_report_telegram():
+    try:
+        today = datetime.now().strftime('%Y-%m-%d')
+        report = db.get_daily_close_report(today)
+        restaurant = db.get_setting('restaurant_name', 'Fırınna')
+        top = report.get('top_products', [])[:5]
+        open_warn = ''
+        if report.get('open_orders_count', 0) > 0:
+            open_warn = f"\n⚠️ {report['open_orders_count']} masa hâlâ açık!"
+        top_txt = '\n'.join([f"  {i+1}. {p['name']} — {p['quantity']} adet" for i, p in enumerate(top)]) if top else '  —'
+        text = (
+            f"📊 <b>{restaurant} — Anlık Durum Raporu</b> ({datetime.now().strftime('%H:%M')})\n\n"
+            f"💰 Toplam Satış: <b>{report.get('total_sales',0):.2f} ₺</b>\n"
+            f"💵 Nakit: {report.get('total_cash',0):.2f} ₺\n"
+            f"💳 Kart: {report.get('total_card',0):.2f} ₺\n"
+            f"💸 Bahşiş: {report.get('total_tips',0):.2f} ₺\n"
+            f"🎁 İkramlar: {report.get('total_ikram',0):.2f} ₺\n"
+            f"📉 İndirimler: {report.get('total_discount',0):.2f} ₺\n"
+            f"🔻 Giderler: {report.get('total_expenses',0):.2f} ₺\n"
+            f"💵 Net Kasa: <b>{report.get('net',0):.2f} ₺</b>\n\n"
+            f"🧾 Masa Sayısı: {report.get('order_count',0)} ({report.get('cash_order_count',0)} Nakit, {report.get('card_order_count',0)} Kart, {report.get('mixed_order_count',0)} Parçalı)\n\n"
+            f"📦 En Çok Satanlar:\n{top_txt}"
+            f"{open_warn}"
+        )
+        import telegram_notify
+        telegram_notify.send_message(text)
+        return jsonify({'success': True})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/api/telegram/contacts', methods=['GET'])
 def api_get_telegram_contacts():
     return jsonify(db.get_telegram_contacts())
