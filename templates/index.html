@@ -16,7 +16,7 @@
     </div>
 
     <div class="container">
-        <div class="zone-tabs" id="zoneTabs"></div>
+        <div class="zone-tabs" id="zoneTabs" style="display:none;"></div>
         <div class="tables-grid" id="tablesGrid"></div>
 
         <!-- Sipariş Geçmişi — Collapsible Panel -->
@@ -812,6 +812,7 @@
 
             // Blueprint layout for main zone (Cafe)
             if (zoneId == 1 || tables.some(t => t.name === '1' || t.name.toLowerCase().includes('masa'))) {
+                tablesGrid.style.display = 'block'; // Disable grid layout
                 let m1 = tables.find(t => t.name === '1' || t.name === 'Masa 1');
                 let m2 = tables.find(t => t.name === '2' || t.name === 'Masa 2');
                 let m3 = tables.find(t => t.name === '3' || t.name === 'Masa 3');
@@ -853,6 +854,7 @@
                     </div>
                 `;
             } else {
+                tablesGrid.style.display = 'grid'; // Enable grid layout for others
                 // Fallback for other zones
                 tablesGrid.innerHTML = tables.map(table => {
                     const hasOrder = table.has_order > 0;
@@ -2539,27 +2541,7 @@ async function cancelOrder() {
 }
 
 async function refreshZone() {
-    const tables = await fetch(`/api/tables?zone_id=${currentZone}`).then(r => r.json());
-    const tablesGrid = document.getElementById('tablesGrid');
-    if (!tables.length) {
-        tablesGrid.innerHTML = '<p class="no-data">Bu bölgede masa yok. <a href="/tables">Masa ekle</a></p>';
-        return;
-    }
-    tablesGrid.innerHTML = tables.map(table => {
-        const hasOrder = table.has_order > 0;
-        const status = hasOrder ? 'occupied' : 'empty';
-        const dur = hasOrder ? calcDuration(table.order_started_at) : null;
-        return `
-            <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
-                <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
-                ${hasOrder ? `<div class="table-total">${fmtTL(table.order_total||0)}</div>` : ''}
-                <div class="table-status">
-                    ${hasOrder ? 'Dolu' : 'Boş'}
-                    ${dur ? `<span class="dur-badge ${dur.cls}" style="margin-left:.4rem;">${dur.text}</span>` : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
+    await selectZone(currentZone);
 }
 
 function previewReceiptPDF() {

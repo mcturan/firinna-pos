@@ -556,3 +556,145 @@ footer { text-align: center; padding: 1.5rem 1rem; color: var(--ink-4); font-siz
     font-size: 0.8rem;
     font-weight: bold;
 }
+.blueprint-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 1000px;
+}
+
+.blueprint-side {
+    width: 120px;
+    height: 350px;
+    border: 3px solid #4299e1;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ebf8ff;
+    color: #2b6cb0;
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.blueprint-side:hover {
+    background: #bee3f8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.blueprint-side .icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.blueprint-center {
+    flex: 1;
+    border: 3px solid #4299e1;
+    border-radius: 12px;
+    position: relative;
+    background: white;
+    padding: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.blueprint-table {
+    border: 3px solid #4299e1;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    position: relative;
+    padding: 20px 10px;
+    min-height: 140px;
+}
+
+.blueprint-table.occupied {
+    background: #fed7d7;
+    border-color: #e53e3e;
+}
+
+.blueprint-table:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.blueprint-table .table-icon {
+    font-size: 3.5rem;
+    margin-bottom: 8px;
+}
+
+.blueprint-table .table-name {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #2d3748;
+}
+
+.blueprint-table .table-total {
+    font-size: 1.2rem;
+    color: #e53e3e;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.blueprint-table .dur-badge {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .blueprint-container {
+        flex-direction: column;
+        padding: 5px;
+        box-sizing: border-box;
+    }
+    .blueprint-side {
+        width: 100%;
+        height: 80px;
+        flex-direction: row;
+        gap: 15px;
+    }
+    .blueprint-side .icon {
+        margin-bottom: 0;
+        font-size: 2.5rem;
+    }
+    .blueprint-center {
+        width: 100%;
+        box-sizing: border-box;
+        gap: 10px;
+        padding: 15px;
+    }
+    .blueprint-table {
+        min-height: 110px;
+    }
+    .blueprint-table .table-icon {
+        font-size: 2.5rem;
+    }
+    .blueprint-table .table-name {
+        font-size: 1.1rem;
+    }
+    .blueprint-table .table-total {
+        font-size: 1rem;
+    }
+}
