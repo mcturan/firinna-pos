@@ -2404,6 +2404,24 @@ def web_message():
     telegram_notify.send_async(msg)
     return jsonify({"success": True, "message": "Mesajınız iletildi."})
 
+import json
+import os
+SETTINGS_FILE = '/opt/firinna-pos/web_settings.json'
+
+@app.route('/api/web/settings', methods=['GET'])
+def get_web_settings():
+    if not os.path.exists(SETTINGS_FILE):
+        return jsonify({})
+    with open(SETTINGS_FILE, 'r') as f:
+        return jsonify(json.load(f))
+
+@app.route('/api/web/settings', methods=['POST'])
+def save_web_settings():
+    data = request.json
+    with open(SETTINGS_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+    return jsonify({"success": True})
+
 if __name__ == '__main__':
     db.init_db()
     try: db.init_muhasebe_tables()
