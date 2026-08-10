@@ -48,13 +48,20 @@
         }
         
         var savedIp = localStorage.getItem("server_ip");
-        const APP_VERSION = "1.4.1";
+        const APP_VERSION = "1.4.2";
+        const PUBLIC_URL = "http://84.17.86.208:5000";
 
         if (savedIp) {
             var serverUrl = "http://" + savedIp + ":5000";
-            fetch(serverUrl + "/api/mobile_version")
+            
+            // 2 saniye içinde yanıt vermezse (örn. hücresel veri) public IP'ye geç
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000);
+            
+            fetch(serverUrl + "/api/mobile_version", { signal: controller.signal })
                 .then(r => r.json())
                 .then(data => {
+                    clearTimeout(timeoutId);
                     if (parseFloat(data.version) > parseFloat(APP_VERSION)) {
                         alert("Yeni bir güncelleme mevcut. İndirme başlıyor. Lütfen indirme bitince kurunuz.");
                         window.location.href = serverUrl + data.apk_url;
@@ -64,8 +71,9 @@
                     }
                 })
                 .catch(err => {
-                    console.error("Versiyon kontrolü başarısız:", err);
-                    doRedirect(serverUrl + "/?mode=garson");
+                    clearTimeout(timeoutId);
+                    console.log("Lokal IP'ye bağlanılamadı, Hücresel (Public IP) deneniyor...", err);
+                    doRedirect(PUBLIC_URL + "/?mode=garson");
                 });
         } else {
             document.getElementById('splash').style.display = 'none';
