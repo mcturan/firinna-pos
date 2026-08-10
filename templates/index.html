@@ -826,7 +826,7 @@
                     return `
                         <div class="blueprint-table ${status} ${extraCls}" onclick="openTable(${t.id}, '${t.name}')">
                             ${dur ? `<span class="dur-badge ${dur.cls}">${dur.text}</span>` : ''}
-                            <div class="table-icon">💎</div>
+                            <div class="table-icon">🍽️</div>
                             <div class="table-name">MASA-${t.name.replace(/[^0-9]/g, '')}${t.table_note ? ' 📝' : ''}</div>
                             ${hasOrder ? `<div class="table-total">${fmtTL(t.order_total||0)}</div>` : ''}
                         </div>
@@ -845,7 +845,7 @@
                         <img id="blueprintLogo" src="/static/uploads/logo.png" onerror="this.style.display='none'" alt="Logo" class="blueprint-logo">
                         <div class="blueprint-container">
                             <div class="blueprint-side" onclick="window.location.href='/kitchen'">
-                                <div class="icon">🍳</div>
+                                <div class="icon">🧑‍🍳</div>
                                 <div>Mutfak</div>
                             </div>
                             <div class="blueprint-center">
@@ -858,7 +858,7 @@
                             </div>
                             <div class="blueprint-side" style="position:relative; ${tkwStatusStyle}" onclick="openTable(${tkw ? tkw.id : 9}, 'TakeAway')">
                                 ${tkwDur ? `<span class="dur-badge ${tkwDur.cls}" style="position:absolute; top:-10px; right:-10px; padding:4px 8px; border-radius:20px; font-size:0.8rem; font-weight:bold;">${tkwDur.text}</span>` : ''}
-                                <div class="icon">🛵</div>
+                                <div class="icon">🥡</div>
                                 <div>Gel-Al</div>
                                 ${tkwHasOrder ? `<div style="color:#e53e3e;font-size:1rem;margin-top:5px;">${fmtTL(tkw.order_total||0)}</div>` : ''}
                             </div>
@@ -874,17 +874,15 @@
                     const dur = hasOrder ? calcDuration(table.order_started_at) : null;
                     return `
                         <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
+                            ${dur ? `<span class="dur-badge ${dur.cls}">${dur.text}</span>` : ''}
+                            <div class="table-icon">🍽️</div>
                             <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
                             ${hasOrder ? `<div class="table-total">${fmtTL(table.order_total||0)}</div>` : ''}
-                            <div class="table-status">
-                                ${hasOrder ? 'Dolu' : 'Boş'}
-                                ${dur ? `<span class="dur-badge ${dur.cls}" style="margin-left:.4rem;">${dur.text}</span>` : ''}
-                            </div>
                         </div>
                     `;
                 }).join('');
             }
-        }
+        } // selectZone end
 
         let noteDebounce = null;
         async function saveOrderNote() {
