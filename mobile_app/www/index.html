@@ -58,7 +58,8 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 2000);
             
-            fetch(serverUrl + "/api/mobile_version", { signal: controller.signal })
+            // fetch için cache'i aşmak adına Date.now() eklendi
+            fetch(serverUrl + "/api/mobile_version?_=" + Date.now(), { signal: controller.signal })
                 .then(r => r.json())
                 .then(data => {
                     clearTimeout(timeoutId);

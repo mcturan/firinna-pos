@@ -255,4 +255,46 @@ function showToast(msg, type, duration) {
         setTimeout(function() { t.remove(); }, 300);
     }, duration);
 }
+
+// Version Display & Update Logic
+(function() {
+    var vDiv = document.createElement('div');
+    vDiv.style.position = 'fixed';
+    vDiv.style.bottom = '10px';
+    vDiv.style.right = '10px';
+    vDiv.style.fontSize = '0.75rem';
+    vDiv.style.color = '#718096';
+    vDiv.style.background = 'rgba(255,255,255,0.8)';
+    vDiv.style.padding = '2px 6px';
+    vDiv.style.borderRadius = '4px';
+    vDiv.style.zIndex = '9999';
+    vDiv.style.userSelect = 'none';
+    vDiv.style.cursor = 'pointer';
+    vDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    vDiv.textContent = 'v...';
+    document.body.appendChild(vDiv);
+
+    fetch('/api/mobile_version?_=' + Date.now())
+        .then(r => r.json())
+        .then(d => { vDiv.textContent = 'v' + d.version; })
+        .catch(e => { vDiv.style.display = 'none'; });
+
+    var pressTimer;
+    function startPress() {
+        pressTimer = setTimeout(function() {
+            if(confirm("Son sürüme güncellensin mi?")) {
+                window.location.href = '/download_apk';
+            }
+        }, 3000);
+    }
+    function cancelPress() {
+        clearTimeout(pressTimer);
+    }
+    
+    vDiv.addEventListener('touchstart', startPress, {passive: true});
+    vDiv.addEventListener('touchend', cancelPress);
+    vDiv.addEventListener('mousedown', startPress);
+    vDiv.addEventListener('mouseup', cancelPress);
+    vDiv.addEventListener('mouseleave', cancelPress);
+})();
 </script>
