@@ -300,6 +300,31 @@
             btn.disabled = false; btn.textContent = '📨 Test Mesajı Gönder';
         }
 
+        async function sendInstantReport() {
+            const btn = event.target;
+            const oldText = btn.textContent;
+            btn.disabled = true; btn.textContent = '📊 Gönderiliyor...';
+            const statusEl = document.getElementById('tg-status');
+            statusEl.style.display = 'none';
+            try {
+                const res = await fetch('/api/settings/telegram/instant_report', {method:'POST'});
+                const d = await res.json();
+                statusEl.style.display = 'block';
+                if (d.success) {
+                    statusEl.style.background = '#d1fae5'; statusEl.style.color = '#065f46';
+                    statusEl.textContent = '✅ Anlık durum raporu başarıyla gönderildi!';
+                } else {
+                    statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+                    statusEl.textContent = '❌ ' + (d.error || 'Gönderim başarısız');
+                }
+            } catch(e) {
+                statusEl.style.display = 'block';
+                statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+                statusEl.textContent = '❌ Bağlantı hatası';
+            }
+            btn.disabled = false; btn.textContent = oldText;
+        }
+
         // --- getUpdates ---
         async function getUpdates() {
             const btn = event.target;
@@ -793,6 +818,7 @@
                 <div class="save-row">
                     <button class="btn btn-primary" onclick="saveTelegram()">💾 Kaydet</button>
                     <button class="btn btn-secondary" onclick="testTelegram()">📨 Test Mesajı Gönder</button>
+                    <button class="btn btn-secondary" onclick="sendInstantReport()">📊 Anlık Rapor Gönder</button>
                 </div>
             </div>
             <div id="tg-status" style="margin-top:1rem;padding:.75rem;border-radius:8px;display:none;font-size:.9rem;font-weight:600;"></div>
