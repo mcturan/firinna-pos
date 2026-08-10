@@ -69,6 +69,7 @@ async function submitReservation(e) {
     e.preventDefault();
     const btn = document.getElementById('btnResSubmit');
     const resText = document.getElementById('resResult');
+    
     btn.disabled = true;
     btn.innerText = "Gönderiliyor...";
     
@@ -82,7 +83,7 @@ async function submitReservation(e) {
     };
 
     try {
-        const response = await fetch('/api/web/reservations', {
+        const response = await fetch('/api/web/reservation', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
@@ -109,6 +110,7 @@ async function submitMessage(e) {
     e.preventDefault();
     const btn = document.getElementById('btnMsgSubmit');
     const resText = document.getElementById('msgResult');
+    
     btn.disabled = true;
     btn.innerText = "Gönderiliyor...";
     
@@ -119,7 +121,7 @@ async function submitMessage(e) {
     };
 
     try {
-        const response = await fetch('/api/web/messages', {
+        const response = await fetch('/api/web/contact', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
@@ -159,6 +161,7 @@ const i18n = {
         title_virtual_tour: "Sanal Tur (360°)",
         text_virtual_tour: "150 yıllık tarihi binamızı oturduğunuz yerden keşfedin.",
         title_location: "Lokasyon",
+        title_contact: "İletişim & Ulaşım",
         title_gallery: "Ortam & Lezzetler",
         badge_halal: "%100 Helal",
         badge_quality: "En İyi Kalite",
@@ -178,7 +181,30 @@ const i18n = {
         modal_msg_title: "Bize Mesaj Gönderin",
         label_message: "Mesajınız",
         btn_submit_msg: "Mesajı Gönder",
-        footer_rights: "Tüm hakları saklıdır."
+        footer_rights: "Tüm hakları saklıdır.",
+        menu_header_title: "İmza Lezzetlerimiz",
+        menu_header_sub: "Fırınna Dokunuşlarıyla...",
+        menu_back: "Ana Sayfa",
+        menu_intro: "Tüm menü seçeneklerimiz için mağazamızı ziyaret edebilir veya personelimizden detaylı bilgi alabilirsiniz. Aşağıda en sevilen imza lezzetlerimizi inceleyebilirsiniz.",
+        menu_download: "Fiyatlı Menüyü İndir (PDF)",
+        cat_food: "Fırından Sıcak Sıcak",
+        cat_drinks: "İçecekler & Tatlılar",
+        item_pizza: "Taş Fırın Pizza",
+        desc_pizza: "Özel mayalanmış hamurumuz, İtalyan domates sosu ve enfes mozzarella peyniriyle odun ateşinde pişer.",
+        item_menemen: "Meşhur Çakallı Menemeni",
+        desc_menemen: "Sadece sarısıyla hazırlanan, bol kaşarlı ve tereyağlı, yöresel lezzetiyle kahvaltıların efsanesi.",
+        item_toast: "Fırında Bazlama Tost",
+        desc_toast: "Köy ekmeği arasında kaşar peyniri ve özel sucuk/kavurma ile taş fırında çıtır çıtır servis edilir.",
+        item_coffee: "Közde Türk Kahvesi",
+        desc_coffee: "150 yıllık atmosferde, bakır cezvede ağır ağır pişen, lokum eşliğinde servis edilen klasik lezzet.",
+        item_tea: "İmza: Gül Yapraklı Çay",
+        desc_tea: "Özel harman çayımızın içine katılan taze kurutulmuş gül yapraklarıyla inanılmaz bir aroma şöleni.",
+        item_cake: "Çikolata Soslu Sıcak Kek",
+        desc_cake: "İçi yumuşacık, bol kakaolu ve üzeri sıcak çikolata sosu ile kaplanmış vazgeçilmez lezzet.",
+        badge_veg: "Vejetaryen",
+        badge_vegan: "Vegan",
+        badge_gluten: "Gluten İçerir",
+        badge_dairy: "Süt Ürünü"
     },
     en: {
         category: "Cafe & Restaurant",
@@ -195,6 +221,7 @@ const i18n = {
         title_virtual_tour: "Virtual Tour (360°)",
         text_virtual_tour: "Explore our 150-year-old historic building right from where you sit.",
         title_location: "Location",
+        title_contact: "Contact & Location",
         title_gallery: "Ambiance & Tastes",
         badge_halal: "100% Halal",
         badge_quality: "Best Quality",
@@ -214,7 +241,30 @@ const i18n = {
         modal_msg_title: "Send us a Message",
         label_message: "Your Message",
         btn_submit_msg: "Send Message",
-        footer_rights: "All rights reserved."
+        footer_rights: "All rights reserved.",
+        menu_header_title: "Signature Tastes",
+        menu_header_sub: "With Firinna's Touch...",
+        menu_back: "Home",
+        menu_intro: "You can visit our store or get detailed information from our staff for all menu options. Below you can review our most loved signature tastes.",
+        menu_download: "Download Priced Menu (PDF)",
+        cat_food: "Hot from the Oven",
+        cat_drinks: "Beverages & Desserts",
+        item_pizza: "Stone-baked Pizza",
+        desc_pizza: "Specially fermented dough, Italian tomato sauce, and exquisite mozzarella cheese baked in a wood-fired oven.",
+        item_menemen: "Famous Çakallı Menemen",
+        desc_menemen: "Prepared only with egg yolks, plenty of cheddar and butter, a legendary regional breakfast taste.",
+        item_toast: "Baked Bazlama Toast",
+        desc_toast: "Served crispy from the stone oven with cheddar cheese and special sausage/beef between village bread.",
+        item_coffee: "Turkish Coffee on Embers",
+        desc_coffee: "A classic taste slowly brewed in a copper pot in a 150-year-old atmosphere, served with Turkish delight.",
+        item_tea: "Signature: Rose Petal Tea",
+        desc_tea: "An incredible feast of aromas with freshly dried rose petals added to our special blend tea.",
+        item_cake: "Hot Cake with Chocolate Sauce",
+        desc_cake: "Soft on the inside, lots of cocoa, and covered with hot chocolate sauce, an indispensable taste.",
+        badge_veg: "Vegetarian",
+        badge_vegan: "Vegan",
+        badge_gluten: "Contains Gluten",
+        badge_dairy: "Contains Dairy"
     },
     ru: {
         category: "Кафе и Ресторан",
@@ -229,6 +279,7 @@ const i18n = {
         review_2: "Вы должны попробовать менемен Чакаллы. Персонал очень улыбчивый, и здорово, что к ним можно с питомцами.",
         review_3: "Лучшее место в Галате для кофе и десертов. Персонал очень внимателен.",
         title_location: "Расположение",
+        title_contact: "Контакты и расположение",
         title_gallery: "Атмосфера и вкусы",
         badge_halal: "100% Халяль",
         badge_quality: "Лучшее качество",
@@ -248,7 +299,30 @@ const i18n = {
         modal_msg_title: "Напишите нам",
         label_message: "Ваше сообщение",
         btn_submit_msg: "Отправить сообщение",
-        footer_rights: "Все права защищены."
+        footer_rights: "Все права защищены.",
+        menu_header_title: "Фирменные блюда",
+        menu_header_sub: "С особым подходом Firinna...",
+        menu_back: "Главная",
+        menu_intro: "Вы можете посетить наше кафе или получить подробную информацию у нашего персонала обо всех вариантах меню. Ниже вы можете ознакомиться с нашими самыми любимыми фирменными блюдами.",
+        menu_download: "Скачать меню с ценами (PDF)",
+        cat_food: "Горячее из печи",
+        cat_drinks: "Напитки и десерты",
+        item_pizza: "Пицца на камне",
+        desc_pizza: "Особо ферментированное тесто, итальянский томатный соус и изысканный сыр моцарелла, запеченные в дровяной печи.",
+        item_menemen: "Знаменитый Менемен Чакаллы",
+        desc_menemen: "Легендарный региональный вкус для завтрака, приготовленный только из яичных желтков, с большим количеством чеддера и сливочного масла.",
+        item_toast: "Запеченный тост Базлама",
+        desc_toast: "Подается хрустящим из каменной печи с сыром чеддер и особой колбасой/говядиной между ломтиками деревенского хлеба.",
+        item_coffee: "Турецкий кофе на углях",
+        desc_coffee: "Классический вкус, медленно завариваемый в медной турке в атмосфере со 150-летней историей, подается с рахат-лукумом.",
+        item_tea: "Фирменный: Чай с лепестками роз",
+        desc_tea: "Невероятный праздник ароматов со свежевысушенными лепестками роз, добавленными в наш особый купажированный чай.",
+        item_cake: "Горячий кекс с шоколадным соусом",
+        desc_cake: "Мягкий внутри, с большим количеством какао и покрытый горячим шоколадным соусом, незаменимый вкус.",
+        badge_veg: "Вегетарианский",
+        badge_vegan: "Веганский",
+        badge_gluten: "Содержит глютен",
+        badge_dairy: "Содержит молочные продукты"
     },
     ar: {
         category: "مقهى ومطعم",
@@ -263,6 +337,7 @@ const i18n = {
         review_2: "يجب أن تجرب مينيمين تشاكالي. الموظفون مبتسمون للغاية ومن الرائع أنهم يسمحون بالحيوانات الأليفة.",
         review_3: "أفضل مكان في غلطة لتناول القهوة والحلويات. فريق العمل مهتم جدا.",
         title_location: "الموقع",
+        title_contact: "الاتصال والموقع",
         title_gallery: "الأجواء والمذاق",
         badge_halal: "حلال 100%",
         badge_quality: "أفضل جودة",
@@ -282,7 +357,30 @@ const i18n = {
         modal_msg_title: "ارسل لنا رسالة",
         label_message: "رسالتك",
         btn_submit_msg: "إرسال الرسالة",
-        footer_rights: "كل الحقوق محفوظة."
+        footer_rights: "كل الحقوق محفوظة.",
+        menu_header_title: "نكهاتنا المميزة",
+        menu_header_sub: "بلمسة فيرينا...",
+        menu_back: "الصفحة الرئيسية",
+        menu_intro: "يمكنك زيارة متجرنا أو الحصول على معلومات مفصلة من موظفينا لجميع خيارات القائمة. يمكنك أدناه مراجعة نكهاتنا المميزة المحبوبة.",
+        menu_download: "تنزيل القائمة بالأسعار (PDF)",
+        cat_food: "ساخن من الفرن",
+        cat_drinks: "المشروبات والحلويات",
+        item_pizza: "بيتزا مخبوزة على الحجر",
+        desc_pizza: "عجينة مخمرة بشكل خاص، صلصة طماطم إيطالية، وجبن موزاريلا رائع يخبز في فرن الحطب.",
+        item_menemen: "مينيمين تشاكالي الشهير",
+        desc_menemen: "محضر فقط بصفار البيض والكثير من الشيدر والزبدة، طعم إفطار إقليمي أسطوري.",
+        item_toast: "توست بازلاما مخبوز",
+        desc_toast: "يقدم مقرمشاً من فرن الحجر مع جبن الشيدر والسجق/اللحم البقري الخاص بين خبز القرية.",
+        item_coffee: "قهوة تركية على الجمر",
+        desc_coffee: "طعم كلاسيكي يخمر ببطء في وعاء نحاسي في جو يمتد لـ 150 عاماً، يقدم مع راحة الحلقوم التركية.",
+        item_tea: "مميز: شاي بتلات الورد",
+        desc_tea: "مهرجان مذهل من الروائح مع بتلات الورد المجففة حديثاً المضافة إلى مزيج الشاي الخاص بنا.",
+        item_cake: "كيك ساخن مع صلصة الشوكولاتة",
+        desc_cake: "طري من الداخل، الكثير من الكاكاو، ومغطى بصلصة الشوكولاتة الساخنة، طعم لا غنى عنه.",
+        badge_veg: "نباتي",
+        badge_vegan: "فيغان",
+        badge_gluten: "يحتوي على الجلوتين",
+        badge_dairy: "يحتوي على منتجات الألبان"
     },
     zh: {
         category: "咖啡厅与餐厅",
@@ -297,6 +395,7 @@ const i18n = {
         review_2: "你一定要尝尝Çakallı menemen。员工都面带微笑，而且这里对宠物很友好，真是太棒了。",
         review_3: "Galata喝咖啡和吃甜点的最佳去处。员工非常周到。",
         title_location: "地点",
+        title_contact: "联系与位置",
         title_gallery: "氛围与口味",
         badge_halal: "100% 清真",
         badge_quality: "最高品质",
@@ -316,7 +415,30 @@ const i18n = {
         modal_msg_title: "给我们留言",
         label_message: "您的留言",
         btn_submit_msg: "发送留言",
-        footer_rights: "版权所有。"
+        footer_rights: "版权所有。",
+        menu_header_title: "招牌美味",
+        menu_header_sub: "带有 Firinna 的特色...",
+        menu_back: "主页",
+        menu_intro: "您可以光临我们的商店或从我们的员工那里获取有关所有菜单选项的详细信息。在下面，您可以查看我们最受欢迎的招牌美味。",
+        menu_download: "下载带价格的菜单 (PDF)",
+        cat_food: "新鲜出炉",
+        cat_drinks: "饮料与甜点",
+        item_pizza: "石烤披萨",
+        desc_pizza: "特制发酵面团，意大利番茄酱，搭配精美马苏里拉奶酪，在柴火烤炉中烘烤而成。",
+        item_menemen: "著名的 Çakallı Menemen",
+        desc_menemen: "仅用蛋黄，大量的切达干酪和黄油制成，一种传奇的地域性早餐口味。",
+        item_toast: "烤 Bazlama 吐司",
+        desc_toast: "石炉烤制，酥脆可口，乡村面包中夹有切达干酪和特制香肠/牛肉。",
+        item_coffee: "炭火土耳其咖啡",
+        desc_coffee: "在 150 年历史的氛围中，在铜壶中慢慢煮出的经典口味，搭配土耳其软糖。",
+        item_tea: "招牌：玫瑰花瓣茶",
+        desc_tea: "在我们的特制混合茶中加入新鲜干燥的玫瑰花瓣，带来令人难以置信的香气盛宴。",
+        item_cake: "热巧克力酱蛋糕",
+        desc_cake: "内里柔软，富含可可，表面覆盖着热巧克力酱，不可或缺的美味。",
+        badge_veg: "素食",
+        badge_vegan: "纯素",
+        badge_gluten: "含麸质",
+        badge_dairy: "含乳制品"
     }
 };
 
@@ -347,9 +469,79 @@ async function fetchWebSettings() {
     try {
         const res = await fetch('/api/web/settings');
         const data = await res.json();
-        if (data.work_hours) {
-            document.getElementById('dynamic_work_hours').innerText = `Şu An Açık (${data.work_hours})`;
+        
+        function updateWorkHours(settingsData) {
+            const element = document.getElementById('dynamic_work_hours');
+            if (!element) return;
+            
+            const hours = settingsData.work_hours;
+            const manualStatus = settingsData.manual_status || 'auto';
+            
+            if (manualStatus === 'open') {
+                element.innerHTML = `<span class="pulse-dot"></span> Şu An Açık (${hours})`;
+                element.parentElement.style.background = '#ecfdf5';
+                element.parentElement.style.color = '#059669';
+                return;
+            } else if (manualStatus === 'closed') {
+                const closedUntil = settingsData.closed_until || 'Belirsiz';
+                element.innerHTML = `<span class="pulse-dot" style="background:#ef4444; box-shadow:none; animation:none;"></span> Kapalı (Açılış: ${closedUntil})`;
+                element.parentElement.style.background = '#fef2f2';
+                element.parentElement.style.color = '#dc2626';
+                return;
+            }
+            
+            // Auto Mode
+            if (hours) {
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinute = now.getMinutes();
+                
+                const parts = hours.split('-');
+                if(parts.length === 2) {
+                    const openTime = parts[0].trim();
+                    const closeTime = parts[1].trim();
+                    const [openH, openM] = openTime.split(':').map(Number);
+                    const [closeH, closeM] = closeTime.split(':').map(Number);
+                    
+                    const nowTotal = currentHour * 60 + currentMinute;
+                    const openTotal = openH * 60 + openM;
+                    let closeTotal = closeH * 60 + closeM;
+                    
+                    if(closeTotal < openTotal) {
+                        closeTotal += 24 * 60;
+                    }
+                    
+                    let isOpen = false;
+                    if(closeH < openH) {
+                        if(nowTotal >= openTotal || nowTotal < (closeH * 60 + closeM)) {
+                            isOpen = true;
+                        }
+                    } else {
+                        if(nowTotal >= openTotal && nowTotal < closeTotal) {
+                            isOpen = true;
+                        }
+                    }
+                    
+                    if(isOpen) {
+                        element.innerHTML = `<span class="pulse-dot"></span> Şu An Açık (${hours})`;
+                        element.parentElement.style.background = '#ecfdf5';
+                        element.parentElement.style.color = '#059669';
+                    } else {
+                        let nextOpenDay = "Bugün";
+                        if(nowTotal >= closeTotal || (closeH < openH && nowTotal >= (closeH * 60 + closeM) && nowTotal < openTotal)) {
+                            nextOpenDay = "Yarın";
+                        }
+                        element.innerHTML = `<span class="pulse-dot" style="background:#ef4444; box-shadow:none; animation:none;"></span> Kapalı (Açılış: ${nextOpenDay} ${openTime})`;
+                        element.parentElement.style.background = '#fef2f2';
+                        element.parentElement.style.color = '#dc2626';
+                    }
+                } else {
+                    element.innerText = hours;
+                }
+            }
         }
+        
+        updateWorkHours(data);
         if (data.address) {
             document.getElementById('dynamic_address').innerText = data.address;
         }
@@ -412,12 +604,27 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(fetchTableStatus, 30000);
 });
 
-// Carousel Logic
+// Review Carousel Auto-Scroll Logic
 let currentReviewIndex = 0;
 const totalReviews = 3;
-function nextReview() {
-    document.getElementById(`review-slide-${currentReviewIndex}`).style.display = 'none';
+
+function showNextReview() {
+    const currentSlide = document.getElementById(`review-slide-${currentReviewIndex}`);
+    if (currentSlide) {
+        currentSlide.style.opacity = '0';
+        currentSlide.style.zIndex = '0';
+    }
+    
     currentReviewIndex = (currentReviewIndex + 1) % totalReviews;
-    document.getElementById(`review-slide-${currentReviewIndex}`).style.display = 'block';
+    
+    const nextSlide = document.getElementById(`review-slide-${currentReviewIndex}`);
+    if (nextSlide) {
+        nextSlide.style.opacity = '1';
+        nextSlide.style.zIndex = '1';
+    }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    setInterval(showNextReview, 4000);
+});
 

@@ -25,8 +25,16 @@
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     background-color: var(--bg-color);
+    background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg' stroke='%23d4af37' fill='none' stroke-width='2' opacity='0.1'%3E %3C!-- Coffee --%3E %3Cpath d='M30 40h20v10c0 5.5-4.5 10-10 10s-10-4.5-10-10V40zm20 5h5c2.8 0 5 2.2 5 5s-2.2 5-5 5h-5m-10-25v5m5-7v7m5-5v5'/%3E %3C!-- Pizza --%3E %3Cpath d='M130 50 l20 -30 l20 30 a10 10 0 0 1 -40 0'/%3E %3Ccircle cx='140' cy='35' r='2' fill='%23d4af37'/%3E %3Ccircle cx='155' cy='42' r='2' fill='%23d4af37'/%3E %3Ccircle cx='148' cy='25' r='2' fill='%23d4af37'/%3E %3C!-- Fork --%3E %3Cpath d='M40 130 v20 c0 5 5 10 5 20 v20 m-10 -60 v20 c0 5 10 10 10 20 m20 -40 v20 c0 5 -10 10 -10 20'/%3E %3C!-- Knife --%3E %3Cpath d='M150 130 v60 m0 -60 c 15 0 15 30 0 30'/%3E %3C/svg%3E");
     color: var(--text-main);
+    line-height: 1.6;
     min-height: 100vh;
+    animation: bgScroll 60s linear infinite;
+}
+
+@keyframes bgScroll {
+    from { background-position: 0 0; }
+    to { background-position: 1000px 1000px; }
 }
 
 /* Üst Dekoratif Banner */
@@ -65,11 +73,33 @@ body {
 /* Kart Stilleri */
 .card {
     background: var(--card-bg);
-    border-radius: 20px;
+    border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(255,255,255,0.5);
     margin-bottom: 24px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+/* Ottoman Motif Decoration */
+.card::before, .card::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0C50 27.6 27.6 50 0 50C27.6 50 50 72.4 50 100C50 72.4 72.4 50 100 50C72.4 50 50 27.6 50 0Z' fill='%23d4af37' opacity='0.3'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
+.card::before {
+    top: 10px;
+    left: 10px;
+}
+.card::after {
+    bottom: 10px;
+    right: 10px;
+    transform: rotate(180deg);
 }
 
 .card-title {
@@ -77,6 +107,26 @@ body {
     font-weight: 700;
     color: var(--text-main);
     margin-bottom: 16px;
+}
+
+.badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--primary-dark);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
 .m-0 { margin: 0 !important; }
@@ -96,15 +146,16 @@ body {
 }
 
 .profile-logo {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
+    width: 220px;
+    height: 180px;
     object-fit: contain;
-    border: 4px solid var(--card-bg);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    margin-bottom: 16px;
-    background: #fff;
-    padding: 12px;
+    margin-bottom: 24px;
+    animation: softFloat 4s ease-in-out infinite;
+}
+
+@keyframes softFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }
 
 .profile-name {
@@ -149,29 +200,37 @@ body {
 
 .social-row {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     justify-content: center;
-    width: 100%;
+    margin-top: 24px;
+    flex-wrap: wrap;
 }
 
 .social-btn {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 12px;
-    background: var(--bg-color);
+    width: 50px;
+    height: 50px;
     border-radius: 12px;
-    color: var(--text-main);
-    font-size: 1.4rem;
+    background: var(--bg-color);
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    border: 1px solid var(--border-color);
 }
 
 .social-btn:hover {
-    background: var(--border-color);
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
+
+.social-btn.insta:hover { color: #fff; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border-color: transparent; }
+.social-btn.wp:hover { color: #fff; background: #25D366; border-color: transparent; }
+.social-btn.tel:hover { color: #fff; background: var(--primary-dark); border-color: transparent; }
+.social-btn.tg:hover { color: #fff; background: #0088cc; border-color: transparent; }
+.social-btn.tk:hover { color: #fff; background: #000; border-color: transparent; }
 
 /* Butonlar */
 .btn {

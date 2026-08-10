@@ -3,277 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Fırınna Cafe & Restaurant">
+    <meta name="description" content="Fırınna Cafe & Restaurant - Galata'nın kalbinde tarihi lezzetler">
     <title>Fırınna Cafe & Restaurant</title>
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="logo.png">
-    <link rel="stylesheet" href="style.css">
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Pannellum 360 Viewer CSS -->
+    <link rel="stylesheet" href="https://cdn.pannellum.org/2.5/pannellum.css">
 </head>
 <body>
-    
+
+    <!-- Üst Dekoratif Alan -->
     <div class="top-banner">
         <img src="banner.jpg" alt="Galata Istanbul" class="banner-img">
         <div class="banner-overlay"></div>
-        
         <div class="lang-selector">
-            <button onclick="changeLang('tr')">TR</button>
+            <button class="active" onclick="changeLang('tr')">TR</button>
             <button onclick="changeLang('en')">EN</button>
-            <button onclick="changeLang('ar')">AR</button>
             <button onclick="changeLang('ru')">RU</button>
+            <button onclick="changeLang('ar')">AR</button>
             <button onclick="changeLang('zh')">ZH</button>
         </div>
     </div>
 
+    <!-- Ana Konteyner -->
     <main class="dashboard">
         
         <!-- SOL KOLON: Profil & İşlemler -->
         <aside class="left-col">
+            
+            <!-- 1. KİMLİK & DURUM -->
             <div class="card profile-card">
                 <img src="logo.png" alt="Fırınna Logo" class="profile-logo">
-                <h1 class="profile-name">Fırınna</h1>
-                <p class="profile-category" data-i18n="category">Cafe & Restaurant</p>
+                <p class="profile-category" data-i18n="category" style="margin-bottom: 8px;">Cafe & Restaurant</p>
+                
+                <!-- Rozetler Sol Kolona Taşındı -->
+                <div class="badges" style="justify-content: center; margin-bottom: 16px;">
+                    <span class="badge"><i class="ph-fill ph-seal-check"></i> <span data-i18n="badge_halal">%100 Helal</span></span>
+                    <span class="badge"><i class="ph-fill ph-star"></i> <span data-i18n="badge_quality">En İyi Kalite</span></span>
+                    <span class="badge"><i class="ph-fill ph-money"></i> <span data-i18n="badge_price">Uygun Fiyat</span></span>
+                </div>
+
                 <div class="status-badge"><span class="pulse-dot"></span><span data-i18n="status_open" id="dynamic_work_hours">Şu An Açık (08:00 - 23:00)</span></div>
-                
-                <div class="table-status-box" style="margin-top: 16px; padding: 12px; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <i class="ph-fill ph-armchair" style="color:#2ecc71; font-size:1.5rem;"></i>
-                    <span id="live-table-status" style="font-weight: 600; color: #27ae60; font-size: 0.95rem;">Canlı Masa Durumu Yükleniyor...</span>
-                </div>
-                
-                <div class="social-row">
-                    <a href="https://instagram.com/firinnacafe" class="social-btn" id="dynamic_instagram"><i class="ph-fill ph-instagram-logo"></i></a>
-                    <a href="https://api.whatsapp.com/send?phone=905456301214" class="social-btn" id="dynamic_whatsapp"><i class="ph-fill ph-whatsapp-logo"></i></a>
-                    <a href="tel:+905456301214" class="social-btn" id="dynamic_phone"><i class="ph-fill ph-phone"></i></a>
-                </div>
             </div>
 
+            <!-- 2. HIZLI İŞLEMLER -->
             <div class="card action-card">
-                <a href="menu.html" class="btn btn-primary" id="menu-link">
+                <a href="menu.html" class="btn btn-primary" id="menu-link" style="margin-bottom: 16px;">
                     <i class="ph-bold ph-book-open"></i>
                     <span data-i18n="btn_menu">İnteraktif Menüyü İncele</span>
                 </a>
+                
+                <div class="table-status-box" style="padding: 12px; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;">
+                    <i class="ph-fill ph-armchair" style="color:#2ecc71; font-size:1.5rem;"></i>
+                    <span id="live-table-status" style="font-weight: 600; color: #27ae60; font-size: 0.95rem;">Canlı Masa Durumu Yükleniyor...</span>
+                </div>
+
                 <button onclick="openModal('reservationModal')" class="btn btn-secondary" style="width:100%; border:none; cursor:pointer;">
                     <i class="ph-bold ph-calendar-plus"></i>
                     <span data-i18n="btn_reserve">Hemen Masa Ayırt</span>
                 </button>
-                <button onclick="openModal('messageModal')" class="btn btn-outline" style="width:100%; border:none; cursor:pointer; margin-top:12px; background:var(--card-bg);">
-                    <i class="ph-bold ph-chat-circle-text"></i>
-                    <span data-i18n="btn_message">Bize Mesaj Gönder</span>
-                </button>
             </div>
 
+            <!-- 3. İLETİŞİM & ULAŞIM -->
             <div class="card location-card">
-                <h3 class="card-title" data-i18n="title_location">Lokasyon</h3>
+                <h3 class="card-title" data-i18n="title_contact">İletişim & Ulaşım</h3>
                 <p class="address-text" id="dynamic_address">Şahkulu Mah. Kumbaracı Yokuşu, No:41A<br>Beyoğlu, İstanbul</p>
                 
-                <div class="map-buttons">
+                <div class="map-buttons" style="margin-bottom: 16px;">
                     <a href="https://maps.google.com/?q=Firinna" target="_blank" class="map-link">
                         <i class="ph-fill ph-google-logo"></i> Google
                     </a>
                     <a href="yandexnavi://build_route_on_map?lat_to=41.0&lon_to=29.0" target="_blank" class="map-link">
                         <i class="ph-fill ph-navigation-arrow"></i> Yandex
                     </a>
-                    <a href="https://map.baidu.com/" target="_blank" class="map-link" id="dynamic_baidu_map">
-                        <i class="ph-fill ph-compass"></i> Baidu
+                    <a href="http://maps.apple.com/?address=Kumbaracı+Yokuşu+No:41A,Beyoğlu,Istanbul,Turkey" target="_blank" class="map-link">
+                        <i class="ph-fill ph-apple-logo"></i> Apple Maps
                     </a>
                 </div>
+
+                <!-- Google Harita İframe Geri Eklendi -->
+                <div style="width: 100%; height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border-color);">
+                    <iframe src="https://maps.google.com/maps?q=Fırınna%20Kumbaracı%20Yokuşu%20Beyoğlu&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); margin: 16px 0;"></div>
+
+                <div class="social-row" style="margin-bottom: 16px; margin-top: 0;">
+                    <a href="https://instagram.com/firinnacafe" class="social-btn insta" id="dynamic_instagram" target="_blank"><i class="ph-bold ph-instagram-logo"></i></a>
+                    <a href="https://api.whatsapp.com/send?phone=905456301214" class="social-btn wp" id="dynamic_whatsapp" target="_blank"><i class="ph-bold ph-whatsapp-logo"></i></a>
+                    <a href="https://t.me/firinnacafe" class="social-btn tg" target="_blank"><i class="ph-bold ph-telegram-logo"></i></a>
+                    <a href="https://tiktok.com/@firinnacafe" class="social-btn tk" target="_blank"><i class="ph-bold ph-tiktok-logo"></i></a>
+                    <a href="tel:+905456301214" class="social-btn tel" id="dynamic_phone"><i class="ph-bold ph-phone"></i></a>
+                </div>
+
+                <button onclick="openModal('messageModal')" class="btn btn-outline" style="width:100%; border:none; cursor:pointer; background:var(--card-bg);">
+                    <i class="ph-bold ph-chat-circle-text"></i>
+                    <span data-i18n="btn_message">Bize Mesaj Gönder</span>
+                </button>
             </div>
         </aside>
 
-        <section class="right-col">
+        <!-- SAĞ KOLON: İçerik (Galeri, Hakkımızda, Yorumlar, Sanal Tur vb.) -->
+        <main class="right-col">
             
+            <!-- Galeri -->
+            <div class="card gallery-card">
+                <h2 class="card-title" data-i18n="title_gallery">Ortam & Lezzetler</h2>
+                <div class="gallery-grid">
+                    <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80" alt="Cafe İç Mekan" class="gallery-img">
+                    <img src="https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?auto=format&fit=crop&w=400&q=80" alt="Türk Kahvesi" class="gallery-img">
+                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80" alt="Pizza" class="gallery-img">
+                    <img src="https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=400&q=80" alt="Menemen" class="gallery-img">
+                </div>
+            </div>
+
+            <!-- Hakkımızda -->
             <div class="card about-card">
-                <h3 class="card-title" data-i18n="title_about">Hakkımızda</h3>
-                <p style="line-height: 1.6; color: var(--text-muted);" data-i18n="text_about">
-                    DEĞERLİ MİSAFİRİMİZ, FIRINNA'YA HOŞ GELDİNİZ.<br><br>
-                    TÜM ÜRÜNLERİMİZ; EN SEÇKİN MALZEMELERLE, GELENEKSEL TARİFLERE FIRINNA DOKUNUŞLARIYLA EV YAPIMI HAZIRLANMAKTADIR.<br><br>
-                    BURADA ACELE YOK - 150 YILLIK YAPININ SICAKLIĞINDA LEZZETİN, HUZURUN, SOHBETİN VE GÜZEL ANLARIN TADINI ÇIKARIN.<br><br>
-                    TARİHİ İSTANBUL GEZİNİZDE LEZZETLİ VE HUZURLU BİR ANI OLABİLİRSEK NE MUTLU BİZE.
+                <h2 class="card-title" data-i18n="title_about">Hakkımızda</h2>
+                <p class="about-text" data-i18n="text_about">
+                    DEĞERLI MISAFIRIMIZ, FIRINNA'YA HOŞ GELDINIZ.<br><br>
+                    TÜM ÜRÜNLERIMIZ; EN SEÇKIN MALZEMELERLE, GELENEKSEL TARIFLERE FIRINNA DOKUNUŞLARIYLA EV YAPIMI HAZIRLANMAKTADIR.<br><br>
+                    BURADA ACELE YOK - 150 YILLIK YAPININ SICAKLIĞINDA LEZZETIN, HUZURUN, SOHBETIN VE GÜZEL ANLARIN TADINI ÇIKARIN.<br><br>
+                    TARIHI İSTANBUL GEZINIZDE LEZZETLI VE HUZURLU BIR ANI OLABILIRSEK NE MUTLU BIZE.
                 </p>
             </div>
 
-            <div class="card trust-card">
-                <div class="trust-grid" style="display:flex; justify-content:space-around; text-align:center; padding: 10px 0;">
-                    <div>
-                        <i class="ph-fill ph-shield-check" style="color:#2ecc71; font-size:2.5rem; margin-bottom:8px;"></i>
-                        <p data-i18n="badge_halal" style="font-weight:600; font-size:0.9rem;">%100 Helal</p>
-                    </div>
-                    <div>
-                        <i class="ph-fill ph-star" style="color:#f1c40f; font-size:2.5rem; margin-bottom:8px;"></i>
-                        <p data-i18n="badge_quality" style="font-weight:600; font-size:0.9rem;">En İyi Kalite</p>
-                    </div>
-                    <div>
-                        <i class="ph-fill ph-tag" style="color:var(--primary); font-size:2.5rem; margin-bottom:8px;"></i>
-                        <p data-i18n="badge_price" style="font-weight:600; font-size:0.9rem;">Uygun Fiyat</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card reviews-showcase">
-                <h3 class="card-title" data-i18n="title_top_reviews">Müşterilerimizin Gözünden</h3>
-                <div class="carousel-container" style="position:relative;">
-                    
-                    <div class="review-slide" id="review-slide-0" style="background:#fff; padding:16px; border-radius:12px; border-left:4px solid var(--primary); box-shadow:0 4px 15px rgba(0,0,0,0.05); cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                            <strong>Ahmet Y.</strong>
-                            <span style="color:var(--primary); font-size:1.2rem;">★★★★★</span>
-                        </div>
-                        <p style="font-size:0.9rem; color:#555;" data-i18n="review_1">İstiklal'in gürültüsünden kaçıp nefes alabileceğiniz harika, tarihi bir mekan. Pizzaları efsane!</p>
-                    </div>
-
-                    <div class="review-slide" id="review-slide-1" style="display:none; background:#fff; padding:16px; border-radius:12px; border-left:4px solid var(--primary); box-shadow:0 4px 15px rgba(0,0,0,0.05); cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                            <strong>Elena S.</strong>
-                            <span style="color:var(--primary); font-size:1.2rem;">★★★★★</span>
-                        </div>
-                        <p style="font-size:0.9rem; color:#555;" data-i18n="review_2">Çakallı menemenini denemelisiniz. Personel çok güleryüzlü ve evcil hayvan dostu olmaları harika.</p>
-                    </div>
-
-                    <div class="review-slide" id="review-slide-2" style="display:none; background:#fff; padding:16px; border-radius:12px; border-left:4px solid var(--primary); box-shadow:0 4px 15px rgba(0,0,0,0.05); cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                            <strong>Mehmet K.</strong>
-                            <span style="color:var(--primary); font-size:1.2rem;">★★★★★</span>
-                        </div>
-                        <p style="font-size:0.9rem; color:#555;" data-i18n="review_3">Galata'da kahve içip tatlı yemek için en iyi nokta. Çalışanlar çok ilgili.</p>
-                    </div>
-
-                    <div style="text-align:right; margin-top:12px;">
-                        <button type="button" onclick="nextReview()" style="background:transparent; border:none; color:var(--primary-dark); font-weight:bold; cursor:pointer; font-size:0.95rem; display:inline-flex; align-items:center; gap:4px;">
-                            Sonraki Yorum <i class="ph-fill ph-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card virtual-tour-card">
-                <h3 class="card-title" data-i18n="title_virtual_tour">Sanal Tur (360°)</h3>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;" data-i18n="text_virtual_tour">150 yıllık tarihi binamızı oturduğunuz yerden keşfedin.</p>
+            <!-- Gerçek Yorumlar & Fotoğraflar (Widget Alanı) -->
+            <div style="display: flex; gap: 16px; margin-bottom: 24px;">
                 
-                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                    <button class="btn btn-outline" style="flex:1; border-color:var(--primary); color:var(--primary-dark);" onclick="changeTour('interior')">İç Mekan</button>
-                    <button class="btn btn-outline" style="flex:1; border-color:var(--primary); color:var(--primary-dark);" onclick="changeTour('exterior')">Dış Mekan</button>
+                <!-- Google Pano -->
+                <div class="card review-card" style="flex: 1; margin-bottom: 0; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-left: 6px solid var(--google-blue);">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px 0;">
+                        <div style="background: #fff; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 12px;">
+                            <i class="ph-fill ph-google-logo" style="color:#4285F4; font-size: 2.2rem;"></i>
+                        </div>
+                        <h2 style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">5.0</h2>
+                        <div style="display: flex; color: #f1c40f; font-size: 1.4rem; margin-bottom: 4px;">
+                            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                        </div>
+                        <p style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px;">Google'da Mükemmel</p>
+                        
+                        <a href="https://maps.google.com/?q=Firinna" target="_blank" class="btn btn-primary" style="background: var(--google-blue); border:none; display: inline-flex; width: auto; padding: 10px 24px; font-size: 0.95rem; border-radius: 30px;">
+                            İncele
+                        </a>
+                    </div>
                 </div>
 
-                <!-- Pannellum Viewer iframe -->
-                <div style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color);">
-                    <iframe id="tour-iframe" width="100%" height="100%" allowfullscreen style="border-style:none;" 
-                            src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https://pannellum.org/images/alma.jpg&autoLoad=true">
+                <!-- Yandex Pano -->
+                <div class="card review-card" style="flex: 1; margin-bottom: 0; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-left: 6px solid #FF0000;">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px 0;">
+                        <div style="background: #fff; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 12px;">
+                            <span style="color:#FF0000; font-weight: 900; font-size: 2.2rem; font-family: sans-serif;">Y</span>
+                        </div>
+                        <h2 style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">5.0</h2>
+                        <div style="display: flex; color: #f1c40f; font-size: 1.4rem; margin-bottom: 4px;">
+                            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                        </div>
+                        <p style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px;">Yandex'te Mükemmel</p>
+                        
+                        <a href="https://yandex.com.tr/harita/?text=Firinna" target="_blank" class="btn btn-primary" style="background: #FF0000; border:none; display: inline-flex; width: auto; padding: 10px 24px; font-size: 0.95rem; border-radius: 30px;">
+                            İncele
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Sanal Tur 360 -->
+            <div class="card tour-card">
+                <h2 class="card-title" data-i18n="title_virtual_tour">Sanal Tur (360°)</h2>
+                <p style="margin-bottom: 16px;" data-i18n="text_virtual_tour">150 yıllık tarihi binamızı oturduğunuz yerden keşfedin.</p>
+                <div class="tour-container">
+                    <iframe id="tour-iframe" 
+                        src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https://pannellum.org/images/alma.jpg&autoLoad=true" 
+                        title="360 Sanal Tur"
+                        allowfullscreen>
                     </iframe>
                 </div>
-            </div>
-
-            <!-- KONUM VE YORUMLAR -->
-            <div class="card reviews-card">
-                <div class="reviews-header">
-                    <div class="reviews-title-area">
-                        <i class="ph-fill ph-map-pin-line" style="color: var(--primary); font-size: 1.5rem;"></i>
-                        <h3 class="card-title m-0" data-i18n="title_reviews">Konum & Son Yorumlar</h3>
-                    </div>
-                </div>
-
-                <div class="map-embed" style="border-radius: 12px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border-color);">
-                    <iframe 
-                        src="https://maps.google.com/maps?q=F%C4%B1r%C4%B1nna%20Kumbarac%C4%B1%20Yoku%C5%9Fu&hl=tr&z=17&output=embed" 
-                        width="100%" 
-                        height="250" 
-                        style="border:0; display: block;" 
-                        allowfullscreen="" 
-                        loading="lazy">
-                    </iframe>
-                </div>
-                
-                <div class="review-portals" style="display: flex; gap: 12px; flex-direction: column;">
-                    <a href="https://www.google.com/maps/place/F%C4%B1r%C4%B1nna/@41.0274591,28.9774941,18z/data=!4m6!3m5!1s0x14cab9607a4a1d4b:0x4388b092452d9380!8m2!3d41.028328!4d28.976906!16s%2Fg%2F11zjlr06t6" target="_blank" class="btn btn-outline" style="justify-content: flex-start; padding: 12px 16px;">
-                        <i class="ph-fill ph-google-logo" style="color: var(--google-blue); font-size: 1.5rem;"></i>
-                        <span style="color: var(--text-main); font-weight: 600;" data-i18n="btn_google">Google'daki Son Yorumları Oku</span>
-                    </a>
-                    
-                    <a href="https://yandex.com.tr/maps/org/firinna/37863615675/?ll=28.977064%2C41.028377&z=17" target="_blank" class="btn btn-outline" style="justify-content: flex-start; padding: 12px 16px;">
-                        <i class="ph-fill ph-navigation-arrow" style="color: #ff0000; font-size: 1.5rem;"></i>
-                        <span style="color: var(--text-main); font-weight: 600;" data-i18n="btn_yandex">Yandex Haritalar'da İncele</span>
-                    </a>
-                    <a href="https://map.baidu.com/" target="_blank" class="btn btn-outline" id="dynamic_baidu_review" style="justify-content: flex-start; padding: 12px 16px;">
-                        <i class="ph-fill ph-compass" style="color: #2980b9; font-size: 1.5rem;"></i>
-                        <span style="color: var(--text-main); font-weight: 600;" data-i18n="btn_baidu">Baidu'da İncele (百度地图)</span>
-                    </a>
+                <div class="tour-controls">
+                    <button class="btn btn-outline" style="flex:1" onclick="changeTour('interior')">İç Mekan</button>
+                    <button class="btn btn-outline" style="flex:1" onclick="changeTour('exterior')">Dış Mekan</button>
                 </div>
             </div>
 
-        </section>
-
-        <!-- MODALS -->
-        <div id="reservationModal" class="modal-overlay">
-            <div class="modal-content">
-                <span class="close-modal" onclick="closeModal('reservationModal')">&times;</span>
-                <h3 data-i18n="modal_res_title">Masa Rezervasyonu</h3>
-                <form id="reservationForm" onsubmit="submitReservation(event)">
-                    <div class="form-group">
-                        <label data-i18n="label_name">Ad Soyad</label>
-                        <input type="text" id="resName" required>
-                    </div>
-                    <div class="form-group">
-                        <label data-i18n="label_phone">Telefon</label>
-                        <input type="tel" id="resPhone" required>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label data-i18n="label_date">Tarih</label>
-                            <input type="date" id="resDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label data-i18n="label_time">Saat (08:00-23:00)</label>
-                            <input type="time" id="resTime" min="08:00" max="23:00" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label data-i18n="label_guests">Kişi Sayısı</label>
-                        <input type="number" id="resGuests" min="1" max="20" value="2" required>
-                    </div>
-                    <div class="form-group">
-                        <label data-i18n="label_note">Özel İstek / Not (İsteğe Bağlı)</label>
-                        <textarea id="resNote" rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width:100%; border:none; cursor:pointer;" id="btnResSubmit" data-i18n="btn_submit">Talebi Gönder</button>
-                    <p id="resResult" class="form-result"></p>
-                </form>
-            </div>
-        </div>
-
-        <div id="messageModal" class="modal-overlay">
-            <div class="modal-content">
-                <span class="close-modal" onclick="closeModal('messageModal')">&times;</span>
-                <h3 data-i18n="modal_msg_title">Bize Mesaj Gönderin</h3>
-                <form id="messageForm" onsubmit="submitMessage(event)">
-                    <div class="form-group">
-                        <label data-i18n="label_name">Ad Soyad</label>
-                        <input type="text" id="msgName" required>
-                    </div>
-                    <div class="form-group">
-                        <label data-i18n="label_phone">Telefon</label>
-                        <input type="tel" id="msgPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label data-i18n="label_message">Mesajınız</label>
-                        <textarea id="msgText" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-secondary" style="width:100%; border:none; cursor:pointer;" id="btnMsgSubmit" data-i18n="btn_submit_msg">Mesajı Gönder</button>
-                    <p id="msgResult" class="form-result"></p>
-                </form>
-            </div>
-        </div>
-
+        </main>
     </main>
 
+    <!-- Footer -->
     <footer>
         <p>© <span id="year"></span> Fırınna Cafe & Restaurant. <span data-i18n="footer_rights">Tüm hakları saklıdır.</span></p>
     </footer>
 
+    <!-- REZERVASYON MODAL -->
+    <div id="reservationModal" class="modal-overlay">
+        <div class="modal-content card">
+            <span class="close-btn" onclick="closeModal('reservationModal')"><i class="ph-bold ph-x"></i></span>
+            <h2 class="card-title" data-i18n="modal_res_title">Masa Rezervasyonu</h2>
+            <form id="reservationForm" onsubmit="submitReservation(event)">
+                <div class="form-group">
+                    <label data-i18n="label_name">Ad Soyad</label>
+                    <input type="text" id="resName" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_phone">Telefon</label>
+                    <input type="tel" id="resPhone" required>
+                </div>
+                <div style="display:flex; gap:16px;">
+                    <div class="form-group" style="flex:1;">
+                        <label data-i18n="label_date">Tarih</label>
+                        <input type="date" id="resDate" required>
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label data-i18n="label_time">Saat</label>
+                        <input type="time" id="resTime" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_guests">Kişi Sayısı</label>
+                    <input type="number" id="resGuests" min="1" max="20" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_note">Özel İstek / Not (İsteğe Bağlı)</label>
+                    <textarea id="resNote" rows="2"></textarea>
+                </div>
+                <button type="submit" id="btnResSubmit" class="btn btn-primary" style="width:100%;" data-i18n="btn_submit">Talebi Gönder</button>
+                <div id="resResult" style="margin-top:12px; font-weight:bold; text-align:center;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MESAJ MODAL -->
+    <div id="messageModal" class="modal-overlay">
+        <div class="modal-content card">
+            <span class="close-btn" onclick="closeModal('messageModal')"><i class="ph-bold ph-x"></i></span>
+            <h2 class="card-title" data-i18n="modal_msg_title">Bize Mesaj Gönderin</h2>
+            <form id="messageForm" onsubmit="submitMessage(event)">
+                <div class="form-group">
+                    <label data-i18n="label_name">Ad Soyad</label>
+                    <input type="text" id="msgName" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_phone">Telefon</label>
+                    <input type="tel" id="msgPhone" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="label_message">Mesajınız</label>
+                    <textarea id="msgText" rows="4" required></textarea>
+                </div>
+                <button type="submit" id="btnMsgSubmit" class="btn btn-primary" style="width:100%;" data-i18n="btn_submit_msg">Mesajı Gönder</button>
+                <div id="msgResult" style="margin-top:12px; font-weight:bold; text-align:center;"></div>
+            </form>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script src="https://cdn.pannellum.org/2.5/pannellum.js"></script>
 </body>
 </html>

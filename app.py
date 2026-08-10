@@ -2422,6 +2422,20 @@ def save_web_settings():
         json.dump(data, f, indent=4)
     return jsonify({"success": True})
 
+@app.route('/api/web/upload-menu', methods=['POST'])
+def upload_menu():
+    lang = request.form.get('lang')
+    if 'file' not in request.files or not lang:
+        return jsonify({"success": False, "error": "Geçersiz istek"})
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"success": False, "error": "Dosya seçilmedi"})
+    
+    filename = f"firinna_menu_{lang}.pdf"
+    filepath = os.path.join('/opt/firinna-pos/web', filename)
+    file.save(filepath)
+    return jsonify({"success": True, "filename": filename})
+
 @app.route('/api/web/tables-status', methods=['GET'])
 def api_web_tables_status():
     try:

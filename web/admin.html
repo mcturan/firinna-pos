@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fırınna YKP (Yönetim Kontrol Paneli)</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        
+        <!-- Sidebar (Sol Menü) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="ph-fill ph-storefront" style="font-size: 2rem; color: #ffcc00;"></i>
+                <h2>Fırınna YKP</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item" data-target="dashboard">
+                    <i class="ph-bold ph-squares-four"></i> Başlangıç
+                </a>
+                <a href="#" class="nav-item active" data-target="settings">
+                    <i class="ph-bold ph-gear"></i> Web Ayarları
+                </a>
+                <a href="#" class="nav-item" data-target="menu-docs">
+                    <i class="ph-bold ph-book-open"></i> Menü Dosyaları
+                </a>
+                <a href="#" class="nav-item" data-target="reservations">
+                    <i class="ph-bold ph-calendar-plus"></i> Rezervasyonlar
+                </a>
+                <a href="#" class="nav-item" data-target="messages">
+                    <i class="ph-bold ph-envelope-simple"></i> İletişim Mesajları
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="/" target="_blank" class="nav-item" style="color: #60a5fa;">
+                    <i class="ph-bold ph-arrow-square-out"></i> Siteyi Görüntüle
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content (Sağ İçerik) -->
+        <main class="main-content">
+            <header class="topbar">
+                <h1>Web Ayarları</h1>
+                <div class="user-profile">
+                    <span>Admin</span>
+                    <i class="ph-fill ph-user-circle" style="font-size: 2rem; color: #94a3b8;"></i>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                
+                <!-- BAŞLANGIÇ (DASHBOARD) -->
+                <section id="dashboard" class="admin-section" style="display:none;">
+                    <div class="card" style="max-width: 100%;">
+                        <h3>Site İstatistikleri ve Analiz</h3>
+                        <p class="card-desc">Sitenizin trafik ve etkileşim verilerini buradan anlık olarak takip edebilirsiniz. Veri toplanmaya başlandıkça grafikler dolacaktır.</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 24px;">
+                            <div style="background:#f8fafc; padding:20px; border-radius:8px; border:1px solid #cbd5e1; text-align:center;">
+                                <i class="ph-fill ph-users" style="font-size:2.5rem; color:#3b82f6;"></i>
+                                <h4 style="margin:10px 0; color:#475569; font-size:0.95rem;">Bugünkü Ziyaretçi</h4>
+                                <p style="font-size:1.8rem; font-weight:800; color:#1e293b;" id="stat-today">0</p>
+                            </div>
+                            <div style="background:#f8fafc; padding:20px; border-radius:8px; border:1px solid #cbd5e1; text-align:center;">
+                                <i class="ph-fill ph-chart-line-up" style="font-size:2.5rem; color:#10b981;"></i>
+                                <h4 style="margin:10px 0; color:#475569; font-size:0.95rem;">Bu Ayki Toplam</h4>
+                                <p style="font-size:1.8rem; font-weight:800; color:#1e293b;" id="stat-month">0</p>
+                            </div>
+                            <div style="background:#f8fafc; padding:20px; border-radius:8px; border:1px solid #cbd5e1; text-align:center;">
+                                <i class="ph-fill ph-globe" style="font-size:2.5rem; color:#8b5cf6;"></i>
+                                <h4 style="margin:10px 0; color:#475569; font-size:0.95rem;">Genel Toplam</h4>
+                                <p style="font-size:1.8rem; font-weight:800; color:#1e293b;" id="stat-total">0</p>
+                            </div>
+                            <div style="background:#f8fafc; padding:20px; border-radius:8px; border:1px solid #cbd5e1; text-align:center;">
+                                <i class="ph-fill ph-book-open" style="font-size:2.5rem; color:#f59e0b;"></i>
+                                <h4 style="margin:10px 0; color:#475569; font-size:0.95rem;">Menü Tıklamaları</h4>
+                                <p style="font-size:1.8rem; font-weight:800; color:#1e293b;" id="stat-menu">0</p>
+                            </div>
+                            <div style="background:#f8fafc; padding:20px; border-radius:8px; border:1px solid #cbd5e1; text-align:center;">
+                                <i class="ph-fill ph-phone-call" style="font-size:2.5rem; color:#ef4444;"></i>
+                                <h4 style="margin:10px 0; color:#475569; font-size:0.95rem;">İletişim / Rzv</h4>
+                                <p style="font-size:1.8rem; font-weight:800; color:#1e293b;" id="stat-actions">0</p>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="background:#fff; padding:20px; border-radius:8px; border:1px solid #e2e8f0;">
+                                <h4 style="margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;">Ziyaretçi Kaynakları (Son 7 Gün)</h4>
+                                <ul style="list-style: none; padding:0; color:#64748b; font-size:0.95rem;">
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Google Arama</span> <strong>0%</strong></li>
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Instagram</span> <strong>0%</strong></li>
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Direkt Giriş</span> <strong>0%</strong></li>
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Google Haritalar</span> <strong>0%</strong></li>
+                                </ul>
+                            </div>
+                            <div style="background:#fff; padding:20px; border-radius:8px; border:1px solid #e2e8f0;">
+                                <h4 style="margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;">Kullanılan Cihazlar</h4>
+                                <ul style="list-style: none; padding:0; color:#64748b; font-size:0.95rem;">
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="display:flex; align-items:center; gap:6px;"><i class="ph-fill ph-device-mobile"></i> Mobil</span> <strong>0%</strong></li>
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="display:flex; align-items:center; gap:6px;"><i class="ph-fill ph-desktop"></i> Masaüstü</span> <strong>0%</strong></li>
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="display:flex; align-items:center; gap:6px;"><i class="ph-fill ph-device-tablet"></i> Tablet</span> <strong>0%</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- WEB AYARLARI -->
+                <section id="settings" class="admin-section">
+                    <div class="card">
+                        <h3>Genel Bilgiler ve İletişim</h3>
+                        <p class="card-desc">Web sitesinde müşterilere gösterilecek iletişim ve çalışma saati bilgilerinizi buradan yönetebilirsiniz.</p>
+                        
+                        <form id="settingsForm">
+                        <div class="form-group" style="padding:16px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; margin-bottom:24px;">
+                            <label style="color:#1e40af; font-size:1rem; margin-bottom:12px;"><i class="ph-bold ph-power"></i> Manuel Dükkan Durumu Kontrolü</label>
+                            <div style="display:flex; gap:20px; font-weight:500;">
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="radio" name="manual_status" value="auto" checked> Otomatik (Saatlere Göre)</label>
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#16a34a;"><input type="radio" name="manual_status" value="open"> Zorunlu Açık</label>
+                                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#dc2626;"><input type="radio" name="manual_status" value="closed"> Zorunlu Kapalı</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="closed_until_div" style="display:none; padding:16px; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; margin-bottom:24px;">
+                            <label style="color:#b91c1c;">Mekanı kapattınız. Peki ne zaman açılacak?</label>
+                            <input type="datetime-local" id="closed_until" name="closed_until" class="form-control" style="width: auto;">
+                            <small style="color:#b91c1c;">Lütfen net bir tarih ve saat seçin. (Sitede geri sayım veya direkt saat gösterilir).</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Çalışma Saatleri (Açılış - Kapanış)</label>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <input type="time" id="work_hours_start" class="form-control" style="width:150px;" required>
+                                <span> - </span>
+                                <input type="time" id="work_hours_end" class="form-control" style="width:150px;" required>
+                            </div>
+                        </div>
+                            
+                            <div class="form-group">
+                                <label>Fiziksel Adres</label>
+                                <textarea id="address" name="address" class="form-control" rows="3" required></textarea>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Telefon (Sıfır olmadan, örn: 905456301214)</label>
+                                    <input type="text" id="phone" name="phone" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Instagram Linki</label>
+                                    <input type="url" id="instagram" name="instagram" class="form-control" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ph-bold ph-floppy-disk"></i> Ayarları Kaydet
+                                </button>
+                                <div id="saveResult" class="toast-success">Ayarlar başarıyla kaydedildi!</div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- MENÜ DOSYALARI -->
+                <section id="menu-docs" class="admin-section" style="display:none;">
+                    <div class="card">
+                        <h3>PDF Menü Yükleme</h3>
+                        <p class="card-desc">Sitenizdeki 5 dil için PDF menülerinizi buradan tek tek güncelleyebilirsiniz.</p>
+                        
+                        <div style="display:flex; flex-direction:column; gap:16px;">
+                            <!-- TR -->
+                            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border:1px solid #cbd5e1; border-radius:8px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <i class="ph-fill ph-file-pdf" style="font-size:2rem; color:#ef4444;"></i>
+                                    <h4 style="margin:0;">Türkçe Menü (TR)</h4>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <input type="file" id="menu_file_tr" accept=".pdf" class="form-control" style="padding:4px; max-width:250px;">
+                                    <button class="btn btn-primary" onclick="uploadMenu('tr')">Yükle</button>
+                                </div>
+                            </div>
+                            <!-- EN -->
+                            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border:1px solid #cbd5e1; border-radius:8px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <i class="ph-fill ph-file-pdf" style="font-size:2rem; color:#ef4444;"></i>
+                                    <h4 style="margin:0;">İngilizce Menü (EN)</h4>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <input type="file" id="menu_file_en" accept=".pdf" class="form-control" style="padding:4px; max-width:250px;">
+                                    <button class="btn btn-primary" onclick="uploadMenu('en')">Yükle</button>
+                                </div>
+                            </div>
+                            <!-- AR -->
+                            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border:1px solid #cbd5e1; border-radius:8px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <i class="ph-fill ph-file-pdf" style="font-size:2rem; color:#ef4444;"></i>
+                                    <h4 style="margin:0;">Arapça Menü (AR)</h4>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <input type="file" id="menu_file_ar" accept=".pdf" class="form-control" style="padding:4px; max-width:250px;">
+                                    <button class="btn btn-primary" onclick="uploadMenu('ar')">Yükle</button>
+                                </div>
+                            </div>
+                            <!-- RU -->
+                            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border:1px solid #cbd5e1; border-radius:8px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <i class="ph-fill ph-file-pdf" style="font-size:2rem; color:#ef4444;"></i>
+                                    <h4 style="margin:0;">Rusça Menü (RU)</h4>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <input type="file" id="menu_file_ru" accept=".pdf" class="form-control" style="padding:4px; max-width:250px;">
+                                    <button class="btn btn-primary" onclick="uploadMenu('ru')">Yükle</button>
+                                </div>
+                            </div>
+                            <!-- ZH -->
+                            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border:1px solid #cbd5e1; border-radius:8px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <i class="ph-fill ph-file-pdf" style="font-size:2rem; color:#ef4444;"></i>
+                                    <h4 style="margin:0;">Çince Menü (ZH)</h4>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <input type="file" id="menu_file_zh" accept=".pdf" class="form-control" style="padding:4px; max-width:250px;">
+                                    <button class="btn btn-primary" onclick="uploadMenu('zh')">Yükle</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="uploadResult" style="margin-top:15px; color:green; font-weight:bold; display:none;">Yükleme başarılı!</div>
+                    </div>
+                </section>
+
+                <!-- REZERVASYONLAR -->
+                <section id="reservations" class="admin-section" style="display:none;">
+                    <div class="card">
+                        <h3>Rezervasyon Yönetimi</h3>
+                        <p class="card-desc">Siteden gelen rezervasyon talepleri anlık olarak <strong>Telegram</strong> grubunuza düşmektedir.</p>
+                        <div style="padding: 20px; background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 4px;">
+                            <p style="color: #1e3a8a; font-weight: 500;"><i class="ph-fill ph-telegram-logo"></i> Telegram Entegrasyonu Aktif. Gelen tüm talepler saniyeler içinde yetkili telefonlara mesaj olarak gitmektedir.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- İLETİŞİM MESAJLARI -->
+                <section id="messages" class="admin-section" style="display:none;">
+                    <div class="card">
+                        <h3>İletişim Mesajları</h3>
+                        <p class="card-desc">Müşterilerden gelen iletişim mesajları doğrudan yetkili <strong>Telegram</strong> grubunuza yönlendirilmektedir.</p>
+                        <div style="padding: 20px; background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 4px;">
+                            <p style="color: #1e3a8a; font-weight: 500;"><i class="ph-fill ph-telegram-logo"></i> Telegram Entegrasyonu Aktif. Tüm mesajlar anlık olarak cebinize gelmektedir.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

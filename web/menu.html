@@ -29,6 +29,7 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             transition: transform 0.3s ease;
+            position: relative;
         }
         .menu-item:hover {
             transform: translateY(-5px);
@@ -54,6 +55,7 @@
             font-size: 0.9rem;
             color: var(--text-muted);
             line-height: 1.5;
+            margin-bottom: 12px;
         }
         .menu-category-title {
             margin-top: 30px;
@@ -64,6 +66,24 @@
             display: inline-block;
             padding-bottom: 4px;
         }
+        .dietary-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .diet-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+        .badge-veg { background: #e8f5e9; color: #2e7d32; }
+        .badge-vegan { background: #e0f2f1; color: #00695c; }
+        .badge-gluten { background: #fff3e0; color: #e65100; }
+        .badge-dairy { background: #e3f2fd; color: #1565c0; }
     </style>
 </head>
 <body style="background: var(--bg-color);">
@@ -72,70 +92,144 @@
         <img src="banner.jpg" alt="Galata Istanbul" class="banner-img">
         <div class="banner-overlay"></div>
         
+        <div class="lang-selector">
+            <button onclick="changeLang('tr')">TR</button>
+            <button onclick="changeLang('en')">EN</button>
+            <button onclick="changeLang('ar')">AR</button>
+            <button onclick="changeLang('ru')">RU</button>
+            <button onclick="changeLang('zh')">ZH</button>
+        </div>
+
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; text-align: center; width: 100%;">
-            <h1 style="color: #fff; font-size: 2.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">İmza Lezzetlerimiz</h1>
-            <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem;">Fırınna Dokunuşlarıyla...</p>
+            <h1 style="color: #fff; font-size: 2.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5);" data-i18n="menu_header_title">İmza Lezzetlerimiz</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem;" data-i18n="menu_header_sub">Fırınna Dokunuşlarıyla...</p>
         </div>
         <a href="index.html" class="btn btn-outline" style="position: absolute; top: 20px; left: 20px; z-index: 10; background: rgba(255,255,255,0.9); color: var(--primary-dark); border: none;">
-            <i class="ph-bold ph-arrow-left"></i> Ana Sayfa
+            <i class="ph-bold ph-arrow-left"></i> <span data-i18n="menu_back">Ana Sayfa</span>
         </a>
     </div>
 
     <main style="max-width: 1000px; margin: -40px auto 40px; padding: 0 20px; position: relative; z-index: 5;">
         <div class="card" style="padding: 30px;">
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px;">
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px;" data-i18n="menu_intro">
                 Tüm menü seçeneklerimiz için mağazamızı ziyaret edebilir veya personelimizden detaylı bilgi alabilirsiniz. 
                 Aşağıda en sevilen imza lezzetlerimizi inceleyebilirsiniz.
             </p>
             
             <div style="text-align: center; margin-bottom: 30px;">
-                <a href="#" class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:8px;">
-                    <i class="ph-bold ph-download-simple"></i> Fiyatlı Menüyü İndir (PDF)
+                <a href="menu_tr.pdf" id="pdf-download-link" target="_blank" class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:8px;">
+                    <i class="ph-bold ph-download-simple"></i> <span data-i18n="menu_download">Fiyatlı Menüyü İndir (PDF)</span>
                 </a>
             </div>
 
-            <h2 class="menu-category-title"><i class="ph-fill ph-fire"></i> Fırından Sıcak Sıcak</h2>
+            <h2 class="menu-category-title"><i class="ph-fill ph-fire"></i> <span data-i18n="cat_food">Fırından Sıcak Sıcak</span></h2>
             <div class="menu-grid">
+                
                 <div class="menu-item">
-                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80" alt="İtalyan İşi Taş Fırın Pizza" class="menu-img">
+                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80" alt="Pizza" class="menu-img">
                     <div class="menu-content">
-                        <div class="menu-title"><span>Taş Fırın Pizza</span> <i class="ph-fill ph-star" style="color:#f1c40f; font-size:1rem;"></i></div>
-                        <p class="menu-desc">Özel mayalanmış hamurumuz, İtalyan domates sosu ve enfes mozzarella peyniriyle odun ateşinde pişer.</p>
+                        <div class="menu-title"><span data-i18n="item_pizza">Taş Fırın Pizza</span> <i class="ph-fill ph-star" style="color:#f1c40f; font-size:1rem;"></i></div>
+                        <p class="menu-desc" data-i18n="desc_pizza">Özel mayalanmış hamurumuz, İtalyan domates sosu ve enfes mozzarella peyniriyle odun ateşinde pişer.</p>
+                        <div class="dietary-badges">
+                            <span class="diet-badge badge-gluten"><i class="ph-bold ph-grains"></i> <span data-i18n="badge_gluten">Gluten</span></span>
+                            <span class="diet-badge badge-dairy"><i class="ph-bold ph-drop"></i> <span data-i18n="badge_dairy">Süt Ürünü</span></span>
+                            <span class="diet-badge badge-veg"><i class="ph-bold ph-leaf"></i> <span data-i18n="badge_veg">Vejetaryen</span></span>
+                        </div>
                     </div>
                 </div>
+
                 <div class="menu-item">
-                    <img src="https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=400&q=80" alt="Meşhur Çakallı Menemeni" class="menu-img">
+                    <img src="https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=400&q=80" alt="Menemen" class="menu-img">
                     <div class="menu-content">
-                        <div class="menu-title"><span>Meşhur Çakallı Menemeni</span> <i class="ph-fill ph-star" style="color:#f1c40f; font-size:1rem;"></i></div>
-                        <p class="menu-desc">Sadece sarısıyla hazırlanan, bol kaşarlı ve tereyağlı, yöresel lezzetiyle kahvaltıların efsanesi.</p>
+                        <div class="menu-title"><span data-i18n="item_menemen">Meşhur Çakallı Menemeni</span> <i class="ph-fill ph-star" style="color:#f1c40f; font-size:1rem;"></i></div>
+                        <p class="menu-desc" data-i18n="desc_menemen">Sadece sarısıyla hazırlanan, bol kaşarlı ve tereyağlı, yöresel lezzetiyle kahvaltıların efsanesi.</p>
+                        <div class="dietary-badges">
+                            <span class="diet-badge badge-veg"><i class="ph-bold ph-leaf"></i> <span data-i18n="badge_veg">Vejetaryen</span></span>
+                            <span class="diet-badge badge-dairy"><i class="ph-bold ph-drop"></i> <span data-i18n="badge_dairy">Süt Ürünü</span></span>
+                        </div>
                     </div>
                 </div>
+
+                <div class="menu-item">
+                    <img src="https://images.unsplash.com/photo-1606755456206-b25206cde27e?auto=format&fit=crop&w=400&q=80" alt="Tost" class="menu-img">
+                    <div class="menu-content">
+                        <div class="menu-title"><span data-i18n="item_toast">Fırında Bazlama Tost</span></div>
+                        <p class="menu-desc" data-i18n="desc_toast">Köy ekmeği arasında kaşar peyniri ve özel sucuk/kavurma ile taş fırında çıtır çıtır servis edilir.</p>
+                        <div class="dietary-badges">
+                            <span class="diet-badge badge-gluten"><i class="ph-bold ph-grains"></i> <span data-i18n="badge_gluten">Gluten</span></span>
+                            <span class="diet-badge badge-dairy"><i class="ph-bold ph-drop"></i> <span data-i18n="badge_dairy">Süt Ürünü</span></span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <h2 class="menu-category-title"><i class="ph-fill ph-coffee"></i> İçecekler & Tatlılar</h2>
+            <h2 class="menu-category-title"><i class="ph-fill ph-coffee"></i> <span data-i18n="cat_drinks">İçecekler & Tatlılar</span></h2>
             <div class="menu-grid">
+                
                 <div class="menu-item">
-                    <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=400&q=80" alt="Geleneksel Türk Kahvesi" class="menu-img">
+                    <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=400&q=80" alt="Kahve" class="menu-img">
                     <div class="menu-content">
-                        <div class="menu-title"><span>Közde Türk Kahvesi</span></div>
-                        <p class="menu-desc">150 yıllık atmosferde, bakır cezvede ağır ağır pişen, lokum eşliğinde servis edilen klasik lezzet.</p>
+                        <div class="menu-title"><span data-i18n="item_coffee">Közde Türk Kahvesi</span></div>
+                        <p class="menu-desc" data-i18n="desc_coffee">150 yıllık atmosferde, bakır cezvede ağır ağır pişen, lokum eşliğinde servis edilen klasik lezzet.</p>
+                        <div class="dietary-badges">
+                            <span class="diet-badge badge-vegan"><i class="ph-bold ph-plant"></i> <span data-i18n="badge_vegan">Vegan</span></span>
+                        </div>
                     </div>
                 </div>
+                
                 <div class="menu-item">
-                    <img src="https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?auto=format&fit=crop&w=400&q=80" alt="Gül Yapraklı Çay" class="menu-img">
+                    <img src="https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?auto=format&fit=crop&w=400&q=80" alt="Çay" class="menu-img">
                     <div class="menu-content">
-                        <div class="menu-title"><span>İmza: Gül Yapraklı Çay</span></div>
-                        <p class="menu-desc">Özel harman çayımızın içine katılan taze kurutulmuş gül yapraklarıyla inanılmaz bir aroma şöleni.</p>
+                        <div class="menu-title"><span data-i18n="item_tea">İmza: Gül Yapraklı Çay</span></div>
+                        <p class="menu-desc" data-i18n="desc_tea">Özel harman çayımızın içine katılan taze kurutulmuş gül yapraklarıyla inanılmaz bir aroma şöleni.</p>
+                        <div class="dietary-badges">
+                            <span class="diet-badge badge-vegan"><i class="ph-bold ph-plant"></i> <span data-i18n="badge_vegan">Vegan</span></span>
+                        </div>
                     </div>
                 </div>
+
+                <div class="menu-item">
+                    <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=400&q=80" alt="Kek" class="menu-img">
+                    <div class="menu-content">
+                        <div class="menu-title"><span data-i18n="item_cake">Çikolata Soslu Sıcak Kek</span></div>
+                        <p class="menu-desc" data-i18n="desc_cake">İçi yumuşacık, bol kakaolu ve üzeri sıcak çikolata sosu ile kaplanmış vazgeçilmez lezzet.</p>
+                        <div class="dietary-badges">
+                            <span class="diet-badge badge-veg"><i class="ph-bold ph-leaf"></i> <span data-i18n="badge_veg">Vejetaryen</span></span>
+                            <span class="diet-badge badge-gluten"><i class="ph-bold ph-grains"></i> <span data-i18n="badge_gluten">Gluten</span></span>
+                            <span class="diet-badge badge-dairy"><i class="ph-bold ph-drop"></i> <span data-i18n="badge_dairy">Süt Ürünü</span></span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         </div>
     </main>
 
     <footer>
-        <p>© 2026 Fırınna Cafe & Restaurant. Tüm hakları saklıdır.</p>
+        <p>© <span id="year"></span> Fırınna Cafe & Restaurant. <span data-i18n="footer_rights">Tüm hakları saklıdır.</span></p>
     </footer>
 
+    <script src="script.js"></script>
+    <script>
+        // Override changeLang specifically for menu.html to update the PDF link
+        const originalChangeLang = window.changeLang;
+        window.changeLang = function(lang) {
+            originalChangeLang(lang);
+            // Update PDF download link
+            const pdfLink = document.getElementById('pdf-download-link');
+            if (pdfLink) {
+                pdfLink.href = `menu_${lang}.pdf`;
+            }
+        };
+        // Initial setup for the PDF link on load
+        document.addEventListener("DOMContentLoaded", () => {
+            const pdfLink = document.getElementById('pdf-download-link');
+            if (pdfLink && window.currentLang) {
+                pdfLink.href = `menu_${window.currentLang}.pdf`;
+            }
+        });
+    </script>
 </body>
 </html>
