@@ -1974,7 +1974,11 @@ def start_telegram_auto_send():
                             f"💰 Toplam Satış: <b>{report.get('total_sales',0):.2f} ₺</b>\n"
                             f"💵 Nakit: {report.get('total_cash',0):.2f} ₺\n"
                             f"💳 Kart: {report.get('total_card',0):.2f} ₺\n"
-                            f"🧾 Sipariş Sayısı: {report.get('order_count',0)}\n"
+                            f"💸 Bahşiş: {report.get('total_tips',0):.2f} ₺\n"
+                            f"🎁 İkramlar: {report.get('total_ikram',0):.2f} ₺\n"
+                            f"📉 İndirimler: {report.get('total_discount',0):.2f} ₺\n"
+                            f"🔻 Giderler: {report.get('total_expenses',0):.2f} ₺\n"
+                            f"🧾 Sipariş Sayısı: {report.get('order_count',0)}\n\n"
                             f"📦 En Çok Satanlar:\n{top_txt}"
                             f"{open_warn}"
                         )
