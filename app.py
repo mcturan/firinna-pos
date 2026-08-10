@@ -12,8 +12,8 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-APP_VERSION = "1.4.0"
-APP_BUILD   = "2026-03-15"
+APP_VERSION = "1.4.1"
+APP_BUILD   = "2026-08-10"
 
 # DB migration — __name__ kontrolü olmadan her başlangıçta çalışır
 try:
@@ -863,26 +863,28 @@ def api_backup_full_zip():
 
 @app.route('/api/backup/sync-push', methods=['POST'])
 def api_backup_sync_push():
-    import subprocess, os
     try:
         db.backup_database()
         dump_path = db.dump_database_sql()
-        base = os.path.dirname(db.DB_PATH)
-        subprocess.run(['git', '-C', base, 'add', 'db_export.sql'], capture_output=True, timeout=30)
-        r = subprocess.run(['git', '-C', base, 'commit', '-m',
-            f'db sync {datetime.now().strftime("%Y-%m-%d %H:%M")}'],
-            capture_output=True, text=True, timeout=30)
-        subprocess.run(['git', '-C', base, 'push'], capture_output=True, timeout=60)
-        return jsonify({'success': True, 'message': "Veritabani GitHub'a gonderildi."})
+        run_git(['add', 'db_export.sql'])
+        run_git(['commit', '-m', f'db sync {datetime.now().strftime("%Y-%m-%d %H:%M")}'])
+        ok, out = run_git(['push'], timeout=60)
+        if ok:
+            return jsonify({'success': True, 'message': "Veritabani GitHub'a gonderildi."})
+        else:
+            return jsonify({'success': False, 'error': f"Push hatası: {out}"})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/api/backup/sync-pull', methods=['POST'])
 def api_backup_sync_pull():
-    import subprocess, os
+    import os
     try:
+        ok, out = run_git(['pull'], timeout=60)
+        if not ok:
+            return jsonify({'success': False, 'error': f"Pull hatası: {out}"})
+            
         base = os.path.dirname(db.DB_PATH)
-        subprocess.run(['git', '-C', base, 'pull'], capture_output=True, text=True, timeout=60)
         dump_path = os.path.join(base, 'db_export.sql')
         if os.path.exists(dump_path):
             db.backup_database()
@@ -1700,16 +1702,20 @@ def get_git_credentials():
 
 def run_git(args, timeout=30):
     """Git komutunu çalıştır, (success, output) döndür"""
+    import os
+    env = os.environ.copy()
+    env['GIT_TERMINAL_PROMPT'] = '0'
     try:
         result = subprocess.run(
             ['/usr/bin/git'] + args,
             cwd=GIT_DIR,
+            env=env,
             capture_output=True, text=True, timeout=timeout
         )
         out = (result.stdout + result.stderr).strip()
         return result.returncode == 0, out
     except subprocess.TimeoutExpired:
-        return False, 'Zaman aşımı (30s)'
+        return False, f'Zaman aşımı ({timeout}s)'
     except Exception as e:
         return False, str(e)
 
