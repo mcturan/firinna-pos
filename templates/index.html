@@ -2249,17 +2249,47 @@ async function doMerge(targetTableId, targetTableName) {
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('mode') === 'garson') {
-            // Navbar'ı gizle
             const navbar = document.querySelector('.navbar');
             if (navbar) navbar.style.display = 'none';
-            
-            // Geçmiş Sipariş panelini gizle
             const histToggle = document.getElementById('histToggleBtn');
             if (histToggle) histToggle.style.display = 'none';
-            
-            // Sayfa içeriğini tam ekran yapmak için margin sıfırlama (gerekirse)
             document.body.style.paddingTop = '10px';
         }
+
+        let backPressCount = 0;
+        function closeTopModal() {
+            const modals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'block');
+            if (modals.length > 0) {
+                modals[modals.length - 1].style.display = 'none';
+                return true;
+            }
+            return false;
+        }
+
+        history.pushState({page: 'home'}, "", window.location.href);
+        window.addEventListener('popstate', function(e) {
+            if (closeTopModal()) {
+                history.pushState({page: 'home'}, "", window.location.href);
+                return;
+            }
+            
+            if (backPressCount === 0) {
+                backPressCount++;
+                if (typeof showToast === 'function') {
+                    showToast('Çıkmak için tekrar geri tuşuna basın', 'warn');
+                } else {
+                    alert('Çıkmak için tekrar geri tuşuna basın');
+                }
+                history.pushState({page: 'home'}, "", window.location.href);
+                setTimeout(() => { backPressCount = 0; }, 2000);
+            } else {
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+                    window.Capacitor.Plugins.App.exitApp();
+                } else {
+                    history.back();
+                }
+            }
+        });
     });
 </script>
 </body>
