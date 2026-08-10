@@ -548,13 +548,15 @@ def backup_database():
 def dump_database_sql():
     """DB'yi SQL metin dosyası olarak dışa aktar (git için)"""
     import sqlite3 as _sq
+    import os
     conn = _sq.connect(DB_PATH)
     lines = ['-- Fırınna POS DB Dump', f'-- {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', '']
     for line in conn.iterdump():
         lines.append(line)
     conn.close()
-    import tempfile as _tmp
-    dump_path = _tmp.mktemp(prefix='firinna_dump_', suffix='.sql')
+    
+    base = os.path.dirname(DB_PATH)
+    dump_path = os.path.join(base, 'db_export.sql')
     with open(dump_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(lines))
     return dump_path
