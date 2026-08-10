@@ -32,6 +32,9 @@
         const MIN_SPLASH_TIME = 500; // Yarım saniye logo kalsın
 
         function doRedirect(url) {
+            if(url.indexOf('app_version=') === -1) {
+                url += (url.indexOf('?') === -1 ? '?' : '&') + 'app_version=' + APP_VERSION;
+            }
             const elapsed = Date.now() - splashStart;
             const remaining = Math.max(0, MIN_SPLASH_TIME - elapsed);
             setTimeout(() => {
@@ -74,12 +77,13 @@
                 .catch(err => {
                     clearTimeout(timeoutId);
                     console.log("Lokal IP'ye bağlanılamadı, Hücresel (Public IP) deneniyor...", err);
-                    doRedirect(PUBLIC_URL + "/?mode=garson");
+                    doRedirect(PUBLIC_URL + "/?mode=garson&app_version=" + APP_VERSION);
                 });
         } else {
             document.getElementById('splash').style.display = 'none';
             document.getElementById('setup').style.display = 'block';
         }
+        
     </script>
 </body>
 </html>

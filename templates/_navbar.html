@@ -271,18 +271,32 @@ function showToast(msg, type, duration) {
     vDiv.style.userSelect = 'none';
     vDiv.style.cursor = 'pointer';
     vDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-    vDiv.textContent = 'v...';
     document.body.appendChild(vDiv);
 
+    // Get actual app version from URL params (passed by mobile app wrapper)
+    var urlParams = new URLSearchParams(window.location.search);
+    var actualAppVersion = urlParams.get('app_version');
+    if (actualAppVersion) {
+        localStorage.setItem('garson_app_version', actualAppVersion);
+    } else {
+        actualAppVersion = localStorage.getItem('garson_app_version') || 'Bilinmiyor';
+    }
+    vDiv.textContent = 'Mobil v' + actualAppVersion;
+
+    var serverVersion = null;
     fetch('/api/mobile_version?_=' + Date.now())
         .then(r => r.json())
-        .then(d => { vDiv.textContent = 'v' + d.version; })
-        .catch(e => { vDiv.style.display = 'none'; });
+        .then(d => { serverVersion = d.version; })
+        .catch(e => { console.error('Versiyon alinamadi'); });
 
     var pressTimer;
     function startPress() {
         pressTimer = setTimeout(function() {
-            if(confirm("Son sürüme güncellensin mi?")) {
+            if (serverVersion && actualAppVersion !== 'Bilinmiyor' && parseFloat(serverVersion) <= parseFloat(actualAppVersion)) {
+                alert("Uygulamanız zaten son sürümde (v" + actualAppVersion + ").");
+                return;
+            }
+            if(confirm("Son sürüme (v" + (serverVersion || 'Yeni') + ") güncellensin mi?")) {
                 window.location.href = '/download_apk';
             }
         }, 3000);
