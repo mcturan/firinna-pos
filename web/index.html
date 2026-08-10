@@ -41,6 +41,11 @@
                 <p class="profile-category" data-i18n="category">Cafe & Restaurant</p>
                 <div class="status-badge"><span class="pulse-dot"></span><span data-i18n="status_open" id="dynamic_work_hours">Şu An Açık (08:00 - 23:00)</span></div>
                 
+                <div class="table-status-box" style="margin-top: 16px; padding: 12px; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="ph-fill ph-armchair" style="color:#2ecc71; font-size:1.5rem;"></i>
+                    <span id="live-table-status" style="font-weight: 600; color: #27ae60; font-size: 0.95rem;">Canlı Masa Durumu Yükleniyor...</span>
+                </div>
+                
                 <div class="social-row">
                     <a href="https://instagram.com/firinnacafe" class="social-btn" id="dynamic_instagram"><i class="ph-fill ph-instagram-logo"></i></a>
                     <a href="https://api.whatsapp.com/send?phone=905456301214" class="social-btn" id="dynamic_whatsapp"><i class="ph-fill ph-whatsapp-logo"></i></a>
@@ -49,9 +54,9 @@
             </div>
 
             <div class="card action-card">
-                <a href="#" class="btn btn-primary" id="menu-link">
+                <a href="menu.html" class="btn btn-primary" id="menu-link">
                     <i class="ph-bold ph-book-open"></i>
-                    <span data-i18n="btn_menu">Dijital Menüyü İncele</span>
+                    <span data-i18n="btn_menu">İnteraktif Menüyü İncele</span>
                 </a>
                 <button onclick="openModal('reservationModal')" class="btn btn-secondary" style="width:100%; border:none; cursor:pointer;">
                     <i class="ph-bold ph-calendar-plus"></i>
@@ -146,16 +151,22 @@
                 </div>
             </div>
 
-            <!-- GALERİ (Gerçek fotoğraflar gelene kadar gizlendi) 
-            <div class="card gallery-card">
-                <h3 class="card-title" data-i18n="title_gallery">Ortam & Lezzetler</h3>
-                <div class="gallery-grid">
-                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80" alt="Pizza">
-                    <img src="https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=400&q=80" alt="Kahvaltı">
-                    <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=400&q=80" alt="Kahve">
+            <div class="card virtual-tour-card">
+                <h3 class="card-title" data-i18n="title_virtual_tour">Sanal Tur (360°)</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;" data-i18n="text_virtual_tour">150 yıllık tarihi binamızı oturduğunuz yerden keşfedin.</p>
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <button class="btn btn-outline" style="flex:1; border-color:var(--primary); color:var(--primary-dark);" onclick="changeTour('interior')">İç Mekan</button>
+                    <button class="btn btn-outline" style="flex:1; border-color:var(--primary); color:var(--primary-dark);" onclick="changeTour('exterior')">Dış Mekan</button>
+                </div>
+
+                <!-- Pannellum Viewer iframe -->
+                <div style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color);">
+                    <iframe id="tour-iframe" width="100%" height="100%" allowfullscreen style="border-style:none;" 
+                            src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https://pannellum.org/images/alma.jpg&autoLoad=true">
+                    </iframe>
                 </div>
             </div>
-            -->
 
             <!-- KONUM VE YORUMLAR -->
             <div class="card reviews-card">

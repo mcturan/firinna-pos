@@ -2425,7 +2425,7 @@ def save_web_settings():
 @app.route('/api/web/tables-status', methods=['GET'])
 def api_web_tables_status():
     try:
-        tables = db.get_tables()
+        tables = [t for t in db.get_tables() if 'takeaway' not in t.get('name', '').lower() and 'paket' not in t.get('name', '').lower()]
         empty_count = 0
         total_count = len(tables)
         for t in tables:

@@ -156,6 +156,8 @@ const i18n = {
         review_1: "İstiklal'in gürültüsünden kaçıp nefes alabileceğiniz harika, tarihi bir mekan. Pizzaları efsane!",
         review_2: "Çakallı menemenini denemelisiniz. Personel çok güleryüzlü ve evcil hayvan dostu olmaları harika.",
         review_3: "Galata'da kahve içip tatlı yemek için en iyi nokta. Çalışanlar çok ilgili.",
+        title_virtual_tour: "Sanal Tur (360°)",
+        text_virtual_tour: "150 yıllık tarihi binamızı oturduğunuz yerden keşfedin.",
         title_location: "Lokasyon",
         title_gallery: "Ortam & Lezzetler",
         badge_halal: "%100 Helal",
@@ -190,6 +192,8 @@ const i18n = {
         review_1: "A wonderful, historic place to escape the noise of Istiklal and take a breath. Their pizzas are legendary!",
         review_2: "You must try the Çakallı menemen. The staff is very smiling and it's great that they are pet-friendly.",
         review_3: "The best spot in Galata for coffee and desserts. The staff is very attentive.",
+        title_virtual_tour: "Virtual Tour (360°)",
+        text_virtual_tour: "Explore our 150-year-old historic building right from where you sit.",
         title_location: "Location",
         title_gallery: "Ambiance & Tastes",
         badge_halal: "100% Halal",
@@ -364,7 +368,49 @@ async function fetchWebSettings() {
         console.error("Failed to fetch settings:", err);
     }
 }
-document.addEventListener("DOMContentLoaded", fetchWebSettings);
+// Live Table Status Logic
+function fetchTableStatus() {
+    fetch('/api/web/tables-status')
+        .then(response => response.json())
+        .then(data => {
+            const statusEl = document.getElementById('live-table-status');
+            const iconEl = statusEl.previousElementSibling;
+            if (data.success) {
+                if (data.empty > 0) {
+                    statusEl.innerText = `Şu an ${data.empty} masamız müsait, bekleriz!`;
+                    statusEl.style.color = '#27ae60';
+                    iconEl.style.color = '#2ecc71';
+                } else {
+                    statusEl.innerText = `Şu an tüm masalarımız dolu.`;
+                    statusEl.style.color = '#e74c3c';
+                    iconEl.style.color = '#e74c3c';
+                }
+            } else {
+                statusEl.innerText = "Masa durumu alınamadı.";
+            }
+        })
+        .catch(err => {
+            console.error('Masa durumu hatası:', err);
+            document.getElementById('live-table-status').innerText = "Sistem çevrimdışı.";
+        });
+}
+
+// Virtual Tour Logic
+function changeTour(type) {
+    const iframe = document.getElementById('tour-iframe');
+    if (type === 'interior') {
+        iframe.src = "https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https://pannellum.org/images/alma.jpg&autoLoad=true";
+    } else {
+        iframe.src = "https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https://pannellum.org/images/cerro-toco-0.jpg&autoLoad=true";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetchWebSettings();
+    fetchTableStatus();
+    // Refresh table status every 30 seconds
+    setInterval(fetchTableStatus, 30000);
+});
 
 // Carousel Logic
 let currentReviewIndex = 0;
