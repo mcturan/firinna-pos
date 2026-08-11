@@ -3,5 +3,7 @@
     "baidu": "https://map.baidu.com/",
     "instagram": "https://instagram.com/firinnacafe",
     "phone": "905456301214",
-    "work_hours": "11:00 - 19:00"
+    "work_hours": "11:00 - 19:00",
+    "manual_status": "closed",
+    "closed_until": "2026-08-12T12:00"
 }

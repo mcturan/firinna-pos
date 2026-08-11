@@ -1,5 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetchSettings();
+    if(sessionStorage.getItem('firinna_admin') === 'true') {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('adminMain').style.display = 'flex';
+        fetchSettings();
+        fetchAnalytics();
+    } else {
+        document.getElementById('loginOverlay').style.display = 'flex';
+        document.getElementById('adminMain').style.display = 'none';
+    }
+
     document.getElementById('settingsForm').addEventListener('submit', saveSettings);
     
     // Manual Status Toggle Events
@@ -36,6 +45,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+function checkLogin() {
+    const user = document.getElementById('admin_user').value;
+    const pass = document.getElementById('admin_pass').value;
+    if(user === 'admin' && pass === 'FirinnaPos2026!') {
+        sessionStorage.setItem('firinna_admin', 'true');
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('adminMain').style.display = 'flex';
+        fetchSettings();
+        fetchAnalytics();
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+    }
+}
+
+// Analitikleri API'den Çek
+async function fetchAnalytics() {
+    try {
+        const res = await fetch('/api/web/analytics');
+        const data = await res.json();
+        
+        document.getElementById('stat-today').innerText = data.today || 0;
+        document.getElementById('stat-month').innerText = data.month || 0;
+        document.getElementById('stat-total').innerText = data.total || 0;
+        document.getElementById('stat-menu').innerText = data.menu || 0;
+        document.getElementById('stat-actions').innerText = data.actions || 0;
+    } catch (e) {
+        console.error("Analitikler yüklenemedi", e);
+    }
+}
 
 // Ayarları API'den Çek
 async function fetchSettings() {

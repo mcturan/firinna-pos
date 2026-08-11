@@ -442,7 +442,33 @@ const i18n = {
     }
 };
 
-function changeLang(lang) {
+function trackEvent(eventName) {
+    try {
+        fetch('/api/web/track-visit', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({event: eventName})
+        });
+    } catch(e) {}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    trackEvent('pageview');
+    
+    // Yalnızca dışarı giden veya menüye tıklayan eylemleri izle
+    document.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', (e) => {
+            const href = a.getAttribute('href');
+            if (href && href.includes('.pdf')) {
+                trackEvent('menu');
+            } else if (href && (href.includes('whatsapp') || href.includes('tel:'))) {
+                trackEvent('action');
+            }
+        });
+    });
+});
+
+function changeLanguage(event, lang) {
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(el => {
         const key = el.getAttribute('data-i18n');
