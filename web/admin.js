@@ -159,6 +159,7 @@ async function fetchSettings() {
         if (data.google_review_url) document.getElementById('google_review_url').value = data.google_review_url;
         if (data.yandex_review_url) document.getElementById('yandex_review_url').value = data.yandex_review_url;
         if (data.tripadvisor_review_url) document.getElementById('tripadvisor_review_url').value = data.tripadvisor_review_url;
+        if (data.group_event_text && document.getElementById('group_event_text')) document.getElementById('group_event_text').value = data.group_event_text;
         
         if (data.manual_status) {
             document.querySelector(`input[name="manual_status"][value="${data.manual_status}"]`).checked = true;
@@ -178,8 +179,6 @@ async function fetchSettings() {
 async function saveSettings(e) {
     e.preventDefault();
     
-    // Yalnızca ekrandaki değerleri okuyup gönderirsek diğer mevcut ayarları silebiliriz (örn: baidu).
-    // O yüzden önce eskileri alıp üzerlerine yazalım.
     try {
         const res = await fetch('/api/web/settings');
         const existingData = await res.json();
@@ -196,6 +195,7 @@ async function saveSettings(e) {
             google_review_url: document.getElementById('google_review_url').value,
             yandex_review_url: document.getElementById('yandex_review_url').value,
             tripadvisor_review_url: document.getElementById('tripadvisor_review_url').value,
+            group_event_text: document.getElementById('group_event_text') ? document.getElementById('group_event_text').value : '',
             manual_status: document.querySelector('input[name="manual_status"]:checked').value,
             closed_until: document.getElementById('closed_until').value
         };
@@ -209,8 +209,6 @@ async function saveSettings(e) {
         if (saveRes.ok) {
             const resultMsg = document.getElementById('saveResult');
             resultMsg.style.display = 'block';
-            
-            // 3 saniye sonra mesajı gizle
             setTimeout(() => {
                 resultMsg.style.display = 'none';
             }, 3000);
@@ -218,7 +216,85 @@ async function saveSettings(e) {
             alert("Kaydetme işlemi başarısız oldu.");
         }
     } catch (e) {
-        alert("Bağlantı hatası: " + e.message);
+        console.error("Ayarlar kaydedilemedi", e);
+    }
+}
+
+// İstatistikleri Sıfırla
+async function resetAnalyticsData() {
+    if (!confirm("Tüm ziyaretçi ve analitik verilerini sıfırlamak istediğinize emin misiniz? Bu işlem geri alınamaz.")) return;
+    try {
+        const res = await fetch('/api/web/reset-analytics', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            alert("Analitik verileri başarıyla sıfırlandı.");
+            fetchAnalytics();
+        } else {
+            alert("Hata: " + (data.error || "Sıfırlanamadı"));
+        }
+    } catch(e) {
+        alert("Bağlantı hatası");
+    }
+}
+
+// Mekan Fotoğrafı Yükle
+async function uploadGalleryPhoto(slot) {
+    const fileInput = document.getElementById(`gal_${slot}`);
+    if (!fileInput || !fileInput.files[0]) {
+        alert("Lütfen önce bir fotoğraf seçin.");
+        return;
+    }
+    const formData = new FormData();
+    formData.append('slot', slot);
+    formData.append('file', fileInput.files[0]);
+
+    try {
+        const res = await fetch('/api/web/upload-gallery-photo', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        const resEl = document.getElementById('galleryUploadResult');
+        if (data.success) {
+            resEl.innerText = `${slot} fotoğrafı başarıyla yüklendi!`;
+            resEl.style.display = 'block';
+            setTimeout(() => { resEl.style.display = 'none'; }, 4000);
+        } else {
+            alert("Hata: " + (data.error || "Yüklenemedi"));
+        }
+    } catch(e) {
+        alert("Fotoğraf yüklenirken bağlantı hatası oluştu.");
+    }
+}
+
+// Şifre Değiştir
+async function changeAdminPassword(e) {
+    e.preventDefault();
+    const old_password = document.getElementById('old_password').value;
+    const new_password = document.getElementById('new_password').value;
+    const pwdResult = document.getElementById('pwdResult');
+
+    try {
+        const res = await fetch('/api/web/change-password', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ old_password, new_password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            pwdResult.style.color = '#166534';
+            pwdResult.innerText = "Şifreniz başarıyla değiştirildi!";
+            pwdResult.style.display = 'block';
+            document.getElementById('changePasswordForm').reset();
+        } else {
+            pwdResult.style.color = '#dc2626';
+            pwdResult.innerText = data.error || "Hata oluştu!";
+            pwdResult.style.display = 'block';
+        }
+    } catch(e) {
+        pwdResult.style.color = '#dc2626';
+        pwdResult.innerText = "Bağlantı hatası!";
+        pwdResult.style.display = 'block';
     }
 }
 

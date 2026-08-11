@@ -176,9 +176,33 @@ const i18n = {
         review_3: "Galata'da kahve içip tatlı yemek için en iyi nokta. Çalışanlar çok ilgili.",
         title_virtual_tour: "Sanal Tur (360°)",
         text_virtual_tour: "150 yıllık tarihi binamızı oturduğunuz yerden keşfedin.",
+        title_faq: "Sıkça Sorulan Sorular",
+        faq_q1: "🐾 Evcil hayvan kabul ediyor musunuz?",
+        faq_a1: "Evet! Fırınna evcil hayvan dostudur (Pet-Friendly). Sevimli dostlarınızla bahçemizde ve iç mekanımızda keyifle vakit geçirebilirsiniz.",
+        faq_q2: "💳 Hangi ödeme yöntemleri geçerlidir?",
+        faq_a2: "Tüm yerli ve yabancı kredi kartları, banka kartları, temassız ödeme (Apple Pay / Google Pay) ve nakit geçerlidir.",
+        faq_q3: "🥗 Vejetaryen / Glutensiz seçenekler var mı?",
+        faq_a3: "Evet! Menümüzde özel vejetaryen taş fırın pizzalar, zengin kahvaltılıklar ve glutensiz/vegan alternatiflerimiz mevcuttur.",
+        faq_q4: "🕒 Grup rezervasyonu veya özel etkinlik yapabilir miyiz?",
+        faq_a4: "Evet, doğum günü, toplantı ve özel mini organizasyonlar için doğrudan WhatsApp hattımızdan bizimle iletişime geçebilirsiniz.",
         title_location: "Lokasyon",
         title_contact: "İletişim & Ulaşım",
         title_gallery: "Ortam & Lezzetler",
+        gal_title_interior: "İç Mekan & Atmosfer",
+        gal_title_exterior: "Dış Mekan & Kumbaracı Yokuşu",
+        gal_title_signature: "İmza Lezzetlerimiz",
+        gal_lbl_interior_history: "Tarihi İç Mekan",
+        gal_lbl_warm_tables: "Sıcak Masalar",
+        gal_lbl_details: "Mekan Detayları",
+        gal_lbl_street: "Kumbaracı Yokuşu",
+        gal_lbl_outdoor_seating: "Dış Masa Alanı",
+        gal_lbl_historic_building: "Tarihi Binası",
+        gal_lbl_fresh_tea: "Taze Çay",
+        gal_lbl_turkish_coffee: "Türk Kahvesi",
+        gal_lbl_menemen: "Tava Menemen",
+        gal_lbl_pizza: "Taş Fırın Pizza",
+        gal_lbl_lemonade: "Ev Yapımı Limonata",
+        gal_lbl_glintwein: "Sıcak Glintwein",
         badge_historic_tr: "Tarihi Türk Cafesi",
         badge_halal: "%100 Helal",
         badge_quality: "En İyi Kalite",
@@ -254,9 +278,33 @@ const i18n = {
         review_3: "The best spot in Galata for coffee and desserts. The staff is very attentive.",
         title_virtual_tour: "Virtual Tour (360°)",
         text_virtual_tour: "Explore our 150-year-old historic building right from where you sit.",
+        title_faq: "Frequently Asked Questions",
+        faq_q1: "🐾 Are pets allowed?",
+        faq_a1: "Yes! Fırınna is 100% pet-friendly. You are welcome to enjoy your time with your furry friends both in our outdoor garden and indoor seating.",
+        faq_q2: "💳 What payment methods do you accept?",
+        faq_a2: "We accept all major credit cards, debit cards, contactless mobile payments (Apple Pay / Google Pay), and cash.",
+        faq_q3: "🥗 Do you have Vegetarian or Gluten-Free options?",
+        faq_a3: "Yes! Our menu offers gourmet vegetarian stone-oven pizzas, rich breakfast spreads, and gluten-free/vegan alternatives.",
+        faq_q4: "🕒 Can we make group reservations or private events?",
+        faq_a4: "Yes! For birthdays, corporate meetings, or private mini events, feel free to contact us directly via WhatsApp.",
         title_location: "Location",
         title_contact: "Contact & Location",
         title_gallery: "Ambiance & Tastes",
+        gal_title_interior: "Indoor & Ambiance",
+        gal_title_exterior: "Outdoor & Kumbaracı Street",
+        gal_title_signature: "Our Signature Tastes",
+        gal_lbl_interior_history: "Historic Interior",
+        gal_lbl_warm_tables: "Cozy Seating",
+        gal_lbl_details: "Venue Details",
+        gal_lbl_street: "Kumbaracı Street",
+        gal_lbl_outdoor_seating: "Outdoor Seating",
+        gal_lbl_historic_building: "Historic Building",
+        gal_lbl_fresh_tea: "Fresh Turkish Tea",
+        gal_lbl_turkish_coffee: "Turkish Coffee",
+        gal_lbl_menemen: "Skillet Menemen",
+        gal_lbl_pizza: "Stone Oven Pizza",
+        gal_lbl_lemonade: "Homemade Lemonade",
+        gal_lbl_glintwein: "Mulled Wine",
         badge_historic_tr: "Historic Turkish Cafe",
         badge_halal: "100% Halal",
         badge_quality: "Best Quality",
@@ -332,7 +380,22 @@ const i18n = {
         review_3: "Лучшее место в Галате для кофе и десертов. Персонал очень внимателен.",
         title_location: "Расположение",
         title_contact: "Контакты и расположение",
-        title_gallery: "Атмосфера и вкусы",
+        title_gallery: "Атмосфера и Вкус",
+        gal_title_interior: "Интерьер и Атмосфера",
+        gal_title_exterior: "Улица и Терраса",
+        gal_title_signature: "Наши Фирменные Блюда",
+        gal_lbl_interior_history: "Исторический Интерьер",
+        gal_lbl_warm_tables: "Уютные Столики",
+        gal_lbl_details: "Детали Заведения",
+        gal_lbl_street: "Улица Кумбараджи",
+        gal_lbl_outdoor_seating: "Столики на Улице",
+        gal_lbl_historic_building: "Историческое Здание",
+        gal_lbl_fresh_tea: "Свежий Турецкий Чай",
+        gal_lbl_turkish_coffee: "Турецкий Кофе",
+        gal_lbl_menemen: "Менемен на Сковороде",
+        gal_lbl_pizza: "Пицца из Печи",
+        gal_lbl_lemonade: "Домашний Лимонад",
+        gal_lbl_glintwein: "Горячий Глинтвейн",
         badge_historic_tr: "Историческое турецкое кафе",
         badge_halal: "100% Халяль",
         badge_quality: "Лучшее качество",
@@ -406,9 +469,33 @@ const i18n = {
         review_1: "مكان تاريخي رائع للهروب من ضجيج الاستقلال وأخذ قسط من الراحة. البيتزا الخاصة بهم أسطورية!",
         review_2: "يجب أن تجرب مينيمين تشاكالي. الموظفون مبتسمون للغاية ومن الرائع أنهم يسمحون بالحيوانات الأليفة.",
         review_3: "أفضل مكان في غلطة لتناول القهوة والحلويات. فريق العمل مهتم جدا.",
+        title_faq: "الأسئلة الشائعة",
+        faq_q1: "🐾 هل يُسمح باصطحاب الحيوانات الأليفة؟",
+        faq_a1: "نعم! مقهى فرنة صديق للحيوانات الأليفة. يمكنك الاستمتاع بفيض الأجواء الجميلة برفقة أليفك في الحديقة الخارجية والقاعة الداخلية.",
+        faq_q2: "💳 ما هي طرق الدفع المتاحة؟",
+        faq_a2: "نقبل جميع البطاقات الائتمانية والدفع اللاتلامسي (Apple Pay / Google Pay) والنقد.",
+        faq_q3: "🥗 هل تتوفر خيارات نباتية أو خالية من الغلوتين؟",
+        faq_a3: "نعم! تحتوي قائمتنا على بيتزا الحطب النباتية، وجبات الإفطار الغنية، وبدائل خالية من الغلوتين.",
+        faq_q4: "🕒 هل يمكننا حجز طاولات للمجموعات أو المناسبات الخاصة؟",
+        faq_a4: "نعم، لحفلات أعياد الميلاد والاجتماعات الخاصة، يمكنك التواصل معنا مباشرة عبر الواتساب.",
         title_location: "الموقع",
         title_contact: "الاتصال والموقع",
         title_gallery: "الأجواء والمذاق",
+        gal_title_interior: "التصميم الداخلي والجو",
+        gal_title_exterior: "الجلسات الخارجية والموقع",
+        gal_title_signature: "أطباقنا المميزة",
+        gal_lbl_interior_history: "التصميم التاريخي",
+        gal_lbl_warm_tables: "طاولات دافئة",
+        gal_lbl_details: "تفاصيل المكان",
+        gal_lbl_street: "شارع كومباراجي",
+        gal_lbl_outdoor_seating: "الجلسة الخارجية",
+        gal_lbl_historic_building: "المبنى التاريخي",
+        gal_lbl_fresh_tea: "شاي تركي طازج",
+        gal_lbl_turkish_coffee: "قهوة تركية",
+        gal_lbl_menemen: "قلاية ميجنيمن",
+        gal_lbl_pizza: "بيتزا الحطب",
+        gal_lbl_lemonade: "ليموناضة منزلية",
+        gal_lbl_glintwein: "شراب دافئ",
         badge_historic_tr: "مقهى تركي تاريخي",
         badge_halal: "حلال 100%",
         badge_quality: "أفضل جودة",
@@ -482,9 +569,33 @@ const i18n = {
         review_1: "一个美妙的、充满历史感的地方，在这里可以逃离Istiklal的喧嚣，稍作喘息。他们的比萨堪称传奇！",
         review_2: "你一定要尝尝Çakallı menemen。员工都面带微笑，而且这里对宠物很友好，真是太棒了。",
         review_3: "Galata喝咖啡和吃甜点的最佳去处。员工非常周到。",
+        title_faq: "常见问题解答",
+        faq_q1: "🐾 是否允许携带宠物？",
+        faq_a1: "是的！Fırınna 是宠物友好型餐厅。欢迎您带着宠物在我们的户外花园和室内用餐。",
+        faq_q2: "💳 接受哪些支付方式？",
+        faq_a2: "我们接受所有主要的信用卡、借记卡、非接触式支付（Apple Pay / Google Pay）和现金。",
+        faq_q3: "🥗 是否提供素食或无麸质选择？",
+        faq_a3: "是的！我们的菜单提供石炉烘烤素食披萨、丰富的早餐拼盘以及无麸质/纯素选择。",
+        faq_q4: "🕒 是否可以预订团体用餐或举办私人活动？",
+        faq_a4: "是的！对于生日聚会、商务会议或私人小型活动，请通过 WhatsApp 直接与我们联系。",
         title_location: "地点",
         title_contact: "联系与位置",
         title_gallery: "氛围与口味",
+        gal_title_interior: "室内环境与氛围",
+        gal_title_exterior: "户外与街景",
+        gal_title_signature: "招牌美味",
+        gal_lbl_interior_history: "历史感室内",
+        gal_lbl_warm_tables: "温馨座位",
+        gal_lbl_details: "场地细节",
+        gal_lbl_street: "Kumbara 街",
+        gal_lbl_outdoor_seating: "户外座位",
+        gal_lbl_historic_building: "历史建筑",
+        gal_lbl_fresh_tea: "新鲜土耳其茶",
+        gal_lbl_turkish_coffee: "土耳其咖啡",
+        gal_lbl_menemen: "铁锅煎蛋米内门",
+        gal_lbl_pizza: "石炉披萨",
+        gal_lbl_lemonade: "自制柠檬水",
+        gal_lbl_glintwein: "热红酒",
         badge_historic_tr: "历史悠久的土耳其咖啡馆",
         badge_halal: "100% 清真",
         badge_quality: "最高品质",
@@ -560,6 +671,18 @@ function trackEvent(eventName, extraData = {}) {
 document.addEventListener('DOMContentLoaded', () => {
     trackEvent('pageview');
     
+    // Otomatik Cihaz / Tarayıcı Dili Algılama
+    let initialLang = localStorage.getItem('firinna_lang');
+    if (!initialLang) {
+        const sysLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+        if (sysLang.startsWith('tr')) initialLang = 'tr';
+        else if (sysLang.startsWith('ru')) initialLang = 'ru';
+        else if (sysLang.startsWith('ar')) initialLang = 'ar';
+        else if (sysLang.startsWith('zh')) initialLang = 'zh';
+        else initialLang = 'en'; // Bilinmeyen dillerde varsayılan İNGİLİZCE!
+    }
+    changeLang(initialLang);
+
     // Harita, PDF ve İletişim eylemlerini izle
     document.querySelectorAll('a').forEach(a => {
         a.addEventListener('click', (e) => {
@@ -575,11 +698,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+function switchGalleryTab(tab) {
+    const intBox = document.getElementById('gallery_interior_box');
+    const extBox = document.getElementById('gallery_exterior_box');
+    const btnInt = document.getElementById('tab_interior');
+    const btnExt = document.getElementById('tab_exterior');
+    if (tab === 'interior') {
+        if (intBox) intBox.style.display = 'grid';
+        if (extBox) extBox.style.display = 'none';
+        if (btnInt) { btnInt.style.background = '#f59e0b'; btnInt.style.color = '#fff'; }
+        if (btnExt) { btnExt.style.background = '#e2e8f0'; btnExt.style.color = '#475569'; }
+    } else {
+        if (intBox) intBox.style.display = 'none';
+        if (extBox) extBox.style.display = 'grid';
+        if (btnInt) { btnInt.style.background = '#e2e8f0'; btnInt.style.color = '#475569'; }
+        if (btnExt) { btnExt.style.background = '#f59e0b'; btnExt.style.color = '#fff'; }
+    }
+}
+
 let currentLang = 'tr';
 let cachedTableData = null;
 
 function changeLang(lang) {
     currentLang = lang;
+    try { localStorage.setItem('firinna_lang', lang); } catch(e){}
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(el => {
         const key = el.getAttribute('data-i18n');
@@ -713,17 +855,24 @@ async function fetchWebSettings() {
                 gatingWp.href = `https://wa.me/${data.phone}?text=Merhaba,%20Fırınna%20hakkında%20geri%20bildirimde%20bulunmak%20istiyorum.`;
             }
         }
-        if (data.google_review_url) {
-            const el = document.getElementById('gating_google_btn');
-            if (el) el.href = data.google_review_url;
+        const googleBtn = document.getElementById('gating_google_btn');
+        if (googleBtn) {
+            googleBtn.href = data.google_review_url || "https://g.page/r/CYCTLUWSsIhDEBM/review";
         }
-        if (data.yandex_review_url) {
-            const el = document.getElementById('gating_yandex_btn');
-            if (el) el.href = data.yandex_review_url;
+        
+        const yandexBtn = document.getElementById('gating_yandex_btn');
+        if (yandexBtn) {
+            yandexBtn.href = data.yandex_review_url || "https://yandex.com.tr/harita/?text=Firinna+Cafe+Galata";
         }
-        if (data.tripadvisor_review_url) {
-            const el = document.getElementById('gating_tripadvisor_btn');
-            if (el) el.href = data.tripadvisor_review_url;
+
+        const tripadvisorBtn = document.getElementById('gating_tripadvisor_btn');
+        if (tripadvisorBtn) {
+            if (data.tripadvisor_review_url && data.tripadvisor_review_url.trim() !== '') {
+                tripadvisorBtn.href = data.tripadvisor_review_url;
+                tripadvisorBtn.style.display = 'inline-flex';
+            } else {
+                tripadvisorBtn.style.display = 'none';
+            }
         }
     } catch (err) {
         console.error("Failed to fetch settings:", err);
@@ -833,38 +982,20 @@ function rateExperience(stars) {
 }
 
 // Gallery Tab Switcher (10 Photos / 5 Videos)
-function switchGalleryTab(tab) {
-    const photosGrid = document.getElementById('gallery-photos-grid');
-    const videosGrid = document.getElementById('gallery-videos-grid');
-    const btnPhotos = document.getElementById('gallery-tab-photos');
-    const btnVideos = document.getElementById('gallery-tab-videos');
-
-    if (tab === 'photos') {
-        if (photosGrid) photosGrid.style.display = 'grid';
-        if (videosGrid) videosGrid.style.display = 'none';
-        if (btnPhotos) {
-            btnPhotos.style.background = 'var(--primary)';
-            btnPhotos.style.color = '#fff';
-            btnPhotos.style.border = 'none';
+function openLightbox(src, captionKeyOrText) {
+    const modal = document.getElementById('lightboxModal');
+    const img = document.getElementById('lightboxImg');
+    const caption = document.getElementById('lightboxCaption');
+    if (modal && img) {
+        img.src = src;
+        if (caption) {
+            let text = captionKeyOrText || '';
+            if (i18n[currentLang] && i18n[currentLang][captionKeyOrText]) {
+                text = i18n[currentLang][captionKeyOrText];
+            }
+            caption.innerText = text;
         }
-        if (btnVideos) {
-            btnVideos.style.background = 'transparent';
-            btnVideos.style.color = 'var(--text-main)';
-            btnVideos.style.border = '1px solid #cbd5e1';
-        }
-    } else {
-        if (photosGrid) photosGrid.style.display = 'none';
-        if (videosGrid) videosGrid.style.display = 'grid';
-        if (btnVideos) {
-            btnVideos.style.background = 'var(--primary)';
-            btnVideos.style.color = '#fff';
-            btnVideos.style.border = 'none';
-        }
-        if (btnPhotos) {
-            btnPhotos.style.background = 'transparent';
-            btnPhotos.style.color = 'var(--text-main)';
-            btnPhotos.style.border = '1px solid #cbd5e1';
-        }
+        modal.style.display = 'flex';
     }
 }
 

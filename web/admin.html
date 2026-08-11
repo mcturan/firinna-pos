@@ -147,9 +147,12 @@
                                 <h4 style="margin: 0; color:#1e293b; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
                                     <i class="ph-bold ph-lightning" style="color:#eab308; font-size:1.3rem;"></i> Son Girilen Ziyaretçiler & Canlı IP Akışı (Son 30 Ziyaret)
                                 </h4>
-                                <span style="font-size:0.8rem; background:#ecfdf5; color:#047857; padding:4px 12px; border-radius:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
-                                    <span class="pulse-dot" style="width:8px; height:8px; background:#10b981; border-radius:50%;"></span> Canlı İzleme Aktif
-                                </span>
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:0.8rem; background:#ecfdf5; color:#047857; padding:4px 12px; border-radius:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
+                                        <span class="pulse-dot" style="width:8px; height:8px; background:#10b981; border-radius:50%;"></span> Canlı İzleme Aktif
+                                    </span>
+                                    <button class="btn" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; font-size:0.8rem; padding:4px 12px; border-radius:6px; cursor:pointer;" onclick="resetAnalyticsData()"><i class="ph-bold ph-trash"></i> İstatistikleri Sıfırla</button>
+                                </div>
                             </div>
                             <div style="overflow-x: auto;">
                                 <table style="width:100%; border-collapse:collapse; font-size:0.88rem; text-align:left;">
@@ -229,9 +232,13 @@
                                     <label style="font-size:0.85rem;">Yandex Doğrudan Yorum Linki</label>
                                     <input type="url" id="yandex_review_url" name="yandex_review_url" class="form-control" placeholder="https://yandex.com.tr/maps/org/..." required>
                                 </div>
-                                <div class="form-group" style="margin-bottom:0;">
+                                <div class="form-group" style="margin-bottom:12px;">
                                     <label style="font-size:0.85rem;">TripAdvisor Doğrudan Yorum Linki</label>
                                     <input type="url" id="tripadvisor_review_url" name="tripadvisor_review_url" class="form-control" placeholder="https://www.tripadvisor.com.tr/UserReviewEdit-..." required>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label style="font-size:0.85rem;">Grup & Özel Etkinlik Duyuru Metni (WhatsApp Üstü)</label>
+                                    <textarea id="group_event_text" name="group_event_text" class="form-control" rows="2" placeholder="Grup rezervasyonları için doğrudan WhatsApp'tan iletişime geçebilirsiniz."></textarea>
                                 </div>
                             </div>
                             
@@ -241,6 +248,74 @@
                                 </button>
                                 <div id="saveResult" class="toast-success">Ayarlar başarıyla kaydedildi!</div>
                             </div>
+                        </form>
+                    </div>
+
+                    <!-- FOTOĞRAF GALERİSİ YÖNETİCİSİ -->
+                    <div class="card" style="margin-top:24px;">
+                        <h3>📸 Mekan Fotoğrafları Galerisi Yöneticisi</h3>
+                        <p class="card-desc">Sitenizdeki <strong>İç Mekan (3 Foto)</strong> ve <strong>Dış Mekan (3 Foto)</strong> görsellerini buradan güncelleyebilirsiniz.</p>
+                        
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                            <!-- İç Mekan -->
+                            <div style="background:#f8fafc; padding:16px; border-radius:8px; border:1px solid #e2e8f0;">
+                                <h4 style="margin-top:0; color:#1e293b;"><i class="ph-bold ph-storefront" style="color:#f59e0b;"></i> İç Mekan Fotoğrafları (3 Adet)</h4>
+                                <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="file" id="gal_interior_1" accept="image/*" class="form-control" style="padding:4px;">
+                                        <button class="btn btn-primary" onclick="uploadGalleryPhoto('interior_1')">Foto 1 Yükle</button>
+                                    </div>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="file" id="gal_interior_2" accept="image/*" class="form-control" style="padding:4px;">
+                                        <button class="btn btn-primary" onclick="uploadGalleryPhoto('interior_2')">Foto 2 Yükle</button>
+                                    </div>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="file" id="gal_interior_3" accept="image/*" class="form-control" style="padding:4px;">
+                                        <button class="btn btn-primary" onclick="uploadGalleryPhoto('interior_3')">Foto 3 Yükle</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dış Mekan -->
+                            <div style="background:#f8fafc; padding:16px; border-radius:8px; border:1px solid #e2e8f0;">
+                                <h4 style="margin-top:0; color:#1e293b;"><i class="ph-bold ph-tree" style="color:#10b981;"></i> Dış Mekan Fotoğrafları (3 Adet)</h4>
+                                <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="file" id="gal_exterior_1" accept="image/*" class="form-control" style="padding:4px;">
+                                        <button class="btn btn-primary" onclick="uploadGalleryPhoto('exterior_1')">Foto 1 Yükle</button>
+                                    </div>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="file" id="gal_exterior_2" accept="image/*" class="form-control" style="padding:4px;">
+                                        <button class="btn btn-primary" onclick="uploadGalleryPhoto('exterior_2')">Foto 2 Yükle</button>
+                                    </div>
+                                    <div style="display:flex; gap:8px;">
+                                        <input type="file" id="gal_exterior_3" accept="image/*" class="form-control" style="padding:4px;">
+                                        <button class="btn btn-primary" onclick="uploadGalleryPhoto('exterior_3')">Foto 3 Yükle</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="galleryUploadResult" style="margin-top:12px; font-weight:600; color:#166534; display:none;">Görsel yüklendi!</div>
+                    </div>
+
+                    <!-- YÖNETİM GÜVENLİK & ŞİFRE DEĞİŞTİRME -->
+                    <div class="card" style="margin-top:24px;">
+                        <h3>🔑 Yönetim Paneli Şifresini Değiştir</h3>
+                        <p class="card-desc">Girişte kullanılan paneli güvenceye almak için şifrenizi güncelleyebilirsiniz.</p>
+                        
+                        <form id="changePasswordForm" onsubmit="changeAdminPassword(event)" style="max-width:400px;">
+                            <div class="form-group" style="margin-bottom:12px;">
+                                <label style="font-size:0.85rem;">Mevcut Şifre</label>
+                                <input type="password" id="old_password" class="form-control" required>
+                            </div>
+                            <div class="form-group" style="margin-bottom:12px;">
+                                <label style="font-size:0.85rem;">Yeni Şifre (En az 6 karakter)</label>
+                                <input type="password" id="new_password" class="form-control" minlength="6" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="background:#0f172a; border:none;">
+                                <i class="ph-bold ph-key"></i> Şifreyi Güncelle
+                            </button>
+                            <div id="pwdResult" style="margin-top:12px; font-weight:600; display:none;"></div>
                         </form>
                     </div>
                 </section>
@@ -338,7 +413,7 @@
         
     </div>
 
-    <script src="/admin.js?v=5.0"></script>
+    <script src="/admin.js?v=6.0"></script>
     <script>
         if (typeof fetchAnalytics === 'function') {
             fetchAnalytics();
