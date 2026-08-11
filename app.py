@@ -2436,6 +2436,52 @@ def upload_menu():
     file.save(filepath)
     return jsonify({"success": True, "filename": filename})
 
+@app.route('/api/web/track-visit', methods=['POST'])
+def track_visit():
+    analytics_file = '/opt/firinna-pos/web_analytics.json'
+    try:
+        if os.path.exists(analytics_file):
+            with open(analytics_file, 'r') as f:
+                stats = json.load(f)
+        else:
+            stats = {"today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0, "last_date": ""}
+            
+        import datetime
+        today_str = datetime.date.today().isoformat()
+        
+        if stats.get("last_date") != today_str:
+            stats["today"] = 0
+            if stats.get("last_date", "")[:7] != today_str[:7]:
+                stats["month"] = 0
+            stats["last_date"] = today_str
+            
+        data = request.json or {}
+        event = data.get('event', 'pageview')
+        
+        if event == 'pageview':
+            stats["today"] += 1
+            stats["month"] += 1
+            stats["total"] += 1
+        elif event == 'menu':
+            stats["menu"] = stats.get("menu", 0) + 1
+        elif event == 'action':
+            stats["actions"] = stats.get("actions", 0) + 1
+            
+        with open(analytics_file, 'w') as f:
+            json.dump(stats, f)
+            
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+@app.route('/api/web/analytics', methods=['GET'])
+def get_analytics():
+    analytics_file = '/opt/firinna-pos/web_analytics.json'
+    if os.path.exists(analytics_file):
+        with open(analytics_file, 'r') as f:
+            return jsonify(json.load(f))
+    return jsonify({"today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0})
+
 @app.route('/api/web/tables-status', methods=['GET'])
 def api_web_tables_status():
     try:
