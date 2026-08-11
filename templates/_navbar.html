@@ -283,16 +283,38 @@ function showToast(msg, type, duration) {
     }
     vDiv.textContent = 'Mobil v' + actualAppVersion;
 
+    // Compare versions (e.g. "1.5" vs "1.5.1")
+    function cmpVersions(a, b) {
+        if (!a || !b) return 0;
+        var pa = a.split('.');
+        var pb = b.split('.');
+        for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+            var na = parseInt(pa[i] || 0);
+            var nb = parseInt(pb[i] || 0);
+            if (na > nb) return 1;
+            if (nb > na) return -1;
+        }
+        return 0;
+    }
+
     var serverVersion = null;
     fetch('/api/mobile_version?_=' + Date.now())
         .then(r => r.json())
-        .then(d => { serverVersion = d.version; })
+        .then(d => { 
+            serverVersion = d.version; 
+            // Auto-check on startup
+            if (actualAppVersion !== 'Bilinmiyor' && cmpVersions(serverVersion, actualAppVersion) > 0) {
+                if(confirm("Yeni bir güncelleme mevcut (v" + serverVersion + "). Uygulamayı şimdi güncellemek ister misiniz?")) {
+                    window.location.href = '/download_apk';
+                }
+            }
+        })
         .catch(e => { console.error('Versiyon alinamadi'); });
 
     var pressTimer;
     function startPress() {
         pressTimer = setTimeout(function() {
-            if (serverVersion && actualAppVersion !== 'Bilinmiyor' && parseFloat(serverVersion) <= parseFloat(actualAppVersion)) {
+            if (serverVersion && actualAppVersion !== 'Bilinmiyor' && cmpVersions(serverVersion, actualAppVersion) <= 0) {
                 alert("Uygulamanız zaten son sürümde (v" + actualAppVersion + ").");
                 return;
             }
