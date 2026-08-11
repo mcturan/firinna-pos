@@ -31,6 +31,14 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.after_request
+def add_no_cache_headers(response):
+    if request.path.startswith('/api/web/analytics') or 'admin' in request.path or 'yonetim' in request.path:
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
+
 # Ana sayfa (masalar görünümü)
 @app.route('/api/mobile_version')
 def api_mobile_version():

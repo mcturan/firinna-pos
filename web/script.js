@@ -531,14 +531,23 @@ const i18n = {
     }
 };
 
-function trackEvent(eventName) {
+function trackEvent(eventName, extraData = {}) {
     try {
+        let isRepeat = false;
+        if (localStorage.getItem('firinna_vid')) {
+            isRepeat = true;
+        } else {
+            localStorage.setItem('firinna_vid', Date.now());
+        }
+        
         const payload = {
             event: eventName,
+            isRepeat: isRepeat,
             userAgent: navigator.userAgent,
             language: navigator.language,
             referrer: document.referrer,
-            screenWidth: window.innerWidth
+            screenWidth: window.innerWidth,
+            ...extraData
         };
         fetch('/api/web/track-visit', {
             method: 'POST',
@@ -551,14 +560,16 @@ function trackEvent(eventName) {
 document.addEventListener('DOMContentLoaded', () => {
     trackEvent('pageview');
     
-    // Yalnızca dışarı giden veya menüye tıklayan eylemleri izle
+    // Harita, PDF ve İletişim eylemlerini izle
     document.querySelectorAll('a').forEach(a => {
         a.addEventListener('click', (e) => {
-            const href = a.getAttribute('href');
-            if (href && href.includes('.pdf')) {
+            const href = a.getAttribute('href') || '';
+            if (href.includes('.pdf')) {
                 trackEvent('menu');
-            } else if (href && (href.includes('whatsapp') || href.includes('tel:'))) {
+            } else if (href.includes('whatsapp') || href.includes('tel:')) {
                 trackEvent('action');
+            } else if (href.includes('google.com/maps') || href.includes('yandex') || href.includes('baidu')) {
+                trackEvent('map');
             }
         });
     });

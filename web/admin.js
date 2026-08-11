@@ -42,8 +42,20 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Üst başlığı güncelle
             document.querySelector('.topbar h1').innerText = item.innerText.trim();
+
+            if (targetId === 'dashboard') {
+                fetchAnalytics();
+            }
         });
     });
+
+    // Her 10 saniyede bir analitikleri otomatik canlı tazele
+    setInterval(() => {
+        const dash = document.getElementById('dashboard');
+        if (dash && dash.style.display !== 'none') {
+            fetchAnalytics();
+        }
+    }, 10000);
 });
 
 function checkLogin() {
@@ -72,45 +84,54 @@ async function fetchAnalytics() {
         document.getElementById('stat-menu').innerText = data.menu || 0;
         document.getElementById('stat-actions').innerText = data.actions || 0;
         
+        if (document.getElementById('stat-repeat')) document.getElementById('stat-repeat').innerText = data.repeat_visitors || 0;
+        if (document.getElementById('stat-map')) document.getElementById('stat-map').innerText = data.map_clicks || 0;
+        
         // Fill Lists
-        const renderList = (elementId, dataObj) => {
+        const renderList = (elementId, dataObj = {}) => {
             const el = document.getElementById(elementId);
-            if (!el || !dataObj) return;
+            if (!el) return;
             el.innerHTML = '';
-            const entries = Object.entries(dataObj).sort((a,b) => b[1] - a[1]);
+            const entries = Object.entries(dataObj || {}).sort((a,b) => b[1] - a[1]);
             if (entries.length === 0) {
-                el.innerHTML = '<li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Veri Yok</span> <strong>0</strong></li>';
+                el.innerHTML = '<li style="display:flex; justify-content:space-between; margin-bottom:6px; color:#94a3b8;"><span>Henüz Veri Yok</span> <strong>0</strong></li>';
+                return;
             }
             entries.forEach(([key, val]) => {
-                el.innerHTML += `<li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>${key}</span> <strong>${val}</strong></li>`;
+                el.innerHTML += `<li style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>${key}</span> <strong>${val}</strong></li>`;
             });
         };
         
         renderList('list-referrers', data.referrers);
+        renderList('list-hours', data.peak_hours);
         
-        // Combine Devices and Browsers
-        const devicesAndBrowsers = {...(data.devices || {}), ...(data.browsers || {})};
+        // Combine Devices, OS, and Browsers
+        const devicesAndBrowsers = {...(data.devices || {}), ...(data.os || {}), ...(data.browsers || {})};
         renderList('list-devices', devicesAndBrowsers);
         
         renderList('list-countries', data.countries);
         
         // Render Recent Visitors Log Table
         const tableEl = document.getElementById('table-recent-visitors');
-        if (tableEl && data.recent_visitors && data.recent_visitors.length > 0) {
-            tableEl.innerHTML = '';
-            data.recent_visitors.forEach(v => {
-                const row = document.createElement('tr');
-                row.style.borderBottom = '1px solid #f1f5f9';
-                row.innerHTML = `
-                    <td style="padding:10px; font-weight:600; color:#334155;">${v.time || '-'}</td>
-                    <td style="padding:10px; font-family:monospace; color:#2563eb; font-weight:600;">${v.ip || '-'}</td>
-                    <td style="padding:10px;">${v.country || '-'}</td>
-                    <td style="padding:10px;">${v.device || '-'}</td>
-                    <td style="padding:10px; color:#475569;">${v.browser || '-'}</td>
-                    <td style="padding:10px;"><span style="background:#f1f5f9; color:#0f172a; padding:3px 8px; border-radius:6px; font-weight:600; font-size:0.8rem;">${v.action || 'Ziyaret'}</span></td>
-                `;
-                tableEl.appendChild(row);
-            });
+        if (tableEl) {
+            if (data.recent_visitors && data.recent_visitors.length > 0) {
+                tableEl.innerHTML = '';
+                data.recent_visitors.forEach(v => {
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid #f1f5f9';
+                    row.innerHTML = `
+                        <td style="padding:10px; font-weight:600; color:#334155;">${v.time || '-'}</td>
+                        <td style="padding:10px; font-family:monospace; color:#2563eb; font-weight:600;">${v.ip || '-'}</td>
+                        <td style="padding:10px;">${v.country || '-'}</td>
+                        <td style="padding:10px;">${v.device || '-'}</td>
+                        <td style="padding:10px; color:#475569;">${v.browser || '-'}</td>
+                        <td style="padding:10px;"><span style="background:#f1f5f9; color:#0f172a; padding:3px 8px; border-radius:6px; font-weight:600; font-size:0.8rem;">${v.action || 'Ziyaret'}</span></td>
+                    `;
+                    tableEl.appendChild(row);
+                });
+            } else {
+                tableEl.innerHTML = '<tr><td colspan="6" style="padding:16px; text-align:center; color:#94a3b8;">Henüz canlı ziyaretçi verisi bulunmuyor.</td></tr>';
+            }
         }
     } catch (e) {
         console.error("Analitikler yüklenemedi", e);
