@@ -2491,6 +2491,100 @@ def reset_analytics():
         json.dump(empty_stats, f, indent=4)
     return jsonify({"success": True, "message": "Analitik verileri sıfırlandı."})
 
+# WEB ÜRÜN & MENÜ YÖNETİMİ APIS
+PRODUCTS_FILE = '/opt/firinna-pos/web_products.json'
+
+def load_web_products():
+    if os.path.exists(PRODUCTS_FILE):
+        try:
+            with open(PRODUCTS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
+
+def save_web_products(products):
+    with open(PRODUCTS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(products, f, ensure_ascii=False, indent=4)
+
+@app.route('/api/web/products', methods=['GET'])
+def get_web_products():
+    return jsonify(load_web_products())
+
+@app.route('/api/web/products', methods=['POST'])
+def save_web_product():
+    import time
+    products = load_web_products()
+    prod_id = request.form.get('id')
+    title = request.form.get('title', '').strip()
+    category = request.form.get('category', 'İçecekler & Tatlılar').strip()
+    description = request.form.get('description', '').strip()
+    price = request.form.get('price', '').strip()
+    is_signature = request.form.get('is_signature', 'false').lower() in ['true', '1', 'on']
+
+    image_url = request.form.get('image_url', '').strip()
+    if 'image_file' in request.files:
+        img = request.files['image_file']
+        if img and img.filename:
+            ext = img.filename.split('.')[-1].lower() if '.' in img.filename else 'png'
+            fname = f"prod_{int(time.time())}.{ext}"
+            fpath = os.path.join('/opt/firinna-pos/web', fname)
+            img.save(fpath)
+            image_url = fname
+
+    if not prod_id:
+        new_prod = {
+            "id": f"prod_{int(time.time()*1000)}",
+            "title": title,
+            "category": category,
+            "description": description,
+            "price": price,
+            "image_url": image_url or "drink_cay.png",
+            "is_signature": is_signature
+        }
+        products.append(new_prod)
+    else:
+        found = False
+        for p in products:
+            if p.get('id') == prod_id:
+                p['title'] = title
+                p['category'] = category
+                p['description'] = description
+                p['price'] = price
+                if image_url:
+                    p['image_url'] = image_url
+                p['is_signature'] = is_signature
+                found = True
+                break
+        if not found:
+            return jsonify({"success": False, "error": "Ürün bulunamadı."})
+
+    save_web_products(products)
+    return jsonify({"success": True, "message": "Ürün başarıyla kaydedildi."})
+
+@app.route('/api/web/products/<prod_id>/toggle-signature', methods=['POST'])
+def toggle_product_signature(prod_id):
+    products = load_web_products()
+    found = False
+    new_state = False
+    for p in products:
+        if p.get('id') == prod_id:
+            p['is_signature'] = not p.get('is_signature', False)
+            new_state = p['is_signature']
+            found = True
+            break
+    if not found:
+        return jsonify({"success": False, "error": "Ürün bulunamadı."})
+    save_web_products(products)
+    return jsonify({"success": True, "is_signature": new_state})
+
+@app.route('/api/web/products/<prod_id>', methods=['DELETE'])
+def delete_web_product(prod_id):
+    products = load_web_products()
+    products = [p for p in products if p.get('id') != prod_id]
+    save_web_products(products)
+    return jsonify({"success": True, "message": "Ürün silindi."})
+
 @app.route('/api/web/upload-gallery-photo', methods=['POST'])
 def upload_gallery_photo():
     slot = request.form.get('slot')

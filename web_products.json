@@ -1,0 +1,56 @@
+[
+    {
+        "id": "prod_1",
+        "title": "Gül Goncalı Harman Çay",
+        "category": "İçecekler & Tatlılar",
+        "description": "En seçkin Türk ve Seylan çayı karışımı içinde bergamot ve kuru gül goncaları ile demlenir.",
+        "price": "50 TL",
+        "image_url": "drink_cay.png",
+        "is_signature": true
+    },
+    {
+        "id": "prod_2",
+        "title": "Özel Türk Kahvesi",
+        "category": "İçecekler & Tatlılar",
+        "description": "Özel kavrulmuş ve çekilmiş en kaliteli taze Arabica kahvelerin en lezzetli pişirilmiş hali ve yanında meşhur Türk lokumu.",
+        "price": "90 TL",
+        "image_url": "drink_kahve.png",
+        "is_signature": true
+    },
+    {
+        "id": "prod_3",
+        "title": "Ev Yapımı Özel Limonata",
+        "category": "İçecekler & Tatlılar",
+        "description": "Buz gibi ev yapımı taze limonata; içerisinde ekstra hibiskus, tarçın, yıldız anason ve İran safranı harmanlanmıştır.",
+        "price": "120 TL",
+        "image_url": "drink_limonata.png",
+        "is_signature": true
+    },
+    {
+        "id": "prod_4",
+        "title": "Meşhur Çakallı Menemeni",
+        "category": "Fırından Sıcak Sıcak",
+        "description": "Sadece sarısıyla hazırlanan, bol kaşarlı ve tereyağlı, yöresel lezzetiyle kahvaltıların efsanesi.",
+        "price": "220 TL",
+        "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80",
+        "is_signature": true
+    },
+    {
+        "id": "prod_5",
+        "title": "Taş Fırın Pizza",
+        "category": "Fırından Sıcak Sıcak",
+        "description": "Özel mayalanmış hamurumuz, İtalyan domates sosu ve enfes mozzarella peyniriyle odun ateşinde pişer.",
+        "price": "340 TL",
+        "image_url": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80",
+        "is_signature": true
+    },
+    {
+        "id": "prod_6",
+        "title": "Sıcak Glintwein",
+        "category": "İçecekler & Tatlılar",
+        "description": "Özel baharatlar, taze portakal dilimi ve karanfil aromalı sıcak kış içeceği.",
+        "price": "280 TL",
+        "image_url": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=600&q=80",
+        "is_signature": true
+    }
+]
