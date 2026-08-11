@@ -1021,7 +1021,7 @@ function renderDynamicSignatureGallery() {
     const signatureGrid = document.getElementById('signature-gallery-grid');
     if (!signatureGrid) return;
 
-    const signatureProducts = dynamicWebProducts.filter(p => p.is_signature);
+    const signatureProducts = dynamicWebProducts.filter(p => p.is_signature && p.is_active !== false);
     if (!signatureProducts || signatureProducts.length === 0) return;
 
     signatureGrid.innerHTML = signatureProducts.map(p => {

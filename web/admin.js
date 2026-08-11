@@ -460,9 +460,22 @@ const TAG_MAP = {
     'sugar_free': { label: '🍯 Şekersiz', bg: '#fdf4ff', color: '#86198f' }
 };
 
+async function toggleProductActive(id) {
+    try {
+        const res = await fetch(`/api/web/products/${id}/toggle-active`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            loadWebProducts();
+        }
+    } catch(e) {
+        console.error("Toggle active error:", e);
+    }
+}
+
 function renderAdminProductsGrid(filterSearch = '', filterCat = 'ALL') {
-    const grid = document.getElementById('admin-products-grid');
-    if (!grid) return;
+    const activeGrid = document.getElementById('admin-products-grid');
+    const inactiveGrid = document.getElementById('admin-inactive-products-grid');
+    if (!activeGrid) return;
     
     try {
         let list = cachedWebProducts || [];
@@ -475,70 +488,103 @@ function renderAdminProductsGrid(filterSearch = '', filterCat = 'ALL') {
             list = list.filter(p => p && ((p.title || '').toLowerCase().includes(filterSearch) || (p.description || '').toLowerCase().includes(filterSearch)));
         }
 
-        if (list.length === 0) {
-            grid.innerHTML = '<div style="color:#94a3b8; font-size:0.9rem; grid-column:1/-1;">Aranan kriterlere uygun ürün bulunamadı.</div>';
-            return;
+        const activeList = list.filter(p => p && p.is_active !== false);
+        const inactiveList = list.filter(p => p && p.is_active === false);
+
+        // --- RENDER ACTIVE PRODUCTS ---
+        if (activeList.length === 0) {
+            activeGrid.innerHTML = '<div style="color:#94a3b8; font-size:0.9rem; grid-column:1/-1;">Satışta olan aktif ürün bulunmuyor.</div>';
+        } else {
+            activeGrid.innerHTML = activeList.map(p => renderSingleProductCard(p, true)).join('');
         }
 
-        grid.innerHTML = list.map(p => {
-            if (!p) return '';
-            const isSig = !!p.is_signature;
-            const sigBadgeBg = isSig ? '#dcfce7' : '#f1f5f9';
-            const sigBadgeColor = isSig ? '#15803d' : '#64748b';
-            const sigBtnText = isSig ? '⭐ İmza Lezzette' : '☆ İmza Yap';
-            const rawImg = p.image_url || '';
-            const img = (typeof rawImg === 'string' && rawImg.length > 0) ? rawImg : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80';
-
-            const tagsHtml = (Array.isArray(p.tags) ? p.tags : []).map(t => {
-                const info = TAG_MAP[t] || { label: t, bg: '#f1f5f9', color: '#475569' };
-                return `<span style="background:${info.bg}; color:${info.color}; font-size:0.72rem; font-weight:700; padding:2px 6px; border-radius:4px;">${info.label}</span>`;
-            }).join(' ');
-
-            return `
-                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-                    <div style="height:140px; position:relative; overflow:hidden; background:#f8fafc;">
-                        <img src="${img}" alt="${p.title || ''}" style="width:100%; height:100%; object-fit:cover;">
-                        <span style="position:absolute; top:8px; right:8px; background:${sigBadgeBg}; color:${sigBadgeColor}; font-size:0.75rem; font-weight:700; padding:3px 8px; border-radius:12px; border:1px solid ${isSig ? '#bbf7d0' : '#e2e8f0'};">
-                            ${isSig ? '⭐ İmza Lezzet' : 'Standart'}
-                        </span>
-                    </div>
-                    <div style="padding:14px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
-                        <div>
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:4px;">
-                                <h5 style="margin:0; font-size:1rem; color:#0f172a; font-weight:700;">${p.title || ''}</h5>
-                                <span style="font-size:0.85rem; font-weight:800; color:#d97706; white-space:nowrap;">${p.price || ''}</span>
-                            </div>
-                            <div style="font-size:0.75rem; color:#64748b; margin-bottom:6px; font-weight:600;">📁 ${p.category || 'Genel'}</div>
-                            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px;">${tagsHtml}</div>
-                            <p style="font-size:0.82rem; color:#475569; margin:0 0 12px 0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">
-                                ${p.description || ''}
-                            </p>
-                        </div>
-                        <div style="display:flex; gap:6px; border-top:1px solid #f1f5f9; padding-top:10px; margin-top:6px;">
-                            <button class="btn" onclick="toggleProductSignature('${p.id}')" style="flex:1; background:${isSig ? '#fef3c7' : '#f1f5f9'}; color:${isSig ? '#b45309' : '#475569'}; border:1px solid ${isSig ? '#fde68a' : '#cbd5e1'}; font-size:0.78rem; font-weight:700; padding:6px 8px; border-radius:6px; cursor:pointer;">
-                                ${sigBtnText}
-                            </button>
-                            <button class="btn" onclick="editProduct('${p.id}')" title="Düzenle" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:0.78rem; padding:6px 10px; border-radius:6px; cursor:pointer;">
-                                <i class="ph-bold ph-pencil-simple"></i>
-                            </button>
-                            <button class="btn" onclick="deleteProduct('${p.id}')" title="Sil" style="background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-size:0.78rem; padding:6px 10px; border-radius:6px; cursor:pointer;">
-                                <i class="ph-bold ph-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        // --- RENDER INACTIVE PRODUCTS ---
+        if (inactiveGrid) {
+            if (inactiveList.length === 0) {
+                inactiveGrid.innerHTML = '<div style="color:#94a3b8; font-size:0.9rem; grid-column:1/-1;">Pasif / devre dışı kalmış ürün bulunmuyor.</div>';
+            } else {
+                inactiveGrid.innerHTML = inactiveList.map(p => renderSingleProductCard(p, false)).join('');
+            }
+        }
     } catch(err) {
         console.error("renderAdminProductsGrid error:", err);
-        grid.innerHTML = '<div style="color:#ef4444; font-size:0.9rem; grid-column:1/-1;">Ürünler işlenirken bir hata oluştu.</div>';
+        activeGrid.innerHTML = '<div style="color:#ef4444; font-size:0.9rem; grid-column:1/-1;">Ürünler işlenirken bir hata oluştu.</div>';
     }
+}
+
+function renderSingleProductCard(p, isActive) {
+    if (!p) return '';
+    const isSig = !!p.is_signature;
+    const sigBadgeBg = isSig ? '#dcfce7' : '#f1f5f9';
+    const sigBadgeColor = isSig ? '#15803d' : '#64748b';
+    const sigBtnText = isSig ? '⭐ İmza' : '☆ İmza';
+    const rawImg = p.image_url || '';
+    const img = (typeof rawImg === 'string' && rawImg.length > 0) ? rawImg : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80';
+
+    const tagsHtml = (Array.isArray(p.tags) ? p.tags : []).map(t => {
+        const info = TAG_MAP[t] || { label: t, bg: '#f1f5f9', color: '#475569' };
+        return `<span style="background:${info.bg}; color:${info.color}; font-size:0.72rem; font-weight:700; padding:2px 6px; border-radius:4px;">${info.label}</span>`;
+    }).join(' ');
+
+    const cardOpacity = isActive ? '1' : '0.65';
+    const cardBorder = isActive ? '1px solid #e2e8f0' : '1px dashed #fca5a5';
+    const activeStatusBadge = isActive 
+        ? `<span style="position:absolute; top:8px; left:8px; background:#dcfce7; color:#15803d; font-size:0.75rem; font-weight:700; padding:3px 8px; border-radius:12px; border:1px solid #bbf7d0;">✅ Satışta</span>`
+        : `<span style="position:absolute; top:8px; left:8px; background:#fee2e2; color:#991b1b; font-size:0.75rem; font-weight:700; padding:3px 8px; border-radius:12px; border:1px solid #fca5a5;">⏸️ Pasif</span>`;
+
+    return `
+        <div style="background:#fff; border:${cardBorder}; opacity:${cardOpacity}; border-radius:8px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <div style="height:140px; position:relative; overflow:hidden; background:#f8fafc;">
+                <img src="${img}" alt="${p.title || ''}" style="width:100%; height:100%; object-fit:cover;">
+                ${activeStatusBadge}
+                <span style="position:absolute; top:8px; right:8px; background:${sigBadgeBg}; color:${sigBadgeColor}; font-size:0.75rem; font-weight:700; padding:3px 8px; border-radius:12px; border:1px solid ${isSig ? '#bbf7d0' : '#e2e8f0'};">
+                    ${isSig ? '⭐ İmza Lezzet' : 'Standart'}
+                </span>
+            </div>
+            <div style="padding:14px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:4px;">
+                        <h5 style="margin:0; font-size:1rem; color:#0f172a; font-weight:700;">${p.title || ''}</h5>
+                        <span style="font-size:0.85rem; font-weight:800; color:#d97706; white-space:nowrap;">${p.price || ''}</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:#64748b; margin-bottom:6px; font-weight:600;">📁 ${p.category || 'Genel'}</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px;">${tagsHtml}</div>
+                    <p style="font-size:0.82rem; color:#475569; margin:0 0 12px 0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">
+                        ${p.description || ''}
+                    </p>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px; border-top:1px solid #f1f5f9; padding-top:10px; margin-top:6px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; padding:6px 10px; border-radius:6px; border:1px solid #e2e8f0;">
+                        <span style="font-size:0.78rem; font-weight:700; color:${isActive ? '#15803d' : '#991b1b'};">
+                            ${isActive ? '✅ Sitede Aktif' : '⏸️ Sitede Gizli'}
+                        </span>
+                        <button onclick="toggleProductActive('${p.id}')" class="btn" style="background:${isActive ? '#fee2e2' : '#dcfce7'}; color:${isActive ? '#991b1b' : '#15803d'}; border:1px solid ${isActive ? '#fca5a5' : '#bbf7d0'}; font-size:0.75rem; font-weight:700; padding:3px 8px; border-radius:4px; cursor:pointer;">
+                            ${isActive ? 'Pasife Al ⬇️' : 'Etkinleştir ⬆️'}
+                        </button>
+                    </div>
+
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn" onclick="toggleProductSignature('${p.id}')" style="flex:1; background:${isSig ? '#fef3c7' : '#f1f5f9'}; color:${isSig ? '#b45309' : '#475569'}; border:1px solid ${isSig ? '#fde68a' : '#cbd5e1'}; font-size:0.78rem; font-weight:700; padding:6px 8px; border-radius:6px; cursor:pointer;">
+                            ${sigBtnText}
+                        </button>
+                        <button class="btn" onclick="editProduct('${p.id}')" title="Düzenle" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:0.78rem; padding:6px 10px; border-radius:6px; cursor:pointer;">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                        </button>
+                        <button class="btn" onclick="deleteProduct('${p.id}')" title="Sil" style="background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-size:0.78rem; padding:6px 10px; border-radius:6px; cursor:pointer;">
+                            <i class="ph-bold ph-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function resetProductForm() {
     document.getElementById('webProductForm').reset();
     document.getElementById('prod_id').value = '';
     document.getElementById('prod_image_url').value = '';
+    if (document.getElementById('prod_is_active')) document.getElementById('prod_is_active').checked = true;
     document.querySelectorAll('.prod-tag-cb').forEach(cb => cb.checked = false);
     document.getElementById('prod-form-heading').innerHTML = '<i class="ph-bold ph-pencil-simple" style="color:#3b82f6;"></i> Yeni Ürün Girişi';
     document.getElementById('prodSaveResult').style.display = 'none';
@@ -554,6 +600,7 @@ function editProduct(id) {
     document.getElementById('prod_description').value = p.description || '';
     document.getElementById('prod_image_url').value = p.image_url || '';
     document.getElementById('prod_is_signature').checked = !!p.is_signature;
+    if (document.getElementById('prod_is_active')) document.getElementById('prod_is_active').checked = p.is_active !== false;
 
     const tags = p.tags || [];
     document.querySelectorAll('.prod-tag-cb').forEach(cb => {
@@ -580,6 +627,7 @@ async function saveWebProduct(e) {
     formData.append('description', document.getElementById('prod_description').value);
     formData.append('image_url', document.getElementById('prod_image_url').value);
     formData.append('is_signature', document.getElementById('prod_is_signature').checked);
+    formData.append('is_active', document.getElementById('prod_is_active') ? document.getElementById('prod_is_active').checked : true);
     formData.append('tags', selectedTags.join(','));
 
     const fileInput = document.getElementById('prod_image_file');

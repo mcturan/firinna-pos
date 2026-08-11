@@ -12,7 +12,8 @@
             "vegetarian",
             "dairy",
             "gluten_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_m2",
@@ -26,7 +27,8 @@
             "halal",
             "dairy",
             "gluten_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_m3",
@@ -40,7 +42,8 @@
             "halal",
             "dairy",
             "gluten_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_m4",
@@ -54,7 +57,8 @@
             "halal",
             "dairy",
             "gluten_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_o1",
@@ -69,7 +73,8 @@
             "vegetarian",
             "dairy",
             "gluten_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_o2",
@@ -84,7 +89,8 @@
             "vegetarian",
             "dairy",
             "gluten_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_o3",
@@ -98,7 +104,8 @@
             "halal",
             "dairy",
             "gluten_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_o4",
@@ -112,7 +119,8 @@
             "halal",
             "dairy",
             "gluten_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_p1",
@@ -126,7 +134,8 @@
             "halal",
             "gluten",
             "dairy"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_p2",
@@ -141,7 +150,8 @@
             "vegetarian",
             "gluten",
             "dairy"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_p3",
@@ -155,7 +165,8 @@
             "halal",
             "gluten",
             "dairy"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_p4",
@@ -169,7 +180,8 @@
             "halal",
             "gluten",
             "dairy"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_b1",
@@ -183,7 +195,8 @@
             "halal",
             "gluten",
             "dairy"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_b2",
@@ -197,7 +210,8 @@
             "halal",
             "gluten",
             "dairy"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_b3",
@@ -212,7 +226,8 @@
             "vegetarian",
             "gluten",
             "dairy"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_s1",
@@ -227,7 +242,8 @@
             "vegetarian",
             "vegan",
             "sugar_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_s2",
@@ -241,7 +257,8 @@
             "halal",
             "vegetarian",
             "vegan"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_s3",
@@ -250,12 +267,13 @@
         "description": "Özel kış baharatları, taze portakal dilimi, karanfil ve çubuk tarçın aromalı sıcak kış içeceği.",
         "price": "150 TL",
         "image_url": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=600&q=80",
-        "is_signature": true,
+        "is_signature": false,
         "tags": [
             "halal",
             "vegetarian",
             "vegan"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_s4",
@@ -270,7 +288,8 @@
             "vegetarian",
             "vegan",
             "sugar_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_s5",
@@ -285,7 +304,8 @@
             "vegetarian",
             "vegan",
             "sugar_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_s6",
@@ -299,7 +319,8 @@
             "halal",
             "vegetarian",
             "dairy"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_s7",
@@ -313,7 +334,8 @@
             "halal",
             "vegetarian",
             "dairy"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_dr1",
@@ -327,7 +349,8 @@
             "halal",
             "vegetarian",
             "vegan"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_dr2",
@@ -341,7 +364,8 @@
             "halal",
             "vegetarian",
             "vegan"
-        ]
+        ],
+        "is_active": false
     },
     {
         "id": "prod_dr3",
@@ -355,7 +379,8 @@
             "halal",
             "vegetarian",
             "vegan"
-        ]
+        ],
+        "is_active": false
     },
     {
         "id": "prod_dr4",
@@ -369,7 +394,8 @@
             "halal",
             "vegetarian",
             "vegan"
-        ]
+        ],
+        "is_active": false
     },
     {
         "id": "prod_dr5",
@@ -383,7 +409,8 @@
             "halal",
             "vegetarian",
             "vegan"
-        ]
+        ],
+        "is_active": false
     },
     {
         "id": "prod_dr6",
@@ -398,7 +425,8 @@
             "vegetarian",
             "vegan",
             "sugar_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_dr7",
@@ -413,7 +441,8 @@
             "vegetarian",
             "vegan",
             "sugar_free"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_t1",
@@ -428,7 +457,8 @@
             "vegetarian",
             "dairy",
             "gluten"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_t2",
@@ -444,7 +474,8 @@
             "dairy",
             "gluten",
             "nuts"
-        ]
+        ],
+        "is_active": true
     },
     {
         "id": "prod_t3",
@@ -459,6 +490,7 @@
             "vegetarian",
             "dairy",
             "gluten_free"
-        ]
+        ],
+        "is_active": true
     }
 ]

@@ -409,11 +409,19 @@
                                         <label style="font-size:0.85rem; font-weight:600;">Ürün Fotoğrafı (Yükle veya Seç)</label>
                                         <input type="file" id="prod_image_file" accept="image/*" class="form-control" style="padding:4px;">
                                     </div>
-                                    <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:10px 14px; border-radius:6px; border:1px solid #cbd5e1; margin-top:20px;">
-                                        <input type="checkbox" id="prod_is_signature" style="width:18px; height:18px; cursor:pointer;">
-                                        <label for="prod_is_signature" style="font-size:0.9rem; font-weight:700; color:#d97706; cursor:pointer; margin:0; display:flex; align-items:center; gap:4px;">
-                                            ⭐ İmza Lezzetlerde Göster
-                                        </label>
+                                    <div style="display:flex; align-items:center; gap:16px; margin-top:20px; flex-wrap:wrap;">
+                                        <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:10px 14px; border-radius:6px; border:1px solid #cbd5e1;">
+                                            <input type="checkbox" id="prod_is_active" checked style="width:18px; height:18px; cursor:pointer;">
+                                            <label for="prod_is_active" style="font-size:0.9rem; font-weight:700; color:#166534; cursor:pointer; margin:0; display:flex; align-items:center; gap:4px;">
+                                                ✅ Ürün Satışta / Etkin
+                                            </label>
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:10px 14px; border-radius:6px; border:1px solid #cbd5e1;">
+                                            <input type="checkbox" id="prod_is_signature" style="width:18px; height:18px; cursor:pointer;">
+                                            <label for="prod_is_signature" style="font-size:0.9rem; font-weight:700; color:#d97706; cursor:pointer; margin:0; display:flex; align-items:center; gap:4px;">
+                                                ⭐ İmza Lezzetlerde Göster
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -429,7 +437,7 @@
 
                         <!-- KAYITLI ÜRÜNLER LİSTESİ & FİLTRELER -->
                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-                            <h4 style="margin:0; color:#334155;"><i class="ph-bold ph-list-bullets"></i> Kayıtlı Ürün Listesi</h4>
+                            <h4 style="margin:0; color:#334155;"><i class="ph-bold ph-check-circle" style="color:#166534;"></i> Satışta Olan Etkin Ürünler</h4>
                             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                                 <input type="text" id="prod-search-input" onkeyup="filterAdminProducts()" placeholder="Ürün Ara..." class="form-control" style="width:180px; padding:6px 12px; font-size:0.85rem;">
                                 <select id="prod-category-filter" onchange="filterAdminProducts()" class="form-control" style="width:180px; padding:6px 12px; font-size:0.85rem;">
@@ -440,6 +448,16 @@
 
                         <div id="admin-products-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
                             <div style="color:#94a3b8; font-size:0.9rem;">Ürünler yükleniyor...</div>
+                        </div>
+
+                        <!-- ETKİN OLMAYAN / PASİF ÜRÜNLER SEKSİYONU -->
+                        <div id="admin-inactive-products-section" style="margin-top:32px; padding-top:24px; border-top:2px dashed #cbd5e1;">
+                            <h4 style="margin:0 0 16px 0; color:#991b1b; display:flex; align-items:center; gap:8px;">
+                                <i class="ph-bold ph-eye-slash" style="color:#dc2626;"></i> Etkin Olmayan / Pasif Ürünler
+                            </h4>
+                            <div id="admin-inactive-products-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+                                <div style="color:#94a3b8; font-size:0.9rem;">Pasif ürün bulunmuyor.</div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -537,7 +555,7 @@
         
     </div>
 
-    <script src="admin.js?v=12.0"></script>
+    <script src="admin.js?v=13.0"></script>
     <script>
         if (typeof fetchAnalytics === 'function') {
             fetchAnalytics();
