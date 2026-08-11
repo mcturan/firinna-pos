@@ -1,9 +1,7 @@
 {
+    "work_hours": "11:00 - 19:00",
     "address": "\u015eahkulu Mah. Kumbarac\u0131 Yoku\u015fu, No:41A\nBeyo\u011flu, \u0130stanbul",
-    "baidu": "https://map.baidu.com/",
-    "closed_until": "2026-08-12T12:00",
-    "instagram": "https://instagram.com/firinnacafe",
-    "manual_status": "auto",
     "phone": "905456301214",
-    "work_hours": "11:00 - 19:00"
+    "instagram": "https://instagram.com/firinnacafe",
+    "baidu": "https://map.baidu.com/"
 }

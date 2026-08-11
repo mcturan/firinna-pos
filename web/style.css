@@ -25,7 +25,7 @@
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     background-color: var(--bg-color);
-    background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg' stroke='%23d4af37' fill='none' stroke-width='2' opacity='0.1'%3E %3C!-- Coffee --%3E %3Cpath d='M30 40h20v10c0 5.5-4.5 10-10 10s-10-4.5-10-10V40zm20 5h5c2.8 0 5 2.2 5 5s-2.2 5-5 5h-5m-10-25v5m5-7v7m5-5v5'/%3E %3C!-- Pizza --%3E %3Cpath d='M130 50 l20 -30 l20 30 a10 10 0 0 1 -40 0'/%3E %3Ccircle cx='140' cy='35' r='2' fill='%23d4af37'/%3E %3Ccircle cx='155' cy='42' r='2' fill='%23d4af37'/%3E %3Ccircle cx='148' cy='25' r='2' fill='%23d4af37'/%3E %3C!-- Fork --%3E %3Cpath d='M40 130 v20 c0 5 5 10 5 20 v20 m-10 -60 v20 c0 5 10 10 10 20 m20 -40 v20 c0 5 -10 10 -10 20'/%3E %3C!-- Knife --%3E %3Cpath d='M150 130 v60 m0 -60 c 15 0 15 30 0 30'/%3E %3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='240' height='240' viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E %3Cg stroke='%23d4af37' fill='none' stroke-width='1.5' opacity='0.12'%3E %3C!-- Türk Kahvesi Cezvesi --%3E %3Cpath d='M30 45 L50 45 L45 65 L35 65 Z M50 48 L65 42 M32 65 H48'/%3E %3C!-- Taş Fırın Pizza Dilimi --%3E %3Cpath d='M125 25 L165 25 L145 65 Z M122 23 Q145 17 168 23'/%3E %3Ccircle cx='140' cy='35' r='3' fill='%23d4af37'/%3E %3Ccircle cx='150' cy='45' r='3' fill='%23d4af37'/%3E %3C!-- Matematiksel Gerçek Selçuklu 8 Köşeli Yıldızı --%3E %3Crect x='170' y='25' width='30' height='30'/%3E %3Crect x='170' y='25' width='30' height='30' transform='rotate(45 185 40)'/%3E %3C!-- Türk Bayrağı İnce Ay-Yıldız Motifi --%3E %3Cpath d='M30 170 A14 14 0 1 0 54 192 A18 18 0 1 1 30 170'/%3E %3Cpolygon points='60,175 62,181 67,181 63,184 65,189 60,186 55,189 57,184 53,181 58,181' fill='%23d4af37'/%3E %3C!-- Çini Baklava Motifleri --%3E %3Cpath d='M150 160 L165 145 L180 160 L165 175 Z M165 145 V175 M150 160 H180'/%3E %3C/g%3E %3C/svg%3E");
     color: var(--text-main);
     line-height: 1.6;
     min-height: 100vh;
@@ -53,52 +53,82 @@ body {
 
 .banner-overlay {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.1), var(--bg-color));
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(15, 23, 42, 0.3) 0%, rgba(15, 23, 42, 0.8) 100%);
 }
 
-/* Ana Grid Yapısı (Dashboard Tipi) */
-.dashboard {
-    max-width: 1100px;
-    margin: -100px auto 40px auto;
-    padding: 0 20px;
-    position: relative;
+.lang-selector {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
     z-index: 10;
-    display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: 24px;
-    align-items: start;
 }
 
-/* Kart Stilleri */
+.lang-selector button {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.lang-selector button:hover,
+.lang-selector button.active {
+    background: #fff;
+    color: var(--text-main);
+}
+
+/* Ana Konteyner */
+.dashboard {
+    max-width: 1200px;
+    margin: -60px auto 40px;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+    position: relative;
+    z-index: 5;
+}
+
+/* Kart Genel Stil (Gerçek Selçuklu 8 Köşeli Yıldız Çini Motifi) */
 .card {
     background: var(--card-bg);
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.25);
     margin-bottom: 24px;
-    box-shadow: 0 4px 15px var(--shadow-color);
-    border: 1px solid var(--border-color);
     position: relative;
+    overflow: hidden;
 }
 
-/* Ottoman Motif Decoration */
 .card::before, .card::after {
     content: '';
     position: absolute;
-    width: 40px;
-    height: 40px;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0C50 27.6 27.6 50 0 50C27.6 50 50 72.4 50 100C50 72.4 72.4 50 100 50C72.4 50 50 27.6 50 0Z' fill='%23d4af37' opacity='0.3'/%3E%3C/svg%3E");
+    width: 44px;
+    height: 44px;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23d4af37' fill='none' stroke-width='2' opacity='0.25'%3E%3Crect x='30' y='30' width='40' height='40'/%3E%3Crect x='30' y='30' width='40' height='40' transform='rotate(45 50 50)'/%3E%3Ccircle cx='50' cy='50' r='8'/%3E%3C/g%3E%3C/svg%3E");
     background-size: contain;
     background-repeat: no-repeat;
     pointer-events: none;
 }
 .card::before {
-    top: 10px;
-    left: 10px;
+    top: 8px;
+    left: 8px;
 }
 .card::after {
-    bottom: 10px;
-    right: 10px;
+    bottom: 8px;
+    right: 8px;
     transform: rotate(180deg);
 }
 
@@ -147,9 +177,9 @@ body {
 
 .profile-logo {
     width: 220px;
-    height: 180px;
+    height: 170px;
     object-fit: contain;
-    margin-bottom: 24px;
+    margin-bottom: 2px;
     animation: softFloat 4s ease-in-out infinite;
 }
 
@@ -252,12 +282,16 @@ body {
 .btn i { font-size: 1.3rem; }
 
 .btn-primary {
-    background: var(--primary);
-    color: #fff;
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    color: #ffffff !important;
+    font-weight: 800;
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+    border: none;
 }
 .btn-primary:hover {
-    background: var(--primary-hover);
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+    background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+    box-shadow: 0 6px 18px rgba(180, 83, 9, 0.45);
+    transform: translateY(-2px);
 }
 
 .btn-secondary {

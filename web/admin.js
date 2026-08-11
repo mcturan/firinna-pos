@@ -115,6 +115,9 @@ async function fetchSettings() {
         if (data.address) document.getElementById('address').value = data.address;
         if (data.phone) document.getElementById('phone').value = data.phone;
         if (data.instagram) document.getElementById('instagram').value = data.instagram;
+        if (data.google_review_url) document.getElementById('google_review_url').value = data.google_review_url;
+        if (data.yandex_review_url) document.getElementById('yandex_review_url').value = data.yandex_review_url;
+        if (data.tripadvisor_review_url) document.getElementById('tripadvisor_review_url').value = data.tripadvisor_review_url;
         
         if (data.manual_status) {
             document.querySelector(`input[name="manual_status"][value="${data.manual_status}"]`).checked = true;
@@ -149,6 +152,9 @@ async function saveSettings(e) {
             address: document.getElementById('address').value,
             phone: document.getElementById('phone').value,
             instagram: document.getElementById('instagram').value,
+            google_review_url: document.getElementById('google_review_url').value,
+            yandex_review_url: document.getElementById('yandex_review_url').value,
+            tripadvisor_review_url: document.getElementById('tripadvisor_review_url').value,
             manual_status: document.querySelector('input[name="manual_status"]:checked').value,
             closed_until: document.getElementById('closed_until').value
         };

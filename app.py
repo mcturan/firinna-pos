@@ -2464,40 +2464,70 @@ def track_visit():
         data = request.json or {}
         event = data.get('event', 'pageview')
         
-        # Sadece yeni bir sayfa görüntülemesinde detayları topla
+        # IP & Zaman tespiti
+        visitor_ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
+        if not visitor_ip or visitor_ip == '127.0.0.1':
+            visitor_ip = request.remote_addr or 'Gizli IP'
+            
+        import datetime
+        now_dt = datetime.datetime.now()
+        months_tr = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+        time_str = f"{now_dt.day} {months_tr[now_dt.month - 1]} {now_dt.strftime('%H:%M')}"
+        
+        # Cihaz Tespiti
+        ua = data.get('userAgent', '').lower()
+        if 'ipad' in ua or 'tablet' in ua:
+            device_type = "📱 Tablet"
+        elif 'mobi' in ua or 'android' in ua or 'iphone' in ua:
+            device_type = "📱 Mobil"
+        else:
+            device_type = "💻 Masaüstü"
+            
+        # Tarayıcı Tespiti
+        browser = "Diğer Tarayıcı"
+        if 'instagram' in ua: browser = "Instagram App"
+        elif 'edg' in ua: browser = "Microsoft Edge"
+        elif 'chrome' in ua: browser = "Google Chrome"
+        elif 'safari' in ua: browser = "Apple Safari"
+        elif 'firefox' in ua: browser = "Mozilla Firefox"
+        
+        # Dil / Ülke Tespiti
+        lang = (data.get('language') or 'tr-TR').upper()[:2]
+        country_map = {"TR": "🇹🇷 Türkiye", "EN": "🇬🇧 İngiltere/ABD", "AR": "🇸🇦 Arap Ülkeleri", "RU": "🇷🇺 Rusya", "ZH": "🇨🇳 Çin"}
+        c_name = country_map.get(lang, f"🌐 {lang}")
+        
+        action_name = "Ana Sayfa İnceleme"
+        if event == 'menu': action_name = "📄 PDF Menü İndirme"
+        elif event == 'action': action_name = "💬 WhatsApp / İletişim"
+
+        # Ziyaretçi Günlükleri (Son 30 Kayıt)
+        recent = stats.setdefault("recent_visitors", [])
+        recent.insert(0, {
+            "time": time_str,
+            "ip": visitor_ip,
+            "country": c_name,
+            "device": device_type,
+            "browser": browser,
+            "action": action_name
+        })
+        stats["recent_visitors"] = recent[:30]
+
+        # Sadece yeni bir sayfa görüntülemesinde sayaçları artır
         if event == 'pageview':
             stats["today"] += 1
             stats["month"] += 1
             stats["total"] += 1
             
-            # Cihaz Tespiti
-            ua = data.get('userAgent', '').lower()
-            if 'mobi' in ua or 'android' in ua or 'iphone' in ua:
-                stats.setdefault("devices", {})["Mobil"] = stats.get("devices", {}).get("Mobil", 0) + 1
-            else:
-                stats.setdefault("devices", {})["Masaüstü"] = stats.get("devices", {}).get("Masaüstü", 0) + 1
-                
-            # Tarayıcı Tespiti
-            browser = "Diğer"
-            if 'chrome' in ua and 'edg' not in ua: browser = "Chrome"
-            elif 'safari' in ua and 'chrome' not in ua: browser = "Safari"
-            elif 'firefox' in ua: browser = "Firefox"
-            elif 'edg' in ua: browser = "Edge"
-            elif 'instagram' in ua: browser = "Instagram App"
+            stats.setdefault("devices", {})[device_type] = stats.get("devices", {}).get(device_type, 0) + 1
             stats.setdefault("browsers", {})[browser] = stats.get("browsers", {}).get(browser, 0) + 1
-            
-            # Dil / Ülke Tespiti (Proxy olarak)
-            lang = (data.get('language') or 'tr-TR').upper()[:2]
-            country_map = {"TR": "Türkiye", "EN": "İngiltere/ABD", "AR": "Arap Ülkeleri", "RU": "Rusya", "ZH": "Çin"}
-            c_name = country_map.get(lang, lang)
             stats.setdefault("countries", {})[c_name] = stats.get("countries", {}).get(c_name, 0) + 1
             
             # Referans Kaynağı
             ref = (data.get('referrer') or '').lower()
             ref_name = "Direkt Giriş"
-            if 'google' in ref: ref_name = "Google"
+            if 'google' in ref: ref_name = "Google Arama"
             elif 'instagram' in ref: ref_name = "Instagram"
-            elif ref != '': ref_name = "Diğer"
+            elif ref != '': ref_name = "Diğer Site"
             stats.setdefault("referrers", {})[ref_name] = stats.get("referrers", {}).get(ref_name, 0) + 1
             
         elif event == 'menu':

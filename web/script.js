@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Yıl Güncelleme
     const yearSpan = document.getElementById('year');
     if (yearSpan) {
-        yearSpan.textContent = new Date().getFullYear();
+        yearSpan.textContent = '2025';
     }
 
     // Kartlar için giriş animasyonu
@@ -157,10 +157,12 @@ const i18n = {
         title_top_reviews: "Müşterilerimizin Gözünden",
         title_gating: "Deneyiminizi Puanlayın",
         sub_gating: "Fırınna deneyiminiz nasıldı? Görüşleriniz bizim için çok kıymetli.",
-        gating_high_msg: "🎉 Harika! Beğenmenize çok sevindik. Bize Google'da 5 yıldız vererek destek olmak ister misiniz?",
+        gating_high_msg: "🎉 Harika! Beğenmenize çok sevindik. Bize aşağıdaki platformlardan 5 yıldızlı yorum vererek destek olmak ister misiniz?",
         gating_low_title: "Görüşleriniz Bizim İçin Çok Değerli!",
         gating_low_msg: "Yaşadığınız aksaklığı veya önerinizi doğrudan işletme yöneticimize iletebilirsiniz:",
-        btn_google_review: "Google'da Değerlendir",
+        btn_google_review: "Google'da 5 Yıldız Ver",
+        btn_yandex_review: "Yandex'te Puanla",
+        btn_tripadvisor_review: "TripAdvisor'da Değerlendir",
         google_perfect: "Google'da Mükemmel",
         yandex_perfect: "Yandex'te Mükemmel",
         btn_inspect: "İncele",
@@ -168,6 +170,7 @@ const i18n = {
         table_available: "Şu an {N} masamız müsait, bekleriz!",
         table_full: "Şu an tüm masalarımız dolu.",
         table_offline: "Masa durumu bilgisi alınamadı.",
+        text_group_events: "<strong>Grup & Özel Etkinlikler:</strong> Çalışma saatleri dışı grup rezervasyonları ve mini organizasyonlar için <a href='https://wa.me/905456301214?text=Merhaba,%20grup%20rezervasyonu%20veya%20özel%20etkinlik%20hakkında%20bilgi%20almak%20istiyorum.' target='_blank' style='color:#059669; font-weight:700; text-decoration:underline;'>WhatsApp'tan Ulaşabilirsiniz</a>.",
         review_1: "İstiklal'in gürültüsünden kaçıp nefes alabileceğiniz harika, tarihi bir mekan. Pizzaları efsane!",
         review_2: "Çakallı menemenini denemelisiniz. Personel çok güleryüzlü ve evcil hayvan dostu olmaları harika.",
         review_3: "Galata'da kahve içip tatlı yemek için en iyi nokta. Çalışanlar çok ilgili.",
@@ -176,6 +179,7 @@ const i18n = {
         title_location: "Lokasyon",
         title_contact: "İletişim & Ulaşım",
         title_gallery: "Ortam & Lezzetler",
+        badge_historic_tr: "Tarihi Türk Cafesi",
         badge_halal: "%100 Helal",
         badge_quality: "En İyi Kalite",
         badge_price: "Uygun Fiyat",
@@ -231,10 +235,12 @@ const i18n = {
         title_top_reviews: "From Our Customers",
         title_gating: "Rate Your Experience",
         sub_gating: "How was your experience at Firinna? Your feedback means a lot to us.",
-        gating_high_msg: "🎉 Wonderful! We're glad you enjoyed it. Would you like to support us with a 5-star review on Google?",
+        gating_high_msg: "🎉 Wonderful! We're glad you enjoyed it. Would you like to support us with a 5-star review on these platforms?",
         gating_low_title: "Your Feedback is Very Valuable to Us!",
         gating_low_msg: "You can send any feedback or issues directly to our manager:",
-        btn_google_review: "Review on Google",
+        btn_google_review: "Rate 5 Stars on Google",
+        btn_yandex_review: "Rate on Yandex",
+        btn_tripadvisor_review: "Review on TripAdvisor",
         google_perfect: "Excellent on Google",
         yandex_perfect: "Excellent on Yandex",
         btn_inspect: "Review",
@@ -242,6 +248,7 @@ const i18n = {
         table_available: "Currently {N} tables available, welcome!",
         table_full: "Currently all tables are occupied.",
         table_offline: "Table status unavailable.",
+        text_group_events: "<strong>Group & Private Events:</strong> For after-hours group bookings and mini events, please <a href='https://wa.me/905456301214?text=Hello,%20I%20would%20like%20information%20about%20group%20bookings.' target='_blank' style='color:#059669; font-weight:700; text-decoration:underline;'>Contact via WhatsApp</a>.",
         review_1: "A wonderful, historic place to escape the noise of Istiklal and take a breath. Their pizzas are legendary!",
         review_2: "You must try the Çakallı menemen. The staff is very smiling and it's great that they are pet-friendly.",
         review_3: "The best spot in Galata for coffee and desserts. The staff is very attentive.",
@@ -250,6 +257,7 @@ const i18n = {
         title_location: "Location",
         title_contact: "Contact & Location",
         title_gallery: "Ambiance & Tastes",
+        badge_historic_tr: "Historic Turkish Cafe",
         badge_halal: "100% Halal",
         badge_quality: "Best Quality",
         badge_price: "Fair Price",
@@ -305,10 +313,12 @@ const i18n = {
         title_top_reviews: "Отзывы клиентов",
         title_gating: "Оцените ваш визит",
         sub_gating: "Как вам отдых в Firinna? Ваше мнение очень важно для нас.",
-        gating_high_msg: "🎉 Замечательно! Будем благодарны за 5 звезд в Google!",
+        gating_high_msg: "🎉 Замечательно! Будем благодарны за 5 звезд на следующих платформах:",
         gating_low_title: "Ваше мнение очень важно для нас!",
         gating_low_msg: "Вы можете отправить ваш отзыв напрямую нашему управляющему:",
-        btn_google_review: "Оценить в Google",
+        btn_google_review: "Поставить 5 звезд в Google",
+        btn_yandex_review: "Оценить в Яндекс",
+        btn_tripadvisor_review: "Отзыв на TripAdvisor",
         google_perfect: "Отлично в Google",
         yandex_perfect: "Отлично в Яндекс",
         btn_inspect: "Посмотреть",
@@ -316,12 +326,14 @@ const i18n = {
         table_available: "Сейчас свободно {N} столов, ждем вас!",
         table_full: "Сейчас все столы заняты.",
         table_offline: "Статус столов недоступен.",
+        text_group_events: "<strong>Группы и мероприятия:</strong> Для бронирования во внерабочее время <a href='https://wa.me/905456301214' target='_blank' style='color:#059669; font-weight:700; text-decoration:underline;'>Напишите в WhatsApp</a>.",
         review_1: "Замечательное, историческое место, где можно спрятаться от шума Истикляля и перевести дух. Их пицца легендарна!",
         review_2: "Вы должны попробовать менемен Чакаллы. Персонал очень улыбчивый, и здорово, что к ним можно с питомцами.",
         review_3: "Лучшее место в Галате для кофе и десертов. Персонал очень внимателен.",
         title_location: "Расположение",
         title_contact: "Контакты и расположение",
         title_gallery: "Атмосфера и вкусы",
+        badge_historic_tr: "Историческое турецкое кафе",
         badge_halal: "100% Халяль",
         badge_quality: "Лучшее качество",
         badge_price: "Хорошая цена",
@@ -377,10 +389,12 @@ const i18n = {
         title_top_reviews: "من عملائنا",
         title_gating: "قيم تجربتك",
         sub_gating: "كيف كانت تجربتك في فِرِنّا؟ رأيك يهمنا كثيراً.",
-        gating_high_msg: "🎉 رائع! نتشرف بدعمك لنا بتقييم 5 نجوم على جوجل!",
+        gating_high_msg: "🎉 رائع! نتشرف بدعمك لنا بتقييم 5 نجوم على إحدى المنصات التالية:",
         gating_low_title: "رأيك يهمنا جداً!",
         gating_low_msg: "يمكنك إرسال ملاحظاتك مباشرة إلى مديرنا:",
-        btn_google_review: "تقييم على جوجل",
+        btn_google_review: "تقييم 5 نجوم على جوجل",
+        btn_yandex_review: "تقييم على ياندكس",
+        btn_tripadvisor_review: "تقييم على TripAdvisor",
         google_perfect: "ممتاز على جوجل",
         yandex_perfect: "ممتاز على ياندكس",
         btn_inspect: "تصفح",
@@ -388,12 +402,14 @@ const i18n = {
         table_available: "حالياً هناك {N} طاولات متاحة، أهلاً بكم!",
         table_full: "حالياً جميع الطاولات مشغولة.",
         table_offline: "حالة الطاولات غير متوفرة.",
+        text_group_events: "<strong>المجموعات والفعاليات:</strong> للحجوزات الجماعية والفعاليات خارج أوقات العمل <a href='https://wa.me/905456301214' target='_blank' style='color:#059669; font-weight:700; text-decoration:underline;'>تواصل عبر واتساب</a>.",
         review_1: "مكان تاريخي رائع للهروب من ضجيج الاستقلال وأخذ قسط من الراحة. البيتزا الخاصة بهم أسطورية!",
         review_2: "يجب أن تجرب مينيمين تشاكالي. الموظفون مبتسمون للغاية ومن الرائع أنهم يسمحون بالحيوانات الأليفة.",
         review_3: "أفضل مكان في غلطة لتناول القهوة والحلويات. فريق العمل مهتم جدا.",
         title_location: "الموقع",
         title_contact: "الاتصال والموقع",
         title_gallery: "الأجواء والمذاق",
+        badge_historic_tr: "مقهى تركي تاريخي",
         badge_halal: "حلال 100%",
         badge_quality: "أفضل جودة",
         badge_price: "سعر مناسب",
@@ -449,10 +465,12 @@ const i18n = {
         title_top_reviews: "顾客评价",
         title_gating: "评价您的体验",
         sub_gating: "您在 Firinna 的体验如何？您的反馈对我们非常重要。",
-        gating_high_msg: "🎉 太棒了！很高兴您喜欢。愿意在 Google 上为我们留下 5 星好评吗？",
+        gating_high_msg: "🎉 太棒了！很高兴您喜欢。欢迎在以下平台上为我们留下 5 星好评：",
         gating_low_title: "您的宝贵意见对我们非常重要！",
         gating_low_msg: "您可以直接将建议或遇到的问题发送给我们的管理人员：",
-        btn_google_review: "在 Google 上评价",
+        btn_google_review: "在 Google 上给 5 星好评",
+        btn_yandex_review: "在 Yandex 上评价",
+        btn_tripadvisor_review: "在 TripAdvisor 上评价",
         google_perfect: "Google 上的绝佳评价",
         yandex_perfect: "Yandex 上的绝佳评价",
         btn_inspect: "查看",
@@ -460,12 +478,14 @@ const i18n = {
         table_available: "目前有 {N} 张空桌，欢迎光临！",
         table_full: "目前所有餐桌均已客满。",
         table_offline: "无法获取餐桌状态。",
+        text_group_events: "<strong>团体与私人活动：</strong> 如需非营业时间的团体预订或私人活动，请 <a href='https://wa.me/905456301214' target='_blank' style='color:#059669; font-weight:700; text-decoration:underline;'>通过 WhatsApp 联系我们</a>。",
         review_1: "一个美妙的、充满历史感的地方，在这里可以逃离Istiklal的喧嚣，稍作喘息。他们的比萨堪称传奇！",
         review_2: "你一定要尝尝Çakallı menemen。员工都面带微笑，而且这里对宠物很友好，真是太棒了。",
         review_3: "Galata喝咖啡和吃甜点的最佳去处。员工非常周到。",
         title_location: "地点",
         title_contact: "联系与位置",
         title_gallery: "氛围与口味",
+        badge_historic_tr: "历史悠久的土耳其咖啡馆",
         badge_halal: "100% 清真",
         badge_quality: "最高品质",
         badge_price: "价格合理",
@@ -681,6 +701,18 @@ async function fetchWebSettings() {
             if (gatingWp) {
                 gatingWp.href = `https://wa.me/${data.phone}?text=Merhaba,%20Fırınna%20hakkında%20geri%20bildirimde%20bulunmak%20istiyorum.`;
             }
+        }
+        if (data.google_review_url) {
+            const el = document.getElementById('gating_google_btn');
+            if (el) el.href = data.google_review_url;
+        }
+        if (data.yandex_review_url) {
+            const el = document.getElementById('gating_yandex_btn');
+            if (el) el.href = data.yandex_review_url;
+        }
+        if (data.tripadvisor_review_url) {
+            const el = document.getElementById('gating_tripadvisor_btn');
+            if (el) el.href = data.tripadvisor_review_url;
         }
     } catch (err) {
         console.error("Failed to fetch settings:", err);

@@ -110,31 +110,23 @@
                     </div>
 
                     <div class="order-actions">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
                             <button class="btn btn-warning" onclick="openDiscountModal()">🏷️ İndirim</button>
                             <button class="btn btn-success" onclick="openPaymentModal()">💰 Hesap Öde</button>
+                            <button class="btn" style="background:#38a169;color:white;" onclick="openQuickPay()">⚡ Hızlı Öde</button>
                         </div>
-                        <div style="font-weight: bold; margin-bottom: 0.5rem; color: #4a5568;">📄 Sipariş Fişi</div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                            <button class="btn" onclick="previewReceipt()" style="background:#4299e1;color:white;">👁️ Önizle</button>
-                            <button class="btn btn-secondary" onclick="printReceipt()">🖨️ Yazdır</button>
-                        </div>
-                        <div style="font-weight: bold; margin-bottom: 0.5rem; color: #4a5568;">👨‍🍳 Mutfak Fişi</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                            <button class="btn" onclick="previewKitchen()" style="background:#48bb78;color:white;">👁️ Önizle</button>
-                            <button class="btn" onclick="printKitchen()" style="background:#38a169;color:white;">🖨️ Yazdır</button>
-                        </div>
-                        <div style="margin-bottom: 1rem;">
-                            <button class="btn" onclick="previewReceiptPDF()" style="background:#ed8936;color:white;width:100%;" title="Müşteri fişi önizle / PDF kaydet">📄 PDF Fiş Kaydet</button>
+                            <button class="btn" onclick="printKitchen()" style="background:#d69e2e;color:white;">👨‍🍳 Mutfak Fişi</button>
+                            <button class="btn" onclick="printReceipt()" style="background:#d69e2e;color:white;">📄 Sipariş Fişi</button>
                         </div>
                         <button class="btn" onclick="cancelOrder()" style="background:#f56565;color:white;width:100%;">🗑️ Fiş İptal</button>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
-                            <button class="btn" onclick="openTransferModal()" style="background:#667eea;color:white;" title="Tüm masayı taşı">↔ Masayı Taşı</button>
-                            <button class="btn" onclick="openItemTransferModal()" style="background:#4c51bf;color:white;" title="Seçilen ürünleri taşı">↔ Ürün Aktar</button>
+                            <button class="btn" onclick="openTransferModal()" style="background:#718096;color:white;" title="Tüm masayı taşı">↔ Masayı Taşı</button>
+                            <button class="btn" onclick="openItemTransferModal()" style="background:#718096;color:white;" title="Seçilen ürünleri taşı">↔ Ürün Aktar</button>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
-                            <button class="btn" onclick="openMergeModal()" style="background:#ed8936;color:white;" title="Siparişleri Birleştir">⊕ Birleştir</button>
-                            <button class="btn" onclick="promptSplitTable()" style="background:#00b4d8;color:white;" title="Alt masa oluşturarak masayı böl">✂ Masayı Böl</button>
+                            <button class="btn" onclick="openMergeModal()" style="background:#718096;color:white;" title="Siparişleri Birleştir">⊕ Birleştir</button>
+                            <button class="btn" onclick="promptSplitTable()" style="background:#718096;color:white;" title="Alt masa oluşturarak masayı böl">✂ Masayı Böl</button>
                         </div>
 
                         </div>
@@ -486,7 +478,7 @@
     </div>
 
     <!-- Quick Pay Mini Modal -->
-    <div id="quickPayModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+    <div id="quickPayModal" onclick="if(event.target===this) closeQuickPay()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
         <div style="background:var(--surface);border-radius:var(--r-xl);padding:1.75rem;width:100%;max-width:340px;box-shadow:var(--s-lg);border:1px solid var(--border);">
             <div style="font-size:1rem;font-weight:700;margin-bottom:.3rem;">Hızlı Ödeme</div>
             <div id="quickPayAmount" style="font-size:1.8rem;font-weight:800;color:var(--ink);margin-bottom:1.25rem;">0.00 ₺</div>
@@ -856,11 +848,11 @@
                                 ${renderTable(m1, 'bp-table-1')}
                                 ${renderTable(m4, 'bp-table-4')}
                             </div>
-                            <div class="blueprint-side" style="position:relative; ${tkwStatusStyle}" onclick="openTable(${tkw ? tkw.id : 9}, 'TakeAway')">
-                                ${tkwDur ? `<span class="dur-badge ${tkwDur.cls}" style="position:absolute; top:-10px; right:-10px; padding:4px 8px; border-radius:20px; font-size:0.8rem; font-weight:bold;">${tkwDur.text}</span>` : ''}
+                            <div class="blueprint-side" style="${tkwStatusStyle}" onclick="openTable(${tkw ? tkw.id : 9}, 'TakeAway')">
+                                ${tkwDur ? `<span class="dur-badge ${tkwDur.cls}">${tkwDur.text}</span>` : ''}
                                 <div class="icon">🥡</div>
                                 <div>Gel-Al</div>
-                                ${tkwHasOrder ? `<div style="color:#e53e3e;font-size:1rem;margin-top:5px;">${fmtTL(tkw.order_total||0)}</div>` : ''}
+                                ${tkwHasOrder ? `<div style="font-size:0.85rem; font-weight:bold; color:var(--ink); margin-top:0.25rem;">${fmtTL(tkw.order_total||0)}</div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -2528,11 +2520,46 @@ async function cancelOrder() {
             const r = await fetch(`/api/orders/${currentOrder.id}`, { method: 'DELETE' });
             const d = await r.json();
             if (!d.success) { showToast('Silme hatası: ' + (d.error||'bilinmeyen'), 'error'); return; }
-        } catch(e) {
-            showToast('Bağlantı hatası: ' + e.message, 'error');
-            return;
+        } catch (e) {
+            showToast('Yazıcıya bağlanılamadı.', 'error');
         }
     }
+
+    async function printOrderDirect(orderId) {
+        try {
+            const res = await fetch(`/api/print/receipt/${orderId}`, {method: 'POST'}).then(r => r.json());
+            if(res.success) showToast('Fiş yazdırıldı', 'success');
+            else showToast('Yazdırma hatası', 'error');
+        } catch (e) {
+            showToast('Yazıcı bağlantı hatası', 'error');
+        }
+    }
+    
+    async function quickPayDirect(orderId, total) {
+        const payType = confirm(`Fiş Toplamı: ${fmtTL(total)}\n\nNAKİT ile hesabı kapatmak için "Tamam" (OK) tıklayın.\nKART ile kapatmak için "İptal" (Cancel) tıklayın.\n\nNot: Bu işlem hesabı anında kapatır!`);
+        const pTypeStr = payType ? 'cash' : 'card';
+        
+        if(!confirm(`Tüm hesap (${fmtTL(total)}) ${pTypeStr==='cash'?'NAKİT':'KREDİ KARTI'} olarak kapatılacak. Onaylıyor musunuz?`)) return;
+        
+        try {
+            await fetch(`/api/orders/${orderId}/close-with-payment`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    payment_cash: pTypeStr === 'cash' ? total : 0,
+                    payment_card: pTypeStr === 'card' ? total : 0,
+                    tip_amount: 0,
+                    tip_method: 'cash',
+                    closed_at: getCustomDatetime()
+                })
+            });
+            showToast('Hesap başarıyla kapatıldı!', 'success');
+            refreshZone();
+        } catch(e) {
+            showToast('Hesap kapatılamadı', 'error');
+        }
+    }
+
     // Boş kalıntıları da temizle
     await fetch('/api/orders/cleanup-empty', { method: 'POST' });
 
