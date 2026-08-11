@@ -444,10 +444,17 @@ const i18n = {
 
 function trackEvent(eventName) {
     try {
+        const payload = {
+            event: eventName,
+            userAgent: navigator.userAgent,
+            language: navigator.language,
+            referrer: document.referrer,
+            screenWidth: window.innerWidth
+        };
         fetch('/api/web/track-visit', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({event: eventName})
+            body: JSON.stringify(payload)
         });
     } catch(e) {}
 }
@@ -468,26 +475,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-function changeLanguage(event, lang) {
+function changeLang(lang) {
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (i18n[lang] && i18n[lang][key]) {
-            // Use innerHTML instead of innerText to support line breaks (\n) if present
             el.innerHTML = i18n[lang][key].replace(/\n/g, "<br>");
         }
     });
 
-    // Handle RTL for Arabic
     if (lang === 'ar') {
         document.body.style.direction = 'rtl';
     } else {
         document.body.style.direction = 'ltr';
     }
     
-    // Update active button state
-    document.querySelectorAll('.lang-selector button').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    document.querySelectorAll('.lang-selector button').forEach(btn => {
+        if(btn.innerText.toLowerCase() === lang) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    // Update PDF download link if present
+    const pdfLink = document.getElementById('pdf-download-link');
+    if (pdfLink) {
+        pdfLink.href = `firinna_menu_${lang}.pdf`;
+    }
 }
 
 // FETCH SETTINGS
@@ -509,7 +524,13 @@ async function fetchWebSettings() {
                 element.parentElement.style.color = '#059669';
                 return;
             } else if (manualStatus === 'closed') {
-                const closedUntil = settingsData.closed_until || 'Belirsiz';
+                let closedUntil = settingsData.closed_until || 'Belirsiz';
+                if(closedUntil !== 'Belirsiz' && closedUntil.includes('T')) {
+                    const d = new Date(closedUntil);
+                    if(!isNaN(d)) {
+                        closedUntil = d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' }) + ' ' + d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute:'2-digit' });
+                    }
+                }
                 element.innerHTML = `<span class="pulse-dot" style="background:#ef4444; box-shadow:none; animation:none;"></span> Kapalı (Açılış: ${closedUntil})`;
                 element.parentElement.style.background = '#fef2f2';
                 element.parentElement.style.color = '#dc2626';

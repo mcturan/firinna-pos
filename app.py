@@ -2444,7 +2444,13 @@ def track_visit():
             with open(analytics_file, 'r') as f:
                 stats = json.load(f)
         else:
-            stats = {"today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0, "last_date": ""}
+            stats = {
+                "today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0, "last_date": "",
+                "devices": {"Mobil": 0, "Masaüstü": 0},
+                "browsers": {},
+                "countries": {},
+                "referrers": {"Direkt Giriş": 0, "Google": 0, "Instagram": 0, "Diğer": 0}
+            }
             
         import datetime
         today_str = datetime.date.today().isoformat()
@@ -2458,10 +2464,42 @@ def track_visit():
         data = request.json or {}
         event = data.get('event', 'pageview')
         
+        # Sadece yeni bir sayfa görüntülemesinde detayları topla
         if event == 'pageview':
             stats["today"] += 1
             stats["month"] += 1
             stats["total"] += 1
+            
+            # Cihaz Tespiti
+            ua = data.get('userAgent', '').lower()
+            if 'mobi' in ua or 'android' in ua or 'iphone' in ua:
+                stats.setdefault("devices", {})["Mobil"] = stats.get("devices", {}).get("Mobil", 0) + 1
+            else:
+                stats.setdefault("devices", {})["Masaüstü"] = stats.get("devices", {}).get("Masaüstü", 0) + 1
+                
+            # Tarayıcı Tespiti
+            browser = "Diğer"
+            if 'chrome' in ua and 'edg' not in ua: browser = "Chrome"
+            elif 'safari' in ua and 'chrome' not in ua: browser = "Safari"
+            elif 'firefox' in ua: browser = "Firefox"
+            elif 'edg' in ua: browser = "Edge"
+            elif 'instagram' in ua: browser = "Instagram App"
+            stats.setdefault("browsers", {})[browser] = stats.get("browsers", {}).get(browser, 0) + 1
+            
+            # Dil / Ülke Tespiti (Proxy olarak)
+            lang = (data.get('language') or 'tr-TR').upper()[:2]
+            country_map = {"TR": "Türkiye", "EN": "İngiltere/ABD", "AR": "Arap Ülkeleri", "RU": "Rusya", "ZH": "Çin"}
+            c_name = country_map.get(lang, lang)
+            stats.setdefault("countries", {})[c_name] = stats.get("countries", {}).get(c_name, 0) + 1
+            
+            # Referans Kaynağı
+            ref = (data.get('referrer') or '').lower()
+            ref_name = "Direkt Giriş"
+            if 'google' in ref: ref_name = "Google"
+            elif 'instagram' in ref: ref_name = "Instagram"
+            elif ref != '': ref_name = "Diğer"
+            stats.setdefault("referrers", {})[ref_name] = stats.get("referrers", {}).get(ref_name, 0) + 1
+            
         elif event == 'menu':
             stats["menu"] = stats.get("menu", 0) + 1
         elif event == 'action':
