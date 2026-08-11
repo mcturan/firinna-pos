@@ -118,25 +118,94 @@
         <!-- SAĞ KOLON: İçerik (Galeri, Hakkımızda, Yorumlar, Sanal Tur vb.) -->
         <main class="right-col">
             
-            <!-- Galeri -->
+            <!-- Galeri (İç Mekan, Dış Mekan & Lezzetler) -->
             <div class="card gallery-card">
-                <h2 class="card-title" data-i18n="title_gallery">Ortam & Lezzetler</h2>
-                <div class="gallery-grid">
-                    <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80" alt="Cafe İç Mekan" class="gallery-img">
-                    <img src="https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?auto=format&fit=crop&w=400&q=80" alt="Türk Kahvesi" class="gallery-img">
-                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80" alt="Pizza" class="gallery-img">
-                    <img src="https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=400&q=80" alt="Menemen" class="gallery-img">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <h2 class="card-title" style="margin-bottom: 0;" data-i18n="title_gallery">Ortam & Lezzetler</h2>
+                    <a href="https://maps.google.com/?q=Firinna" target="_blank" style="font-size: 0.85rem; background: rgba(66, 133, 244, 0.1); color: #2563eb; padding: 6px 14px; border-radius: 20px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="ph-fill ph-google-logo"></i> Google Haritalar'daki Tüm Fotoğrafları Gör (100+) <i class="ph-bold ph-arrow-square-out"></i>
+                    </a>
+                </div>
+
+                <!-- 1. İÇ MEKAN (3 FOTOĞRAF) -->
+                <h4 style="font-size: 1rem; color: var(--primary-dark); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                    <i class="ph-fill ph-house-line"></i> İç Mekan & Atmosfer (3 Fotoğraf)
+                </h4>
+                <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="gallery_interior.jpg" alt="150 Yıllık Tarihi Galata İç Mekanı" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Tarihi İç Mekan</span>
+                    </div>
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80" alt="Galata Ahşap Masalar" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Sıcak Masalar</span>
+                    </div>
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80" alt="Barista & Detaylar" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Mekan Detayları</span>
+                    </div>
+                </div>
+
+                <!-- 2. DIŞ MEKAN (3 FOTOĞRAF) -->
+                <h4 style="font-size: 1rem; color: var(--primary-dark); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                    <i class="ph-fill ph-map-pin"></i> Dış Mekan & Kumbaracı Yokuşu (3 Fotoğraf)
+                </h4>
+                <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?auto=format&fit=crop&w=600&q=80" alt="Kumbaracı Yokuşu Sokağı" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Kumbaracı Yokuşu</span>
+                    </div>
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=600&q=80" alt="Galata Sokak Masaları" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Dış Masa Alanı</span>
+                    </div>
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=600&q=80" alt="Tarihi Galata Cephesi" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Tarihi Binası</span>
+                    </div>
+                </div>
+
+                <!-- 3. İMZA LEZZETLER (6 FOTOĞRAF) -->
+                <h4 style="font-size: 1rem; color: var(--primary-dark); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                    <i class="ph-fill ph-fork-knife"></i> İmza Lezzetlerimiz (6 Fotoğraf)
+                </h4>
+                <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px;">
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1579954115545-a95591f28bfc?auto=format&fit=crop&w=600&q=80" alt="Demleme Çay" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Taze Çay</span>
+                    </div>
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80" alt="Türk Kahvesi" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Türk Kahvesi</span>
+                    </div>
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80" alt="Tava Menemen" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Tava Menemen</span>
+                    </div>
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80" alt="Taş Fırın Pizza" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Taş Fırın Pizza</span>
+                    </div>
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80" alt="Limonata" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Ev Yapımı Limonata</span>
+                    </div>
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px;">
+                        <img src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=600&q=80" alt="Sıcak Glintwein" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">Sıcak Glintwein</span>
+                    </div>
                 </div>
             </div>
-
-            <!-- Hakkımızda -->
             <div class="card about-card">
                 <h2 class="card-title" data-i18n="title_about">Hakkımızda</h2>
-                <p class="about-text" data-i18n="text_about">
-                    DEĞERLI MISAFIRIMIZ, FIRINNA'YA HOŞ GELDINIZ.<br><br>
-                    TÜM ÜRÜNLERIMIZ; EN SEÇKIN MALZEMELERLE, GELENEKSEL TARIFLERE FIRINNA DOKUNUŞLARIYLA EV YAPIMI HAZIRLANMAKTADIR.<br><br>
-                    BURADA ACELE YOK - 150 YILLIK YAPININ SICAKLIĞINDA LEZZETIN, HUZURUN, SOHBETIN VE GÜZEL ANLARIN TADINI ÇIKARIN.<br><br>
-                    TARIHI İSTANBUL GEZINIZDE LEZZETLI VE HUZURLU BIR ANI OLABILIRSEK NE MUTLU BIZE.
+                <div class="about-slogan" data-i18n="slogan_about" style="font-weight: 800; font-size: 1.15rem; color: #d97706; text-transform: uppercase; margin-bottom: 16px; border-left: 4px solid #d97706; padding-left: 12px; letter-spacing: 0.5px;">
+                    GELENEKSEL TATLARA BENZERSİZ DOKUNUŞLAR
+                </div>
+                <p class="about-text" data-i18n="text_about" style="line-height: 1.7;">
+                    DEĞERLİ MİSAFİRİMİZ, FIRINNA'YA HOŞ GELDİNİZ.<br><br>
+                    Galata’nın 150 yıllık büyüleyici ve tarihi dokusunda, Kumbaracı Yokuşu'nun huzur veren atmosferinde yer alan Fırınna Cafe & Restaurant; İstiklal’in gürültüsünden kaçıp nefes alabileceğiniz özel bir lezzet durağıdır.<br><br>
+                    Özenle seçilmiş malzemelerimiz, fırınımızdan çıkan taze lezzetlerimiz, leziz kahve çeşitlerimiz ve ev yapımı tatlılarımızla geleneksel tarifleri modern dokunuşlarla sunuyoruz.<br><br>
+                    Burada acele yok! Samimi, misafirperver ve evcil hayvan dostu ekibimizle, 150 yıllık bu tarihi yapının sıcaklığında güzel sohbetlerin ve huzurlu anların tadını çıkarın. Tarihi İstanbul gezinizde tatlı bir anı olabilmek bizim en büyük mutluluğumuz.
                 </p>
             </div>
 
@@ -176,6 +245,42 @@
                         <a href="https://yandex.com.tr/harita/?text=Firinna" target="_blank" class="btn btn-primary" style="background: #FF0000; border:none; display: inline-flex; width: auto; padding: 10px 24px; font-size: 0.95rem; border-radius: 30px;">
                             İncele
                         </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review Gating (Akıllı Puanlama Filtresi) -->
+            <div class="card review-gating-card" style="background: #ffffff; border: 1px solid #e2e8f0; text-align: center; padding: 24px; margin-bottom: 24px;">
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;" data-i18n="title_gating">Deneyiminizi Puanlayın</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;" data-i18n="sub_gating">Fırınna deneyiminiz nasıldı? Görüşleriniz bizim için çok kıymetli.</p>
+                
+                <div class="interactive-stars" style="font-size: 2.2rem; color: #cbd5e1; cursor: pointer; display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;">
+                    <i class="ph-fill ph-star" data-star="1" onclick="rateExperience(1)"></i>
+                    <i class="ph-fill ph-star" data-star="2" onclick="rateExperience(2)"></i>
+                    <i class="ph-fill ph-star" data-star="3" onclick="rateExperience(3)"></i>
+                    <i class="ph-fill ph-star" data-star="4" onclick="rateExperience(4)"></i>
+                    <i class="ph-fill ph-star" data-star="5" onclick="rateExperience(5)"></i>
+                </div>
+
+                <!-- 5 Yıldız Sonuç Box -->
+                <div id="gating-high" style="display: none; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 8px;">
+                    <p style="color: #166534; font-weight: 700; margin-bottom: 12px;" data-i18n="gating_high_msg">🎉 Harika! Beğenmenize çok sevindik. Bize Google'da 5 yıldız vererek destek olmak ister misiniz?</p>
+                    <a href="https://maps.google.com/?q=Firinna" target="_blank" class="btn btn-primary" style="background: #4285F4; border: none; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="ph-fill ph-google-logo"></i> <span data-i18n="btn_google_review">Google'da Değerlendir</span>
+                    </a>
+                </div>
+
+                <!-- 1-4 Yıldız Sonuç Box -->
+                <div id="gating-low" style="display: none; background: #fffbebf; border: 1px solid #fef3c7; padding: 16px; border-radius: 8px;">
+                    <p style="color: #92400e; font-weight: 700; margin-bottom: 8px;" data-i18n="gating_low_title">Görüşleriniz Bizim İçin Çok Değerli!</p>
+                    <p style="color: #b45309; font-size: 0.9rem; margin-bottom: 12px;" data-i18n="gating_low_msg">Yaşadığınız aksaklığı veya önerinizi doğrudan işletme yöneticimize iletebilirsiniz:</p>
+                    <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                        <a href="https://wa.me/905456301214?text=Merhaba,%20Fırınna%20hakkında%20geri%20bildirimde%20bulunmak%20istiyorum." id="dynamic_gating_whatsapp" target="_blank" class="btn" style="background: #25D366; color: white; border: none; padding: 8px 16px; font-size: 0.9rem;">
+                            <i class="ph-fill ph-whatsapp-logo"></i> WhatsApp Yöneticisi
+                        </a>
+                        <button onclick="openModal('msgModal')" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">
+                            <i class="ph-fill ph-paper-plane-tilt"></i> Mesaj Gönder
+                        </button>
                     </div>
                 </div>
             </div>

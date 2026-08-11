@@ -153,8 +153,15 @@ const i18n = {
         btn_reserve: "Hemen Masa Ayırt",
         btn_message: "Bize Mesaj Gönder",
         title_about: "Hakkımızda",
-        text_about: "DEĞERLI MISAFIRIMIZ, FIRINNA'YA HOŞ GELDINIZ.\n\nTÜM ÜRÜNLERIMIZ; EN SEÇKIN MALZEMELERLE, GELENEKSEL TARIFLERE FIRINNA DOKUNUŞLARIYLA EV YAPIMI HAZIRLANMAKTADIR.\n\nBURADA ACELE YOK - 150 YILLIK YAPININ SICAKLIĞINDA LEZZETIN, HUZURUN, SOHBETIN VE GÜZEL ANLARIN TADINI ÇIKARIN.\n\nTARIHI İSTANBUL GEZINIZDE LEZZETLI VE HUZURLU BIR ANI OLABILIRSEK NE MUTLU BIZE.",
+        slogan_about: "GELENEKSEL TATLARA BENZERSİZ DOKUNUŞLAR",
+        text_about: "DEĞERLİ MİSAFİRİMİZ, FIRINNA'YA HOŞ GELDİNİZ.\n\nGalata’nın 150 yıllık büyüleyici ve tarihi dokusında, Kumbaracı Yokuşu'nun huzur veren atmosferinde yer alan Fırınna Cafe & Restaurant; İstiklal’in gürültüsünden kaçıp nefes alabileceğiniz özel bir lezzet durağıdır.\n\nÖzenle seçilmiş malzemelerimiz, fırınımızdan çıkan taze lezzetlerimiz, leziz kahve çeşitlerimiz ve ev yapımı tatlılarımızla geleneksel tarifleri modern dokunuşlarla sunuyoruz.\n\nBurada acele yok! Samimi, misafirperver ve evcil hayvan dostu ekibimizle, 150 yıllık bu tarihi yapının sıcaklığında güzel sohbetlerin ve huzurlu anların tadını çıkarın. Tarihi İstanbul gezinizde tatlı bir anı olabilmek bizim en büyük mutluluğumuz.",
         title_top_reviews: "Müşterilerimizin Gözünden",
+        title_gating: "Deneyiminizi Puanlayın",
+        sub_gating: "Fırınna deneyiminiz nasıldı? Görüşleriniz bizim için çok kıymetli.",
+        gating_high_msg: "🎉 Harika! Beğenmenize çok sevindik. Bize Google'da 5 yıldız vererek destek olmak ister misiniz?",
+        gating_low_title: "Görüşleriniz Bizim İçin Çok Değerli!",
+        gating_low_msg: "Yaşadığınız aksaklığı veya önerinizi doğrudan işletme yöneticimize iletebilirsiniz:",
+        btn_google_review: "Google'da Değerlendir",
         review_1: "İstiklal'in gürültüsünden kaçıp nefes alabileceğiniz harika, tarihi bir mekan. Pizzaları efsane!",
         review_2: "Çakallı menemenini denemelisiniz. Personel çok güleryüzlü ve evcil hayvan dostu olmaları harika.",
         review_3: "Galata'da kahve içip tatlı yemek için en iyi nokta. Çalışanlar çok ilgili.",
@@ -195,8 +202,8 @@ const i18n = {
         desc_menemen: "Sadece sarısıyla hazırlanan, bol kaşarlı ve tereyağlı, yöresel lezzetiyle kahvaltıların efsanesi.",
         item_toast: "Fırında Bazlama Tost",
         desc_toast: "Köy ekmeği arasında kaşar peyniri ve özel sucuk/kavurma ile taş fırında çıtır çıtır servis edilir.",
-        item_coffee: "Közde Türk Kahvesi",
-        desc_coffee: "150 yıllık atmosferde, bakır cezvede ağır ağır pişen, lokum eşliğinde servis edilen klasik lezzet.",
+        item_coffee: "Geleneksel Türk Kahvesi",
+        desc_coffee: "150 yıllık atmosferde özenle demlenen, lokum eşliğinde servis edilen klasik lezzet.",
         item_tea: "İmza: Gül Yapraklı Çay",
         desc_tea: "Özel harman çayımızın içine katılan taze kurutulmuş gül yapraklarıyla inanılmaz bir aroma şöleni.",
         item_cake: "Çikolata Soslu Sıcak Kek",
@@ -213,8 +220,15 @@ const i18n = {
         btn_reserve: "Book a Table",
         btn_message: "Send us a Message",
         title_about: "About Us",
-        text_about: "DEAR GUEST, WELCOME TO FIRINNA.\n\nALL OUR PRODUCTS ARE HOMEMADE WITH THE MOST EXCLUSIVE INGREDIENTS, BLENDING TRADITIONAL RECIPES WITH FIRINNA'S SPECIAL TOUCH.\n\nTHERE IS NO RUSH HERE - ENJOY TASTE, PEACE, CONVERSATION, AND BEAUTIFUL MOMENTS IN THE WARMTH OF OUR 150-YEAR-OLD BUILDING.\n\nWE WOULD BE DELIGHTED TO BE A DELICIOUS AND PEACEFUL MEMORY IN YOUR HISTORIC ISTANBUL TRIP.",
+        slogan_about: "UNIQUE TOUCHES TO TRADITIONAL FLAVORS",
+        text_about: "DEAR GUEST, WELCOME TO FIRINNA.\n\nLocated in the 150-year-old historic atmosphere of Galata, right on the peaceful Kumbaracı Yokuşu, Fırınna Cafe & Restaurant is a special culinary haven where you can step away from the bustle of Istiklal Street and take a refreshing breath.\n\nWith carefully selected ingredients, fresh oven-baked specialties, rich coffee varieties, and homemade desserts, we bring traditional recipes to life with modern touches.\n\nThere is no rush here! With our friendly, hospitable, and pet-friendly team, enjoy warm conversations and peaceful moments in the ambiance of our 150-year-old historic building. We would be delighted to be a sweet memory of your historic trip to Istanbul.",
         title_top_reviews: "From Our Customers",
+        title_gating: "Rate Your Experience",
+        sub_gating: "How was your experience at Firinna? Your feedback means a lot to us.",
+        gating_high_msg: "🎉 Wonderful! We're glad you enjoyed it. Would you like to support us with a 5-star review on Google?",
+        gating_low_title: "Your Feedback is Very Valuable to Us!",
+        gating_low_msg: "You can send any feedback or issues directly to our manager:",
+        btn_google_review: "Review on Google",
         review_1: "A wonderful, historic place to escape the noise of Istiklal and take a breath. Their pizzas are legendary!",
         review_2: "You must try the Çakallı menemen. The staff is very smiling and it's great that they are pet-friendly.",
         review_3: "The best spot in Galata for coffee and desserts. The staff is very attentive.",
@@ -255,8 +269,8 @@ const i18n = {
         desc_menemen: "Prepared only with egg yolks, plenty of cheddar and butter, a legendary regional breakfast taste.",
         item_toast: "Baked Bazlama Toast",
         desc_toast: "Served crispy from the stone oven with cheddar cheese and special sausage/beef between village bread.",
-        item_coffee: "Turkish Coffee on Embers",
-        desc_coffee: "A classic taste slowly brewed in a copper pot in a 150-year-old atmosphere, served with Turkish delight.",
+        item_coffee: "Traditional Turkish Coffee",
+        desc_coffee: "A classic taste carefully brewed in a 150-year-old atmosphere, served with Turkish delight.",
         item_tea: "Signature: Rose Petal Tea",
         desc_tea: "An incredible feast of aromas with freshly dried rose petals added to our special blend tea.",
         item_cake: "Hot Cake with Chocolate Sauce",
@@ -273,8 +287,15 @@ const i18n = {
         btn_reserve: "Забронировать столик",
         btn_message: "Напишите нам",
         title_about: "О нас",
-        text_about: "ДОРОГОЙ ГОСТЬ, ДОБРО ПОЖАЛОВАТЬ В FIRINNA.\n\nВСЕ НАШИ ПРОДУКТЫ ГОТОВЯТСЯ ПО-ДОМАШНЕМУ ИЗ САМЫХ ИЗЫСКАННЫХ ИНГРЕДИЕНТОВ, СОЧЕТАЯ ТРАДИЦИОННЫЕ РЕЦЕПТЫ С ОСОБЫМ ПОДХОДОМ FIRINNA.\n\nЗДЕСЬ НЕТ СПЕШКИ - НАСЛАЖДАЙТЕСЬ ВКУСОМ, ПОКОЕМ, БЕСЕДОЙ И ПРЕКРАСНЫМИ МГНОВЕНИЯМИ В ТЕПЛЕ НАШЕГО 150-ЛЕТНЕГО ЗДАНИЯ.\n\nМЫ БУДЕМ СЧАСТЛИВЫ СТАТЬ ВКУСНЫМ И СПОКОЙНЫМ ВОСПОМИНАНИЕМ О ВАШЕМ ПУТЕШЕСТВИИ ПО ИСТОРИЧЕСКОМУ СТАМБУЛУ.",
+        slogan_about: "УНИКАЛЬНЫЙ ШТРИХ К ТРАДИЦИОННЫМ ВКУСАМ",
+        text_about: "ДОРОГОЙ ГОСТЬ, ДОБРО ПОЖАЛОВАТЬ В FIRINNA.\n\nРасположенное в 150-летнем историческом здании в районе Галата, на уютной улочке Кумбараджи Йокушу, кафе-ресторан Fırınna — это особенный уголок, где можно отдохнуть от шума улицы Истикляль.\n\nКак часто отмечают наши гости в отзывах Google: мы предлагаем традиционные рецепты с фирменными штрихами Fırınna — хрустящую пиццу из дровяной каменной печи, знаменитый менемен Чакаллы, горячие тосты на домашнем хлебе и турецкий кофе на углях в медной джезве.\n\nЗдесь нет спешки! С нашей радушной и pet-friendly командой наслаждайтесь теплым общением и незабываемыми вкусами.",
         title_top_reviews: "Отзывы клиентов",
+        title_gating: "Оцените ваш визит",
+        sub_gating: "Как вам отдых в Firinna? Ваше мнение очень важно для нас.",
+        gating_high_msg: "🎉 Замечательно! Будем благодарны за 5 звезд в Google!",
+        gating_low_title: "Ваше мнение очень важно для нас!",
+        gating_low_msg: "Вы можете отправить ваш отзыв напрямую нашему управляющему:",
+        btn_google_review: "Оценить в Google",
         review_1: "Замечательное, историческое место, где можно спрятаться от шума Истикляля и перевести дух. Их пицца легендарна!",
         review_2: "Вы должны попробовать менемен Чакаллы. Персонал очень улыбчивый, и здорово, что к ним можно с питомцами.",
         review_3: "Лучшее место в Галате для кофе и десертов. Персонал очень внимателен.",
@@ -313,8 +334,8 @@ const i18n = {
         desc_menemen: "Легендарный региональный вкус для завтрака, приготовленный только из яичных желтков, с большим количеством чеддера и сливочного масла.",
         item_toast: "Запеченный тост Базлама",
         desc_toast: "Подается хрустящим из каменной печи с сыром чеддер и особой колбасой/говядиной между ломтиками деревенского хлеба.",
-        item_coffee: "Турецкий кофе на углях",
-        desc_coffee: "Классический вкус, медленно завариваемый в медной турке в атмосфере со 150-летней историей, подается с рахат-лукумом.",
+        item_coffee: "Традиционный турецкий кофе",
+        desc_coffee: "Классический вкус, бережно завариваемый в атмосфере со 150-летней историей, подается с рахат-лукумом.",
         item_tea: "Фирменный: Чай с лепестками роз",
         desc_tea: "Невероятный праздник ароматов со свежевысушенными лепестками роз, добавленными в наш особый купажированный чай.",
         item_cake: "Горячий кекс с шоколадным соусом",
@@ -331,8 +352,15 @@ const i18n = {
         btn_reserve: "احجز طاولة",
         btn_message: "ارسل لنا رسالة",
         title_about: "معلومات عنا",
-        text_about: "ضيفنا العزيز، مرحباً بك في FIRINNA.\n\nجميع منتجاتنا محلية الصنع باستخدام أفخر المكونات، وتجمع بين الوصفات التقليدية ولمسة FIRINNA الخاصة.\n\nلا عجلة هنا - استمتع بالطعم والسلام والمحادثة واللحظات الجميلة في دفء مبنانا الذي يبلغ عمره 150 عامًا.\n\nيسعدنا أن نكون ذكرى لذيذة وهادئة في رحلتك التاريخية إلى اسطنبول.",
+        slogan_about: "لمسات فريدة على النكهات التقليدية",
+        text_about: "ضيفنا العزيز، أهلاً بك في FIRINNA.\n\nيقع مطعم ومقهى فِرِنّا في أجواء غلاطة التاريخية الممتدة لـ 150 عامًا على منحدر كومباراجي الهادئ، وهو ملاذ رائع للابتعاد عن صخب شارع الاستقلال والاستمتاع بلحظات ممتعة.\n\nكما يُثني ضيوفنا دائمًا في مراجعات جوجل؛ نقدم الوصفات التقليدية بلمسات حديثة مميزة — بدءًا من البيتزا المقرمشة المخبوزة في الفرن الحجري على الخشب، والمناقيش والشكشوكة التركية، إلى القهوة التركية المطهوة بطبقتين على الفحم والشاي ببتلات الورد والحلويات المنزلية الطازجة.\n\nلا يوجد استعجال هنا! مع فريقنا الودود والمستضيف والرحب بالحيوانات الأليفة، استمتع بأجواء 150 عامًا من التاريخ والنكهات الرائعة.",
         title_top_reviews: "من عملائنا",
+        title_gating: "قيم تجربتك",
+        sub_gating: "كيف كانت تجربتك في فِرِنّا؟ رأيك يهمنا كثيراً.",
+        gating_high_msg: "🎉 رائع! نتشرف بدعمك لنا بتقييم 5 نجوم على جوجل!",
+        gating_low_title: "رأيك يهمنا جداً!",
+        gating_low_msg: "يمكنك إرسال ملاحظاتك مباشرة إلى مديرنا:",
+        btn_google_review: "تقييم على جوجل",
         review_1: "مكان تاريخي رائع للهروب من ضجيج الاستقلال وأخذ قسط من الراحة. البيتزا الخاصة بهم أسطورية!",
         review_2: "يجب أن تجرب مينيمين تشاكالي. الموظفون مبتسمون للغاية ومن الرائع أنهم يسمحون بالحيوانات الأليفة.",
         review_3: "أفضل مكان في غلطة لتناول القهوة والحلويات. فريق العمل مهتم جدا.",
@@ -371,8 +399,8 @@ const i18n = {
         desc_menemen: "محضر فقط بصفار البيض والكثير من الشيدر والزبدة، طعم إفطار إقليمي أسطوري.",
         item_toast: "توست بازلاما مخبوز",
         desc_toast: "يقدم مقرمشاً من فرن الحجر مع جبن الشيدر والسجق/اللحم البقري الخاص بين خبز القرية.",
-        item_coffee: "قهوة تركية على الجمر",
-        desc_coffee: "طعم كلاسيكي يخمر ببطء في وعاء نحاسي في جو يمتد لـ 150 عاماً، يقدم مع راحة الحلقوم التركية.",
+        item_coffee: "قهوة تركية تقليدية",
+        desc_coffee: "طعم كلاسيكي يخمر بعناية في جو يمتد لـ 150 عاماً، يقدم مع راحة الحلقوم التركية.",
         item_tea: "مميز: شاي بتلات الورد",
         desc_tea: "مهرجان مذهل من الروائح مع بتلات الورد المجففة حديثاً المضافة إلى مزيج الشاي الخاص بنا.",
         item_cake: "كيك ساخن مع صلصة الشوكولاتة",
@@ -389,8 +417,15 @@ const i18n = {
         btn_reserve: "预订餐桌",
         btn_message: "给我们留言",
         title_about: "关于我们",
-        text_about: "尊贵的客人们，欢迎来到 FIRINNA。\n\n我们所有的产品都是自制的，采用最独特的原料，将传统配方与 FIRINNA 的特殊触感相结合。\n\n在这里无需匆忙 - 在我们 150 年历史的建筑的温暖中享受美味、宁静、对话和美好时光。\n\n如果您在伊斯坦布尔的历史之旅中，我们能成为一个美味和平和的回忆，我们将非常高兴。",
+        slogan_about: "传统风味的独特创新",
+        text_about: "尊贵的客人们，欢迎来到 FIRINNA。\n\nFırınna 咖啡餐厅位于加拉塔拥有150年历史的建筑之中，地处宁静的 Kumbaracı 巷。这里是避开独立大街喧嚣、享受悠闲时光的绝佳去处。\n\n正如许多顾客在 Google 评价中所盛赞的那样：我们以现代创新融合传统配方——石炉木炭烘烤的松脆披萨、特制土耳其土豆软蛋饼（Menemen）、炭火烘培的传统土耳其咖啡以及玫瑰花瓣香茶与手工甜点。\n\n在这里，无需匆忙！在我们宠物友好的热情服务下，尽情享受这栋150年历史建筑带来的温馨与美妙风味。",
         title_top_reviews: "顾客评价",
+        title_gating: "评价您的体验",
+        sub_gating: "您在 Firinna 的体验如何？您的反馈对我们非常重要。",
+        gating_high_msg: "🎉 太棒了！很高兴您喜欢。愿意在 Google 上为我们留下 5 星好评吗？",
+        gating_low_title: "您的宝贵意见对我们非常重要！",
+        gating_low_msg: "您可以直接将建议或遇到的问题发送给我们的管理人员：",
+        btn_google_review: "在 Google 上评价",
         review_1: "一个美妙的、充满历史感的地方，在这里可以逃离Istiklal的喧嚣，稍作喘息。他们的比萨堪称传奇！",
         review_2: "你一定要尝尝Çakallı menemen。员工都面带微笑，而且这里对宠物很友好，真是太棒了。",
         review_3: "Galata喝咖啡和吃甜点的最佳去处。员工非常周到。",
@@ -429,8 +464,8 @@ const i18n = {
         desc_menemen: "仅用蛋黄，大量的切达干酪和黄油制成，一种传奇的地域性早餐口味。",
         item_toast: "烤 Bazlama 吐司",
         desc_toast: "石炉烤制，酥脆可口，乡村面包中夹有切达干酪和特制香肠/牛肉。",
-        item_coffee: "炭火土耳其咖啡",
-        desc_coffee: "在 150 年历史的氛围中，在铜壶中慢慢煮出的经典口味，搭配土耳其软糖。",
+        item_coffee: "传统土耳其咖啡",
+        desc_coffee: "在 150 年历史的氛围中精心烹制的经典口味，搭配土耳其软糖。",
         item_tea: "招牌：玫瑰花瓣茶",
         desc_tea: "在我们的特制混合茶中加入新鲜干燥的玫瑰花瓣，带来令人难以置信的香气盛宴。",
         item_cake: "热巧克力酱蛋糕",
@@ -602,6 +637,10 @@ async function fetchWebSettings() {
         if (data.phone) {
             document.getElementById('dynamic_whatsapp').href = `https://api.whatsapp.com/send?phone=${data.phone}`;
             document.getElementById('dynamic_phone').href = `tel:+${data.phone}`;
+            const gatingWp = document.getElementById('dynamic_gating_whatsapp');
+            if (gatingWp) {
+                gatingWp.href = `https://wa.me/${data.phone}?text=Merhaba,%20Fırınna%20hakkında%20geri%20bildirimde%20bulunmak%20istiyorum.`;
+            }
         }
     } catch (err) {
         console.error("Failed to fetch settings:", err);
@@ -674,4 +713,65 @@ function showNextReview() {
 document.addEventListener("DOMContentLoaded", () => {
     setInterval(showNextReview, 4000);
 });
+
+// Interactive Review Gating Function
+function rateExperience(stars) {
+    const starIcons = document.querySelectorAll('.interactive-stars i');
+    starIcons.forEach((star, idx) => {
+        if (idx < stars) {
+            star.style.color = '#f59e0b';
+        } else {
+            star.style.color = '#cbd5e1';
+        }
+    });
+
+    const highBox = document.getElementById('gating-high');
+    const lowBox = document.getElementById('gating-low');
+
+    if (stars === 5) {
+        if (highBox) highBox.style.display = 'block';
+        if (lowBox) lowBox.style.display = 'none';
+        trackEvent('review_5star');
+    } else {
+        if (highBox) highBox.style.display = 'none';
+        if (lowBox) lowBox.style.display = 'block';
+        trackEvent('review_lowstar');
+    }
+}
+
+// Gallery Tab Switcher (10 Photos / 5 Videos)
+function switchGalleryTab(tab) {
+    const photosGrid = document.getElementById('gallery-photos-grid');
+    const videosGrid = document.getElementById('gallery-videos-grid');
+    const btnPhotos = document.getElementById('gallery-tab-photos');
+    const btnVideos = document.getElementById('gallery-tab-videos');
+
+    if (tab === 'photos') {
+        if (photosGrid) photosGrid.style.display = 'grid';
+        if (videosGrid) videosGrid.style.display = 'none';
+        if (btnPhotos) {
+            btnPhotos.style.background = 'var(--primary)';
+            btnPhotos.style.color = '#fff';
+            btnPhotos.style.border = 'none';
+        }
+        if (btnVideos) {
+            btnVideos.style.background = 'transparent';
+            btnVideos.style.color = 'var(--text-main)';
+            btnVideos.style.border = '1px solid #cbd5e1';
+        }
+    } else {
+        if (photosGrid) photosGrid.style.display = 'none';
+        if (videosGrid) videosGrid.style.display = 'grid';
+        if (btnVideos) {
+            btnVideos.style.background = 'var(--primary)';
+            btnVideos.style.color = '#fff';
+            btnVideos.style.border = 'none';
+        }
+        if (btnPhotos) {
+            btnPhotos.style.background = 'transparent';
+            btnPhotos.style.color = 'var(--text-main)';
+            btnPhotos.style.border = '1px solid #cbd5e1';
+        }
+    }
+}
 
