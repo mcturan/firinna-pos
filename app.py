@@ -2474,7 +2474,7 @@ def track_visit():
         months_tr = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
         time_str = f"{now_dt.day} {months_tr[now_dt.month - 1]} {now_dt.strftime('%H:%M')}"
         
-        # Cihaz Tespiti
+        # Cihaz & İşletim Sistemi Tespiti
         ua = data.get('userAgent', '').lower()
         if 'ipad' in ua or 'tablet' in ua:
             device_type = "📱 Tablet"
@@ -2482,6 +2482,13 @@ def track_visit():
             device_type = "📱 Mobil"
         else:
             device_type = "💻 Masaüstü"
+            
+        os_name = "Diğer Sistem"
+        if 'iphone' in ua or 'ipad' in ua: os_name = "Apple iOS"
+        elif 'android' in ua: os_name = "Android OS"
+        elif 'windows' in ua: os_name = "Windows PC"
+        elif 'mac os' in ua or 'macintosh' in ua: os_name = "Apple macOS"
+        elif 'linux' in ua: os_name = "Linux"
             
         # Tarayıcı Tespiti
         browser = "Diğer Tarayıcı"
@@ -2496,9 +2503,27 @@ def track_visit():
         country_map = {"TR": "🇹🇷 Türkiye", "EN": "🇬🇧 İngiltere/ABD", "AR": "🇸🇦 Arap Ülkeleri", "RU": "🇷🇺 Rusya", "ZH": "🇨🇳 Çin"}
         c_name = country_map.get(lang, f"🌐 {lang}")
         
+        # Ziyaret Tipi (Yeni vs Tekrar Gelen)
+        is_repeat = data.get('isRepeat', False)
+        visitor_type = "🔄 Tekrar Gelen Misafir" if is_repeat else "✨ Yeni Ziyaretçi"
+
+        # Peak Hours (Giriş Saati Aralığı)
+        hour = now_dt.hour
+        if 8 <= hour < 11: hour_slot = "08:00 - 11:00 (Sabah Kahvaltı)"
+        elif 11 <= hour < 14: hour_slot = "11:00 - 14:00 (Öğle Brunch)"
+        elif 14 <= hour < 17: hour_slot = "14:00 - 17:00 (İkindi Kahve/Tatlı)"
+        elif 17 <= hour < 20: hour_slot = "17:00 - 20:00 (Akşam Yemeği)"
+        elif 20 <= hour < 23: hour_slot = "20:00 - 23:00 (Gece Keyfi)"
+        else: hour_slot = "23:00 - 08:00 (Gece / Erken)"
+
         action_name = "Ana Sayfa İnceleme"
         if event == 'menu': action_name = "📄 PDF Menü İndirme"
         elif event == 'action': action_name = "💬 WhatsApp / İletişim"
+        elif event == 'map': action_name = "🗺️ Harita / Navigasyon Niyeti"
+        elif event == 'item':
+            item_name = data.get('item', 'Özel Lezzet')
+            action_name = f"🍽️ Ürün İnceleme ({item_name})"
+            stats.setdefault("menu_interests", {})[item_name] = stats.get("menu_interests", {}).get(item_name, 0) + 1
 
         # Ziyaretçi Günlükleri (Son 30 Kayıt)
         recent = stats.setdefault("recent_visitors", [])
@@ -2506,9 +2531,10 @@ def track_visit():
             "time": time_str,
             "ip": visitor_ip,
             "country": c_name,
-            "device": device_type,
+            "device": f"{device_type} ({os_name})",
             "browser": browser,
-            "action": action_name
+            "action": action_name,
+            "type": visitor_type
         })
         stats["recent_visitors"] = recent[:30]
 
@@ -2518,9 +2544,16 @@ def track_visit():
             stats["month"] += 1
             stats["total"] += 1
             
+            if is_repeat:
+                stats["repeat_visitors"] = stats.get("repeat_visitors", 0) + 1
+            else:
+                stats["new_visitors"] = stats.get("new_visitors", 0) + 1
+                
             stats.setdefault("devices", {})[device_type] = stats.get("devices", {}).get(device_type, 0) + 1
+            stats.setdefault("os", {})[os_name] = stats.get("os", {}).get(os_name, 0) + 1
             stats.setdefault("browsers", {})[browser] = stats.get("browsers", {}).get(browser, 0) + 1
             stats.setdefault("countries", {})[c_name] = stats.get("countries", {}).get(c_name, 0) + 1
+            stats.setdefault("peak_hours", {})[hour_slot] = stats.get("peak_hours", {}).get(hour_slot, 0) + 1
             
             # Referans Kaynağı
             ref = (data.get('referrer') or '').lower()
@@ -2534,6 +2567,8 @@ def track_visit():
             stats["menu"] = stats.get("menu", 0) + 1
         elif event == 'action':
             stats["actions"] = stats.get("actions", 0) + 1
+        elif event == 'map':
+            stats["map_clicks"] = stats.get("map_clicks", 0) + 1
             
         with open(analytics_file, 'w') as f:
             json.dump(stats, f)

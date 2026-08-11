@@ -111,22 +111,51 @@
 
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
                             <div style="background:#fff; padding:20px; border-radius:8px; border:1px solid #e2e8f0;">
-                                <h4 style="margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;">Ziyaretçi Kaynakları</h4>
+                                <h4 style="margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;"><i class="ph-bold ph-compass"></i> Ziyaretçi Kaynakları</h4>
                                 <ul id="list-referrers" style="list-style: none; padding:0; color:#64748b; font-size:0.95rem;">
                                     <li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Veri Bekleniyor</span> <strong>0</strong></li>
                                 </ul>
                             </div>
                             <div style="background:#fff; padding:20px; border-radius:8px; border:1px solid #e2e8f0;">
-                                <h4 style="margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;">Kullanılan Cihazlar / Tarayıcılar</h4>
+                                <h4 style="margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;"><i class="ph-bold ph-device-mobile"></i> Kullanılan Cihazlar / Tarayıcılar</h4>
                                 <ul id="list-devices" style="list-style: none; padding:0; color:#64748b; font-size:0.95rem;">
                                     <li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Veri Bekleniyor</span> <strong>0</strong></li>
                                 </ul>
                             </div>
                             <div style="background:#fff; padding:20px; border-radius:8px; border:1px solid #e2e8f0;">
-                                <h4 style="margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;">Müşteri Uyruk / Dil</h4>
+                                <h4 style="margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:8px;"><i class="ph-bold ph-globe-hemisphere-west"></i> Müşteri Uyruk / Dil</h4>
                                 <ul id="list-countries" style="list-style: none; padding:0; color:#64748b; font-size:0.95rem;">
                                     <li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Veri Bekleniyor</span> <strong>0</strong></li>
                                 </ul>
+                            </div>
+                        </div>
+
+                        <!-- CANLI ZİYARETÇİ LOG TABLOSU -->
+                        <div style="margin-top: 24px; background:#fff; padding:20px; border-radius:8px; border:1px solid #e2e8f0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
+                                <h4 style="margin: 0; color:#1e293b; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                                    <i class="ph-bold ph-lightning" style="color:#eab308; font-size:1.3rem;"></i> Son Girilen Ziyaretçiler & Canlı IP Akışı (Son 30 Ziyaret)
+                                </h4>
+                                <span style="font-size:0.8rem; background:#ecfdf5; color:#047857; padding:4px 12px; border-radius:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
+                                    <span class="pulse-dot" style="width:8px; height:8px; background:#10b981; border-radius:50%;"></span> Canlı İzleme Aktif
+                                </span>
+                            </div>
+                            <div style="overflow-x: auto;">
+                                <table style="width:100%; border-collapse:collapse; font-size:0.88rem; text-align:left;">
+                                    <thead>
+                                        <tr style="background:#f8fafc; color:#64748b; border-bottom:2px solid #e2e8f0;">
+                                            <th style="padding:10px;">Giriş Zamanı</th>
+                                            <th style="padding:10px;">IP Adresi</th>
+                                            <th style="padding:10px;">Cihaz Dili / Uyruk</th>
+                                            <th style="padding:10px;">Cihaz Tipi</th>
+                                            <th style="padding:10px;">Tarayıcı</th>
+                                            <th style="padding:10px;">Yapılan Eylem / Sayfa</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-recent-visitors">
+                                        <tr><td colspan="6" style="padding:16px; text-align:center; color:#94a3b8;">Henüz canlı ziyaretçi verisi bulunmuyor.</td></tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

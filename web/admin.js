@@ -94,6 +94,24 @@ async function fetchAnalytics() {
         
         renderList('list-countries', data.countries);
         
+        // Render Recent Visitors Log Table
+        const tableEl = document.getElementById('table-recent-visitors');
+        if (tableEl && data.recent_visitors && data.recent_visitors.length > 0) {
+            tableEl.innerHTML = '';
+            data.recent_visitors.forEach(v => {
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid #f1f5f9';
+                row.innerHTML = `
+                    <td style="padding:10px; font-weight:600; color:#334155;">${v.time || '-'}</td>
+                    <td style="padding:10px; font-family:monospace; color:#2563eb; font-weight:600;">${v.ip || '-'}</td>
+                    <td style="padding:10px;">${v.country || '-'}</td>
+                    <td style="padding:10px;">${v.device || '-'}</td>
+                    <td style="padding:10px; color:#475569;">${v.browser || '-'}</td>
+                    <td style="padding:10px;"><span style="background:#f1f5f9; color:#0f172a; padding:3px 8px; border-radius:6px; font-weight:600; font-size:0.8rem;">${v.action || 'Ziyaret'}</span></td>
+                `;
+                tableEl.appendChild(row);
+            });
+        }
     } catch (e) {
         console.error("Analitikler yüklenemedi", e);
     }
