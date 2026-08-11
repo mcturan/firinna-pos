@@ -2493,6 +2493,63 @@ def reset_analytics():
 
 # WEB ÜRÜN & MENÜ YÖNETİMİ APIS
 PRODUCTS_FILE = '/opt/firinna-pos/web_products.json'
+CATEGORIES_FILE = '/opt/firinna-pos/web_categories.json'
+
+def load_web_categories():
+    if os.path.exists(CATEGORIES_FILE):
+        try:
+            with open(CATEGORIES_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
+
+def save_web_categories(categories):
+    with open(CATEGORIES_FILE, 'w', encoding='utf-8') as f:
+        json.dump(categories, f, ensure_ascii=False, indent=4)
+
+@app.route('/api/web/categories', methods=['GET'])
+def get_web_categories():
+    return jsonify(load_web_categories())
+
+@app.route('/api/web/categories', methods=['POST'])
+def save_web_category():
+    import time
+    categories = load_web_categories()
+    cat_id = request.form.get('id')
+    name = request.form.get('name', '').strip()
+    icon = request.form.get('icon', 'ph-fork-knife').strip()
+
+    if not name:
+        return jsonify({"success": False, "error": "Kategori adı boş olamaz."})
+
+    if not cat_id:
+        new_cat = {
+            "id": f"cat_{int(time.time()*1000)}",
+            "name": name,
+            "icon": icon
+        }
+        categories.append(new_cat)
+    else:
+        found = False
+        for c in categories:
+            if c.get('id') == cat_id:
+                c['name'] = name
+                c['icon'] = icon
+                found = True
+                break
+        if not found:
+            return jsonify({"success": False, "error": "Kategori bulunamadı."})
+
+    save_web_categories(categories)
+    return jsonify({"success": True, "message": "Kategori kaydedildi."})
+
+@app.route('/api/web/categories/<cat_id>', methods=['DELETE'])
+def delete_web_category(cat_id):
+    categories = load_web_categories()
+    categories = [c for c in categories if c.get('id') != cat_id]
+    save_web_categories(categories)
+    return jsonify({"success": True, "message": "Kategori silindi."})
 
 def load_web_products():
     if os.path.exists(PRODUCTS_FILE):

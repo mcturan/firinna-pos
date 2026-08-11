@@ -680,6 +680,7 @@ function trackEvent(eventName, extraData = {}) {
 
 document.addEventListener('DOMContentLoaded', () => {
     trackEvent('pageview');
+    fetchWebProducts();
     
     // Otomatik Cihaz / Tarayıcı Dili Algılama
     let initialLang = localStorage.getItem('firinna_lang');
@@ -991,19 +992,56 @@ function rateExperience(stars) {
     }
 }
 
-// Gallery Tab Switcher (10 Photos / 5 Videos)
-function openLightbox(src, captionKeyOrText) {
+// Dynamic Web Products Fetch & Signature Gallery Renderer
+let dynamicWebProducts = [];
+
+async function fetchWebProducts() {
+    try {
+        const res = await fetch('/api/web/products');
+        dynamicWebProducts = await res.json();
+        renderDynamicSignatureGallery();
+    } catch(e) {
+        console.error("Failed to fetch web products:", e);
+    }
+}
+
+function renderDynamicSignatureGallery() {
+    const signatureGrid = document.getElementById('signature-gallery-grid');
+    if (!signatureGrid) return;
+
+    const signatureProducts = dynamicWebProducts.filter(p => p.is_signature);
+    if (!signatureProducts || signatureProducts.length === 0) return;
+
+    signatureGrid.innerHTML = signatureProducts.map(p => {
+        const img = p.image_url.startsWith('http') || p.image_url.startsWith('drink_') || p.image_url.startsWith('prod_') ? p.image_url : p.image_url;
+        const titleEscaped = (p.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const descEscaped = (p.description || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        
+        return `
+            <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px; cursor:pointer;" onclick="openLightbox('${img}', '${titleEscaped}', '${descEscaped}')">
+                <img src="${img}" alt="${p.title}" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">${p.title}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function openLightbox(src, captionKeyOrText, descText) {
     const modal = document.getElementById('lightboxModal');
     const img = document.getElementById('lightboxImg');
     const caption = document.getElementById('lightboxCaption');
     if (modal && img) {
         img.src = src;
         if (caption) {
-            let text = captionKeyOrText || '';
+            let title = captionKeyOrText || '';
             if (i18n[currentLang] && i18n[currentLang][captionKeyOrText]) {
-                text = i18n[currentLang][captionKeyOrText];
+                title = i18n[currentLang][captionKeyOrText];
             }
-            caption.innerText = text;
+            let html = `<div style="font-size:1.2rem; font-weight:700; margin-bottom:6px; color:#fbbf24;">${title}</div>`;
+            if (descText) {
+                html += `<div style="font-size:0.95rem; font-weight:400; color:#e2e8f0; max-width:600px; line-height:1.5; margin:0 auto;">${descText}</div>`;
+            }
+            caption.innerHTML = html;
         }
         modal.style.display = 'flex';
     }

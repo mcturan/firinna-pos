@@ -45,6 +45,9 @@
                 <a href="#" class="nav-item" data-target="settings">
                     <i class="ph-bold ph-gear"></i> Web Ayarları
                 </a>
+                <a href="#" class="nav-item" data-target="products-mgmt">
+                    <i class="ph-bold ph-fork-knife"></i> Ürünler & Menü Yönetimi
+                </a>
                 <a href="#" class="nav-item" data-target="menu-docs">
                     <i class="ph-bold ph-book-open"></i> Menü Dosyaları
                 </a>
@@ -317,6 +320,84 @@
                             </button>
                             <div id="pwdResult" style="margin-top:12px; font-weight:600; display:none;"></div>
                         </form>
+                    </div>
+                </section>
+
+                <!-- ÜRÜNLER & MENÜ YÖNETİMİ -->
+                <section id="products-mgmt" class="admin-section" style="display:none;">
+                    <div class="card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+                            <div>
+                                <h3 style="margin:0;"><i class="ph-bold ph-fork-knife" style="color:#d97706;"></i> Ürün & Menü Yönetimi</h3>
+                                <p class="card-desc" style="margin:4px 0 0 0;">Menünüzdeki ürünleri ekleyin, açıklamasını ve fotoğrafını güncelleyin. Tek tıkla "İmza Lezzetler" galerisine ekleyebilirsiniz.</p>
+                            </div>
+                            <button class="btn btn-primary" onclick="resetProductForm()" style="background:#059669; border:none; display:inline-flex; align-items:center; gap:6px;">
+                                <i class="ph-bold ph-plus-circle"></i> Yeni Ürün Ekle
+                            </button>
+                        </div>
+
+                        <!-- ÜRÜN EKLE / DÜZENLE FORMU -->
+                        <div id="product-form-card" style="background:#f8fafc; border:1px solid #cbd5e1; padding:20px; border-radius:8px; margin-bottom:24px;">
+                            <h4 id="prod-form-heading" style="margin-top:0; margin-bottom:16px; color:#1e293b; font-size:1rem; display:flex; align-items:center; gap:8px;">
+                                <i class="ph-bold ph-pencil-simple" style="color:#3b82f6;"></i> Yeni Ürün Girişi
+                            </h4>
+                            <form id="webProductForm" onsubmit="saveWebProduct(event)">
+                                <input type="hidden" id="prod_id" value="">
+                                <input type="hidden" id="prod_image_url" value="">
+                                
+                                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:16px;">
+                                    <div class="form-group" style="margin:0;">
+                                        <label style="font-size:0.85rem; font-weight:600;">Ürün Adı (Başlık)</label>
+                                        <input type="text" id="prod_title" class="form-control" placeholder="Örn: Gül Goncalı Harman Çay" required>
+                                    </div>
+                                    <div class="form-group" style="margin:0;">
+                                        <label style="font-size:0.85rem; font-weight:600;">Kategori</label>
+                                        <select id="prod_category" class="form-control">
+                                            <option value="İçecekler & Tatlılar">İçecekler & Tatlılar</option>
+                                            <option value="Fırından Sıcak Sıcak">Fırından Sıcak Sıcak</option>
+                                            <option value="Kahvaltılıklar">Kahvaltılıklar</option>
+                                            <option value="Ana Yemekler">Ana Yemekler</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin:0;">
+                                        <label style="font-size:0.85rem; font-weight:600;">Fiyat (İsteğe Bağlı)</label>
+                                        <input type="text" id="prod_price" class="form-control" placeholder="Örn: 120 TL">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label style="font-size:0.85rem; font-weight:600;">Ürün Açıklaması (İçerik, Aroma, Hikayesi)</label>
+                                    <textarea id="prod_description" class="form-control" rows="3" placeholder="Örn: En seçkin Türk ve Seylan çayı karışımı içinde bergamot ve kuru gül goncaları ile demlenir." required></textarea>
+                                </div>
+
+                                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:16px;">
+                                    <div class="form-group" style="margin:0; flex:1; min-width:250px;">
+                                        <label style="font-size:0.85rem; font-weight:600;">Ürün Fotoğrafı (Yükle veya Seç)</label>
+                                        <input type="file" id="prod_image_file" accept="image/*" class="form-control" style="padding:4px;">
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:10px 14px; border-radius:6px; border:1px solid #cbd5e1; margin-top:20px;">
+                                        <input type="checkbox" id="prod_is_signature" style="width:18px; height:18px; cursor:pointer;">
+                                        <label for="prod_is_signature" style="font-size:0.9rem; font-weight:700; color:#d97706; cursor:pointer; margin:0; display:flex; align-items:center; gap:4px;">
+                                            ⭐ İmza Lezzetlerde Göster
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div style="display:flex; gap:10px;">
+                                    <button type="submit" class="btn btn-primary" style="background:#2563eb; border:none; padding:8px 20px;">
+                                        <i class="ph-bold ph-floppy-disk"></i> Ürünü Kaydet
+                                    </button>
+                                    <button type="button" class="btn" onclick="resetProductForm()" style="background:#e2e8f0; color:#475569;">İptal / Temizle</button>
+                                </div>
+                                <div id="prodSaveResult" style="margin-top:10px; font-weight:600; color:#059669; display:none;"></div>
+                            </form>
+                        </div>
+
+                        <!-- KAYITLI ÜRÜNLER LİSTESİ -->
+                        <h4 style="margin-bottom:12px; color:#334155;"><i class="ph-bold ph-list-bullets"></i> Kayıtlı Ürün Listesi</h4>
+                        <div id="admin-products-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+                            <div style="color:#94a3b8; font-size:0.9rem;">Ürünler yükleniyor...</div>
+                        </div>
                     </div>
                 </section>
 

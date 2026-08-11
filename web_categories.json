@@ -1,0 +1,22 @@
+[
+    {
+        "id": "cat_1",
+        "name": "İçecekler & Tatlılar",
+        "icon": "ph-coffee"
+    },
+    {
+        "id": "cat_2",
+        "name": "Fırından Sıcak Sıcak",
+        "icon": "ph-pizza"
+    },
+    {
+        "id": "cat_3",
+        "name": "Kahvaltılıklar",
+        "icon": "ph-cooking-pot"
+    },
+    {
+        "id": "cat_4",
+        "name": "Ana Yemekler",
+        "icon": "ph-fork-knife"
+    }
+]

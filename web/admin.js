@@ -40,6 +40,8 @@ function initAdmin() {
 
             if (targetId === 'dashboard') {
                 fetchAnalytics();
+            } else if (targetId === 'products-mgmt') {
+                loadWebProducts();
             }
         });
     });
@@ -327,5 +329,155 @@ async function uploadMenu(lang) {
         }
     } catch (e) {
         alert("Yükleme sırasında hata: " + e.message);
+    }
+}
+
+// --- ÜRÜN & MENÜ YÖNETİMİ ---
+let cachedWebProducts = [];
+
+async function loadWebProducts() {
+    try {
+        const res = await fetch('/api/web/products');
+        cachedWebProducts = await res.json();
+        renderAdminProductsGrid();
+    } catch(e) {
+        console.error("Failed to load products:", e);
+    }
+}
+
+function renderAdminProductsGrid() {
+    const grid = document.getElementById('admin-products-grid');
+    if (!grid) return;
+    if (!cachedWebProducts || cachedWebProducts.length === 0) {
+        grid.innerHTML = '<div style="color:#94a3b8; font-size:0.9rem; grid-column:1/-1;">Henüz kayıtlı ürün bulunmuyor. Eklemek için yukarıdaki formu kullanın.</div>';
+        return;
+    }
+
+    grid.innerHTML = cachedWebProducts.map(p => {
+        const isSig = p.is_signature;
+        const sigBadgeBg = isSig ? '#dcfce7' : '#f1f5f9';
+        const sigBadgeColor = isSig ? '#15803d' : '#64748b';
+        const sigBtnText = isSig ? '⭐ İmza Lezzette' : '☆ İmza Yap';
+        const img = p.image_url.startsWith('http') || p.image_url.startsWith('drink_') || p.image_url.startsWith('prod_') ? p.image_url : p.image_url;
+
+        return `
+            <div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                <div style="height:140px; position:relative; overflow:hidden; background:#f8fafc;">
+                    <img src="${img}" alt="${p.title}" style="width:100%; height:100%; object-fit:cover;">
+                    <span style="position:absolute; top:8px; right:8px; background:${sigBadgeBg}; color:${sigBadgeColor}; font-size:0.75rem; font-weight:700; padding:3px 8px; border-radius:12px; border:1px solid ${isSig ? '#bbf7d0' : '#e2e8f0'};">
+                        ${isSig ? '⭐ İmza Lezzet' : 'Standart'}
+                    </span>
+                </div>
+                <div style="padding:14px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px;">
+                            <h5 style="margin:0; font-size:1rem; color:#0f172a; font-weight:700;">${p.title}</h5>
+                            <span style="font-size:0.85rem; font-weight:800; color:#d97706; white-space:nowrap;">${p.price || ''}</span>
+                        </div>
+                        <div style="font-size:0.75rem; color:#64748b; margin-bottom:8px; font-weight:600;">📁 ${p.category || 'Genel'}</div>
+                        <p style="font-size:0.82rem; color:#475569; margin:0 0 12px 0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">
+                            ${p.description || ''}
+                        </p>
+                    </div>
+                    <div style="display:flex; gap:6px; border-top:1px solid #f1f5f9; padding-top:10px; margin-top:6px;">
+                        <button class="btn" onclick="toggleProductSignature('${p.id}')" style="flex:1; background:${isSig ? '#fef3c7' : '#f1f5f9'}; color:${isSig ? '#b45309' : '#475569'}; border:1px solid ${isSig ? '#fde68a' : '#cbd5e1'}; font-size:0.78rem; font-weight:700; padding:6px 8px; border-radius:6px; cursor:pointer;">
+                            ${sigBtnText}
+                        </button>
+                        <button class="btn" onclick="editProduct('${p.id}')" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:0.78rem; padding:6px 10px; border-radius:6px; cursor:pointer;">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                        </button>
+                        <button class="btn" onclick="deleteProduct('${p.id}')" style="background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-size:0.78rem; padding:6px 10px; border-radius:6px; cursor:pointer;">
+                            <i class="ph-bold ph-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function resetProductForm() {
+    document.getElementById('webProductForm').reset();
+    document.getElementById('prod_id').value = '';
+    document.getElementById('prod_image_url').value = '';
+    document.getElementById('prod-form-heading').innerHTML = '<i class="ph-bold ph-pencil-simple" style="color:#3b82f6;"></i> Yeni Ürün Girişi';
+    document.getElementById('prodSaveResult').style.display = 'none';
+}
+
+function editProduct(id) {
+    const p = cachedWebProducts.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('prod_id').value = p.id;
+    document.getElementById('prod_title').value = p.title || '';
+    document.getElementById('prod_category').value = p.category || 'İçecekler & Tatlılar';
+    document.getElementById('prod_price').value = p.price || '';
+    document.getElementById('prod_description').value = p.description || '';
+    document.getElementById('prod_image_url').value = p.image_url || '';
+    document.getElementById('prod_is_signature').checked = !!p.is_signature;
+
+    document.getElementById('prod-form-heading').innerHTML = `<i class="ph-bold ph-note-pencil" style="color:#d97706;"></i> Ürünü Düzenle: ${p.title}`;
+    document.getElementById('product-form-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function saveWebProduct(e) {
+    e.preventDefault();
+    const saveRes = document.getElementById('prodSaveResult');
+    saveRes.style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('id', document.getElementById('prod_id').value);
+    formData.append('title', document.getElementById('prod_title').value);
+    formData.append('category', document.getElementById('prod_category').value);
+    formData.append('price', document.getElementById('prod_price').value);
+    formData.append('description', document.getElementById('prod_description').value);
+    formData.append('image_url', document.getElementById('prod_image_url').value);
+    formData.append('is_signature', document.getElementById('prod_is_signature').checked);
+
+    const fileInput = document.getElementById('prod_image_file');
+    if (fileInput.files && fileInput.files[0]) {
+        formData.append('image_file', fileInput.files[0]);
+    }
+
+    try {
+        const res = await fetch('/api/web/products', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+            saveRes.innerText = "Ürün başarıyla kaydedildi!";
+            saveRes.style.display = 'block';
+            resetProductForm();
+            loadWebProducts();
+        } else {
+            alert("Hata: " + (data.error || "Bilinmeyen hata"));
+        }
+    } catch(err) {
+        alert("Bağlantı hatası: " + err.message);
+    }
+}
+
+async function toggleProductSignature(id) {
+    try {
+        const res = await fetch(`/api/web/products/${id}/toggle-signature`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            loadWebProducts();
+        }
+    } catch(e) {
+        console.error("Toggle error:", e);
+    }
+}
+
+async function deleteProduct(id) {
+    if (!confirm("Bu ürünü silmek istediğinize emin misiniz?")) return;
+    try {
+        const res = await fetch(`/api/web/products/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            loadWebProducts();
+        }
+    } catch(e) {
+        console.error("Delete error:", e);
     }
 }
