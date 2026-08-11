@@ -336,6 +336,28 @@
                             </button>
                         </div>
 
+                        <!-- KATEGORİ YÖNETİMİ BÖLÜMÜ -->
+                        <div style="background:#fff7ed; border:1px solid #fed7aa; padding:16px; border-radius:8px; margin-bottom:24px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <h4 style="margin:0; color:#9a3412; font-size:0.95rem; display:flex; align-items:center; gap:6px;">
+                                    <i class="ph-bold ph-folders" style="color:#ea580c;"></i> Menü Kategorileri Yönetimi
+                                </h4>
+                            </div>
+                            
+                            <form id="categoryForm" onsubmit="saveWebCategory(event)" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
+                                <input type="hidden" id="cat_id" value="">
+                                <input type="text" id="cat_name" class="form-control" placeholder="Yeni Kategori Adı (Örn: Çorbalar & Salatalar)" style="flex:1; min-width:220px;" required>
+                                <button type="submit" class="btn btn-primary" style="background:#ea580c; border:none; padding:8px 16px; white-space:nowrap;">
+                                    <i class="ph-bold ph-plus"></i> Kategoriyi Kaydet
+                                </button>
+                                <button type="button" class="btn" onclick="resetCategoryForm()" style="background:#e2e8f0; color:#475569; padding:8px 12px;">Temizle</button>
+                            </form>
+
+                            <div id="category-badges-container" style="display:flex; flex-wrap:wrap; gap:8px;">
+                                <div style="color:#9a3412; font-size:0.85rem;">Kategoriler yükleniyor...</div>
+                            </div>
+                        </div>
+
                         <!-- ÜRÜN EKLE / DÜZENLE FORMU -->
                         <div id="product-form-card" style="background:#f8fafc; border:1px solid #cbd5e1; padding:20px; border-radius:8px; margin-bottom:24px;">
                             <h4 id="prod-form-heading" style="margin-top:0; margin-bottom:16px; color:#1e293b; font-size:1rem; display:flex; align-items:center; gap:8px;">
@@ -353,10 +375,7 @@
                                     <div class="form-group" style="margin:0;">
                                         <label style="font-size:0.85rem; font-weight:600;">Kategori</label>
                                         <select id="prod_category" class="form-control">
-                                            <option value="İçecekler & Tatlılar">İçecekler & Tatlılar</option>
-                                            <option value="Fırından Sıcak Sıcak">Fırından Sıcak Sıcak</option>
-                                            <option value="Kahvaltılıklar">Kahvaltılıklar</option>
-                                            <option value="Ana Yemekler">Ana Yemekler</option>
+                                            <!-- JS ile yüklenir -->
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin:0;">
@@ -393,8 +412,17 @@
                             </form>
                         </div>
 
-                        <!-- KAYITLI ÜRÜNLER LİSTESİ -->
-                        <h4 style="margin-bottom:12px; color:#334155;"><i class="ph-bold ph-list-bullets"></i> Kayıtlı Ürün Listesi</h4>
+                        <!-- KAYITLI ÜRÜNLER LİSTESİ & FİLTRELER -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+                            <h4 style="margin:0; color:#334155;"><i class="ph-bold ph-list-bullets"></i> Kayıtlı Ürün Listesi</h4>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                                <input type="text" id="prod-search-input" onkeyup="filterAdminProducts()" placeholder="Ürün Ara..." class="form-control" style="width:180px; padding:6px 12px; font-size:0.85rem;">
+                                <select id="prod-category-filter" onchange="filterAdminProducts()" class="form-control" style="width:180px; padding:6px 12px; font-size:0.85rem;">
+                                    <option value="ALL">Tüm Kategoriler</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div id="admin-products-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
                             <div style="color:#94a3b8; font-size:0.9rem;">Ürünler yükleniyor...</div>
                         </div>

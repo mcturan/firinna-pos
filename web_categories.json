@@ -1,22 +1,37 @@
 [
     {
-        "id": "cat_1",
-        "name": "İçecekler & Tatlılar",
-        "icon": "ph-coffee"
-    },
-    {
-        "id": "cat_2",
-        "name": "Fırından Sıcak Sıcak",
-        "icon": "ph-pizza"
-    },
-    {
-        "id": "cat_3",
-        "name": "Kahvaltılıklar",
-        "icon": "ph-cooking-pot"
+        "id": "cat_6",
+        "name": "Bazlama",
+        "icon": "ph-fork-knife"
     },
     {
         "id": "cat_4",
-        "name": "Ana Yemekler",
+        "name": "Menemen",
+        "icon": "ph-fork-knife"
+    },
+    {
+        "id": "cat_5",
+        "name": "Omlet",
+        "icon": "ph-fork-knife"
+    },
+    {
+        "id": "cat_3",
+        "name": "Pizza",
+        "icon": "ph-fork-knife"
+    },
+    {
+        "id": "cat_9",
+        "name": "Soğuk içecekler",
+        "icon": "ph-fork-knife"
+    },
+    {
+        "id": "cat_8",
+        "name": "Sıcak içecekler",
+        "icon": "ph-fork-knife"
+    },
+    {
+        "id": "cat_10",
+        "name": "Tatlı",
         "icon": "ph-fork-knife"
     }
 ]

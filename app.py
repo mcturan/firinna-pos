@@ -2578,6 +2578,8 @@ def save_web_product():
     description = request.form.get('description', '').strip()
     price = request.form.get('price', '').strip()
     is_signature = request.form.get('is_signature', 'false').lower() in ['true', '1', 'on']
+    tags_raw = request.form.get('tags', '')
+    tags = [t.strip() for t in tags_raw.split(',') if t.strip()]
 
     image_url = request.form.get('image_url', '').strip()
     if 'image_file' in request.files:
@@ -2597,7 +2599,8 @@ def save_web_product():
             "description": description,
             "price": price,
             "image_url": image_url or "drink_cay.png",
-            "is_signature": is_signature
+            "is_signature": is_signature,
+            "tags": tags
         }
         products.append(new_prod)
     else:
@@ -2611,6 +2614,7 @@ def save_web_product():
                 if image_url:
                     p['image_url'] = image_url
                 p['is_signature'] = is_signature
+                p['tags'] = tags
                 found = True
                 break
         if not found:

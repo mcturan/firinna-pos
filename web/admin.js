@@ -41,6 +41,7 @@ function initAdmin() {
             if (targetId === 'dashboard') {
                 fetchAnalytics();
             } else if (targetId === 'products-mgmt') {
+                loadWebCategories();
                 loadWebProducts();
             }
         });
@@ -332,28 +333,139 @@ async function uploadMenu(lang) {
     }
 }
 
-// --- ÜRÜN & MENÜ YÖNETİMİ ---
+// --- KATEGORİ & ÜRÜN YÖNETİMİ ---
+let cachedWebCategories = [];
 let cachedWebProducts = [];
+
+async function loadWebCategories() {
+    try {
+        const res = await fetch('/api/web/categories');
+        cachedWebCategories = await res.json();
+        renderCategoryBadges();
+        populateCategoryDropdowns();
+    } catch(e) {
+        console.error("Failed to load categories:", e);
+    }
+}
+
+function renderCategoryBadges() {
+    const container = document.getElementById('category-badges-container');
+    if (!container) return;
+    if (!cachedWebCategories || cachedWebCategories.length === 0) {
+        container.innerHTML = '<span style="color:#94a3b8; font-size:0.85rem;">Henüz kategori bulunmuyor.</span>';
+        return;
+    }
+
+    container.innerHTML = cachedWebCategories.map(c => `
+        <span style="background:#fff; border:1px solid #fed7aa; color:#9a3412; padding:4px 10px; border-radius:16px; font-size:0.82rem; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+            📁 ${c.name}
+            <button onclick="editCategory('${c.id}')" title="Düzenle" style="background:none; border:none; color:#2563eb; cursor:pointer; font-size:0.85rem; padding:0;"><i class="ph-bold ph-pencil-simple"></i></button>
+            <button onclick="deleteCategory('${c.id}')" title="Sil" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:0.85rem; padding:0;"><i class="ph-bold ph-x"></i></button>
+        </span>
+    `).join('');
+}
+
+function populateCategoryDropdowns() {
+    const formSelect = document.getElementById('prod_category');
+    const filterSelect = document.getElementById('prod-category-filter');
+
+    if (formSelect) {
+        formSelect.innerHTML = cachedWebCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    }
+
+    if (filterSelect) {
+        filterSelect.innerHTML = `<option value="ALL">Tüm Kategoriler</option>` + 
+            cachedWebCategories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    }
+}
+
+function resetCategoryForm() {
+    document.getElementById('categoryForm').reset();
+    document.getElementById('cat_id').value = '';
+}
+
+function editCategory(id) {
+    const c = cachedWebCategories.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('cat_id').value = c.id;
+    document.getElementById('cat_name').value = c.name;
+    document.getElementById('cat_name').focus();
+}
+
+async function saveWebCategory(e) {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('id', document.getElementById('cat_id').value);
+    formData.append('name', document.getElementById('cat_name').value);
+
+    try {
+        const res = await fetch('/api/web/categories', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success) {
+            resetCategoryForm();
+            loadWebCategories();
+            loadWebProducts();
+        } else {
+            alert("Hata: " + data.error);
+        }
+    } catch(err) {
+        alert("Bağlantı hatası: " + err.message);
+    }
+}
+
+async function deleteCategory(id) {
+    if (!confirm("Bu kategoriyi silmek istediğinize emin misiniz?")) return;
+    try {
+        const res = await fetch(`/api/web/categories/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            loadWebCategories();
+            loadWebProducts();
+        }
+    } catch(err) {
+        console.error("Delete category error:", err);
+    }
+}
 
 async function loadWebProducts() {
     try {
         const res = await fetch('/api/web/products');
         cachedWebProducts = await res.json();
-        renderAdminProductsGrid();
+        filterAdminProducts();
     } catch(e) {
         console.error("Failed to load products:", e);
     }
 }
 
-function renderAdminProductsGrid() {
+function filterAdminProducts() {
+    const searchEl = document.getElementById('prod-search-input');
+    const catEl = document.getElementById('prod-category-filter');
+    const search = searchEl ? searchEl.value.toLowerCase() : '';
+    const cat = catEl ? catEl.value : 'ALL';
+    
+    renderAdminProductsGrid(search, cat);
+}
+
+function renderAdminProductsGrid(filterSearch = '', filterCat = 'ALL') {
     const grid = document.getElementById('admin-products-grid');
     if (!grid) return;
-    if (!cachedWebProducts || cachedWebProducts.length === 0) {
-        grid.innerHTML = '<div style="color:#94a3b8; font-size:0.9rem; grid-column:1/-1;">Henüz kayıtlı ürün bulunmuyor. Eklemek için yukarıdaki formu kullanın.</div>';
+    
+    let list = cachedWebProducts || [];
+    
+    if (filterCat !== 'ALL') {
+        list = list.filter(p => p.category === filterCat);
+    }
+    
+    if (filterSearch) {
+        list = list.filter(p => (p.title || '').toLowerCase().includes(filterSearch) || (p.description || '').toLowerCase().includes(filterSearch));
+    }
+
+    if (list.length === 0) {
+        grid.innerHTML = '<div style="color:#94a3b8; font-size:0.9rem; grid-column:1/-1;">Aranan kriterlere uygun ürün bulunamadı.</div>';
         return;
     }
 
-    grid.innerHTML = cachedWebProducts.map(p => {
+    grid.innerHTML = list.map(p => {
         const isSig = p.is_signature;
         const sigBadgeBg = isSig ? '#dcfce7' : '#f1f5f9';
         const sigBadgeColor = isSig ? '#15803d' : '#64748b';
@@ -383,10 +495,10 @@ function renderAdminProductsGrid() {
                         <button class="btn" onclick="toggleProductSignature('${p.id}')" style="flex:1; background:${isSig ? '#fef3c7' : '#f1f5f9'}; color:${isSig ? '#b45309' : '#475569'}; border:1px solid ${isSig ? '#fde68a' : '#cbd5e1'}; font-size:0.78rem; font-weight:700; padding:6px 8px; border-radius:6px; cursor:pointer;">
                             ${sigBtnText}
                         </button>
-                        <button class="btn" onclick="editProduct('${p.id}')" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:0.78rem; padding:6px 10px; border-radius:6px; cursor:pointer;">
+                        <button class="btn" onclick="editProduct('${p.id}')" title="Düzenle" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:0.78rem; padding:6px 10px; border-radius:6px; cursor:pointer;">
                             <i class="ph-bold ph-pencil-simple"></i>
                         </button>
-                        <button class="btn" onclick="deleteProduct('${p.id}')" style="background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-size:0.78rem; padding:6px 10px; border-radius:6px; cursor:pointer;">
+                        <button class="btn" onclick="deleteProduct('${p.id}')" title="Sil" style="background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-size:0.78rem; padding:6px 10px; border-radius:6px; cursor:pointer;">
                             <i class="ph-bold ph-trash"></i>
                         </button>
                     </div>
@@ -409,7 +521,7 @@ function editProduct(id) {
     if (!p) return;
     document.getElementById('prod_id').value = p.id;
     document.getElementById('prod_title').value = p.title || '';
-    document.getElementById('prod_category').value = p.category || 'İçecekler & Tatlılar';
+    document.getElementById('prod_category').value = p.category || '';
     document.getElementById('prod_price').value = p.price || '';
     document.getElementById('prod_description').value = p.description || '';
     document.getElementById('prod_image_url').value = p.image_url || '';
