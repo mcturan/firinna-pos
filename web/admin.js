@@ -71,6 +71,29 @@ async function fetchAnalytics() {
         document.getElementById('stat-total').innerText = data.total || 0;
         document.getElementById('stat-menu').innerText = data.menu || 0;
         document.getElementById('stat-actions').innerText = data.actions || 0;
+        
+        // Fill Lists
+        const renderList = (elementId, dataObj) => {
+            const el = document.getElementById(elementId);
+            if (!el || !dataObj) return;
+            el.innerHTML = '';
+            const entries = Object.entries(dataObj).sort((a,b) => b[1] - a[1]);
+            if (entries.length === 0) {
+                el.innerHTML = '<li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Veri Yok</span> <strong>0</strong></li>';
+            }
+            entries.forEach(([key, val]) => {
+                el.innerHTML += `<li style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>${key}</span> <strong>${val}</strong></li>`;
+            });
+        };
+        
+        renderList('list-referrers', data.referrers);
+        
+        // Combine Devices and Browsers
+        const devicesAndBrowsers = {...(data.devices || {}), ...(data.browsers || {})};
+        renderList('list-devices', devicesAndBrowsers);
+        
+        renderList('list-countries', data.countries);
+        
     } catch (e) {
         console.error("Analitikler yüklenemedi", e);
     }
