@@ -2578,6 +2578,7 @@ def save_web_product():
     description = request.form.get('description', '').strip()
     price = request.form.get('price', '').strip()
     is_signature = request.form.get('is_signature', 'false').lower() in ['true', '1', 'on']
+    is_active = request.form.get('is_active', 'true').lower() in ['true', '1', 'on']
     tags_raw = request.form.get('tags', '')
     tags = [t.strip() for t in tags_raw.split(',') if t.strip()]
 
@@ -2600,6 +2601,7 @@ def save_web_product():
             "price": price,
             "image_url": image_url or "drink_cay.png",
             "is_signature": is_signature,
+            "is_active": is_active,
             "tags": tags
         }
         products.append(new_prod)
@@ -2614,6 +2616,7 @@ def save_web_product():
                 if image_url:
                     p['image_url'] = image_url
                 p['is_signature'] = is_signature
+                p['is_active'] = is_active
                 p['tags'] = tags
                 found = True
                 break
@@ -2622,6 +2625,16 @@ def save_web_product():
 
     save_web_products(products)
     return jsonify({"success": True, "message": "Ürün başarıyla kaydedildi."})
+
+@app.route('/api/web/products/<prod_id>/toggle-active', methods=['POST'])
+def toggle_web_product_active(prod_id):
+    products = load_web_products()
+    for p in products:
+        if p.get('id') == prod_id:
+            p['is_active'] = not p.get('is_active', True)
+            save_web_products(products)
+            return jsonify({"success": True, "is_active": p['is_active']})
+    return jsonify({"success": False, "error": "Ürün bulunamadı."})
 
 @app.route('/api/web/products/<prod_id>/toggle-signature', methods=['POST'])
 def toggle_product_signature(prod_id):

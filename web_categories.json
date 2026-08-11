@@ -1,37 +1,37 @@
 [
     {
-        "id": "cat_6",
-        "name": "Bazlama",
-        "icon": "ph-fork-knife"
+        "id": "cat_1",
+        "name": "Kahvaltılıklar & Menemen",
+        "icon": "ph-cooking-pot"
     },
     {
-        "id": "cat_4",
-        "name": "Menemen",
-        "icon": "ph-fork-knife"
-    },
-    {
-        "id": "cat_5",
-        "name": "Omlet",
-        "icon": "ph-fork-knife"
+        "id": "cat_2",
+        "name": "Omletler",
+        "icon": "ph-egg"
     },
     {
         "id": "cat_3",
-        "name": "Pizza",
-        "icon": "ph-fork-knife"
+        "name": "Taş Fırın Pizza",
+        "icon": "ph-pizza"
     },
     {
-        "id": "cat_9",
-        "name": "Soğuk içecekler",
-        "icon": "ph-fork-knife"
+        "id": "cat_4",
+        "name": "Fırında Bazlama Tost",
+        "icon": "ph-sandwich"
     },
     {
-        "id": "cat_8",
-        "name": "Sıcak içecekler",
-        "icon": "ph-fork-knife"
+        "id": "cat_5",
+        "name": "Sıcak İçecekler",
+        "icon": "ph-coffee"
     },
     {
-        "id": "cat_10",
-        "name": "Tatlı",
-        "icon": "ph-fork-knife"
+        "id": "cat_6",
+        "name": "Soğuk İçecekler",
+        "icon": "ph-drop"
+    },
+    {
+        "id": "cat_7",
+        "name": "Tatlılar",
+        "icon": "ph-cake"
     }
 ]

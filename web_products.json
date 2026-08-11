@@ -1,343 +1,153 @@
 [
     {
-        "id": "prod_27",
-        "title": "Baklava",
-        "category": "Tatlı",
-        "description": "Baklava - Fırınna'da taze malzemelerle hazırlanır.",
+        "id": "prod_m1",
+        "title": "Geleneksel Çakallı Menemeni",
+        "category": "Kahvaltılıklar & Menemen",
+        "description": "Sadece yumurta sarısıyla hazırlanan, taze domates, biber, bol kaşar peyniri ve özel tereyağı ile pişen meşhur Çakallı menemeni.",
+        "price": "250 TL",
+        "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80",
+        "is_signature": true,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "dairy",
+            "gluten_free"
+        ]
+    },
+    {
+        "id": "prod_m2",
+        "title": "Kavurmalı Çakallı Menemeni",
+        "category": "Kahvaltılıklar & Menemen",
+        "description": "Özel lezzetli dana kavurma parçaları, taze domates, biber ve erimiş bol kaşar peyniriyle sunulan lezzet patlaması.",
+        "price": "350 TL",
+        "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80",
+        "is_signature": true,
+        "tags": [
+            "halal",
+            "dairy",
+            "gluten_free"
+        ]
+    },
+    {
+        "id": "prod_m3",
+        "title": "Sucuklu Çakallı Menemeni",
+        "category": "Kahvaltılıklar & Menemen",
+        "description": "Dilimlenmiş nefis baharatlı kasap sucuğu, taze domates, biber ve bol kaşarlı Çakallı usulü menemen.",
+        "price": "350 TL",
+        "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "dairy",
+            "gluten_free"
+        ]
+    },
+    {
+        "id": "prod_m4",
+        "title": "Tavuklu Çakallı Menemeni",
+        "category": "Kahvaltılıklar & Menemen",
+        "description": "Sotelenmiş özel tavuk parçaları, taze domates, biber ve eritilmiş kaşar peyniri eşliğinde enfes menemen.",
+        "price": "350 TL",
+        "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "dairy",
+            "gluten_free"
+        ]
+    },
+    {
+        "id": "prod_o1",
+        "title": "Sade Omlet",
+        "category": "Omletler",
+        "description": "Taze çırpılmış çiftlik yumurtaları ve hafif tereyağı ile tava usulü pişen yumuşacık klasik omlet.",
+        "price": "150 TL",
+        "image_url": "https://images.unsplash.com/photo-1510693206972-df098062cb71?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "dairy",
+            "gluten_free"
+        ]
+    },
+    {
+        "id": "prod_o2",
+        "title": "Kaşarlı Omlet",
+        "category": "Omletler",
+        "description": "Bol rendelenmiş taze kaşar peynirinin içinde eridiği sıcak ve nefis tava omleti.",
         "price": "170 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+        "image_url": "https://images.unsplash.com/photo-1510693206972-df098062cb71?auto=format&fit=crop&w=600&q=80",
         "is_signature": false,
         "tags": [
             "halal",
             "vegetarian",
             "dairy",
+            "gluten_free"
+        ]
+    },
+    {
+        "id": "prod_o3",
+        "title": "Kavurmalı Omlet",
+        "category": "Omletler",
+        "description": "Özel lezzetli dana kavurma parçaları ile zenginleştirilmiş doyurucu tava omleti.",
+        "price": "250 TL",
+        "image_url": "https://images.unsplash.com/photo-1510693206972-df098062cb71?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "dairy",
+            "gluten_free"
+        ]
+    },
+    {
+        "id": "prod_o4",
+        "title": "Sucuklu Omlet",
+        "category": "Omletler",
+        "description": "Dilimlenmiş nefis kasap sucuğu aromasıyla paha biçilmez sıcak omlet lezzeti.",
+        "price": "250 TL",
+        "image_url": "https://images.unsplash.com/photo-1510693206972-df098062cb71?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "dairy",
+            "gluten_free"
+        ]
+    },
+    {
+        "id": "prod_p1",
+        "title": "Taş Fırın Pizza Karışık",
+        "category": "Taş Fırın Pizza",
+        "description": "İtalyan domates sosu, mozzarella peyniri, kasap sucuk, zeytin, mısır ve özel fırın ateşi aroması (27cm).",
+        "price": "400 TL",
+        "image_url": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80",
+        "is_signature": true,
+        "tags": [
+            "halal",
             "gluten",
-            "nuts"
+            "dairy"
         ]
     },
     {
-        "id": "prod_14",
-        "title": "Bazlama (Etli)",
-        "category": "Bazlama",
-        "description": "Bazlama (Etli) - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "300 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_13",
-        "title": "Bazlama (Sucuklu)",
-        "category": "Bazlama",
-        "description": "Bazlama (Sucuklu) - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "250 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_34",
-        "title": "Bazlama (Tavuklu)",
-        "category": "Bazlama",
-        "description": "Bazlama (Tavuklu) - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "250 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_31",
-        "title": "Bazlama Tost (sade)",
-        "category": "Bazlama",
-        "description": "Bazlama Tost (sade) - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "200 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_12",
-        "title": "Bazlama Yumurtalı",
-        "category": "Bazlama",
-        "description": "Bazlama Yumurtalı - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "200 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_32",
-        "title": "Espresso",
-        "category": "Sıcak içecekler",
-        "description": "Espresso - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "90 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal",
-            "vegetarian"
-        ]
-    },
-    {
-        "id": "prod_25",
-        "title": "FuseTea Soğukçay",
-        "category": "Soğuk içecekler",
-        "description": "FuseTea Soğukçay - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "70 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal",
-            "vegetarian",
-            "vegan",
-            "sugar_free"
-        ]
-    },
-    {
-        "id": "prod_20",
-        "title": "Glintwein",
-        "category": "Sıcak içecekler",
-        "description": "Özel baharatlar, taze portakal dilimi ve karanfil aromalı sıcak kış içeceği.",
-        "price": "150 TL",
-        "image_url": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=600&q=80",
+        "id": "prod_p2",
+        "title": "Taş Fırın Pizza Margarita",
+        "category": "Taş Fırın Pizza",
+        "description": "Geleneksel Napoliten domates sosu, taze mozzarella ve fesleğen dokunuşuyla taş fırında pişen lezzet (27cm).",
+        "price": "380 TL",
+        "image_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&q=80",
         "is_signature": true,
         "tags": [
             "halal",
             "vegetarian",
-            "vegan"
-        ]
-    },
-    {
-        "id": "prod_29",
-        "title": "Hibiscus Soğuk Çay",
-        "category": "Soğuk içecekler",
-        "description": "Hibiscus Soğuk Çay - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "150 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal",
-            "vegetarian",
-            "vegan",
-            "sugar_free"
-        ]
-    },
-    {
-        "id": "prod_18",
-        "title": "Kahve Americano",
-        "category": "Sıcak içecekler",
-        "description": "Kahve Americano - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "120 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal",
-            "vegetarian"
-        ]
-    },
-    {
-        "id": "prod_17",
-        "title": "Kahve Cappucino",
-        "category": "Sıcak içecekler",
-        "description": "Kahve Cappucino - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "150 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal",
-            "vegetarian"
-        ]
-    },
-    {
-        "id": "prod_16",
-        "title": "Kahve Latte",
-        "category": "Sıcak içecekler",
-        "description": "Kahve Latte - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "150 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal",
-            "vegetarian"
-        ]
-    },
-    {
-        "id": "prod_30",
-        "title": "Limonata",
-        "category": "Soğuk içecekler",
-        "description": "Buz gibi ev yapımı taze limonata; içerisinde ekstra hibiskus, tarçın, yıldız anason ve İran safranı harmanlanmıştır.",
-        "price": "150 TL",
-        "image_url": "drink_limonata.png",
-        "is_signature": true,
-        "tags": [
-            "halal",
-            "vegetarian",
-            "vegan"
-        ]
-    },
-    {
-        "id": "prod_22",
-        "title": "Madensuyu",
-        "category": "Soğuk içecekler",
-        "description": "Madensuyu - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "40 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_28",
-        "title": "Maraş Dondurma",
-        "category": "Tatlı",
-        "description": "Maraş Dondurma - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "100 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal",
-            "vegetarian",
-            "dairy",
             "gluten",
-            "nuts"
+            "dairy"
         ]
     },
     {
-        "id": "prod_6",
-        "title": "Menemen",
-        "category": "Menemen",
-        "description": "Sadece sarısıyla hazırlanan, bol kaşarlı ve tereyağlı, yöresel lezzetiyle kahvaltıların efsanesi.",
-        "price": "250 TL",
-        "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80",
-        "is_signature": true,
-        "tags": [
-            "halal",
-            "vegetarian",
-            "dairy",
-            "gluten_free"
-        ]
-    },
-    {
-        "id": "prod_7",
-        "title": "Menemen (Etli)",
-        "category": "Menemen",
-        "description": "Sadece sarısıyla hazırlanan, bol kaşarlı ve tereyağlı, yöresel lezzetiyle kahvaltıların efsanesi.",
-        "price": "350 TL",
-        "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80",
-        "is_signature": true,
-        "tags": [
-            "halal",
-            "vegetarian",
-            "dairy",
-            "gluten_free"
-        ]
-    },
-    {
-        "id": "prod_37",
-        "title": "Menemen (Sucuklu)",
-        "category": "Menemen",
-        "description": "Sadece sarısıyla hazırlanan, bol kaşarlı ve tereyağlı, yöresel lezzetiyle kahvaltıların efsanesi.",
-        "price": "350 TL",
-        "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80",
-        "is_signature": true,
-        "tags": [
-            "halal",
-            "vegetarian",
-            "dairy",
-            "gluten_free"
-        ]
-    },
-    {
-        "id": "prod_38",
-        "title": "Menemen (Tavuklu)",
-        "category": "Menemen",
-        "description": "Sadece sarısıyla hazırlanan, bol kaşarlı ve tereyağlı, yöresel lezzetiyle kahvaltıların efsanesi.",
-        "price": "350 TL",
-        "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80",
-        "is_signature": true,
-        "tags": [
-            "halal",
-            "vegetarian",
-            "dairy",
-            "gluten_free"
-        ]
-    },
-    {
-        "id": "prod_8",
-        "title": "Omlet",
-        "category": "Omlet",
-        "description": "Omlet - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "150 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_11",
-        "title": "Omlet (Etli)",
-        "category": "Omlet",
-        "description": "Omlet (Etli) - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "250 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_39",
-        "title": "Omlet (Tavuklu)",
-        "category": "Omlet",
-        "description": "Omlet (Tavuklu) - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "250 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_9",
-        "title": "Omlet Peynirli",
-        "category": "Omlet",
-        "description": "Omlet Peynirli - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "170 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_10",
-        "title": "Omlet Sucuklu",
-        "category": "Omlet",
-        "description": "Omlet Sucuklu - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "250 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_5",
-        "title": "Pizza (Etli)",
-        "category": "Pizza",
-        "description": "Özel mayalanmış hamurumuz, İtalyan domates sosu ve enfes mozzarella peyniriyle odun ateşinde pişer.",
+        "id": "prod_p3",
+        "title": "Taş Fırın Pizza Kavurmalı",
+        "category": "Taş Fırın Pizza",
+        "description": "Odun ateşinde nar gibi kızaran hamur üzerine özel dana kavurma ve bol mozzarella peyniri (27cm).",
         "price": "500 TL",
         "image_url": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80",
         "is_signature": false,
@@ -348,38 +158,10 @@
         ]
     },
     {
-        "id": "prod_4",
-        "title": "Pizza Karışık",
-        "category": "Pizza",
-        "description": "Özel mayalanmış hamurumuz, İtalyan domates sosu ve enfes mozzarella peyniriyle odun ateşinde pişer.",
-        "price": "400 TL",
-        "image_url": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80",
-        "is_signature": true,
-        "tags": [
-            "halal",
-            "gluten",
-            "dairy"
-        ]
-    },
-    {
-        "id": "prod_3",
-        "title": "Pizza Margarita",
-        "category": "Pizza",
-        "description": "Özel mayalanmış hamurumuz, İtalyan domates sosu ve enfes mozzarella peyniriyle odun ateşinde pişer.",
-        "price": "380 TL",
-        "image_url": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80",
-        "is_signature": true,
-        "tags": [
-            "halal",
-            "gluten",
-            "dairy"
-        ]
-    },
-    {
-        "id": "prod_35",
-        "title": "Pizza Sucuklu",
-        "category": "Pizza",
-        "description": "Özel mayalanmış hamurumuz, İtalyan domates sosu ve enfes mozzarella peyniriyle odun ateşinde pişer.",
+        "id": "prod_p4",
+        "title": "Taş Fırın Pizza Sucuklu",
+        "category": "Taş Fırın Pizza",
+        "description": "Baharatlı kasap sucuğu ve erimiş mozarella peyniri ile taş fırında pişen nefis pizza (27cm).",
         "price": "400 TL",
         "image_url": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80",
         "is_signature": false,
@@ -390,12 +172,12 @@
         ]
     },
     {
-        "id": "prod_36",
-        "title": "Pizza Tavuklu",
-        "category": "Pizza",
-        "description": "Özel mayalanmış hamurumuz, İtalyan domates sosu ve enfes mozzarella peyniriyle odun ateşinde pişer.",
-        "price": "400 TL",
-        "image_url": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80",
+        "id": "prod_b1",
+        "title": "Bazlama Tost (Kavurmalı)",
+        "category": "Fırında Bazlama Tost",
+        "description": "Fırınna özel taş fırın köy bazlama ekmeğinde bol dana kavurma ve erimiş kaşar peyniri lezzeti.",
+        "price": "300 TL",
+        "image_url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80",
         "is_signature": false,
         "tags": [
             "halal",
@@ -404,71 +186,39 @@
         ]
     },
     {
-        "id": "prod_23",
-        "title": "Sarıyer Kola",
-        "category": "Soğuk içecekler",
-        "description": "Sarıyer Kola - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "70 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+        "id": "prod_b2",
+        "title": "Bazlama Tost (Sucuklu)",
+        "category": "Fırında Bazlama Tost",
+        "description": "Geleneksel ekşi mayalı bazlama arasında fırınlanmış dilim kasap sucuğu ve erimiş kaşar peyniri.",
+        "price": "250 TL",
+        "image_url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80",
         "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_24",
-        "title": "Sarıyer Portakal",
-        "category": "Soğuk içecekler",
-        "description": "Sarıyer Portakal - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "70 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_21",
-        "title": "Su",
-        "category": "Soğuk içecekler",
-        "description": "Su - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "20 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_33",
-        "title": "Süt",
-        "category": "Soğuk içecekler",
-        "description": "Süt - Fırınna'da taze malzemelerle hazırlanır.",
-        "price": "100 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-        "is_signature": false,
-        "tags": [
-            "halal"
-        ]
-    },
-    {
-        "id": "prod_19",
-        "title": "Türk Kahvesi",
-        "category": "Sıcak içecekler",
-        "description": "Özel kavrulmuş ve çekilmiş en kaliteli taze Arabica kahvelerin en lezzetli pişirilmiş hali ve yanında meşhur Türk lokumu.",
-        "price": "120 TL",
-        "image_url": "drink_kahve.png",
-        "is_signature": true,
         "tags": [
             "halal",
-            "vegetarian"
+            "gluten",
+            "dairy"
         ]
     },
     {
-        "id": "prod_15",
-        "title": "Çay",
-        "category": "Sıcak içecekler",
-        "description": "En seçkin Türk ve Seylan çayı karışımı içinde bergamot ve kuru gül goncaları ile demlenir.",
+        "id": "prod_b3",
+        "title": "Bazlama Tost (Yumurtalı & Kaşarlı)",
+        "category": "Fırında Bazlama Tost",
+        "description": "Sıcak bazlama ekmeği içinde çiftlik yumurtası ve erimiş kaşar peynirli fırın tost.",
+        "price": "200 TL",
+        "image_url": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "gluten",
+            "dairy"
+        ]
+    },
+    {
+        "id": "prod_s1",
+        "title": "Gül Goncalı Harman Çay",
+        "category": "Sıcak İçecekler",
+        "description": "En seçkin Türk ve Seylan çayı karışımı içinde bergamot ve kuru gül goncaları ile özel demlenir.",
         "price": "40 TL",
         "image_url": "drink_cay.png",
         "is_signature": true,
@@ -480,18 +230,235 @@
         ]
     },
     {
-        "id": "prod_26",
-        "title": "Çikolatalı Kek",
-        "category": "Tatlı",
-        "description": "Çikolatalı Kek - Fırınna'da taze malzemelerle hazırlanır.",
+        "id": "prod_s2",
+        "title": "Özel Türk Kahvesi",
+        "category": "Sıcak İçecekler",
+        "description": "Özel kavrulmuş ve taze çekilmiş Arabica çekirdeklerinden pişirilen geleneksel Türk kahvesi, yanında meşhur Türk lokumu.",
+        "price": "120 TL",
+        "image_url": "drink_kahve.png",
+        "is_signature": true,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan"
+        ]
+    },
+    {
+        "id": "prod_s3",
+        "title": "Sıcak Glintwein (Alkolsüz)",
+        "category": "Sıcak İçecekler",
+        "description": "Özel kış baharatları, taze portakal dilimi, karanfil ve çubuk tarçın aromalı sıcak kış içeceği.",
         "price": "150 TL",
-        "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+        "image_url": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=600&q=80",
+        "is_signature": true,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan"
+        ]
+    },
+    {
+        "id": "prod_s4",
+        "title": "Espresso",
+        "category": "Sıcak İçecekler",
+        "description": "Taze çekilmiş %100 Arabica çekirdeklerinden hazırlanan yoğun gövdeli zengin İtalyan espressosu.",
+        "price": "90 TL",
+        "image_url": "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=600&q=80",
         "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan",
+            "sugar_free"
+        ]
+    },
+    {
+        "id": "prod_s5",
+        "title": "Americano",
+        "category": "Sıcak İçecekler",
+        "description": "Çift shot taze espresso ve sıcak su birleşimi ile yumuşak içimli sıcak kahve.",
+        "price": "120 TL",
+        "image_url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan",
+            "sugar_free"
+        ]
+    },
+    {
+        "id": "prod_s6",
+        "title": "Kahve Latte",
+        "category": "Sıcak İçecekler",
+        "description": "Espresso lezzetinin kremsi buharlaştırılmış sıcak süt ve zarif süt köpüğü ile buluşması.",
+        "price": "150 TL",
+        "image_url": "https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "dairy"
+        ]
+    },
+    {
+        "id": "prod_s7",
+        "title": "Cappuccino",
+        "category": "Sıcak İçecekler",
+        "description": "Zengin espresso, bol kadifemsi sıcak süt köpüğü ve üzeri hafif kakao dokunuşlu İtalyan klasiği.",
+        "price": "150 TL",
+        "image_url": "https://images.unsplash.com/photo-1572442388796-11668ba67e53?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "dairy"
+        ]
+    },
+    {
+        "id": "prod_dr1",
+        "title": "Ev Yapımı Özel Limonata",
+        "category": "Soğuk İçecekler",
+        "description": "Buz gibi taze sıkım limon; içerisinde harmanlanmış hibiskus, çubuk tarçın, yıldız anason ve İran safranı.",
+        "price": "150 TL",
+        "image_url": "drink_limonata.png",
+        "is_signature": true,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan"
+        ]
+    },
+    {
+        "id": "prod_dr2",
+        "title": "Hibiscus Soğuk Çay",
+        "category": "Soğuk İçecekler",
+        "description": "Doğal hibiskus çiçekleri, karanfil ve taze nane yaprakları ile demlenen ferahlatıcı soğuk çay.",
+        "price": "150 TL",
+        "image_url": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan"
+        ]
+    },
+    {
+        "id": "prod_dr3",
+        "title": "FuseTea Şeftalili Soğuk Çay",
+        "category": "Soğuk İçecekler",
+        "description": "Buz gibi serinletici şeftali aromalı FuseTea soğuk çay kutusu (330ml).",
+        "price": "70 TL",
+        "image_url": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan"
+        ]
+    },
+    {
+        "id": "prod_dr4",
+        "title": "Sarıyer Kola",
+        "category": "Soğuk İçecekler",
+        "description": "Geleneksel lezzet serinletici buz gibi Sarıyer kola (330ml).",
+        "price": "70 TL",
+        "image_url": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan"
+        ]
+    },
+    {
+        "id": "prod_dr5",
+        "title": "Sarıyer Portakal",
+        "category": "Soğuk İçecekler",
+        "description": "Meyve aromalı serinletici Sarıyer portakal gazozu (330ml).",
+        "price": "70 TL",
+        "image_url": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan"
+        ]
+    },
+    {
+        "id": "prod_dr6",
+        "title": "Natural Madensuyu",
+        "category": "Soğuk İçecekler",
+        "description": "Zengin mineralli ferahlatıcı cam şişe doğal madensuyu.",
+        "price": "40 TL",
+        "image_url": "https://images.unsplash.com/photo-1560023907-5f339617ea30?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan",
+            "sugar_free"
+        ]
+    },
+    {
+        "id": "prod_dr7",
+        "title": "Doğal Kaynak Suyu",
+        "category": "Soğuk İçecekler",
+        "description": "Buz gibi cam şişe doğal kaynak içme suyu.",
+        "price": "20 TL",
+        "image_url": "https://images.unsplash.com/photo-1560023907-5f339617ea30?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "vegan",
+            "sugar_free"
+        ]
+    },
+    {
+        "id": "prod_t1",
+        "title": "Çikolata Soslu Kakaolu Sıcak Kek",
+        "category": "Tatlılar",
+        "description": "İçi nemli ve akışkan yoğun kakaolu kek, üzerine dökülen sıcak çikolata sosu ve pudra şekeri dokunuşuyla mükemmel lezzet.",
+        "price": "150 TL",
+        "image_url": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80",
+        "is_signature": true,
         "tags": [
             "halal",
             "vegetarian",
             "dairy",
             "gluten"
+        ]
+    },
+    {
+        "id": "prod_t2",
+        "title": "Maraş Dondurmalı Çıtır Baklava",
+        "category": "Tatlılar",
+        "description": "İncecik çıtır baklava yufkası, bol antep fıstığı dolgusu ve yanında sunulan keçi sütlü hakiki Maraş dondurması.",
+        "price": "170 TL",
+        "image_url": "https://images.unsplash.com/photo-1519676867240-f03562e64548?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "dairy",
+            "gluten",
+            "nuts"
+        ]
+    },
+    {
+        "id": "prod_t3",
+        "title": "Hakiki Maraş Dondurma",
+        "category": "Tatlılar",
+        "description": "Keçi sütü ve salep dokusuyla hazırlanan geleneksel sade Kahramanmaraş dondurması porsiyonu.",
+        "price": "100 TL",
+        "image_url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",
+        "is_signature": false,
+        "tags": [
+            "halal",
+            "vegetarian",
+            "dairy",
+            "gluten_free"
         ]
     }
 ]

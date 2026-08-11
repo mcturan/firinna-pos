@@ -1005,6 +1005,18 @@ async function fetchWebProducts() {
     }
 }
 
+const FRONTEND_TAG_MAP = {
+    'vegetarian': { label: '🌱 Vejetaryen', bg: '#dcfce7', color: '#15803d' },
+    'vegan': { label: '🥑 Vegan', bg: '#ecfdf5', color: '#166534' },
+    'gluten': { label: '🌾 Gluten', bg: '#fff7ed', color: '#c2410c' },
+    'gluten_free': { label: '🌾🚫 Glutensiz', bg: '#f0fdf4', color: '#047857' },
+    'dairy': { label: '🥛 Süt Ürünü', bg: '#f0f9ff', color: '#0369a1' },
+    'nuts': { label: '🥜 Kuruyemiş', bg: '#fef3c7', color: '#b45309' },
+    'spicy': { label: '🌶️ Acı', bg: '#fef2f2', color: '#b91c1c' },
+    'halal': { label: '🥩 Helal', bg: '#ecfdf5', color: '#065f46' },
+    'sugar_free': { label: '🍯 Şekersiz', bg: '#fdf4ff', color: '#86198f' }
+};
+
 function renderDynamicSignatureGallery() {
     const signatureGrid = document.getElementById('signature-gallery-grid');
     if (!signatureGrid) return;
@@ -1016,9 +1028,10 @@ function renderDynamicSignatureGallery() {
         const img = p.image_url.startsWith('http') || p.image_url.startsWith('drink_') || p.image_url.startsWith('prod_') ? p.image_url : p.image_url;
         const titleEscaped = (p.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
         const descEscaped = (p.description || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        
+        const tagsStr = (p.tags || []).join(',');
+
         return `
-            <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px; cursor:pointer;" onclick="openLightbox('${img}', '${titleEscaped}', '${descEscaped}')">
+            <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px; cursor:pointer;" onclick="openLightbox('${img}', '${titleEscaped}', '${descEscaped}', '${tagsStr}')">
                 <img src="${img}" alt="${p.title}" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
                 <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">${p.title}</span>
             </div>
@@ -1026,7 +1039,7 @@ function renderDynamicSignatureGallery() {
     }).join('');
 }
 
-function openLightbox(src, captionKeyOrText, descText) {
+function openLightbox(src, captionKeyOrText, descText, tagsStr = '') {
     const modal = document.getElementById('lightboxModal');
     const img = document.getElementById('lightboxImg');
     const caption = document.getElementById('lightboxCaption');
@@ -1038,6 +1051,19 @@ function openLightbox(src, captionKeyOrText, descText) {
                 title = i18n[currentLang][captionKeyOrText];
             }
             let html = `<div style="font-size:1.2rem; font-weight:700; margin-bottom:6px; color:#fbbf24;">${title}</div>`;
+
+            if (tagsStr) {
+                const tagList = tagsStr.split(',').filter(Boolean);
+                if (tagList.length > 0) {
+                    html += `<div style="display:flex; justify-content:center; flex-wrap:wrap; gap:6px; margin-bottom:10px;">`;
+                    tagList.forEach(t => {
+                        const info = FRONTEND_TAG_MAP[t] || { label: t, bg: '#334155', color: '#f8fafc' };
+                        html += `<span style="background:${info.bg}; color:${info.color}; font-size:0.75rem; font-weight:700; padding:3px 8px; border-radius:12px;">${info.label}</span>`;
+                    });
+                    html += `</div>`;
+                }
+            }
+
             if (descText) {
                 html += `<div style="font-size:0.95rem; font-weight:400; color:#e2e8f0; max-width:600px; line-height:1.5; margin:0 auto;">${descText}</div>`;
             }
