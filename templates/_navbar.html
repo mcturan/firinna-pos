@@ -306,8 +306,8 @@ function showToast(msg, type, duration) {
             if (actualAppVersion !== 'Bilinmiyor' && cmpVersions(serverVersion, actualAppVersion) > 0) {
                 if(confirm("Yeni bir güncelleme mevcut (v" + serverVersion + "). Uygulamayı şimdi güncellemek ister misiniz?")) {
                     var fullUrl = window.location.origin + '/download_apk';
-                    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.UpdatePlugin) {
-                        window.Capacitor.Plugins.UpdatePlugin.downloadAndInstall({ url: fullUrl });
+                    if (window.AndroidNative && window.AndroidNative.downloadAndInstall) {
+                        window.AndroidNative.downloadAndInstall(fullUrl);
                     } else {
                         window.open(fullUrl, '_system') || window.open(fullUrl, '_blank');
                         alert("İndirme işlemi tarayıcınızda başlatıldı. Lütfen indirme tamamlandığında bildirimlerden tıklayarak kurunuz.");
@@ -326,8 +326,8 @@ function showToast(msg, type, duration) {
             }
             if(confirm("Son sürüme (v" + (serverVersion || 'Yeni') + ") güncellensin mi?")) {
                 var fullUrl = window.location.origin + '/download_apk';
-                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.UpdatePlugin) {
-                    window.Capacitor.Plugins.UpdatePlugin.downloadAndInstall({ url: fullUrl });
+                if (window.AndroidNative && window.AndroidNative.downloadAndInstall) {
+                    window.AndroidNative.downloadAndInstall(fullUrl);
                 } else {
                     window.open(fullUrl, '_system') || window.open(fullUrl, '_blank');
                     alert("İndirme işlemi tarayıcınızda başlatıldı. Lütfen indirme tamamlandığında bildirimlerden tıklayarak kurunuz.");
