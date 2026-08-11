@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Yönetimi - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    {% include '_navbar.html' %}
+
+    <div class="container">
+        <!-- Excel İmport/Export Bar -->
+        <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;">
+            <span style="font-weight:700;color:#4a5568;font-size:.95rem;">📊 Excel:</span>
+            <button onclick="downloadTemplate()" style="padding:.5rem 1rem;background:#217346;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">
+                📥 Şablon İndir / Dışa Aktar
+            </button>
+            <label style="padding:.5rem 1rem;background:#1d6fa5;color:white;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;">
+                📤 Excel'den Güncelle
+                <input type="file" id="excelFile" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleExcelImport(event)">
+            </label>
+            <span id="importStatus" style="font-size:.85rem;color:#718096;"></span>
+        </div>
+
+        <div class="management-grid">
+            <!-- Kategoriler -->
+            <div class="management-section">
+                <h2>Kategoriler</h2>
+                <form id="categoryForm" class="add-form">
+                    <input type="text" id="categoryName" placeholder="Kategori adı" required>
+                    <input type="color" id="categoryColor" value="#3B82F6">
+                    <button type="submit" class="btn btn-primary">➕ Ekle</button>
+                </form>
+                
+                <div id="categoriesList" class="items-list"></div>
+            </div>
+
+            <!-- Ürünler -->
+            <div class="management-section">
+                <h2>Ürünler</h2>
+                <form id="productForm" class="add-form">
+                    <input type="text" id="productName" placeholder="Ürün adı" required>
+                    <select id="productCategory" required>
+                        <option value="">Kategori seç</option>
+                    </select>
+                    <input type="number" id="productPrice" placeholder="Fiyat" step="0.01" required>
+                    <button type="submit" class="btn btn-primary">➕ Ekle</button>
+                </form>
+                
+                <div id="productsList" class="items-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+            loadProducts();
+
+            document.getElementById('categoryForm').onsubmit = async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('categoryName').value;
+                const color = document.getElementById('categoryColor').value;
+                
+                await fetch('/api/categories', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, color})
+                });
+                
+                document.getElementById('categoryForm').reset();
+                document.getElementById('categoryColor').value = '#3B82F6';
+                loadCategories();
+                loadProducts();
+            };
+
+            document.getElementById('productForm').onsubmit = async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('productName').value;
+                const category_id = parseInt(document.getElementById('productCategory').value);
+                const price = parseFloat(document.getElementById('productPrice').value);
+                
+                await fetch('/api/products', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, category_id, price})
+                });
+                
+                document.getElementById('productForm').reset();
+                loadProducts();
+            };
+        });
+
+        async function loadCategories() {
+            const categories = await fetch('/api/categories').then(r => r.json());
+            const categoriesList = document.getElementById('categoriesList');
+            const productCategory = document.getElementById('productCategory');
+            
+            categoriesList.innerHTML = categories.map(cat => `
+                <div class="item-row" style="border-left: 4px solid ${cat.color}" id="cat-row-${cat.id}">
+                    <span class="item-name">${cat.name}</span>
+                    <div style="display:flex;gap:.4rem;">
+                        <button class="btn-delete" style="background:none;border:none;cursor:pointer;font-size:1rem;" onclick="editCategory(${cat.id})" data-name="${cat.name}" id="cat-btn-${cat.id}" title="Düzenle">✏️</button>
+                        <button class="btn-delete" onclick="deleteCategory(${cat.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            productCategory.innerHTML = '<option value="">Kategori seç</option>' + 
+                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        }
+
+        let stockItemsForLink = [];
+
+        async function loadProducts() {
+            const [products, stockItems] = await Promise.all([
+                fetch('/api/products').then(r => r.json()),
+                fetch('/api/stock').then(r => r.json())
+            ]);
+            stockItemsForLink = stockItems;
+            const productsList = document.getElementById('productsList');
+
+            if (products.length === 0) {
+                productsList.innerHTML = '<p class="no-data">Henüz ürün eklenmemiş</p>';
+                return;
+            }
+
+            productsList.innerHTML = products.map(prod => {
+                const linked = prod.stock_item_id
+                    ? stockItems.find(s => s.id === prod.stock_item_id)
+                    : null;
+                const badge = linked
+                    ? `<span style="font-size:.72rem;background:#d1fae5;color:#065f46;border-radius:10px;padding:.1rem .5rem;margin-left:.4rem;">📦 ${linked.name}</span>`
+                    : `<span style="font-size:.72rem;background:#f1f5f9;color:#94a3b8;border-radius:10px;padding:.1rem .5rem;margin-left:.4rem;">Stok yok</span>`;
+                const isAvail = prod.is_available !== 0;
+                return `
+                <div class="item-row" id="prod-row-${prod.id}" style="${isAvail ? '' : 'opacity:.6;'}">
+                    <div class="item-info">
+                        <span class="item-name">${prod.name}${isAvail ? '' : ' <span style="font-size:.7rem;background:#fee2e2;color:#991b1b;border-radius:8px;padding:.1rem .45rem;font-weight:700;">Tükendi</span>'}</span>
+                        <span class="item-meta">${prod.category_name} • ${prod.price.toFixed(2)} TL ${badge}</span>
+                    </div>
+                    <div style="display:flex;gap:.4rem;align-items:center;">
+                        <button style="background:${isAvail ? '#fff7ed' : '#f0fdf4'};border:1px solid ${isAvail ? '#fed7aa' : '#bbf7d0'};border-radius:6px;cursor:pointer;font-size:.78rem;padding:.25rem .55rem;color:${isAvail ? '#c2410c' : '#15803d'};font-weight:600;" onclick="toggleAvailability(${prod.id})" title="${isAvail ? 'Tükendi işaretle' : 'Mevcut işaretle'}">${isAvail ? '🚫 Tükendi' : '✅ Mevcut'}</button>
+                        <button style="background:none;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:.8rem;padding:.25rem .5rem;color:#4a5568;" onclick="openStockLink(${prod.id},'${prod.name}',${prod.stock_item_id||'null'})" title="Stok Bağla">📦</button>
+                        <button class="btn-delete" style="background:none;border:none;cursor:pointer;font-size:1rem;" onclick="editProduct(${prod.id})" data-name="${prod.name}" data-price="${prod.price}" data-catid="${prod.category_id||0}" id="prod-btn-${prod.id}" title="Düzenle">✏️</button>
+                        <button class="btn-delete" onclick="deleteProduct(${prod.id})">🗑️</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function editCategory(id) {
+            const currentName = document.getElementById('cat-btn-' + id).dataset.name;
+            const row = document.getElementById('cat-row-' + id);
+            row.innerHTML = `
+                <input type="text" id="cat-edit-${id}" value="${currentName}"
+                    style="flex:1;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.95rem;">
+                <div style="display:flex;gap:.4rem;">
+                    <button class="btn btn-primary" style="padding:.35rem .75rem;" onclick="saveCategoryEdit(${id})">✓</button>
+                    <button class="btn btn-secondary" style="padding:.35rem .75rem;" onclick="loadCategories()">✕</button>
+                </div>`;
+            document.getElementById('cat-edit-' + id).focus();
+        }
+
+        async function saveCategoryEdit(id) {
+            const name = document.getElementById('cat-edit-' + id).value.trim();
+            if (!name) return;
+            await fetch(`/api/categories/${id}/name`, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name})
+            });
+            loadCategories(); loadProducts();
+        }
+
+        function editProduct(id) {
+            const btn = document.getElementById('prod-btn-' + id);
+            const currentName = btn.dataset.name;
+            const currentPrice = parseFloat(btn.dataset.price);
+            const currentCatId = btn.dataset.catid;
+            const row = document.getElementById('prod-row-' + id);
+            const catOptions = Array.from(document.getElementById('productCategory').options)
+                .filter(o => o.value)
+                .map(o => `<option value="${o.value}" ${o.value == currentCatId ? 'selected' : ''}>${o.text}</option>`)
+                .join('');
+            row.innerHTML = `
+                <div style="display:flex;gap:.4rem;flex:1;flex-wrap:wrap;">
+                    <input type="text" id="prod-name-${id}" value="${currentName}"
+                        style="flex:2;min-width:120px;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.95rem;">
+                    <input type="number" id="prod-price-${id}" value="${currentPrice}" step="0.01" min="0"
+                        style="flex:1;min-width:80px;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.95rem;">
+                    <select id="prod-cat-${id}" style="flex:1;min-width:100px;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.9rem;">
+                        ${catOptions}
+                    </select>
+                </div>
+                <div style="display:flex;gap:.4rem;">
+                    <button class="btn btn-primary" style="padding:.35rem .75rem;" onclick="saveProductEdit(${id})">✓</button>
+                    <button class="btn btn-secondary" style="padding:.35rem .75rem;" onclick="loadProducts()">✕</button>
+                </div>`;
+        }
+
+        async function saveProductEdit(id) {
+            const name = document.getElementById('prod-name-' + id).value.trim();
+            const price = parseFloat(document.getElementById('prod-price-' + id).value);
+            const category_id = document.getElementById('prod-cat-' + id).value;
+            if (!name || isNaN(price)) return;
+            await fetch(`/api/products/${id}`, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name, price, category_id})
+            });
+            loadProducts();
+        }
+
+        async function deleteCategory(id) {
+            confirmDelete('Kategoriyi sil', 'Bu kategoriyi silmek istediğinize emin misiniz? Kategoriye bağlı ürünler de etkilenebilir.', async () => {
+                const res = await fetch(`/api/categories/${id}`, {method: 'DELETE'});
+                const d = await res.json();
+                if (!d.success) { showDeleteError(d.error || 'Kategori silinemedi'); return; }
+                loadCategories(); loadProducts();
+            });
+        }
+
+        function openStockLink(productId, productName, currentStockId) {
+            document.getElementById('slProductId').value = productId;
+            document.getElementById('slProductName').textContent = productName;
+            const sel = document.getElementById('slStockSelect');
+            sel.innerHTML = '<option value="">— Bağlama (stok düşme yok) —</option>' +
+                stockItemsForLink.map(s =>
+                    `<option value="${s.id}" ${s.id === currentStockId ? 'selected' : ''}>${s.name} (${Number(s.current_qty||0).toFixed(1)} ${s.unit})</option>`
+                ).join('');
+            document.getElementById('stockLinkModal').style.display = 'block';
+        }
+
+        async function saveStockLink() {
+            const pid = document.getElementById('slProductId').value;
+            const sid = document.getElementById('slStockSelect').value;
+            if (sid) {
+                await fetch(`/api/products/${pid}/stock-link`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({stock_item_id: parseInt(sid)})
+                });
+            } else {
+                await fetch(`/api/products/${pid}/stock-link`, {method: 'DELETE'});
+            }
+            document.getElementById('stockLinkModal').style.display = 'none';
+            loadProducts();
+        }
+
+        async function toggleAvailability(id) {
+            await fetch(`/api/products/${id}/availability`, {method:'PATCH'});
+            loadProducts();
+        }
+
+        async function deleteProduct(id) {
+            confirmDelete('Ürünü sil', 'Bu ürünü kalıcı olarak silmek istediğinize emin misiniz?', async () => {
+                const res = await fetch(`/api/products/${id}`, {method: 'DELETE'});
+                const data = await res.json();
+                if (!data.success) { showDeleteError(data.error || 'Ürün silinemedi'); return; }
+                loadProducts();
+            });
+        }
+
+        // === EXCEL IMPORT/EXPORT ===
+        function downloadTemplate() {
+            // Mevcut ürünleri CSV olarak indir
+            window.location.href = '/api/products/excel-export';
+        }
+
+        async function handleExcelImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const status = document.getElementById('importStatus');
+            status.textContent = '⏳ Okunuyor...';
+
+            const ext = file.name.split('.').pop().toLowerCase();
+            let rows = [];
+
+            if (ext === 'csv') {
+                const text = await file.text();
+                const lines = text.replace(/\r/g,'').split('\n').filter(l=>l.trim());
+                const headers = lines[0].split(';').map(h=>h.replace(/^\uFEFF/,'').trim());
+                for (let i=1; i<lines.length; i++) {
+                    const vals = lines[i].split(';');
+                    const obj = {};
+                    headers.forEach((h,j) => obj[h] = (vals[j]||'').trim());
+                    if (obj.name) rows.push(obj);
+                }
+            } else {
+                // xlsx — basit okuma için uyarı
+                status.textContent = '⚠️ Lütfen CSV formatında yükleyin. "Şablon İndir" ile CSV alabilirsiniz.';
+                event.target.value = '';
+                return;
+            }
+
+            if (!rows.length) { status.textContent = '⚠️ Veri bulunamadı.'; return; }
+
+            // Önizleme onayla
+            const preview = rows.slice(0,5).map(r=>`${r.name} — ${r.price} ₺ (${r.category_name})`).join('\n');
+            const more = rows.length > 5 ? `\n...ve ${rows.length-5} satır daha` : '';
+            if (!confirm(`${rows.length} satır yüklenecek:\n\n${preview}${more}\n\nDevam edilsin mi?`)) {
+                event.target.value = '';
+                status.textContent = '';
+                return;
+            }
+
+            status.textContent = '⏳ Yükleniyor...';
+            const res = await fetch('/api/products/excel-import', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(rows)
+            }).then(r=>r.json());
+
+            status.textContent = `✅ ${res.updated} güncellendi, ${res.added} eklendi${res.errors.length ? ', '+res.errors.length+' hata' : ''}`;
+            event.target.value = '';
+            loadProducts();
+        }
+    </script>
+    </div><!-- /container -->
+
+    <!-- Stok Bağlantı Modal -->
+    <div id="stockLinkModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;display:none;">
+        <div style="background:white;border-radius:16px;padding:1.5rem;width:90%;max-width:420px;margin:auto;margin-top:15vh;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+            <h3 style="margin:0 0 .5rem;font-size:1rem;">📦 Stok Bağlantısı</h3>
+            <p style="font-size:.85rem;color:#718096;margin:0 0 1rem;">
+                <strong id="slProductName"></strong> satıldığında seçilen stok kaleminden <strong>1 adet</strong> otomatik düşer.
+            </p>
+            <input type="hidden" id="slProductId">
+            <select id="slStockSelect" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;margin-bottom:1rem;"></select>
+            <div style="display:flex;gap:.5rem;">
+                <button onclick="saveStockLink()" style="flex:1;padding:.65rem;background:#2d6a4f;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">💾 Kaydet</button>
+                <button onclick="document.getElementById('stockLinkModal').style.display='none'" style="flex:1;padding:.65rem;background:#f1f5f9;color:#4a5568;border:none;border-radius:8px;font-weight:600;cursor:pointer;">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Silme Onay Modalı -->
+    <div id="deleteConfirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+        <div style="background:var(--surface);border-radius:var(--r-xl);padding:1.75rem;width:100%;max-width:360px;box-shadow:var(--s-lg);border:1px solid var(--border);">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+                <div style="width:40px;height:40px;background:var(--red-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>
+                        <path d="M9 6V4h6v2"/>
+                    </svg>
+                </div>
+                <div id="deleteConfirmTitle" style="font-weight:700;font-size:.98rem;color:var(--ink);"></div>
+            </div>
+            <div id="deleteConfirmMsg" style="font-size:.85rem;color:var(--ink-2);margin-bottom:1.5rem;line-height:1.5;"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+                <button onclick="closeDeleteConfirm()" style="padding:.65rem;border:1.5px solid var(--border);border-radius:var(--r-sm);background:none;cursor:pointer;font-size:.85rem;font-weight:600;font-family:inherit;color:var(--ink-2);">İptal</button>
+                <button id="deleteConfirmBtn" style="padding:.65rem;border:none;border-radius:var(--r-sm);background:var(--red);color:#fff;cursor:pointer;font-size:.85rem;font-weight:700;font-family:inherit;">Sil</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let _deleteCallback = null;
+        function confirmDelete(title, msg, callback) {
+            document.getElementById('deleteConfirmTitle').textContent = title;
+            document.getElementById('deleteConfirmMsg').textContent = msg;
+            _deleteCallback = callback;
+            document.getElementById('deleteConfirmModal').style.display = 'flex';
+        }
+        function closeDeleteConfirm() {
+            document.getElementById('deleteConfirmModal').style.display = 'none';
+            _deleteCallback = null;
+        }
+        document.getElementById('deleteConfirmBtn').onclick = async function() {
+            closeDeleteConfirm();
+            if (_deleteCallback) await _deleteCallback();
+        };
+        function showDeleteError(msg) {
+            // toast benzeri basit hata
+            const t = document.createElement('div');
+            t.textContent = '⚠️ ' + msg;
+            t.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:var(--red);color:#fff;padding:.9rem 1.25rem;border-radius:var(--r);font-weight:600;font-size:.86rem;z-index:99999;box-shadow:var(--s-lg);';
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3500);
+        }
+    </script>
+
+    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
+        Fırınna POS &mdash; TA1XTA &copy; 2026
+    </footer>
+    <script>
+    (function(){
+        async function loadAlerts() {
+            try {
+                const items = await fetch("/api/stock/alerts").then(r=>r.json());
+                const badge = document.getElementById("alertBadge");
+                const body  = document.getElementById("alertPanelBody");
+                if (!badge || !body) return;
+                if (items.length > 0) {
+                    badge.textContent = items.length;
+                    badge.style.display = "flex";
+                    body.innerHTML = items.map(i => `
+                        <div class="alert-item">
+                            <span class="alert-item-name">${i.name}</span>
+                            <span class="alert-item-qty">
+                                <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
+                                <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
+                            </span>
+                        </div>`).join("");
+                } else {
+                    badge.style.display = "none";
+                    body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
+                }
+            } catch(e) {}
+        }
+        function toggleAlertPanel() {
+            const p = document.getElementById("alertPanel");
+            if (p) p.classList.toggle("open");
+        }
+        document.addEventListener("click", function(e) {
+            const p  = document.getElementById("alertPanel");
+            const b  = document.getElementById("alertBtn");
+            const dd = document.getElementById("navDropdown");
+            if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove("open");
+        });
+        loadAlerts();
+        setInterval(loadAlerts, 60000);
+    })();
+    </script>
+</body>
+</html>

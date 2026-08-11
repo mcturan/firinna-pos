@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasa - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .kasa-tabs { display:flex; gap:0; border-bottom:2px solid #e2e8f0; margin-bottom:1.5rem; }
+        .kasa-tab { padding:.55rem 1.2rem; border:none; background:none; font-size:.85rem; font-weight:600; color:#718096; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; }
+        .kasa-tab:hover { color:#2d6a4f; }
+        .kasa-tab.active { color:#2d6a4f; border-bottom-color:#2d6a4f; }
+
+        .period-bar { display:flex; gap:.75rem; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; }
+        .period-bar input { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; }
+        .period-btn.active { border-color:#2d6a4f; color:#2d6a4f; background:#f0fdf4; }
+
+        .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+        .sum-card { background:white; border-radius:12px; padding:1.2rem; box-shadow:0 2px 8px rgba(0,0,0,.07); text-align:center; }
+        .sum-val.green { color:#2d6a4f; }
+        .sum-val.red { color:#e53e3e; }
+        .sum-val.blue { color:#3b82f6; }
+        .sum-val.orange { color:#ed8936; }
+        .sum-label { font-size:.78rem; color:#a0aec0; margin-top:.3rem; }
+
+        .tx-table { width:100%; border-collapse:collapse; font-size:.9rem; }
+        .tx-table th { background:#f7fafc; padding:.65rem .75rem; text-align:left; color:#4a5568; font-weight:600; border-bottom:2px solid #e2e8f0; }
+        .tx-table td { padding:.6rem .75rem; border-bottom:1px solid #f0f0f0; }
+        .tx-table tr:hover td { background:#fafafa; }
+        .badge-in  { background:#d1fae5; color:#065f46; padding:.2rem .6rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .badge-out { background:#fee2e2; color:#991b1b; padding:.2rem .6rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .cat-badge { background:#e2e8f0; color:#4a5568; padding:.15rem .5rem; border-radius:20px; font-size:.72rem; }
+
+        .add-tx-form { background:white; border-radius:12px; padding:1.25rem; box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.5rem; }
+        .add-tx-form h4 { margin:0 0 1rem; color:#4a5568; }
+        .tx-inputs { display:flex; gap:.5rem; flex-wrap:wrap; align-items:flex-end; }
+        .tx-inputs select, .tx-inputs input { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; }
+        .tx-inputs input[type=text] { flex:2; min-width:150px; }
+        .tx-inputs input[type=number] { flex:1; min-width:100px; }
+        .no-data { text-align:center; color:#a0aec0; padding:2rem; }
+        .btn-del { background:none; border:none; cursor:pointer; color:#cbd5e0; font-size:.9rem; }
+        .btn-del:hover { color:#e53e3e; }
+
+        /* F3: Giriş/Çıkış toggle */
+        .type-toggle { display:flex; border-radius:8px; overflow:hidden; border:2px solid #e2e8f0; flex-shrink:0; }
+        .toggle-btn { padding:.45rem .9rem; border:none; background:#f7fafc; font-size:.85rem; font-weight:600; cursor:pointer; transition:all .2s; }
+        .toggle-btn[data-type="out"].active { background:#fee2e2; color:#991b1b; border-color:#feb2b2; }
+        .toggle-btn[data-type="in"].active  { background:#d1fae5; color:#065f46; border-color:#6ee7b7; }
+
+        /* F2: Filtre bölümü */
+        .tx-filter { background:white; border-radius:12px; padding:1rem 1.25rem; box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1rem; display:flex; gap:.75rem; flex-wrap:wrap; align-items:flex-end; }
+        .tx-filter label { font-size:.78rem; color:#4a5568; font-weight:600; display:flex; flex-direction:column; gap:.3rem; }
+        .tx-filter input, .tx-filter select { padding:.42rem .65rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.85rem; }
+
+        /* F2: Sayfalama */
+        .pagination { display:flex; gap:.5rem; align-items:center; justify-content:center; padding:1rem 0; }
+        .page-btn { padding:.4rem .9rem; border:2px solid #e2e8f0; border-radius:8px; background:white; cursor:pointer; font-size:.85rem; font-weight:600; color:#4a5568; transition:all .2s; }
+        .page-btn:hover:not(:disabled) { border-color:#2d6a4f; color:#2d6a4f; }
+        .page-btn:disabled { opacity:.4; cursor:not-allowed; }
+        .page-info { font-size:.85rem; color:#718096; padding:0 .5rem; }
+    </style>
+</head>
+<body>
+    {% include '_navbar.html' %}
+
+    <div class="container">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+            <h1 style="margin:0;">💰 Kasa</h1>
+            <div class="period-bar" style="margin:0;">
+                <button class="period-btn active" onclick="setPeriod('daily')"   id="pb-daily">Bugün</button>
+                <button class="period-btn"         onclick="setPeriod('weekly')"  id="pb-weekly">Bu Hafta</button>
+                <button class="period-btn"         onclick="setPeriod('monthly')" id="pb-monthly">Bu Ay</button>
+                <button class="period-btn"         onclick="setPeriod('custom')"  id="pb-custom">Özel</button>
+                <input type="date" id="dateInput" style="display:none;">
+                <span id="customRange" style="display:none;gap:.5rem;align-items:center;">
+                    <input type="date" id="customStart">
+                    <span>—</span>
+                    <input type="date" id="customEnd">
+                </span>
+                <button class="btn btn-primary" id="getirBtn" style="display:none;" onclick="loadAll()">Getir</button>
+            </div>
+        </div>
+
+        <!-- Sekmeler -->
+        <div class="kasa-tabs">
+            <button class="kasa-tab"        onclick="switchKasa('nakit')" id="tab-nakit">💵 Nakit Kasa</button>
+            <button class="kasa-tab"        onclick="switchKasa('kart')"  id="tab-kart">💳 Banka Kasa</button>
+            <button class="kasa-tab active" onclick="switchKasa('ana')"   id="tab-ana">📊 Ana Kasa</button>
+        </div>
+
+        <!-- Özet + işlem formu -->
+        <div id="kasaContent"><div class="no-data">⏳ Yükleniyor...</div></div>
+
+        <!-- Günlük Kapanış Raporu -->
+        <div id="dailyCloseCard" style="background:white;border-radius:12px;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:1.5rem;display:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;">
+                <h3 style="margin:0;font-size:.95rem;color:#2d3748;">📋 Günlük Kapanış Raporu</h3>
+                <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+                    <button onclick="loadDailyClose()" style="padding:.38rem .8rem;background:#e2e8f0;color:#2d3748;border:none;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;">🔄 Yenile</button>
+                    <button onclick="sendTelegramClose()" style="padding:.38rem .8rem;background:#2d6a4f;color:white;border:none;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;">✈️ Telegram</button>
+                    <label style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:#4a5568;cursor:pointer;">
+                        <input type="checkbox" id="tgAutoEnabled" onchange="saveTgAutoSettings()" style="cursor:pointer;">
+                        Otomatik
+                    </label>
+                    <input type="time" id="tgAutoTime" onchange="saveTgAutoSettings()" style="padding:.3rem .5rem;border:1px solid #e2e8f0;border-radius:6px;font-size:.8rem;font-family:inherit;" title="Günlük gönderim saati">
+                </div>
+            </div>
+            <div id="dailyCloseReport" style="color:#a0aec0;font-size:.85rem;">Yükleniyor...</div>
+        </div>
+
+        <!-- F2: İşlem listesi (filtre + sayfalama) -->
+        <div id="txSection"></div>
+    </div>
+
+    <script>
+        let currentKasa   = 'ana';
+        let currentPeriod = 'daily';
+        let data = { nakit: null, kart: null, ana: null };
+        let txPage = 1, txTotal = 0, txPages = 0;
+        let currentTxType = 'out';   // F3: varsayılan çıkış
+
+        function localDate(d) {
+            d = d || new Date();
+            return d.getFullYear() + '-' +
+                String(d.getMonth()+1).padStart(2,'0') + '-' +
+                String(d.getDate()).padStart(2,'0');
+        }
+
+        // F4: Varsayılan tarih/saat ayarla
+        function setDefaultDateTime() {
+            const el = document.getElementById('txDate');
+            if (!el) return;
+            const now = new Date();
+            el.value = now.getFullYear() + '-' +
+                String(now.getMonth()+1).padStart(2,'0') + '-' +
+                String(now.getDate()).padStart(2,'0') + 'T' +
+                String(now.getHours()).padStart(2,'0') + ':' +
+                String(now.getMinutes()).padStart(2,'0');
+        }
+
+        // Dönem tarih aralığını hesapla
+        function getPeriodDates() {
+            const today = localDate();
+            if (currentPeriod === 'daily') {
+                const d = document.getElementById('dateInput').value || today;
+                return { from: d, to: d };
+            } else if (currentPeriod === 'weekly') {
+                const now = new Date();
+                const diff = now.getDay() === 0 ? -6 : 1 - now.getDay();
+                const mon = new Date(now); mon.setDate(now.getDate() + diff);
+                return { from: localDate(mon), to: today };
+            } else if (currentPeriod === 'monthly') {
+                const now = new Date();
+                return { from: now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-01', to: today };
+            } else if (currentPeriod === 'custom') {
+                return {
+                    from: document.getElementById('customStart').value || today,
+                    to:   document.getElementById('customEnd').value   || today
+                };
+            }
+            return { from: today, to: today };
+        }
+
+        // F2: Filtre parametrelerini oluştur
+        function buildTxParams(page) {
+            const dates = getPeriodDates();
+            const fromEl   = document.getElementById('filterFrom');
+            const toEl     = document.getElementById('filterTo');
+            const typeEl   = document.getElementById('filterType');
+            const catEl    = document.getElementById('filterCat');
+            const methodEl = document.getElementById('filterMethod');
+
+            const from = (fromEl && fromEl.value) ? fromEl.value : dates.from;
+            const to   = (toEl   && toEl.value)   ? toEl.value   : dates.to;
+
+            let params = `date_from=${from}&date_to=${to}&page=${page}&per_page=30`;
+
+            if (currentKasa === 'nakit')       params += '&method=cash';
+            else if (currentKasa === 'kart')   params += '&method=card';
+            else if (methodEl && methodEl.value) params += `&method=${methodEl.value}`;
+
+            if (typeEl && typeEl.value)  params += `&type=${typeEl.value}`;
+            if (catEl  && catEl.value)   params += `&category=${catEl.value}`;
+            return params;
+        }
+
+        // F2: İşlem listesini yükle
+        async function loadTransactions(page) {
+            page = page || 1; txPage = page;
+            const params = buildTxParams(page);
+            try {
+                const d = await fetch(`/api/kasa/transactions?${params}`).then(r => r.json());
+                renderTransactionList(d);
+            } catch(e) {
+                document.getElementById('txSection').innerHTML = '<div class="no-data">İşlem listesi yüklenemedi.</div>';
+            }
+        }
+
+        // F2: İşlem listesi render
+        function renderTransactionList(d) {
+            txTotal = d.total; txPages = d.pages; txPage = d.page;
+            const isAna = currentKasa === 'ana';
+
+            // Mevcut filtre değerlerini oku (yeniden render için)
+            const fromEl   = document.getElementById('filterFrom');
+            const toEl     = document.getElementById('filterTo');
+            const typeEl   = document.getElementById('filterType');
+            const catEl    = document.getElementById('filterCat');
+            const methodEl = document.getElementById('filterMethod');
+            const dates    = getPeriodDates();
+            const from = (fromEl && fromEl.value) ? fromEl.value : dates.from;
+            const to   = (toEl   && toEl.value)   ? toEl.value   : dates.to;
+            const selType   = typeEl   ? typeEl.value   : '';
+            const selCat    = catEl    ? catEl.value    : '';
+            const selMethod = (isAna && methodEl && methodEl.tagName === 'SELECT') ? methodEl.value : '';
+
+            const catLabelMap    = { satis:'Satış', bahsis:'Bahşiş', masraf:'Masraf', stok_alim:'Stok Alım', sarf:'Sarf', duzeltme:'Düzeltme', in_transfer:'Nakit', Genel:'Genel' };
+            const methodLabelMap = { cash:'Nakit', card:'Kart' };
+
+            let rows = d.rows.length === 0
+                ? `<tr><td colspan="${isAna ? 6 : 5}" class="no-data">Bu dönemde işlem yok.</td></tr>`
+                : d.rows.map(m => {
+                const isStokAlim = m.category === 'stok_alim' && m.sm_qty;
+                const unitPrice  = isStokAlim ? (m.amount / m.sm_qty) : null;
+                const descCell   = isStokAlim
+                    ? `<strong>${m.sm_item_name || m.description || '—'}</strong>
+                       <br><span style="font-size:.8rem;color:#718096;">
+                         ${m.sm_qty} ${m.sm_unit || ''}
+                         &nbsp;×&nbsp; ${fmtTL(unitPrice)}/${m.sm_unit || 'br'}
+                       </span>`
+                    : (m.description || '—');
+                return `
+                    <tr>
+                        <td style="color:#718096;font-size:.82rem;">${m.date}${m.created_at ? '<br><span style="font-size:.72rem;color:#cbd5e0;">' + (m.created_at||'').slice(11,16) + '</span>' : ''}</td>
+                        <td><span class="${m.type==='in'?'badge-in':'badge-out'}">${m.type==='in'?'▲ GİRİŞ':'▼ ÇIKIŞ'}</span></td>
+                        <td>${descCell}</td>
+                        <td><span class="cat-badge">${catLabelMap[m.category]||m.category}</span></td>
+                        ${isAna ? `<td><span class="cat-badge">${methodLabelMap[m.payment_method]||m.payment_method}</span></td>` : ''}
+                        <td style="font-weight:700;color:${m.type==='in'?'#2d6a4f':'#e53e3e'};text-align:right;">${m.type==='in'?'+':'−'}${fmtTL(m.amount)}</td>
+                        <td style="white-space:nowrap;">
+                            ${m.related_order_id ? '' : `
+                                <button class="btn-del" onclick="editTx(${m.id},'${(m.description||'').replace(/'/g,"\\'")}',${m.amount},'${m.category}','${m.payment_method}','${m.date}','${(m.created_at||'').slice(0,16)}')" title="Düzenle" style="margin-right:.2rem;">✏️</button>
+                                <button class="btn-del" onclick="delTx(${m.id})" title="Sil">🗑️</button>
+                            `}
+                        </td>
+                    </tr>`;
+            }).join('');
+
+            // CSV link parametreleri
+            let csvParams = `date_from=${from}&date_to=${to}&per_page=100000&format=csv`;
+            if (currentKasa === 'nakit')       csvParams += '&method=cash';
+            else if (currentKasa === 'kart')   csvParams += '&method=card';
+            else if (selMethod)                csvParams += `&method=${selMethod}`;
+            if (selType)  csvParams += `&type=${selType}`;
+            if (selCat)   csvParams += `&category=${selCat}`;
+
+            const methodFilter = isAna
+                ? `<label>Kasa<select id="filterMethod" onchange="loadTransactions(1)">
+                        <option value="">Hepsi</option>
+                        <option value="cash" ${selMethod==='cash'?'selected':''}>Nakit</option>
+                        <option value="card" ${selMethod==='card'?'selected':''}>Kart</option>
+                    </select></label>`
+                : '<span id="filterMethod"></span>';
+
+            const pager = txPages > 1
+                ? `<div class="pagination">
+                    <button class="page-btn" onclick="loadTransactions(${txPage-1})" ${txPage<=1?'disabled':''}>← Önceki</button>
+                    <span class="page-info">Sayfa ${txPage} / ${txPages} &nbsp;(${txTotal} işlem)</span>
+                    <button class="page-btn" onclick="loadTransactions(${txPage+1})" ${txPage>=txPages?'disabled':''}>Sonraki →</button>
+                   </div>`
+                : `<div class="page-info" style="text-align:center;padding:.5rem 0;">${txTotal} işlem</div>`;
+
+            document.getElementById('txSection').innerHTML = `
+                <h3 style="color:#2d3748;margin-bottom:.75rem;">📋 İşlem Listesi</h3>
+                <div class="tx-filter">
+                    <label>Başlangıç<input type="date" id="filterFrom" value="${from}" onchange="loadTransactions(1)"></label>
+                    <label>Bitiş<input type="date" id="filterTo" value="${to}" onchange="loadTransactions(1)"></label>
+                    <label>Tür<select id="filterType" onchange="loadTransactions(1)">
+                        <option value="">Hepsi</option>
+                        <option value="in"  ${selType==='in' ?'selected':''}>Giriş</option>
+                        <option value="out" ${selType==='out'?'selected':''}>Çıkış</option>
+                    </select></label>
+                    <label>Kategori<select id="filterCat" onchange="loadTransactions(1)">
+                        <option value="">Hepsi</option>
+                        <option value="satis"       ${selCat==='satis'      ?'selected':''}>Satış</option>
+                        <option value="bahsis"      ${selCat==='bahsis'     ?'selected':''}>Bahşiş</option>
+                        <option value="masraf"      ${selCat==='masraf'     ?'selected':''}>Masraf</option>
+                        <option value="stok_alim"   ${selCat==='stok_alim'  ?'selected':''}>Stok Alım</option>
+                        <option value="sarf"        ${selCat==='sarf'       ?'selected':''}>Sarf</option>
+                        <option value="duzeltme"    ${selCat==='duzeltme'   ?'selected':''}>Düzeltme</option>
+                        <option value="in_transfer" ${selCat==='in_transfer'?'selected':''}>Nakit</option>
+                        <option value="Genel"       ${selCat==='Genel'      ?'selected':''}>Genel</option>
+                    </select></label>
+                    ${methodFilter}
+                    <a href="/api/kasa/transactions?${csvParams}" class="btn btn-primary" style="text-decoration:none;font-size:.82rem;align-self:flex-end;" download>⬇️ Excel İndir</a>
+                </div>
+                <div style="background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.07);overflow:hidden;">
+                    <table class="tx-table">
+                        <thead><tr>
+                            <th>Tarih</th><th>Tür</th><th>Açıklama</th><th>Kategori</th>
+                            ${isAna ? '<th>Kasa</th>' : ''}
+                            <th style="text-align:right;">Tutar</th>
+                            <th></th>
+                        </tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+                ${pager}
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = localDate();
+            document.getElementById('dateInput').value  = today;
+            document.getElementById('customStart').value = today;
+            document.getElementById('customEnd').value   = today;
+            loadAll();
+        });
+
+        // F1: Dönem seçimi — daily/weekly/monthly otomatik yükler, custom için Getir butonu
+        function setPeriod(p) {
+            currentPeriod = p;
+            document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('pb-' + p).classList.add('active');
+            document.getElementById('dateInput').style.display   = p === 'daily'  ? 'block' : 'none';
+            document.getElementById('customRange').style.display = p === 'custom' ? 'flex'  : 'none';
+            document.getElementById('getirBtn').style.display    = p === 'custom' ? 'inline-flex' : 'none';
+            if (p !== 'custom') {
+                // Filtre tarih aralığını dönem ile senkronize et
+                const dates = getPeriodDates();
+                const fromEl = document.getElementById('filterFrom');
+                const toEl   = document.getElementById('filterTo');
+                if (fromEl) fromEl.value = dates.from;
+                if (toEl)   toEl.value   = dates.to;
+                loadAll();
+            }
+        }
+
+        function getParams() {
+            let url = '?period=' + currentPeriod;
+            if (currentPeriod === 'daily')  url += '&date=' + document.getElementById('dateInput').value;
+            else if (currentPeriod === 'custom') {
+                url += '&start=' + document.getElementById('customStart').value;
+                url += '&end='   + document.getElementById('customEnd').value;
+            }
+            return url;
+        }
+
+        async function loadAll() {
+            document.getElementById('kasaContent').innerHTML = '<div class="no-data">⏳ Yükleniyor...</div>';
+            const base = getParams();
+            const [nakit, kart, ana] = await Promise.all([
+                fetch('/api/kasa/data' + base + '&method=cash').then(r => r.json()),
+                fetch('/api/kasa/data' + base + '&method=card').then(r => r.json()),
+                fetch('/api/kasa/data' + base).then(r => r.json()),
+            ]);
+            data = { nakit, kart, ana };
+            renderKasa();
+            loadTransactions(1);
+            const dates = getPeriodDates();
+            loadMasrafOzet(dates.from, dates.to);
+            if (currentKasa === 'ana') {
+                document.getElementById('dailyCloseCard').style.display = '';
+                loadDailyClose();
+            }
+        }
+
+        async function loadMasrafOzet(from, to) {
+            const el = document.getElementById('masrafOzetSection');
+            if (!el) return;
+            const rows = await fetch(`/api/expenses/summary?start=${from}&end=${to}`).then(r => r.json()).catch(() => []);
+            if (!rows || rows.length === 0) { el.innerHTML = ''; return; }
+            // Kategoriye göre topla
+            const bycat = {};
+            rows.forEach(r => {
+                if (!bycat[r.category]) bycat[r.category] = 0;
+                bycat[r.category] += r.total;
+            });
+            const total = Object.values(bycat).reduce((a,b) => a+b, 0);
+            el.innerHTML = `
+                <div style="background:white;border-radius:12px;padding:1.1rem 1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:1.5rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+                        <span style="font-weight:700;color:#e53e3e;">📋 Masraf Özeti — ${fmtTL(total)}</span>
+                        <span style="color:#a0aec0;font-size:.82rem;">▼ detay</span>
+                    </div>
+                    <div style="display:none;margin-top:.75rem;">
+                        <table style="width:100%;font-size:.88rem;border-collapse:collapse;">
+                            ${Object.entries(bycat).sort((a,b)=>b[1]-a[1]).map(([cat,amt]) => `
+                            <tr>
+                                <td style="padding:.3rem .5rem;color:#4a5568;">${cat}</td>
+                                <td style="padding:.3rem .5rem;text-align:right;font-weight:600;color:#e53e3e;">${fmtTL(amt)}</td>
+                            </tr>`).join('')}
+                            <tr style="border-top:2px solid #e2e8f0;">
+                                <td style="padding:.4rem .5rem;font-weight:700;">Toplam</td>
+                                <td style="padding:.4rem .5rem;text-align:right;font-weight:700;color:#e53e3e;">${fmtTL(total)}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>`;
+        }
+
+        function switchKasa(tab) {
+            currentKasa = tab;
+            document.querySelectorAll('.kasa-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            renderKasa();
+            loadTransactions(1);
+            const dcc = document.getElementById('dailyCloseCard');
+            if (tab === 'ana') {
+                dcc.style.display = '';
+                loadDailyClose();
+            } else {
+                dcc.style.display = 'none';
+            }
+        }
+
+        function fmt(n) { return fmtTL(n); }
+        const catLabel    = { satis:'Satış', bahsis:'Bahşiş', masraf:'Masraf', stok_alim:'Stok Alım', sarf:'Sarf', duzeltme:'Düzeltme', in_transfer:'Nakit', Genel:'Genel' };
+        const methodLabel = { cash:'Nakit', card:'Kart' };
+
+        const SUBCATS = {
+            'Faturalar':   ['Elektrik','Su','Doğalgaz','İnternet','Telefon','Abonelik'],
+            'Kira':        ['Kira','Depozito','Aidat'],
+            'Personel':    ['Maaş','Sigorta','İkramiye'],
+            'Malzeme':     ['Gıda','Ambalaj','Tek Kullanımlık'],
+            'Temizlik':    ['Deterjan','Sarf Malzeme','Dezenfektan'],
+            'Tamir/Bakım': ['Cihaz Tamiri','Bina Bakım','Servis'],
+            'Demirbaş':    ['Ekipman','Mobilya','Elektronik'],
+            'Pazarlama':   ['Reklam','Sosyal Medya','Tanıtım'],
+            'Diğer':       ['Diğer'],
+        };
+        const MASRAF_CATS = Object.keys(SUBCATS);
+
+        // F3: Toggle tip seçimi
+        function setTxType(type) {
+            currentTxType = type;
+            document.querySelectorAll('.toggle-btn').forEach(b =>
+                b.classList.toggle('active', b.dataset.type === type));
+        }
+
+        function renderKasa() {
+            const d = data[currentKasa];
+            if (!d) { document.getElementById('kasaContent').innerHTML = '<div class="no-data">Veri yok</div>'; return; }
+
+            document.getElementById('kasaContent').innerHTML = `
+                <div class="summary-grid">
+                    ${(d.indirim||0)>0 ? `
+                    <div class="sum-card"><div class="sum-val">${fmt(d.brut_satis||d.satis)}</div><div class="sum-label">Brüt Satış</div></div>
+                    <div class="sum-card"><div class="sum-val" style="color:#d97706;">−${fmt(d.indirim)}</div><div class="sum-label">🏷️ İndirim</div></div>
+                    <div class="sum-card"><div class="sum-val green">${fmt(d.satis)}</div><div class="sum-label">Net Satış</div></div>
+                    ` : `
+                    <div class="sum-card"><div class="sum-val green">${fmt(d.income)}</div><div class="sum-label">Toplam Giriş</div></div>
+                    <div class="sum-card"><div class="sum-val">${fmt(d.satis)}</div><div class="sum-label">Satış</div></div>
+                    `}
+                    <div class="sum-card"><div class="sum-val orange">${fmt(d.bahsis)}</div><div class="sum-label">Bahşiş</div></div>
+                    ${(d.ikram||0)>0  ? `<div class="sum-card"><div class="sum-val" style="color:#9f7aea;">${fmt(d.ikram)}</div><div class="sum-label">🎁 İkram Değeri</div></div>` : ''}
+                    <div class="sum-card"><div class="sum-val red">${fmt(d.outcome)}</div><div class="sum-label">Toplam Çıkış</div></div>
+                    <div class="sum-card"><div class="sum-val red">${fmt(d.masraf)}</div><div class="sum-label">Masraf</div></div>
+                    <div class="sum-card"><div class="sum-val red">${fmt(d.stok_alim)}</div><div class="sum-label">Stok Alım</div></div>
+                    <div class="sum-card"><div class="sum-val ${d.net>=0?'green':'red'}">${fmt(d.net)}</div><div class="sum-label">Net Kasa</div></div>
+                </div>
+
+                <div id="masrafOzetSection"></div>
+
+                <div class="add-tx-form">
+                    <h4>➕ İşlem Ekle</h4>
+                    <div class="tx-inputs">
+                        <input type="datetime-local" id="txDate" style="padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                        <div id="typeToggle" class="type-toggle">
+                            <button class="toggle-btn ${currentTxType==='out'?'active':''}" data-type="out" onclick="setTxType('out')">▼ Çıkış</button>
+                            <button class="toggle-btn ${currentTxType==='in' ?'active':''}" data-type="in"  onclick="setTxType('in')">▲ Giriş</button>
+                        </div>
+                        <select id="txCat" onchange="onCatChange()">
+                            <optgroup label="─ Stok / Kasa ─">
+                                <option value="stok_alim">Stok Alım</option>
+                                <option value="sarf">Sarf Malzeme</option>
+                                <option value="duzeltme">Düzeltme</option>
+                                <option value="in_transfer">Nakit Giriş</option>
+                                <option value="Genel">Diğer</option>
+                            </optgroup>
+                            <optgroup label="─ Masraf ─">
+                                <option value="Faturalar">Faturalar</option>
+                                <option value="Kira">Kira</option>
+                                <option value="Personel">Personel</option>
+                                <option value="Malzeme">Malzeme</option>
+                                <option value="Temizlik">Temizlik</option>
+                                <option value="Tamir/Bakım">Tamir/Bakım</option>
+                                <option value="Demirbaş">Demirbaş</option>
+                                <option value="Pazarlama">Pazarlama</option>
+                                <option value="Diğer">Diğer Masraf</option>
+                            </optgroup>
+                        </select>
+                        <select id="txStokItem" style="display:none;flex:2;min-width:150px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;" onchange="onStokItemChange()"></select>
+                        <select id="txSubcat" style="display:none;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;min-width:130px;"></select>
+                        <input type="text" id="txDesc" placeholder="Açıklama">
+                        <input type="number" id="txQty" placeholder="Miktar" step="0.01" min="0" style="display:none;width:90px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                        <select id="txQtyUnit" style="display:none;width:90px;padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                            <option value="adet">adet</option>
+                            <option value="kg">kg</option>
+                            <option value="gr">gr</option>
+                            <option value="lt">lt</option>
+                            <option value="ml">ml</option>
+                            <option value="paket">paket</option>
+                            <option value="dilim">dilim</option>
+                            <option value="kutu">kutu</option>
+                            <option value="şişe">şişe</option>
+                        </select>
+                        <select id="txMethod">
+                            <option value="cash">Nakit</option>
+                            <option value="card">Kart</option>
+                        </select>
+                        <input type="number" id="txAmount" placeholder="Tutar ₺" step="0.01" min="0">
+                        <button class="btn btn-warning" onclick="addTx()">Ekle</button>
+                    </div>
+                </div>
+            `;
+            setDefaultDateTime();
+            onCatChange();
+        }
+
+        let stockItemsCache = [];
+
+        async function loadStockItems() {
+            if (stockItemsCache.length > 0) return;
+            stockItemsCache = await fetch('/api/stock').then(r => r.json());
+        }
+
+        // F3: Kategori değişince toggle davranışı
+        function onCatChange() {
+            const catEl    = document.getElementById('txCat');
+            const toggleEl = document.getElementById('typeToggle');
+            const stokSel  = document.getElementById('txStokItem');
+            const qtyEl    = document.getElementById('txQty');
+            const unitEl   = document.getElementById('txQtyUnit');
+            const descEl   = document.getElementById('txDesc');
+            const subcatEl = document.getElementById('txSubcat');
+            if (!catEl) return;
+            const cat = catEl.value;
+
+            if (cat === 'stok_alim' || cat === 'sarf') {
+                if (toggleEl)  toggleEl.style.display  = 'none';
+                if (subcatEl)  subcatEl.style.display  = 'none';
+                currentTxType = 'out';
+                if (cat === 'stok_alim') {
+                    loadStockItems().then(() => {
+                        if (stokSel) {
+                            stokSel.innerHTML = stockItemsCache.map(s =>
+                                `<option value="${s.id}" data-unit="${s.unit}">${s.name} (${s.unit})</option>`).join('');
+                            stokSel.style.display = 'block';
+                            onStokItemChange();
+                        }
+                        if (qtyEl)  qtyEl.style.display  = 'block';
+                        if (unitEl) unitEl.style.display = 'block';
+                        if (descEl) descEl.style.display = 'none';
+                    });
+                } else {
+                    if (stokSel) stokSel.style.display = 'none';
+                    if (qtyEl)   qtyEl.style.display   = 'none';
+                    if (unitEl)  unitEl.style.display  = 'none';
+                    if (descEl)  descEl.style.display  = 'block';
+                }
+            } else if (MASRAF_CATS.includes(cat)) {
+                if (toggleEl) toggleEl.style.display = 'none';
+                if (stokSel)  stokSel.style.display  = 'none';
+                if (qtyEl)    qtyEl.style.display    = 'none';
+                if (unitEl)   unitEl.style.display   = 'none';
+                if (descEl)   descEl.style.display   = 'block';
+                currentTxType = 'out';
+                if (subcatEl) {
+                    const subs = SUBCATS[cat] || ['Diğer'];
+                    subcatEl.innerHTML = '<option value="">Alt başlık...</option>' +
+                        subs.map(s => `<option value="${s}">${s}</option>`).join('');
+                    subcatEl.style.display = 'block';
+                }
+            } else {
+                if (toggleEl) toggleEl.style.display = 'flex';
+                if (stokSel)  stokSel.style.display  = 'none';
+                if (qtyEl)    qtyEl.style.display    = 'none';
+                if (unitEl)   unitEl.style.display   = 'none';
+                if (subcatEl) subcatEl.style.display = 'none';
+                if (descEl)   descEl.style.display   = 'block';
+                if (cat === 'in_transfer') setTxType('in');
+            }
+        }
+
+        function onStokItemChange() {
+            const stokSel = document.getElementById('txStokItem');
+            const unitEl  = document.getElementById('txQtyUnit');
+            if (!stokSel || !unitEl) return;
+            const selected = stokSel.options[stokSel.selectedIndex];
+            if (selected) unitEl.value = selected.dataset.unit || 'adet';
+        }
+
+        // F3 + F4: İşlem ekle
+        async function addTx() {
+            const cat    = document.getElementById('txCat').value;
+            const method = currentKasa === 'kart' ? 'card' : document.getElementById('txMethod').value;
+            const amount = parseFloat(document.getElementById('txAmount').value);
+            const dtVal      = document.getElementById('txDate').value;
+            const txDate     = dtVal ? dtVal.slice(0, 10) : null;
+            const txDatetime = dtVal ? dtVal.replace('T', ' ') + ':00' : null;
+
+            if (cat === 'stok_alim') {
+                const stokSel = document.getElementById('txStokItem');
+                const itemId  = stokSel ? stokSel.value : null;
+                const qty     = parseFloat(document.getElementById('txQty').value);
+                const unit    = document.getElementById('txQtyUnit').value;
+                if (!itemId || isNaN(amount) || amount <= 0) { showToast('Ürün ve tutar gerekli.', 'warn'); return; }
+                if (isNaN(qty) || qty <= 0) { showToast('Geçerli bir miktar girin.', 'warn'); return; }
+                await fetch(`/api/stock/${itemId}/movement`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({
+                        movement_type: 'in', quantity: qty, cost: amount,
+                        payment_method: method, unit, reason: 'alim',
+                        description: '', date: txDate
+                    })
+                });
+                document.getElementById('txQty').value    = '';
+                document.getElementById('txAmount').value = '';
+                loadAll();
+                return;
+            }
+
+            if (MASRAF_CATS.includes(cat)) {
+                const desc = document.getElementById('txDesc').value.trim();
+                const sub  = document.getElementById('txSubcat').value;
+                if (!desc || isNaN(amount) || amount <= 0) { showToast('Açıklama ve tutar gerekli.', 'warn'); return; }
+                await fetch('/api/expenses', {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ description: desc, amount, category: cat,
+                        subcategory: sub, payment_method: method, date: txDate })
+                });
+                document.getElementById('txDesc').value   = '';
+                document.getElementById('txAmount').value = '';
+                loadAll();
+                return;
+            }
+
+            let desc = document.getElementById('txDesc').value.trim();
+            if (!desc || isNaN(amount) || amount <= 0) { showToast('Açıklama ve tutar gerekli.', 'warn'); return; }
+
+            await fetch('/api/transactions', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    type: currentTxType,
+                    amount, category: cat,
+                    payment_method: method,
+                    description: desc,
+                    date: txDate,
+                    datetime: txDatetime
+                })
+            });
+            document.getElementById('txDesc').value   = '';
+            document.getElementById('txAmount').value = '';
+            loadAll();
+        }
+
+        async function delTx(id) {
+            showConfirm('Bu işlemi silmek istediğine emin misin?', async () => {
+                await fetch(`/api/transactions/${id}`, {method:'DELETE'});
+                loadAll();
+            });
+        }
+
+        let editingTxId = null;
+
+        function editTx(id, desc, amount, category, method, date, createdAt) {
+            editingTxId = id;
+            document.getElementById('editTxDesc').value    = desc;
+            document.getElementById('editTxAmount').value  = amount;
+            document.getElementById('editTxCat').value     = category;
+            document.getElementById('editTxMethod').value  = method;
+            // Tarihi datetime-local formatına çevir: "2026-03-16 14:30" → "2026-03-16T14:30"
+            const dt = createdAt ? createdAt.replace(' ', 'T') : (date ? date + 'T00:00' : '');
+            document.getElementById('editTxDate').value = dt;
+            document.getElementById('editTxModal').style.display = 'flex';
+        }
+
+        function closeEditTxModal() {
+            document.getElementById('editTxModal').style.display = 'none';
+            editingTxId = null;
+        }
+
+        async function saveEditTx() {
+            const desc   = document.getElementById('editTxDesc').value.trim();
+            const amount = parseFloat(document.getElementById('editTxAmount').value);
+            const cat    = document.getElementById('editTxCat').value;
+            const method = document.getElementById('editTxMethod').value;
+            const dtVal  = document.getElementById('editTxDate').value;
+            if (!desc || isNaN(amount) || amount <= 0) { showToast('Açıklama ve tutar gerekli.', 'warn'); return; }
+            const txDate     = dtVal ? dtVal.slice(0, 10) : null;
+            const txDatetime = dtVal ? dtVal.replace('T', ' ') + ':00' : null;
+            const res = await fetch(`/api/transactions/${editingTxId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ amount, description: desc, category: cat, payment_method: method, date: txDate, datetime: txDatetime })
+            }).then(r => r.json());
+            if (res.success) {
+                closeEditTxModal();
+                showToast('İşlem güncellendi.', 'success');
+                loadAll();
+            } else {
+                showToast('Güncellenemedi.', 'error');
+            }
+        }
+
+        async function loadDailyClose() {
+            const dateInp = document.getElementById('dateInput');
+            const date = (dateInp && currentPeriod === 'daily') ? (dateInp.value || new Date().toISOString().slice(0,10)) : new Date().toISOString().slice(0,10);
+            const r = await fetch('/api/reports/daily-close?date=' + date).then(res => res.json());
+            const el = document.getElementById('dailyCloseReport');
+            const fmt2 = n => fmtTL(n);
+            let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.6rem;margin-bottom:.75rem;">';
+            html += `<div class="sum-card"><div class="sum-val green">${fmt2(r.total_sales)}</div><div class="sum-label">Satış</div></div>`;
+            html += `<div class="sum-card"><div class="sum-val">${fmt2(r.total_cash)}</div><div class="sum-label">Nakit</div></div>`;
+            html += `<div class="sum-card"><div class="sum-val blue">${fmt2(r.total_card)}</div><div class="sum-label">Kart</div></div>`;
+            html += `<div class="sum-card"><div class="sum-val orange">${fmt2(r.total_tips)}</div><div class="sum-label">Bahşiş</div></div>`;
+            if (r.total_discount > 0) html += `<div class="sum-card"><div class="sum-val red">${fmt2(r.total_discount)}</div><div class="sum-label">İndirim</div></div>`;
+            if (r.total_expenses > 0) html += `<div class="sum-card"><div class="sum-val red">${fmt2(r.total_expenses)}</div><div class="sum-label">Masraf</div></div>`;
+            html += `<div class="sum-card" style="border:2px solid #d1fae5;"><div class="sum-val green" style="font-size:1.2rem;font-weight:800;">${fmt2(r.net)}</div><div class="sum-label">Net Kasa</div></div>`;
+            html += '</div>';
+            if ((r.top_products||[]).length) {
+                html += '<div style="font-size:.8rem;font-weight:700;color:#4a5568;margin-bottom:.35rem;">🏆 En Çok Satan Ürünler</div>';
+                html += '<div style="font-size:.82rem;">' + r.top_products.slice(0,5).map((p,i) => `<div style="padding:.22rem 0;border-bottom:1px solid #f0f0f0;">${i+1}. ${p.name} <span style="color:#a0aec0;">× ${p.quantity}</span> <span style="float:right;color:#2d6a4f;font-weight:600;">${fmtTL(p.total||0)}</span></div>`).join('') + '</div>';
+            }
+            if (r.open_orders_count > 0) {
+                html += `<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:.6rem .85rem;margin-top:.6rem;font-size:.82rem;color:#92400e;">⚠️ ${r.open_orders_count} masa hâlâ açık: ${r.open_orders.map(o => o.table_name).join(', ')}</div>`;
+            }
+            el.innerHTML = html;
+        }
+
+        async function sendTelegramClose() {
+            const dateInp = document.getElementById('dateInput');
+            const date = (dateInp && currentPeriod === 'daily') ? (dateInp.value || new Date().toISOString().slice(0,10)) : new Date().toISOString().slice(0,10);
+            const r = await fetch('/api/reports/daily-close/send-telegram', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({date})
+            }).then(res => res.json());
+            showToast(r.success ? '✅ Rapor Telegram\'a gönderildi!' : '❌ Gönderim başarısız. Bot token/chat ID kontrol et.', r.success ? 'success' : 'error', 4000);
+        }
+
+        async function loadTgAutoSettings() {
+            try {
+                const [en, t] = await Promise.all([
+                    fetch('/api/settings/telegram_daily_close_enabled').then(r=>r.json()),
+                    fetch('/api/settings/telegram_daily_close_time').then(r=>r.json())
+                ]);
+                document.getElementById('tgAutoEnabled').checked = (en.value === '1');
+                document.getElementById('tgAutoTime').value = t.value || '';
+            } catch(e) {}
+        }
+
+        async function saveTgAutoSettings() {
+            const enabled = document.getElementById('tgAutoEnabled').checked ? '1' : '0';
+            const time = document.getElementById('tgAutoTime').value || '';
+            await Promise.all([
+                fetch('/api/settings/telegram_daily_close_enabled', {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:enabled})}),
+                fetch('/api/settings/telegram_daily_close_time', {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:time})})
+            ]);
+            showToast(enabled==='1' && time ? `✅ Telegram otomatik gönderim: ${time}` : '⏸ Telegram otomatik gönderim kapatıldı.', 'info');
+        }
+
+        // Ana sekme yüklendiğinde Telegram ayarlarını da yükle
+        const _origLoadKasa = typeof loadKasa !== 'undefined' ? loadKasa : null;
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTgAutoSettings();
+        });
+    </script>
+
+    <!-- Edit Transaction Modal -->
+    <div id="editTxModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:14px;padding:1.75rem;width:min(420px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.18);">
+            <h3 style="margin:0 0 1.25rem;color:#2d3748;">✏️ İşlemi Düzenle</h3>
+            <div style="display:flex;flex-direction:column;gap:.75rem;">
+                <label style="font-size:.85rem;font-weight:600;color:#4a5568;">Açıklama
+                    <input type="text" id="editTxDesc" style="width:100%;margin-top:.3rem;padding:.55rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </label>
+                <label style="font-size:.85rem;font-weight:600;color:#4a5568;">Tutar (₺)
+                    <input type="number" id="editTxAmount" step="0.01" min="0" style="width:100%;margin-top:.3rem;padding:.55rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </label>
+                <label style="font-size:.85rem;font-weight:600;color:#4a5568;">Kategori
+                    <select id="editTxCat" style="width:100%;margin-top:.3rem;padding:.55rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                        <option value="stok_alim">Stok Alım</option>
+                        <option value="sarf">Sarf Malzeme</option>
+                        <option value="duzeltme">Düzeltme</option>
+                        <option value="in_transfer">Nakit</option>
+                        <option value="Genel">Diğer</option>
+                    </select>
+                </label>
+                <label style="font-size:.85rem;font-weight:600;color:#4a5568;">Kasa
+                    <select id="editTxMethod" style="width:100%;margin-top:.3rem;padding:.55rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                        <option value="cash">Nakit</option>
+                        <option value="card">Kart</option>
+                    </select>
+                </label>
+                <label style="font-size:.85rem;font-weight:600;color:#4a5568;">Tarih / Saat
+                    <input type="datetime-local" id="editTxDate" style="width:100%;margin-top:.3rem;padding:.55rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </label>
+            </div>
+            <div style="display:flex;gap:.75rem;margin-top:1.5rem;justify-content:flex-end;">
+                <button onclick="closeEditTxModal()" style="padding:.6rem 1.25rem;border:2px solid #e2e8f0;background:white;border-radius:8px;font-weight:600;cursor:pointer;color:#4a5568;">İptal</button>
+                <button onclick="saveEditTx()" style="padding:.6rem 1.5rem;background:#2d6a4f;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
+        Fırınna POS &mdash; TA1XTA &copy; 2026
+    </footer>
+    <script>
+    (function(){
+        async function loadAlerts() {
+            try {
+                const items = await fetch("/api/stock/alerts").then(r=>r.json());
+                const badge = document.getElementById("alertBadge");
+                const body  = document.getElementById("alertPanelBody");
+                if (!badge || !body) return;
+                if (items.length > 0) {
+                    badge.textContent = items.length;
+                    badge.style.display = "flex";
+                    body.innerHTML = items.map(i => `
+                        <div class="alert-item">
+                            <span class="alert-item-name">${i.name}</span>
+                            <span class="alert-item-qty">
+                                <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
+                                <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
+                            </span>
+                        </div>`).join("");
+                } else {
+                    badge.style.display = "none";
+                    body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
+                }
+            } catch(e) {}
+        }
+        function toggleAlertPanel() {
+            const p = document.getElementById("alertPanel");
+            if (p) p.classList.toggle("open");
+        }
+        document.addEventListener("click", function(e) {
+            const p = document.getElementById("alertPanel");
+            const b = document.getElementById("alertBtn");
+            if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove("open");
+        });
+        loadAlerts();
+        setInterval(loadAlerts, 60000);
+    })();
+    </script>
+</body>
+</html>
+<!-- b1 -->
+<!-- b2 -->

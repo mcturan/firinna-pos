@@ -1,0 +1,2744 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    {% include '_navbar.html' %}
+
+    <!-- Logo Watermark -->
+    <div id="logoWatermark" style="display:none;position:fixed;bottom:1.5rem;left:1.5rem;z-index:1;pointer-events:none;opacity:.13;">
+        <img id="logoWatermarkImg" src="" alt="" style="max-width:120px;max-height:60px;object-fit:contain;" onerror="document.getElementById('logoWatermark').style.display='none'">
+    </div>
+
+    <div class="container">
+        <div class="zone-tabs" id="zoneTabs" style="display:none;"></div>
+        <div class="tables-grid" id="tablesGrid"></div>
+
+        <!-- Sipariş Geçmişi — Collapsible Panel -->
+        <div style="margin-top:1.5rem;border-top:2px solid #e2e8f0;">
+            <button onclick="toggleHistPanel()" id="histToggleBtn"
+                style="display:flex;align-items:center;gap:.5rem;width:100%;padding:.75rem 0;background:none;border:none;cursor:pointer;font-family:inherit;color:#4a5568;font-size:.88rem;font-weight:700;">
+                <span id="histToggleArrow" style="font-size:.75rem;transition:transform .2s;">▶</span>
+                <span>Sipariş Geçmişi</span>
+                <span id="histToggleCount" style="background:#e2e8f0;color:#4a5568;font-size:.72rem;padding:.1rem .5rem;border-radius:20px;font-weight:600;"></span>
+            </button>
+            <div id="orderHistoryPanel" style="display:none;padding-bottom:1.5rem;">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:.85rem;">
+                    <div style="display:flex;gap:0;border-radius:8px;overflow:hidden;border:2px solid #e2e8f0;">
+                        <button id="histTabToday" onclick="switchHistTab('today')"
+                            style="padding:.4rem 1rem;border:none;font-weight:700;font-size:.83rem;cursor:pointer;background:#2d6a4f;color:white;font-family:inherit;">Bugün</button>
+                        <button id="histTabRange" onclick="switchHistTab('range')"
+                            style="padding:.4rem 1rem;border:none;font-weight:700;font-size:.83rem;cursor:pointer;background:white;color:#4a5568;font-family:inherit;">Geçmiş</button>
+                    </div>
+                    <div id="histRangeFilter" style="display:none;align-items:center;gap:.4rem;flex-wrap:wrap;">
+                        <input type="date" id="histStart" style="padding:.35rem .5rem;border:2px solid #e2e8f0;border-radius:6px;font-size:.83rem;">
+                        <span style="color:#718096;">—</span>
+                        <input type="date" id="histEnd" style="padding:.35rem .5rem;border:2px solid #e2e8f0;border-radius:6px;font-size:.83rem;">
+                        <button onclick="loadHistoryPanel()" style="padding:.35rem .75rem;background:#4a5568;color:white;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:.83rem;font-family:inherit;">Filtrele</button>
+                    </div>
+                    <button onclick="exportHistoryCSV()" style="padding:.35rem .85rem;background:#2b6cb0;color:white;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:.83rem;font-family:inherit;">📥 Excel</button>
+                </div>
+                <div id="histSummaryRow" style="display:flex;gap:.6rem;margin-bottom:.85rem;flex-wrap:wrap;"></div>
+                <div id="orderHistoryPanelList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sipariş Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sipariş - <span id="modalTableName"></span></h2>
+                <span class="close">&times;</span>
+            </div>
+            <div id="tableNoteBanner" style="display:none;padding:.4rem 1.5rem;background:#fef9c3;border-bottom:1px solid #fde047;font-size:.85rem;font-weight:600;color:#854d0e;cursor:pointer;" onclick="openTableNote(currentTable, document.getElementById('modalTableName').textContent, event)"></div>
+            <div style="padding: 0.5rem 1.5rem; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display:flex; gap:.5rem; align-items:center;">
+                <input type="text" id="orderNoteText" placeholder="📝 Not: müşteri adı, özel istek..."
+                    style="flex:1; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;
+                    font-family: inherit; font-size: 0.9rem; box-sizing: border-box; background: white;"
+                    oninput="saveOrderNote()">
+                <label style="display:flex;align-items:center;gap:.3rem;font-size:.78rem;color:#718096;white-space:nowrap;cursor:pointer;">
+                    <input type="checkbox" id="customDateCheck" onchange="toggleCustomDate()" style="cursor:pointer;">
+                    Geçmiş tarih
+                </label>
+                <input type="datetime-local" id="customDatetime"
+                    style="display:none;padding:.4rem .5rem;border:1px solid #4299e1;border-radius:6px;font-size:.82rem;font-family:inherit;background:white;">
+            </div>
+
+            <div class="order-layout">
+                <div class="products-section">
+                    <div>
+                        <input type="text" id="productSearch" placeholder="🔍 Ürün ara..." 
+                               oninput="searchProducts(this.value)"
+                               style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                    </div>
+
+                    <div class="categories" id="categoriesBar"></div>
+                    
+                    <button class="btn btn-warning" onclick="openCustomItemModal()">
+                        ➕ Özel Sipariş Ekle
+                    </button>
+                    
+                    <div class="products-grid" id="productsGrid"></div>
+                </div>
+
+                <div class="order-summary" style="min-width: 450px;">
+                    <h3>Sipariş Özeti</h3>
+                    <div class="order-items" id="orderItems"></div>
+                    
+                    <div id="discountSection" style="margin-bottom: 1rem; display: none;">
+                        <div style="background: #fff5f5; padding: 1rem; border-radius: 8px; border-left: 4px solid #f56565;">
+                            <strong>İndirim:</strong> <span id="discountText"></span>
+                            <button class="btn-delete" onclick="removeDiscount()" style="float: right;">❌</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-total">
+                        <div>
+                            <div style="font-size: 0.9rem; color: #718096;">Ara Toplam:</div>
+                            <strong>TOPLAM:</strong>
+                        </div>
+                        <div>
+                            <div id="orderSubtotal" style="font-size: 0.9rem; color: #718096;">0.00 TL</div>
+                            <span id="orderTotal">0.00 TL</span>
+                        </div>
+                    </div>
+
+                    <div class="order-actions">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                            <button class="btn btn-warning" onclick="openDiscountModal()">🏷️ İndirim</button>
+                            <button class="btn btn-success" onclick="openPaymentModal()">💰 Hesap Öde</button>
+                        </div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem; color: #4a5568;">📄 Sipariş Fişi</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                            <button class="btn" onclick="previewReceipt()" style="background:#4299e1;color:white;">👁️ Önizle</button>
+                            <button class="btn btn-secondary" onclick="printReceipt()">🖨️ Yazdır</button>
+                        </div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem; color: #4a5568;">👨‍🍳 Mutfak Fişi</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                            <button class="btn" onclick="previewKitchen()" style="background:#48bb78;color:white;">👁️ Önizle</button>
+                            <button class="btn" onclick="printKitchen()" style="background:#38a169;color:white;">🖨️ Yazdır</button>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <button class="btn" onclick="previewReceiptPDF()" style="background:#ed8936;color:white;width:100%;" title="Müşteri fişi önizle / PDF kaydet">📄 PDF Fiş Kaydet</button>
+                        </div>
+                        <button class="btn" onclick="cancelOrder()" style="background:#f56565;color:white;width:100%;">🗑️ Fiş İptal</button>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                            <button class="btn" onclick="openTransferModal()" style="background:#667eea;color:white;" title="Tüm masayı taşı">↔ Masayı Taşı</button>
+                            <button class="btn" onclick="openItemTransferModal()" style="background:#4c51bf;color:white;" title="Seçilen ürünleri taşı">↔ Ürün Aktar</button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                            <button class="btn" onclick="openMergeModal()" style="background:#ed8936;color:white;" title="Siparişleri Birleştir">⊕ Birleştir</button>
+                            <button class="btn" onclick="promptSplitTable()" style="background:#00b4d8;color:white;" title="Alt masa oluşturarak masayı böl">✂ Masayı Böl</button>
+                        </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GEÇMİŞ SİPARİŞ MODAL -->
+    <div id="pastOrderModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header">
+                <h2>➕ Geçmiş Sipariş Ekle</h2>
+                <span class="close" onclick="closePastOrderModal()">&times;</span>
+            </div>
+            <div class="order-layout">
+                <div class="products-section">
+                    <div style="background: #f7fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <label>📅 Sipariş Tarihi:</label>
+                                <input type="datetime-local" id="pastOrderDate" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                            </div>
+                            <div>
+                                <label>🍽️ Masa:</label>
+                                <select id="pastOrderTable" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                                    <option value="">Masa seçin...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="categories" id="pastCategoriesBar"></div>
+                    <div class="products-grid" id="pastProductsGrid"></div>
+                </div>
+
+                <div class="order-summary" style="min-width: 450px;">
+                    <h3>Sipariş Sepeti</h3>
+                    <div class="order-items" id="pastOrderItems"></div>
+                    
+                    <div id="pastDiscountSection" style="margin-bottom: 1rem; display: none;">
+                        <div style="background: #fff5f5; padding: 1rem; border-radius: 8px; border-left: 4px solid #f56565;">
+                            <strong>İndirim:</strong> <span id="pastDiscountText"></span>
+                            <button class="btn-delete" onclick="removePastDiscount()" style="float: right;">❌</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-total">
+                        <div>
+                            <div style="font-size: 0.9rem; color: #718096;">Ara Toplam:</div>
+                            <strong>TOPLAM:</strong>
+                        </div>
+                        <div>
+                            <div id="pastOrderSubtotal" style="font-size: 0.9rem; color: #718096;">0.00 TL</div>
+                            <span id="pastOrderTotal">0.00 TL</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding: 1.5rem; background: #f7fafc; border-radius: 12px;">
+                        <h4>💰 Ödeme Bilgisi</h4>
+                        <div>
+                            <label>💵 Nakit (TL):</label>
+                            <input type="number" id="pastPaymentCash" value="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                        </div>
+                        <div>
+                            <label>💳 Kart (TL):</label>
+                            <input type="number" id="pastPaymentCard" value="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                        </div>
+                        <div>
+                            <label>🎁 Bahşiş (TL):</label>
+                            <input type="number" id="pastTipAmount" value="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                            <div style="display:flex;gap:1rem;margin-top:.5rem;">
+                                <label style="font-size:.85rem;cursor:pointer;"><input type="radio" name="pastTipMethod" value="cash" checked> 💵 Nakit</label>
+                                <label style="font-size:.85rem;cursor:pointer;"><input type="radio" name="pastTipMethod" value="card"> 💳 Kart</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-actions" style="margin-top: 1.5rem;">
+                        <button class="btn btn-warning" onclick="openPastDiscountModal()">🏷️ İndirim Ekle</button>
+                        <button class="btn btn-success" onclick="savePastOrder()">✅ Kaydet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Özel Sipariş Modal -->
+    <div id="customItemModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Özel Sipariş</h2>
+                <span class="close" onclick="closeCustomItemModal()">&times;</span>
+            </div>
+            <div style="padding: 2rem;">
+                <div>
+                    <label>Ürün Adı:</label>
+                    <input type="text" id="customItemName" placeholder="Özel içecek, vb." style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label>Fiyat (TL):</label>
+                    <input type="number" id="customItemPrice" placeholder="0.00" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
+                <button class="btn btn-success" style="width:100%;" onclick="addCustomItem()">Ekle</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- İndirim Modal -->
+    <div id="discountModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>İndirim Ekle</h2>
+                <span class="close" onclick="closeDiscountModal()">&times;</span>
+            </div>
+            <div style="padding: 2rem;">
+                <div>
+                    <label>İndirim Tipi:</label><br>
+                    <label style="margin-right: 2rem;"><input type="radio" name="discountType" value="percent" checked> Yüzde (%)</label>
+                    <label><input type="radio" name="discountType" value="fixed"> Tutar (TL)</label>
+                </div>
+                <div>
+                    <label>Değer:</label>
+                    <input type="number" id="discountValue" placeholder="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label>Sebep:</label>
+                    <select id="discountReason" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                        <option value="Öğrenci">Öğrenci</option>
+                        <option value="Komşu">Komşu</option>
+                        <option value="Personel">Personel</option>
+                        <option value="Kampanya">Kampanya</option>
+                        <option value="Diğer">Diğer</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" style="width:100%;" onclick="applyDiscount()">Uygula</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Geçmiş Sipariş İndirim Modal -->
+    <div id="pastDiscountModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>İndirim Ekle</h2>
+                <span class="close" onclick="closePastDiscountModal()">&times;</span>
+            </div>
+            <div style="padding: 2rem;">
+                <div>
+                    <label>İndirim Tipi:</label><br>
+                    <label style="margin-right: 2rem;"><input type="radio" name="pastDiscountType" value="percent" checked> Yüzde (%)</label>
+                    <label><input type="radio" name="pastDiscountType" value="fixed"> Tutar (TL)</label>
+                </div>
+                <div>
+                    <label>Değer:</label>
+                    <input type="number" id="pastDiscountValue" placeholder="0" step="0.01" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label>Sebep:</label>
+                    <select id="pastDiscountReason" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem;">
+                        <option value="Öğrenci">Öğrenci</option>
+                        <option value="Komşu">Komşu</option>
+                        <option value="Personel">Personel</option>
+                        <option value="Kampanya">Kampanya</option>
+                        <option value="Diğer">Diğer</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" style="width:100%;" onclick="applyPastDiscount()">Uygula</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ödeme Modal -->
+    <!-- ═══════ ÖDEME MODALI ═══════ -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content" style="max-width:860px;">
+            <div class="modal-header">
+                <h2 id="paymentModalTitle">Ödeme Al</h2>
+                <span class="close" onclick="closePaymentModal()">&times;</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr;min-height:480px;">
+
+                <!-- SOL: Sipariş kalemleri -->
+                <div style="border-right:1px solid var(--border);padding:1.1rem;display:flex;flex-direction:column;gap:.5rem;overflow-y:auto;max-height:520px;">
+                    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:.25rem;">Kalemler</div>
+                    <div id="payItemsList" style="display:flex;flex-direction:column;gap:.4rem;"></div>
+                    <div style="margin-top:auto;padding-top:.75rem;border-top:1px solid var(--border);">
+                        <div style="display:flex;justify-content:space-between;font-size:.82rem;color:var(--ink-3);margin-bottom:.3rem;">
+                            <span>Ara Toplam</span>
+                            <span id="paymentTotal">0.00 ₺</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:.82rem;color:var(--red);margin-bottom:.3rem;" id="payTipRow" style="display:none;">
+                            <span>Bahşiş</span>
+                            <span id="payTipDisplay">0.00 ₺</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:800;color:var(--ink);">
+                            <span>Toplam</span>
+                            <span id="payGrandTotal">0.00 ₺</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ORTA: Tutar girişi -->
+                <div style="padding:1.1rem;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:.75rem;">
+
+                    <!-- Toplam / Kalan -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+                        <div style="background:var(--bg);border-radius:8px;padding:.75rem;text-align:center;border:1px solid var(--border);">
+                            <div style="font-size:.68rem;color:var(--ink-3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;">Toplam</div>
+                            <div id="payTotalBig" style="font-size:1.4rem;font-weight:800;color:var(--ink);">0.00 ₺</div>
+                        </div>
+                        <div style="background:var(--red-bg);border-radius:8px;padding:.75rem;text-align:center;border:1px solid #FECACA;">
+                            <div style="font-size:.68rem;color:var(--ink-3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;">Kalan</div>
+                            <div id="payRemainingDisplay" style="font-size:1.4rem;font-weight:800;color:var(--red);">0.00 ₺</div>
+                        </div>
+                    </div>
+
+                    <!-- Girilen ödemeler -->
+                    <div id="payEntries" style="display:flex;flex-direction:column;gap:.35rem;min-height:40px;"></div>
+
+                    <!-- Tutar + Nakit/Kart + Ekle -->
+                    <div style="display:flex;gap:.4rem;align-items:stretch;">
+                        <input type="text" id="payEntryAmount" placeholder="Tutar" inputmode="none"
+                            style="flex:1;padding:.55rem .7rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:1.15rem;font-weight:700;font-family:inherit;text-align:center;background:var(--bg);cursor:default;"
+                            readonly>
+                        <button id="btnCash" onclick="setEntryType('cash')"
+                            style="padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.8rem;font-weight:700;cursor:pointer;background:var(--ink);color:#fff;transition:all .14s;font-family:inherit;">
+                            Nakit
+                        </button>
+                        <button id="btnCard" onclick="setEntryType('card')"
+                            style="padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.8rem;font-weight:700;cursor:pointer;background:var(--surface);color:var(--ink-2);transition:all .14s;font-family:inherit;">
+                            Kart
+                        </button>
+                        <button onclick="addPayEntry()"
+                            style="padding:.55rem .8rem;border:none;border-radius:var(--r-sm);background:var(--green);color:#fff;font-weight:700;cursor:pointer;font-size:.82rem;font-family:inherit;">
+                            Ekle
+                        </button>
+                    </div>
+
+                    <!-- Numpad hedef seçici -->
+                    <div style="display:flex;gap:.3rem;background:var(--bg);border-radius:var(--r-sm);padding:.3rem;border:1px solid var(--border);">
+                        <button id="btnNumpadTutar" onclick="setNumpadTarget('amount')"
+                            style="flex:1;padding:.5rem;border:none;border-radius:6px;background:var(--ink);color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;transition:all .14s;">
+                            Tutar
+                        </button>
+                        <button id="btnNumpadBahsis" onclick="setNumpadTarget('tip')"
+                            style="flex:1;padding:.5rem;border:none;border-radius:6px;background:transparent;color:var(--ink-2);font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;transition:all .14s;">
+                            Bahşiş
+                        </button>
+                    </div>
+
+                    <!-- Numpad -->
+                    <div class="pay-numpad">
+                        <button class="pay-numpad-btn" onclick="numpadPress('1')">1</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('2')">2</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('3')">3</button>
+                        <button id="numpadTamBtn" class="pay-numpad-btn pay-numpad-action" onclick="numpadTam()">Tam</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('4')">4</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('5')">5</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('6')">6</button>
+                        <button class="pay-numpad-btn pay-numpad-action" onclick="numpadClear()">C</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('7')">7</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('8')">8</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('9')">9</button>
+                        <button class="pay-numpad-btn pay-numpad-del" onclick="numpadDel()">⌫</button>
+                        <button class="pay-numpad-btn pay-numpad-zero" onclick="numpadPress('0')">0</button>
+                        <button class="pay-numpad-btn" onclick="numpadPress('.')">.</button>
+                    </div>
+
+                    <!-- Hesabı böl -->
+                    <div>
+                        <button class="btn btn-secondary" style="width:100%;font-size:.82rem;" onclick="toggleSplitSection()">Hesabı Böl</button>
+                        <div id="splitSection" style="display:none;margin-top:.5rem;padding:.75rem;background:var(--bg);border-radius:var(--r-sm);border:1px solid var(--border);">
+                            <div style="display:flex;gap:.4rem;align-items:center;">
+                                <label style="font-size:.82rem;white-space:nowrap;">Kişi sayısı:</label>
+                                <input type="number" id="numPeople" value="2" min="2"
+                                    style="flex:1;padding:.45rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.88rem;font-family:inherit;">
+                                <button class="btn btn-secondary" onclick="calculateSplit()">Hesapla</button>
+                            </div>
+                            <div id="splitResult" style="margin-top:.5rem;font-weight:700;text-align:center;font-size:.95rem;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Bahşiş (hidden, JS tarafından yönetilir) -->
+                    <input type="hidden" id="tipAmount" value="0">
+                </div>
+
+                <!-- SAĞ: Ödeme tipleri + Bahşiş Yöntemi + Tamamla -->
+                <div style="padding:1.1rem;display:flex;flex-direction:column;gap:.75rem;">
+                    <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:.1rem;">Ödeme Tipi</div>
+
+                    <!-- Nakit -->
+                    <button onclick="setNumpadTarget('amount');setEntryType('cash');quickExact();addPayEntry();"
+                        style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:1.1rem .75rem;border:1.5px solid var(--border);border-radius:var(--r-lg);background:var(--surface);cursor:pointer;transition:all .14s;font-family:inherit;">
+                        <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                            <rect x="4" y="10" width="40" height="28" rx="5" fill="#E8F5E9" stroke="#16A34A" stroke-width="2"/>
+                            <rect x="18" y="18" width="12" height="12" rx="6" fill="#16A34A"/>
+                            <rect x="8" y="14" width="6" height="6" rx="3" fill="#A7F3D0"/>
+                            <rect x="34" y="28" width="6" height="6" rx="3" fill="#A7F3D0"/>
+                        </svg>
+                        <span style="font-weight:700;font-size:.85rem;color:var(--ink);">NAKİT</span>
+                    </button>
+
+                    <!-- Kredi Kartı -->
+                    <button onclick="setNumpadTarget('amount');setEntryType('card');quickExact();addPayEntry();"
+                        style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:1.1rem .75rem;border:1.5px solid var(--border);border-radius:var(--r-lg);background:var(--surface);cursor:pointer;transition:all .14s;font-family:inherit;">
+                        <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                            <rect x="4" y="10" width="40" height="28" rx="5" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+                            <rect x="4" y="17" width="40" height="7" fill="#BFDBFE"/>
+                            <rect x="8" y="28" width="10" height="4" rx="2" fill="#3B82F6"/>
+                            <circle cx="34" cy="30" r="4" fill="#FCA5A5"/>
+                            <circle cx="38" cy="30" r="4" fill="#F87171"/>
+                        </svg>
+                        <span style="font-weight:700;font-size:.85rem;color:var(--ink);">KREDİ KARTI</span>
+                    </button>
+
+                    <!-- Bahşiş Yöntemi -->
+                    <div>
+                        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:.4rem;">Bahşiş Yöntemi</div>
+                        <div style="display:flex;gap:.3rem;background:var(--bg);border-radius:var(--r-sm);padding:.3rem;border:1px solid var(--border);">
+                            <button id="btnTipCash" onclick="setTipMethod('cash')"
+                                style="flex:1;padding:.5rem;border:none;border-radius:6px;background:var(--ink);color:#fff;font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit;transition:all .14s;">
+                                Nakit
+                            </button>
+                            <button id="btnTipCard" onclick="setTipMethod('card')"
+                                style="flex:1;padding:.5rem;border:none;border-radius:6px;background:transparent;color:var(--ink-2);font-weight:700;font-size:.82rem;cursor:pointer;font-family:inherit;transition:all .14s;">
+                                Kart
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hızlı Ödeme -->
+                    <div>
+                        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:.5rem;">Hızlı Ödeme</div>
+                        <button onclick="openQuickPay()"
+                            style="width:100%;padding:.75rem;border:none;border-radius:var(--r-lg);background:var(--ink);color:#fff;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;transition:all .14s;">
+                            Hızlı Ödeme
+                        </button>
+                    </div>
+
+                    <!-- Ödemeyi Tamamla -->
+                    <button class="btn btn-success" style="width:100%;font-size:1rem;padding:.9rem;margin-top:auto;" onclick="completePayment()">
+                        Ödemeyi Tamamla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Pay Mini Modal -->
+    <div id="quickPayModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+        <div style="background:var(--surface);border-radius:var(--r-xl);padding:1.75rem;width:100%;max-width:340px;box-shadow:var(--s-lg);border:1px solid var(--border);">
+            <div style="font-size:1rem;font-weight:700;margin-bottom:.3rem;">Hızlı Ödeme</div>
+            <div id="quickPayAmount" style="font-size:1.8rem;font-weight:800;color:var(--ink);margin-bottom:1.25rem;">0.00 ₺</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;">
+                <button onclick="doQuickPay('cash')"
+                    style="display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.25rem;border:1.5px solid var(--border);border-radius:var(--r-lg);background:var(--surface);cursor:pointer;font-family:inherit;transition:all .14s;">
+                    <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                        <rect x="4" y="10" width="40" height="28" rx="5" fill="#E8F5E9" stroke="#16A34A" stroke-width="2"/>
+                        <rect x="18" y="18" width="12" height="12" rx="6" fill="#16A34A"/>
+                    </svg>
+                    <span style="font-weight:700;font-size:.88rem;">NAKİT</span>
+                </button>
+                <button onclick="doQuickPay('card')"
+                    style="display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.25rem;border:1.5px solid var(--border);border-radius:var(--r-lg);background:var(--surface);cursor:pointer;font-family:inherit;transition:all .14s;">
+                    <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                        <rect x="4" y="10" width="40" height="28" rx="5" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+                        <rect x="4" y="17" width="40" height="7" fill="#BFDBFE"/>
+                        <circle cx="34" cy="30" r="4" fill="#FCA5A5"/>
+                        <circle cx="38" cy="30" r="4" fill="#F87171"/>
+                    </svg>
+                    <span style="font-weight:700;font-size:.88rem;">KART</span>
+                </button>
+            </div>
+            <button onclick="closeQuickPay()" style="width:100%;padding:.6rem;border:1.5px solid var(--border);border-radius:var(--r-sm);background:none;cursor:pointer;font-size:.84rem;font-weight:600;font-family:inherit;color:var(--ink-2);">İptal</button>
+        </div>
+    </div>
+
+    <!-- Ürün Düzenleme Modal -->
+    <div id="editItemModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Ürün Düzenle</h2>
+                <span class="close" onclick="closeEditItemModal()">&times;</span>
+            </div>
+            <div style="padding: 2rem;">
+                <h3 id="editItemName" style="margin-bottom: 1.5rem; color: #667eea;"></h3>
+                
+                <div>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="editIsComplimentary" style="margin-right: 0.5rem; width: 20px; height: 20px;">
+                        <span style="font-weight: bold;">İkram (Ücretsiz)</span>
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label>Şefe Not:</label>
+                    <textarea id="editKitchenNotes" rows="3" placeholder="Az acılı, ekstra sos, vb." style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 0.5rem; font-family: inherit;"></textarea>
+                </div>
+
+                <button class="btn btn-success" style="width:100%;" onclick="saveItemEdit()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kapalı Sipariş Düzenleme Modal -->
+    <div id="editOrderModal" class="modal">
+        <div class="modal-content" style="max-width:640px;">
+            <div class="modal-header">
+                <h2>✏️ Siparişi Düzenle</h2>
+                <span class="close" onclick="closeEditOrderModal()">&times;</span>
+            </div>
+            <div style="padding:1.5rem;">
+                <div style="background:#f7fafc;border-radius:10px;padding:1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <div id="editOrderInfo" style="font-weight:700;font-size:1rem;"></div>
+                        <div id="editOrderDate" style="font-size:.82rem;color:#718096;"></div>
+                    </div>
+                    <div id="editOrderTotal" style="font-size:1.5rem;font-weight:800;color:#2d6a4f;"></div>
+                </div>
+
+                <!-- Mevcut ürünler -->
+                <div id="editOrderItems" style="margin-bottom:1rem;max-height:260px;overflow-y:auto;"></div>
+
+                <!-- Ürün ekle -->
+                <div style="background:#f0fdf4;border-radius:10px;padding:.75rem;margin-bottom:1rem;">
+                    <div style="font-weight:600;font-size:.85rem;color:#2d6a4f;margin-bottom:.5rem;">➕ Ürün Ekle</div>
+                    <div style="display:flex;gap:.5rem;">
+                        <select id="editAddProduct" style="flex:1;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                            <option value="">Ürün seç...</option>
+                        </select>
+                        <input type="number" id="editAddQty" value="1" min="1" style="width:70px;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                        <button onclick="addItemToEditOrder()" style="padding:.6rem 1rem;background:#2d6a4f;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Ekle</button>
+                    </div>
+                </div>
+
+                <!-- Ödeme -->
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:1rem;">
+                    <div>
+                        <label style="font-size:.8rem;font-weight:600;color:#4a5568;">💵 Nakit</label>
+                        <input type="number" id="editCash" value="0" step="0.01"
+                            style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;margin-top:.25rem;box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="font-size:.8rem;font-weight:600;color:#4a5568;">💳 Kart</label>
+                        <input type="number" id="editCard" value="0" step="0.01"
+                            style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;margin-top:.25rem;box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="font-size:.8rem;font-weight:600;color:#4a5568;">🎁 Bahşiş</label>
+                        <input type="number" id="editTip" value="0" step="0.01"
+                            style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;margin-top:.25rem;box-sizing:border-box;">
+                    </div>
+                </div>
+
+                <button onclick="saveEditOrder()" style="width:100%;padding:.85rem;background:#2d6a4f;color:white;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">
+                    💾 Kaydet ve Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ayarlar Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content" style="max-width: 620px;">
+            <div class="modal-header">
+                <h2>⚙️ Ayarlar</h2>
+                <button class="close-btn" onclick="closeSettingsModal()">✕</button>
+            </div>
+            <!-- Sekmeler -->
+            <div style="display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.5rem;">
+                <button class="settings-tab active" onclick="switchSettingsTab('business')" id="tab-business">🏪 İşletme</button>
+                <button class="settings-tab" onclick="switchSettingsTab('printer')" id="tab-printer">🖨️ Yazıcı</button>
+                <button class="settings-tab" onclick="switchSettingsTab('logo')" id="tab-logo">🖼️ Logo</button>
+                <button class="settings-tab" onclick="switchSettingsTab('note')" id="tab-note">📝 Not Fişi</button>
+            </div>
+
+            <!-- İşletme Bilgileri -->
+            <div id="settings-business" class="settings-panel">
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">İşletme Adı</label>
+                        <input type="text" id="s-restaurant-name" placeholder="Fırınna" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Adres</label>
+                        <input type="text" id="s-restaurant-address" placeholder="Beyoğlu, İstanbul" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Telefon</label>
+                        <input type="text" id="s-restaurant-phone" placeholder="+90 212 ..." style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Fiş Alt Notu</label>
+                        <textarea id="s-receipt-footer" rows="3" placeholder="Afiyet olsun!" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box; resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                    <button onclick="saveBusinessSettings()" style="padding: 0.75rem; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">💾 Kaydet</button>
+                </div>
+            </div>
+
+            <!-- Yazıcı Ayarları -->
+            <div id="settings-printer" class="settings-panel" style="display: none;">
+                <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                    <div style="background: #f8fafc; border-radius: 10px; padding: 1rem;">
+                        <p style="font-weight: 700; margin: 0 0 0.8rem;">🧾 Müşteri Yazıcısı</p>
+                        <div style="display: flex; gap: 1rem;">
+                            <div style="flex: 2;">
+                                <label style="font-size: 0.85rem; font-weight: 600;">IP Adresi</label>
+                                <input type="text" id="s-printer-ip" placeholder="192.168.1.x" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; margin-top: 0.3rem;">
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.85rem; font-weight: 600;">Port</label>
+                                <input type="number" id="s-printer-port" placeholder="9100" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; margin-top: 0.3rem;">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: #f8fafc; border-radius: 10px; padding: 1rem;">
+                        <p style="font-weight: 700; margin: 0 0 0.8rem;">🍳 Mutfak Yazıcısı</p>
+                        <div style="display: flex; gap: 1rem;">
+                            <div style="flex: 2;">
+                                <label style="font-size: 0.85rem; font-weight: 600;">IP Adresi</label>
+                                <input type="text" id="s-kitchen-ip" placeholder="192.168.1.x" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; margin-top: 0.3rem;">
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.85rem; font-weight: 600;">Port</label>
+                                <input type="number" id="s-kitchen-port" placeholder="9100" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; margin-top: 0.3rem;">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button onclick="savePrinterSettings()" style="flex: 1; padding: 0.75rem; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">💾 Kaydet</button>
+                        <button onclick="testPrinter()" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">🖨️ Test Yazdır</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logo -->
+            <div id="settings-logo" class="settings-panel" style="display: none;">
+                <div style="display: flex; flex-direction: column; gap: 1.2rem; align-items: center;">
+                    <div id="logo-preview-box" style="width: 200px; height: 100px; border: 2px dashed #cbd5e1; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #f8fafc;">
+                        <span id="logo-placeholder-text" style="color: #94a3b8; font-size: 0.9rem;">Logo yüklenmemiş</span>
+                        <img id="logo-preview-img" src="" alt="Logo" style="display: none; max-width: 190px; max-height: 90px; object-fit: contain;">
+                    </div>
+                    <p style="font-size: 0.85rem; color: #64748b; text-align: center; margin: 0;">PNG, JPG veya WebP · Önerilen boyut: 300×150px</p>
+                    <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display: none;" onchange="previewLogoFile(event)">
+                    <div style="display: flex; gap: 0.75rem; width: 100%;">
+                        <button onclick="document.getElementById('logo-file-input').click()" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">📁 Dosya Seç</button>
+                        <button onclick="uploadLogo()" id="btn-upload-logo" disabled style="flex: 1; padding: 0.75rem; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; opacity: 0.5;">⬆️ Yükle</button>
+                        <button onclick="deleteLogo()" style="flex: 1; padding: 0.75rem; background: #ef4444; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">🗑️ Sil</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Not Fişi -->
+            <div id="settings-note" class="settings-panel" style="display: none;">
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Başlık</label>
+                        <input type="text" id="note-title" value="NOT" placeholder="NOT" style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Not İçeriği</label>
+                        <textarea id="note-content" rows="6" placeholder="Yazdırmak istediğiniz notu buraya girin..." style="width: 100%; padding: 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box; resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button onclick="previewNote()" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">👁️ Önizle</button>
+                        <button onclick="printNote()" style="flex: 1; padding: 0.75rem; background: #2d6a4f; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">🖨️ Yazdır</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Masa Notu Modal -->
+    <div id="tableNoteModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>📝 Masa Notu</h2>
+                <span class="close" onclick="closeTableNoteModal()">&times;</span>
+            </div>
+            <div style="padding: 2rem;">
+                <h3 id="noteTableName" style="margin-bottom: 1rem; color: #667eea;"></h3>
+                <textarea id="tableNoteText" rows="5" placeholder="Müşteri adı, özel istekler, vb." style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-family: inherit;"></textarea>
+                <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="saveTableNote()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        let currentZone = null;
+        let currentTable = null;
+        let currentOrder = null;
+        let currentEditItemId = null;
+        let currentNoteTableId = null;
+        let allProducts = [];
+        
+        // Geçmiş sipariş için
+        let pastOrderCart = [];
+        let pastOrderDiscount = { type: null, value: 0, reason: '' };
+
+        function calcDuration(startedAt) {
+            if (!startedAt) return null;
+            // SQLite CURRENT_TIMESTAMP is UTC — append Z so JS parses correctly
+            const ts = startedAt.includes('Z') ? startedAt : startedAt.replace(' ', 'T') + 'Z';
+            const mins = Math.floor((Date.now() - new Date(ts).getTime()) / 60000);
+            if (mins < 0) return null;
+            if (mins < 60) return { text: mins + ' dk', cls: mins < 45 ? 'dur-green' : 'dur-orange' };
+            const h = Math.floor(mins / 60), m = mins % 60;
+            return { text: h + 'sa ' + m + 'dk', cls: 'dur-red' };
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadZones();
+            fetch('/api/settings/logo').then(r=>r.json()).then(d=>{
+                if (d.url) {
+                    document.getElementById('logoWatermarkImg').src = d.url;
+                    document.getElementById('logoWatermark').style.display = 'block';
+                }
+            }).catch(()=>{});
+            setInterval(function() { if (typeof currentZone !== 'undefined' && currentZone) refreshZone(); }, 3000); // 3 saniyede bir güncelle (Anlık hissiyatı için)
+            
+            document.querySelectorAll('.close').forEach(el => {
+                el.onclick = function() {
+                    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+                    refreshZone();
+                };
+            });
+            
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                    refreshZone();
+                }
+            };
+        });
+
+        async function loadZones() {
+            const zones = await fetch('/api/zones').then(r => r.json());
+            const zoneTabs = document.getElementById('zoneTabs');
+            
+            if (zones.length === 0) {
+                zoneTabs.innerHTML = '<p class="no-data">Henüz bölge eklenmemiş. <a href="/tables">Bölge ekle</a></p>';
+                return;
+            }
+            
+            zoneTabs.innerHTML = zones.map((zone, index) => 
+                `<button class="zone-tab ${index === 0 ? 'active' : ''}" onclick="selectZone(${zone.id}, event)">${zone.name}</button>`
+            ).join('');
+            
+            selectZone(zones[0].id);
+        }
+
+        async function selectZone(zoneId, event) {
+            currentZone = zoneId;
+            document.querySelectorAll('.zone-tab').forEach(tab => tab.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+            else {
+                // event yoksa zone id ile tab'ı bul ve işaretle
+                document.querySelectorAll('.zone-tab').forEach((tab, i) => {
+                    if (tab.getAttribute('onclick') && tab.getAttribute('onclick').includes('(' + zoneId + ',')) {
+                        tab.classList.add('active');
+                    }
+                });
+            }
+            
+            const tables = await fetch(`/api/tables?zone_id=${zoneId}`).then(r => r.json());
+            const tablesGrid = document.getElementById('tablesGrid');
+            
+            if (tables.length === 0) {
+                tablesGrid.innerHTML = '<p class="no-data">Bu bölgede masa yok. <a href="/tables">Masa ekle</a></p>';
+                return;
+            }
+
+            // Blueprint layout for main zone (Cafe)
+            if (zoneId == 1 || tables.some(t => t.name === '1' || t.name.toLowerCase().includes('masa'))) {
+                tablesGrid.style.display = 'block'; // Disable grid layout
+                let m1 = tables.find(t => t.name === '1' || t.name === 'Masa 1');
+                let m2 = tables.find(t => t.name === '2' || t.name === 'Masa 2');
+                let m3 = tables.find(t => t.name === '3' || t.name === 'Masa 3');
+                let m4 = tables.find(t => t.name === '4' || t.name === 'Masa 4');
+                
+                const renderTable = (t, extraCls) => {
+                    if(!t) return `<div class="blueprint-table ${extraCls}" style="opacity:0.5;cursor:default;"><div>Boş Masa</div></div>`;
+                    const hasOrder = t.has_order > 0;
+                    const status = hasOrder ? 'occupied' : 'empty';
+                    const dur = hasOrder ? calcDuration(t.order_started_at) : null;
+                    return `
+                        <div class="blueprint-table ${status} ${extraCls}" onclick="openTable(${t.id}, '${t.name}')">
+                            ${dur ? `<span class="dur-badge ${dur.cls}">${dur.text}</span>` : ''}
+                            <div class="table-icon">🍽️</div>
+                            <div class="table-name">MASA-${t.name.replace(/[^0-9]/g, '')}${t.table_note ? ' 📝' : ''}</div>
+                            ${hasOrder ? `<div class="table-total">${fmtTL(t.order_total||0)}</div>` : ''}
+                        </div>
+                    `;
+                };
+
+                // Fetch Takeaway table specifically (usually id=9 or zone=3)
+                const allTbls = await fetch('/api/tables').then(r => r.json());
+                const tkw = allTbls.find(t => t.id == 9 || t.name.toLowerCase() === 'takeaway');
+                const tkwHasOrder = tkw && tkw.has_order > 0;
+                const tkwDur = tkwHasOrder ? calcDuration(tkw.order_started_at) : null;
+                const tkwStatusStyle = tkwHasOrder ? 'background:#fed7d7; border-color:#e53e3e;' : '';
+
+                tablesGrid.innerHTML = `
+                    <div class="blueprint-wrapper">
+                        <img id="blueprintLogo" src="/static/uploads/logo.png" onerror="this.style.display='none'" alt="Logo" class="blueprint-logo">
+                        <div class="blueprint-container">
+                            <div class="blueprint-side" onclick="window.location.href='/kitchen'">
+                                <div class="icon">🧑‍🍳</div>
+                                <div>Mutfak</div>
+                            </div>
+                            <div class="blueprint-center">
+                                <!-- Desktop Top Row: 2, 3 -->
+                                ${renderTable(m2, 'bp-table-2')}
+                                ${renderTable(m3, 'bp-table-3')}
+                                <!-- Desktop Bottom Row: 1, 4 -->
+                                ${renderTable(m1, 'bp-table-1')}
+                                ${renderTable(m4, 'bp-table-4')}
+                            </div>
+                            <div class="blueprint-side" style="position:relative; ${tkwStatusStyle}" onclick="openTable(${tkw ? tkw.id : 9}, 'TakeAway')">
+                                ${tkwDur ? `<span class="dur-badge ${tkwDur.cls}" style="position:absolute; top:-10px; right:-10px; padding:4px 8px; border-radius:20px; font-size:0.8rem; font-weight:bold;">${tkwDur.text}</span>` : ''}
+                                <div class="icon">🥡</div>
+                                <div>Gel-Al</div>
+                                ${tkwHasOrder ? `<div style="color:#e53e3e;font-size:1rem;margin-top:5px;">${fmtTL(tkw.order_total||0)}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                tablesGrid.style.display = 'grid'; // Enable grid layout for others
+                // Fallback for other zones
+                tablesGrid.innerHTML = tables.map(table => {
+                    const hasOrder = table.has_order > 0;
+                    const status = hasOrder ? 'occupied' : 'empty';
+                    const dur = hasOrder ? calcDuration(table.order_started_at) : null;
+                    return `
+                        <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
+                            ${dur ? `<span class="dur-badge ${dur.cls}">${dur.text}</span>` : ''}
+                            <div class="table-icon">🍽️</div>
+                            <div class="table-name">${table.name}${table.table_note ? ' 📝' : ''}</div>
+                            ${hasOrder ? `<div class="table-total">${fmtTL(table.order_total||0)}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+        } // selectZone end
+
+        let noteDebounce = null;
+        async function saveOrderNote() {
+            if (!currentOrder || !currentOrder.id) return;
+            clearTimeout(noteDebounce);
+            noteDebounce = setTimeout(async () => {
+                const note = document.getElementById('orderNoteText').value;
+                await fetch(`/api/orders/${currentOrder.id}/note`, {
+                    method: 'PATCH',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({note})
+                });
+            }, 800);
+        }
+
+        async function openTable(tableId, tableName) {
+            currentTable = tableId;
+            document.getElementById('modalTableName').textContent = tableName;
+            
+            currentOrder = await fetch(`/api/orders/table/${tableId}`).then(r => r.json());
+            
+            await loadCategories();
+            updateOrderSummary();
+
+            // #37: Sipariş notunu yükle
+            if (currentOrder && currentOrder.id) {
+                fetch(`/api/orders/${currentOrder.id}/note`)
+                    .then(r => r.json())
+                    .then(d => { document.getElementById('orderNoteText').value = d.note || ''; });
+            } else {
+                document.getElementById('orderNoteText').value = '';
+            }
+            
+            // Masa notu banner
+            fetch(`/api/tables?zone_id=${currentZone}`).then(r=>r.json()).then(tables=>{
+                const t=tables.find(t=>t.id===tableId);
+                const b=document.getElementById('tableNoteBanner');
+                if(t&&t.table_note){b.textContent='📝 Masa Notu: '+t.table_note;b.style.display='block';}else{b.style.display='none';}
+            });
+            // Geçmiş tarih alanını sıfırla
+            document.getElementById('customDateCheck').checked = false;
+            document.getElementById('customDatetime').style.display = 'none';
+            document.getElementById('customDatetime').value = '';
+
+            document.getElementById('orderModal').style.display = 'block';
+        }
+
+        function toggleCustomDate() {
+            const show = document.getElementById('customDateCheck').checked;
+            const inp = document.getElementById('customDatetime');
+            inp.style.display = show ? 'inline-block' : 'none';
+            if (show && !inp.value) {
+                // Şimdiki zamanı varsayılan olarak doldur
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                inp.value = now.toISOString().slice(0, 16);
+            }
+        }
+
+        function getCustomDatetime() {
+            if (!document.getElementById('customDateCheck').checked) return null;
+            const val = document.getElementById('customDatetime').value;
+            if (!val) return null;
+            // datetime-local → "YYYY-MM-DD HH:MM:SS"
+            return val.replace('T', ' ') + ':00';
+        }
+
+        async function loadCategories() {
+            const categories = await fetch('/api/categories').then(r => r.json());
+            const categoriesBar = document.getElementById('categoriesBar');
+            
+            if (categories.length === 0) {
+                categoriesBar.innerHTML = '<p class="no-data">Henüz kategori eklenmemiş.</p>';
+                return;
+            }
+            
+            categoriesBar.innerHTML = categories.map((cat, index) => 
+                `<button class="category-btn ${index === 0 ? 'active' : ''}" 
+                         style="background: ${cat.color}" 
+                         onclick="selectCategory(${cat.id}, event)">${cat.name}</button>`
+            ).join('');
+            
+            selectCategory(categories[0].id);
+        }
+
+        async function selectCategory(categoryId, event) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            if (event) event.target.classList.add('active');
+            
+            const products = await fetch(`/api/products?category_id=${categoryId}`).then(r => r.json());
+            allProducts = products;
+            displayProducts(products);
+        }
+
+        function displayProducts(products) {
+            const productsGrid = document.getElementById('productsGrid');
+            
+            if (products.length === 0) {
+                productsGrid.innerHTML = '<p class="no-data">Bu kategoride ürün yok.</p>';
+                return;
+            }
+            
+            productsGrid.innerHTML = products.map(product => {
+                const avail = product.is_available !== 0;
+                return `
+                <div class="product-card${avail ? '' : ' product-soldout'}" ${avail ? `onclick="addProduct(${product.id}, '${product.name}', ${product.price})"` : 'title="Tükendi"'}>
+                    <div style="position: absolute; top: 0.5rem; right: 0.5rem; font-size: 1.5rem; cursor: pointer;"
+                         onclick="${avail ? `toggleFavorite(${product.id}, event)` : 'event.stopPropagation()'}">
+                        ${product.is_favorite ? '⭐' : '☆'}
+                    </div>
+                    <div class="product-name">${product.name}${avail ? '' : '<br><span style="font-size:.65rem;color:#ef4444;font-weight:700;letter-spacing:.3px;">TÜKENDI</span>'}</div>
+                    <div class="product-price">${fmtTL(product.price)}</div>
+                </div>`;
+            }).join('');
+        }
+
+        async function searchProducts(query) {
+            if (!query.trim()) {
+                displayProducts(allProducts);
+                return;
+            }
+            
+            const products = await fetch(`/api/products/search?q=${encodeURIComponent(query)}`).then(r => r.json());
+            displayProducts(products);
+        }
+
+        async function toggleFavorite(productId, event) {
+            event.stopPropagation();
+            await fetch(`/api/products/${productId}/favorite`, { method: 'PATCH' });
+            
+            const activeCategory = document.querySelector('.category-btn.active');
+            if (activeCategory) {
+                activeCategory.click();
+            }
+        }
+
+        async function addProduct(productId, productName, price) {
+            // Sipariş henüz DB'de yoksa oluştur
+            if (!currentOrder.id) {
+                const res = await fetch('/api/orders/create', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({table_id: currentTable, created_at: getCustomDatetime()})
+                });
+                const created = await res.json();
+                currentOrder.id = created.id;
+            }
+            await fetch(`/api/orders/${currentOrder.id}/items`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({product_id: productId, product_name: productName, quantity: 1, price: price})
+            });
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+            refreshZone(); // Masa rengini hemen güncelle
+        }
+
+        async function changeQuantity(itemId, change) {
+            const item = currentOrder.items.find(i => i.id === itemId);
+            const newQty = item.quantity + change;
+            
+            await fetch(`/api/orders/items/${itemId}/quantity`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({quantity: newQty})
+            });
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+        }
+
+        function openEditItem(itemId, itemName) {
+            currentEditItemId = itemId;
+            const item = currentOrder.items.find(i => i.id === itemId);
+            
+            document.getElementById('editItemName').textContent = itemName;
+            document.getElementById('editIsComplimentary').checked = item.is_complimentary == 1;
+            document.getElementById('editKitchenNotes').value = item.kitchen_notes || '';
+            
+            document.getElementById('editItemModal').style.display = 'block';
+        }
+
+        function closeEditItemModal() {
+            document.getElementById('editItemModal').style.display = 'none';
+        }
+
+        async function saveItemEdit() {
+            await fetch(`/api/orders/items/${currentEditItemId}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    is_complimentary: document.getElementById('editIsComplimentary').checked,
+                    kitchen_notes: document.getElementById('editKitchenNotes').value
+                })
+            });
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+            closeEditItemModal();
+        }
+
+        function openCustomItemModal() {
+            document.getElementById('customItemName').value = '';
+            document.getElementById('customItemPrice').value = '';
+            document.getElementById('customItemModal').style.display = 'block';
+        }
+
+        function closeCustomItemModal() {
+            document.getElementById('customItemModal').style.display = 'none';
+        }
+
+        async function addCustomItem() {
+            const name = document.getElementById('customItemName').value;
+            const price = parseFloat(document.getElementById('customItemPrice').value);
+            
+            if (!name || !price) {
+                showToast('Lütfen ürün adı ve fiyat girin!', 'warn');
+                return;
+            }
+            
+            await fetch(`/api/orders/${currentOrder.id}/custom-item`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, price})
+            });
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+            closeCustomItemModal();
+        }
+
+        function openDiscountModal() {
+            document.getElementById('discountModal').style.display = 'block';
+        }
+
+        function closeDiscountModal() {
+            document.getElementById('discountModal').style.display = 'none';
+        }
+
+        async function applyDiscount() {
+            const type = document.querySelector('input[name="discountType"]:checked').value;
+            const value = parseFloat(document.getElementById('discountValue').value);
+            const reason = document.getElementById('discountReason').value;
+            
+            if (!value) {
+                showToast('Lütfen indirim değeri girin!', 'warn');
+                return;
+            }
+            
+            await fetch(`/api/orders/${currentOrder.id}/discount`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({type, value, reason})
+            });
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+            closeDiscountModal();
+        }
+
+        async function removeDiscount() {
+            await fetch(`/api/orders/${currentOrder.id}/discount`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({type: null, value: 0, reason: ''})
+            });
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+        }
+
+        // === YENİ ÖDEME SİSTEMİ ===
+        let payEntries = [];   // [{type:'cash'|'card', amount:float}]
+        let payEntryType = 'cash';
+        let numpadTarget = 'amount'; // 'amount' | 'tip'
+        let tipMethod = 'cash';     // 'cash' | 'card'
+
+        function quickAmount(amt) {
+            const el = document.getElementById('payEntryAmount');
+            el.value = amt;
+            el.focus();
+        }
+        function quickExact() {
+            const rem = getRemainingAmount();
+            if (rem > 0) {
+                document.getElementById('payEntryAmount').value = rem.toFixed(2);
+            }
+        }
+
+        function setEntryType(type) {
+            payEntryType = type;
+            document.getElementById('btnCash').style.background = type === 'cash' ? '#2d6a4f' : 'white';
+            document.getElementById('btnCash').style.color     = type === 'cash' ? 'white' : '#2d6a4f';
+            document.getElementById('btnCard').style.background = type === 'card' ? '#3b82f6' : 'white';
+            document.getElementById('btnCard').style.color     = type === 'card' ? 'white' : '#3b82f6';
+        }
+
+        function setNumpadTarget(target) {
+            numpadTarget = target;
+            const btnTutar  = document.getElementById('btnNumpadTutar');
+            const btnBahsis = document.getElementById('btnNumpadBahsis');
+            const tamBtn    = document.getElementById('numpadTamBtn');
+            if (target === 'amount') {
+                btnTutar.style.background  = 'var(--ink)';
+                btnTutar.style.color       = '#fff';
+                btnBahsis.style.background = 'transparent';
+                btnBahsis.style.color      = 'var(--ink-2)';
+                if (tamBtn) tamBtn.textContent = 'Tam';
+                updatePayRemaining();
+            } else {
+                btnBahsis.style.background = '#f97316';
+                btnBahsis.style.color      = '#fff';
+                btnTutar.style.background  = 'transparent';
+                btnTutar.style.color       = 'var(--ink-2)';
+                if (tamBtn) tamBtn.textContent = 'Sıfırla';
+                const tip = parseFloat(document.getElementById('tipAmount').value) || 0;
+                document.getElementById('payEntryAmount').value = tip > 0 ? tip.toFixed(2) : '';
+                document.getElementById('payEntryAmount').placeholder = 'Bahşiş';
+            }
+        }
+
+        function setTipMethod(method) {
+            tipMethod = method;
+            document.getElementById('btnTipCash').style.background = method === 'cash' ? 'var(--ink)' : 'transparent';
+            document.getElementById('btnTipCash').style.color      = method === 'cash' ? '#fff' : 'var(--ink-2)';
+            document.getElementById('btnTipCard').style.background = method === 'card' ? 'var(--ink)' : 'transparent';
+            document.getElementById('btnTipCard').style.color      = method === 'card' ? '#fff' : 'var(--ink-2)';
+        }
+
+        function addPayEntry() {
+            if (numpadTarget === 'tip') {
+                setNumpadTarget('amount');
+                return;
+            }
+            const amtInput = document.getElementById('payEntryAmount');
+            const amt = parseFloat(amtInput.value);
+            if (!amt || amt <= 0) { return; }
+            const remaining = getRemainingAmount();
+
+            if (remaining > 0.01 && amt > remaining + 0.01) {
+                const excess = parseFloat((amt - remaining).toFixed(2));
+                payEntries.push({ type: payEntryType, amount: remaining });
+                const currentTip = parseFloat(document.getElementById('tipAmount').value) || 0;
+                document.getElementById('tipAmount').value = (currentTip + excess).toFixed(2);
+                updateTipDisplay();
+                showToast(`${fmtTL(excess)} bahşiş eklendi`, 'success');
+            } else {
+                const actual = Math.min(amt, remaining > 0 ? remaining : amt);
+                payEntries.push({ type: payEntryType, amount: actual });
+            }
+            amtInput.value = '';
+            renderPayEntries();
+            updatePayRemaining();
+        }
+
+        function removePayEntry(idx) {
+            payEntries.splice(idx, 1);
+            renderPayEntries();
+            updatePayRemaining();
+        }
+
+        function renderPayEntries() {
+            const el = document.getElementById('payEntries');
+            if (!payEntries.length) { el.innerHTML = ''; return; }
+            el.innerHTML = payEntries.map((e, i) => `
+                <div style="display:flex;justify-content:space-between;align-items:center;
+                            padding:.5rem .75rem;background:${e.type==='cash'?'#f0fdf4':'#eff6ff'};
+                            border-radius:8px;margin-bottom:.4rem;">
+                    <span style="font-size:1rem;">${e.type==='cash'?'💵 Nakit':'💳 Kart'}</span>
+                    <span style="font-weight:700;font-size:1rem;">${fmtTL(e.amount)}</span>
+                    <button onclick="removePayEntry(${i})"
+                        style="border:none;background:none;color:#e53e3e;font-size:1.1rem;cursor:pointer;padding:0 .25rem;">✕</button>
+                </div>`).join('');
+        }
+
+        function getRemainingAmount() {
+            const total = currentOrder ? currentOrder.total : 0;
+            const paid  = payEntries.reduce((s, e) => s + e.amount, 0);
+            return total - paid;
+        }
+
+        function updatePayRemaining() {
+            const rem = getRemainingAmount();
+            const el  = document.getElementById('payRemainingDisplay');
+            el.textContent = fmtTL(rem);
+            el.style.color = rem > 0.01 ? '#e53e3e' : '#2d6a4f';
+            if (numpadTarget === 'amount') {
+                if (rem > 0.01) {
+                    document.getElementById('payEntryAmount').value = rem.toFixed(2);
+                } else {
+                    document.getElementById('payEntryAmount').value = '';
+                }
+            }
+        }
+
+        function setEntryAmount(val) {
+            document.getElementById('payEntryAmount').value = val.toFixed(2);
+            updatePayRemaining();
+        }
+
+        function openPaymentModal() {
+            payEntries = [];
+            payEntryType = 'cash';
+            numpadTarget = 'amount';
+            tipMethod = 'cash';
+            setEntryType('cash');
+            setNumpadTarget('amount');
+            setTipMethod('cash');
+            document.getElementById('payEntries').innerHTML = '';
+            document.getElementById('payEntryAmount').value = '';
+            document.getElementById('payEntryAmount').placeholder = 'Tutar';
+            document.getElementById('tipAmount').value = '0';
+            const total = fmtTL(currentOrder.total);
+            document.getElementById('paymentTotal').textContent  = total;
+            document.getElementById('payTotalBig').textContent   = total;
+            document.getElementById('payGrandTotal').textContent = total;
+            document.getElementById('paymentModalTitle').textContent = 'Ödeme Al — ' + (currentOrder.table_name || '');
+            const list = document.getElementById('payItemsList');
+            if (list && currentOrder.items) {
+                list.innerHTML = currentOrder.items.map(i =>
+                    `<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid var(--border);">
+                        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.quantity}x ${i.product_name||i.name||''}</span>
+                        <span style="font-weight:600;flex-shrink:0;margin-left:.5rem;">${i.is_complimentary ? 'İkram' : fmtTL(i.quantity * (i.price||0))}</span>
+                    </div>`
+                ).join('');
+            }
+            document.getElementById('payTipRow').style.display = 'none';
+            updatePayRemaining();
+            document.getElementById('paymentModal').style.display = 'block';
+        }
+
+        function updateTipDisplay() {
+            const tip   = parseFloat(document.getElementById('tipAmount').value) || 0;
+            const total = currentOrder ? currentOrder.total : 0;
+            document.getElementById('payTipDisplay').textContent   = fmtTL(tip);
+            document.getElementById('payGrandTotal').textContent   = fmtTL(total + tip);
+            document.getElementById('payTipRow').style.display     = tip > 0 ? 'flex' : 'none';
+        }
+
+        function openQuickPay() {
+            const total = currentOrder ? currentOrder.total : 0;
+            document.getElementById('quickPayAmount').textContent = fmtTL(total);
+            document.getElementById('quickPayModal').style.display = 'flex';
+        }
+        function closeQuickPay() {
+            document.getElementById('quickPayModal').style.display = 'none';
+        }
+        async function doQuickPay(method) {
+            closeQuickPay();
+            const total = currentOrder.total;
+            const tip   = parseFloat(document.getElementById('tipAmount').value) || 0;
+            await fetch(`/api/orders/${currentOrder.id}/close-with-payment`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    payment_cash: method === 'cash' ? total : 0,
+                    payment_card: method === 'card' ? total : 0,
+                    tip_amount: tip,
+                    tip_method: tipMethod,
+                    closed_at: getCustomDatetime()
+                })
+            });
+            showToast('Hesap kapatıldı!', 'success');
+            document.getElementById('paymentModal').style.display = 'none';
+            document.getElementById('orderModal').style.display   = 'none';
+            refreshZone();
+        }
+
+
+        function numpadPress(val) {
+            if (numpadTarget === 'tip') {
+                const tipInp = document.getElementById('tipAmount');
+                const cur = tipInp.value === '0' ? '' : tipInp.value;
+                if (val === '.' && cur.includes('.')) return;
+                const newVal = (cur === '' && val !== '.') ? val : cur + val;
+                tipInp.value = newVal || '0';
+                document.getElementById('payEntryAmount').value = newVal;
+                updateTipDisplay();
+                return;
+            }
+            const inp = document.getElementById('payEntryAmount');
+            if (!inp) return;
+            if (val === '.' && inp.value.includes('.')) return;
+            if (inp.value === '0' && val !== '.') inp.value = val;
+            else inp.value += val;
+        }
+        function numpadClear() {
+            if (numpadTarget === 'tip') {
+                document.getElementById('tipAmount').value = '0';
+                document.getElementById('payEntryAmount').value = '';
+                updateTipDisplay();
+                return;
+            }
+            const inp = document.getElementById('payEntryAmount');
+            if (inp) inp.value = '';
+        }
+        function numpadDel() {
+            if (numpadTarget === 'tip') {
+                const tipInp = document.getElementById('tipAmount');
+                const newVal = tipInp.value.slice(0, -1);
+                tipInp.value = newVal || '0';
+                document.getElementById('payEntryAmount').value = newVal;
+                updateTipDisplay();
+                return;
+            }
+            const inp = document.getElementById('payEntryAmount');
+            if (inp) inp.value = inp.value.slice(0, -1);
+        }
+        function numpadTam() {
+            if (numpadTarget === 'tip') {
+                document.getElementById('tipAmount').value = '0';
+                document.getElementById('payEntryAmount').value = '';
+                updateTipDisplay();
+                return;
+            }
+            quickExact();
+        }
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function updateRemaining() {}  // eski çağrılar için boş bırak
+
+        async function completePayment() {
+            const remaining = getRemainingAmount();
+            if (remaining > 0.01) {
+                showToast(`Henüz ${fmtTL(remaining)} ödenmedi!`, 'warn');
+                return;
+            }
+            let tip = parseFloat(document.getElementById('tipAmount').value) || 0;
+
+            // Fazla ödeme → otomatik bahşiş (onaysız)
+            if (remaining < -0.01) {
+                const extra = Math.abs(remaining);
+                tip += extra;
+                const last = payEntries[payEntries.length - 1];
+                if (last) last.amount -= extra;
+            }
+
+            const totalCash = payEntries.filter(e=>e.type==='cash').reduce((s,e)=>s+e.amount,0);
+            const totalCard = payEntries.filter(e=>e.type==='card').reduce((s,e)=>s+e.amount,0);
+
+            // Normal tüm masayı kapatma
+            await fetch(`/api/orders/${currentOrder.id}/close-with-payment`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    payment_cash: totalCash,
+                    payment_card: totalCard,
+                    tip_amount: tip,
+                    tip_method: tipMethod,
+                    closed_at: getCustomDatetime()
+                })
+            });
+
+            showToast('Hesap kapatıldı!', 'success');
+            document.getElementById('paymentModal').style.display = 'none';
+            document.getElementById('orderModal').style.display   = 'none';
+            refreshZone();
+        }
+        function toggleSplitSection() {
+            const section = document.getElementById('splitSection');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function calculateSplit() {
+            const numPeople = parseInt(document.getElementById('numPeople').value);
+            const response = await fetch(`/api/orders/${currentOrder.id}/split`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({num_people: numPeople})
+            }).then(r => r.json());
+            
+            document.getElementById('splitResult').innerHTML =
+                `Kişi başı: ${fmtTL(response.per_person)} <button class="btn btn-secondary" onclick="setEntryAmount(${response.per_person})" style="padding:.2rem .4rem;font-size:.7rem;margin-left:.5rem;border-radius:4px;display:inline-block;width:auto;height:auto;line-height:1;">Tutara Aktar</button>`;
+        }
+
+        function updateOrderSummary() {
+            const orderItems = document.getElementById('orderItems');
+            const orderTotal = document.getElementById('orderTotal');
+            const orderSubtotal = document.getElementById('orderSubtotal');
+            
+            if (currentOrder.items.length === 0) {
+                orderItems.innerHTML = '<p class="no-data">Henüz ürün eklenmedi</p>';
+                orderTotal.textContent = '0.00 TL';
+                orderSubtotal.textContent = '0.00 TL';
+                return;
+            }
+            
+            let subtotal = 0;
+            currentOrder.items.forEach(item => {
+                if (!item.is_complimentary) {
+                    subtotal += item.quantity * item.price;
+                }
+            });
+            
+            orderItems.innerHTML = currentOrder.items.map(item => {
+                const itemTotal = item.is_complimentary ? 0 : (item.quantity * item.price);
+                return `
+                <div class="order-item">
+                    <div class="order-item-info">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button class="btn-delete" onclick="changeQuantity(${item.id}, -1)" style="background: #ed8936; padding: 0.25rem 0.5rem;">-</button>
+                            <strong>${item.quantity}x</strong>
+                            <button class="btn-delete" onclick="changeQuantity(${item.id}, 1)" style="background: #48bb78; padding: 0.25rem 0.5rem;">+</button>
+                            <span>${item.product_name || 'Özel Ürün'} ${item.is_complimentary ? '(İKRAM)' : ''}</span>
+                        </div>
+                        ${item.kitchen_notes ? `<div style="font-size: 0.85rem; color: #718096; margin-top: 0.25rem;">📝 ${item.kitchen_notes}</div>` : ''}
+                    </div>
+                    <div class="order-item-price">
+                        ${fmtTL(itemTotal)}
+                        <button class="btn-delete" onclick="openEditItem(${item.id}, '${item.product_name || 'Özel Ürün'}')" style="background: #667eea;">✏️</button>
+                        <button class="btn-delete" onclick="deleteItem(${item.id})">🗑️</button>
+                    </div>
+                </div>
+            `}).join('');
+
+            orderSubtotal.textContent = fmtTL(subtotal);
+            orderTotal.textContent = fmtTL(currentOrder.total);
+            
+            if (currentOrder.discount_value && currentOrder.discount_value > 0) {
+                const discountText = currentOrder.discount_type === 'percent' 
+                    ? `%${currentOrder.discount_value} (${currentOrder.discount_reason})`
+                    : `${currentOrder.discount_value} TL (${currentOrder.discount_reason})`;
+                document.getElementById('discountText').textContent = discountText;
+                document.getElementById('discountSection').style.display = 'block';
+            } else {
+                document.getElementById('discountSection').style.display = 'none';
+            }
+        }
+
+        async function deleteItem(itemId) {
+            if (!confirm('Bu ürünü silmek istediğinize emin misiniz?')) return;
+            
+            await fetch(`/api/orders/items/${itemId}`, {method: 'DELETE'});
+            
+            currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+            updateOrderSummary();
+        }
+
+        async function printReceipt() {
+            const result = await fetch(`/api/print/receipt/${currentOrder.id}`, {method: 'POST'}).then(r => r.json());
+            
+            if (result.success) {
+                showToast('Adisyon yazdırıldı!', 'success');
+            } else {
+                showToast('Yazıcı bağlantısı başarısız! Ayarları kontrol edin.', 'error');
+            }
+        }
+
+        // === SİPARİŞ GEÇMİŞİ INLINE PANEL ===
+        let _histTab = 'today';
+        let _histOrders = [];
+
+        function switchHistTab(tab) {
+            _histTab = tab;
+            document.getElementById('histTabToday').style.background = tab === 'today' ? '#2d6a4f' : 'white';
+            document.getElementById('histTabToday').style.color      = tab === 'today' ? 'white'   : '#4a5568';
+            document.getElementById('histTabRange').style.background = tab === 'range' ? '#2d6a4f' : 'white';
+            document.getElementById('histTabRange').style.color      = tab === 'range' ? 'white'   : '#4a5568';
+            const rf = document.getElementById('histRangeFilter');
+            rf.style.display = tab === 'range' ? 'flex' : 'none';
+            loadHistoryPanel();
+        }
+
+        async function loadHistoryPanel() {
+            const list    = document.getElementById('orderHistoryPanelList');
+            const summary = document.getElementById('histSummaryRow');
+            list.innerHTML = '<div style="color:#a0aec0;padding:1rem;text-align:center;font-size:.85rem;">Yükleniyor...</div>';
+            let url;
+            if (_histTab === 'today') {
+                const today = new Date().toISOString().slice(0,10);
+                url = `/api/orders/history?date=${today}`;
+            } else {
+                const s = document.getElementById('histStart').value;
+                const e = document.getElementById('histEnd').value;
+                url = s && e ? `/api/orders/history?start=${s}&end=${e}` : '/api/orders/history';
+            }
+            try {
+                _histOrders = await fetch(url).then(r => r.json());
+            } catch(err) {
+                list.innerHTML = '<div style="color:#e53e3e;padding:1rem;text-align:center;">Yüklenemedi</div>';
+                return;
+            }
+            // Toggle button count güncelle
+            const countBadge = document.getElementById('histToggleCount');
+            if (countBadge) countBadge.textContent = _histOrders.length ? `${_histOrders.length} sipariş` : '';
+
+            // Özet satırı
+            const total   = _histOrders.reduce((s,o) => s + (o.total||0), 0);
+            const cash    = _histOrders.reduce((s,o) => s + (o.payment_cash||0), 0);
+            const card    = _histOrders.reduce((s,o) => s + (o.payment_card||0), 0);
+            const tip     = _histOrders.reduce((s,o) => s + (o.tip_amount||0), 0);
+            summary.innerHTML = `
+                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:700;color:#065f46;">${_histOrders.length} sipariş</div>
+                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:700;color:#065f46;">Toplam: ${fmtTL(total)}</div>
+                ${cash > 0 ? `<div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#78350f;">Nakit: ${fmtTL(cash)}</div>` : ''}
+                ${card > 0 ? `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#1e40af;">Kart: ${fmtTL(card)}</div>` : ''}
+                ${tip  > 0 ? `<div style="background:#fdf4ff;border:1px solid #e9d5ff;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#6b21a8;">Bahşiş: ${fmtTL(tip)}</div>` : ''}
+            `;
+            if (_histOrders.length === 0) {
+                list.innerHTML = '<p class="no-data">Sipariş bulunamadı.</p>';
+                return;
+            }
+            const todayStr = new Date().toISOString().slice(0,10);
+            list.innerHTML = _histOrders.map(order => {
+                const isToday = (order.closed_at||'').slice(0,10) === todayStr;
+                const dt = order.closed_at ? new Date(order.closed_at + (order.closed_at.includes('T') ? '' : 'Z')).toLocaleString('tr-TR') : '—';
+                return `
+                <div style="border:1px solid #e2e8f0;border-radius:10px;padding:.75rem 1rem;margin-bottom:.5rem;background:white;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;">
+                        <div style="flex:1;min-width:0;">
+                            <strong style="font-size:.88rem;">${order.table_name} <span style="color:#a0aec0;font-weight:400;">(${order.zone_name})</span></strong>
+                            <div style="color:#718096;font-size:.76rem;margin-top:.1rem;">${dt}</div>
+                            <div style="font-size:.76rem;color:#94a3b8;margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(order.items||[]).map(i=>`${i.quantity}x ${i.product_name}`).join(', ')}</div>
+                            ${order.discount_value ? `<div style="font-size:.73rem;color:#f56565;margin-top:.1rem;">İndirim: ${order.discount_value} ₺</div>` : ''}
+                        </div>
+                        <div style="text-align:right;flex-shrink:0;">
+                            <div style="font-size:.95rem;font-weight:700;color:#2d6a4f;">${fmtTL(order.total||0)}</div>
+                            <div style="display:flex;gap:.25rem;margin-top:.35rem;justify-content:flex-end;">
+                                ${isToday
+                                    ? `<button onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.28rem .55rem;background:#e2e8f0;color:#2d3748;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;">✏️</button>`
+                                    : `<button onclick="viewOrderModal(${order.id})" title="Görüntüle" style="padding:.28rem .55rem;background:#667eea;color:white;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;">👁️</button>`}
+                                <button onclick="printHistoryReceipt(${order.id})" title="Fiş Yazdır" style="padding:.28rem .55rem;background:#48bb78;color:white;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;">🖨️</button>
+                                <button onclick="deleteOrder(${order.id})" title="Sil" style="padding:.28rem .55rem;background:#f56565;color:white;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function exportHistoryCSV() {
+            if (!_histOrders.length) { showToast('Dışa aktarılacak veri yok', 'warn'); return; }
+            const rows = [['#', 'Masa', 'Bölge', 'Tarih', 'Ürünler', 'Toplam ₺', 'Nakit ₺', 'Kart ₺', 'Bahşiş ₺', 'İndirim ₺']];
+            _histOrders.forEach(o => rows.push([
+                o.id, o.table_name, o.zone_name,
+                o.closed_at ? new Date(o.closed_at + (o.closed_at.includes('T')?'':'Z')).toLocaleString('tr-TR') : '',
+                (o.items||[]).map(i=>`${i.quantity}x ${i.product_name}`).join(' | '),
+                Number(o.total||0).toFixed(2),
+                Number(o.payment_cash||0).toFixed(2),
+                Number(o.payment_card||0).toFixed(2),
+                Number(o.tip_amount||0).toFixed(2),
+                Number(o.discount_value||0).toFixed(2)
+            ]));
+            const csv = '\uFEFF' + rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\r\n');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+            a.download = `siparisler_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+        }
+
+        async function printHistoryReceipt(orderId) {
+            const result = await fetch(`/api/print/receipt/${orderId}`, {method: 'POST'}).then(r => r.json());
+            if (!result.success) showToast('Yazıcı hatası: ' + (result.error || 'bilinmiyor'), 'error');
+        }
+
+        function toggleHistPanel() {
+            const panel = document.getElementById('orderHistoryPanel');
+            const arrow = document.getElementById('histToggleArrow');
+            const open = panel.style.display === 'none';
+            panel.style.display = open ? '' : 'none';
+            arrow.style.transform = open ? 'rotate(90deg)' : '';
+            if (open) loadHistoryPanel();
+        }
+
+        // Eski modal referansları için geriye dönük uyumluluk
+        function openOrderHistory()  { loadHistoryPanel(); }
+        function closeOrderHistory() {}
+
+        async function viewOrderModal(orderId) {
+            try {
+                const order = await fetch(`/api/orders/${orderId}`).then(r => r.json());
+                const dateStr = order.closed_at
+                    ? new Date(order.closed_at).toLocaleString('tr-TR')
+                    : (order.created_at ? new Date(order.created_at).toLocaleString('tr-TR') : '—');
+                const items = (order.items || []).map(i => {
+                    const total = i.is_complimentary ? 'İkram' : fmtTL(i.quantity * i.price);
+                    return `<div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.84rem;">
+                        <span style="flex:1;">${i.quantity}× ${i.product_name||i.name}${i.is_complimentary ? ' <span style="background:#ede9fe;color:#6b21a8;padding:.1rem .35rem;border-radius:8px;font-size:.7rem;">İkram</span>' : ''}</span>
+                        <span style="font-weight:600;flex-shrink:0;margin-left:.75rem;">${total}</span>
+                    </div>`;
+                }).join('');
+
+                const payRows = [
+                    order.payment_cash > 0 ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Nakit</span><span style="font-weight:600;">${fmtTL(order.payment_cash)}</span></div>` : '',
+                    order.payment_card > 0 ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Kart</span><span style="font-weight:600;">${fmtTL(order.payment_card)}</span></div>` : '',
+                    order.tip_amount > 0  ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;"><span style="color:var(--ink-3);">Bahşiş (${order.tip_method==='card'?'Kart':'Nakit'})</span><span style="font-weight:600;color:var(--green);">${fmtTL(order.tip_amount)}</span></div>` : '',
+                ].filter(Boolean).join('');
+
+                const discountRow = (order.discount_value > 0)
+                    ? `<div style="display:flex;justify-content:space-between;font-size:.84rem;padding:.3rem 0;color:var(--orange);"><span>İndirim (${order.discount_type==='percent'?'%'+order.discount_value:order.discount_value+' ₺'})</span><span style="font-weight:600;">-${fmtTL(order.discount_value)}</span></div>`
+                    : '';
+
+                document.getElementById('viewOrderContent').innerHTML = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.1rem;">
+                        <div style="background:var(--bg);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border);">
+                            <div style="font-size:.68rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:.25rem;">Sipariş #${order.id}</div>
+                            <div style="font-weight:700;font-size:.9rem;">${order.table_name || '—'}</div>
+                        </div>
+                        <div style="background:var(--bg);border-radius:var(--r-sm);padding:.75rem;border:1px solid var(--border);">
+                            <div style="font-size:.68rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:.25rem;">Tarih</div>
+                            <div style="font-weight:600;font-size:.84rem;">${dateStr}</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:.4rem;">Kalemler</div>
+                        ${items || '<div style="color:var(--ink-4);font-size:.84rem;padding:.5rem 0;">Kalem bulunamadı</div>'}
+                    </div>
+
+                    <div style="background:var(--bg);border-radius:var(--r-sm);padding:.85rem;border:1px solid var(--border);">
+                        <div style="font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:.5rem;">Ödeme Özeti</div>
+                        ${discountRow}
+                        <div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:800;padding:.4rem 0 .3rem;border-top:1px solid var(--border);margin-top:.3rem;">
+                            <span>Toplam</span><span>${fmtTL(order.total||0)}</span>
+                        </div>
+                        ${payRows}
+                    </div>
+                `;
+                document.getElementById('viewOrderModal').style.display = 'block';
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function deleteOrder(orderId) {
+            showConfirm('Bu siparişi kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz!', async () => {
+                try {
+                    const response = await fetch(`/api/orders/${orderId}`, {method: 'DELETE'});
+                    if (response.ok) {
+                        showToast('Sipariş silindi!', 'success');
+                        loadHistoryPanel();
+                    } else {
+                        showToast('Sipariş silinemedi!', 'error');
+                    }
+                } catch (error) {
+                    showToast('Hata oluştu: ' + error.message, 'error');
+                }
+            }, 'Sil', '#e53e3e');
+        }
+
+        async function reopenOrder(orderId) {
+            if (!confirm('Bu siparişi tekrar açmak istediğinize emin misiniz?')) return;
+            await fetch(`/api/orders/${orderId}/reopen`, {method: 'POST'});
+            showToast('Sipariş tekrar açıldı!', 'success');
+            closeOrderHistory();
+            refreshZone();
+        }
+
+        // === KAPALI SİPARİŞ DÜZENLEME ===
+        let editOrderId = null;
+        let editOrderProductList = [];
+
+        async function openEditOrderModal(orderId) {
+            editOrderId = orderId;
+
+            // Sipariş detayını çek
+            const order = await fetch(`/api/orders/${orderId}`).then(r=>r.json());
+            if (!order || order.error) { showToast('Sipariş bulunamadı', 'warn'); return; }
+
+            // Tüm ürünleri yükle
+            editOrderProductList = await fetch('/api/products').then(r=>r.json());
+
+            document.getElementById('editOrderInfo').textContent  = `${order.table_name} (${order.zone_name})`;
+            document.getElementById('editOrderDate').textContent  = new Date(order.closed_at).toLocaleString('tr-TR');
+            document.getElementById('editCash').value = order.payment_cash || 0;
+            document.getElementById('editCard').value = order.payment_card || 0;
+            document.getElementById('editTip').value  = order.tip_amount   || 0;
+
+            // Ürün dropdown
+            const sel = document.getElementById('editAddProduct');
+            sel.innerHTML = '<option value="">Ürün seç...</option>' +
+                editOrderProductList.map(p=>`<option value="${p.id}" data-price="${p.price}">${p.name} — ${fmtTL(p.price)}</option>`).join('');
+
+            renderEditItems(order.items, order.total);
+            document.getElementById('editOrderModal').style.display = 'block';
+        }
+
+        function renderEditItems(items, total) {
+            document.getElementById('editOrderTotal').textContent = fmtTL(total||0);
+            document.getElementById('editOrderItems').innerHTML = items.length ? items.map(item=>`
+                <div style="display:flex;align-items:center;gap:.5rem;padding:.55rem .25rem;border-bottom:1px solid #f0f0f0;">
+                    <span style="flex:1;font-weight:600;font-size:.9rem;">${item.product_name||item.name}</span>
+                    <input type="number" value="${item.quantity}" min="0" step="1"
+                        style="width:60px;padding:.4rem;border:2px solid #e2e8f0;border-radius:6px;text-align:center;"
+                        onchange="updateEditItemQty(${item.id},this.value)">
+                    <span style="width:75px;text-align:right;font-size:.9rem;color:#2d6a4f;font-weight:600;">${fmtTL(item.price)}</span>
+                    <button onclick="removeEditItem(${item.id})"
+                        style="border:none;background:none;color:#e53e3e;font-size:1.1rem;cursor:pointer;padding:0 .25rem;">✕</button>
+                </div>`).join('') : '<div style="text-align:center;color:#a0aec0;padding:1.5rem;">Ürün yok</div>';
+        }
+
+        async function updateEditItemQty(itemId, qty) {
+            qty = parseInt(qty);
+            if (qty <= 0) { removeEditItem(itemId); return; }
+            await fetch(`/api/order-items/${itemId}`, {
+                method:'PATCH', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({quantity: qty})
+            });
+            await refreshEditOrder();
+        }
+
+        async function removeEditItem(itemId) {
+            await fetch(`/api/order-items/${itemId}`, {method:'DELETE'});
+            await refreshEditOrder();
+        }
+
+        async function addItemToEditOrder() {
+            const sel   = document.getElementById('editAddProduct');
+            const pid   = parseInt(sel.value);
+            const qty   = parseInt(document.getElementById('editAddQty').value) || 1;
+            const price = parseFloat(sel.selectedOptions[0]?.dataset.price || 0);
+            const name  = sel.selectedOptions[0]?.text.split(' — ')[0] || '';
+            if (!pid) return;
+
+            await fetch(`/api/orders/${editOrderId}/items`, {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({product_id:pid, product_name:name, quantity:qty, price})
+            });
+            await refreshEditOrder();
+        }
+
+        async function refreshEditOrder() {
+            const order = await fetch(`/api/orders/${editOrderId}`).then(r=>r.json());
+            if (order && !order.error) renderEditItems(order.items, order.total);
+        }
+
+        async function saveEditOrder() {
+            const cash = parseFloat(document.getElementById('editCash').value)||0;
+            const card = parseFloat(document.getElementById('editCard').value)||0;
+            const tip  = parseFloat(document.getElementById('editTip').value)||0;
+            await fetch(`/api/orders/${editOrderId}/reclose`, {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({payment_cash:cash, payment_card:card, tip_amount:tip})
+            });
+            closeEditOrderModal();
+            loadHistoryPanel();
+        }
+
+        function closeEditOrderModal() {
+            document.getElementById('editOrderModal').style.display = 'none';
+            editOrderId = null;
+        }
+
+        function openTableNote(tableId, tableName, event) {
+            event.stopPropagation();
+            currentNoteTableId = tableId;
+            
+            document.getElementById('noteTableName').textContent = tableName;
+            
+            fetch(`/api/tables?zone_id=${currentZone}`).then(r => r.json()).then(tables => {
+                const table = tables.find(t => t.id === tableId);
+                document.getElementById('tableNoteText').value = table.table_note || '';
+            });
+            
+            document.getElementById('tableNoteModal').style.display = 'block';
+        }
+
+        function closeTableNoteModal() {
+            document.getElementById('tableNoteModal').style.display = 'none';
+        }
+
+        async function saveTableNote() {
+            const note = document.getElementById('tableNoteText').value;
+            
+            await fetch(`/api/tables/${currentNoteTableId}/note`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({note})
+            });
+            
+            showToast('Masa notu kaydedildi!', 'success');
+            closeTableNoteModal();
+            refreshZone();
+        }
+
+        // ===== GEÇMİŞ SİPARİŞ FONKSİYONLARI =====
+
+        async function openPastOrderModal() {
+            pastOrderCart = [];
+            pastOrderDiscount = { type: null, value: 0, reason: '' };
+            
+            // Bugünün tarihini default olarak ayarla
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 16);
+            document.getElementById('pastOrderDate').value = dateStr;
+            
+            // Masaları yükle
+            const allTables = [];
+            const zones = await fetch('/api/zones').then(r => r.json());
+            for (const zone of zones) {
+                const tables = await fetch(`/api/tables?zone_id=${zone.id}`).then(r => r.json());
+                tables.forEach(t => t.zone_name = zone.name);
+                allTables.push(...tables);
+            }
+            
+            document.getElementById('pastOrderTable').innerHTML = 
+                '<option value="">Masa seçin...</option>' +
+                allTables.map(t => `<option value="${t.id}">${t.zone_name} - ${t.name}</option>`).join('');
+            
+            // Kategorileri yükle
+            await loadPastCategories();
+            
+            updatePastOrderSummary();
+            document.getElementById('pastOrderModal').style.display = 'block';
+        }
+
+        function closePastOrderModal() {
+            document.getElementById('pastOrderModal').style.display = 'none';
+        }
+
+        async function loadPastCategories() {
+            const categories = await fetch('/api/categories').then(r => r.json());
+            const categoriesBar = document.getElementById('pastCategoriesBar');
+            
+            categoriesBar.innerHTML = categories.map((cat, index) => 
+                `<button class="category-btn ${index === 0 ? 'active' : ''}" 
+                         style="background: ${cat.color}" 
+                         onclick="selectPastCategory(${cat.id}, event)">${cat.name}</button>`
+            ).join('');
+            
+            if (categories.length > 0) {
+                selectPastCategory(categories[0].id);
+            }
+        }
+
+        async function selectPastCategory(categoryId, event) {
+            if (event) {
+                document.querySelectorAll('#pastCategoriesBar .category-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+            }
+            
+            const products = await fetch(`/api/products?category_id=${categoryId}`).then(r => r.json());
+            displayPastProducts(products);
+        }
+
+        function displayPastProducts(products) {
+            const productsGrid = document.getElementById('pastProductsGrid');
+            
+            productsGrid.innerHTML = products.map(product => `
+                <div class="product-card" onclick="addToPastCart(${product.id}, '${product.name}', ${product.price})">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">${fmtTL(product.price)}</div>
+                </div>
+            `).join('');
+        }
+
+        function addToPastCart(productId, productName, price) {
+            const existing = pastOrderCart.find(item => item.product_id === productId);
+            
+            if (existing) {
+                existing.quantity++;
+            } else {
+                pastOrderCart.push({
+                    product_id: productId,
+                    product_name: productName,
+                    quantity: 1,
+                    price: price,
+                    is_complimentary: 0,
+                    kitchen_notes: ''
+                });
+            }
+            
+            updatePastOrderSummary();
+        }
+
+        function changePastQuantity(index, change) {
+            pastOrderCart[index].quantity += change;
+            
+            if (pastOrderCart[index].quantity <= 0) {
+                pastOrderCart.splice(index, 1);
+            }
+            
+            updatePastOrderSummary();
+        }
+
+        function removePastItem(index) {
+            pastOrderCart.splice(index, 1);
+            updatePastOrderSummary();
+        }
+
+        function updatePastOrderSummary() {
+            const orderItems = document.getElementById('pastOrderItems');
+            const orderTotal = document.getElementById('pastOrderTotal');
+            const orderSubtotal = document.getElementById('pastOrderSubtotal');
+            
+            if (pastOrderCart.length === 0) {
+                orderItems.innerHTML = '<p class="no-data">Henüz ürün eklenmedi</p>';
+                orderTotal.textContent = '0.00 TL';
+                orderSubtotal.textContent = '0.00 TL';
+                return;
+            }
+            
+            let subtotal = 0;
+            pastOrderCart.forEach(item => {
+                if (!item.is_complimentary) {
+                    subtotal += item.quantity * item.price;
+                }
+            });
+            
+            let total = subtotal;
+            if (pastOrderDiscount.type === 'percent') {
+                total = subtotal * (1 - pastOrderDiscount.value / 100);
+            } else if (pastOrderDiscount.type === 'fixed') {
+                total = subtotal - pastOrderDiscount.value;
+            }
+            
+            orderItems.innerHTML = pastOrderCart.map((item, index) => {
+                const itemTotal = item.is_complimentary ? 0 : (item.quantity * item.price);
+                return `
+                <div class="order-item">
+                    <div class="order-item-info">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button class="btn-delete" onclick="changePastQuantity(${index}, -1)" style="background: #ed8936; padding: 0.25rem 0.5rem;">-</button>
+                            <strong>${item.quantity}x</strong>
+                            <button class="btn-delete" onclick="changePastQuantity(${index}, 1)" style="background: #48bb78; padding: 0.25rem 0.5rem;">+</button>
+                            <span>${item.product_name}</span>
+                        </div>
+                    </div>
+                    <div class="order-item-price">
+                        ${fmtTL(itemTotal)}
+                        <button class="btn-delete" onclick="removePastItem(${index})">🗑️</button>
+                    </div>
+                </div>
+            `}).join('');
+
+            orderSubtotal.textContent = fmtTL(subtotal);
+            orderTotal.textContent = fmtTL(total);
+            
+            if (pastOrderDiscount.value > 0) {
+                const discountText = pastOrderDiscount.type === 'percent' 
+                    ? `%${pastOrderDiscount.value} (${pastOrderDiscount.reason})`
+                    : `${pastOrderDiscount.value} TL (${pastOrderDiscount.reason})`;
+                document.getElementById('pastDiscountText').textContent = discountText;
+                document.getElementById('pastDiscountSection').style.display = 'block';
+            } else {
+                document.getElementById('pastDiscountSection').style.display = 'none';
+            }
+        }
+
+        function openPastDiscountModal() {
+            document.getElementById('pastDiscountModal').style.display = 'block';
+        }
+
+        function closePastDiscountModal() {
+            document.getElementById('pastDiscountModal').style.display = 'none';
+        }
+
+        function applyPastDiscount() {
+            const type = document.querySelector('input[name="pastDiscountType"]:checked').value;
+            const value = parseFloat(document.getElementById('pastDiscountValue').value);
+            const reason = document.getElementById('pastDiscountReason').value;
+            
+            if (!value) {
+                showToast('Lütfen indirim değeri girin!', 'warn');
+                return;
+            }
+            
+            pastOrderDiscount = { type, value, reason };
+            updatePastOrderSummary();
+            closePastDiscountModal();
+        }
+
+        function removePastDiscount() {
+            pastOrderDiscount = { type: null, value: 0, reason: '' };
+            updatePastOrderSummary();
+        }
+
+        async function savePastOrder() {
+            const tableId = parseInt(document.getElementById('pastOrderTable').value);
+            const datetime = document.getElementById('pastOrderDate').value;
+            const cash = parseFloat(document.getElementById('pastPaymentCash').value) || 0;
+            const card = parseFloat(document.getElementById('pastPaymentCard').value) || 0;
+            const tip = parseFloat(document.getElementById('pastTipAmount').value) || 0;
+            
+            if (!tableId) {
+                showToast('Lütfen masa seçin!', 'warn');
+                return;
+            }
+            
+            if (!datetime) {
+                showToast('Lütfen tarih ve saat seçin!', 'warn');
+                return;
+            }
+            
+            if (pastOrderCart.length === 0) {
+                showToast('Lütfen en az bir ürün ekleyin!', 'warn');
+                return;
+            }
+            
+            // Toplam tutarı hesapla
+            let subtotal = pastOrderCart.reduce((sum, item) => {
+                return sum + (item.is_complimentary ? 0 : item.quantity * item.price);
+            }, 0);
+            
+            let total = subtotal;
+            if (pastOrderDiscount.type === 'percent') {
+                total = subtotal * (1 - pastOrderDiscount.value / 100);
+            } else if (pastOrderDiscount.type === 'fixed') {
+                total = subtotal - pastOrderDiscount.value;
+            }
+            
+            if (Math.abs(cash + card - total) > 0.01) {
+                showToast('Ödeme tutarı toplam ile eşleşmiyor!', 'warn');
+                return;
+            }
+            
+            const response = await fetch('/api/orders/past', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    table_id: tableId,
+                    created_at: datetime,
+                    closed_at: datetime,
+                    items: pastOrderCart,
+                    payment_cash: cash,
+                    payment_card: card,
+                    discount_type: pastOrderDiscount.type,
+                    discount_value: pastOrderDiscount.value,
+                    discount_reason: pastOrderDiscount.reason,
+                    tip_amount: tip,
+                    tip_method: (document.querySelector('input[name="pastTipMethod"]:checked')?.value || (cash > 0 ? 'cash' : 'card'))
+                })
+            });
+            
+            if (response.ok) {
+                showToast('Geçmiş sipariş başarıyla kaydedildi!', 'success');
+                closePastOrderModal();
+            } else {
+                showToast('Hata oluştu! Lütfen tekrar deneyin.', 'error');
+            }
+        }
+    </script>
+
+    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
+        Fırınna POS &mdash; TA1XTA &copy; 2026
+    </footer>
+    <script>
+    (function(){
+        async function loadAlerts() {
+            try {
+                const items = await fetch("/api/stock/alerts").then(r=>r.json());
+                const badge = document.getElementById("alertBadge");
+                const body  = document.getElementById("alertPanelBody");
+                if (!badge || !body) return;
+                if (items.length > 0) {
+                    badge.textContent = items.length;
+                    badge.style.display = "flex";
+                    body.innerHTML = items.map(i => `
+                        <div class="alert-item">
+                            <span class="alert-item-name">${i.name}</span>
+                            <span class="alert-item-qty">
+                                <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
+                                <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
+                            </span>
+                        </div>`).join("");
+                } else {
+                    badge.style.display = "none";
+                    body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
+                }
+            } catch(e) {}
+        }
+        function toggleAlertPanel() {
+            const p = document.getElementById("alertPanel");
+            if (p) p.classList.toggle("open");
+        }
+        document.addEventListener("click", function(e) {
+            const p  = document.getElementById("alertPanel");
+            const b  = document.getElementById("alertBtn");
+            const dd = document.getElementById("navDropdown");
+            if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove("open");
+        });
+        loadAlerts();
+        setInterval(loadAlerts, 60000);
+    })();
+    </script>
+
+    <!-- Footer -->
+    <div id="app-footer" style="text-align:center;padding:1.5rem 1rem .8rem;color:#a0aec0;font-size:.72rem;border-top:1px solid #f0f0f0;margin-top:2rem;">
+        <span>🍽️ Fırınna POS</span>
+        <span style="margin:0 .5rem;">·</span>
+        <span id="footer-version">v—</span>
+        <span style="margin:0 .5rem;">·</span>
+        <span id="footer-build">—</span>
+        <span style="margin:0 .5rem;">·</span>
+        <span>DB <span id="footer-dbver">—</span> (<span id="footer-dbsize">—</span>)</span>
+    </div>
+    <script>
+    fetch('/api/version').then(r=>r.json()).then(d=>{
+        document.getElementById('footer-version').textContent = 'v'+d.app_version;
+        document.getElementById('footer-build').textContent   = d.build_date;
+        document.getElementById('footer-dbver').textContent  = 'schema '+d.db_version;
+        document.getElementById('footer-dbsize').textContent = d.db_size_kb+' KB';
+    }).catch(()=>{});
+    </script>
+
+    <div id="viewOrderModal" class="modal">
+        <div class="modal-content" style="max-width:540px;">
+            <div class="modal-header">
+                <h2>👁️ Sipariş Detayı</h2>
+                <span class="close" onclick="document.getElementById('viewOrderModal').style.display='none'">&times;</span>
+            </div>
+            <div style="padding:1.5rem;" id="viewOrderContent"></div>
+        </div>
+    </div>
+
+    <script>
+async function openTransferModal() {
+    if (!currentOrder || !currentOrder.id) return;
+    const tables = await fetch('/api/tables').then(r => r.json());
+    const empty = tables.filter(t => !t.has_order && t.id !== currentTable);
+    const list = document.getElementById('transferTableList');
+    list.innerHTML = empty.length ? empty.map(t => `
+        <button onclick="doTransfer(${t.id},'${t.name}')"
+            style="padding:.7rem 1rem;border:2px solid #e2e8f0;border-radius:8px;background:white;cursor:pointer;text-align:left;font-family:inherit;font-weight:600;font-size:.9rem;">
+            🍽️ ${t.name}<span style="color:#a0aec0;font-weight:400;"> — ${t.zone_name||''}</span>
+        </button>`).join('') : '<p style="color:#a0aec0;font-size:.85rem;">Boş masa yok.</p>';
+    document.getElementById('transferModal').style.display = 'flex';
+}
+
+async function doTransfer(newTableId, newTableName) {
+    showConfirm('"' + newTableName + '" masasına taşınsın mı?', async () => {
+        const r = await fetch('/api/orders/' + currentOrder.id + '/transfer', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({new_table_id: newTableId})
+        }).then(res => res.json());
+        document.getElementById('transferModal').style.display = 'none';
+        if (r.success) {
+            document.getElementById('orderModal').style.display = 'none';
+            refreshZone();
+            showToast('Sipariş ' + newTableName + ' masasına taşındı.', 'success');
+        } else {
+            showToast('Hata: ' + r.error, 'error');
+        }
+    }, 'Taşı', '#667eea');
+}
+
+async function openMergeModal() {
+    if (!currentOrder || !currentOrder.id) return;
+    const tables = await fetch('/api/tables').then(r => r.json());
+    const occupied = tables.filter(t => t.has_order && t.id !== currentTable);
+    const list = document.getElementById('mergeTableList');
+    list.innerHTML = occupied.length ? occupied.map(t => `
+        <button onclick="doMerge(${t.id},'${t.name}')"
+            style="padding:.7rem 1rem;border:2px solid #ed8936;border-radius:8px;background:white;cursor:pointer;text-align:left;font-family:inherit;font-weight:600;font-size:.9rem;">
+            🟠 ${t.name} <span style="float:right;color:#2d6a4f;">${fmtTL(t.order_total||0)}</span>
+        </button>`).join('') : '<p style="color:#a0aec0;font-size:.85rem;">Birleştirilecek açık masa yok.</p>';
+    document.getElementById('mergeModal').style.display = 'flex';
+}
+
+async function doMerge(targetTableId, targetTableName) {
+    const srcName = document.getElementById('modalTableName').textContent;
+    showConfirm(srcName + ' siparişi "' + targetTableName + '" masasına eklensin mi?\nBu masa kapatılacak.', async () => {
+        const targetOrder = await fetch('/api/orders/table/' + targetTableId).then(r => r.json());
+        if (!targetOrder.id) { showToast('Hedef sipariş bulunamadı.', 'error'); return; }
+        const r = await fetch('/api/orders/' + currentOrder.id + '/merge', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({target_order_id: targetOrder.id})
+        }).then(res => res.json());
+        document.getElementById('mergeModal').style.display = 'none';
+        if (r.success) {
+            document.getElementById('orderModal').style.display = 'none';
+            refreshZone();
+            showToast('Siparişler "' + targetTableName + '" masasında birleştirildi.', 'success');
+        } else {
+            showToast('Hata: ' + r.error, 'error');
+        }
+    }, 'Birleştir', '#ed8936');
+}
+    </script>
+
+    <!-- Masa Taşıma Modali -->
+    <div id="transferModal" class="modal">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header">
+                <h2>↔ Masayı Taşı</h2>
+                <span class="close" onclick="document.getElementById('transferModal').style.display='none'">&times;</span>
+            </div>
+            <div style="padding:1.5rem;">
+                <p style="color:#718096;font-size:.85rem;margin-bottom:1rem;">Sipariş hangi boş masaya taşınsın?</p>
+                <div id="transferTableList" style="display:flex;flex-direction:column;gap:.5rem;max-height:320px;overflow-y:auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sipariş Birleştirme Modali -->
+    <div id="mergeModal" class="modal">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header">
+                <h2>⊕ Siparişi Birleştir</h2>
+                <span class="close" onclick="document.getElementById('mergeModal').style.display='none'">&times;</span>
+            </div>
+            <div style="padding:1.5rem;">
+                <p style="color:#718096;font-size:.85rem;margin-bottom:1rem;">Bu siparişin kalemleri hangi masaya eklensin? (Bu masa silinir.)</p>
+                <div id="mergeTableList" style="display:flex;flex-direction:column;gap:.5rem;max-height:320px;overflow-y:auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ürün Aktarma Modali -->
+    <div id="itemTransferModal" class="modal">
+        <div class="modal-content" style="max-width:480px;">
+            <div class="modal-header">
+                <h2>↔ Ürün Aktar</h2>
+                <span class="close" onclick="document.getElementById('itemTransferModal').style.display='none'">&times;</span>
+            </div>
+            <div style="padding:1.1rem; display:flex; flex-direction:column; gap:.75rem;">
+                <div style="font-weight:700; font-size:.78rem; color:var(--ink-3); text-transform:uppercase; letter-spacing:.05em;">1. Aktarılacak Ürünleri Seçin</div>
+                <div id="transferItemsList" style="display:flex; flex-direction:column; gap:.4rem; max-height:200px; overflow-y:auto; border:1px solid var(--border); padding:.5rem; border-radius:6px; background:var(--bg);"></div>
+                
+                <div style="font-weight:700; font-size:.78rem; color:var(--ink-3); text-transform:uppercase; letter-spacing:.05em; margin-top:.3rem;">2. Hedef Masayı Seçin</div>
+                <div id="transferTargetTableList" style="display:flex; flex-direction:column; gap:.4rem; max-height:180px; overflow-y:auto; border:1px solid var(--border); padding:.5rem; border-radius:6px; background:var(--bg);"></div>
+                
+                <button class="btn btn-success" style="width:100%; margin-top:.5rem; padding:.75rem;" onclick="doItemTransfer()">Aktarmayı Tamamla</button>
+            </div>
+        </div>
+    </div>
+<!-- Garson Mode Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'garson') {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) navbar.style.display = 'none';
+            const histToggle = document.getElementById('histToggleBtn');
+            if (histToggle) histToggle.style.display = 'none';
+            document.body.style.paddingTop = '10px';
+        }
+
+        let backPressCount = 0;
+        function closeTopModal() {
+            const modals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'block');
+            if (modals.length > 0) {
+                modals[modals.length - 1].style.display = 'none';
+                return true;
+            }
+            return false;
+        }
+
+        // Modal açıldığında tarayıcı geçmişine durum ekle (geri tuşu ile kapatmak için)
+        const modalObserver = new MutationObserver(mutations => {
+            mutations.forEach(m => {
+                if (m.type === 'attributes' && m.attributeName === 'style') {
+                    const target = m.target;
+                    if (target.classList.contains('modal') && target.style.display === 'block') {
+                        if (!target.dataset.isOpen) {
+                            target.dataset.isOpen = 'true';
+                            history.pushState({modal: target.id}, "", window.location.href);
+                        }
+                    } else if (target.classList.contains('modal') && target.style.display === 'none') {
+                        target.dataset.isOpen = '';
+                    }
+                }
+            });
+        });
+        document.querySelectorAll('.modal').forEach(m => modalObserver.observe(m, {attributes: true}));
+
+        history.pushState({page: 'home'}, "", window.location.href);
+        window.addEventListener('popstate', function(e) {
+            if (closeTopModal()) {
+                history.pushState({page: 'home'}, "", window.location.href);
+                return;
+            }
+            
+            if (backPressCount === 0) {
+                backPressCount++;
+                if (typeof showToast === 'function') {
+                    showToast('Çıkmak için tekrar geri tuşuna basın', 'warn');
+                } else {
+                    alert('Çıkmak için tekrar geri tuşuna basın');
+                }
+                
+                // İlk basışta state eklemiyoruz, böylece 3 saniye içinde tekrar basılırsa 
+                // native olarak uygulamadan çıkılacak (çünkü popstate tetiklenmeyecek).
+                setTimeout(() => { 
+                    if (backPressCount > 0) {
+                        backPressCount = 0; 
+                        history.pushState({page: 'home'}, "", window.location.href);
+                    }
+                }, 2500);
+            }
+        });
+    });
+</script>
+</body>
+</html>
+<script>
+// Fiş önizleme fonksiyonları
+function previewReceipt() {
+    if (!currentOrder || !currentOrder.id) {
+        showToast('Önce siparişi kaydedin!', 'warn');
+        return;
+    }
+    window.open(`/api/print/receipt/${currentOrder.id}/preview`, '_blank');
+}
+
+function previewKitchen() {
+    if (!currentOrder || !currentOrder.id) {
+        showToast('Önce siparişi kaydedin!', 'warn');
+        return;
+    }
+    window.open(`/api/print/kitchen/${currentOrder.id}/preview`, '_blank');
+}
+
+function printKitchen() {
+    if (!currentOrder || !currentOrder.id) {
+        showToast('Önce siparişi kaydedin!', 'warn');
+        return;
+    }
+    fetch(`/api/print/kitchen/${currentOrder.id}`, {method: "POST"})
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Mutfak fişi yazıcıya gönderildi!', 'success');
+            } else {
+                showToast('Yazıcı hatası: ' + (data.error || 'Bilinmeyen hata'), 'error');
+            }
+        });
+}
+
+async function openItemTransferModal() {
+    if (!currentOrder || !currentOrder.id) return;
+    
+    // 1. Ürünleri Listele
+    const itemsList = document.getElementById('transferItemsList');
+    if (currentOrder.items && currentOrder.items.length > 0) {
+        itemsList.innerHTML = currentOrder.items.map(i => `
+            <div style="display:flex; gap:.5rem; align-items:center; font-size:.85rem; padding:.3rem 0; border-bottom:1px solid var(--border);">
+                <input type="checkbox" class="transfer-item-check" data-item-id="${i.id}" data-max-qty="${i.quantity}">
+                <input type="number" class="transfer-item-qty" value="${i.quantity}" min="1" max="${i.quantity}" data-item-id="${i.id}" style="width:45px; padding:2px; border:1px solid var(--border); border-radius:4px; text-align:center;" oninput="validatePayQty(this)">
+                <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-left:.25rem;">x ${i.product_name||i.name||''}</span>
+                <span style="font-weight:600; color:var(--ink-2);">${i.is_complimentary ? 'İkram' : fmtTL(i.quantity * (i.price||0))}</span>
+            </div>
+        `).join('');
+    } else {
+        itemsList.innerHTML = '<p style="color:#a0aec0; font-size:.85rem; text-align:center;">Siparişte ürün yok.</p>';
+    }
+    
+    // 2. Hedef Masaları Listele
+    const tables = await fetch('/api/tables').then(r => r.json());
+    const otherTables = tables.filter(t => t.id !== currentTable);
+    const targetList = document.getElementById('transferTargetTableList');
+    
+    targetList.innerHTML = otherTables.length ? otherTables.map(t => {
+        const statusText = t.has_order ? `Dolu (${fmtTL(t.order_total||0)})` : 'Boş';
+        const statusColor = t.has_order ? 'color:#c05621; font-weight:700;' : 'color:#2f855a; font-weight:600;';
+        return `
+            <label style="display:flex; align-items:center; gap:.5rem; padding:.5rem; border:1px solid var(--border); border-radius:6px; background:white; cursor:pointer; font-family:inherit; font-size:.88rem; margin-bottom:.2rem;">
+                <input type="radio" name="transferTargetTable" value="${t.id}" data-table-name="${t.name}">
+                <span style="font-weight:700;">🍽️ ${t.name}</span>
+                <span style="color:#a0aec0; font-size:.8rem; margin-left:.25rem;">— ${t.zone_name||''}</span>
+                <span style="margin-left:auto; font-size:.8rem; ${statusColor}">${statusText}</span>
+            </label>
+        `;
+    }).join('') : '<p style="color:#a0aec0; font-size:.85rem;">Hedef masa yok.</p>';
+    
+    document.getElementById('itemTransferModal').style.display = 'flex';
+}
+
+async function doItemTransfer() {
+    // 1. Seçilen ürünleri al
+    const selectedItems = [];
+    document.querySelectorAll('.transfer-item-check:checked').forEach(cb => {
+        const itemId = parseInt(cb.getAttribute('data-item-id'));
+        const qtyInput = document.querySelector(`.transfer-item-qty[data-item-id="${itemId}"]`);
+        const qty = qtyInput ? parseInt(qtyInput.value) : 1;
+        selectedItems.push({id: itemId, quantity: qty});
+    });
+    
+    if (selectedItems.length === 0) {
+        showToast('Lütfen aktarılacak en az bir ürün seçin.', 'warn');
+        return;
+    }
+    
+    // 2. Seçilen hedef masayı al
+    const targetRadio = document.querySelector('input[name="transferTargetTable"]:checked');
+    if (!targetRadio) {
+        showToast('Lütfen hedef masayı seçin.', 'warn');
+        return;
+    }
+    
+    const targetTableId = parseInt(targetRadio.value);
+    const targetTableName = targetRadio.getAttribute('data-table-name');
+    
+    showConfirm(`Seçilen ürünler "${targetTableName}" masasına aktarılsın mı?`, async () => {
+        const response = await fetch(`/api/orders/${currentOrder.id}/transfer-items`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                target_table_id: targetTableId,
+                items: selectedItems
+            })
+        }).then(r => r.json());
+        
+        if (response.success) {
+            document.getElementById('itemTransferModal').style.display = 'none';
+            if (response.source_deleted) {
+                showToast('Tüm ürünler aktarıldı ve kaynak masa boşaltıldı!', 'success');
+                document.getElementById('orderModal').style.display = 'none';
+            } else {
+                showToast('Ürünler başarıyla aktarıldı!', 'success');
+                // Sipariş detayını yenile
+                currentOrder = await fetch(`/api/orders/table/${currentTable}`).then(r => r.json());
+                updateOrderSummary();
+            }
+            refreshZone();
+        } else {
+            showToast('Aktarım hatası: ' + response.error, 'error');
+        }
+    }, 'Aktar', '#667eea');
+}
+
+async function promptSplitTable() {
+    if (!currentTable) return;
+    const suffix = prompt("Alt masa ekini girin (örn: A, B, 2, 3):\n(Bu masa 'Masa Adı/Ek' şeklinde oluşturulacaktır)");
+    if (!suffix) return;
+    
+    const response = await fetch(`/api/tables/${currentTable}/split`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({suffix: suffix.trim()})
+    }).then(r => r.json());
+    
+    if (response.success) {
+        showToast(`Alt masa başarıyla oluşturuldu!`, 'success');
+        refreshZone();
+        // Ürün aktarma modalını doğrudan açalım
+        setTimeout(() => {
+            openItemTransferModal();
+        }, 300);
+    } else {
+        showToast('Hata: ' + response.error, 'error');
+    }
+}
+
+async function cancelOrder() {
+    if (!confirm("Fişi iptal etmek istediğinize emin misiniz?\n\nTüm ürünler silinecek!")) return;
+
+    // DB'deki sipariş ve tüm items'ları sil
+    if (currentOrder && currentOrder.id) {
+        try {
+            const r = await fetch(`/api/orders/${currentOrder.id}`, { method: 'DELETE' });
+            const d = await r.json();
+            if (!d.success) { showToast('Silme hatası: ' + (d.error||'bilinmeyen'), 'error'); return; }
+        } catch(e) {
+            showToast('Bağlantı hatası: ' + e.message, 'error');
+            return;
+        }
+    }
+    // Boş kalıntıları da temizle
+    await fetch('/api/orders/cleanup-empty', { method: 'POST' });
+
+    // State sıfırla
+    currentOrder = { id: null, items: [], total: 0 };
+    const closedTable = currentTable;
+    currentTable = null;
+
+    // Modal kapat
+    document.getElementById("orderModal").style.display = "none";
+
+    // Masa listesini yenile — masa boş görünsün
+    if (currentZone) {
+        await refreshZone();
+    }
+}
+
+async function refreshZone() {
+    await selectZone(currentZone);
+}
+
+function previewReceiptPDF() {
+    if (!currentOrder || !currentOrder.id) {
+        showToast('Önce sipariş oluşturun!', 'warn');
+        return;
+    }
+    window.open(`/api/print/receipt/${currentOrder.id}/preview`, '_blank');
+}
+
+function downloadPDF() {
+    previewReceiptPDF();
+}
+
+// ===== AYARLAR MODAL (#15 Logo, #17 Not, Ayarlar UI) =====
+
+async function openSettingsModal() {
+    document.getElementById('settingsModal').style.display = 'block';
+    await loadBusinessSettings();
+    await loadPrinterSettings();
+    await loadLogoSettings();
+}
+
+function closeSettingsModal() {
+    document.getElementById('settingsModal').style.display = 'none';
+}
+
+function switchSettingsTab(tab) {
+    document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.settings-panel').forEach(p => p.style.display = 'none');
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('settings-' + tab).style.display = 'block';
+}
+
+// --- İşletme ---
+async function loadBusinessSettings() {
+    const keys = ['restaurant_name', 'restaurant_address', 'restaurant_phone', 'receipt_footer'];
+    const ids = ['s-restaurant-name', 's-restaurant-address', 's-restaurant-phone', 's-receipt-footer'];
+    for (let i = 0; i < keys.length; i++) {
+        const res = await fetch(`/api/settings/${keys[i]}`);
+        const data = await res.json();
+        document.getElementById(ids[i]).value = data.value || '';
+    }
+}
+
+async function saveBusinessSettings() {
+    const fields = [
+        { key: 'restaurant_name', id: 's-restaurant-name' },
+        { key: 'restaurant_address', id: 's-restaurant-address' },
+        { key: 'restaurant_phone', id: 's-restaurant-phone' },
+        { key: 'receipt_footer', id: 's-receipt-footer' },
+    ];
+    for (const f of fields) {
+        await fetch(`/api/settings/${f.key}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: document.getElementById(f.id).value })
+        });
+    }
+    showToast('İşletme bilgileri kaydedildi!', 'success');
+}
+
+// --- Yazıcı ---
+async function loadPrinterSettings() {
+    const r1 = await fetch('/api/settings/printer_ip');
+    const d1 = await r1.json();
+    document.getElementById('s-printer-ip').value = d1.value || '';
+
+    const r2 = await fetch('/api/settings/printer_port');
+    const d2 = await r2.json();
+    document.getElementById('s-printer-port').value = d2.value || '9100';
+
+    const r3 = await fetch('/api/settings/kitchen_printer_ip');
+    const d3 = await r3.json();
+    document.getElementById('s-kitchen-ip').value = d3.value || '';
+
+    const r4 = await fetch('/api/settings/kitchen_printer_port');
+    const d4 = await r4.json();
+    document.getElementById('s-kitchen-port').value = d4.value || '9100';
+}
+
+async function savePrinterSettings() {
+    const fields = [
+        { key: 'printer_ip', id: 's-printer-ip' },
+        { key: 'printer_port', id: 's-printer-port' },
+        { key: 'kitchen_printer_ip', id: 's-kitchen-ip' },
+        { key: 'kitchen_printer_port', id: 's-kitchen-port' },
+    ];
+    for (const f of fields) {
+        await fetch(`/api/settings/${f.key}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: document.getElementById(f.id).value })
+        });
+    }
+    showToast('Yazıcı ayarları kaydedildi!', 'success');
+}
+
+async function testPrinter() {
+    const res = await fetch('/api/printer/test', { method: 'POST' });
+    const data = await res.json();
+    showToast(data.success ? 'Test fişi gönderildi!' : 'Yazıcıya ulaşılamadı. IP/Port kontrol edin.', data.success ? 'success' : 'error');
+}
+
+// --- Logo (#15) ---
+let pendingLogoFile = null;
+
+async function loadLogoSettings() {
+    const res = await fetch('/api/settings/logo');
+    const data = await res.json();
+    if (data.url) {
+        document.getElementById('logo-preview-img').src = data.url + '?t=' + Date.now();
+        document.getElementById('logo-preview-img').style.display = 'block';
+        document.getElementById('logo-placeholder-text').style.display = 'none';
+    } else {
+        document.getElementById('logo-preview-img').style.display = 'none';
+        document.getElementById('logo-placeholder-text').style.display = 'block';
+    }
+}
+
+function previewLogoFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    pendingLogoFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById('logo-preview-img').src = e.target.result;
+        document.getElementById('logo-preview-img').style.display = 'block';
+        document.getElementById('logo-placeholder-text').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+    document.getElementById('btn-upload-logo').disabled = false;
+    document.getElementById('btn-upload-logo').style.opacity = '1';
+}
+
+async function uploadLogo() {
+    if (!pendingLogoFile) return;
+    const formData = new FormData();
+    formData.append('logo', pendingLogoFile);
+    const res = await fetch('/api/settings/logo', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+        showToast('Logo yüklendi!', 'success');
+        pendingLogoFile = null;
+        document.getElementById('btn-upload-logo').disabled = true;
+        document.getElementById('btn-upload-logo').style.opacity = '0.5';
+    } else {
+        showToast('Hata: ' + data.error, 'error');
+    }
+}
+
+async function deleteLogo() {
+    if (!confirm('Logo silinsin mi?')) return;
+    await fetch('/api/settings/logo', { method: 'DELETE' });
+    document.getElementById('logo-preview-img').style.display = 'none';
+    document.getElementById('logo-placeholder-text').style.display = 'block';
+    document.getElementById('logo-file-input').value = '';
+    pendingLogoFile = null;
+    showToast('Logo silindi.', 'success');
+}
+
+// --- Not Fişi (#17) ---
+async function previewNote() {
+    const title = document.getElementById('note-title').value || 'NOT';
+    const note = document.getElementById('note-content').value.trim();
+    if (!note) { showToast('Not içeriği boş!', 'warn'); return; }
+    const res = await fetch('/api/print/note/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, note })
+    });
+    const html = await res.text();
+    const win = window.open('', '_blank', 'width=400,height=600');
+    win.document.write(html);
+    win.document.close();
+}
+
+async function printNote() {
+    const title = document.getElementById('note-title').value || 'NOT';
+    const note = document.getElementById('note-content').value.trim();
+    if (!note) { showToast('Not içeriği boş!', 'warn'); return; }
+    const res = await fetch('/api/print/note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, note })
+    });
+    const data = await res.json();
+    showToast(data.success ? 'Not fişi yazdırıldı!' : 'Yazıcı hatası: ' + (data.error || 'Bilinmeyen'), data.success ? 'success' : 'error');
+}
+</script>

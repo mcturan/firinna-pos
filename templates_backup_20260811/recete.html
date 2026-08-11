@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reçete — Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .progress-bar { background:#e2e8f0; border-radius:20px; height:10px; overflow:hidden; margin:.4rem 0 .8rem; }
+        .progress-fill { height:100%; background:linear-gradient(90deg,#2d6a4f,#52b788); border-radius:20px; transition:width .5s; }
+        .stat-row { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+        .stat-box { background:white; border-radius:10px; padding:.75rem 1.1rem; flex:1; min-width:120px;
+                    box-shadow:0 1px 4px rgba(0,0,0,.07); border:1px solid #e2e8f0; text-align:center; }
+        .stat-box .val { font-size:1.5rem; font-weight:800; }
+        .stat-box .lbl { font-size:.75rem; color:#718096; margin-top:.1rem; }
+        .filter-bar { display:flex; gap:.75rem; margin-bottom:1.25rem; flex-wrap:wrap; align-items:center; }
+        .filter-bar input { padding:.5rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.9rem; flex:1; min-width:180px; }
+        .filter-btn { padding:.45rem 1rem; border:2px solid #e2e8f0; border-radius:8px; background:white;
+                      cursor:pointer; font-size:.83rem; font-weight:600; color:#4a5568; white-space:nowrap; }
+        .filter-btn.active { background:#2d6a4f; color:white; border-color:#2d6a4f; }
+        .recete-card { background:white; border-radius:12px; padding:1.25rem 1.5rem; box-shadow:0 2px 8px rgba(0,0,0,.07);
+                       margin-bottom:1rem; border-left:4px solid #e2e8f0; }
+        .recete-card.has-recipe { border-left-color:#2d6a4f; }
+        .recete-card.no-recipe  { border-left-color:#f6ad55; }
+        .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:.75rem; }
+        .card-header h4 { margin:0; color:#2d3748; font-size:.95rem; }
+        .card-header .meta { font-size:.78rem; color:#a0aec0; display:flex; gap:.6rem; align-items:center; }
+        .badge-ok  { background:#e0f2fe; color:#065f46; padding:.15rem .5rem; border-radius:20px; font-size:.72rem; font-weight:700; }
+        .badge-no  { background:#fef3c7; color:#92400e; padding:.15rem .5rem; border-radius:20px; font-size:.72rem; font-weight:700; }
+        .ingredient-row { display:flex; align-items:center; gap:.75rem; padding:.4rem 0; border-bottom:1px solid #f0f0f0; font-size:.88rem; }
+        .ingredient-row:last-child { border-bottom:none; }
+        .add-row { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-top:.75rem;
+                   padding-top:.75rem; border-top:2px dashed #e2e8f0; }
+        .add-row select { flex:2; min-width:140px; padding:.45rem .65rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.85rem; }
+        .add-row input  { flex:1; min-width:80px;  padding:.45rem .65rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.85rem; }
+        .add-row .unit-lbl { color:#718096; font-size:.82rem; min-width:28px; }
+        .btn-del { background:none; border:none; cursor:pointer; color:#cbd5e0; }
+        .btn-del:hover { color:#e53e3e; }
+        .no-stock-warn { background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:.6rem 1rem;
+                         font-size:.8rem; color:#9a3412; margin-bottom:1rem; }
+        .kar-table { width:100%; border-collapse:collapse; font-size:.88rem; }
+        .kar-table th { background:#f7fafc; padding:.65rem .75rem; text-align:left; color:#4a5568; font-weight:600; border-bottom:2px solid #e2e8f0; cursor:pointer; user-select:none; }
+        .kar-table th:hover { background:#edf2f7; }
+        .kar-table td { padding:.6rem .75rem; border-bottom:1px solid #f0f0f0; }
+        .kar-table tr:hover td { background:#fafafa; }
+        .kar-pos { color:#2d6a4f; font-weight:700; }
+        .kar-neg { color:#e53e3e; font-weight:700; }
+        .kar-na  { color:#a0aec0; font-style:italic; }
+        .margin-bar { height:6px; background:#e2e8f0; border-radius:3px; margin-top:3px; }
+        .margin-fill { height:100%; border-radius:3px; transition:width .4s; }
+        .recete-tabs { display:flex; gap:0; border-bottom:2px solid #e2e8f0; margin-bottom:1.25rem; }
+        .recete-tab  { padding:.55rem 1.2rem; border:none; background:none; font-size:.85rem; font-weight:600;
+                       color:#718096; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; }
+        .recete-tab.active { color:#2d6a4f; border-bottom-color:#2d6a4f; }
+    </style>
+</head>
+<body>
+    {% include '_navbar.html' %}
+
+    <div class="container">
+        <h1 style="margin-bottom:.25rem;">🧾 Reçete Yönetimi</h1>
+        <p style="color:#718096;font-size:.82rem;margin:.2rem 0 1rem;">
+            Her ürün için stok malzemelerini tanımlayın. Sipariş kapandığında stok otomatik düşülür.</p>
+
+        <!-- İlerleme -->
+        <div id="progressBox" style="margin-bottom:1.25rem;"></div>
+
+        <!-- Stok kalemi yoksa uyarı -->
+        <div class="no-stock-warn" id="noStockWarn" style="display:none;">
+            ⚠️ Henüz stok kalemi tanımlanmamış. Reçete eklemek için önce
+            <a href="/stok" style="color:#9a3412;font-weight:700;">Stok</a> sayfasından kalem ekleyin.
+        </div>
+
+        <!-- Sekmeler -->
+        <div class="recete-tabs">
+            <button class="recete-tab active" id="rtab-recete" onclick="switchReceteTab('recete')">🧾 Reçete Yönetimi</button>
+            <button class="recete-tab" id="rtab-karlilik" onclick="switchReceteTab('karlilik')">📊 Karlılık Tablosu</button>
+        </div>
+
+        <!-- Karlılık Paneli -->
+        <div id="panel-karlilik" style="display:none;">
+            <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
+                <input type="text" id="karSearch" placeholder="🔍 Ürün ara..." oninput="renderKarlilik()"
+                    style="padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;flex:1;min-width:180px;">
+                <select id="karFilter" onchange="renderKarlilik()"
+                    style="padding:.5rem .75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                    <option value="all">Tüm Ürünler</option>
+                    <option value="has_recipe">Reçeteli</option>
+                    <option value="no_recipe">Reçetesiz</option>
+                    <option value="profitable">Kârlı</option>
+                    <option value="loss">Zararlı</option>
+                </select>
+            </div>
+            <div id="karTotals" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;margin-bottom:1.25rem;"></div>
+            <div id="karList"><div style="text-align:center;padding:2rem;color:#a0aec0;">⏳ Yükleniyor...</div></div>
+        </div>
+
+        <!-- Reçete Paneli -->
+        <div id="panel-recete">
+        <!-- Filtre -->
+        <div class="filter-bar">
+            <input type="text" id="searchProduct" placeholder="🔍 Ürün ara..." oninput="renderAll()">
+            <button class="filter-btn active" id="btn-all"      onclick="setFilter('all')">Tümü</button>
+            <button class="filter-btn"        id="btn-missing"  onclick="setFilter('missing')">⚠️ Reçetesiz</button>
+            <button class="filter-btn"        id="btn-complete" onclick="setFilter('complete')">✅ Reçeteli</button>
+        </div>
+
+        <div id="receteList"><div style="text-align:center;padding:2rem;color:#a0aec0;">⏳ Yükleniyor...</div></div>
+
+<script>
+let products   = [];
+let stockItems = [];
+let recipes    = {};
+let viewFilter = 'all';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const [prods, stocks, recs] = await Promise.all([
+        fetch('/api/products').then(r => r.json()),
+        fetch('/api/stock').then(r => r.json()),
+        fetch('/api/recipes').then(r => r.json()),
+    ]);
+    products   = prods.filter(p => p.active);
+    stockItems = stocks;
+    recs.forEach(r => {
+        if (!recipes[r.product_id]) recipes[r.product_id] = [];
+        recipes[r.product_id].push(r);
+    });
+    if (stockItems.length === 0) document.getElementById('noStockWarn').style.display = 'block';
+    updateProgress();
+    renderAll();
+});
+
+function setFilter(f) {
+    viewFilter = f;
+    ['all','missing','complete'].forEach(k => {
+        document.getElementById('btn-'+k).classList.toggle('active', k === f);
+    });
+    renderAll();
+}
+
+function updateProgress() {
+    const total    = products.length;
+    const complete = products.filter(p => (recipes[p.id]||[]).length > 0).length;
+    const pct      = total ? Math.round(complete/total*100) : 0;
+    document.getElementById('progressBox').innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;">
+            <span style="font-size:.85rem;font-weight:700;color:#2d3748;">Reçete Tamamlanma Durumu</span>
+            <span style="font-size:.82rem;color:#718096;">${complete} / ${total} ürün (${pct}%)</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div style="display:flex;gap:1rem;margin-top:.4rem;">
+            <span style="font-size:.78rem;color:#2d6a4f;font-weight:700;">✅ ${complete} reçeteli</span>
+            <span style="font-size:.78rem;color:#d97706;font-weight:700;">⚠️ ${total-complete} reçetesiz</span>
+        </div>`;
+}
+
+function renderAll() {
+    const q = document.getElementById('searchProduct').value.toLowerCase();
+    let list = products.filter(p => p.name.toLowerCase().includes(q));
+    if (viewFilter === 'missing')  list = list.filter(p => !(recipes[p.id]||[]).length);
+    if (viewFilter === 'complete') list = list.filter(p =>  (recipes[p.id]||[]).length > 0);
+    if (!list.length) {
+        document.getElementById('receteList').innerHTML =
+            '<div style="text-align:center;padding:2rem;color:#a0aec0;">Ürün bulunamadı.</div>';
+        return;
+    }
+    document.getElementById('receteList').innerHTML = list.map(p => renderCard(p)).join('');
+}
+
+function renderCard(p) {
+    const recs    = recipes[p.id] || [];
+    const hasRec  = recs.length > 0;
+    const rows    = recs.length === 0
+        ? '<div style="color:#a0aec0;font-size:.85rem;padding:.4rem 0;">Henüz malzeme tanımlanmamış.</div>'
+        : recs.map(r => `
+            <div class="ingredient-row">
+                <span style="flex:1;font-weight:600;">${r.stock_name}</span>
+                <span style="color:#718096;">${r.quantity} ${r.unit || ''}</span>
+                <button class="btn-del" onclick="deleteRecipe(${r.id},${p.id})" title="Sil">🗑️</button>
+            </div>`).join('');
+
+    const stockOpts = stockItems.map(s =>
+        `<option value="${s.id}" data-unit="${s.unit}">${s.name} (${s.unit})</option>`).join('');
+
+    return `<div class="recete-card ${hasRec?'has-recipe':'no-recipe'}" id="card-${p.id}">
+        <div class="card-header">
+            <h4>🍽️ ${p.name}</h4>
+            <div class="meta">
+                <span>${fmtTL(p.price)}</span>
+                <span class="${hasRec?'badge-ok':'badge-no'}">${hasRec?'✅ '+recs.length+' malzeme':'⚠️ Reçete Yok'}</span>
+            </div>
+        </div>
+        ${rows}
+        <div class="add-row">
+            <select id="si-${p.id}" onchange="updateUnit(${p.id})">${stockOpts}</select>
+            <input type="number" id="qty-${p.id}" placeholder="Miktar" step="0.001" min="0.001">
+            <span class="unit-lbl" id="unit-${p.id}"></span>
+            <button class="btn btn-primary" style="padding:.45rem 1rem;font-size:.85rem;" onclick="addRecipe(${p.id})">➕ Ekle</button>
+        </div>
+    </div>`;
+}
+
+function updateUnit(pid) {
+    const sel = document.getElementById('si-' + pid);
+    const opt = sel.options[sel.selectedIndex];
+    document.getElementById('unit-' + pid).textContent = opt ? opt.dataset.unit || '' : '';
+}
+
+// Sayfa render sonrası unit etiketlerini güncelle
+document.addEventListener('change', e => {
+    if (e.target.id && e.target.id.startsWith('si-')) {
+        updateUnit(e.target.id.split('-')[1]);
+    }
+});
+
+async function addRecipe(pid) {
+    const stockId  = parseInt(document.getElementById('si-'+pid).value);
+    const quantity = parseFloat(document.getElementById('qty-'+pid).value);
+    if (!stockId || isNaN(quantity) || quantity <= 0) { alert('Malzeme seçin ve miktar girin.'); return; }
+    const btn = document.querySelector(`#card-${pid} .btn-primary`);
+    btn.disabled = true; btn.textContent = '⏳';
+    await fetch('/api/recipes', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({product_id: pid, stock_item_id: stockId, quantity})
+    });
+    const recs = await fetch('/api/recipes?product_id=' + pid).then(r => r.json());
+    recipes[pid] = recs;
+    updateProgress();
+    const p = products.find(x => x.id === pid);
+    document.getElementById('card-'+pid).outerHTML = renderCard(p);
+}
+
+async function deleteRecipe(recipeId, pid) {
+    if (!confirm('Bu malzemeyi reçeteden çıkar?')) return;
+    await fetch('/api/recipes/' + recipeId, {method:'DELETE'});
+    const recs = await fetch('/api/recipes?product_id=' + pid).then(r => r.json());
+    recipes[pid] = recs;
+    updateProgress();
+    const p = products.find(x => x.id === pid);
+    document.getElementById('card-'+pid).outerHTML = renderCard(p);
+}
+
+// ── KARLILIIK ──────────────────────────────────────────
+let karData = [];
+let karSort = { col: 'revenue', dir: -1 };
+
+function switchReceteTab(tab) {
+    document.querySelectorAll('.recete-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('rtab-' + tab).classList.add('active');
+    document.getElementById('panel-recete').style.display  = tab === 'recete'   ? 'block' : 'none';
+    document.getElementById('panel-karlilik').style.display = tab === 'karlilik' ? 'block' : 'none';
+    if (tab === 'karlilik' && karData.length === 0) loadKarlilik();
+}
+
+async function loadKarlilik() {
+    document.getElementById('karList').innerHTML = '<div style="text-align:center;padding:2rem;color:#a0aec0;">⏳ Yükleniyor...</div>';
+    karData = await fetch('/api/reports/profitability').then(r => r.json());
+    renderKarlilik();
+}
+
+function sortKar(col) {
+    if (karSort.col === col) karSort.dir *= -1;
+    else { karSort.col = col; karSort.dir = -1; }
+    renderKarlilik();
+}
+
+function renderKarlilik() {
+    const q   = (document.getElementById('karSearch')?.value || '').toLowerCase();
+    const fil = document.getElementById('karFilter')?.value || 'all';
+    let list = karData.filter(r => r.name.toLowerCase().includes(q));
+    if (fil === 'has_recipe') list = list.filter(r => r.has_recipe);
+    if (fil === 'no_recipe')  list = list.filter(r => !r.has_recipe);
+    if (fil === 'profitable') list = list.filter(r => r.has_recipe && r.profit >= 0);
+    if (fil === 'loss')       list = list.filter(r => r.has_recipe && r.profit < 0);
+
+    // Sırala
+    list.sort((a, b) => {
+        const av = a[karSort.col] ?? 0;
+        const bv = b[karSort.col] ?? 0;
+        return typeof av === 'string' ? av.localeCompare(bv) * karSort.dir : (av - bv) * karSort.dir;
+    });
+
+    // Özet kartlar
+    const rec = list.filter(r => r.has_recipe);
+    const totRev  = rec.reduce((s, r) => s + r.revenue, 0);
+    const totCost = rec.reduce((s, r) => s + r.total_cost, 0);
+    const totProf = totRev - totCost;
+    const avgMar  = rec.length ? rec.reduce((s,r)=>s+r.margin,0)/rec.length : 0;
+    document.getElementById('karTotals').innerHTML = [
+        ['Toplam Ciro',    fmtTL(totRev),  '#2d6a4f'],
+        ['Toplam Maliyet', fmtTL(totCost), '#e53e3e'],
+        ['Net Kâr',        fmtTL(totProf), totProf>=0?'#2d6a4f':'#e53e3e'],
+        ['Ort. Marj',      fmtN(avgMar,1) + '%',    avgMar>=40?'#2d6a4f':avgMar>=20?'#d97706':'#e53e3e'],
+    ].map(([lbl,val,clr]) => `<div style="background:white;border-radius:10px;padding:.85rem 1rem;
+        box-shadow:0 2px 6px rgba(0,0,0,.07);border:1px solid #e2e8f0;text-align:center;">
+        <div style="font-size:1.25rem;font-weight:800;color:${clr};">${val}</div>
+        <div style="font-size:.75rem;color:#a0aec0;margin-top:.15rem;">${lbl}</div>
+    </div>`).join('');
+
+    if (!list.length) {
+        document.getElementById('karList').innerHTML = '<div style="text-align:center;padding:2rem;color:#a0aec0;">Veri yok</div>';
+        return;
+    }
+
+    const arrow = col => karSort.col === col ? (karSort.dir > 0 ? ' ▲' : ' ▼') : '';
+    document.getElementById('karList').innerHTML = `
+    <table class="kar-table">
+        <thead><tr>
+            <th onclick="sortKar('name')">Ürün${arrow('name')}</th>
+            <th onclick="sortKar('sold_qty')" style="text-align:right;">Satış${arrow('sold_qty')}</th>
+            <th onclick="sortKar('avg_price')" style="text-align:right;">Fiyat${arrow('avg_price')}</th>
+            <th onclick="sortKar('unit_cost')" style="text-align:right;">Maliyet${arrow('unit_cost')}</th>
+            <th onclick="sortKar('revenue')" style="text-align:right;">Ciro${arrow('revenue')}</th>
+            <th onclick="sortKar('profit')" style="text-align:right;">Kâr${arrow('profit')}</th>
+            <th onclick="sortKar('margin')" style="text-align:right;">Marj%${arrow('margin')}</th>
+        </tr></thead>
+        <tbody>${list.map(r => {
+            const noRec = !r.has_recipe;
+            const profCls = noRec ? 'kar-na' : r.profit >= 0 ? 'kar-pos' : 'kar-neg';
+            const barW = noRec ? 0 : Math.min(100, Math.max(0, r.margin));
+            const barC = r.margin >= 40 ? '#48bb78' : r.margin >= 20 ? '#ed8936' : '#fc8181';
+            return `<tr>
+                <td><strong>${r.name}</strong>${noRec ? ' <span style="font-size:.72rem;background:#fef3c7;color:#92400e;padding:.1rem .35rem;border-radius:20px;">Reçetesiz</span>' : ''}</td>
+                <td style="text-align:right;">${r.sold_qty}</td>
+                <td style="text-align:right;">${fmtTL(r.avg_price)}</td>
+                <td style="text-align:right;">${noRec ? '<span class="kar-na">—</span>' : fmtTL(r.unit_cost)}</td>
+                <td style="text-align:right;font-weight:600;">${fmtTL(r.revenue)}</td>
+                <td style="text-align:right;" class="${profCls}">${noRec ? '—' : (r.profit >= 0 ? '+' : '') + fmtTL(r.profit)}</td>
+                <td style="text-align:right;min-width:80px;">
+                    ${noRec ? '<span class="kar-na">—</span>' : `<span class="${profCls}">${fmtN(r.margin,1)}%</span>
+                    <div class="margin-bar"><div class="margin-fill" style="width:${barW}%;background:${barC};"></div></div>`}
+                </td>
+            </tr>`;
+        }).join('')}</tbody>
+    </table>`;
+}
+</script>
+</body>
+</html>

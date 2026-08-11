@@ -1,0 +1,348 @@
+<!-- Fırınna POS — Ortak Navbar -->
+<script>
+    (function() {
+        var theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    })();
+</script>
+<nav class="navbar">
+    <a href="/" class="nav-brand">
+        <svg id="navLogoFallback" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="26" height="26" style="flex-shrink:0;border-radius:7px;">
+            <rect width="64" height="64" rx="14" fill="#2d6a4f"/>
+            <line x1="18" y1="10" x2="18" y2="28" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <line x1="13" y1="10" x2="13" y2="22" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <line x1="23" y1="10" x2="23" y2="22" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <path d="M13 22 Q13 28 18 28 Q23 28 23 22" fill="none" stroke="white" stroke-width="3"/>
+            <line x1="18" y1="28" x2="18" y2="54" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            <path d="M46 10 Q52 16 52 26 L46 28 Z" fill="white"/>
+            <line x1="46" y1="28" x2="46" y2="54" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <img id="navLogoImg" src="" alt="" style="display:none;max-height:28px;max-width:72px;object-fit:contain;flex-shrink:0;border-radius:5px;" onerror="this.style.display='none';document.getElementById('navLogoFallback').style.display='block'">
+        Fırınna POS
+    </a>
+    
+    <!-- Clock & Weather Widget -->
+    <div id="topWidget" style="flex:1; display:flex; justify-content:center; align-items:center; gap:2rem; text-align:center;">
+        <div id="clockWidget" style="color:#e53e3e; font-size:2.2rem; font-weight:800; font-family:monospace; letter-spacing:2px; background:rgba(229,62,62,0.1); padding:8px 16px; border-radius:12px; box-shadow:inset 0 1px 3px rgba(0,0,0,0.1); line-height:1;">
+            --:--:--
+        </div>
+        <div id="weatherWidget" style="display:flex; align-items:center;">
+            <div style="font-size:0.85rem; color:#718096;">Hava Durumu Yükleniyor...</div>
+        </div>
+    </div>
+
+    <div class="nav-links">
+        <a href="/" {% if request.path == '/' %}class="active"{% endif %}>Siparişler</a>
+        <a href="/kitchen" {% if request.path == '/kitchen' %}class="active"{% endif %}>Mutfak</a>
+        <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="alert-badge" id="alertBadge" style="display:none">0</span>
+        </button>
+        <button class="alert-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Tema Değiştir" style="margin-right: 0.25rem; display: flex; align-items: center; justify-content: center;">
+            <svg class="sun-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+        <div class="nav-dropdown" id="navDropdown">
+            <button class="nav-dropdown-btn" onclick="toggleNav()">Yönetim ▾</button>
+            <div class="nav-dropdown-menu">
+                <a href="/kasa"     {% if request.path == '/kasa'     %}class="active"{% endif %}>Kasa</a>
+                <a href="/muhasebe" {% if request.path == '/muhasebe' %}class="active"{% endif %}>Muhasebe</a>
+                <a href="/reports"  {% if request.path == '/reports'  %}class="active"{% endif %}>Raporlar</a>
+                <hr>
+                <a href="/products" {% if request.path == '/products' %}class="active"{% endif %}>Ürünler</a>
+                <a href="/stok"     {% if request.path == '/stok'     %}class="active"{% endif %}>Stok</a>
+                <a href="/recete"   {% if request.path == '/recete'   %}class="active"{% endif %}>Reçete</a>
+                <a href="/tables"   {% if request.path == '/tables'   %}class="active"{% endif %}>Sipariş Noktaları</a>
+                <hr>
+                <a href="/backup"   {% if request.path == '/backup'   %}class="active"{% endif %}>Yedek</a>
+                <a href="/settings" {% if request.path == '/settings' %}class="active"{% endif %}>Ayarlar</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="alert-panel" id="alertPanel">
+    <div class="alert-panel-header">
+        <span>Stok Uyarıları</span>
+        <a href="/stok" style="color:white;font-size:.82rem;font-weight:700;text-decoration:none;background:rgba(255,255,255,.2);padding:.2rem .65rem;border-radius:12px;">Stoka Git →</a>
+    </div>
+    <div class="alert-panel-body" id="alertPanelBody">
+        <div class="alert-empty">Yükleniyor...</div>
+    </div>
+</div>
+
+<script>
+function toggleTheme() {
+    var isDark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    updateThemeIcons();
+}
+function updateThemeIcons() {
+    var isDark = document.body.classList.contains('dark-mode');
+    var sun = document.querySelector('#themeToggleBtn .sun-icon');
+    var moon = document.querySelector('#themeToggleBtn .moon-icon');
+    if (sun && moon) {
+        if (isDark) {
+            sun.style.display = 'block';
+            moon.style.display = 'none';
+        } else {
+            sun.style.display = 'none';
+            moon.style.display = 'block';
+        }
+    }
+}
+document.addEventListener('DOMContentLoaded', updateThemeIcons);
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    updateThemeIcons();
+}
+
+function toggleNav() { document.getElementById('navDropdown').classList.toggle('open'); }
+document.addEventListener('click', function(e) {
+    var dd = document.getElementById('navDropdown');
+    var p  = document.getElementById('alertPanel');
+    var b  = document.getElementById('alertBtn');
+    if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+    if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove('open');
+});
+function toggleAlertPanel() {
+    var badge = document.getElementById('alertBadge');
+    if (badge && badge.style.display !== 'none' && parseInt(badge.textContent) > 0) { window.location.href = '/stok'; return; }
+    document.getElementById('alertPanel').classList.toggle('open');
+}
+async function loadAlerts() {
+    try {
+        var items = await fetch('/api/stock/alerts').then(r => r.json());
+        var badge = document.getElementById('alertBadge');
+        var body  = document.getElementById('alertPanelBody');
+        if (!badge || !body) return;
+        if (items.length > 0) {
+            badge.textContent = items.length;
+            badge.style.display = 'flex';
+            body.innerHTML = items.map(function(i) {
+                var minText = i.min_quantity > 0 ? '<span class="min"> / min ' + Number(i.min_quantity).toFixed(1) + '</span>' : '';
+                return '<div class="alert-item"><span class="alert-item-name">' + i.name + '</span>'
+                    + '<span class="alert-item-qty"><span class="cur">' + Number(i.current_qty).toFixed(1) + ' ' + i.unit + '</span>' + minText + '</span></div>';
+            }).join('');
+        } else {
+            badge.style.display = 'none';
+            body.innerHTML = '<div class="alert-empty">Tüm stoklar yeterli</div>';
+        }
+    } catch(e) {}
+}
+loadAlerts();
+setInterval(loadAlerts, 60000);
+(function loadNavLogo() {
+    fetch('/api/settings/logo').then(function(r){ return r.json(); }).then(function(d) {
+        if (d.url) {
+            var img = document.getElementById('navLogoImg');
+            var svg = document.getElementById('navLogoFallback');
+            if (img && svg) {
+                img.src = d.url;
+                img.style.display = 'block';
+                svg.style.display = 'none';
+            }
+        }
+    }).catch(function(){});
+})();
+
+// Clock Update
+setInterval(function() {
+    var d = new Date();
+    document.getElementById('clockWidget').innerText = d.toLocaleTimeString('tr-TR', {hour12:false});
+}, 1000);
+
+// Weather Update (Istanbul/Beyoglu)
+const wmoCodes = {
+    0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+    45: '🌫️', 48: '🌫️', 51: '🌧️', 53: '🌧️', 55: '🌧️',
+    61: '🌧️', 63: '🌧️', 65: '🌧️', 71: '❄️', 73: '❄️', 75: '❄️',
+    80: '🌧️', 81: '🌧️', 82: '🌧️', 95: '⛈️'
+};
+function getWmoIcon(code) { return wmoCodes[code] || '🌡️'; }
+
+async function fetchWeather() {
+    try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=41.0369&longitude=28.9775&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto');
+        const data = await res.json();
+        
+        const curTemp = Math.round(data.current.temperature_2m);
+        const curIcon = getWmoIcon(data.current.weather_code);
+        
+        let html = '<div style="display:flex; align-items:center; gap:12px;">' +
+            '<div style="font-size:1.1rem; display:flex; align-items:center; gap:6px; padding-right:12px; border-right:1px solid #cbd5e1;">' +
+                '<span style="font-size:1.5rem" title="Şu an">' + curIcon + '</span> <strong>' + curTemp + '°C</strong>' +
+            '</div>' +
+            '<div style="display:flex; gap:8px; font-size:0.75rem;">';
+            
+        // Next 3 days (index 1, 2, 3 in daily array)
+        for(let i=1; i<=3; i++) {
+            const date = new Date(data.daily.time[i]);
+            const dayName = date.toLocaleDateString('tr-TR', {weekday:'short'});
+            const maxT = Math.round(data.daily.temperature_2m_max[i]);
+            const minT = Math.round(data.daily.temperature_2m_min[i]);
+            const icon = getWmoIcon(data.daily.weather_code[i]);
+            
+            html += '<div style="display:flex; flex-direction:column; align-items:center; background:rgba(0,0,0,0.03); padding:4px 8px; border-radius:8px;">' +
+                '<span style="color:#718096; font-weight:700;">' + dayName + '</span>' +
+                '<span style="font-size:1.1rem; margin:2px 0;">' + icon + '</span>' +
+                '<span><span style="color:#e53e3e; font-weight:700;">' + maxT + '°</span><span style="color:#3182ce; font-weight:700;"> ' + minT + '°</span></span>' +
+            '</div>';
+        }
+        html += '</div></div>';
+        document.getElementById('weatherWidget').innerHTML = html;
+    } catch(e) {
+        document.getElementById('weatherWidget').innerHTML = '<span style="color:#e53e3e;font-size:0.8rem;">Hava Durumu Alınamadı</span>';
+    }
+}
+fetchWeather();
+setInterval(fetchWeather, 30 * 60 * 1000); // 30 min
+
+</script>
+
+<div id="toast-container"></div>
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:14px;padding:1.75rem;min-width:300px;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.18);">
+        <p id="confirm-msg" style="margin:0 0 1.5rem;font-size:1rem;color:#2d3748;line-height:1.5;white-space:pre-line;"></p>
+        <div style="display:flex;gap:.75rem;justify-content:flex-end;">
+            <button id="confirm-no"  onclick="document.getElementById('confirm-modal').style.display='none'" style="padding:.55rem 1.25rem;border:2px solid #e2e8f0;background:white;border-radius:8px;font-weight:600;cursor:pointer;color:#4a5568;">İptal</button>
+            <button id="confirm-yes" style="padding:.55rem 1.5rem;background:#e53e3e;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Sil</button>
+        </div>
+    </div>
+</div>
+<script>
+function showConfirm(msg, fn, yesTxt, yesCls) {
+    var m = document.getElementById('confirm-modal');
+    document.getElementById('confirm-msg').textContent = msg;
+    var yesBtn = document.getElementById('confirm-yes');
+    yesBtn.textContent = yesTxt || 'Sil';
+    yesBtn.style.background = yesCls || '#e53e3e';
+    m.style.display = 'flex';
+    yesBtn.onclick = function() { m.style.display = 'none'; fn(); };
+}
+function fmtN(n, dec) {
+    dec = (dec === undefined) ? 2 : dec;
+    return Number(n||0).toLocaleString('tr-TR', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+function fmtTL(n) { return fmtN(n) + ' ₺'; }
+function showToast(msg, type, duration) {
+    type = type || 'success';
+    duration = duration || 3000;
+    var c = document.getElementById('toast-container');
+    var t = document.createElement('div');
+    t.className = 'toast toast-' + type;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(function() {
+        t.style.opacity = '0';
+        t.style.transition = 'opacity .3s';
+        setTimeout(function() { t.remove(); }, 300);
+    }, duration);
+}
+
+// Version Display & Update Logic
+(function() {
+    var vDiv = document.createElement('div');
+    vDiv.style.position = 'fixed';
+    vDiv.style.bottom = '10px';
+    vDiv.style.right = '10px';
+    vDiv.style.fontSize = '0.75rem';
+    vDiv.style.color = '#718096';
+    vDiv.style.background = 'rgba(255,255,255,0.8)';
+    vDiv.style.padding = '2px 6px';
+    vDiv.style.borderRadius = '4px';
+    vDiv.style.zIndex = '9999';
+    vDiv.style.userSelect = 'none';
+    vDiv.style.cursor = 'pointer';
+    vDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    document.body.appendChild(vDiv);
+
+    // Get actual app version from URL params (passed by mobile app wrapper)
+    var urlParams = new URLSearchParams(window.location.search);
+    var actualAppVersion = urlParams.get('app_version');
+    if (actualAppVersion) {
+        localStorage.setItem('garson_app_version', actualAppVersion);
+    } else {
+        actualAppVersion = localStorage.getItem('garson_app_version') || 'Bilinmiyor';
+    }
+    vDiv.textContent = 'Mobil v' + actualAppVersion;
+
+    // Compare versions (e.g. "1.5" vs "1.5.1")
+    function cmpVersions(a, b) {
+        if (!a || !b) return 0;
+        var pa = a.split('.');
+        var pb = b.split('.');
+        for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+            var na = parseInt(pa[i] || 0);
+            var nb = parseInt(pb[i] || 0);
+            if (na > nb) return 1;
+            if (nb > na) return -1;
+        }
+        return 0;
+    }
+
+    var serverVersion = null;
+    fetch('/api/mobile_version?_=' + Date.now())
+        .then(r => r.json())
+        .then(d => { 
+            serverVersion = d.version; 
+            // Auto-check on startup
+            if (actualAppVersion !== 'Bilinmiyor' && cmpVersions(serverVersion, actualAppVersion) > 0) {
+                if(confirm("Yeni bir güncelleme mevcut (v" + serverVersion + "). Uygulamayı şimdi güncellemek ister misiniz?")) {
+                    var fullUrl = window.location.origin + '/download_apk';
+                    if (window.AndroidNative && window.AndroidNative.downloadAndInstall) {
+                        window.AndroidNative.downloadAndInstall(fullUrl);
+                    } else {
+                        window.open(fullUrl, '_system') || window.open(fullUrl, '_blank');
+                        alert("İndirme işlemi tarayıcınızda başlatıldı. Lütfen indirme tamamlandığında bildirimlerden tıklayarak kurunuz.");
+                    }
+                }
+            }
+        })
+        .catch(e => { console.error('Versiyon alinamadi'); });
+
+    var pressTimer;
+    function startPress() {
+        pressTimer = setTimeout(function() {
+            if (serverVersion && actualAppVersion !== 'Bilinmiyor' && cmpVersions(serverVersion, actualAppVersion) <= 0) {
+                alert("Uygulamanız zaten son sürümde (v" + actualAppVersion + ").");
+                return;
+            }
+            if(confirm("Son sürüme (v" + (serverVersion || 'Yeni') + ") güncellensin mi?")) {
+                var fullUrl = window.location.origin + '/download_apk';
+                if (window.AndroidNative && window.AndroidNative.downloadAndInstall) {
+                    window.AndroidNative.downloadAndInstall(fullUrl);
+                } else {
+                    window.open(fullUrl, '_system') || window.open(fullUrl, '_blank');
+                    alert("İndirme işlemi tarayıcınızda başlatıldı. Lütfen indirme tamamlandığında bildirimlerden tıklayarak kurunuz.");
+                }
+            }
+        }, 3000);
+    }
+    function cancelPress() {
+        clearTimeout(pressTimer);
+    }
+    
+    vDiv.addEventListener('touchstart', startPress, {passive: true});
+    vDiv.addEventListener('touchend', cancelPress);
+    vDiv.addEventListener('mousedown', startPress);
+    vDiv.addEventListener('mouseup', cancelPress);
+    vDiv.addEventListener('mouseleave', cancelPress);
+})();
+</script>

@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayarlar - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .settings-card { background:white; border-radius:14px; padding:2rem; box-shadow:0 2px 8px rgba(0,0,0,.07); margin-bottom:1.5rem; }
+        .settings-card h3 { margin:0 0 1.5rem; color:#2d3748; font-size:1.1rem; display:flex; align-items:center; gap:.5rem; }
+        .field-group { display:flex; flex-direction:column; gap:1rem; }
+        .field-group label { display:block; font-weight:600; margin-bottom:.3rem; color:#4a5568; font-size:.9rem; }
+        .field-group input, .field-group textarea {
+            width:100%; padding:.6rem; border:2px solid #e2e8f0; border-radius:8px;
+            font-size:1rem; box-sizing:border-box; font-family:inherit;
+        }
+        .field-group input:focus, .field-group textarea:focus { border-color:#4299e1; outline:none; }
+        .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        .printer-box { background:#f8fafc; border-radius:10px; padding:1rem; margin-bottom:1rem; }
+        .printer-box p { font-weight:700; margin:0 0 .8rem; }
+        .save-row { display:flex; gap:.75rem; margin-top:.5rem; }
+        .save-row button { flex:1; }
+        .logo-area { display:flex; flex-direction:column; align-items:center; gap:1rem; }
+        #logo-preview-box { width:200px; height:100px; border:2px dashed #cbd5e1; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#f8fafc; }
+        #qr-preview-box { width:120px; height:120px; min-width:120px; border:2px dashed #cbd5e1; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#f8fafc; }
+
+        /* GitHub Sync */
+        .sync-status-box { background:#f8fafc; border-radius:12px; padding:1.25rem; margin-bottom:1rem; }
+        .sync-row { display:flex; justify-content:space-between; align-items:center; padding:.5rem 0; border-bottom:1px solid #e2e8f0; font-size:.88rem; }
+        .sync-row:last-child { border-bottom:none; }
+        .sync-row label { color:#718096; font-weight:600; min-width:130px; }
+        .sync-row span  { color:#2d3748; font-family:monospace; font-size:.82rem; }
+        .badge-ahead  { background:#d1fae5; color:#065f46; padding:.15rem .55rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .badge-behind { background:#fee2e2; color:#991b1b; padding:.15rem .55rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .badge-ok     { background:#e0f2fe; color:#0369a1; padding:.15rem .55rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+        .diff-box { background:#1e293b; color:#94a3b8; border-radius:10px; padding:1rem; font-family:monospace; font-size:.78rem; line-height:1.6; max-height:200px; overflow-y:auto; white-space:pre-wrap; }
+        .diff-box .add { color:#4ade80; }
+        .diff-box .del { color:#f87171; }
+        .commit-input { width:100%; padding:.55rem .75rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.88rem; font-family:inherit; margin-bottom:.75rem; }
+        .commit-input:focus { outline:none; border-color:#667eea; }
+        .auto-pull-row { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+        .auto-pull-row select { padding:.45rem .7rem; border:2px solid #e2e8f0; border-radius:8px; font-size:.85rem; font-family:inherit; }
+        .git-log-box { background:#f8fafc; border-radius:10px; padding:.85rem; font-size:.78rem; font-family:monospace; color:#475569; line-height:1.7; max-height:150px; overflow-y:auto; white-space:pre-wrap; }
+        /* Kayıtlı Notlar */
+        .saved-note-row { background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:.85rem 1rem; }
+        .sn-title { font-weight:700; color:#2d3748; font-size:.95rem; margin-bottom:.2rem; }
+        .sn-preview { color:#718096; font-size:.83rem; line-height:1.4; white-space:pre-line; margin-bottom:.5rem; word-break:normal; overflow-wrap:break-word; text-align:justify; }
+        .sn-actions { display:flex; gap:.4rem; flex-wrap:wrap; }
+    </style>
+</head>
+<body>
+    {% include '_navbar.html' %}
+
+    <div class="container">
+        <h1 style="margin-bottom:1.25rem;">⚙️ Ayarlar</h1>
+
+        <!-- Sekme Nav -->
+        <div style="display:flex;gap:0;border-bottom:2px solid #e2e8f0;margin-bottom:1.5rem;overflow-x:auto;">
+            <button class="settings-tab active" onclick="switchTab('isletme',this)">🏪 İşletme</button>
+            <button class="settings-tab" onclick="switchTab('yazici',this)">🖨️ Yazıcı</button>
+            <button class="settings-tab" onclick="switchTab('logo',this)">🖼️ Logo & Fiş</button>
+            <button class="settings-tab" onclick="switchTab('not',this)">📝 Not</button>
+            <button class="settings-tab" onclick="switchTab('telegram',this)">📲 Telegram</button>
+            <button class="settings-tab" onclick="switchTab('foto',this)">📸 Fotoğraf</button>
+        </div>
+
+        <!-- İşletme Bilgileri -->
+        <div id="tab-isletme" class="settings-panel">
+        <div class="settings-card">
+            <h3>🏪 İşletme Bilgileri</h3>
+            <div class="field-group">
+                <div><label>İşletme Adı</label><input type="text" id="s-restaurant-name" placeholder="Fırınna"></div>
+                <hr style="border:none;border-top:2px solid #e2e8f0;margin:.25rem 0 .5rem;">
+                <div><label>Adres</label><input type="text" id="s-restaurant-address" placeholder="Beyoğlu, İstanbul"></div>
+                <div class="two-col">
+                    <div><label>Web Sayfası</label><input type="text" id="s-restaurant-web" placeholder="www.firinna.com"></div>
+                    <div><label>Telefon</label><input type="text" id="s-restaurant-phone" placeholder="+90 212 ..."></div>
+                </div>
+                <div><label>Vergi No</label><input type="text" id="s-tax-number" placeholder="1234567890"></div>
+                <div><label>Fiş Alt Notu</label><textarea id="s-receipt-footer" rows="2" placeholder="Afiyet olsun!"></textarea></div>
+                <div><button class="btn btn-primary" onclick="saveBusinessSettings()">💾 Kaydet</button></div>
+            </div>
+        </div>
+
+        </div><!-- /tab-isletme -->
+
+        <!-- Yazıcı -->
+        <div id="tab-yazici" class="settings-panel" style="display:none;">
+        <div class="settings-card">
+            <h3>🖨️ Yazıcı Ayarları</h3>
+            <div class="printer-box">
+                <p>🧾 Müşteri Yazıcısı</p>
+                <div class="two-col">
+                    <div><label>IP Adresi</label><input type="text" id="s-printer-ip" placeholder="192.168.1.x"></div>
+                    <div><label>Port</label><input type="number" id="s-printer-port" placeholder="9100"></div>
+                </div>
+            </div>
+            <div class="printer-box">
+                <p>🍳 Mutfak Yazıcısı</p>
+                <div class="two-col">
+                    <div><label>IP Adresi</label><input type="text" id="s-kitchen-ip" placeholder="192.168.1.x"></div>
+                    <div><label>Port</label><input type="number" id="s-kitchen-port" placeholder="9100"></div>
+                </div>
+            </div>
+            <div class="save-row">
+                <button class="btn btn-primary" onclick="savePrinterSettings()">💾 Kaydet</button>
+                <button class="btn btn-secondary" onclick="testPrinter()">🖨️ Test Yazdır</button>
+            </div>
+        </div>
+
+        </div><!-- /tab-yazici -->
+
+        <!-- Logo & Fiş -->
+        <div id="tab-logo" class="settings-panel" style="display:none;">
+        <div class="settings-card">
+            <h3>🖼️ Logo</h3>
+            <div class="logo-area">
+                <div id="logo-preview-box">
+                    <span id="logo-placeholder-text" style="color:#94a3b8;font-size:.9rem;">Logo yüklenmemiş</span>
+                    <img id="logo-preview-img" src="" alt="Logo" style="display:none;max-width:190px;max-height:90px;object-fit:contain;">
+                </div>
+                <p style="font-size:.85rem;color:#64748b;text-align:center;margin:0;">PNG, JPG veya WebP · Önerilen: 300×150px</p>
+                <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;" onchange="previewLogoFile(event)">
+                <div class="save-row" style="width:100%;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('logo-file-input').click()">📁 Dosya Seç</button>
+                    <button class="btn btn-primary" onclick="uploadLogo()" id="btn-upload-logo" disabled style="opacity:.5;">⬆️ Yükle</button>
+                    <button class="btn" style="background:#ef4444;color:white;" onclick="deleteLogo()">🗑️ Sil</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fiş QR Kodu -->
+        <div class="settings-card">
+            <h3>📍 Fiş Alt QR Kodu</h3>
+            <p style="font-size:.85rem;color:#64748b;margin-bottom:1rem;">
+                Fişin altında gösterilecek QR kod görseli (Google Haritalar, Instagram vb. için).
+                QR kodu harici bir araçla oluşturup buraya yükleyin.
+            </p>
+            <div class="logo-area">
+                <div id="qr-preview-box">
+                    <span id="qr-placeholder-text" style="color:#94a3b8;font-size:.9rem;">QR kod yüklenmemiş</span>
+                    <img id="qr-preview-img" src="" alt="QR" style="display:none;width:110px;height:110px;object-fit:contain;">
+                </div>
+                <div style="width:100%;">
+                    <label style="font-size:.85rem;color:#4a5568;font-weight:600;">QR Altı Yazı</label>
+                    <input type="text" id="qr-label" placeholder="Bizi Google Haritalarda bulun" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;margin-top:.3rem;">
+                </div>
+                <input type="file" id="qr-file-input" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewQrFile(event)">
+                <div class="save-row" style="width:100%;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('qr-file-input').click()">📁 QR Görsel Seç</button>
+                    <button class="btn btn-primary" onclick="uploadQr()" id="btn-upload-qr" disabled style="opacity:.5;">⬆️ Yükle</button>
+                    <button class="btn btn-primary" onclick="saveQrLabel()" style="background:#38a169;">💾 Yazıyı Kaydet</button>
+                    <button class="btn" style="background:#ef4444;color:white;" onclick="deleteQr()">🗑️ Sil</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadBusinessSettings();
+            await loadPrinterSettings();
+            await loadLogoSettings();
+            await loadAutoPullSetting();
+            loadSavedNotes();
+        });
+
+        async function loadBusinessSettings() {
+            const keys = ['restaurant_name','restaurant_address','restaurant_web','restaurant_phone','tax_number','receipt_footer'];
+            const ids  = ['s-restaurant-name','s-restaurant-address','s-restaurant-web','s-restaurant-phone','s-tax-number','s-receipt-footer'];
+            for (let i = 0; i < keys.length; i++) {
+                try {
+                    const d = await fetch(`/api/settings/${keys[i]}`).then(r => r.json());
+                    document.getElementById(ids[i]).value = d.value || '';
+                } catch {}
+            }
+        }
+
+        async function saveBusinessSettings() {
+            const fields = [
+                {key:'restaurant_name', id:'s-restaurant-name'},
+                {key:'restaurant_address', id:'s-restaurant-address'},
+                {key:'restaurant_web', id:'s-restaurant-web'},
+                {key:'restaurant_phone', id:'s-restaurant-phone'},
+                {key:'tax_number', id:'s-tax-number'},
+                {key:'receipt_footer', id:'s-receipt-footer'},
+            ];
+            for (const f of fields) {
+                await fetch(`/api/settings/${f.key}`, {
+                    method:'PUT', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({value: document.getElementById(f.id).value})
+                });
+            }
+            showToast('İşletme bilgileri kaydedildi!', 'success');
+        }
+
+        async function loadPrinterSettings() {
+            const map = {
+                'printer_ip':'s-printer-ip', 'printer_port':'s-printer-port',
+                'kitchen_printer_ip':'s-kitchen-ip', 'kitchen_printer_port':'s-kitchen-port'
+            };
+            for (const [key, id] of Object.entries(map)) {
+                try {
+                    const d = await fetch(`/api/settings/${key}`).then(r => r.json());
+                    document.getElementById(id).value = d.value || '';
+                } catch {}
+            }
+        }
+
+        async function savePrinterSettings() {
+            const fields = [
+                {key:'printer_ip',id:'s-printer-ip'},{key:'printer_port',id:'s-printer-port'},
+                {key:'kitchen_printer_ip',id:'s-kitchen-ip'},{key:'kitchen_printer_port',id:'s-kitchen-port'},
+            ];
+            for (const f of fields) {
+                await fetch(`/api/settings/${f.key}`, {
+                    method:'PUT', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({value: document.getElementById(f.id).value})
+                });
+            }
+            showToast('Yazıcı ayarları kaydedildi!', 'success');
+        }
+
+        async function testPrinter() {
+            const res = await fetch('/api/printer/test', {method:'POST'});
+            const d = await res.json();
+            showToast(d.success ? 'Test fişi gönderildi!' : 'Yazıcıya ulaşılamadı', d.success ? 'success' : 'error');
+        }
+
+        let pendingLogoFile = null;
+        let pendingQrFile = null;
+        let pendingNoteQrFile = null;
+
+        function previewQrFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            pendingQrFile = file;
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('qr-preview-img').src = e.target.result;
+                document.getElementById('qr-preview-img').style.display = 'block';
+                document.getElementById('qr-placeholder-text').style.display = 'none';
+                document.getElementById('btn-upload-qr').disabled = false;
+                document.getElementById('btn-upload-qr').style.opacity = '1';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function uploadQr() {
+            if (!pendingQrFile) return;
+            const formData = new FormData();
+            formData.append('file', pendingQrFile);
+            const label = document.getElementById('qr-label').value;
+            formData.append('label', label);
+            const res = await fetch('/api/settings/qr', {method:'POST', body: formData});
+            const d = await res.json();
+            if (d.success) showToast('\u2705 QR kodu kaydedildi!', 'success');
+            else showToast(d.error || 'Hata', 'error');
+        }
+
+        // --- Telegram ---
+        async function saveTelegram() {
+            const token = document.getElementById('tg-token').value.trim();
+            const chat_id = document.getElementById('tg-chat-id').value.trim();
+            const res = await fetch('/api/settings/telegram', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({token, chat_id})
+            });
+            const d = await res.json();
+            if (d.success) showToast('Telegram ayarları kaydedildi!', 'success');
+            else showToast('Kayıt hatası', 'error');
+        }
+
+        async function testTelegram() {
+            const btn = event.target;
+            btn.disabled = true; btn.textContent = '📨 Gönderiliyor...';
+            const statusEl = document.getElementById('tg-status');
+            statusEl.style.display = 'none';
+            try {
+                const res = await fetch('/api/settings/telegram/test', {method:'POST'});
+                const d = await res.json();
+                statusEl.style.display = 'block';
+                if (d.success) {
+                    statusEl.style.background = '#d1fae5'; statusEl.style.color = '#065f46';
+                    statusEl.textContent = '✅ Test mesajı başarıyla gönderildi!';
+                } else {
+                    statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+                    statusEl.textContent = '❌ ' + (d.error || 'Gönderim başarısız');
+                }
+            } catch(e) {
+                statusEl.style.display = 'block';
+                statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+                statusEl.textContent = '❌ Bağlantı hatası';
+            }
+            btn.disabled = false; btn.textContent = '📨 Test Mesajı Gönder';
+        }
+
+        async function sendInstantReport() {
+            const btn = event.target;
+            const oldText = btn.textContent;
+            btn.disabled = true; btn.textContent = '📊 Gönderiliyor...';
+            const statusEl = document.getElementById('tg-status');
+            statusEl.style.display = 'none';
+            try {
+                const res = await fetch('/api/settings/telegram/instant_report', {method:'POST'});
+                const d = await res.json();
+                statusEl.style.display = 'block';
+                if (d.success) {
+                    statusEl.style.background = '#d1fae5'; statusEl.style.color = '#065f46';
+                    statusEl.textContent = '✅ Anlık durum raporu başarıyla gönderildi!';
+                } else {
+                    statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+                    statusEl.textContent = '❌ ' + (d.error || 'Gönderim başarısız');
+                }
+            } catch(e) {
+                statusEl.style.display = 'block';
+                statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+                statusEl.textContent = '❌ Bağlantı hatası';
+            }
+            btn.disabled = false; btn.textContent = oldText;
+        }
+
+        // --- getUpdates ---
+        async function getUpdates() {
+            const btn = event.target;
+            btn.disabled = true; btn.textContent = '🔄 Yükleniyor...';
+            const listEl = document.getElementById('updates-list');
+            listEl.style.display = 'block';
+            listEl.innerHTML = 'Yükleniyor...';
+            try {
+                const res = await fetch('/api/telegram/updates');
+                const d = await res.json();
+                if (!d.length) {
+                    listEl.innerHTML = '<em style="color:#94a3b8;">Mesaj bulunamadı. Kişi bota /start yazmış olmalı.</em>';
+                } else {
+                    listEl.innerHTML = d.map(u => `
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:.4rem .5rem;border-bottom:1px solid #e2e8f0;">
+                            <div>
+                                <b>${u.name}</b>
+                                <span style="color:#718096;font-size:.8rem;margin-left:.5rem;">@${u.username||'—'}</span><br>
+                                <code style="font-size:.82rem;">${u.chat_id}</code>
+                            </div>
+                            <button onclick="fillContact('${u.name}','${u.chat_id}')"
+                                style="background:#667eea;color:white;border:none;border-radius:6px;padding:.25rem .6rem;cursor:pointer;font-size:.8rem;">
+                                + Rehbere Ekle
+                            </button>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) {
+                listEl.innerHTML = '<em style="color:#e53e3e;">Hata: ' + e.message + '</em>';
+            }
+            btn.disabled = false; btn.textContent = '🔍 Bota Yazan Kişileri Listele (getUpdates)';
+        }
+
+        function fillContact(name, chatId) {
+            document.getElementById('new-contact-name').value = name;
+            document.getElementById('new-contact-chatid').value = chatId;
+        }
+
+        // --- Telegram Rehber ---
+        let tgContacts = [];
+
+        async function loadContacts() {
+            tgContacts = await fetch('/api/telegram/contacts').then(r=>r.json()).catch(()=>[]);
+            renderContacts();
+            renderRecipientSelect();
+        }
+
+        function renderContacts() {
+            const list = document.getElementById('contact-list');
+            if (!tgContacts.length) {
+                list.innerHTML = '<div style="color:#94a3b8;font-size:.85rem;text-align:center;padding:.5rem;">Henüz kişi eklenmedi.</div>';
+                return;
+            }
+            list.innerHTML = tgContacts.map(c => `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+                    <div>
+                        <span style="font-weight:600;">${c.name}</span>
+                        <span style="color:#94a3b8;font-size:.8rem;margin-left:.5rem;">ID: ${c.chat_id}</span>
+                    </div>
+                    <button onclick="deleteContact(${c.id})" style="background:#ef4444;color:white;border:none;border-radius:6px;padding:.25rem .6rem;cursor:pointer;font-size:.8rem;">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function renderRecipientSelect() {
+            const sel = document.getElementById('tg-recipient');
+            const cur = sel.value;
+            sel.innerHTML = '<option value="">⬅ Varsayılan (stok uyarı chat ID)</option>';
+            tgContacts.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.chat_id;
+                opt.textContent = c.name + ' (' + c.chat_id + ')';
+                sel.appendChild(opt);
+            });
+            if (cur) sel.value = cur;
+        }
+
+        async function addContact() {
+            const name = document.getElementById('new-contact-name').value.trim();
+            const chat_id = document.getElementById('new-contact-chatid').value.trim();
+            if (!name || !chat_id) { showToast('İsim ve Chat ID zorunlu!', 'warn'); return; }
+            if (!/^-?[0-9]+$/.test(chat_id)) { showToast('Chat ID sadece sayı olmalı (örn: 1326104090)', 'warn'); return; }
+            const res = await fetch('/api/telegram/contacts', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({name, chat_id})
+            });
+            const d = await res.json();
+            if (d.success) {
+                document.getElementById('new-contact-name').value = '';
+                document.getElementById('new-contact-chatid').value = '';
+                showToast('Kişi eklendi!', 'success');
+                loadContacts();
+            } else showToast(d.error || 'Hata', 'error');
+        }
+
+        async function deleteContact(id) {
+            await fetch('/api/telegram/contacts/' + id, {method:'DELETE'});
+            showToast('Kişi silindi', 'success');
+            loadContacts();
+        }
+
+        // --- Telegram Mesaj Gönder ---
+        async function sendTelegramNote() {
+            const note = document.getElementById('tg-manual-note').value.trim();
+            if (!note) { showToast('Mesaj boş olamaz!', 'warn'); return; }
+            const chat_id = document.getElementById('tg-recipient').value || null;
+            const statusEl = document.getElementById('tg-note-status');
+            statusEl.style.display = 'none';
+            const res = await fetch('/api/settings/telegram/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: note, chat_id})
+            });
+            const d = await res.json();
+            statusEl.style.display = 'block';
+            if (d.success) {
+                statusEl.style.background = '#d1fae5'; statusEl.style.color = '#065f46';
+                statusEl.textContent = '✅ Mesaj gönderildi!';
+                document.getElementById('tg-manual-note').value = '';
+            } else {
+                statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
+                statusEl.textContent = '❌ ' + (d.error || 'Gönderilemedi');
+            }
+        }
+
+        // --- Note QR ---
+        async function noteQrFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            // Önce önizle
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('note-qr-img').src = e.target.result;
+                document.getElementById('note-qr-img').style.display = 'block';
+                document.getElementById('note-qr-placeholder').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+            // Hemen yükle
+            const btn = document.getElementById('btn-upload-note-qr');
+            btn.disabled = true; btn.textContent = '⏳ Yükleniyor...';
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('label', document.getElementById('note-qr-label').value);
+            let ok = false;
+            try {
+                const res = await fetch('/api/settings/note-qr', {method:'POST', body: formData});
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const d = await res.json();
+                if (d.success) { showToast('Not QR kodu kaydedildi!', 'success'); ok = true; }
+                else showToast(d.error || 'Yükleme hatası', 'error');
+            } catch(e) {
+                showToast('Yükleme başarısız: ' + e.message, 'error');
+            }
+            btn.disabled = false; btn.textContent = '📁 Görsel Seç & Yükle';
+            // input'u sıfırla ki aynı dosya tekrar seçilebilsin
+            event.target.value = '';
+        }
+
+        async function saveNoteQrLabel() {
+            const label = document.getElementById('note-qr-label').value;
+            const res = await fetch('/api/settings/note-qr/label', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({label})
+            });
+            const d = await res.json();
+            if (d.success) showToast('Not QR yazısı kaydedildi!', 'success');
+            else showToast('Hata', 'error');
+        }
+
+        async function saveNoteQrLabel() {
+            const label = document.getElementById('note-qr-label').value;
+            const res = await fetch('/api/settings/note-qr/label', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({label})
+            });
+            const d = await res.json();
+            if (d.success) showToast('Not QR yazısı kaydedildi!', 'success');
+            else showToast('Hata', 'error');
+        }
+
+        async function deleteNoteQr() {
+            await fetch('/api/settings/note-qr', {method:'DELETE'});
+            document.getElementById('note-qr-img').style.display = 'none';
+            document.getElementById('note-qr-placeholder').style.display = 'block';
+            showToast('Not QR silindi', 'success');
+        }
+
+        async function saveQrLabel() {
+            const label = document.getElementById('qr-label').value;
+            const res = await fetch('/api/settings/qr/label', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({label: label})
+            });
+            const d = await res.json();
+            if (d.success) showToast('QR yazısı kaydedildi!', 'success');
+            else showToast(d.error || 'Hata', 'error');
+        }
+
+        async function deleteQr() {
+            await fetch('/api/settings/qr', {method:'DELETE'});
+            document.getElementById('qr-preview-img').style.display = 'none';
+            document.getElementById('qr-placeholder-text').style.display = 'block';
+            document.getElementById('btn-upload-qr').disabled = true;
+            document.getElementById('btn-upload-qr').style.opacity = '.5';
+            showToast('\u2705 QR kodu silindi!', 'success');
+        }
+
+        async function loadLogoSettings() {
+            try {
+                const d = await fetch('/api/settings/logo').then(r => r.json());
+                if (d.url) {
+                    document.getElementById('logo-preview-img').src = d.url + '?t=' + Date.now();
+                    document.getElementById('logo-preview-img').style.display = 'block';
+                    document.getElementById('logo-placeholder-text').style.display = 'none';
+                }
+            } catch {}
+            // QR yükle
+            try {
+                const qr = await fetch('/api/settings/qr').then(r => r.json());
+                if (qr.url) {
+                    document.getElementById('qr-preview-img').src = qr.url;
+                    document.getElementById('qr-preview-img').style.display = 'block';
+                    document.getElementById('qr-placeholder-text').style.display = 'none';
+                }
+                if (qr.label) document.getElementById('qr-label').value = qr.label;
+
+                // Note QR yükle
+                const noteQr = await fetch('/api/settings/note-qr').then(r=>r.json()).catch(()=>({}));
+                if (noteQr.url) {
+                    document.getElementById('note-qr-img').src = noteQr.url;
+                    document.getElementById('note-qr-img').style.display = 'block';
+                    document.getElementById('note-qr-placeholder').style.display = 'none';
+                }
+                if (noteQr.label) document.getElementById('note-qr-label').value = noteQr.label;
+
+                // Telegram ayarları yükle
+                const tg = await fetch('/api/settings/telegram').then(r=>r.json()).catch(()=>({}));
+                if (tg.token) document.getElementById('tg-token').value = tg.token;
+                if (tg.chat_id) document.getElementById('tg-chat-id').value = tg.chat_id;
+
+                // Telegram rehberi yükle
+                loadContacts();
+            } catch(e) {}
+        }
+        function previewLogoFile(event) {
+            const file = event.target.files[0]; if (!file) return;
+            pendingLogoFile = file;
+            const r = new FileReader();
+            r.onload = e => {
+                document.getElementById('logo-preview-img').src = e.target.result;
+                document.getElementById('logo-preview-img').style.display = 'block';
+                document.getElementById('logo-placeholder-text').style.display = 'none';
+            };
+            r.readAsDataURL(file);
+            const btn = document.getElementById('btn-upload-logo');
+            btn.disabled = false; btn.style.opacity = '1';
+        }
+        async function uploadLogo() {
+            if (!pendingLogoFile) return;
+            const fd = new FormData(); fd.append('logo', pendingLogoFile);
+            const d = await fetch('/api/settings/logo', {method:'POST', body:fd}).then(r => r.json());
+            if (d.success) { showToast('Logo yüklendi!', 'success'); pendingLogoFile = null; }
+            else showToast(d.error || 'Hata', 'error');
+        }
+        async function deleteLogo() {
+            showConfirm('Logo silinsin mi?', async () => {
+                await fetch('/api/settings/logo', {method:'DELETE'});
+                document.getElementById('logo-preview-img').style.display = 'none';
+                document.getElementById('logo-placeholder-text').style.display = 'block';
+                showToast('Logo silindi.', 'success');
+            }, 'Sil', '#e53e3e');
+        }
+
+        // ===== KAYITLI NOTLAR =====
+        async function loadSavedNotes() {
+            const notes = await fetch('/api/notes/saved').then(r => r.json()).catch(() => []);
+            const list = document.getElementById('saved-notes-list');
+            if (!notes.length) {
+                list.innerHTML = '<div style="color:#94a3b8;font-size:.85rem;padding:.5rem 0;">Henüz kayıtlı not yok.</div>';
+                return;
+            }
+            list.innerHTML = notes.map(n => `
+                <div class="saved-note-row" id="snrow-${n.id}">
+                    <div class="sn-view" id="snview-${n.id}">
+                        <div class="sn-title">${escHtml(n.title)}</div>
+                        <div class="sn-preview">${escHtml(n.content.substring(0,160))}${n.content.length>160?'…':''}</div>
+                        <div class="sn-actions">
+                            <button class="btn btn-secondary" style="padding:.3rem .8rem;font-size:.82rem;" onclick="loadNoteIntoEditor(${n.id})">📄 Yükle</button>
+                            <button class="btn btn-secondary" style="padding:.3rem .8rem;font-size:.82rem;" onclick="startEditNote(${n.id})">✏️ Düzenle</button>
+                            <button class="btn" style="padding:.3rem .8rem;font-size:.82rem;background:#fed7d7;color:#c53030;" onclick="deleteSavedNote(${n.id})">🗑️ Sil</button>
+                        </div>
+                    </div>
+                    <div class="sn-edit" id="snedit-${n.id}" style="display:none;">
+                        <input type="text" id="snedit-title-${n.id}" value="${escAttr(n.title)}" style="width:100%;padding:.5rem;border:2px solid #e2e8f0;border-radius:7px;font-size:.95rem;margin-bottom:.4rem;">
+                        <textarea id="snedit-content-${n.id}" rows="8" style="width:100%;padding:.5rem;border:2px solid #e2e8f0;border-radius:7px;font-size:.9rem;resize:vertical;">${escHtml(n.content)}</textarea>
+                        <div class="sn-actions" style="margin-top:.4rem;">
+                            <button class="btn btn-primary" style="padding:.3rem .9rem;font-size:.82rem;background:#38a169;" onclick="saveEditNote(${n.id})">💾 Kaydet</button>
+                            <button class="btn btn-secondary" style="padding:.3rem .8rem;font-size:.82rem;" onclick="cancelEditNote(${n.id})">İptal</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            // notları hafızaya al (loadNoteIntoEditor için)
+            window._savedNotes = {};
+            notes.forEach(n => window._savedNotes[n.id] = n);
+        }
+        function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+        function loadNoteIntoEditor(id) {
+            const n = window._savedNotes && window._savedNotes[id];
+            if (!n) return;
+            document.getElementById('note-title').value = n.title;
+            document.getElementById('note-content').value = n.content;
+            showToast('"' + n.title + '" editöre yüklendi', 'success');
+        }
+        function startEditNote(id) {
+            document.getElementById('snview-' + id).style.display = 'none';
+            document.getElementById('snedit-' + id).style.display = 'block';
+        }
+        function cancelEditNote(id) {
+            document.getElementById('snedit-' + id).style.display = 'none';
+            document.getElementById('snview-' + id).style.display = 'block';
+        }
+        async function saveEditNote(id) {
+            const title = document.getElementById('snedit-title-' + id).value.trim() || 'NOT';
+            const content = document.getElementById('snedit-content-' + id).value.trim();
+            if (!content) { showToast('İçerik boş olamaz', 'error'); return; }
+            const d = await fetch('/api/notes/saved/' + id, {
+                method:'PUT', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({title, content})
+            }).then(r => r.json());
+            if (d.success) { showToast('Not güncellendi', 'success'); loadSavedNotes(); }
+            else showToast(d.error || 'Hata', 'error');
+        }
+        async function deleteSavedNote(id) {
+            const n = window._savedNotes && window._savedNotes[id];
+            const name = n ? n.title : 'bu not';
+            showConfirm('"' + name + '" silinsin mi?', async () => {
+                await fetch('/api/notes/saved/' + id, {method:'DELETE'});
+                showToast('Not silindi', 'success');
+                loadSavedNotes();
+            }, 'Sil', '#e53e3e');
+        }
+        async function saveCurrentNote() {
+            const title = document.getElementById('note-title').value.trim() || 'NOT';
+            const content = document.getElementById('note-content').value.trim();
+            if (!content) { showToast('Not içeriği boş!', 'warn'); return; }
+            const d = await fetch('/api/notes/saved', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({title, content})
+            }).then(r => r.json());
+            if (d.success) { showToast('Not kaydedildi!', 'success'); loadSavedNotes(); }
+            else showToast(d.error || 'Hata', 'error');
+        }
+        // ===========================
+
+        async function previewNote() {
+            const title = document.getElementById('note-title').value || 'NOT';
+            const note = document.getElementById('note-content').value.trim();
+            if (!note) { showToast('Not içeriği boş!', 'warn'); return; }
+            const res = await fetch('/api/print/note/preview', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({title, note})
+            });
+            const html = await res.text();
+            const win = window.open('','_blank','width=400,height=600');
+            win.document.write(html); win.document.close();
+        }
+        async function printNote() {
+            const title = document.getElementById('note-title').value || 'NOT';
+            const note = document.getElementById('note-content').value.trim();
+            if (!note) { showToast('Not içeriği boş!', 'warn'); return; }
+            const d = await fetch('/api/print/note', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({title, note})
+            }).then(r => r.json());
+            showToast(d.success ? 'Not fişi yazdırıldı!' : (d.error||'Hata'), d.success ? 'success' : 'error');
+        }
+    </script>
+
+        </div><!-- /tab-logo -->
+
+        <!-- Not -->
+        <div id="tab-not" class="settings-panel" style="display:none;">
+
+        <!-- Kayıtlı Notlar -->
+        <div class="settings-card">
+            <h3>🗂️ Kayıtlı Notlar</h3>
+            <div id="saved-notes-list" style="display:flex;flex-direction:column;gap:.5rem;">
+                <div style="color:#94a3b8;font-size:.85rem;padding:.5rem 0;">Yükleniyor...</div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h3>📝 Not Fişi Editörü</h3>
+            <div class="field-group">
+                <div><label>Başlık</label><input type="text" id="note-title" value="NOT" placeholder="NOT"></div>
+                <div><label>Not İçeriği</label><textarea id="note-content" rows="12" placeholder="Yazdırmak istediğiniz notu buraya girin..."></textarea></div>
+            </div>
+            <div style="margin-top:.75rem;">
+                <button class="btn btn-secondary" onclick="saveCurrentNote()" style="width:100%;">💾 Bu Notu Kayıtlı Notlara Ekle</button>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h3>📍 Not Fişi QR Kodu</h3>
+            <p style="font-size:.85rem;color:#718096;margin-bottom:1rem;">
+                WiFi QR, Google Haritalar, Instagram vb. — not fişinin altında basılır.
+            </p>
+            <div class="logo-area">
+                <div id="note-qr-preview-box" style="width:120px;height:120px;border:2px dashed #cbd5e1;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f8fafc;">
+                    <span id="note-qr-placeholder" style="color:#94a3b8;font-size:.8rem;text-align:center;">QR yüklenmemiş</span>
+                    <img id="note-qr-img" src="" alt="QR" style="display:none;width:110px;height:110px;object-fit:contain;">
+                </div>
+                <div style="width:100%;">
+                    <label style="font-size:.85rem;color:#4a5568;font-weight:600;">QR Altı Yazı</label>
+                    <input type="text" id="note-qr-label" placeholder="WiFi: Firinna_Guest" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;margin-top:.3rem;">
+                </div>
+                <input type="file" id="note-qr-file-input" accept="image/*" style="display:none;" onchange="noteQrFileSelected(event)">
+                <div class="save-row" style="width:100%;">
+                    <button class="btn btn-secondary" id="btn-upload-note-qr" onclick="document.getElementById('note-qr-file-input').click()">📁 Görsel Seç &amp; Yükle</button>
+                    <button class="btn btn-primary" onclick="saveNoteQrLabel()" style="background:#38a169;">💾 Yazıyı Kaydet</button>
+                    <button class="btn" style="background:#ef4444;color:white;" onclick="deleteNoteQr()">🗑️ Sil</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card" style="display:flex;gap:.75rem;">
+            <button class="btn btn-secondary" onclick="previewNote()" style="flex:1;">👁️ Önizle</button>
+            <button class="btn btn-primary" onclick="printNote()" style="flex:1;">🖨️ Yazdır</button>
+        </div>
+
+        </div><!-- /tab-not -->
+
+        <!-- Telegram -->
+        <div id="tab-telegram" class="settings-panel" style="display:none;">
+
+        <!-- 1. Mesaj Gönder -->
+        <div class="settings-card">
+            <h3>✉️ Mesaj Gönder</h3>
+            <div class="field-group">
+                <div>
+                    <label>Alıcı</label>
+                    <select id="tg-recipient" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;">
+                        <option value="">— Varsayılan (Bot Chat ID) —</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Mesaj</label>
+                    <textarea id="tg-manual-note" rows="4" placeholder="Göndermek istediğiniz mesajı yazın..."></textarea>
+                </div>
+                <div class="save-row">
+                    <button class="btn btn-primary" onclick="sendTelegramNote()" style="flex:1;">📤 Gönder</button>
+                </div>
+                <div id="tg-note-status" style="display:none;padding:.6rem .9rem;border-radius:8px;font-size:.88rem;font-weight:600;"></div>
+            </div>
+        </div>
+
+        <!-- 2. Kişi Rehberi -->
+        <div class="settings-card">
+            <h3>👥 Kişi Rehberi</h3>
+            <p style="font-size:.85rem;color:#718096;margin-bottom:.75rem;">
+                Kişinin Chat ID'sini öğrenmek için terminalde: <code>getUpdates</code> butonuna bas.
+            </p>
+            <div id="contact-list" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem;"></div>
+            <div style="display:flex;gap:.5rem;">
+                <input type="text" id="new-contact-name" placeholder="Ad (Tedarikçi, Personel...)" style="flex:2;padding:.55rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                <input type="text" id="new-contact-chatid" placeholder="Chat ID" style="flex:1;padding:.55rem;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;">
+                <button class="btn btn-primary" onclick="addContact()" style="white-space:nowrap;">➕ Ekle</button>
+            </div>
+            <div style="margin-top:.75rem;">
+                <button class="btn btn-secondary" onclick="getUpdates()" style="width:100%;">🔍 Bota Yazan Kişileri Listele (getUpdates)</button>
+            </div>
+            <div id="updates-list" style="display:none;margin-top:.75rem;background:#f8fafc;border-radius:8px;padding:.75rem;font-size:.85rem;"></div>
+        </div>
+
+        <!-- 3. Bot Ayarları (ALTTA) -->
+        <div class="settings-card">
+            <h3>⚙️ Bot Ayarları</h3>
+            <div class="field-group">
+                <div>
+                    <label>Bot Token</label>
+                    <input type="text" id="tg-token" placeholder="123456789:ABCdefGHI...">
+                    <div style="font-size:.78rem;color:#94a3b8;margin-top:.3rem;">@BotFather'dan alınan token</div>
+                </div>
+                <div>
+                    <label>Varsayılan Chat ID <span style="font-size:.78rem;color:#94a3b8;">(stok uyarıları buraya gider)</span></label>
+                    <input type="text" id="tg-chat-id" placeholder="-100123456789 veya kişisel ID">
+                </div>
+                <div class="save-row">
+                    <button class="btn btn-primary" onclick="saveTelegram()">💾 Kaydet</button>
+                    <button class="btn btn-secondary" onclick="testTelegram()">📨 Test Mesajı Gönder</button>
+                    <button class="btn btn-secondary" onclick="sendInstantReport()">📊 Anlık Rapor Gönder</button>
+                </div>
+            </div>
+            <div id="tg-status" style="margin-top:1rem;padding:.75rem;border-radius:8px;display:none;font-size:.9rem;font-weight:600;"></div>
+        </div>
+
+        </div><!-- /tab-telegram -->
+
+        <!-- Fotoğraf Yazdır -->
+        <div id="tab-foto" class="settings-panel" style="display:none;">
+        <div class="settings-card">
+            <h3>📸 Fotoğraf Yazdır</h3>
+            <p style="font-size:.88rem;color:#64748b;margin-bottom:1.25rem;">
+                Seçtiğiniz fotoğrafı kağıt genişliğine tam sığacak şekilde ölçekleyip yazdırır.
+                Yazıcı IP'si Yazıcı sekmesinden ayarlanmalıdır.
+            </p>
+
+            <!-- Kağıt genişliği -->
+            <div style="margin-bottom:1.25rem;">
+                <label style="display:block;font-weight:600;color:#4a5568;font-size:.9rem;margin-bottom:.5rem;">Kağıt Genişliği</label>
+                <div style="display:flex;gap:.75rem;">
+                    <label style="flex:1;display:flex;align-items:center;gap:.5rem;padding:.6rem .9rem;border:2px solid #4299e1;border-radius:9px;cursor:pointer;font-weight:600;font-size:.88rem;" id="pw-label-80">
+                        <input type="radio" name="paper_width" value="80" checked onchange="updatePaperLabel()"> 80mm <span style="color:#94a3b8;font-weight:400;">(576 nokta)</span>
+                    </label>
+                    <label style="flex:1;display:flex;align-items:center;gap:.5rem;padding:.6rem .9rem;border:2px solid #e2e8f0;border-radius:9px;cursor:pointer;font-weight:600;font-size:.88rem;" id="pw-label-58">
+                        <input type="radio" name="paper_width" value="58" onchange="updatePaperLabel()"> 58mm <span style="color:#94a3b8;font-weight:400;">(384 nokta)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Görsel seçimi -->
+            <div style="margin-bottom:1.25rem;">
+                <label style="display:block;font-weight:600;color:#4a5568;font-size:.9rem;margin-bottom:.5rem;">Fotoğraf</label>
+                <input type="file" id="photo-file-input" accept="image/*" style="display:none;" onchange="previewPhotoFile(event)">
+                <div id="photo-preview-box" onclick="document.getElementById('photo-file-input').click()"
+                    style="width:100%;min-height:120px;border:2px dashed #cbd5e1;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f8fafc;overflow:hidden;cursor:pointer;margin-bottom:.75rem;">
+                    <span id="photo-placeholder" style="color:#94a3b8;font-size:.9rem;user-select:none;">📁 Tıklayın — fotoğraf seçin</span>
+                    <img id="photo-preview-img" src="" alt="" style="display:none;max-width:100%;max-height:320px;object-fit:contain;">
+                </div>
+                <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('photo-file-input').click()">📁 Dosya Seç</button>
+                    <button class="btn" id="btn-clear-photo" style="background:#f1f5f9;color:#475569;display:none;" onclick="clearPhoto()">✖ Temizle</button>
+                </div>
+            </div>
+
+            <!-- Yazdır -->
+            <div class="save-row">
+                <button class="btn btn-primary" id="btn-print-photo" onclick="printPhoto()" disabled style="opacity:.5;">🖨️ Fotoğrafı Yazdır</button>
+            </div>
+            <div id="photo-msg" style="margin-top:.75rem;display:none;"></div>
+        </div>
+        </div><!-- /tab-foto -->
+
+    </div><!-- /container -->
+
+    <script>
+        // ===== SEKME SİSTEMİ =====
+        function switchTab(name, btn) {
+            document.querySelectorAll('.settings-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.settings-tab').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + name).style.display = 'block';
+            btn.classList.add('active');
+            
+        }
+
+        // ===== FOTOĞRAF YAZDIR =====
+        function previewPhotoFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('photo-placeholder').style.display = 'none';
+                const img = document.getElementById('photo-preview-img');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                const btn = document.getElementById('btn-print-photo');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                document.getElementById('btn-clear-photo').style.display = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearPhoto() {
+            document.getElementById('photo-file-input').value = '';
+            document.getElementById('photo-preview-img').src = '';
+            document.getElementById('photo-preview-img').style.display = 'none';
+            document.getElementById('photo-placeholder').style.display = '';
+            const btn = document.getElementById('btn-print-photo');
+            btn.disabled = true;
+            btn.style.opacity = '.5';
+            document.getElementById('btn-clear-photo').style.display = 'none';
+            document.getElementById('photo-msg').style.display = 'none';
+        }
+
+        function updatePaperLabel() {
+            const val = document.querySelector('input[name="paper_width"]:checked').value;
+            document.getElementById('pw-label-80').style.borderColor = val === '80' ? '#4299e1' : '#e2e8f0';
+            document.getElementById('pw-label-58').style.borderColor = val === '58' ? '#4299e1' : '#e2e8f0';
+        }
+
+        async function printPhoto() {
+            const fileInput = document.getElementById('photo-file-input');
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('Lütfen önce bir fotoğraf seçin.');
+                return;
+            }
+            const paperWidth = document.querySelector('input[name="paper_width"]:checked').value;
+            const btn = document.getElementById('btn-print-photo');
+            const msg = document.getElementById('photo-msg');
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Yazdırılıyor...';
+            msg.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('photo', fileInput.files[0]);
+            formData.append('paper_width', paperWidth);
+
+            try {
+                const res  = await fetch('/api/print/photo', { method: 'POST', body: formData });
+                const d    = await res.json();
+                msg.style.display = 'block';
+                if (d.success) {
+                    msg.innerHTML = '<div style="background:#f0fff4;border:1.5px solid #9ae6b4;border-radius:9px;padding:.75rem 1rem;color:#276749;font-weight:600;">✅ Fotoğraf başarıyla yazdırıldı!</div>';
+                } else {
+                    msg.innerHTML = `<div style="background:#fff5f5;border:1.5px solid #fc8181;border-radius:9px;padding:.75rem 1rem;color:#c53030;font-weight:600;">❌ Hata: ${d.error || 'Yazıcıya bağlanılamadı'}</div>`;
+                }
+            } catch(e) {
+                msg.style.display = 'block';
+                msg.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fc8181;border-radius:9px;padding:.75rem 1rem;color:#c53030;font-weight:600;">❌ Sunucu hatası</div>';
+            }
+
+            btn.disabled = false;
+            btn.textContent = '🖨️ Fotoğrafı Yazdır';
+        }
+
+        // ===== GİTHUB SYNC =====
+        async function loadGitStatus() {
+            const box = document.getElementById('git-status-box');
+            box.innerHTML = '<div style="color:#94a3b8;font-size:.85rem;text-align:center;padding:1rem;">⏳ GitHub kontrol ediliyor...</div>';
+            document.getElementById('btn-refresh-status').disabled = true;
+            try {
+                const d = await fetch('/api/git/status').then(r => r.json());
+                let aheadBadge  = d.ahead  > 0 ? `<span class="badge-ahead">↑ ${d.ahead} commit ileride</span>` : '';
+                let behindBadge = d.behind > 0 ? `<span class="badge-behind">↓ ${d.behind} commit geride</span>` : '';
+                let syncBadge   = (!d.ahead && !d.behind) ? '<span class="badge-ok">✓ Senkronize</span>' : '';
+                let dirtyBadge  = d.dirty_count > 0
+                    ? `<span class="badge-behind">${d.dirty_count} commit edilmemiş dosya</span>`
+                    : '<span class="badge-ok">Temiz</span>';
+                let diffHtml = '';
+                if (d.diff_stat) {
+                    const lines = d.diff_stat.split('\n').map(l => {
+                        if (l.match(/\+/)) return `<span style="color:#4ade80">${l}</span>`;
+                        if (l.match(/-/))   return `<span style="color:#f87171">${l}</span>`;
+                        return l;
+                    }).join('\n');
+                    diffHtml = `<div style="margin-top:.75rem;"><div style="font-size:.78rem;font-weight:600;color:#64748b;margin-bottom:.4rem;">Değişen dosyalar:</div><div class="diff-box">${lines}</div></div>`;
+                }
+                box.innerHTML = `
+                    <div class="sync-row"><label>Senkronizasyon</label><span>${aheadBadge}${behindBadge}${syncBadge}</span></div>
+                    <div class="sync-row"><label>Yerel değişiklikler</label><span>${dirtyBadge}</span></div>
+                    <div class="sync-row"><label>Son yerel commit</label><span>${d.last_local}</span></div>
+                    <div class="sync-row"><label>Son GitHub commit</label><span>${d.last_remote}</span></div>
+                    ${diffHtml}`;
+            } catch(e) {
+                box.innerHTML = `<div style="color:#e53e3e;font-size:.85rem;padding:.5rem;">❌ ${e.message}</div>`;
+            }
+            document.getElementById('btn-refresh-status').disabled = false;
+        }
+
+        async function gitPush() {
+            const btn = document.getElementById('btn-push');
+            const msg = document.getElementById('commit-message').value.trim();
+            btn.disabled = true; btn.textContent = '⏳ Yükleniyor...';
+            showGitLog('Push başlatılıyor...');
+            try {
+                const d = await fetch('/api/git/push', {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({message: msg})
+                }).then(r => r.json());
+                if (d.success) {
+                    (() => {
+                        if (d.had_changes) {
+                            showGitLog('✅ Commit edildi ve push yapıldı!\n' + d.output);
+                        } else if (d.output && d.output.includes('->')) {
+                            showGitLog('✅ Push tamam! (Bekleyen commit gönderildi)\n' + d.output);
+                        } else {
+                            showGitLog('✅ Zaten güncel, gönderilecek bir şey yok.');
+                        }
+                    })();
+                    showToast('GitHub\'a yüklendi!', 'success');
+                    document.getElementById('commit-message').value = '';
+                    setTimeout(loadGitStatus, 1500);
+                } else {
+                    showGitLog('❌ Push hatası:\n' + d.error);
+                    showToast('Push başarısız', 'error');
+                }
+            } catch(e) { showGitLog('❌ ' + e.message); }
+            btn.disabled = false; btn.textContent = '⬆️ GitHub\'a Yükle (Push)';
+        }
+
+        async function gitPull() {
+            const btn = document.getElementById('btn-pull');
+            btn.disabled = true; btn.textContent = '⏳ Çekiliyor...';
+            showGitLog('Pull başlatılıyor...');
+            try {
+                const d = await fetch('/api/git/pull', {method:'POST'}).then(r => r.json());
+                if (d.success) {
+                    if (d.already_up) {
+                        showGitLog('✅ Zaten güncel.'); showToast('Zaten güncel', 'success');
+                    } else {
+                        showGitLog('✅ Pull tamam! Uygulama yeniden başlıyor...\n' + d.output);
+                        showToast('Güncellendi! Sayfa yenilenecek...', 'success');
+                        setTimeout(() => location.reload(), 4000);
+                    }
+                    setTimeout(loadGitStatus, 1500);
+                } else {
+                    showGitLog('❌ Pull hatası:\n' + d.error); showToast('Pull başarısız', 'error');
+                }
+            } catch(e) { showGitLog('❌ ' + e.message); }
+            btn.disabled = false; btn.textContent = '⬇️ GitHub\'dan Güncelle (Pull)';
+        }
+
+        async function saveAutoPull() {
+            const mode = document.querySelector('input[name="pull-mode"]:checked').value;
+            let payload = {mode};
+            if (mode === 'interval') payload.interval = parseInt(document.getElementById('auto-pull-interval').value);
+            if (mode === 'time') payload.time = document.getElementById('auto-pull-time').value;
+            const d = await fetch('/api/git/auto-pull/set', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            }).then(r => r.json());
+            const status = document.getElementById('auto-pull-status');
+            if (d.success && status) {
+                if (mode === 'interval') status.textContent = 'Her ' + payload.interval + ' dakikada bir kontrol aktif';
+                else if (mode === 'time') status.textContent = "Her gun " + payload.time + "'de pull aktif";
+                else status.textContent = 'Otomatik pull kapali';
+            }
+            showToast(d.success ? 'Kaydedildi!' : 'Hata', d.success ? 'success' : 'error');
+        }
+
+        function togglePullMode() {
+            const mode = document.querySelector('input[name="pull-mode"]:checked').value;
+            document.getElementById('pull-interval-row').style.display = mode === 'interval' ? 'flex' : 'none';
+            document.getElementById('pull-time-row').style.display = mode === 'time' ? 'flex' : 'none';
+        }
+
+        async function loadAutoPullSetting() {
+            try {
+                const d = await fetch('/api/git/auto-pull/status').then(r => r.json());
+                const status = document.getElementById('auto-pull-status');
+                if (d.mode === 'interval' && d.interval > 0) {
+                    document.getElementById('pull-mode-interval').checked = true;
+                    document.getElementById('auto-pull-interval').value = String(d.interval);
+                    togglePullMode();
+                    if (status) status.textContent = 'Her ' + d.interval + ' dakikada bir kontrol aktif';
+                } else if (d.mode === 'time' && d.time) {
+                    document.getElementById('pull-mode-time').checked = true;
+                    document.getElementById('auto-pull-time').value = d.time;
+                    togglePullMode();
+                    if (status) status.textContent = 'Her gun ' + d.time + "'de pull aktif";
+                } else {
+                    document.getElementById('pull-mode-off').checked = true;
+                    if (status) status.textContent = 'Otomatik pull kapali';
+                }
+            } catch(e) {}
+        }
+
+        function togglePushMode() {
+            const mode = document.querySelector('input[name="push-mode"]:checked').value;
+            document.getElementById('push-interval-row').style.display = mode === 'interval' ? 'flex' : 'none';
+            document.getElementById('push-time-row').style.display = mode === 'time' ? 'flex' : 'none';
+        }
+
+        async function loadAutoPushSetting() {
+            try {
+                const d = await fetch('/api/git/auto-push').then(r => r.json());
+                const status = document.getElementById('auto-push-status');
+                if (d.mode === 'interval' && d.interval > 0) {
+                    document.getElementById('push-mode-interval').checked = true;
+                    document.getElementById('auto-push-interval').value = String(d.interval);
+                    togglePushMode();
+                    if (status) status.textContent = 'Her ' + d.interval + ' dakikada bir push aktif';
+                } else if (d.mode === 'time' && d.time) {
+                    document.getElementById('push-mode-time').checked = true;
+                    document.getElementById('auto-push-time').value = d.time;
+                    togglePushMode();
+                    if (status) status.textContent = "Her gun " + d.time + "'de push aktif";
+                } else {
+                    document.getElementById('push-mode-off').checked = true;
+                    if (status) status.textContent = 'Otomatik push kapali';
+                }
+            } catch(e) {}
+        }
+
+        async function saveAutoPush() {
+            const mode = document.querySelector('input[name="push-mode"]:checked').value;
+            let payload = {mode};
+            if (mode === 'interval') payload.interval = parseInt(document.getElementById('auto-push-interval').value);
+            if (mode === 'time') payload.time = document.getElementById('auto-push-time').value;
+            const d = await fetch('/api/git/auto-push', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            }).then(r => r.json());
+            const status = document.getElementById('auto-push-status');
+            if (d.success && status) {
+                if (mode === 'interval') status.textContent = 'Her ' + payload.interval + ' dakikada bir push aktif';
+                else if (mode === 'time') status.textContent = "Her gun " + payload.time + "'de push aktif";
+                else status.textContent = 'Otomatik push kapali';
+            }
+            showToast(d.success ? 'Kaydedildi!' : 'Hata', d.success ? 'success' : 'error');
+        }
+
+
+        function showGitLog(text) {
+            const box = document.getElementById('git-log');
+            box.style.display = 'block';
+            box.textContent = text;
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+
+    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
+        Fırınna POS &mdash; TA1XTA &copy; 2026
+    </footer>
+    <script>
+    (function(){
+        async function loadAlerts() {
+            try {
+                const items = await fetch("/api/stock/alerts").then(r=>r.json());
+                const badge = document.getElementById("alertBadge");
+                const body  = document.getElementById("alertPanelBody");
+                if (!badge || !body) return;
+                if (items.length > 0) {
+                    badge.textContent = items.length;
+                    badge.style.display = "flex";
+                    body.innerHTML = items.map(i => `
+                        <div class="alert-item">
+                            <span class="alert-item-name">${i.name}</span>
+                            <span class="alert-item-qty">
+                                <span class="cur">${Number(i.current_qty).toFixed(1)} ${i.unit}</span>
+                                <span class="min"> / min ${Number(i.min_quantity).toFixed(1)}</span>
+                            </span>
+                        </div>`).join("");
+                } else {
+                    badge.style.display = "none";
+                    body.innerHTML = '<div class="alert-empty">✅ Tüm stoklar yeterli</div>';
+                }
+            } catch(e) {}
+        }
+        function toggleAlertPanel() {
+            const p = document.getElementById("alertPanel");
+            if (p) p.classList.toggle("open");
+        }
+        document.addEventListener("click", function(e) {
+            const p  = document.getElementById("alertPanel");
+            const b  = document.getElementById("alertBtn");
+            const dd = document.getElementById("navDropdown");
+            if (p && b && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove("open");
+        });
+        loadAlerts();
+        setInterval(loadAlerts, 60000);
+    })();
+    </script>
+</body>
+</html>

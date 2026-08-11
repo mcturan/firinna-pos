@@ -293,7 +293,8 @@ def get_tables(zone_id=None):
             SELECT t.*, z.name as zone_name,
                    (SELECT COUNT(*) FROM orders WHERE table_id = t.id AND status = 'open') as has_order,
                    (SELECT COALESCE(total,0) FROM orders WHERE table_id = t.id AND status = 'open' LIMIT 1) as order_total,
-                   (SELECT MIN(created_at) FROM orders WHERE table_id = t.id AND status = 'open') as order_started_at
+                   (SELECT MIN(created_at) FROM orders WHERE table_id = t.id AND status = 'open') as order_started_at,
+                   (SELECT id FROM orders WHERE table_id = t.id AND status = 'open' LIMIT 1) as current_order_id
             FROM tables t
             LEFT JOIN zones z ON t.zone_id = z.id
             WHERE t.zone_id = ?
@@ -304,7 +305,8 @@ def get_tables(zone_id=None):
             SELECT t.*, z.name as zone_name,
                    (SELECT COUNT(*) FROM orders WHERE table_id = t.id AND status = 'open') as has_order,
                    (SELECT COALESCE(total,0) FROM orders WHERE table_id = t.id AND status = 'open' LIMIT 1) as order_total,
-                   (SELECT MIN(created_at) FROM orders WHERE table_id = t.id AND status = 'open') as order_started_at
+                   (SELECT MIN(created_at) FROM orders WHERE table_id = t.id AND status = 'open') as order_started_at,
+                   (SELECT id FROM orders WHERE table_id = t.id AND status = 'open' LIMIT 1) as current_order_id
             FROM tables t
             LEFT JOIN zones z ON t.zone_id = z.id
             ORDER BY t.name

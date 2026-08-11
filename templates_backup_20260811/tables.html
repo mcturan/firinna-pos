@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipariş Noktaları - Fırınna POS</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    {% include '_navbar.html' %}
+
+    <div class="container">
+        <div class="management-grid">
+            <!-- Bölgeler -->
+            <div class="management-section">
+                <h2>Bölgeler</h2>
+                <form id="zoneForm" class="add-form">
+                    <input type="text" id="zoneName" placeholder="Bölge adı (ör: İç Mekan)" required>
+                    <button type="submit" class="btn btn-primary">➕ Ekle</button>
+                </form>
+                
+                <div id="zonesList" class="items-list"></div>
+            </div>
+
+            <!-- Masalar -->
+            <div class="management-section">
+                <h2>Masalar</h2>
+                <form id="tableForm" class="add-form">
+                    <input type="text" id="tableName" placeholder="Masa adı (ör: Masa 1)" required>
+                    <select id="tableZone" required>
+                        <option value="">Bölge seç</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">➕ Ekle</button>
+                </form>
+                
+                <div id="tablesList" class="items-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadZones();
+            loadTables();
+
+            document.getElementById('zoneForm').onsubmit = async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('zoneName').value;
+                
+                await fetch('/api/zones', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name})
+                });
+                
+                document.getElementById('zoneForm').reset();
+                loadZones();
+                loadTables();
+            };
+
+            document.getElementById('tableForm').onsubmit = async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('tableName').value;
+                const zone_id = parseInt(document.getElementById('tableZone').value);
+                
+                await fetch('/api/tables', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, zone_id})
+                });
+                
+                document.getElementById('tableForm').reset();
+                loadTables();
+            };
+        });
+
+        async function loadZones() {
+            const zones = await fetch('/api/zones').then(r => r.json());
+            const zonesList = document.getElementById('zonesList');
+            const tableZone = document.getElementById('tableZone');
+            
+            if (zones.length === 0) {
+                zonesList.innerHTML = '<p class="no-data">Henüz bölge eklenmemiş</p>';
+                return;
+            }
+            
+            zonesList.innerHTML = zones.map(zone => `
+                <div class="item-row" id="zone-row-${zone.id}">
+                    <span class="item-name">${zone.name}</span>
+                    <div style="display:flex;gap:.4rem;">
+                        <button class="btn-delete" style="background:none;border:none;cursor:pointer;font-size:1rem;" onclick="editZone(${zone.id})" data-name="${zone.name}" id="zone-btn-${zone.id}" title="Düzenle">✏️</button>
+                        <button class="btn-delete" onclick="deleteZone(${zone.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            tableZone.innerHTML = '<option value="">Bölge seç</option>' + 
+                zones.map(zone => `<option value="${zone.id}">${zone.name}</option>`).join('');
+        }
+
+        async function loadTables() {
+            const tables = await fetch('/api/tables').then(r => r.json());
+            const tablesList = document.getElementById('tablesList');
+            
+            if (tables.length === 0) {
+                tablesList.innerHTML = '<p class="no-data">Henüz masa eklenmemiş</p>';
+                return;
+            }
+            
+            tablesList.innerHTML = tables.map(table => `
+                <div class="item-row" id="table-row-${table.id}">
+                    <div class="item-info">
+                        <span class="item-name">${table.name}</span>
+                        <span class="item-meta">${table.zone_name}</span>
+                    </div>
+                    <div style="display:flex;gap:.4rem;">
+                        <button class="btn-delete" style="background:none;border:none;cursor:pointer;font-size:1rem;" onclick="editTable(${table.id})" data-name="${table.name}" id="table-btn-${table.id}" title="Düzenle">✏️</button>
+                        <button class="btn-delete" style="background:none;border:none;cursor:pointer;font-size:1rem;" onclick="downloadQR(${table.id},'${table.name}')" title="QR Kod İndir">📷</button>
+                        <button class="btn-delete" onclick="deleteTable(${table.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editZone(id) {
+            const currentName = document.getElementById('zone-btn-' + id).dataset.name;
+            const row = document.getElementById('zone-row-' + id);
+            row.innerHTML = `
+                <input type="text" id="zone-edit-${id}" value="${currentName}"
+                    style="flex:1;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.95rem;">
+                <div style="display:flex;gap:.4rem;">
+                    <button class="btn btn-primary" style="padding:.35rem .75rem;" onclick="saveZoneEdit(${id})">✓</button>
+                    <button class="btn btn-secondary" style="padding:.35rem .75rem;" onclick="loadZones()">✕</button>
+                </div>`;
+            document.getElementById('zone-edit-' + id).focus();
+        }
+
+        async function saveZoneEdit(id) {
+            const name = document.getElementById('zone-edit-' + id).value.trim();
+            if (!name) return;
+            await fetch(`/api/zones/${id}/name`, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name})
+            });
+            loadZones(); loadTables();
+        }
+
+        function editTable(id) {
+            const currentName = document.getElementById('table-btn-' + id).dataset.name;
+            const row = document.getElementById('table-row-' + id);
+            row.innerHTML = `
+                <input type="text" id="table-edit-${id}" value="${currentName}"
+                    style="flex:1;padding:.4rem .6rem;border:2px solid #4299e1;border-radius:6px;font-size:.95rem;">
+                <div style="display:flex;gap:.4rem;">
+                    <button class="btn btn-primary" style="padding:.35rem .75rem;" onclick="saveTableEdit(${id})">✓</button>
+                    <button class="btn btn-secondary" style="padding:.35rem .75rem;" onclick="loadTables()">✕</button>
+                </div>`;
+            document.getElementById('table-edit-' + id).focus();
+        }
+
+        async function saveTableEdit(id) {
+            const name = document.getElementById('table-edit-' + id).value.trim();
+            if (!name) return;
+            await fetch(`/api/tables/${id}/name`, {
+                method: 'PATCH', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({name})
+            });
+            loadTables();
+        }
+
+        async function deleteZone(id) {
+            showConfirm('Bu bölgeyi silmek istediğinize emin misiniz?', async () => {
+                const res = await fetch(`/api/zones/${id}`, {method: 'DELETE'});
+                const d = await res.json();
+                if (!d.success) { showToast(d.error, 'error'); return; }
+                loadZones(); loadTables();
+            });
+        }
+
+        async function deleteTable(id) {
+            showConfirm('Bu masayı silmek istediğinize emin misiniz?', async () => {
+                const res = await fetch(`/api/tables/${id}`, {method: 'DELETE'});
+                const d = await res.json();
+                if (!d.success) { showToast(d.error, 'error'); return; }
+                loadTables();
+            });
+        }
+
+        function downloadQR(tableId, tableName) {
+            const a = document.createElement('a');
+            a.href = `/api/qr-code/${tableId}`;
+            a.download = `${tableName || 'masa-'+tableId}-qr.png`;
+            a.click();
+        }
+    </script>
+
+    <footer style="text-align:center; padding:2rem 1rem 1.5rem; color:#a0aec0; font-size:.78rem; margin-top:3rem; border-top:1px solid #f0f0f0;">
+        Fırınna POS &mdash; TA1XTA &copy; 2026
+    </footer>
+</body>
+</html>
