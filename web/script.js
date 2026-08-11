@@ -151,10 +151,9 @@ const i18n = {
         status_open: "Şu An Açık (08:00 - 23:00)",
         btn_menu: "Dijital Menüyü İncele",
         btn_reserve: "Hemen Masa Ayırt",
-        btn_message: "Bize Mesaj Gönder",
-        title_about: "Hakkımızda",
+             title_about: "Hakkımızda",
         slogan_about: "GELENEKSEL TATLARA BENZERSİZ DOKUNUŞLAR",
-        text_about: "DEĞERLİ MİSAFİRİMİZ, FIRINNA'YA HOŞ GELDİNİZ.\n\nGalata’nın 150 yıllık büyüleyici ve tarihi dokusında, Kumbaracı Yokuşu'nun huzur veren atmosferinde yer alan Fırınna Cafe & Restaurant; İstiklal’in gürültüsünden kaçıp nefes alabileceğiniz özel bir lezzet durağıdır.\n\nÖzenle seçilmiş malzemelerimiz, fırınımızdan çıkan taze lezzetlerimiz, leziz kahve çeşitlerimiz ve ev yapımı tatlılarımızla geleneksel tarifleri modern dokunuşlarla sunuyoruz.\n\nBurada acele yok! Samimi, misafirperver ve evcil hayvan dostu ekibimizle, 150 yıllık bu tarihi yapının sıcaklığında güzel sohbetlerin ve huzurlu anların tadını çıkarın. Tarihi İstanbul gezinizde tatlı bir anı olabilmek bizim en büyük mutluluğumuz.",
+        text_about: "DEĞERLİ MİSAFİRİMİZ, FIRINNA'YA HOŞ GELDİNİZ.\n\nGalata’nın 150 yıllık büyüleyici ve tarihi dokusunda, Kumbaracı Yokuşu'nun huzur veren atmosferinde yer alan Fırınna Cafe & Restaurant; İstiklal’in gürültüsünden kaçıp nefes alabileceğiniz özel bir lezzet durağıdır.\n\nÖzenle seçilmiş malzemelerimiz, fırınımızdan çıkan taze lezzetlerimiz, leziz kahve çeşitlerimiz ve ev yapımı tatlılarımızla geleneksel tarifleri modern dokunuşlarla sunuyoruz.\n\nBurada acele yok! Samimi, misafirperver ve evcil hayvan dostu ekibimizle, 150 yıllık bu tarihi yapının sıcaklığında güzel sohbetlerin ve huzurlu anların tadını çıkarın. Tarihi İstanbul gezinizde tatlı bir anı olabilmek bizim en büyük mutluluğumuz.",
         title_top_reviews: "Müşterilerimizin Gözünden",
         title_gating: "Deneyiminizi Puanlayın",
         sub_gating: "Fırınna deneyiminiz nasıldı? Görüşleriniz bizim için çok kıymetli.",
@@ -162,6 +161,13 @@ const i18n = {
         gating_low_title: "Görüşleriniz Bizim İçin Çok Değerli!",
         gating_low_msg: "Yaşadığınız aksaklığı veya önerinizi doğrudan işletme yöneticimize iletebilirsiniz:",
         btn_google_review: "Google'da Değerlendir",
+        google_perfect: "Google'da Mükemmel",
+        yandex_perfect: "Yandex'te Mükemmel",
+        btn_inspect: "İncele",
+        btn_see_all_google_photos: "Google Haritalar'daki Tüm Fotoğrafları Gör (100+)",
+        table_available: "Şu an {N} masamız müsait, bekleriz!",
+        table_full: "Şu an tüm masalarımız dolu.",
+        table_offline: "Masa durumu bilgisi alınamadı.",
         review_1: "İstiklal'in gürültüsünden kaçıp nefes alabileceğiniz harika, tarihi bir mekan. Pizzaları efsane!",
         review_2: "Çakallı menemenini denemelisiniz. Personel çok güleryüzlü ve evcil hayvan dostu olmaları harika.",
         review_3: "Galata'da kahve içip tatlı yemek için en iyi nokta. Çalışanlar çok ilgili.",
@@ -229,6 +235,13 @@ const i18n = {
         gating_low_title: "Your Feedback is Very Valuable to Us!",
         gating_low_msg: "You can send any feedback or issues directly to our manager:",
         btn_google_review: "Review on Google",
+        google_perfect: "Excellent on Google",
+        yandex_perfect: "Excellent on Yandex",
+        btn_inspect: "Review",
+        btn_see_all_google_photos: "See All Photos on Google Maps (100+)",
+        table_available: "Currently {N} tables available, welcome!",
+        table_full: "Currently all tables are occupied.",
+        table_offline: "Table status unavailable.",
         review_1: "A wonderful, historic place to escape the noise of Istiklal and take a breath. Their pizzas are legendary!",
         review_2: "You must try the Çakallı menemen. The staff is very smiling and it's great that they are pet-friendly.",
         review_3: "The best spot in Galata for coffee and desserts. The staff is very attentive.",
@@ -296,6 +309,13 @@ const i18n = {
         gating_low_title: "Ваше мнение очень важно для нас!",
         gating_low_msg: "Вы можете отправить ваш отзыв напрямую нашему управляющему:",
         btn_google_review: "Оценить в Google",
+        google_perfect: "Отлично в Google",
+        yandex_perfect: "Отлично в Яндекс",
+        btn_inspect: "Посмотреть",
+        btn_see_all_google_photos: "Все фото на Гугл Картах (100+)",
+        table_available: "Сейчас свободно {N} столов, ждем вас!",
+        table_full: "Сейчас все столы заняты.",
+        table_offline: "Статус столов недоступен.",
         review_1: "Замечательное, историческое место, где можно спрятаться от шума Истикляля и перевести дух. Их пицца легендарна!",
         review_2: "Вы должны попробовать менемен Чакаллы. Персонал очень улыбчивый, и здорово, что к ним можно с питомцами.",
         review_3: "Лучшее место в Галате для кофе и десертов. Персонал очень внимателен.",
@@ -361,6 +381,13 @@ const i18n = {
         gating_low_title: "رأيك يهمنا جداً!",
         gating_low_msg: "يمكنك إرسال ملاحظاتك مباشرة إلى مديرنا:",
         btn_google_review: "تقييم على جوجل",
+        google_perfect: "ممتاز على جوجل",
+        yandex_perfect: "ممتاز على ياندكس",
+        btn_inspect: "تصفح",
+        btn_see_all_google_photos: "عرض جميع الصور على خرائط جوجل (+100)",
+        table_available: "حالياً هناك {N} طاولات متاحة، أهلاً بكم!",
+        table_full: "حالياً جميع الطاولات مشغولة.",
+        table_offline: "حالة الطاولات غير متوفرة.",
         review_1: "مكان تاريخي رائع للهروب من ضجيج الاستقلال وأخذ قسط من الراحة. البيتزا الخاصة بهم أسطورية!",
         review_2: "يجب أن تجرب مينيمين تشاكالي. الموظفون مبتسمون للغاية ومن الرائع أنهم يسمحون بالحيوانات الأليفة.",
         review_3: "أفضل مكان في غلطة لتناول القهوة والحلويات. فريق العمل مهتم جدا.",
@@ -426,6 +453,13 @@ const i18n = {
         gating_low_title: "您的宝贵意见对我们非常重要！",
         gating_low_msg: "您可以直接将建议或遇到的问题发送给我们的管理人员：",
         btn_google_review: "在 Google 上评价",
+        google_perfect: "Google 上的绝佳评价",
+        yandex_perfect: "Yandex 上的绝佳评价",
+        btn_inspect: "查看",
+        btn_see_all_google_photos: "在 Google 地图上查看所有照片 (100+)",
+        table_available: "目前有 {N} 张空桌，欢迎光临！",
+        table_full: "目前所有餐桌均已客满。",
+        table_offline: "无法获取餐桌状态。",
         review_1: "一个美妙的、充满历史感的地方，在这里可以逃离Istiklal的喧嚣，稍作喘息。他们的比萨堪称传奇！",
         review_2: "你一定要尝尝Çakallı menemen。员工都面带微笑，而且这里对宠物很友好，真是太棒了。",
         review_3: "Galata喝咖啡和吃甜点的最佳去处。员工非常周到。",
@@ -510,7 +544,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+let currentLang = 'tr';
+let cachedTableData = null;
+
 function changeLang(lang) {
+    currentLang = lang;
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(el => {
         const key = el.getAttribute('data-i18n');
@@ -538,6 +576,8 @@ function changeLang(lang) {
     if (pdfLink) {
         pdfLink.href = `firinna_menu_${lang}.pdf`;
     }
+
+    renderTableStatusText();
 }
 
 // FETCH SETTINGS
@@ -647,29 +687,39 @@ async function fetchWebSettings() {
     }
 }
 // Live Table Status Logic
+function renderTableStatusText() {
+    const statusEl = document.getElementById('live-table-status');
+    if (!statusEl) return;
+    const iconEl = statusEl.previousElementSibling;
+
+    if (!cachedTableData || !cachedTableData.success) {
+        statusEl.innerText = (i18n[currentLang] && i18n[currentLang].table_offline) || "Masa durumu alınamadı.";
+        return;
+    }
+
+    if (cachedTableData.empty > 0) {
+        let msg = (i18n[currentLang] && i18n[currentLang].table_available) || "Şu an {N} masamız müsait, bekleriz!";
+        statusEl.innerText = msg.replace("{N}", cachedTableData.empty);
+        statusEl.style.color = '#27ae60';
+        if (iconEl) iconEl.style.color = '#2ecc71';
+    } else {
+        statusEl.innerText = (i18n[currentLang] && i18n[currentLang].table_full) || "Şu an tüm masalarımız dolu.";
+        statusEl.style.color = '#e74c3c';
+        if (iconEl) iconEl.style.color = '#e74c3c';
+    }
+}
+
 function fetchTableStatus() {
     fetch('/api/web/tables-status')
         .then(response => response.json())
         .then(data => {
-            const statusEl = document.getElementById('live-table-status');
-            const iconEl = statusEl.previousElementSibling;
-            if (data.success) {
-                if (data.empty > 0) {
-                    statusEl.innerText = `Şu an ${data.empty} masamız müsait, bekleriz!`;
-                    statusEl.style.color = '#27ae60';
-                    iconEl.style.color = '#2ecc71';
-                } else {
-                    statusEl.innerText = `Şu an tüm masalarımız dolu.`;
-                    statusEl.style.color = '#e74c3c';
-                    iconEl.style.color = '#e74c3c';
-                }
-            } else {
-                statusEl.innerText = "Masa durumu alınamadı.";
-            }
+            cachedTableData = data;
+            renderTableStatusText();
         })
         .catch(err => {
             console.error('Masa durumu hatası:', err);
-            document.getElementById('live-table-status').innerText = "Sistem çevrimdışı.";
+            cachedTableData = { success: false };
+            renderTableStatusText();
         });
 }
 

@@ -222,10 +222,10 @@
                         <div style="display: flex; color: #f1c40f; font-size: 1.4rem; margin-bottom: 4px;">
                             <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
                         </div>
-                        <p style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px;">Google'da Mükemmel</p>
+                        <p style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px;" data-i18n="google_perfect">Google'da Mükemmel</p>
                         
                         <a href="https://maps.google.com/?q=Firinna" target="_blank" class="btn btn-primary" style="background: var(--google-blue); border:none; display: inline-flex; width: auto; padding: 10px 24px; font-size: 0.95rem; border-radius: 30px;">
-                            İncele
+                            <span data-i18n="btn_inspect">İncele</span>
                         </a>
                     </div>
                 </div>
@@ -240,10 +240,10 @@
                         <div style="display: flex; color: #f1c40f; font-size: 1.4rem; margin-bottom: 4px;">
                             <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
                         </div>
-                        <p style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px;">Yandex'te Mükemmel</p>
+                        <p style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px;" data-i18n="yandex_perfect">Yandex'te Mükemmel</p>
                         
                         <a href="https://yandex.com.tr/harita/?text=Firinna" target="_blank" class="btn btn-primary" style="background: #FF0000; border:none; display: inline-flex; width: auto; padding: 10px 24px; font-size: 0.95rem; border-radius: 30px;">
-                            İncele
+                            <span data-i18n="btn_inspect">İncele</span>
                         </a>
                     </div>
                 </div>
@@ -287,22 +287,8 @@
 
 
 
-            <!-- Sanal Tur 360 -->
-            <div class="card tour-card">
-                <h2 class="card-title" data-i18n="title_virtual_tour">Sanal Tur (360°)</h2>
-                <p style="margin-bottom: 16px;" data-i18n="text_virtual_tour">150 yıllık tarihi binamızı oturduğunuz yerden keşfedin.</p>
-                <div class="tour-container">
-                    <iframe id="tour-iframe" 
-                        src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https://pannellum.org/images/alma.jpg&autoLoad=true" 
-                        title="360 Sanal Tur"
-                        allowfullscreen>
-                    </iframe>
-                </div>
-                <div class="tour-controls">
-                    <button class="btn btn-outline" style="flex:1" onclick="changeTour('interior')">İç Mekan</button>
-                    <button class="btn btn-outline" style="flex:1" onclick="changeTour('exterior')">Dış Mekan</button>
-                </div>
             </div>
+        </main>
 
         </main>
     </main>
