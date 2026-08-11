@@ -19,17 +19,21 @@
         <p>POS & Sipariş</p>
     </div>
 
-    <div id="setup" style="display:none; padding-top: 50px;">
-        <h2 style="color:#2d6a4f;">Sunucu IP Adresi</h2>
-        <p>Bilgisayarın IP adresini giriniz (Örn: 192.168.1.100)</p>
-        <input type="text" id="ipInput" placeholder="192.168.1.100" />
+    <div id="setup" style="display:none; padding-top: 30px;">
+        <h2 style="color:#2d6a4f;">Sunucu Ayarları</h2>
+        <p style="margin-bottom:5px;">Lokal IP (WiFi, Restoran İçi)</p>
+        <input type="text" id="ipInput" placeholder="Örn: 192.168.1.100" />
+        <p style="margin-bottom:5px;">Uzak IP (Hücresel/WAN)</p>
+        <input type="text" id="wanInput" placeholder="Örn: 84.17.86.208" />
         <br>
         <button onclick="saveAndGo()">Kaydet ve Başla</button>
     </div>
     
     <script>
         const splashStart = Date.now();
-        const MIN_SPLASH_TIME = 500; // Yarım saniye logo kalsın
+        const MIN_SPLASH_TIME = 500;
+
+        const APP_VERSION = "1.5.2";
 
         function doRedirect(url) {
             if(url.indexOf('app_version=') === -1) {
@@ -44,46 +48,41 @@
 
         function saveAndGo() {
             var ip = document.getElementById('ipInput').value.trim();
+            var wan = document.getElementById('wanInput').value.trim();
             if(ip) {
                 localStorage.setItem("server_ip", ip);
-                window.location.replace("http://" + ip + ":5000/?mode=garson");
+                if(wan) localStorage.setItem("wan_ip", wan);
+                doRedirect("http://" + ip + ":5000/?mode=garson");
             }
         }
         
         var savedIp = localStorage.getItem("server_ip");
-        const APP_VERSION = "1.5.1";
-        const PUBLIC_URL = "http://84.17.86.208:5000";
+        var savedWan = localStorage.getItem("wan_ip") || "84.17.86.208";
 
         if (savedIp) {
-            var serverUrl = "http://" + savedIp + ":5000";
+            var lanUrl = "http://" + savedIp + ":5000";
+            var wanUrl = "http://" + savedWan + ":5000";
             
-            // 2 saniye içinde yanıt vermezse (örn. hücresel veri) public IP'ye geç
+            // 1.5 saniye içinde LAN yanıt vermezse WAN'a geç
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000);
+            const timeoutId = setTimeout(() => controller.abort(), 1500);
             
-            // fetch için cache'i aşmak adına Date.now() eklendi
-            fetch(serverUrl + "/api/mobile_version?_=" + Date.now(), { signal: controller.signal })
+            fetch(lanUrl + "/api/mobile_version?_=" + Date.now(), { signal: controller.signal })
                 .then(r => r.json())
                 .then(data => {
                     clearTimeout(timeoutId);
-                    if (parseFloat(data.version) > parseFloat(APP_VERSION)) {
-                        alert("Yeni bir güncelleme mevcut. İndirme başlıyor. Lütfen indirme bitince kurunuz.");
-                        window.location.href = serverUrl + data.apk_url;
-                        document.body.innerHTML = '<div style="padding: 50px;"><h3>Güncelleme İndiriliyor...</h3><p>Uygulamayı kurduktan sonra baştan başlatın.</p><button onclick="window.location.replace(\'' + serverUrl + '/?mode=garson\')">Geç ve Devam Et</button></div>';
-                    } else {
-                        doRedirect(serverUrl + "/?mode=garson");
-                    }
+                    // Sunucuya LAN'dan erişildi
+                    doRedirect(lanUrl + "/?mode=garson");
                 })
                 .catch(err => {
                     clearTimeout(timeoutId);
-                    console.log("Lokal IP'ye bağlanılamadı, Hücresel (Public IP) deneniyor...", err);
-                    doRedirect(PUBLIC_URL + "/?mode=garson&app_version=" + APP_VERSION);
+                    console.log("Lokal IP'ye bağlanılamadı, Hücresel (WAN IP) deneniyor...", err);
+                    doRedirect(wanUrl + "/?mode=garson");
                 });
         } else {
             document.getElementById('splash').style.display = 'none';
             document.getElementById('setup').style.display = 'block';
         }
-        
     </script>
 </body>
 </html>
