@@ -35,7 +35,7 @@ def allowed_file(filename):
 @app.route('/api/mobile_version')
 def api_mobile_version():
     return jsonify({
-        'version': '1.5',
+        'version': APP_VERSION,
         'apk_url': '/download_apk'
     })
 
