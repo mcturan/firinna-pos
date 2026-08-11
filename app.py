@@ -2444,6 +2444,67 @@ def upload_menu():
     file.save(filepath)
     return jsonify({"success": True, "filename": filename})
 
+@app.route('/api/web/admin-login', methods=['POST'])
+def admin_login():
+    data = request.json or {}
+    password = data.get('password', '')
+    current_pass = "FirinnaPos2026!"
+    if os.path.exists(SETTINGS_FILE):
+        with open(SETTINGS_FILE, 'r') as f:
+            settings = json.load(f)
+            current_pass = settings.get('admin_password', "FirinnaPos2026!")
+    if password == current_pass:
+        return jsonify({"success": True})
+    return jsonify({"success": False, "error": "Hatalı şifre!"})
+
+@app.route('/api/web/change-password', methods=['POST'])
+def change_password():
+    data = request.json or {}
+    old_pass = data.get('old_password', '')
+    new_pass = data.get('new_password', '')
+    if not new_pass or len(new_pass) < 6:
+        return jsonify({"success": False, "error": "Yeni şifre en az 6 karakter olmalıdır."})
+    
+    settings = {}
+    if os.path.exists(SETTINGS_FILE):
+        with open(SETTINGS_FILE, 'r') as f:
+            settings = json.load(f)
+    
+    current_pass = settings.get('admin_password', "FirinnaPos2026!")
+    if old_pass != current_pass:
+        return jsonify({"success": False, "error": "Mevcut şifreniz hatalı!"})
+        
+    settings['admin_password'] = new_pass
+    with open(SETTINGS_FILE, 'w') as f:
+        json.dump(settings, f, indent=4)
+    return jsonify({"success": True, "message": "Şifreniz başarıyla değiştirildi."})
+
+@app.route('/api/web/reset-analytics', methods=['POST'])
+def reset_analytics():
+    analytics_file = '/opt/firinna-pos/web_analytics.json'
+    empty_stats = {
+        "today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0, "last_date": "",
+        "devices": {}, "browsers": {}, "countries": {}, "referrers": {},
+        "recent_visitors": [], "repeat_visitors": 0, "new_visitors": 0, "os": {}, "peak_hours": {}
+    }
+    with open(analytics_file, 'w') as f:
+        json.dump(empty_stats, f, indent=4)
+    return jsonify({"success": True, "message": "Analitik verileri sıfırlandı."})
+
+@app.route('/api/web/upload-gallery-photo', methods=['POST'])
+def upload_gallery_photo():
+    slot = request.form.get('slot')
+    if not slot or 'file' not in request.files:
+        return jsonify({"success": False, "error": "Geçersiz istek"})
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"success": False, "error": "Dosya seçilmedi"})
+        
+    filename = f"gallery_{slot}.jpg"
+    filepath = os.path.join('/opt/firinna-pos/web', filename)
+    file.save(filepath)
+    return jsonify({"success": True, "filename": filename})
+
 @app.route('/api/web/track-visit', methods=['POST'])
 def track_visit():
     analytics_file = '/opt/firinna-pos/web_analytics.json'

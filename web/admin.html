@@ -14,11 +14,11 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <!-- Admin CSS -->
-    <link rel="stylesheet" href="admin.css?v=2.5">
+    <link rel="stylesheet" href="/admin.css?v=3.5">
 </head>
 <body>
     <!-- LOGIN OVERLAY -->
-    <div id="loginOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div id="loginOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; z-index:9999; display:none; align-items:center; justify-content:center;">
        <div style="background:#fff; padding:40px; border-radius:12px; width:100%; max-width:400px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
            <i class="ph-fill ph-storefront" style="font-size: 4rem; color: #ffcc00; margin-bottom:10px;"></i>
            <h2 style="margin-bottom:24px; color:#0f172a;">Yönetim Girişi</h2>
@@ -29,7 +29,7 @@
        </div>
     </div>
 
-    <div class="admin-wrapper" id="adminMain" style="display:none;">
+    <div class="admin-wrapper" id="adminMain" style="display:flex;">
         
         <!-- Sidebar (Sol Menü) -->
         <aside class="sidebar">
@@ -118,25 +118,25 @@
                             <div style="background:#fff; padding:16px; border-radius:8px; border:1px solid #e2e8f0;">
                                 <h4 style="margin-bottom: 12px; border-bottom:1px solid #f1f5f9; padding-bottom:8px; font-size:0.9rem;"><i class="ph-bold ph-compass"></i> Ziyaretçi Kaynakları</h4>
                                 <ul id="list-referrers" style="list-style: none; padding:0; color:#64748b; font-size:0.85rem;">
-                                    <li style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Veri Bekleniyor</span> <strong>0</strong></li>
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:6px; color:#94a3b8;"><span>Yükleniyor...</span> <strong>-</strong></li>
                                 </ul>
                             </div>
                             <div style="background:#fff; padding:16px; border-radius:8px; border:1px solid #e2e8f0;">
                                 <h4 style="margin-bottom: 12px; border-bottom:1px solid #f1f5f9; padding-bottom:8px; font-size:0.9rem;"><i class="ph-bold ph-clock"></i> En Yoğun Giriş Saatleri</h4>
                                 <ul id="list-hours" style="list-style: none; padding:0; color:#64748b; font-size:0.85rem;">
-                                    <li style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Veri Bekleniyor</span> <strong>0</strong></li>
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:6px; color:#94a3b8;"><span>Yükleniyor...</span> <strong>-</strong></li>
                                 </ul>
                             </div>
                             <div style="background:#fff; padding:16px; border-radius:8px; border:1px solid #e2e8f0;">
                                 <h4 style="margin-bottom: 12px; border-bottom:1px solid #f1f5f9; padding-bottom:8px; font-size:0.9rem;"><i class="ph-bold ph-device-mobile"></i> Cihaz & İşletim Sistemleri</h4>
                                 <ul id="list-devices" style="list-style: none; padding:0; color:#64748b; font-size:0.85rem;">
-                                    <li style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Veri Bekleniyor</span> <strong>0</strong></li>
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:6px; color:#94a3b8;"><span>Yükleniyor...</span> <strong>-</strong></li>
                                 </ul>
                             </div>
                             <div style="background:#fff; padding:16px; border-radius:8px; border:1px solid #e2e8f0;">
                                 <h4 style="margin-bottom: 12px; border-bottom:1px solid #f1f5f9; padding-bottom:8px; font-size:0.9rem;"><i class="ph-bold ph-globe-hemisphere-west"></i> Müşteri Uyruk / Dili</h4>
                                 <ul id="list-countries" style="list-style: none; padding:0; color:#64748b; font-size:0.85rem;">
-                                    <li style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Veri Bekleniyor</span> <strong>0</strong></li>
+                                    <li style="display:flex; justify-content:space-between; margin-bottom:6px; color:#94a3b8;"><span>Yükleniyor...</span> <strong>-</strong></li>
                                 </ul>
                             </div>
                         </div>
@@ -338,6 +338,11 @@
         
     </div>
 
-    <script src="admin.js?v=2.5"></script>
+    <script src="/admin.js?v=5.0"></script>
+    <script>
+        if (typeof fetchAnalytics === 'function') {
+            fetchAnalytics();
+        }
+    </script>
 </body>
 </html>

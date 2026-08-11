@@ -1,7 +1,12 @@
 {
-    "work_hours": "11:00 - 19:00",
-    "address": "\u015eahkulu Mah. Kumbarac\u0131 Yoku\u015fu, No:41A\nBeyo\u011flu, \u0130stanbul",
+    "work_hours": "08:00 - 23:00",
+    "address": "Şahkulu Mah. Kumbaracı Yokuşu, No:41A\nBeyoğlu, İstanbul",
     "phone": "905456301214",
     "instagram": "https://instagram.com/firinnacafe",
-    "baidu": "https://map.baidu.com/"
+    "baidu": "https://map.baidu.com/",
+    "google_review_url": "https://g.page/r/CYCTLUWSsIhDEBM/review",
+    "yandex_review_url": "",
+    "tripadvisor_review_url": "",
+    "admin_password": "FirinnaPos2026!",
+    "group_event_text": "Normal saatler harici grup rezervasyonu ve özel mini organizasyonlar için doğrudan WhatsApp'tan iletişime geçebilirsiniz."
 }

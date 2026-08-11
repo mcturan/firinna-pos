@@ -1,25 +1,22 @@
-document.addEventListener('DOMContentLoaded', () => {
-    if(sessionStorage.getItem('firinna_admin') === 'true') {
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('adminMain').style.display = 'flex';
-        fetchSettings();
-        fetchAnalytics();
-    } else {
-        document.getElementById('loginOverlay').style.display = 'flex';
-        document.getElementById('adminMain').style.display = 'none';
-    }
+function initAdmin() {
+    if (document.getElementById('loginOverlay')) document.getElementById('loginOverlay').style.display = 'none';
+    if (document.getElementById('adminMain')) document.getElementById('adminMain').style.display = 'flex';
+    fetchSettings();
+    fetchAnalytics();
 
-    document.getElementById('settingsForm').addEventListener('submit', saveSettings);
+    if (document.getElementById('settingsForm')) {
+        document.getElementById('settingsForm').addEventListener('submit', saveSettings);
+    }
     
     // Manual Status Toggle Events
     document.querySelectorAll('input[name="manual_status"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             if(e.target.value === 'closed') {
-                document.getElementById('closed_until_div').style.display = 'block';
-                document.getElementById('closed_until').required = true;
+                if (document.getElementById('closed_until_div')) document.getElementById('closed_until_div').style.display = 'block';
+                if (document.getElementById('closed_until')) document.getElementById('closed_until').required = true;
             } else {
-                document.getElementById('closed_until_div').style.display = 'none';
-                document.getElementById('closed_until').required = false;
+                if (document.getElementById('closed_until_div')) document.getElementById('closed_until_div').style.display = 'none';
+                if (document.getElementById('closed_until')) document.getElementById('closed_until').required = false;
             }
         });
     });
@@ -29,34 +26,35 @@ document.addEventListener('DOMContentLoaded', () => {
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
-            // Aktif sınıfını güncelle
             navItems.forEach(nav => nav.classList.remove('active'));
             item.classList.add('active');
             
-            // Tüm bölümleri gizle
             document.querySelectorAll('.admin-section').forEach(sec => sec.style.display = 'none');
             
-            // Seçilen bölümü göster
             const targetId = item.getAttribute('data-target');
-            document.getElementById(targetId).style.display = 'block';
+            if (document.getElementById(targetId)) document.getElementById(targetId).style.display = 'block';
             
-            // Üst başlığı güncelle
-            document.querySelector('.topbar h1').innerText = item.innerText.trim();
+            if (document.querySelector('.topbar h1')) {
+                document.querySelector('.topbar h1').innerText = item.innerText.trim();
+            }
 
             if (targetId === 'dashboard') {
                 fetchAnalytics();
             }
         });
     });
+}
 
-    // Her 10 saniyede bir analitikleri otomatik canlı tazele
-    setInterval(() => {
-        const dash = document.getElementById('dashboard');
-        if (dash && dash.style.display !== 'none') {
-            fetchAnalytics();
-        }
-    }, 10000);
-});
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdmin);
+} else {
+    initAdmin();
+}
+
+// Her 5 saniyede bir analitikleri otomatik canlı tazele
+setInterval(() => {
+    fetchAnalytics();
+}, 5000);
 
 function checkLogin() {
     const user = document.getElementById('admin_user').value;
@@ -78,14 +76,18 @@ async function fetchAnalytics() {
         const res = await fetch('/api/web/analytics');
         const data = await res.json();
         
-        document.getElementById('stat-today').innerText = data.today || 0;
-        document.getElementById('stat-month').innerText = data.month || 0;
-        document.getElementById('stat-total').innerText = data.total || 0;
-        document.getElementById('stat-menu').innerText = data.menu || 0;
-        document.getElementById('stat-actions').innerText = data.actions || 0;
-        
-        if (document.getElementById('stat-repeat')) document.getElementById('stat-repeat').innerText = data.repeat_visitors || 0;
-        if (document.getElementById('stat-map')) document.getElementById('stat-map').innerText = data.map_clicks || 0;
+        const setText = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = val || 0;
+        };
+
+        setText('stat-today', data.today);
+        setText('stat-month', data.month);
+        setText('stat-total', data.total);
+        setText('stat-menu', data.menu);
+        setText('stat-actions', data.actions);
+        setText('stat-repeat', data.repeat_visitors);
+        setText('stat-map', data.map_clicks);
         
         // Fill Lists
         const renderList = (elementId, dataObj = {}) => {
