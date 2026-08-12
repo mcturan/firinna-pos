@@ -3010,8 +3010,29 @@ def track_visit():
         elif 20 <= hour < 23: hour_slot = "20:00 - 23:00 (Gece Keyfi)"
         else: hour_slot = "23:00 - 08:00 (Gece / Erken)"
 
-        action_name = "Ana Sayfa İnceleme"
-        if event == 'menu': action_name = "📄 PDF Menü İndirme"
+        item_raw = str(data.get('item', ''))
+        if 'Gezi Rehberi' in item_raw:
+            hotel_txt = data.get('hotelName') or data.get('startPoint') or 'Merkezi Başlangıç Hub'
+            reg_txt = data.get('selectedRegion') or 'Galata'
+            time_txt = data.get('selectedTime') or 'Yarım Gün'
+            action_name = f"🗺️ Gezi Rotası Oluşturdu (Otel/Konum: {hotel_txt} | Bölge: {reg_txt})"
+
+            # Telegram Canlı Bildirimi Gönder
+            try:
+                import telegram_notify
+                tg_msg = (
+                    f"🗺️ <b>YENİ İSTANBUL GEZİ ROTASI OLUŞTURULDU!</b>\n\n"
+                    f"🏨 <b>Otel / Konum:</b> {hotel_txt}\n"
+                    f"🗺️ <b>Seçilen Bölge:</b> {reg_txt}\n"
+                    f"⏱️ <b>Süre:</b> {time_txt}\n"
+                    f"📍 <b>Ziyaretçi Konumu:</b> {geo_location} ({visitor_ip})\n"
+                    f"📱 <b>Cihaz:</b> {device_type} ({os_name})\n"
+                    f"⏰ <b>Zaman:</b> {time_str}"
+                )
+                telegram_notify.send_async(tg_msg)
+            except Exception as e:
+                print(f"[Gezi Track TG Error]: {e}")
+        elif event == 'menu': action_name = "📄 PDF Menü İndirme"
         elif event == 'action': action_name = "💬 WhatsApp / İletişim"
         elif event == 'map': action_name = "🗺️ Harita / Navigasyon Niyeti"
         elif event == 'duration_update': action_name = f"⏱️ Sitede Kalma ({time_spent_sec}s)"
