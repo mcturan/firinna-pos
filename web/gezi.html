@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="Kademeli açılan akıllı İstanbul gezi rehberi, zaman kısıtına göre genişleyen birleşik bölge rotaları, 4 günlük hava durumu ve Fırınna Cafe VIP ikram kartı.">
-    <meta name="keywords" content="İstanbul gezi rehberi, zaman kısıtı gezi, tarihi yarımada galata birleşik rota, polonezköy gezi rotası, belgrad ormanı rotası, Fırınna cafe">
+    <meta name="description" content="Kademeli açılan akıllı İstanbul gezi rehberi; Balat, Beşiktaş, Akaretler, Galata, Sultanahmet nokta atışı rotaları, 4 günlük hava durumu ve Fırınna Cafe VIP ikram kartı.">
+    <meta name="keywords" content="İstanbul gezi rehberi, Balat gezilecek yerler, Beşiktaş gezilecek yerler, Akaretler sıraevler, Ortaköy cami, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
     <meta property="og:title" content="İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe">
-    <meta property="og:description" content="Zaman kısıtınıza göre genişleyen birleşik harita rotanızı ve VIP İkram Biletinizi oluşturun!">
+    <meta property="og:description" content="Balat, Beşiktaş, Galata ve Boğaz rotalarını kategorilerine göre keşfedin; canlı harita rotanızı ve VIP İkram Biletinizi oluşturun!">
     <meta property="og:image" content="https://firinna.com/logo.png">
     <meta property="og:url" content="https://firinna.com/gezi">
     <meta property="og:type" content="website">
@@ -40,10 +40,10 @@
         },
         {
           "@type": "Question",
-          "name": "İstanbul'da otantik hediyelikler (Lokum, Kahve, Halı/Kilim) nereden alınır?",
+          "name": "Balat ve Beşiktaş'ta gezilmesi gereken ana yerler nerelerdir?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Taze kahve ve dökme bakır cezve Mısır Çarşısı Tahmis Sokak'tan; lokum Kapalıçarşı bedestenlerinden; tarihi Türk halısı ve ipek kilim ise Anka Carpets'ten (#ANKA-FIRINNA-VIP kodu ile %15 İndirimli) satın alınabilir."
+            "text": "Balat'ta Kiremit Sokak renkli evler, Kırmızı Mektep, Fener Rum Patrikhanesi ve Sveti Stefan Demir Kilisesi; Beşiktaş'ta ise Dolmabahçe Sarayı, Tarihi Akaretler Sıraevler, Ortaköy Meydanı ve Ihlamur Kasrı gezilmelidir."
           }
         },
         {
@@ -51,7 +51,7 @@
           "name": "Galata Fırınna Cafe'nin çalışma saatleri nedir?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Fırınna Cafe & Restaurant haftanın 7 günü 11:00 - 19:15 saatleri arasında hizmet vermektedir. Mesai saatleri dışındaki grup etkinlikleri ve masa rezervasyonu için WhatsApp hattından iletişime geçebilirsiniz."
+            "text": "Fırınna Cafe & Restaurant haftanın 7 günü 11:00 - 19:15 saatleri arasında hizmet vermektedir."
           }
         }
       ]
@@ -137,7 +137,7 @@
             border-color: #f59e0b;
         }
 
-        /* WEATHER WIDGET WARD STYLING */
+        /* WEATHER WIDGET STYLING */
         .weather-forecast-widget {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             border: 1.5px solid #f59e0b;
@@ -978,7 +978,7 @@
                     </div>
                     <div class="option-pill" onclick="selectConceptOption('nightlife')">
                         <div class="title">🎷 Gece Hayatı & Akşam Barları 🍻</div>
-                        <div class="desc">Asmalımescit, Kadıköy & canlı müzik mekanları</div>
+                        <div class="desc">Asmalımescit, Beşiktaş Çarşı & Kadıköy Barları</div>
                     </div>
                 </div>
             </div>
@@ -997,6 +997,14 @@
                         <div class="title">📍 Galata / Kumbaracı</div>
                         <div class="desc">Fırınna Cafe kapı komşusu</div>
                     </div>
+                    <div class="option-pill" onclick="selectStartOption('besiktas')">
+                        <div class="title">📍 Beşiktaş İskele</div>
+                        <div class="desc">Dolmabahçe & Akaretler</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartOption('balat')">
+                        <div class="title">📍 Balat Meydanı</div>
+                        <div class="desc">Renkli evler & Haliç sahil</div>
+                    </div>
                     <div class="option-pill" onclick="selectStartOption('eminonu')">
                         <div class="title">📍 Eminönü Meydanı</div>
                         <div class="desc">İskele ve Mısır Çarşısı</div>
@@ -1004,14 +1012,6 @@
                     <div class="option-pill" onclick="selectStartOption('sultanahmet')">
                         <div class="title">📍 Sultanahmet</div>
                         <div class="desc">Ayasofya & Yerebatan çevresi</div>
-                    </div>
-                    <div class="option-pill" onclick="selectStartOption('kapalicarsi')">
-                        <div class="title">📍 Kapalıçarşı</div>
-                        <div class="desc">Nuruosmaniye Kral Yolu</div>
-                    </div>
-                    <div class="option-pill" onclick="selectStartOption('nisantasi')">
-                        <div class="title">📍 Nişantaşı</div>
-                        <div class="desc">Abdi İpekçi & Maçka</div>
                     </div>
                     <div class="option-pill" onclick="selectStartOption('kadikoy')">
                         <div class="title">📍 Kadıköy İskele</div>
@@ -1027,7 +1027,7 @@
                     <label style="font-weight:700; font-size:0.86rem; color:#78350f; display:block; margin-bottom:6px;">
                         🏨 Konakladığınız Otel / Airbnb Adı veya Semti (Opsiyonel — Rota öncesi Fırınna Cafe'de Kahvaltı/Kahve Molası eklensin):
                     </label>
-                    <input type="text" id="hotel-name-input" class="input-hotel-box" style="margin-bottom:0;" placeholder="Örn: Tomtom Suites Galata, Pera Palace, Ada Karaköy..." autocomplete="off">
+                    <input type="text" id="hotel-name-input" class="input-hotel-box" style="margin-bottom:0;" placeholder="Örn: Tomtom Suites Galata, Pera Palace, W Hotel Akaretler..." autocomplete="off">
                     <div id="hotel-suggestions" class="suggestions-dropdown"></div>
                 </div>
             </div>
@@ -1051,7 +1051,7 @@
                         <div class="desc">Öğle yemeği sonrası gezi</div>
                     </div>
                     <div class="option-pill" onclick="selectStartTimeOption('17:30')">
-                        <div class="title">🌆 17:30 (Akşamüstü & Gün Batımı)</div>
+                        <div class="title"><ctrl42> 17:30 (Akşamüstü & Gün Batımı)</div>
                         <div class="desc">Gün batımı, akşam yemeği & barlar</div>
                     </div>
                 </div>
@@ -1070,11 +1070,11 @@
                         </tr>
                         <tr>
                             <td class="label">🗺️ Gezilecek Bölge:</td>
-                            <td class="val" id="summary-val-region">👑 Tarihi Yarımada + Galata / Pera Birleşik Mega Turu</td>
+                            <td class="val" id="summary-val-region">📸 Balat & Fener Renkli Sokaklar</td>
                         </tr>
                         <tr>
                             <td class="label">🎯 Gezi Konsepti:</td>
-                            <td class="val" id="summary-val-concept">🏛️ Tarih, Kültür & Şehir Klasikleri</td>
+                            <td class="val" id="summary-val-concept">📸 Renkli Mahalleler & Çift Yürüyüşleri</td>
                         </tr>
                         <tr>
                             <td class="label">📍 Başlangıç Noktası:</td>
@@ -1254,8 +1254,8 @@
                 <div class="info-card">
                     <h4><i class="ph-bold ph-sneaker" style="color:#d97706;"></i> 👟 Galata & İstanbul İpuçları</h4>
                     <p>
-                        • <strong>Yürüyüş Ayakkabısı:</strong> Galata taş sokakları için rahat spor ayakkabı şarttır.<br>
-                        • <strong>Müze Sıraları:</strong> Topkapı Sarayı ve Yerebatan Sarnıcı için biletleri online alın.<br>
+                        • <strong>Yürüyüş Ayakkabısı:</strong> Galata ve Balat taş sokakları için rahat spor ayakkabı şarttır.<br>
+                        • <strong>Müze Sıraları:</strong> Dolmabahçe Sarayı, Topkapı ve Yerebatan Sarnıcı biletlerini online alın.<br>
                         • <strong>Genel Yemek Durakları:</strong> Sultanahmet'te meşhur köfte, Karaköy'de Güllüoğlu Baklava, Galata'da Fırınna Cafe'de İtalyan Pizza & Sınırsız Çay keyfi!
                     </p>
                 </div>
@@ -1267,6 +1267,16 @@
             </h3>
 
             <div class="faq-accordion">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>📸 Balat ve Beşiktaş'ta gezilmesi gereken ana yerler nerelerdir?</span>
+                        <i class="ph-bold ph-caret-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Balat'ta Kiremit Sokak renkli evler, Kırmızı Mektep, Fener Rum Patrikhanesi ve Sveti Stefan Demir Kilisesi; Beşiktaş'ta ise Dolmabahçe Sarayı, Tarihi Akaretler Sıraevler, Ortaköy Meydanı ve Ihlamur Kasrı gezilmelidir.
+                    </div>
+                </div>
+
                 <div class="faq-item">
                     <div class="faq-question">
                         <span>🥮 İstanbul'da meşhur baklava nerede yenir?</span>
@@ -1289,21 +1299,11 @@
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <span>👑 İstanbul'da gezilmesi şart olan 'Kral Yolu' rotası nerelerden geçer?</span>
-                        <i class="ph-bold ph-caret-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        Kapalıçarşı Nuruosmaniye Kapısı'ndan başlar; Sultanahmet Meydanı, Mısır Çarşısı, tarihi Galata Köprüsü yürüyüşü, Karaköy, Kamondo Merdivenleri, Fırınna Cafe & Restaurant lezzet molası, Tarihi Tünel Füniküleri, Şişhane ve İstiklal Caddesi üzerinden Taksim Meydanı'na uzanır.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
                         <span>⏰ Galata Fırınna Cafe'nin çalışma saatleri nedir?</span>
                         <i class="ph-bold ph-caret-down"></i>
                     </div>
                     <div class="faq-answer">
-                        Fırınna Cafe & Restaurant sistem kayıtlarına göre haftanın 7 günü <strong id="faq-hours-text">11:00 - 19:15</strong> saatleri arasında hizmet vermektedir. Çalışma saatleri haricindeki grup organizasyonları ve masa rezervasyonu için WhatsApp hattımızdan iletişime geçebilirsiniz.
+                        Fırınna Cafe & Restaurant sistem kayıtlarına göre haftanın 7 günü <strong id="faq-hours-text">11:00 - 19:15</strong> saatleri arasında hizmet vermektedir.
                     </div>
                 </div>
             </div>
@@ -1329,14 +1329,16 @@
         const POPULAR_HUBS = [
             "Taksim Meydanı / İstiklal Başı",
             "Galata / Kumbaracı Yokuşu (Fırınna Yakını)",
+            "Beşiktaş İskele & Meydan",
+            "Balat Meydanı & Kiremit Sokak",
             "Eminönü Meydanı & İskele",
             "Sultanahmet / Ayasofya Meydanı",
             "Kapalıçarşı Nuruosmaniye Kapısı",
             "Nişantaşı Abdi İpekçi Caddesi",
             "Kadıköy İskele / Rıhtım",
             "Moda Sahil / Çay Bahçesi",
-            "Beyoğlu Galata & Pera Airbnb / Butik Daire",
             "Tomtom Suites (Galata)",
+            "W Hotel Akaretler (Beşiktaş)",
             "Pera Palace Hotel (Taksim/Şişhane)"
         ];
 
@@ -1501,7 +1503,7 @@
             generateSmartItinerary(); // AUTO GENERATE IMMEDIATELY!
         }
 
-        // DYNAMICALLY SCALE REGION OPTIONS ACCORDING TO TIME DURATION!
+        // DYNAMICALLY SCALE REGION OPTIONS ACCORDING TO TIME DURATION & INCLUDE BALAT & BEŞİKTAŞ!
         function updateRegionOptions() {
             const gridRegion = document.getElementById('grid-region');
             gridRegion.innerHTML = '';
@@ -1511,19 +1513,20 @@
             // FOR HALF DAY (3-4 HOURS): SINGLE-ZONE FOCUSED NEIGHBORHOOD TOURS
             if (selectedTime === 'half') {
                 regionOptions = [
+                    { key: 'balat_fener', title: '📸 Balat & Fener Renkli Tarihi Sokaklar', desc: 'Renkli merdivenler, Kırmızı Mektep & Demir Kilise' },
+                    { key: 'besiktas_akaretler', title: '🏛️ Beşiktaş, Akaretler & Ihlamur Kasrı', desc: 'Dolmabahçe, Akaretler sıraevler & Çarşı içi' },
                     { key: 'galata_pera', title: '🏛️ Galata - Pera - İstiklal Sanat Hattı', desc: 'Galata Kulesi, Kamondo & Fırınna Cafe' },
                     { key: 'eminonu_historic', title: '🕌 Eminönü, Mısır Çarşısı & Galata Köprüsü', desc: 'Baharat kokuları & Haliç yürüyüşü' },
                     { key: 'sultanahmet_classic', title: '🕌 Tarihi Yarımada: Ayasofya & Yerebatan', desc: 'Bizans su sarayı & Ayasofya meydanı' },
-                    { key: 'moda_caddebostan', title: '🌊 Moda Sahili & Kordon Yürüyüşü', desc: 'Deniz manzaralı çimler & Moda çay bahçesi' },
-                    { key: 'balat_fener', title: '📸 Balat & Fener Renkli Sokaklar', desc: 'Renkli merdivenler, kafeler & tarihi evler' }
+                    { key: 'moda_caddebostan', title: '🌊 Moda Sahili & Kordon Yürüyüşü', desc: 'Deniz manzaralı çimler & Moda çay bahçesi' }
                 ];
             } 
             // FOR 1 FULL DAY (6-8 HOURS): MULTI-ZONE MEGA COMBINED CIRCUITS!
             else if (selectedTime === '1day') {
                 regionOptions = [
+                    { key: 'bosphorus_besiktas_combo', title: '⛵ Beşiktaş + Ortaköy + Bebek Boğaz Sahil Kordonu', desc: 'Dolmabahçe Sarayı, Akaretler, Ortaköy Cami & Bebek' },
                     { key: 'sultanahmet_galata_combo', title: '👑 Tarihi Yarımada + Galata / Pera Birleşik Mega Turu', desc: 'Ayasofya ➔ Mısır Çarşısı ➔ Galata Köprüsü ➔ Fırınna Cafe' },
                     { key: 'galata_moda_combo', title: '🌉 İki Yakalı Vapur Birleşimi: Galata/Pera + Kadıköy & Moda', desc: 'Fırınna Cafe ➔ Vapurla Moda Sahili & Çimler' },
-                    { key: 'bosphorus_besiktas_combo', title: '⛵ Boğaz Hattı: Beşiktaş - Ortaköy - Bebek Sahil Kordonu', desc: 'Saraylar, Ortaköy cami & Bebek koyu' },
                     { key: 'polonezkoy_riva', title: '🌲 Polonezköy Tabiat Parkı & Riva Deresi Doğa Turu', desc: 'Sakin orman yürüyüş kulvarı & nehir kıyısı' },
                     { key: 'belgrad_forest', title: '🌲 Belgrad Ormanı & Neşet Suyu (Avrupa Doğa)', desc: 'İstanbul akciğeri kauçuk parkur' },
                     { key: 'buyukada_islands', title: '⛵ Büyükada Çam Ormanları & Aya Yorgi Manastırı', desc: 'Vapurla Ada doğa turu' }
@@ -1532,7 +1535,7 @@
             // FOR MULTI-DAY (2-3 DAYS): GRAND COMPLETE ISTANBUL CIRCUITS!
             else {
                 regionOptions = [
-                    { key: 'grand_istanbul_3days', title: '🗺️ 3 Günlük Tam Program (Tüm İstanbul Klasikleri)', desc: '1. Gün Galata/Pera + 2. Gün Sultanahmet + 3. Gün Moda Sahil' },
+                    { key: 'grand_istanbul_3days', title: '🗺️ 3 Günlük Tam Program (Tüm İstanbul Klasikleri)', desc: '1. Gün Galata/Balat + 2. Gün Sultanahmet + 3. Gün Beşiktaş/Moda' },
                     { key: 'nature_grand_2days', title: '🌲 Doğa & Orman Ağırlıklı 2 Günlük Rota', desc: '1. Gün Belgrad Ormanı + 2. Gün Polonezköy & Riva' }
                 ];
             }
@@ -1554,6 +1557,8 @@
             const map = {
                 taksim: '📍 Taksim Meydanı',
                 galata: '📍 Galata / Kumbaracı (Fırınna Yanı)',
+                besiktas: '📍 Beşiktaş İskele & Meydan',
+                balat: '📍 Balat Meydanı & Kiremit Sokak',
                 eminonu: '📍 Eminönü Meydanı & İskele',
                 sultanahmet: '📍 Sultanahmet / Ayasofya',
                 kapalicarsi: '📍 Kapalıçarşı (Kral Yolu)',
@@ -1566,20 +1571,19 @@
 
         function getRegionLabelName(regionKey) {
             const map = {
+                balat_fener: '📸 Balat & Fener Renkli Tarihi Sokaklar',
+                besiktas_akaretler: '🏛️ Beşiktaş, Akaretler & Ihlamur Kasrı',
+                bosphorus_besiktas_combo: '⛵ Beşiktaş + Ortaköy + Bebek Boğaz Sahil Kordonu',
                 sultanahmet_galata_combo: '👑 Tarihi Yarımada + Galata / Pera Birleşik Mega Turu',
                 galata_moda_combo: '🌉 İki Yakalı Vapur Birleşimi: Galata/Pera + Kadıköy & Moda',
-                bosphorus_besiktas_combo: '⛵ Boğaz Hattı: Beşiktaş - Ortaköy - Bebek Sahil Kordonu',
                 grand_istanbul_3days: '🗺️ 3 Günlük Tam Program (Tüm İstanbul Klasikleri)',
                 nature_grand_2days: '🌲 Doğa & Orman Ağırlıklı 2 Günlük Rota',
                 polonezkoy_riva: '🌲 Polonezköy Tabiat Parkı & Riva Deresi',
                 belgrad_forest: '🌲 Belgrad Ormanı & Neşet Suyu (Avrupa Doğa)',
-                ataturk_arboretum: '🌿 Atatürk Arboretumu Canlı Ağaç Müzesi',
                 galata_pera: '🏛️ Galata - Pera - İstiklal Hattı',
                 eminonu_historic: '🕌 Eminönü, Mısır Çarşısı & Galata Köprüsü',
                 sultanahmet_classic: '🕌 Sultanahmet & Yerebatan Sarnıcı',
-                balat_fener: '📸 Balat & Fener Renkli Tarihi Sokaklar',
                 moda_caddebostan: '🌊 Moda - Kalamış - Caddebostan Sahil Kordonu',
-                bosphorus_asian: '⛵ Asya Yakası: Kuzguncuk & Üsküdar',
                 buyukada_islands: '⛵ Büyükada Çam Ormanları & Aya Yorgi'
             };
             return map[regionKey] || '🏛️ Galata - Pera - İstiklal Hattı';
@@ -1592,7 +1596,7 @@
             else if (selectedConcept === 'photo') conceptTxt = "📸 Renkli Mahalleler 👫";
             else if (selectedConcept === 'nightlife') conceptTxt = "🎷 Gece Hayatı & Barlar 🍻";
 
-            let regionTxt = getRegionLabelName(selectedRegion || 'galata_pera');
+            let regionTxt = getRegionLabelName(selectedRegion || 'balat_fener');
 
             let timeTxt = "Yarım Gün (3-4 Saat)";
             if (selectedTime === '1day') timeTxt = "1 Tam Gün (6-8 Saat Kapsamlı)";
@@ -1614,8 +1618,35 @@
             if (elRegion) elRegion.innerText = regionTxt;
         }
 
-        // COMPREHENSIVE DYNAMIC REGION-SPECIFIC POIS DATABASE
+        // COMPREHENSIVE DYNAMIC REGION-SPECIFIC POIS DATABASE (INCLUDING BALAT & BEŞİKTAŞ DETAILED POIS)
         const REGION_POIS_DATABASE = {
+            // 📸 BALAT & FENER RENKLİ TARİHİ SOKAKLAR (KATEGORİLERİYLE DETAYLI)
+            balat_fener: [
+                { offsetMin: 0, title: '📍 1. DURAK: Haliç Sahili Balat Meydanı Geçişi', category: 'photo', desc: 'Haliç kıyısından tarihi renkli semtin merkezine giriş.', mapQuery: 'Balat+Meydani+Fatih+Istanbul' },
+                { offsetMin: 40, title: '📸 2. DURAK (Mahalle & Fotoğraf): Kiremit Sokak & Merdivenli Yokuş Renkli Evler', category: 'photo', desc: 'İstanbul’un en çok fotoğraflanan tarihi ahşap cumbalı evleri ve pastel merdivenli yokuşlar.', mapQuery: 'Kiremit+Caddesi+Balat+Istanbul' },
+                { offsetMin: 100, title: '🏛️ 3. DURAK (Tarih & Mimari): Fener Rum Patrikhanesi & Kırmızı Mektep (Fener Rum Lisesi)', category: 'museums', desc: 'Görkemli tuğla mimarisiyle 1881 yapımı Kırmızı Mektep ve tarihi patrikhane kompleksi.', mapQuery: 'Fener+Rum+Ortodoks+Patrikhanesi+Istanbul' },
+                { offsetMin: 155, title: '⛪ 4. DURAK (Tarihi Mabet): Sveti Stefan Dökme Demir Bulgar Kilisesi', category: 'worship', desc: 'Dünyanın dökme demirden inşa edilmiş tek kilisesi.', mapQuery: 'Sveti+Stefan+Kilisesi+Balat+Istanbul' },
+                { offsetMin: 200, title: '🛍️ 5. DURAK (Alışveriş & Kültür): Balat Antikacılar & Retro Mezat Sokakları', category: 'shopping', desc: 'Nostaljik mezatlar, vintage kıyafet ve dökme pirinç antikacılar sokağı.', mapQuery: 'Balat+Caddesi+Fatih+Istanbul' },
+                { offsetMin: 250, featured: true, title: 'FIRINNA CAFE & RESTAURANT — Galata Köprüsü Geçişi & Fırınna Mola 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da fırından yeni çıkmış pizza, menemen ve sınırsız Türk çayı!', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' }
+            ],
+
+            // 🏛️ BEŞİKTAŞ, AKARETLER & IHLAMUR KASRI (KATEGORİLERİYLE DETAYLI)
+            besiktas_akaretler: [
+                { offsetMin: 0, title: '📍 1. DURAK: Beşiktaş İskele Meydanı & Barbaros Hayrettin Paşa Türbesi', category: 'photo', desc: 'Boğaz kıyısındaki hareketli Beşiktaş meydanı.', mapQuery: 'Besiktas+Meydani+Istanbul' },
+                { offsetMin: 45, title: '🏰 2. DURAK (Saray & Tarih): Tarihi Dolmabahçe Sarayı & Saat Kulesi', category: 'museums', desc: 'Osmanlı’nın son sarayı, neoklasik saat kulesi ve Boğaz kapısı.', mapQuery: 'Dolmabahce+Sarayi+Besiktas+Istanbul' },
+                { offsetMin: 110, title: '🏛️ 3. DURAK (Mimari & Fotoğraf): Tarihi Akaretler Sıraevler & Şairler Parkı', category: 'photo', desc: '1875 yapımı neoklasik sıra evler, çağdaş sanat galerileri ve Şairler Parkı.', mapQuery: 'Akaretler+Besiktas+Istanbul' },
+                { offsetMin: 170, title: '🌿 4. DURAK (Doğa & Mola): Ihlamur Kasrı Parkı & Asırlık Çınarlar', category: 'nature_sports', desc: 'Sultan Abdülmecid’in dinlenme kasrı ve manolya bahçeleri.', mapQuery: 'Ihlamur+Kasri+Besiktas+Istanbul' },
+                { offsetMin: 230, featured: true, title: 'FIRINNA CAFE & RESTAURANT — Galata Mola Durağı & Sınırsız Çay 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da İtalyan pizza, bakır menemen ve demlik çay!', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' }
+            ],
+
+            // ⛵ BEŞİKTAŞ + ORTAKÖY + BEBEK BOĞAZ SAHİL KORDONU (1 TAM GÜN)
+            bosphorus_besiktas_combo: [
+                { offsetMin: 0, title: '📍 1. DURAK: Dolmabahçe Sarayı & Akaretler Sıraevler Başlangıcı', category: 'museums', desc: 'Saray mimarisi ve Akaretler yürüyüşü.', mapQuery: 'Dolmabahce+Sarayi+Besiktas+Istanbul' },
+                { offsetMin: 60, title: '🕌 2. DURAK: Ortaköy Meydanı & Büyük Mecidiye Cami (Boğaz Kapısı)', category: 'worship', desc: 'Boğaz Köprüsü altındaki ikonik cami ve fotoğraf kulvarı.', mapQuery: 'Ortakoy+Meydani+Besiktas+Istanbul' },
+                { offsetMin: 130, title: '🌊 3. DURAK: Arnavutköy Yalıları & Bebek Sahil Kordonu', category: 'photo', desc: 'Tarihi ahşap yalılar ve Bebek Parkı deniz kıyısı yürüyüşü.', mapQuery: 'Bebek+Parki+Besiktas+Istanbul' },
+                { offsetMin: 210, featured: true, title: 'FIRINNA CAFE & RESTAURANT — Galata Dönüşü Fırınna Lezzet Molası 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da taş fırın pizza ve sınırsız Türk çayı.', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' }
+            ],
+
             // 👑 TARİHİ YARIMADA + GALATA / PERA BİRLEŞİK MEGA TURU (1 TAM GÜN)
             sultanahmet_galata_combo: [
                 { offsetMin: 0, title: '📍 1. DURAK: Sultanahmet Meydanı & Dikilitaş Başlangıcı', category: 'photo', desc: 'Ayasofya ve Sultanahmet Meydanı tarihi açılışı.', mapQuery: 'Sultanahmet+Meydani+Istanbul' },
@@ -1639,20 +1670,19 @@
 
             // 🗺️ 3 GÜNLÜK TAM PROGRAM (TÜM İSTANBUL KLASİKLERİ)
             grand_istanbul_3days: [
-                { dayTitle: '🗓️ 1. GÜN: Tarihi Pera, Galata & Fırınna Lezzet Kulvarı' },
+                { dayTitle: '🗓️ 1. GÜN: Tarihi Pera, Galata & Balat Renkli Evler' },
                 { offsetMin: 0, title: '📍 1. Gün (10:00): İstiklal Caddesi & Çiçek Pasajı Başlangıç', category: 'photo', desc: 'Tarihi binalar ve nostaljik tramvay kulvarı yürüyüşü.', mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul' },
                 { offsetMin: 90, featured: true, title: 'FIRINNA CAFE & RESTAURANT — 1. Gün Öğle Yemeği & Sınırsız Çay 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da lezzet molası.', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' },
-                { offsetMin: 180, title: '🗼 1. Gün (15:00): Galata Kulesi & Kamondo Merdivenleri', category: 'museums', desc: 'Galata Kulesi seyir kulvarı ve taş sokaklar.', mapQuery: 'Galata+Kulesi+Beyoglu+Istanbul' },
-                { offsetMin: 270, title: '🎷 1. Gün Akşamı (18:30): Asmalımescit & Cihangir Sanat Barları', category: 'photo', desc: 'Gece hayatı ve barlar sokağı.', mapQuery: 'Asmalimescit+Beyoglu+Istanbul' },
+                { offsetMin: 180, title: '📸 1. Gün (15:00): Balat Renkli Evler & Kırmızı Mektep', category: 'photo', desc: 'Merdivenli Yokuş ve tarihi Haliç mahallesi.', mapQuery: 'Balat+Meydani+Fatih+Istanbul' },
 
                 { dayTitle: '🗓️ 2. GÜN: Sultanahmet Tarihi Yarımada & Mısır Çarşısı' },
                 { offsetMin: 1440, title: '🕌 2. Gün (10:00): Ayasofya-i Kebir & Yerebatan Sarnıcı', category: 'worship', desc: 'Bizans su sarayı ve Ayasofya meydanı.', mapQuery: 'Hagia+Sophia+Sultanahmet+Istanbul' },
                 { offsetMin: 1560, title: '🌿 2. Gün (13:00): Tarihi Gülhane Parkı & Sarayburnu', category: 'nature_sports', desc: 'Asırlık çınarlar ve deniz havası.', mapQuery: 'Gulhane+Parki+Sultanahmet+Istanbul' },
                 { offsetMin: 1680, title: '🛍️ 2. Gün (16:00): Kapalıçarşı Kral Yolu & Mısır Çarşısı', category: 'shopping', desc: 'Otantik Türk lokumu, kahve ve hediyelikler.', mapQuery: 'Grand+Bazaar+Nuruosmaniye+Istanbul' },
 
-                { dayTitle: '🗓️ 3. GÜN: Anadolu Yakası — Kadıköy Moda Sahili & Boğaz Vapuru' },
-                { offsetMin: 2880, title: '⛵ 3. Gün (11:00): Karaköy-Kadıköy Nostaljik Vapur Yolculuğu', category: 'photo', desc: 'Kız Kulesi manzarası ile Boğaz geçişi.', mapQuery: 'Karakoy+Iskele+Istanbul' },
-                { offsetMin: 2970, title: '🌊 3. Gün (13:00): Moda Sahil Parkı & Çimler Yürüyüşü', category: 'nature_sports', desc: 'Deniz kıyısı yürüyüş kulvarı ve tarihi çay bahçesi.', mapQuery: 'Moda+Sahil+Parki+Kadikoy+Istanbul' }
+                { dayTitle: '🗓️ 3. GÜN: Beşiktaş, Akaretler & Kadıköy Moda Sahili' },
+                { offsetMin: 2880, title: '🏰 3. Gün (10:30): Dolmabahçe Sarayı & Akaretler Sıraevler', category: 'museums', desc: 'Saray kapısı ve Akaretler yürüyüşü.', mapQuery: 'Dolmabahce+Sarayi+Besiktas+Istanbul' },
+                { offsetMin: 2970, title: '🌊 3. Gün (14:00): Moda Sahil Parkı & Çimler Yürüyüşü', category: 'nature_sports', desc: 'Deniz kıyısı yürüyüş kulvarı ve tarihi çay bahçesi.', mapQuery: 'Moda+Sahil+Parki+Kadikoy+Istanbul' }
             ],
 
             // 🌲 POLONEZKÖY TABİAT PARKI & RİVA DERESİ
@@ -1716,8 +1746,8 @@
             }
 
             // DYNAMICALLY FETCH EXACT POIS FOR THE CHOSEN TARGET REGION!
-            let targetRegionKey = selectedRegion || 'galata_pera';
-            let rawPOIs = REGION_POIS_DATABASE[targetRegionKey] || REGION_POIS_DATABASE['galata_pera'];
+            let targetRegionKey = selectedRegion || 'balat_fener';
+            let rawPOIs = REGION_POIS_DATABASE[targetRegionKey] || REGION_POIS_DATABASE['balat_fener'];
 
             let finalPOIs = [];
 
