@@ -1,14 +1,23 @@
 {
-    "address": "\u015eahkulu Mah. Kumbarac\u0131 Yoku\u015fu, No:41A\nBeyo\u011flu, \u0130stanbul",
+    "address": "Şahkulu Mah. Kumbaracı Yokuşu, No:41A\nBeyoğlu, İstanbul",
     "admin_password": "FirinnaPos2026!",
     "baidu": "https://map.baidu.com/",
     "google_review_url": "https://g.page/r/CYCTLUWSsIhDEBM/review",
-    "group_event_text": "Normal saatler harici grup rezervasyonu ve \u00f6zel mini organizasyonlar i\u00e7in do\u011frudan WhatsApp'tan ileti\u015fime ge\u00e7ebilirsiniz.",
+    "group_event_text": "Normal saatler harici grup rezervasyonu ve özel mini organizasyonlar için doğrudan WhatsApp'tan iletişime geçebilirsiniz.",
     "instagram": "https://instagram.com/firinnacafe",
     "phone": "905456301214",
     "tripadvisor_review_url": "",
-    "work_hours": "11:00 - 19:00",
-    "yandex_review_url": "https://yandex.com.tr/maps/org/firinna/37863615675/reviews/?add-review=true",
+    "work_hours": "08:30 - 23:00",
+    "daily_hours": {
+        "Pazartesi": {"open": "08:30", "close": "23:00", "active": true},
+        "Salı": {"open": "08:30", "close": "23:00", "active": true},
+        "Çarşamba": {"open": "08:30", "close": "23:00", "active": true},
+        "Perşembe": {"open": "08:30", "close": "23:00", "active": true},
+        "Cuma": {"open": "08:30", "close": "23:00", "active": true},
+        "Cumartesi": {"open": "08:30", "close": "23:00", "active": true},
+        "Pazar": {"open": "08:30", "close": "23:00", "active": true}
+    },
     "manual_status": "auto",
-    "closed_until": ""
+    "closed_until": "",
+    "yandex_review_url": "https://yandex.com.tr/maps/org/firinna/37863615675/reviews/?add-review=true"
 }

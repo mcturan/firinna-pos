@@ -678,6 +678,56 @@ def api_daily_close_report():
     date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
     return jsonify(db.get_daily_close_report(date))
 
+def get_tomorrow_schedule_alert():
+    """Checks if tomorrow's operating schedule is CLOSED or DIFFERENT from standard hours."""
+    try:
+        settings = {}
+        if os.path.exists(SETTINGS_FILE):
+            with open(SETTINGS_FILE, 'r') as f:
+                settings = json.load(f)
+        
+        daily_hours = settings.get('daily_hours', {})
+        if not daily_hours:
+            return ""
+            
+        days_tr = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
+        now = datetime.now()
+        tomorrow_idx = (now.weekday() + 1) % 7
+        tomorrow_day = days_tr[tomorrow_idx]
+        
+        tomorrow_cfg = daily_hours.get(tomorrow_day, {"open": "08:30", "close": "23:00", "active": True})
+        
+        active_hours = [
+            f"{cfg.get('open','08:30')}-{cfg.get('close','23:00')}"
+            for d, cfg in daily_hours.items()
+            if cfg.get('active', True)
+        ]
+        
+        from collections import Counter
+        standard_hours = Counter(active_hours).most_common(1)[0][0] if active_hours else "08:30-23:00"
+        
+        tomorrow_is_active = tomorrow_cfg.get('active', True)
+        tomorrow_hours = f"{tomorrow_cfg.get('open','08:30')}-{tomorrow_cfg.get('close','23:00')}"
+        
+        if not tomorrow_is_active:
+            return (
+                f"\n\n⚠️ <b>DİKKAT: YARINKİ ÇALIŞMA SAATİ KONTROLÜ!</b>\n"
+                f"Yarın (<b>{tomorrow_day}</b>) mekan yönetim panelinde <b>KAPALI</b> olarak ayarlanmış!\n"
+                f"<i>Bu bilgi doğru mu? Eğer kapalı olmayacaksanız lütfen yönetim panelinden kontrol edin.</i>"
+            )
+        elif tomorrow_hours != standard_hours:
+            open_t = tomorrow_cfg.get('open', '08:30')
+            close_t = tomorrow_cfg.get('close', '23:00')
+            std_t = standard_hours.replace('-', ' - ')
+            return (
+                f"\n\n⚠️ <b>DİKKAT: YARINKİ ÇALIŞMA SAATİ KONTROLÜ!</b>\n"
+                f"Yarın (<b>{tomorrow_day}</b>) çalışma saati diğer günlerden farklı tanımlanmış: <b>{open_t} - {close_t}</b> (Standart: {std_t})\n"
+                f"<i>Bu bilgi doğru mu? Eğer özel bir durum yoksa yönetim panelinden kontrol edebilirsiniz.</i>"
+            )
+    except Exception as e:
+        print("Schedule alert calculation error:", e)
+    return ""
+
 @app.route('/api/reports/daily-close/send-telegram', methods=['POST'])
 def api_send_daily_close_telegram():
     data = request.json or {}
@@ -694,6 +744,9 @@ def api_send_daily_close_telegram():
             f"  {i+1}. {p['name']} × {p['quantity']} adet — {p['total']:.2f} ₺"
             for i, p in enumerate(top)
         )
+    
+    tomorrow_alert = get_tomorrow_schedule_alert()
+
     msg = (
         f"🏪 <b>{restaurant} — Günlük Rapor</b>\n"
         f"📅 {date}\n"
@@ -706,7 +759,7 @@ def api_send_daily_close_telegram():
         f"📦 Masraf:        {report['total_expenses']:.2f} ₺\n"
         f"─────────────────\n"
         f"✅ Net Kasa:      <b>{report['net']:.2f} ₺</b>"
-        f"{top_lines}{open_warn}"
+        f"{top_lines}{open_warn}{tomorrow_alert}"
     )
     ok = telegram_notify.send_message(msg)
     return jsonify({'success': ok, 'message': msg if not ok else ''})

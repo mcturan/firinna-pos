@@ -42,6 +42,41 @@
     <!-- MapLibre GL JS (OpenFreeMap 3D Official Library) -->
     <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+    <!-- Schema.org Structured Data for Search Engines & AI Crawlers -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CafeOrCoffeeShop",
+      "name": "Fırınna Cafe & Restaurant",
+      "image": "https://firinna.com/logo.png",
+      "@id": "https://firinna.com",
+      "url": "https://firinna.com",
+      "telephone": "+905456301214",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Kumbaracı Yokuşu Sok. No:41A",
+        "addressLocality": "Beyoğlu",
+        "addressRegion": "İstanbul",
+        "postalCode": "34421",
+        "addressCountry": "TR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 41.028328,
+        "longitude": 28.976906
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "08:30",
+          "closes": "23:00"
+        }
+      ]
+    }
+    </script>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#d97706">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -174,7 +209,49 @@
                     <span class="badge"><i class="ph-fill ph-money"></i> <span data-i18n="badge_price">Uygun Fiyat</span></span>
                 </div>
 
-                <div class="status-badge"><span class="pulse-dot"></span><span data-i18n="status_open" id="dynamic_work_hours">Şu An Açık (08:00 - 23:00)</span></div>
+                <div class="status-badge"><span class="pulse-dot"></span><span data-i18n="status_open" id="dynamic_work_hours">Şu An Açık (08:30 - 23:00)</span></div>
+                
+                <!-- HAFTALIK ÇALIŞMA GÜNLERİ TABLOSU (GOOGLE BUSINESS UYUMLU) -->
+                <div style="margin-top: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; width: 100%; box-sizing: border-box;">
+                    <div style="font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                            <i class="ph-bold ph-calendar-blank" style="color: #d97706;"></i> Çalışma Günleri & Saatleri
+                        </span>
+                        <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">Her Gün Açık</span>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem; text-align: left;">
+                        <tbody id="public-hours-table-body">
+                            <tr style="border-bottom: 1px solid #f1f5f9; background: #fffbe0; font-weight: 700;">
+                                <td style="padding: 6px 0; color: #334155;">Pazartesi <span style="background: #d97706; color: #fff; font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; margin-left: 6px;">📍 Bugün</span></td>
+                                <td style="padding: 6px 0; text-align: right; color: #b45309; font-weight: 800;">08:30 - 23:00</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 6px 0; color: #334155;">Salı</td>
+                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 6px 0; color: #334155;">Çarşamba</td>
+                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 6px 0; color: #334155;">Perşembe</td>
+                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 6px 0; color: #334155;">Cuma</td>
+                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 6px 0; color: #334155;">Cumartesi</td>
+                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 6px 0; color: #334155;">Pazar</td>
+                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- 2. HIZLI İŞLEMLER -->
@@ -218,9 +295,9 @@
                     </a>
                 </div>
 
-                <!-- Google Harita İframe Geri Eklendi -->
+                <!-- Yandex 3D Görünümlü Mini Harita -->
                 <div style="width: 100%; height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border-color);">
-                    <iframe src="https://maps.google.com/maps?q=Fırınna%20Kumbaracı%20Yokuşu%20Beyoğlu&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    <iframe src="https://yandex.com/map-widget/v1/?ll=28.976906%2C41.028328&z=17.5&pt=28.976906%2C41.028328%2Cpm2amm&l=map%2Cstl%3A3d" width="100%" height="100%" style="border:0;" allowfullscreen="true" loading="lazy"></iframe>
                 </div>
 
                 <div style="border-top: 1px solid var(--border-color); margin: 16px 0;"></div>
@@ -324,9 +401,9 @@
                     </p>
                 </div>
                 
-                <!-- Yandex Haritalar Canlı Inframe Widget (100% Mobil Uyumlu, Türkiye En Yüksek Detay) -->
+                <!-- Yandex Haritalar Canlı 3D Widget (100% Mobil Uyumlu, Türkiye En Yüksek Detay) -->
                 <div style="width: 100%; height: 360px; position: relative; background: #f1f5f9; overflow: hidden;">
-                    <iframe src="https://yandex.com/map-widget/v1/?ll=28.976906%2C41.028328&z=17.5&pt=28.976906%2C41.028328%2Cpm2amm&l=map" width="100%" height="360" frameborder="0" allowfullscreen="true" style="position:relative; width:100%; height:100%; border:0; display:block;"></iframe>
+                    <iframe src="https://yandex.com/map-widget/v1/?ll=28.976906%2C41.028328&z=17.5&pt=28.976906%2C41.028328%2Cpm2amm&l=map%2Cstl%3A3d" width="100%" height="360" frameborder="0" allowfullscreen="true" style="position:relative; width:100%; height:100%; border:0; display:block;"></iframe>
                 </div>
                 
                 <div style="padding: 16px 20px; background: #ffffff; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">

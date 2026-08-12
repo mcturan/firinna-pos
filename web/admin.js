@@ -340,11 +340,63 @@ async function confirmResetAnalytics() {
     }
 }
 
+const DAYS_LIST = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
+
+function renderAdminSchedule(dailyHours = {}) {
+    const container = document.getElementById('weekly-schedule-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+    DAYS_LIST.forEach(day => {
+        const cfg = dailyHours[day] || { open: "08:30", close: "23:00", active: true };
+        const row = document.createElement('div');
+        row.style.cssText = "display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;";
+        
+        const isChecked = cfg.active !== false;
+        
+        row.innerHTML = `
+            <label style="display:flex; align-items:center; gap:8px; width:130px; font-weight:700; color:#0f172a; cursor:pointer;">
+                <input type="checkbox" id="day_active_${day}" ${isChecked ? 'checked' : ''} onchange="toggleDayRow('${day}')">
+                <span>${day}</span>
+            </label>
+            <div id="day_inputs_${day}" style="display:${isChecked ? 'flex' : 'none'}; align-items:center; gap:8px;">
+                <input type="time" id="day_open_${day}" class="form-control" style="width:130px;" value="${cfg.open || '08:30'}">
+                <span style="color:#64748b; font-weight:bold;">-</span>
+                <input type="time" id="day_close_${day}" class="form-control" style="width:130px;" value="${cfg.close || '23:00'}">
+            </div>
+            <span id="day_closed_badge_${day}" style="display:${!isChecked ? 'inline-block' : 'none'}; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">
+                🔴 KAPALI
+            </span>
+        `;
+        container.appendChild(row);
+    });
+}
+
+function toggleDayRow(day) {
+    const active = document.getElementById(`day_active_${day}`).checked;
+    document.getElementById(`day_inputs_${day}`).style.display = active ? 'flex' : 'none';
+    document.getElementById(`day_closed_badge_${day}`).style.display = !active ? 'inline-block' : 'none';
+}
+
+function applyAllDaysSchedule(openTime, closeTime) {
+    DAYS_LIST.forEach(day => {
+        const chk = document.getElementById(`day_active_${day}`);
+        if (chk) chk.checked = true;
+        const openInp = document.getElementById(`day_open_${day}`);
+        if (openInp) openInp.value = openTime;
+        const closeInp = document.getElementById(`day_close_${day}`);
+        if (closeInp) closeInp.value = closeTime;
+        toggleDayRow(day);
+    });
+}
+
 // Ayarları API'den Çek
 async function fetchSettings() {
     try {
         const res = await fetch('/api/web/settings');
         const data = await res.json();
+        
+        renderAdminSchedule(data.daily_hours || {});
         
         if (data.work_hours) {
             const parts = data.work_hours.split('-');
@@ -383,12 +435,22 @@ async function saveSettings(e) {
         const res = await fetch('/api/web/settings');
         const existingData = await res.json();
         
-        const startH = document.getElementById('work_hours_start').value;
-        const endH = document.getElementById('work_hours_end').value;
+        const daily_hours = {};
+        DAYS_LIST.forEach(day => {
+            const active = document.getElementById(`day_active_${day}`).checked;
+            const openVal = document.getElementById(`day_open_${day}`).value || "08:30";
+            const closeVal = document.getElementById(`day_close_${day}`).value || "23:00";
+            daily_hours[day] = { open: openVal, close: closeVal, active: active };
+        });
+
+        // Generate work_hours summary string (e.g. 08:30 - 23:00)
+        const pazartesiCfg = daily_hours["Pazartesi"] || { open: "08:30", close: "23:00" };
+        const workHoursSummary = `${pazartesiCfg.open} - ${pazartesiCfg.close}`;
         
         const payload = {
             ...existingData,
-            work_hours: `${startH} - ${endH}`,
+            work_hours: workHoursSummary,
+            daily_hours: daily_hours,
             address: document.getElementById('address').value,
             phone: document.getElementById('phone').value,
             instagram: document.getElementById('instagram').value,
@@ -413,10 +475,11 @@ async function saveSettings(e) {
                 resultMsg.style.display = 'none';
             }, 3000);
         } else {
-            alert("Kaydetme işlemi başarısız oldu.");
+            alert("Ayarlar kaydedilirken hata oluştu!");
         }
     } catch (e) {
-        console.error("Ayarlar kaydedilemedi", e);
+        console.error("Kaydetme hatası", e);
+        alert("Kaydetme hatası!");
     }
 }
 
