@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="İnteraktif otel arama, Çoklu bölge seçimi (Kral Yolu, Galata, Yarımada, Balat, Moda), Karaköy Güllüoğlu Baklava, Anka Carpets Halı/Kilim rehberi ve Sınırsız Çay.">
-    <meta name="keywords" content="İstanbul gezi rehberi, otel arama navigasyon, Karaköy Güllüoğlu baklava, Anka Carpets halı kilim indirim kodu, Fırınna cafe">
+    <meta name="description" content="Serbest Konum & Airbnb Arama, Çoklu Bölge Seçimi, Karaköy Güllüoğlu Baklava, Anka Carpets Halı/Kilim rehberi ve Sınırsız Çay.">
+    <meta name="keywords" content="İstanbul gezi rehberi, Airbnb otel rota navigasyon, Karaköy Güllüoğlu baklava, Anka Carpets halı kilim indirim kodu, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
     <meta property="og:title" content="İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe">
-    <meta property="og:description" content="Kaldığınız oteli yazın, çoklu bölgenizi ve ilgi alanlarınızı seçin; kişiselleştirilmiş İstanbul rotanızı anında alın!">
+    <meta property="og:description" content="Kaldığınız oteli veya Airbnb konutunuzu yazın; çoklu bölgenizi seçip kişiselleştirilmiş İstanbul rotanızı anında alın!">
     <meta property="og:image" content="https://firinna.com/galata_cafe_bg_new.jpg">
     <meta property="og:url" content="https://firinna.com/gezi">
     <meta property="og:type" content="website">
@@ -721,7 +721,7 @@
         </div>
 
         <h1><i class="ph-bold ph-compass"></i> Akıllı İstanbul Gezi & Rota Planlayıcı</h1>
-        <p>Otellerinizden başlayan akıllı rota planlayıcısı, Efsane Kral Yolu, Ne Nereden Alınır rehberi ve sınırsız çay ikramı. Fırınna Cafe hazır!</p>
+        <p>Otellerinizden ve Airbnb evlerinizden başlayan akıllı rota planlayıcısı, Efsane Kral Yolu, Ne Nereden Alınır rehberi ve sınırsız çay ikramı. Fırınna Cafe hazır!</p>
     </header>
 
     <!-- WIZARD FORM -->
@@ -729,19 +729,19 @@
         
         <!-- STEP 1: ACCOMMODATION / STARTING POINT -->
         <div class="step-label">
-            <span class="num">1</span> <span>Kaldığınız Yer / Otelinizin Konumu (İnteraktif Arama):</span>
+            <span class="num">1</span> <span>Kaldığınız Yer / Başlangıç Noktanız (Serbest Metin & Hızlı Seçim):</span>
         </div>
         <div class="options-grid" id="grid-start">
             <div class="option-pill active" onclick="selectSingleOption('grid-start', this, 'beyoglu')">
-                <div class="title">🏨 Beyoğlu / Taksim / Galata</div>
+                <div class="title">🏡 Galata & Pera (Airbnb / Butik)</div>
                 <div class="desc">Fırınna'ya yürüme mesafesinde</div>
             </div>
             <div class="option-pill" onclick="selectSingleOption('grid-start', this, 'sultanahmet')">
-                <div class="title">🕌 Sultanahmet / Yarımada</div>
+                <div class="title">🕌 Sultanahmet / Cankurtaran</div>
                 <div class="desc">Tarihi merkezde konaklama</div>
             </div>
             <div class="option-pill" onclick="selectSingleOption('grid-start', this, 'karakoy_besiktas')">
-                <div class="title">🌊 Karaköy / Beşiktaş / Şişli</div>
+                <div class="title">🌊 Karaköy / Port / Beşiktaş</div>
                 <div class="desc">Boğaz ve sahil hattı</div>
             </div>
             <div class="option-pill" onclick="selectSingleOption('grid-start', this, 'kadikoy')">
@@ -751,7 +751,7 @@
         </div>
 
         <div class="input-hotel-container">
-            <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="🔎 Otelinizin veya kaldığınız yerin adını yazın (Örn: Rixos Pera, Galataport Hotel, CVK Park Bosphorus)..." autocomplete="off">
+            <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="🔎 Otelinizin, Airbnb evinizin veya sokağınızın adını serbestçe yazın (Örn: Galata Airbnb, Tomtom Suites, Limonlu Bahçe Sokak)..." autocomplete="off">
             <div id="hotel-suggestions" class="suggestions-dropdown"></div>
         </div>
 
@@ -1024,26 +1024,21 @@
         let systemWorkHours = '11:00 - 19:15';
         let systemPhone = '905456301214';
 
-        // POPULAR HOTELS LIST FOR INTERACTIVE AUTOCOMPLETE
-        const POPULAR_HOTELS = [
-            "Rixos Pera Istanbul (Beyoğlu)",
-            "The Marmara Taksim",
-            "Pera Palace Hotel (Beyoğlu)",
-            "Galataport Hotel (Karaköy)",
-            "Soho House Istanbul (Beyoğlu)",
-            "CVK Park Bosphorus Hotel (Taksim)",
-            "Swissotel The Bosphorus (Beşiktaş)",
-            "Sura Hagia Sophia Hotel (Sultanahmet)",
-            "Celine Hotel (Sultanahmet)",
-            "Çırağan Palace Kempinski (Beşiktaş)",
-            "Conrad Istanbul Bosphorus (Beşiktaş)",
-            "Shangri-La Bosphorus (Beşiktaş)",
-            "Hilton Istanbul Bosphorus (Harbiye)",
-            "Witt Istanbul Suites (Cihangir)",
-            "Sultanahmet Palace Hotel"
+        // POPULAR AIRBNB & BOUTIQUE LOCATION SUGGESTIONS FOR INTERACTIVE AUTOCOMPLETE
+        const POPULAR_HUBS = [
+            "Galata / Kumbaracı Yokuşu (Fırınna Yakını)",
+            "Beyoğlu Galata & Pera Airbnb / Butik Daire",
+            "Tomtom Suites (Galata)",
+            "World House Hostel (Galata)",
+            "Ada Karaköy Hotel",
+            "Walton Hotels Galata",
+            "Cihangir Airbnb & Sanat Sokakları",
+            "Sultanahmet / Cankurtaran Butik Otelleri",
+            "Karaköy Port & Rıhtım Daireleri",
+            "Kadıköy Moda Airbnb & Sahil"
         ];
 
-        // SETUP INTERACTIVE HOTEL SEARCH AUTOCOMPLETE
+        // SETUP INTERACTIVE HOTEL / AIRBNB SEARCH AUTOCOMPLETE
         const hotelInput = document.getElementById('hotel-name-input');
         const suggestionsBox = document.getElementById('hotel-suggestions');
 
@@ -1056,13 +1051,13 @@
                 return;
             }
 
-            const matches = POPULAR_HOTELS.filter(h => h.toLowerCase().includes(query));
+            const matches = POPULAR_HUBS.filter(h => h.toLowerCase().includes(query));
             
             if (matches.length > 0) {
                 matches.forEach(matchText => {
                     const div = document.createElement('div');
                     div.className = 'suggestion-item';
-                    div.innerHTML = `<i class="ph-bold ph-buildings" style="color:#d97706;"></i> <span>${matchText}</span>`;
+                    div.innerHTML = `<i class="ph-bold ph-house-line" style="color:#d97706;"></i> <span>${matchText}</span>`;
                     div.onclick = function() {
                         hotelInput.value = matchText;
                         suggestionsBox.style.display = 'none';
@@ -1555,10 +1550,10 @@
                 finalPOIs.push({
                     time: '08:30',
                     hotelStart: true,
-                    title: `🏨 Konaklama Noktanız: ${hotelNameInput}`,
+                    title: `🏨 Konaklama / Başlangıç: ${hotelNameInput}`,
                     category: 'hotel',
                     desc: `Rotanız doğrudan "${hotelNameInput}" konumunuzdan başlayıp Google Haritalar navigasyonuyla adım adım ilerliyor.`,
-                    tip: '📍 Otelinizden başlayarak navigasyonu başlatabilirsiniz.',
+                    tip: '📍 Otelinizden/konumunuzdan başlayarak navigasyonu başlatabilirsiniz.',
                     mapQuery: encodeURIComponent(hotelNameInput)
                 });
             }
@@ -1572,7 +1567,7 @@
                 finalPOIs = finalPOIs.slice(0, 8);
             }
 
-            const startText = hotelNameInput ? `"${hotelNameInput}" otelinizden başlayan` : `Seçtiğiniz başlangıç noktalarından`;
+            const startText = hotelNameInput ? `"${hotelNameInput}" konumunuzdan başlayan` : `Seçtiğiniz başlangıç noktalarından`;
             document.getElementById('result-start-desc').innerText = `${startText} kişiselleştirilmiş tam filtreli rota ve Fırınna Cafe sınırsız çay ikramlı lezzet molanız hazır.`;
 
             const randomCode = Math.floor(1000 + Math.random() * 9000);
@@ -1620,17 +1615,18 @@
             container.style.display = 'block';
             container.scrollIntoView({ behavior: 'smooth' });
 
+            // TRACK VISIT AND SEND LIVE TELEGRAM NOTIFICATION VIA BACKEND API
             if (window.fetch) {
                 fetch('/api/web/track-visit', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         event: 'action',
-                        item: `Gezi Rehberi (${selectedRegions.join(',')})`,
-                        selectedRegion: selectedRegions.join(','),
+                        item: `Gezi Rehberi Rota Oluşturma`,
+                        selectedRegion: selectedRegions.join(', '),
                         selectedTime: selectedTime,
                         startPoint: selectedStart,
-                        hotelName: hotelNameInput
+                        hotelName: hotelNameInput || 'Serbest Konum'
                     })
                 }).catch(e => {});
             }
