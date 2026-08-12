@@ -86,6 +86,9 @@ def gezi_web_page():
 
 @app.route('/admin')
 @app.route('/admin.html')
+@app.route('/yonetim')
+@app.route('/yonetim/')
+@app.route('/yonetim/index.html')
 def admin_web_page():
     return send_from_directory('web', 'admin.html')
 
