@@ -1,18 +1,18 @@
 {
-    "today": 94,
-    "month": 94,
-    "total": 94,
+    "today": 95,
+    "month": 95,
+    "total": 95,
     "menu": 1,
     "actions": 5,
     "last_date": "2026-08-12",
     "devices": {
-        "💻 Masaüstü": 57,
+        "💻 Masaüstü": 58,
         "📱 Mobil": 37
     },
     "browsers": {
         "Google Chrome": 87,
         "Apple Safari": 5,
-        "Microsoft Edge": 2
+        "Microsoft Edge": 3
     },
     "countries": {
         "🇹🇷 Türkiye": 58,
@@ -26,9 +26,45 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 3,
         "🌐 Diğer Web Sitesi": 7,
-        "🔗 Doğrudan (Direct)": 7
+        "🔗 Doğrudan (Direct)": 8
     },
     "recent_visitors": [
+        {
+            "id": "log_1786562304427",
+            "time": "12 Ağustos 22:18",
+            "iso_date": "2026-08-12",
+            "raw_time": "2026-08-12 22:18:24",
+            "ip": "46.1.173.159",
+            "country": "📍 Şişli / Turkey",
+            "location": "📍 Şişli / Turkey",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Microsoft Edge",
+            "action": "⏱️ Sitede Kalma (17s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%8",
+            "time_spent": "17 sn",
+            "lang_compare": "EN ➔ EN"
+        },
+        {
+            "id": "log_1786562287734",
+            "time": "12 Ağustos 22:18",
+            "iso_date": "2026-08-12",
+            "raw_time": "2026-08-12 22:18:07",
+            "ip": "46.1.173.159",
+            "country": "📍 Şişli / Turkey",
+            "location": "📍 Şişli / Turkey",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Microsoft Edge",
+            "action": "Ana Sayfa İnceleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
         {
             "id": "log_1786560533298",
             "time": "12 Ağustos 21:48",
@@ -1882,9 +1918,9 @@
         }
     ],
     "repeat_visitors": 79,
-    "new_visitors": 15,
+    "new_visitors": 16,
     "os": {
-        "Linux": 52,
+        "Linux": 53,
         "Windows PC": 5,
         "Apple iOS": 5,
         "Android OS": 32
@@ -1892,7 +1928,7 @@
     "peak_hours": {
         "14:00 - 17:00 (İkindi Kahve/Tatlı)": 35,
         "17:00 - 20:00 (Akşam Yemeği)": 42,
-        "20:00 - 23:00 (Gece Keyfi)": 17
+        "20:00 - 23:00 (Gece Keyfi)": 18
     },
     "map_clicks": 1,
     "locations": {
@@ -1901,21 +1937,21 @@
         "📍 Prineville / United States": 1,
         "📍 Kansas City / United States": 1,
         "📍 Istanbul / Türkiye": 4,
-        "📍 Şişli / Turkey": 4
+        "📍 Şişli / Turkey": 5
     },
     "traffic_sources": {
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 3,
         "🌐 Diğer Web Sitesi": 7,
-        "🔗 Doğrudan (Direct)": 7
+        "🔗 Doğrudan (Direct)": 8
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 17
+        "🌐 Dışarıdan İnceleyen": 18
     },
     "lang_comparisons": {
         "TR ➔ TR": 10,
-        "EN ➔ TR": 4,
+        "EN ➔ TR": 5,
         "EN ➔ EN": 4
     }
 }
