@@ -2501,6 +2501,8 @@ def change_password():
 
 @app.route('/api/web/reset-analytics', methods=['POST'])
 def reset_analytics():
+    if not verify_admin_auth():
+        return jsonify({"success": False, "error": "Yetkisiz erişim! Lütfen giriş yapın."}), 401
     data = request.json or {}
     scope = data.get('scope', 'all')
     start_date = data.get('startDate')
@@ -2562,6 +2564,8 @@ def get_web_categories():
 
 @app.route('/api/web/categories', methods=['POST'])
 def save_web_category():
+    if not verify_admin_auth():
+        return jsonify({"success": False, "error": "Yetkisiz erişim! Lütfen giriş yapın."}), 401
     import time
     categories = load_web_categories()
     cat_id = request.form.get('id')
@@ -2594,6 +2598,8 @@ def save_web_category():
 
 @app.route('/api/web/categories/<cat_id>', methods=['DELETE'])
 def delete_web_category(cat_id):
+    if not verify_admin_auth():
+        return jsonify({"success": False, "error": "Yetkisiz erişim! Lütfen giriş yapın."}), 401
     categories = load_web_categories()
     categories = [c for c in categories if c.get('id') != cat_id]
     save_web_categories(categories)
