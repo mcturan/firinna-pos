@@ -65,7 +65,7 @@
         .logo-wrap{ text-align: center; margin-bottom: 10px; }
         .logo-wrap img { max-width: 180px; max-height: 90px; object-fit: contain; }
         .qr-wrap  { text-align: center; margin-top: 16px; margin-bottom: 8px; }
-        .qr-label { font-size: 13px; font-weight: bold; color: #000; margin-bottom: 10px; line-height: 1.45; text-align: center; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; padding: 0 8px; }
+        .qr-label { font-size: 12px; font-weight: bold; color: #000; margin-bottom: 10px; line-height: 1.45; text-align: center; white-space: pre-line; word-break: normal; overflow-wrap: normal; font-family: 'Courier New', monospace; }
         .qr-box   { display: inline-block; padding: 10px; background: #ffffff; border: 2px solid #000000; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
         .qr-box img { width: 185px; height: 185px; display: block; image-rendering: pixelated; }
         @media print {
@@ -132,7 +132,7 @@
 <hr class="sep-dash" style="margin-top:14px; margin-bottom:12px;">
 <div class="qr-wrap">
     {% if qr_label %}
-    <div class="qr-label">⭐ {{ qr_label }} ⭐</div>
+    <div class="qr-label">{{ qr_label }}</div>
     {% endif %}
     <div class="qr-box">
         <img src="{{ qr_image_url }}" alt="QR">
