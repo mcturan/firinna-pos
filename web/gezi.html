@@ -3,17 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fırınna Gezi Rehberi | Akıllı İstanbul Rota Planlayıcı</title>
-    <meta name="description" content="Galata, Tarihi Yarımada ve Kadıköy/Moda bölgeleri için minimalist ve akıllı gezi rotası. Tek tıkla Google Haritalar navigasyonu.">
-    <meta name="keywords" content="İstanbul gezi rehberi, Galata gezilecek yerler, Tarihi Yarımada gezi rotası, Kadıköy Moda gezi rehberi, Fırınna cafe">
+    <title>İstanbul Gezi Rehberi & Ulaşım İpuçları | İstanbulkart, Vapur & Metro Saatleri</title>
+    <meta name="description" content="İstanbulkart nereden alınır? Metro, tramvay, vapur saatleri için en iyi uygulamalar, Galata & Tarihi Yarımada gezi rotaları ve İstanbul seyahat ipuçları.">
+    <meta name="keywords" content="İstanbulkart nasıl alınır, İstanbul vapur saatleri, İstanbul metro uygulaması, Moovit İstanbul, Galata gezilecek yerler, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="Fırınna Gezi Rehberi | Akıllı İstanbul Rota Planlayıcı">
-    <meta property="og:description" content="Galata, Tarihi Yarımada ve Moda rotanızı saniyeler içinde oluşturun, Google Haritalar'da navigasyonu başlatın!">
+    <meta property="og:title" content="İstanbul Gezi Rehberi & Ulaşım İpuçları | Fırınna Cafe">
+    <meta property="og:description" content="İstanbulkart temini, vapur ve metro saatleri uygulamaları, Galata ve Yarımada gezi rehberi!">
     <meta property="og:image" content="https://firinna.com/galata_cafe_bg_new.jpg">
     <meta property="og:url" content="https://firinna.com/gezi.html">
     <meta property="og:type" content="website">
+
+    <!-- Schema.org FAQ Structured Data for Google SEO Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "İstanbulkart nereden ve nasıl alınır?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "İstanbulkart; İstanbul Havalimanı (IST), Sabiha Gökçen Havalimanı (SAW), tüm Metro, Tramvay ve Vapur iskelelerindeki sarı/siyah Biletmatik otomatlarından nakit veya kredi kartıyla dakikalar içinde satın alınabilir. Ayrıca tüm toplu taşıma turnikelerinde temassız Visa/Mastercard kredi kartınızla doğrudan geçiş yapabilirsiniz."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "İstanbul otobüs, metro ve vapur saatleri için hangi uygulamalar kullanılır?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Canlı otobüs ve metro takibi için Moovit ve Citymapper uygulamaları tercih edilir. Vapur saatleri için Şehir Hatları (sehirhatlari.istanbul) resmi web sitesi veya uygulaması; bakiye yüklemek için İstanbulkart Mobil uygulaması kullanılır."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Galata ve Pera bölgesinde en iyi kahvaltı ve dinlenme durağı neresidir?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Galata Kumbaracı Yokuşu No:41A adresinde yer alan Fırınna Cafe & Restaurant; bakır sahanda taze Çakallı Menemeni, çıtır bazlama tost, taş fırın pizza ve közde Türk kahvesi lezzetleriyle Galata bölgesinin en popüler mola durağıdır."
+          }
+        }
+      ]
+    }
+    </script>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="logo.png">
@@ -43,7 +77,7 @@
             color: #334155;
             margin: 0;
             padding: 0;
-            line-height: 1.5;
+            line-height: 1.55;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -118,7 +152,7 @@
 
         .guide-header p {
             font-size: 0.95rem;
-            max-width: 580px;
+            max-width: 620px;
             margin: 0 auto;
             color: #94a3b8;
             font-weight: 400;
@@ -225,7 +259,7 @@
             background: #b45309;
         }
 
-        /* ITINERARY RESULT TIMELINE (MINIMALIST) */
+        /* ITINERARY RESULT TIMELINE */
         .itinerary-container {
             max-width: 860px;
             margin: 0 auto 3rem;
@@ -378,6 +412,109 @@
             border: 1px solid #f59e0b;
         }
 
+        /* PRACTICAL TRAVEL GUIDE & FAQ SECTION */
+        .practical-guide-section {
+            max-width: 860px;
+            margin: 2rem auto 3rem;
+            padding: 0 1rem;
+        }
+
+        .section-header-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        .info-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .info-card h4 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p {
+            margin: 0;
+            font-size: 0.86rem;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .app-badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .app-badge {
+            background: #f1f5f9;
+            color: #1e293b;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .faq-accordion {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            padding: 1rem 1.25rem;
+            font-weight: 700;
+            font-size: 0.94rem;
+            color: #0f172a;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            background: #ffffff;
+        }
+
+        .faq-answer {
+            padding: 0 1.25rem 1rem;
+            font-size: 0.88rem;
+            color: #475569;
+            line-height: 1.55;
+        }
+
         @media (max-width: 640px) {
             .guide-header h1 { font-size: 1.5rem; }
             .wizard-card { padding: 1rem; margin-top: -1rem; }
@@ -401,8 +538,8 @@
             </div>
         </div>
 
-        <h1><i class="ph-bold ph-compass"></i> Fırınna Akıllı İstanbul Gezi Rehberi</h1>
-        <p>Bölgeye, zamana ve zevkinize göre hazırlanan minimalist gezi rotası. Fırınna Cafe lezzet durağı ve Google Haritalar navigasyonu hazır!</p>
+        <h1><i class="ph-bold ph-compass"></i> Akıllı İstanbul Gezi & Ulaşım Rehberi</h1>
+        <p>İstanbulkart temini, vapur/metro saatleri, en pratik mobil uygulamalar ve bölge rotaları. Google'dan daha detaylı ve hızlı!</p>
     </header>
 
     <!-- WIZARD FORM (MINIMALIST) -->
@@ -510,6 +647,93 @@
             <div>
                 <h4 style="margin:0 0 2px; color:#fbbf24; font-size:1rem;">Fırınna Gezi Rota Ödülü!</h4>
                 <p style="margin:0; font-size:0.84rem; color:#cbd5e1;">Bu gezi rotasındaki tek lezzet durağı olan **Fırınna Cafe & Restaurant**'ta mola verip bu ekranı gösteren misafirlerimize **Ev Yapımı Sıcak Çay veya Soğuk Limonata İkramımızdır!**</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRACTICAL TRAVEL GUIDE & FAQ SECTION (SEO & GOOGLE BEATER) -->
+    <section class="practical-guide-section">
+        <h2 class="section-header-title">
+            <i class="ph-bold ph-lightbulb" style="color:#d97706;"></i> 🧳 İstanbul Seyahat Hazırlığı & Ulaşım İpuçları
+        </h2>
+
+        <div class="info-cards-grid">
+            <!-- CARD 1: İSTANBULKART -->
+            <div class="info-card">
+                <h4><i class="ph-bold ph-credit-card" style="color:#2563eb;"></i> 💳 İstanbulkart Nasıl & Nereden Alınır?</h4>
+                <p>
+                    <strong>Nereden Alınır?</strong> İstanbul Havalimanı (IST), Sabiha Gökçen (SAW), tüm Metro, Tramvay ve Vapur iskelelerindeki sarı/siyah <strong>Biletmatik</strong> otomatlarından dakikalar içinde alınabilir.<br>
+                    <strong>💳 Kredi Kartı Kullanımı:</strong> Fiziksel İstanbulkart almak istemiyorsanız, tüm Metro/Tramvay turnikelerinde <strong>Temassız Visa/Mastercard</strong> kartınızı basarak doğrudan geçebilirsiniz!
+                </p>
+            </div>
+
+            <!-- CARD 2: MOBİL UYGULAMALAR -->
+            <div class="info-card">
+                <h4><i class="ph-bold ph-device-mobile-camera" style="color:#16a34a;"></i> 📱 En Gerekli 4 İstanbul Seyahat Uygulaması</h4>
+                <p>İstanbul'da kaybolmadan en hızlı seyahat etmek için telefonunuzda bulunması gereken uygulamalar:</p>
+                <div class="app-badge-list">
+                    <span class="app-badge">🗺️ Moovit (Canlı Otobüs/Metro)</span>
+                    <span class="app-badge">⛵ Şehir Hatları (Vapur Saatleri)</span>
+                    <span class="app-badge">💳 İstanbulkart Mobil (TL Yükleme)</span>
+                    <span class="app-badge">📍 Google Maps (Yürüyüş Navigasyonu)</span>
+                </div>
+            </div>
+
+            <!-- CARD 3: PRATİK TAVSİYELER -->
+            <div class="info-card">
+                <h4><i class="ph-bold ph-sneaker" style="color:#d97706;"></i> 👟 Galata & İstanbul Gezisi İpuçları</h4>
+                <p>
+                    • <strong>Yürüyüş Ayakkabısı:</strong> Galata ve Kumbaracı Yokuşu tarihi taş yokuşlardır; rahat spor ayakkabı şarttır.<br>
+                    • <strong>Müze Sıraları:</strong> Topkapı Sarayı ve Yerebatan Sarnıcı gişelerinde sıra beklememek için biletleri önceden online e-bilet alın.<br>
+                    • <strong>Cami Ziyaretleri:</strong> Ayasofya ve Süleymaniye cami ziyaretleri için omuz/diz örtecek kıyafet veya şal bulundurun.
+                </p>
+            </div>
+        </div>
+
+        <!-- FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION) -->
+        <h3 style="font-size:1.15rem; font-weight:800; color:#0f172a; margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+            <i class="ph-bold ph-question" style="color:#d97706;"></i> Sıkça Sorulan Sorular (İstanbul Seyahat FAQ)
+        </h3>
+
+        <div class="faq-accordion">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>💳 İstanbulkart şart mı, temassız kredi kartı geçer mi?</span>
+                    <i class="ph-bold ph-caret-down"></i>
+                </div>
+                <div class="faq-answer">
+                    İstanbul'daki tüm otobüs, metro, tramvay, vapur ve funiküler turnikelerinde temassız Visa ve Mastercard kredi/banka kartları geçerlidir. Kart satın almadan doğrudan cebinizdeki temassız kartı turnikeye basabilirsiniz.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>⛵ Vapur saatlerini canlı nasıl takip edebilirim?</span>
+                    <i class="ph-bold ph-caret-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Şehir Hatları'nın resmi web sitesi olan <strong>sehirhatlari.istanbul</strong> adresinden veya Şehir Hatları mobil uygulamasından Karaköy, Eminönü, Kadıköy ve Üsküdar vapur kalkış ve varış saatlerini anlık takip edebilirsiniz.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>☕ Galata ve Pera bölgesinde nerede mola vermeliyim?</span>
+                    <i class="ph-bold ph-caret-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Kumbaracı Yokuşu No:41A adresindeki <strong>Fırınna Cafe & Restaurant</strong>; bakır sahanda Çakallı Menemeni, taş fırın İtalyan pizzası, közde Türk kahvesi ve Belçika çikolatalı San Sebastian Cheesecake'i ile Galata bölgesinin en otantik mola noktasıdır.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>🚕 İstanbul'da Taksi mi Toplu Taşıma mı tercih edilmeli?</span>
+                    <i class="ph-bold ph-caret-down"></i>
+                </div>
+                <div class="faq-answer">
+                    İstanbul trafiğinde taksi hem bulması zor hem de zaman kaybıdır. M2 Metro hattı (Yenikapı-Taksim-Hacıosman), T1 Tramvay hattı (Kabataş-Sultanahmet-Eminönü) ve Şehir Hatları vapurları ile taksiden en az 2 kat daha hızlı seyahat edebilirsiniz.
+                </div>
             </div>
         </div>
     </section>
