@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="Kademeli açılan akıllı İstanbul gezi rehberi, canlı haritalar ve Fırınna Cafe VIP ikram kartı.">
-    <meta name="keywords" content="İstanbul gezi rehberi, kademeli rota planlayıcı, galata kulesi gezi rehberi, Karaköy Güllüoğlu baklava, Fırınna cafe">
+    <meta name="description" content="Kademeli açılan akıllı İstanbul gezi rehberi, canlı haritalar, 4 günlük hava durumu ve Fırınna Cafe VIP ikram kartı.">
+    <meta name="keywords" content="İstanbul gezi rehberi, başlangıç noktası, hava durumu istanbul, galata kulesi gezi rehberi, Karaköy Güllüoğlu baklava, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
@@ -137,6 +137,63 @@
             border-color: #f59e0b;
         }
 
+        /* WEATHER WIDGET WARD STYLING */
+        .weather-forecast-widget {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 1.5px solid #f59e0b;
+            border-radius: 14px;
+            padding: 1.1rem 1.4rem;
+            margin-bottom: 1.8rem;
+            color: white;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        }
+
+        .weather-widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        .weather-days-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .weather-day-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .weather-day-card.today {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: #f59e0b;
+        }
+
+        .weather-day-title {
+            font-size: 0.76rem;
+            font-weight: 800;
+            color: #fbbf24;
+            text-transform: uppercase;
+        }
+
+        .weather-day-icon {
+            font-size: 1.5rem;
+            margin: 3px 0;
+        }
+
+        .weather-day-temp {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
         /* MAIN CLEAN CONTAINER */
         .gezi-dashboard-clean {
             max-width: 960px;
@@ -150,25 +207,6 @@
             padding: 2rem;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
             border: 1px solid #e2e8f0;
-        }
-
-        .surprise-banner-btn {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border: 2px solid #f59e0b;
-            border-radius: 14px;
-            padding: 12px 18px;
-            margin-bottom: 1.8rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: white;
-        }
-
-        .surprise-banner-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.25);
         }
 
         .step-label {
@@ -356,28 +394,6 @@
         .btn-generate:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(217, 119, 6, 0.35);
-        }
-
-        .btn-surprise {
-            background: #0f172a;
-            color: #fbbf24;
-            flex: 1;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #f59e0b;
-            font-size: 0.95rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-surprise:hover {
-            background: #1e293b;
-            transform: translateY(-2px);
         }
 
         /* ITINERARY RESULT TIMELINE */
@@ -842,7 +858,7 @@
             .actions-bar { flex-direction: column; }
             .pass-grid { grid-template-columns: 1fr; }
             .summary-table td.label { width: 120px; }
-            .surprise-banner-btn { flex-direction: column; text-align: center; gap: 8px; }
+            .weather-days-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -875,22 +891,44 @@
                 <p style="margin:0; font-size:0.92rem; color:#64748b;">Gezinize özel canlı haritalar, esnek gezi saatleri ve Fırınna Cafe'de VIP ikram kartınız.</p>
             </div>
 
-            <!-- QUICK SURPRISE ROUTE BUTTON -->
-            <div class="surprise-banner-btn" onclick="generateSurpriseItinerary()">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-size:1.6rem; animation: floatIcon 2.5s infinite;">🎲</span>
-                    <div>
-                        <strong style="font-size:0.98rem; color:#fbbf24; display:block;">Kararsız mısınız? Sürpriz Rota Oluşturun!</strong>
-                        <span style="font-size:0.82rem; color:#cbd5e1;">Hızlıca sürpriz efsane bir rota çıkarır.</span>
+            <!-- LIVE ISTANBUL WEATHER WIDGET (CURRENT + NEXT 3 DAYS) -->
+            <div class="weather-forecast-widget">
+                <div class="weather-widget-header">
+                    <div style="font-weight:800; font-size:0.95rem; color:#fbbf24; display:flex; align-items:center; gap:8px;">
+                        <i class="ph-bold ph-cloud-sun" style="font-size:1.2rem; color:#f59e0b;"></i> 
+                        <span>İstanbul Canlı Hava Tahmini (Şimdi & Gelecek 3 Gün)</span>
+                    </div>
+                    <span id="weather-tip-badge" style="font-size:0.78rem; background:rgba(255,255,255,0.1); padding:3px 10px; border-radius:12px; color:#cbd5e1;">Açık & Geziye Uygun</span>
+                </div>
+                <div class="weather-days-grid" id="weather-days-grid">
+                    <!-- Populated by Open-Meteo JS -->
+                    <div class="weather-day-card today">
+                        <div class="weather-day-title">Bugün</div>
+                        <div class="weather-day-icon">☀️</div>
+                        <div class="weather-day-temp">24°C / 18°C</div>
+                    </div>
+                    <div class="weather-day-card">
+                        <div class="weather-day-title">Yarın</div>
+                        <div class="weather-day-icon">⛅</div>
+                        <div class="weather-day-temp">23°C / 17°C</div>
+                    </div>
+                    <div class="weather-day-card">
+                        <div class="weather-day-title">Cuma</div>
+                        <div class="weather-day-icon">☀️</div>
+                        <div class="weather-day-temp">25°C / 19°C</div>
+                    </div>
+                    <div class="weather-day-card">
+                        <div class="weather-day-title">Cumartesi</div>
+                        <div class="weather-day-icon">🌤️</div>
+                        <div class="weather-day-temp">24°C / 18°C</div>
                     </div>
                 </div>
-                <span style="background:#f59e0b; color:#0f172a; font-weight:800; padding:6px 14px; border-radius:10px; font-size:0.82rem; display:inline-block; white-space:nowrap;">🎲 Sürpriz Yap!</span>
             </div>
 
-            <!-- STEP 1: STARTING LOCATION (ALWAYS VISIBLE AT START) -->
+            <!-- STEP 1: STARTING POINT (EXPLICITLY RE-NAMED TO BAŞLANGIÇ NOKTASI) -->
             <div class="step-container" id="step-container-1">
                 <div class="step-label">
-                    <span class="num">1</span> <span>Neredesiniz / Nereden Başlayacaksınız? (Başlangıç Merkeziniz):</span>
+                    <span class="num">1</span> <span>Başlangıç Noktası (Geziye Nereden Başlayacaksınız?):</span>
                 </div>
                 <div class="options-grid" id="grid-start">
                     <div class="option-pill" onclick="selectStartOption('taksim')">
@@ -927,8 +965,12 @@
                     </div>
                 </div>
 
-                <div class="input-hotel-container">
-                    <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="🔎 Veya otelinizin, Airbnb evinizin adını serbestçe yazın (Örn: Tomtom Suites, Ada Karaköy)..." autocomplete="off">
+                <!-- OPTIONAL SECONDARY HOTEL LOCATION FOR PRE-TOUR FIRINNA BREAKFAST ROUTING -->
+                <div style="background:#fffdf5; border:1px solid #fde68a; border-radius:12px; padding:12px 16px; margin-bottom:1.8rem;">
+                    <label style="font-weight:700; font-size:0.86rem; color:#78350f; display:block; margin-bottom:6px;">
+                        🏨 Konakladığınız Otel / Airbnb Adı veya Semti (Opsiyonel — Rota öncesi Fırınna Cafe'de Kahvaltı/Kahve Molası eklensin):
+                    </label>
+                    <input type="text" id="hotel-name-input" class="input-hotel-box" style="margin-bottom:0;" placeholder="Örn: Tomtom Suites Galata, Pera Palace, Ada Karaköy..." autocomplete="off">
                     <div id="hotel-suggestions" class="suggestions-dropdown"></div>
                 </div>
             </div>
@@ -1004,17 +1046,17 @@
                 </div>
             </div>
 
-            <!-- STEP 5: REGION (REVEALED AFTER STEP 4) -->
+            <!-- STEP 5: REGION (REVEALED AFTER STEP 4 - STRICTLY CATEGORIZED BY GEOGRAPHY) -->
             <div class="step-container" id="step-container-5" style="display: none;">
                 <div class="step-label">
-                    <span class="num">5</span> <span>Gezmek İstediniz Hedef Bölge & Yön:</span>
+                    <span class="num">5</span> <span>Gezmek İstediğiniz Hedef Bölge & Yön (Kategorili Seçenekler):</span>
                 </div>
                 <div class="options-grid" id="grid-region">
-                    <!-- Dynamically populated -->
+                    <!-- Dynamically populated by updateRegionOptions() -->
                 </div>
             </div>
 
-            <!-- SUMMARY PREVIEW & SUBMIT BUTTON (REVEALED AFTER STEP 5 OR ALL SELECTED) -->
+            <!-- SUMMARY PREVIEW & SUBMIT BUTTON (REVEALED AFTER STEP 5) -->
             <div class="step-container" id="step-container-final" style="display: none;">
                 <div class="summary-preview-card" id="summary-preview-card">
                     <h4 style="margin:0 0 6px; color:#0f172a; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
@@ -1281,7 +1323,7 @@
 
         let systemWorkHours = '11:00 - 19:15';
         let systemPhone = '905456301214';
-        let liveWeatherText = '☀️ İstanbul 23°C (Açık & Güneşli)';
+        let liveWeatherText = '☀️ İstanbul 24°C (Açık & Güneşli)';
 
         const POPULAR_HUBS = [
             "Taksim Meydanı / İstiklal Başı",
@@ -1293,31 +1335,48 @@
             "Kadıköy İskele / Rıhtım",
             "Moda Sahil / Çay Bahçesi",
             "Beyoğlu Galata & Pera Airbnb / Butik Daire",
-            "Tomtom Suites (Galata)"
+            "Tomtom Suites (Galata)",
+            "Pera Palace Hotel (Taksim/Şişhane)"
         ];
 
-        // FETCH LIVE ISTANBUL WEATHER FROM OPEN-METEO API
+        // FETCH LIVE ISTANBUL WEATHER FOR CURRENT & NEXT 3 DAYS FROM OPEN-METEO API
         if (window.fetch) {
-            fetch('https://api.open-meteo.com/v1/forecast?latitude=41.0082&longitude=28.9784&current_weather=true')
+            fetch('https://api.open-meteo.com/v1/forecast?latitude=41.0082&longitude=28.9784&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=Europe%2FIstanbul')
                 .then(r => r.json())
                 .then(data => {
-                    if (data && data.current_weather) {
-                        const temp = Math.round(data.current_weather.temperature);
-                        const code = data.current_weather.weathercode;
-                        let weatherDesc = 'Açık & Güneşli';
-                        let icon = '☀️';
+                    if (data && data.daily && data.daily.temperature_2m_max) {
+                        const gridEl = document.getElementById('weather-days-grid');
+                        gridEl.innerHTML = '';
 
-                        if (code >= 1 && code <= 3) { weatherDesc = 'Parçalı Bulutlu'; icon = '⛅'; }
-                        else if (code >= 51 && code <= 67) { weatherDesc = 'Yağmurlu'; icon = '🌧️'; }
-                        else if (code >= 71 && code <= 77) { weatherDesc = 'Karlı'; icon = '❄️'; }
-                        else if (code >= 80) { weatherDesc = 'Sağanak Yağışlı'; icon = '🌧️'; }
+                        const daysNames = ['Bugün', 'Yarın', '2. Gün', '3. Gün'];
+                        const daysData = data.daily;
 
-                        liveWeatherText = `${icon} İstanbul ${temp}°C (${weatherDesc})`;
-                        const weatherEl = document.getElementById('weather-display');
-                        if (weatherEl) weatherEl.innerText = liveWeatherText;
+                        for (let i = 0; i < 4; i++) {
+                            const maxTemp = Math.round(daysData.temperature_2m_max[i]);
+                            const minTemp = Math.round(daysData.temperature_2m_min[i]);
+                            const code = daysData.weathercode[i];
 
-                        const passWeatherEl = document.getElementById('pass-val-weather');
-                        if (passWeatherEl) passWeatherEl.innerText = `${temp}°C ${weatherDesc}`;
+                            let icon = '☀️';
+                            if (code >= 1 && code <= 3) icon = '⛅';
+                            else if (code >= 51 && code <= 67) icon = '🌧️';
+                            else if (code >= 71) icon = '❄️';
+
+                            const dayCard = document.createElement('div');
+                            dayCard.className = `weather-day-card ${i === 0 ? 'today' : ''}`;
+                            dayCard.innerHTML = `
+                                <div class="weather-day-title">${daysNames[i]}</div>
+                                <div class="weather-day-icon">${icon}</div>
+                                <div class="weather-day-temp">${maxTemp}° / ${minTemp}°</div>
+                            `;
+                            gridEl.appendChild(dayCard);
+                        }
+
+                        if (data.current_weather) {
+                            const currentTemp = Math.round(data.current_weather.temperature);
+                            liveWeatherText = `☀️ İstanbul ${currentTemp}°C`;
+                            const weatherEl = document.getElementById('weather-display');
+                            if (weatherEl) weatherEl.innerText = liveWeatherText;
+                        }
                     }
                 }).catch(e => {});
         }
@@ -1345,7 +1404,6 @@
                     div.onclick = function() {
                         hotelInput.value = matchText;
                         suggestionsBox.style.display = 'none';
-                        selectStartOption('taksim'); // Trigger step 2
                     };
                     suggestionsBox.appendChild(div);
                 });
@@ -1438,49 +1496,49 @@
             updateSummaryPreview();
         }
 
-        // DYNAMICALLY FILTER TARGET REGIONS BASED ON STEPS 1, 3 & 4
+        // STRICTLY GEOGRAPHICALLY CATEGORIZED REGION OPTIONS ACCORDING TO CONCEPT & DURATION
         function updateRegionOptions() {
             const gridRegion = document.getElementById('grid-region');
             gridRegion.innerHTML = '';
 
             let regionOptions = [];
 
-            if (selectedStart === 'kadikoy' || selectedStart === 'moda') {
-                if (selectedTime === 'half') {
-                    regionOptions = [
-                        { key: 'moda_caddebostan', title: '🌊 Moda - Kalamış - Caddebostan Sahil Kordonu', desc: 'Deniz manzaralı sahil yürüyüşü & çimler' },
-                        { key: 'bosphorus_asian', title: '⛵ Boğaz Kıyısı: Kuzguncuk, Üsküdar & Beylerbeyi', desc: 'Vapurla 15 dk tarihi yalılar ve çay molası' },
-                        { key: 'galata_firinna', title: '🌉 Vapurla Karaköy & Galata (Fırınna Cafe Mola)', desc: '15 dk nostaljik vapurla Galata geçişi' }
-                    ];
-                } else {
-                    regionOptions = [
-                        { key: 'polonezkoy_riva', title: '🌲 Polonezköy Tabiat Parkı & Riva (Özel Araçlı Doğa)', desc: 'Geniş orman yürüyüş kulvarı & nehir kıyısı' },
-                        { key: 'buyukada_islands', title: '⛵ Büyükada Çam Ormanları & Aya Yorgi (Vapur + Bisiklet)', desc: 'Ada çamlıkları ve bisiklet turu' },
-                        { key: 'belgrad_forest', title: '🌳 Belgrad Ormanı & Neşet Suyu (Avrupa Doğa)', desc: '6 km kauçuk koşu ve yürüyüş kulvarı' }
-                    ];
-                }
-            } else {
-                if (selectedConcept === 'nature') {
-                    if (selectedTime === 'half') {
-                        regionOptions = [
-                            { key: 'macka_nisantasi', title: '🌳 Nişantaşı & Maçka Demokrasi Parkı (Teleferikli)', desc: 'Lüks caddeler ve park kulvarı' },
-                            { key: 'gulhane_sarayburnu', title: '🌿 Tarihi Gülhane Parkı & Sarayburnu Sahil', desc: 'Asırlık çınar ağaçları ve deniz havası' },
-                            { key: 'yildiz_besiktas', title: '🌳 Yıldız Parkı Tarihi Koruları & Beşiktaş Sahil', desc: 'Tarihi köşkler ve Boğaz kordonu' }
-                        ];
-                    } else {
-                        regionOptions = [
-                            { key: 'belgrad_forest', title: '🌲 Belgrad Ormanı & Neşet Suyu 6km Koşu Kulvarı', desc: 'İstanbul akciğeri kauçuk parkur' },
-                            { key: 'ataturk_arboretum', title: '🌿 Atatürk Arboretumu (Bahçeköy Canlı Müze)', desc: 'Göletli nadir ağaç türleri müzesi' },
-                            { key: 'buyukada_islands', title: '⛵ Büyükada Çam Ormanları & Aya Yorgi', desc: 'Vapurla Ada doğa turu' }
-                        ];
-                    }
-                } else {
-                    regionOptions = [
-                        { key: 'galata_pera', title: '🏛️ Galata - Pera - İstiklal Tarihi Hattı', desc: 'Galata Kulesi, Kamondo & Fırınna Cafe' },
-                        { key: 'eminonu_historic', title: '🕌 Eminönü, Mısır Çarşısı & Galata Köprüsü', desc: 'Baharat kokuları & Haliç yürüyüşü' },
-                        { key: 'sultanahmet_classic', title: '🕌 Sultanahmet & Yerebatan Bizans Su Sarayı', desc: 'Ayasofya & Hipodrom meydanı' }
-                    ];
-                }
+            // IF CONCEPT IS NATURE / ORMAN / RUNNING
+            if (selectedConcept === 'nature') {
+                regionOptions = [
+                    { key: 'belgrad_forest', title: '🌲 Belgrad Ormanı & Neşet Suyu (6km Koşu Kulvarı)', desc: 'İstanbul akciğeri kauçuk parkur' },
+                    { key: 'ataturk_arboretum', title: '🌿 Atatürk Arboretumu (Bahçeköy Canlı Müze)', desc: 'Göletli nadir ağaç türleri müzesi' },
+                    { key: 'moda_caddebostan', title: '🌊 Moda Sahil & Caddebostan Kordon Yürüyüşü', desc: 'Deniz manzaralı yeşil alanlar & çimler' },
+                    { key: 'polonezkoy_riva', title: '🌲 Polonezköy Tabiat Parkı (Özel Araçlı Orman)', desc: 'Geniş orman yürüyüşü ve nehir kıyısı' },
+                    { key: 'buyukada_islands', title: '⛵ Büyükada Çam Ormanları & Aya Yorgi Manastırı', desc: 'Vapurla Ada doğa turu' }
+                ];
+            }
+            // IF CONCEPT IS HISTORICAL / CULTURAL / CITY WALKS (NEVER OFFER BELGRAD ORMANI HERE!)
+            else if (selectedConcept === 'historical') {
+                regionOptions = [
+                    { key: 'sultanahmet_classic', title: '🕌 Tarihi Yarımada: Ayasofya, Sultanahmet & Yerebatan', desc: 'Bizans su sarayı & Ayasofya meydanı' },
+                    { key: 'eminonu_historic', title: '🕌 Eminönü, Mısır Çarşısı & Galata Köprüsü', desc: 'Baharat kokuları & Haliç yürüyüşü' },
+                    { key: 'galata_pera', title: '🏛️ Galata - Pera - İstiklal Sanat & Kültür Hattı', desc: 'Galata Kulesi, Kamondo & Fırınna Cafe' },
+                    { key: 'balat_fener', title: '📸 Balat, Fener & Haliç Kıyısı Sanat Evleri', desc: 'Renkli tarihi konaklar ve patrikhane' },
+                    { key: 'bosphorus_asian', title: '⛵ Asya Yakası: Kuzguncuk, Üsküdar & Beylerbeyi Sarayı', desc: 'Vapurla tarihi yalılar ve Boğaz havası' }
+                ];
+            }
+            // IF CONCEPT IS PHOTO / COUPLES / NEIGHBORHOODS
+            else if (selectedConcept === 'photo') {
+                regionOptions = [
+                    { key: 'balat_fener', title: '📸 Balat & Fener Renkli Sokaklar', desc: 'Renkli merdivenler, kafeler & tarihi evler' },
+                    { key: 'galata_pera', title: '🏛️ Galata Taş Sokaklar & Kamondo Merdivenleri', desc: 'Fototrafik Ceneviz dokusu' },
+                    { key: 'bosphorus_asian', title: '⛵ Kuzguncuk Tarihi Ahşap Evler & Üsküdar Sahil', desc: 'Nostaljik mahalle kültürü' },
+                    { key: 'moda_caddebostan', title: '🌊 Moda Sahili & Çay Bahçesi Gün Batımı', desc: 'Deniz kıyısı yürüyüşü' }
+                ];
+            }
+            // NIGHTLIFE & BARS
+            else {
+                regionOptions = [
+                    { key: 'galata_pera', title: '🎷 Asmalımescit, Pera & Cihangir Barlar Sokağı', desc: 'Canlı müzik, teraslar ve sanat barları' },
+                    { key: 'kadikoy_bars', title: '🍻 Kadıköy Kadife Sokak (Barlar Sokağı) & Moda', desc: 'Anadolu yakası gece hayatı' },
+                    { key: 'besiktas_carsi', title: '🍻 Beşiktaş Çarşı İçi & Akaretler Sıraevler', desc: 'Genç ve dinamik akşam mekanları' }
+                ];
             }
 
             selectedRegion = regionOptions[0].key;
@@ -1515,15 +1573,16 @@
                 galata_pera: '🏛️ Galata - Pera - İstiklal Hattı',
                 eminonu_historic: '🕌 Eminönü, Mısır Çarşısı & Galata Köprüsü',
                 sultanahmet_classic: '🕌 Sultanahmet & Yerebatan Sarnıcı',
+                balat_fener: '📸 Balat & Fener Renkli Tarihi Sokaklar',
                 moda_caddebostan: '🌊 Moda - Kalamış - Caddebostan Sahil Kordonu',
-                bosphorus_asian: '⛵ Boğaz Kıyısı: Kuzguncuk & Üsküdar',
+                bosphorus_asian: '⛵ Asya Yakası: Kuzguncuk & Üsküdar',
                 galata_firinna: '🌉 Vapurla Karaköy & Galata (Fırınna Mola)',
-                polonezkoy_riva: '🌲 Polonezköy Tabiat Parkı & Riva (Özel Araçlı)',
+                polonezkoy_riva: '🌲 Polonezköy Tabiat Parkı & Riva',
                 buyukada_islands: '⛵ Büyükada Çam Ormanları & Aya Yorgi',
-                belgrad_forest: '🌲 Belgrad Ormanı & Neşet Suyu',
-                macka_nisantasi: '🌳 Nişantaşı & Maçka Demokrasi Parkı',
-                gulhane_sarayburnu: '🌿 Tarihi Gülhane Parkı & Sarayburnu',
-                yildiz_besiktas: '🌳 Yıldız Parkı & Beşiktaş Sahil'
+                belgrad_forest: '🌲 Belgrad Ormanı & Neşet Suyu (Avrupa Doğa)',
+                ataturk_arboretum: '🌿 Atatürk Arboretumu Canlı Ağaç Müzesi',
+                kadikoy_bars: '🍻 Kadıköy Kadife Sokak (Barlar Sokağı)',
+                besiktas_carsi: '🍻 Beşiktaş Çarşı İçi & Akaretler'
             };
             return map[regionKey] || '🏛️ Galata - Pera - İstiklal Hattı';
         }
@@ -1531,16 +1590,11 @@
         function updateSummaryPreview() {
             let startName = getStartLabelName(selectedStart || 'taksim');
             let conceptTxt = "🏛️ Tarih, Kültür & Şehir Klasikleri";
-            let regionTxt = getRegionLabelName(selectedRegion || 'galata_pera');
-            let stopsTxt = "Taksim Meydanı ➔ İstiklal ➔ Kamondo Merdivenleri ➔ Fırınna Cafe";
+            if (selectedConcept === 'nature') conceptTxt = "🌲 Doğa Gezisi & Yürüyüş 🏃";
+            else if (selectedConcept === 'photo') conceptTxt = "📸 Renkli Mahalleler 👫";
+            else if (selectedConcept === 'nightlife') conceptTxt = "🎷 Gece Hayatı & Barlar 🍻";
 
-            if (selectedStart === 'galata') stopsTxt = "Fırınna Cafe ➔ Galata Kulesi ➔ Kamondo Merdivenleri ➔ Karaköy";
-            else if (selectedStart === 'eminonu') stopsTxt = "Eminönü ➔ Mısır Çarşısı ➔ Galata Köprüsü ➔ Fırınna Cafe";
-            else if (selectedStart === 'sultanahmet') stopsTxt = "Sultanahmet ➔ Yerebatan Sarnıcı ➔ Galata Köprüsü ➔ Fırınna Cafe";
-            else if (selectedStart === 'kapalicarsi') stopsTxt = "Kapalıçarşı (Kral Yolu) ➔ Mısır Çarşısı ➔ Galata ➔ Fırınna Cafe";
-            else if (selectedStart === 'nisantasi') stopsTxt = "Nişantaşı ➔ Maçka Parkı ➔ Teleferik ➔ Karaköy ➔ Fırınna Cafe";
-            else if (selectedStart === 'kadikoy') stopsTxt = "Kadıköy İskele ➔ Boğa Heykeli ➔ Vapurla Karaköy ➔ Fırınna Cafe";
-            else if (selectedStart === 'moda') stopsTxt = "Moda Sahil ➔ Fenerbahçe Korusu ➔ Nostaljik Vapur ➔ Fırınna Cafe";
+            let regionTxt = getRegionLabelName(selectedRegion || 'galata_pera');
 
             let timeTxt = "Yarım Gün (3-4 Saat)";
             if (selectedTime === '1day') timeTxt = "1 Tam Gün (6-8 Saat Kapsamlı)";
@@ -1551,19 +1605,18 @@
             document.getElementById('summary-val-concept').innerText = conceptTxt;
             document.getElementById('summary-val-time').innerText = timeTxt;
             document.getElementById('summary-val-region').innerText = regionTxt;
-            document.getElementById('summary-val-stops').innerText = stopsTxt;
         }
 
         const POIS_DATABASE = {
             half: [
-                { offsetMin: 0, title: '📍 Başlangıç Merkeziniz & Çevre Keşfi', category: 'photo', desc: 'Seçtiğiniz lokasyondan yürüyüş ve gezi başlangıcı.', mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul' },
-                { offsetMin: 60, title: '🚋 Tarihi Semt Sokakları & Kültürel Durak', category: 'photo', desc: 'Caddeler, nostaljik yapılardan taş sokaklara geçiş.', alt: '💡 Alternatif: Tarihi pasajlar & çay molası', mapQuery: 'Cicek+Pasaji+Beyoglu+Istanbul' },
+                { offsetMin: 0, title: '📍 Başlangıç Noktanız & Çevre Keşfi', category: 'photo', desc: 'Seçtiğiniz başlangıç lokasyonundan geziye başlama.', mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul' },
+                { offsetMin: 60, title: '🚋 Tarihi Semt Sokakları & Kültürel Yürüyüş', category: 'photo', desc: 'Caddeler, nostaljik yapılardan taş sokaklara geçiş.', alt: '💡 Alternatif: Tarihi pasajlar & çay molası', mapQuery: 'Cicek+Pasaji+Beyoglu+Istanbul' },
                 { offsetMin: 120, title: '🗼 Galata Kulesi & Kamondo Merdivenleri', category: 'museums', desc: 'Ceneviz surları ve Galata simgesi etrafında yürüyüş.', mapQuery: 'Galata+Kulesi+Beyoglu+Istanbul' },
                 { offsetMin: 180, featured: true, title: 'FIRINNA CAFE & RESTAURANT', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da bakır sahanda menemen, taş fırın pizza & sınırsız Türk çayı.', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' }
             ],
 
             '1day': [
-                { offsetMin: 0, title: '📍 1. DURAK: Başlangıç Merkezinizde Güne Başlangıç', category: 'photo', desc: 'Sabah tazeliğinde tarihi caddeler ve meydan turu.', mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul' },
+                { offsetMin: 0, title: '📍 1. DURAK: Başlangıç Noktanızda Güne Başlangıç', category: 'photo', desc: 'Sabah tazeliğinde tarihi caddeler ve meydan turu.', mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul' },
                 { offsetMin: 60, title: '🏛️ 2. DURAK: Tarihi Mimari & Sanat Galerileri Yürüyüşü', category: 'museums', desc: 'Çiçek Pasajı, St. Antuan Kilisesi ve Pera caddesi gezisi.', mapQuery: 'St+Antuan+Kilisesi+Beyoglu+Istanbul' },
                 { offsetMin: 135, featured: true, title: 'FIRINNA CAFE & RESTAURANT — Gün Ortası Lezzet Molası & Sınırsız Çay 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da fırından yeni çıkmış gurme lezzetler.', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' },
                 { offsetMin: 210, title: '🗼 4. DURAK: Galata Kulesi & Kamondo Merdivenleri', category: 'museums', desc: 'Galata Kulesi taş sokakları ve merdiven fotoğrafı.', mapQuery: 'Galata+Kulesi+Beyoglu+Istanbul' },
@@ -1590,35 +1643,25 @@
             ]
         };
 
+        function formatTimeOffset(startStr, offsetMinutes) {
+            const parts = startStr.split(':');
+            let startH = parseInt(parts[0], 10);
+            let startM = parseInt(parts[1], 10);
+
+            let totalM = startH * 60 + startM + (offsetMinutes % 1440);
+            let finalH = Math.floor(totalM / 60) % 24;
+            let finalM = totalM % 60;
+
+            const strH = finalH < 10 ? '0' + finalH : finalH;
+            const strM = finalM < 10 ? '0' + finalM : finalM;
+            return `${strH}:${strM}`;
+        }
+
         function generateSmartItinerary() {
-            renderItinerary(false);
+            renderItinerary();
         }
 
-        // SURPRISE ROUTE REVEALS ALL STEPS INSTANTLY AND RENDERS
-        function generateSurpriseItinerary() {
-            const starts = ['taksim', 'galata', 'eminonu', 'sultanahmet', 'kadikoy', 'moda'];
-            const startTimes = ['10:00', '11:30', '14:00', '17:30'];
-            const concepts = ['historical', 'nature', 'photo', 'nightlife'];
-            const times = ['half', '1day', '2days'];
-
-            selectedStart = starts[Math.floor(Math.random() * starts.length)];
-            selectedStartTime = startTimes[Math.floor(Math.random() * startTimes.length)];
-            selectedConcept = concepts[Math.floor(Math.random() * concepts.length)];
-            selectedTime = times[Math.floor(Math.random() * times.length)];
-
-            // Reveal all steps
-            for (let i = 2; i <= 5; i++) {
-                const el = document.getElementById(`step-container-${i}`);
-                if (el) el.style.display = 'block';
-            }
-            document.getElementById('step-container-final').style.display = 'block';
-
-            updateRegionOptions();
-            updateSummaryPreview();
-            renderItinerary(true);
-        }
-
-        function renderItinerary(isSurprise) {
+        function renderItinerary() {
             const container = document.getElementById('itinerary-result');
             const listEl = document.getElementById('timeline-list');
             const hotelNameInput = document.getElementById('hotel-name-input').value.trim();
@@ -1633,22 +1676,46 @@
             }
 
             let rawPOIs = POIS_DATABASE[selectedTime || 'half'] || POIS_DATABASE['half'];
-
             let finalPOIs = [];
-            const startLabelName = hotelNameInput || getStartLabelName(selectedStart || 'taksim');
-            const mapOriginQuery = hotelNameInput ? encodeURIComponent(`${hotelNameInput}, İstanbul`) : encodeURIComponent(startLabelName);
 
+            const startLabelName = getStartLabelName(selectedStart || 'taksim');
             const startTimeVal = selectedStartTime || '11:30';
 
-            finalPOIs.push({
-                time: startTimeVal,
-                hotelStart: true,
-                title: `🏡 Başlangıç Merkeziniz: ${startLabelName}`,
-                category: 'hotel',
-                desc: `Rotanız tam saat ${startTimeVal}’da "${startLabelName}" merkezinden başlayıp navigasyonla adım adım ilerliyor.`,
-                tip: '📍 Merkezinizden başlayarak doğrudan harita navigasyonunu başlatabilirsiniz.',
-                mapQuery: mapOriginQuery
-            });
+            // SMART PRE-TOUR FIRINNA BREAKFAST ROUTING IF HOTEL IS IN GALATA/PERA/TAKSIM
+            if (hotelNameInput) {
+                finalPOIs.push({
+                    time: startTimeVal,
+                    hotelStart: true,
+                    title: `🏨 Otelinizden Çıkış: ${hotelNameInput}`,
+                    category: 'hotel',
+                    desc: `Güne otelinizden (${hotelNameInput}) başlayarak Fırınna Cafe'ye veya başlangıç noktanıza adım atıyorsunuz.`,
+                    mapQuery: encodeURIComponent(`${hotelNameInput}, İstanbul`)
+                });
+
+                // IF HOTEL IS IN GALATA/PERA/TAKSIM AREA, ROUTE THEM FIRST TO FIRINNA FOR BREAKFAST/TEA!
+                const hLower = hotelNameInput.toLowerCase();
+                if (hLower.includes('galata') || hLower.includes('pera') || hLower.includes('tomtom') || hLower.includes('taksim') || hLower.includes('karakoy')) {
+                    finalPOIs.push({
+                        time: formatTimeOffset(startTimeVal, 20),
+                        featured: true,
+                        title: '🍳 FIRINNA CAFE & RESTAURANT — Gezi Öncesi Enerji & Kahvaltı Molası 🍵',
+                        category: 'gourmet',
+                        desc: 'Kumbaracı Yokuşu No:41A’da sıcak menemen, fırın lezzetleri ve sınırsız Türk çayı ile güne muhteşem başlangıç!',
+                        closedNoteDynamic: true,
+                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                    });
+                }
+            } else {
+                finalPOIs.push({
+                    time: startTimeVal,
+                    hotelStart: true,
+                    title: `📍 Başlangıç Noktanız: ${startLabelName}`,
+                    category: 'hotel',
+                    desc: `Rotanız tam saat ${startTimeVal}’da "${startLabelName}" merkezinden başlayıp navigasyonla adım adım ilerliyor.`,
+                    tip: '📍 Başlangıç noktanızdan harita navigasyonunu kolayca takip edebilirsiniz.',
+                    mapQuery: encodeURIComponent(startLabelName)
+                });
+            }
 
             const now = new Date();
             const currentHour = now.getHours();
@@ -1656,13 +1723,15 @@
             const currentTotalMin = currentHour * 60 + currentMin;
             const isFirinnaOpenNow = currentTotalMin >= 660 && currentTotalMin <= 1155;
 
+            let timeOffsetAccumulator = hotelNameInput ? 45 : 0;
+
             rawPOIs.forEach(poi => {
                 if (poi.dayTitle) {
                     finalPOIs.push(poi);
                     return;
                 }
 
-                const calculatedTime = formatTimeOffset(startTimeVal, poi.offsetMin || 0);
+                const calculatedTime = formatTimeOffset(startTimeVal, (poi.offsetMin || 0) + timeOffsetAccumulator);
                 
                 let dynamicTitle = poi.title;
                 if (poi.featured) {
@@ -1683,8 +1752,7 @@
                 });
             });
 
-            const startText = isSurprise ? `🎲 SÜRPRİZ ROTA! "${startLabelName}" merkezinden saat ${startTimeVal}’da başlayan` : `"${startLabelName}" merkezinden saat ${startTimeVal}’da başlayan`;
-            document.getElementById('result-start-desc').innerText = `${startText} nokta atışı gezi rotanız ve Fırınna Cafe sınırsız çay ikramlı lezzet molanız hazır.`;
+            document.getElementById('result-start-desc').innerText = `"${startLabelName}" noktasından saat ${startTimeVal}’da başlayan nokta atışı gezi rotanız ve Fırınna Cafe VIP ikram kartınız hazır.`;
 
             const randomCode = Math.floor(1000 + Math.random() * 9000);
             const fullTicketCode = `#FIRINNA-TEA-${randomCode}`;
@@ -1787,7 +1855,7 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         event: 'action',
-                        item: `Gezi Rehberi ${isSurprise ? 'Sürpriz Rota' : 'Rota'} (${startLabelName} - ${timeTextReadable})`,
+                        item: `Gezi Rehberi Rota (${startLabelName} - ${timeTextReadable})`,
                         selectedRegion: selectedConcept,
                         selectedTime: selectedTime,
                         startPoint: selectedStart,
