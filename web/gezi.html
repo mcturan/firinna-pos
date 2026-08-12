@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="Kral Yolu Efsane Rota, Karaköy Güllüoğlu Baklava, Anka Carpets Halı/Kilim rehberi, Otel navigasyonu, Gece Hayatı ve Sınırsız Çay İkramı.">
-    <meta name="keywords" content="İstanbul gezi rehberi, Karaköy Güllüoğlu baklava, Anka Carpets halı kilim indirim kodu, İstanbul gece hayatı barlar, Fırınna cafe">
+    <meta name="description" content="İnteraktif otel arama, Çoklu bölge seçimi (Kral Yolu, Galata, Yarımada, Balat, Moda), Karaköy Güllüoğlu Baklava, Anka Carpets Halı/Kilim rehberi ve Sınırsız Çay.">
+    <meta name="keywords" content="İstanbul gezi rehberi, otel arama navigasyon, Karaköy Güllüoğlu baklava, Anka Carpets halı kilim indirim kodu, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
     <meta property="og:title" content="İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe">
-    <meta property="og:description" content="Kaldığınız oteli ve ilgi alanlarınızı seçin; rotanızı, Karaköy Güllüoğlu baklava molanızı ve Fırınna Sınırsız Çay ikram kartınızı anında alın!">
+    <meta property="og:description" content="Kaldığınız oteli yazın, çoklu bölgenizi ve ilgi alanlarınızı seçin; kişiselleştirilmiş İstanbul rotanızı anında alın!">
     <meta property="og:image" content="https://firinna.com/galata_cafe_bg_new.jpg">
     <meta property="og:url" content="https://firinna.com/gezi">
     <meta property="og:type" content="website">
@@ -239,7 +239,7 @@
             box-shadow: 0 4px 14px rgba(217, 119, 6, 0.15);
         }
 
-        .option-pill.featured-pill {
+        .option-pill.featured-pill.active {
             background: #fffbeb;
             border-color: #f59e0b;
         }
@@ -259,22 +259,65 @@
             margin-top: 3px;
         }
 
+        .input-hotel-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
         .input-hotel-box {
             width: 100%;
-            padding: 12px 16px;
-            border-radius: 10px;
+            padding: 14px 16px;
+            border-radius: 12px;
             border: 1.5px solid #cbd5e1;
             font-size: 0.95rem;
             font-family: inherit;
-            margin-bottom: 1.5rem;
             box-sizing: border-box;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
         }
 
         .input-hotel-box:focus {
             outline: none;
             border-color: #d97706;
             background: #fffdf5;
+            box-shadow: 0 4px 14px rgba(217, 119, 6, 0.12);
+        }
+
+        /* AUTOCOMPLETE DROPDOWN */
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            margin-top: 6px;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            color: #1e293b;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.15s;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: #fef3c7;
+            color: #92400e;
         }
 
         .btn-group-wizard {
@@ -543,7 +586,7 @@
             animation: floatIcon 3s ease-in-out infinite;
         }
 
-        /* PRACTICAL TRAVEL GUIDE & FAQ SECTION */
+        /* PRACTICAL TRAVEL GUIDE, SHOPPING & FAQ SECTION */
         .practical-guide-section {
             max-width: 960px;
             margin: 3rem auto 4rem;
@@ -686,7 +729,7 @@
         
         <!-- STEP 1: ACCOMMODATION / STARTING POINT -->
         <div class="step-label">
-            <span class="num">1</span> <span>Kaldığınız Yer / Otelinizin Konumu:</span>
+            <span class="num">1</span> <span>Kaldığınız Yer / Otelinizin Konumu (İnteraktif Arama):</span>
         </div>
         <div class="options-grid" id="grid-start">
             <div class="option-pill active" onclick="selectSingleOption('grid-start', this, 'beyoglu')">
@@ -706,34 +749,38 @@
                 <div class="desc">Anadolu yakasından başlangıç</div>
             </div>
         </div>
-        <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="Otelinizin veya kaldığınız yerin adını yazın (Örn: Rixos Pera, Galata Port Hotel, CVK Park Bosphorus)...">
 
-        <!-- STEP 2: REGION & PRESET ROUTES -->
+        <div class="input-hotel-container">
+            <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="🔎 Otelinizin veya kaldığınız yerin adını yazın (Örn: Rixos Pera, Galataport Hotel, CVK Park Bosphorus)..." autocomplete="off">
+            <div id="hotel-suggestions" class="suggestions-dropdown"></div>
+        </div>
+
+        <!-- STEP 2: REGION & PRESET ROUTES (MULTI-SELECTABLE) -->
         <div class="step-label">
-            <span class="num">2</span> <span>Gezmek İstediğiniz Bölge & Özel Rotalar:</span>
+            <span class="num">2</span> <span>Gezmek İstediğiniz Bölge & Özel Rotalar (Birden Fazla Seçebilirsiniz):</span>
         </div>
         <div class="options-grid" id="grid-region">
-            <div class="option-pill active featured-pill" onclick="selectSingleOption('grid-region', this, 'kral_yolu')">
-                <div class="title">👑 Efsane Kral Yolu Rotası</div>
-                <div class="desc">Kapalıçarşı ➔ Sultanahmet ➔ Galata Köprüsü ➔ Fırınna ➔ Tünel ➔ Taksim</div>
-            </div>
-            <div class="option-pill" onclick="selectSingleOption('grid-region', this, 'galata')">
+            <div class="option-pill active" onclick="toggleRegionOption(this, 'galata')">
                 <div class="title">📍 Galata, Karaköy & Pera</div>
                 <div class="desc">Kule, Tramvay, Tünel & Vapur</div>
             </div>
-            <div class="option-pill" onclick="selectSingleOption('grid-region', this, 'historical')">
+            <div class="option-pill" onclick="toggleRegionOption(this, 'kral_yolu')">
+                <div class="title">👑 Efsane Kral Yolu Rotası</div>
+                <div class="desc">Kapalıçarşı ➔ Sultanahmet ➔ Galata Köprüsü ➔ Fırınna ➔ Tünel</div>
+            </div>
+            <div class="option-pill" onclick="toggleRegionOption(this, 'historical')">
                 <div class="title">🕌 Tarihi Yarımada</div>
                 <div class="desc">Ayasofya, Süleymaniye, Çarşı</div>
             </div>
-            <div class="option-pill" onclick="selectSingleOption('grid-region', this, 'balat')">
+            <div class="option-pill" onclick="toggleRegionOption(this, 'balat')">
                 <div class="title">📸 Balat & Fener</div>
                 <div class="desc">Renkli Evler & Demir Kilise</div>
             </div>
-            <div class="option-pill" onclick="selectSingleOption('grid-region', this, 'nature')">
-                <div class="title">🌲 Doğa Gezisi & Koşu Parkurları 🏃</div>
-                <div class="desc">Belgrad Ormanı, Arboretüm, Gülhane & Büyükada</div>
+            <div class="option-pill" onclick="toggleRegionOption(this, 'nature')">
+                <div class="title">🌲 Doğa Gezisi & Koşu 🏃</div>
+                <div class="desc">Belgrad Ormanı, Arboretüm & Büyükada</div>
             </div>
-            <div class="option-pill" onclick="selectSingleOption('grid-region', this, 'moda')">
+            <div class="option-pill" onclick="toggleRegionOption(this, 'moda')">
                 <div class="title">⛵ Kadıköy & Moda</div>
                 <div class="desc">Vapur Yolculuğu & Sahil</div>
             </div>
@@ -970,12 +1017,70 @@
 
     <script>
         let selectedStart = 'beyoglu';
-        let selectedRegion = 'kral_yolu';
+        let selectedRegions = ['galata'];
         let selectedTime = 'half';
         let selectedInterests = ['museums', 'worship', 'photo', 'gourmet'];
 
         let systemWorkHours = '11:00 - 19:15';
         let systemPhone = '905456301214';
+
+        // POPULAR HOTELS LIST FOR INTERACTIVE AUTOCOMPLETE
+        const POPULAR_HOTELS = [
+            "Rixos Pera Istanbul (Beyoğlu)",
+            "The Marmara Taksim",
+            "Pera Palace Hotel (Beyoğlu)",
+            "Galataport Hotel (Karaköy)",
+            "Soho House Istanbul (Beyoğlu)",
+            "CVK Park Bosphorus Hotel (Taksim)",
+            "Swissotel The Bosphorus (Beşiktaş)",
+            "Sura Hagia Sophia Hotel (Sultanahmet)",
+            "Celine Hotel (Sultanahmet)",
+            "Çırağan Palace Kempinski (Beşiktaş)",
+            "Conrad Istanbul Bosphorus (Beşiktaş)",
+            "Shangri-La Bosphorus (Beşiktaş)",
+            "Hilton Istanbul Bosphorus (Harbiye)",
+            "Witt Istanbul Suites (Cihangir)",
+            "Sultanahmet Palace Hotel"
+        ];
+
+        // SETUP INTERACTIVE HOTEL SEARCH AUTOCOMPLETE
+        const hotelInput = document.getElementById('hotel-name-input');
+        const suggestionsBox = document.getElementById('hotel-suggestions');
+
+        hotelInput.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            suggestionsBox.innerHTML = '';
+            
+            if (query.length < 1) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            const matches = POPULAR_HOTELS.filter(h => h.toLowerCase().includes(query));
+            
+            if (matches.length > 0) {
+                matches.forEach(matchText => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.innerHTML = `<i class="ph-bold ph-buildings" style="color:#d97706;"></i> <span>${matchText}</span>`;
+                    div.onclick = function() {
+                        hotelInput.value = matchText;
+                        suggestionsBox.style.display = 'none';
+                        generateSmartItinerary();
+                    };
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = 'block';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!hotelInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
 
         // DYNAMICALLY FETCH REAL SYSTEM WORK HOURS FROM FLASK API
         if (window.fetch) {
@@ -997,8 +1102,19 @@
             document.querySelectorAll(`#${gridId} .option-pill`).forEach(p => p.classList.remove('active'));
             el.classList.add('active');
             if (gridId === 'grid-start') selectedStart = val;
-            if (gridId === 'grid-region') selectedRegion = val;
             if (gridId === 'grid-time') selectedTime = val;
+        }
+
+        function toggleRegionOption(el, regionVal) {
+            el.classList.toggle('active');
+            if (el.classList.contains('active')) {
+                if (!selectedRegions.includes(regionVal)) selectedRegions.push(regionVal);
+            } else {
+                selectedRegions = selectedRegions.filter(r => r !== regionVal);
+            }
+            if (selectedRegions.length === 0) {
+                selectedRegions = ['galata'];
+            }
         }
 
         function toggleMultiOption(el, val) {
@@ -1372,7 +1488,7 @@
         function generateSurpriseItinerary() {
             const regions = ['kral_yolu', 'galata', 'historical', 'balat', 'nature', 'moda'];
             const times = ['half', '1day'];
-            selectedRegion = regions[Math.floor(Math.random() * regions.length)];
+            selectedRegions = [regions[Math.floor(Math.random() * regions.length)]];
             selectedTime = times[Math.floor(Math.random() * times.length)];
             
             document.querySelectorAll('#grid-region .option-pill').forEach(p => p.classList.remove('active'));
@@ -1395,12 +1511,16 @@
                 });
             }
 
-            // 1. COLLECT CANDIDATE POIs
+            // 1. COLLECT CANDIDATE POIs FROM ALL SELECTED REGIONS
             let candidateList = [];
-            if (selectedRegion === 'all_city') {
-                Object.keys(POI_DATABASE).forEach(r => candidateList.push(...POI_DATABASE[r]));
-            } else {
-                candidateList = [...(POI_DATABASE[selectedRegion] || POI_DATABASE['kral_yolu'])];
+            selectedRegions.forEach(regKey => {
+                if (POI_DATABASE[regKey]) {
+                    candidateList.push(...POI_DATABASE[regKey]);
+                }
+            });
+
+            if (candidateList.length === 0) {
+                candidateList = [...POI_DATABASE['galata']];
             }
 
             // 2. STRICT CATEGORY FILTERING BY SELECTED INTERESTS
@@ -1408,7 +1528,7 @@
                 return item.featured || selectedInterests.includes(item.category);
             });
 
-            // If selected region doesn't have enough POIs matching user's exact interests (e.g. nightlife in historical peninsula), pool from other regions!
+            // Fallback: If selected regions don't have enough matching POIs for user's interests, fetch matching POIs from other regions!
             if (interestMatched.length < 3) {
                 Object.keys(POI_DATABASE).forEach(r => {
                     POI_DATABASE[r].forEach(item => {
@@ -1452,7 +1572,7 @@
                 finalPOIs = finalPOIs.slice(0, 8);
             }
 
-            const startText = hotelNameInput ? `"${hotelNameInput}" otelinizden başlayan` : `Seçtiğiniz başlangıç noktasından`;
+            const startText = hotelNameInput ? `"${hotelNameInput}" otelinizden başlayan` : `Seçtiğiniz başlangıç noktalarından`;
             document.getElementById('result-start-desc').innerText = `${startText} kişiselleştirilmiş tam filtreli rota ve Fırınna Cafe sınırsız çay ikramlı lezzet molanız hazır.`;
 
             const randomCode = Math.floor(1000 + Math.random() * 9000);
@@ -1506,8 +1626,8 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         event: 'action',
-                        item: `Gezi Rehberi (${selectedRegion})`,
-                        selectedRegion: selectedRegion,
+                        item: `Gezi Rehberi (${selectedRegions.join(',')})`,
+                        selectedRegion: selectedRegions.join(','),
                         selectedTime: selectedTime,
                         startPoint: selectedStart,
                         hotelName: hotelNameInput
