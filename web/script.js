@@ -908,12 +908,12 @@ function renderPublicScheduleTable(statusData) {
             headerBadge.style.background = '#ecfdf5';
             headerBadge.style.color = '#065f46';
             headerBadge.style.borderColor = '#a7f3d0';
-            headerBadge.innerHTML = '🟢 Bugün Açık';
+            headerBadge.innerHTML = '🟢 Şu An Açık';
         } else {
             headerBadge.style.background = '#fef2f2';
             headerBadge.style.color = '#991b1b';
             headerBadge.style.borderColor = '#fca5a5';
-            headerBadge.innerHTML = '🔴 Bugün Kapalı';
+            headerBadge.innerHTML = '🔴 Şu An Kapalı';
         }
     }
 
