@@ -1199,3 +1199,231 @@ function openLightbox(src, captionKeyOrText, descText, tagsStr = '') {
     }
 }
 
+// ----------------------------------------------------
+// ⚡ PWA SERVICE WORKER KAYDI (İnternetsiz Menü Desteği)
+// ----------------------------------------------------
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Fırınna PWA Service Worker aktif:', reg.scope))
+            .catch(err => console.log('PWA Service Worker hatası:', err));
+    });
+}
+
+// ----------------------------------------------------
+// ⭐ GOOGLE REVIEWS SLIDER CAROUSEL MANTIĞI
+// ----------------------------------------------------
+let currentReviewSlide = 0;
+const totalReviewSlides = 10;
+let reviewAutoTimer = null;
+
+function updateReviewSlider() {
+    const track = document.getElementById('reviews-track');
+    const dots = document.querySelectorAll('#review-dots .dot');
+    if (track) {
+        track.style.transform = `translateX(-${currentReviewSlide * 100}%)`;
+    }
+    if (dots) {
+        dots.forEach((d, idx) => {
+            if (idx === currentReviewSlide) {
+                d.style.background = '#2563eb';
+                d.style.width = '24px';
+                d.style.borderRadius = '10px';
+            } else {
+                d.style.background = '#cbd5e1';
+                d.style.width = '10px';
+                d.style.borderRadius = '50%';
+            }
+        });
+    }
+}
+
+function nextReviewSlide() {
+    currentReviewSlide = (currentReviewSlide + 1) % totalReviewSlides;
+    updateReviewSlider();
+    resetReviewAutoTimer();
+}
+
+function prevReviewSlide() {
+    currentReviewSlide = (currentReviewSlide - 1 + totalReviewSlides) % totalReviewSlides;
+    updateReviewSlider();
+    resetReviewAutoTimer();
+}
+
+function goToReviewSlide(index) {
+    currentReviewSlide = index;
+    updateReviewSlider();
+    resetReviewAutoTimer();
+}
+
+function resetReviewAutoTimer() {
+    if (reviewAutoTimer) clearInterval(reviewAutoTimer);
+    reviewAutoTimer = setInterval(() => {
+        currentReviewSlide = (currentReviewSlide + 1) % totalReviewSlides;
+        updateReviewSlider();
+    }, 5000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('reviews-track')) {
+        updateReviewSlider();
+        resetReviewAutoTimer();
+    }
+});
+
+// ----------------------------------------------------
+// 🔍 YAPIŞKAN ARAMA & DİYET FİLTRE HAPLARI MANTIĞI
+// ----------------------------------------------------
+let activeDietaryFilter = 'all';
+
+function setDietaryFilter(filter, btn) {
+    activeDietaryFilter = filter;
+    document.querySelectorAll('.diet-chip').forEach(b => {
+        b.style.background = '#fff';
+        b.style.color = '#334155';
+        b.style.border = '1px solid #cbd5e1';
+        b.style.fontWeight = '600';
+    });
+    if (btn) {
+        btn.style.background = '#2563eb';
+        btn.style.color = '#fff';
+        btn.style.border = 'none';
+        btn.style.fontWeight = '700';
+    }
+    filterMenuInteractive();
+}
+
+function filterMenuInteractive() {
+    const searchInput = document.getElementById('menu-search-input');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    const menuItems = document.querySelectorAll('#dynamic-full-menu .menu-item, .card-item, .menu-card');
+    menuItems.forEach(item => {
+        const text = item.innerText.toLowerCase();
+        let matchesSearch = !query || text.includes(query);
+        let matchesDiet = true;
+
+        if (activeDietaryFilter === 'halal') {
+            matchesDiet = text.includes('helal') || text.includes('halal') || true; // All items are %100 Halal
+        } else if (activeDietaryFilter === 'veggie') {
+            matchesDiet = text.includes('vejetaryen') || text.includes('peynir') || text.includes('sebze') || text.includes('omlet') || text.includes('tatlı') || text.includes('çikolata');
+        } else if (activeDietaryFilter === 'glutenfree') {
+            matchesDiet = text.includes('glutensiz') || text.includes('fit') || text.includes('salata') || text.includes('yumurta') || text.includes('kahve') || text.includes('çay');
+        } else if (activeDietaryFilter === 'signature') {
+            matchesDiet = text.includes('imza') || item.innerHTML.includes('ph-star') || text.includes('çakallı') || text.includes('pizza') || text.includes('tost');
+        }
+
+        if (matchesSearch && matchesDiet) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// ----------------------------------------------------
+// 🗺️ OPENFREEMAP 3D VECTOR HARİTA BAŞLATICI (MAPLIBRE GL 3D EXTRUSION)
+// ----------------------------------------------------
+function initOpenFreeMap3D() {
+    var mapElem = document.getElementById('osm-3d-map');
+    if (!mapElem) return;
+
+    if (typeof maplibregl !== 'undefined' && typeof maplibregl.supported === 'function' && maplibregl.supported()) {
+        try {
+            mapElem.innerHTML = '';
+            var map = new maplibregl.Map({
+                container: 'osm-3d-map',
+                style: 'https://tiles.openfreemap.org/styles/liberty',
+                center: [28.976906, 41.028328],
+                zoom: 16.8,
+                pitch: 60,
+                bearing: -35,
+                antialias: true
+            });
+
+            map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+            // Restoranim.net Style Orange Marker Pin
+            var pinEl = document.createElement('div');
+            pinEl.className = 'marker-pin';
+            pinEl.style.width = '36px';
+            pinEl.style.height = '36px';
+            pinEl.style.background = '#d97706';
+            pinEl.style.borderRadius = '50% 50% 50% 0';
+            pinEl.style.transform = 'rotate(-45deg)';
+            pinEl.style.display = 'flex';
+            pinEl.style.alignItems = 'center';
+            pinEl.style.justifyContent = 'center';
+            pinEl.style.boxShadow = '0 6px 16px rgba(0,0,0,0.35)';
+            pinEl.style.border = '2px solid #ffffff';
+            pinEl.style.cursor = 'pointer';
+            pinEl.innerHTML = '<span style="transform: rotate(45deg); font-size: 1.05rem; color: #ffffff;">📍</span>';
+
+            var popup = new maplibregl.Popup({ offset: 25 }).setHTML(
+                '<div style="text-align:center; font-family:sans-serif; padding:4px;">' +
+                '<b style="color:#0f172a; font-size:0.95rem;">Fırınna Cafe & Restaurant</b><br>' +
+                '<span style="font-size:0.8rem; color:#64748b;">Kumbaracı Yokuşu No: 41A, Beyoğlu</span>' +
+                '</div>'
+            );
+
+            new maplibregl.Marker({ element: pinEl })
+                .setLngLat([28.976906, 41.028328])
+                .setPopup(popup)
+                .addTo(map);
+
+            map.on('load', function() {
+                map.resize();
+                
+                // Add 3D Extruded Buildings (Matching restoranim.net 222.png)
+                try {
+                    var layers = map.getStyle().layers;
+                    var labelLayerId;
+                    for (var i = 0; i < layers.length; i++) {
+                        if (layers[i].type === 'symbol' && layers[i].layout && layers[i].layout['text-field']) {
+                            labelLayerId = layers[i].id;
+                            break;
+                        }
+                    }
+
+                    if (!map.getLayer('3d-buildings')) {
+                        map.addLayer({
+                            'id': '3d-buildings',
+                            'source': 'openmaptiles',
+                            'source-layer': 'building',
+                            'type': 'fill-extrusion',
+                            'minzoom': 13,
+                            'paint': {
+                                'fill-extrusion-color': '#d1d5db',
+                                'fill-extrusion-height': [
+                                    'interpolate', ['linear'], ['zoom'],
+                                    14, 0,
+                                    14.05, ['get', 'render_height']
+                                ],
+                                'fill-extrusion-base': [
+                                    'interpolate', ['linear'], ['zoom'],
+                                    14, 0,
+                                    14.05, ['get', 'render_min_height']
+                                ],
+                                'fill-extrusion-opacity': 0.82
+                            }
+                        }, labelLayerId);
+                    }
+                } catch(e) { console.log('3D Buildings layer info:', e); }
+            });
+
+            window.addEventListener('resize', function() { map.resize(); });
+            setTimeout(function() { map.resize(); }, 300);
+            setTimeout(function() { map.resize(); }, 1000);
+
+        } catch(e) {
+            console.warn('MapLibre GL error:', e);
+        }
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initOpenFreeMap3D);
+} else {
+    initOpenFreeMap3D();
+}
+

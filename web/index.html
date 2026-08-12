@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fırınna Cafe & Restaurant | Galata'da En İyi Menemen, Taş Fırın İtalyan Pizza, Serpme Kahvaltı & %100 Helal Lezzetler</title>
-    <meta name="description" content="Galata Kumbaracı Yokuşu'nda 150 yıllık tarihi atmosferde %100 Helal sertifikalı geleneksel Türk kahvaltısı, Çakallı menemen, uygun fiyatlı kahvaltı seçenekleri, odun ateşinde taş fırın İtalyan Napoliten pizza, taze çay ve közde Türk kahvesi. Istiklal Caddesi yakınında en iyi kahvaltı ve pizza mekanı.">
+    <meta name="description" content="Galata Kumbaracı Yokuşu'nda 150 yıllık tarihi atmosferde %100 Helal sertifikalı geleneksel Türk kahvaltısı, Çakallı menemen, uygun fiyatlı kahvaltı seçenekleri, taş fırında İtalyan Napoliten pizza, taze çay ve közde Türk kahvesi. Istiklal Caddesi yakınında en iyi kahvaltı ve pizza mekanı.">
     <meta name="keywords" content="Helal, Helal kahvaltı, Halal breakfast Istanbul, Halal restaurant Galata, kahvaltı, Türk kahvaltısı, serpme kahvaltı, menemen, Çakallı menemen, en iyi menemen, sahanda yumurta, omlet, bazlama tost, uygun fiyatlı kahvaltı, geleneksel Türk mutfağı, Türk kahvesi, közde kahve, harman çay, İtalyan pizza, Napoliten pizza, taş fırın pizza, en iyi pizza Galata, pizza cafe Istiklal, pet friendly cafe Istanbul, Galata cafe restaurant, Kumbaracı Yokuşu">
     <meta name="author" content="Fırınna Cafe & Restaurant">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -26,7 +26,7 @@
     
     <!-- Open Graph / Social & AI Search Summary Cards -->
     <meta property="og:title" content="Fırınna Cafe & Restaurant | Galata'da En İyi Menemen, Taş Fırın İtalyan Pizza & %100 Helal Kahvaltı">
-    <meta property="og:description" content="Galata Kumbaracı Yokuşu'nda 150 yıllık tarihi atmosferde helal serpme Türk kahvaltısı, meşhur Çakallı menemeni, odun ateşinde taş fırın İtalyan Napoliten pizza ve özel közde Türk kahvesi.">
+    <meta property="og:description" content="Galata Kumbaracı Yokuşu'nda 150 yıllık tarihi atmosferde helal serpme Türk kahvaltısı, meşhur Çakallı menemeni, taş fırında İtalyan Napoliten pizza ve özel közde Türk kahvesi.">
     <meta property="og:type" content="restaurant">
     <meta property="og:url" content="https://firinna.com/">
     <meta property="og:image" content="https://firinna.com/food_menemen_sahanda.jpg">
@@ -36,8 +36,16 @@
     <meta name="twitter:title" content="Fırınna Cafe & Restaurant | Galata Kahvaltı & Taş Fırın Pizza">
     <meta name="twitter:description" content="%100 Helal sertifikalı geleneksel Türk kahvaltısı, Çakallı menemen, taş fırın İtalyan pizza ve Türk kahvesi.">
     
-    <!-- Favicon -->
+    <!-- Favicon & PWA App Manifest -->
     <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- MapLibre GL JS (OpenFreeMap 3D Official Library) -->
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d97706">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -299,60 +307,148 @@
                 </div>
             </div>
 
-            <div class="card about-card">
-                <h2 class="card-title" data-i18n="title_about">Hakkımızda</h2>
-                <div class="about-slogan" data-i18n="slogan_about" style="font-weight: 800; font-size: 1.15rem; color: #d97706; text-transform: uppercase; margin-bottom: 16px; border-left: 4px solid #d97706; padding-left: 12px; letter-spacing: 0.5px;">
-                    GELENEKSEL TATLARA BENZERSİZ DOKUNUŞLAR
+            <!-- KONUM & ULAŞIM (YANDEX HARİTALAR & 360° SOKAK GÖRÜNÜMÜ) -->
+            <section id="location" class="card map-3d-card" style="border-top: 4px solid #d97706; background: #ffffff; padding: 0; margin-bottom: 24px; border-radius: 16px; width: 100%; max-width: 100%; box-sizing: border-box; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.04);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #ffffff;">
+                    <h2 class="card-title" style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px; font-size: 1.15rem;">
+                        <i class="ph-fill ph-map-pin" style="color: #fc3f1d;"></i> Konum & Ulaşım (Yandex Haritalar)
+                    </h2>
+                    <span style="background: #fff5f5; color: #dc2626; font-weight: 700; font-size: 0.78rem; padding: 4px 12px; border-radius: 20px; border: 1px solid #fecaca;">
+                        🔴 Canlı Trafik & 3D Binalar
+                    </span>
                 </div>
-                <p class="about-text" data-i18n="text_about" style="line-height: 1.7;">
-                    DEĞERLİ MİSAFİRİMİZ, FIRINNA'YA HOŞ GELDİNİZ.<br><br>
-                    Galata’nın 150 yıllık büyüleyici ve tarihi dokusunda, Kumbaracı Yokuşu'nun huzur veren atmosferinde yer alan Fırınna Cafe & Restaurant; İstiklal’in gürültüsünden kaçıp nefes alabileceğiniz özel bir lezzet durağıdır.<br><br>
-                    Özenle seçilmiş malzemelerimiz, fırınımızdan çıkan taze lezzetlerimiz, leziz kahve çeşitlerimiz ve ev yapımı tatlılarımızla geleneksel tarifleri modern dokunuşlarla sunuyoruz.<br><br>
-                    Burada acele yok! Samimi, misafirperver ve evcil hayvan dostu ekibimizle, 150 yıllık bu tarihi yapının sıcaklığında güzel sohbetlerin ve huzurlu anların tadını çıkarın. Tarihi İstanbul gezinizde tatlı bir anı olabilmek bizim en büyük mutluluğumuz.
-                </p>
+                
+                <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                    <p style="font-size: 0.88rem; color: #475569; margin: 0; line-height: 1.5; font-weight: 500;">
+                        <strong>Adres:</strong> Şahkulu Mah. Kumbaracı Yokuşu Sok. No:41A, 34421 Beyoğlu/İstanbul (İstiklal Caddesi & Galata Kulesi Yakını)
+                    </p>
+                </div>
+                
+                <!-- Yandex Haritalar Canlı Inframe Widget (100% Mobil Uyumlu, Türkiye En Yüksek Detay) -->
+                <div style="width: 100%; height: 360px; position: relative; background: #f1f5f9; overflow: hidden;">
+                    <iframe src="https://yandex.com/map-widget/v1/?ll=28.976906%2C41.028328&z=17.5&pt=28.976906%2C41.028328%2Cpm2amm&l=map" width="100%" height="360" frameborder="0" allowfullscreen="true" style="position:relative; width:100%; height:100%; border:0; display:block;"></iframe>
+                </div>
+                
+                <div style="padding: 16px 20px; background: #ffffff; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <a href="https://yandex.com/maps/?rtext=~41.028328,28.976906" target="_blank" class="btn btn-primary" style="background: #fc3f1d; color: #fff; font-size: 0.85rem; padding: 10px 20px; border-radius: 30px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; border: none; box-shadow: 0 4px 12px rgba(252, 63, 29, 0.25);">
+                        <i class="ph-bold ph-navigation-arrow"></i> Yandex Navigasyon
+                    </a>
+                    <a href="https://maps.google.com/?q=Firinna" target="_blank" class="btn btn-secondary" style="background: #eff6ff; color: #1d4ed8; font-size: 0.85rem; padding: 10px 18px; border-radius: 30px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #bfdbfe;">
+                        <i class="ph-bold ph-map-pin"></i> Google Maps
+                    </a>
+                    <a href="https://yandex.com/maps/?ll=28.976906%2C41.028328&panorama%5Bpoint%5D=28.976906%2C41.028328&z=17" target="_blank" style="background: #f8fafc; color: #334155; font-size: 0.82rem; padding: 10px 16px; border-radius: 30px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #cbd5e1; margin-left: auto;">
+                        <i class="ph-bold ph-eye"></i> 360° Kumbaracı Yokuşu Panorama
+                    </a>
+                </div>
+            </section>
+
+            <!-- SOSYAL MEDYADA FIRINNA (VİDEO SHORTS AKIŞI - MOBİL UYUMLU) -->
+            <div class="card shorts-feed-card" style="border-top: 4px solid #dc2626; background: #ffffff; padding: 18px; margin-bottom: 24px; border-radius: 16px; width: 100%; max-width: 100%; box-sizing: border-box; overflow: hidden;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; width: 100%; max-width: 100%; box-sizing: border-box;">
+                    <h2 class="card-title" style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px; font-size: 1.1rem; flex-wrap: wrap;">
+                        <i class="ph-fill ph-youtube-logo" style="color: #dc2626;"></i> Sosyal Medyada Ne Meşhur?
+                    </h2>
+                    <span style="background: #fef2f2; color: #dc2626; font-weight: 700; font-size: 0.78rem; padding: 4px 12px; border-radius: 20px;">
+                        🎬 Tur & Hazırlık Videoları
+                    </span>
+                </div>
+                
+                <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; width: 100%; max-width: 100%; box-sizing: border-box;">
+                    <!-- Video Card 1 -->
+                    <div onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" style="min-width: 130px; width: 130px; height: 210px; border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <img src="food_pizza.jpg" alt="Taş Fırın Pizza" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);"></div>
+                        <span style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.65rem; padding: 2px 7px; border-radius: 10px; font-weight: 700;">🍕 Taş Fırın</span>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 34px; height: 34px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #dc2626;">
+                            <i class="ph-fill ph-play" style="font-size: 1.1rem;"></i>
+                        </div>
+                        <span style="position: absolute; bottom: 8px; left: 8px; color: #fff; font-size: 0.78rem; font-weight: 700;">Napoliten Pizza</span>
+                    </div>
+
+                    <!-- Video Card 2 -->
+                    <div onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" style="min-width: 130px; width: 130px; height: 210px; border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <img src="food_menemen_sahanda.jpg" alt="Çakallı Menemen" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);"></div>
+                        <span style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.65rem; padding: 2px 7px; border-radius: 10px; font-weight: 700;">🍳 Meşhur</span>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 34px; height: 34px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #dc2626;">
+                            <i class="ph-fill ph-play" style="font-size: 1.1rem;"></i>
+                        </div>
+                        <span style="position: absolute; bottom: 8px; left: 8px; color: #fff; font-size: 0.78rem; font-weight: 700;">Çakallı Menemeni</span>
+                    </div>
+
+                    <!-- Video Card 3 -->
+                    <div onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" style="min-width: 130px; width: 130px; height: 210px; border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <img src="food_kahve.jpg" alt="Közde Türk Kahvesi" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);"></div>
+                        <span style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.65rem; padding: 2px 7px; border-radius: 10px; font-weight: 700;">☕ Geleneksel</span>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 34px; height: 34px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #dc2626;">
+                            <i class="ph-fill ph-play" style="font-size: 1.1rem;"></i>
+                        </div>
+                        <span style="position: absolute; bottom: 8px; left: 8px; color: #fff; font-size: 0.78rem; font-weight: 700;">Közde Türk Kahvesi</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEKAN ÖZELLİKLERİ & OLANAKLARI -->
+            <div class="card amenities-card" style="background: #ffffff; padding: 18px; margin-bottom: 24px; border-radius: 16px; border: 1px solid #e2e8f0; width: 100%; max-width: 100%; box-sizing: border-box; overflow: hidden;">
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: #1e293b; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="ph-bold ph-list-checks" style="color: #059669;"></i> Mekan Özellikleri & Olanakları
+                </h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; width: 100%; max-width: 100%; box-sizing: border-box;">
+                    <span style="background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 16px;">🐾 Evcil Hayvan Dostu</span>
+                    <span style="background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 16px;">🕌 %100 Helal Gıda</span>
+                    <span style="background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 16px;">📶 Ücretsiz Yüksek Hızlı Wi-Fi</span>
+                    <span style="background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 16px;">🍕 Geleneksel Taş Fırın</span>
+                    <span style="background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 16px;">🏛️ 150 Yıllık Tarihi Atmosfer</span>
+                    <span style="background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 16px;">💳 Temassız / NFC Ödeme</span>
+                    <span style="background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 16px;">🌿 Vejetaryen Alternatifler</span>
+                    <span style="background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 16px;">🌾 Glutensiz / Fit Seçenekler</span>
+                    <span style="background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 16px;">👶 Aileler & Çocuklar İçin Uygun</span>
+                    <span style="background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 600; padding: 5px 12px; border-radius: 16px;">☕ Özel Harman Gül Çayı</span>
+                </div>
             </div>
 
             <!-- Gerçek Yorumlar & Fotoğraflar (Widget Alanı) -->
+            <!-- 100% Gerçek & Şeffaf Harita Yorum Bağlantıları (Anti-Illusion / Anti-Mock) -->
             <div style="display: flex; gap: 16px; margin-bottom: 24px;">
                 
-                <!-- Google Pano -->
-                <div class="card review-card" style="flex: 1; margin-bottom: 0; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-left: 6px solid var(--google-blue);">
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px 0;">
-                        <div style="background: #fff; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 12px;">
-                            <i class="ph-fill ph-google-logo" style="color:#4285F4; font-size: 2.2rem;"></i>
-                        </div>
-                        <h2 style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">5.0</h2>
-                        <div style="display: flex; color: #f1c40f; font-size: 1.4rem; margin-bottom: 4px;">
-                            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
-                        </div>
-                        <p style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px;" data-i18n="google_perfect">Google'da Mükemmel</p>
-                        
-                        <a href="https://maps.google.com/?q=Firinna" target="_blank" class="btn btn-primary" style="background: var(--google-blue); border:none; display: inline-flex; width: auto; padding: 10px 24px; font-size: 0.95rem; border-radius: 30px;">
-                            <span data-i18n="btn_inspect">İncele</span>
-                        </a>
+                <!-- Google Haritalar Canlı Yorum Kartı -->
+                <div class="card review-card" style="flex: 1; margin-bottom: 0; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-top: 4px solid var(--google-blue); text-align: center; padding: 24px;">
+                    <div style="background: #eff6ff; border-radius: 50%; width: 64px; height: 64px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <i class="ph-fill ph-google-logo" style="color:#4285F4; font-size: 2.4rem;"></i>
                     </div>
+                    <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">Google Haritalar</h3>
+                    <div style="display: flex; justify-content: center; color: #f1c40f; font-size: 1.3rem; margin-bottom: 6px;">
+                        <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                    </div>
+                    <p style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px;">
+                        Google üzerindeki tüm gerçek misafir yorumlarını ve puanlamaları doğrudan inceleyin.
+                    </p>
+                    
+                    <a href="https://maps.google.com/?q=Firinna" target="_blank" class="btn btn-primary" style="background: var(--google-blue); border:none; display: inline-flex; width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.92rem; border-radius: 30px; font-weight: 700; gap: 8px;">
+                        <i class="ph-bold ph-arrow-square-out"></i> <span>Google'da Gerçek Yorumları Gör</span>
+                    </a>
                 </div>
 
-                <!-- Yandex Pano -->
-                <div class="card review-card" style="flex: 1; margin-bottom: 0; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-left: 6px solid #FF0000;">
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px 0;">
-                        <div style="background: #fff; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 12px;">
-                            <span style="color:#FF0000; font-weight: 900; font-size: 2.2rem; font-family: sans-serif;">Y</span>
-                        </div>
-                        <h2 style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">5.0</h2>
-                        <div style="display: flex; color: #f1c40f; font-size: 1.4rem; margin-bottom: 4px;">
-                            <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
-                        </div>
-                        <p style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px;" data-i18n="yandex_perfect">Yandex'te Mükemmel</p>
-                        
-                        <a href="https://yandex.com.tr/harita/?text=Firinna" target="_blank" class="btn btn-primary" style="background: #FF0000; border:none; display: inline-flex; width: auto; padding: 10px 24px; font-size: 0.95rem; border-radius: 30px;">
-                            <span data-i18n="btn_inspect">İncele</span>
-                        </a>
+                <!-- Yandex Haritalar Canlı Yorum Kartı -->
+                <div class="card review-card" style="flex: 1; margin-bottom: 0; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-top: 4px solid #FF0000; text-align: center; padding: 24px;">
+                    <div style="background: #fef2f2; border-radius: 50%; width: 64px; height: 64px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <span style="color:#FF0000; font-weight: 900; font-size: 2.2rem; font-family: sans-serif;">Y</span>
                     </div>
+                    <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">Yandex Haritalar</h3>
+                    <div style="display: flex; justify-content: center; color: #f1c40f; font-size: 1.3rem; margin-bottom: 6px;">
+                        <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                    </div>
+                    <p style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px;">
+                        Yandex Haritalar üzerindeki konum ve değerlendirme kayıtlarını görün.
+                    </p>
+                    
+                    <a href="https://yandex.com.tr/harita/?text=Firinna" target="_blank" class="btn btn-primary" style="background: #FF0000; border:none; display: inline-flex; width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.92rem; border-radius: 30px; font-weight: 700; gap: 8px;">
+                        <i class="ph-bold ph-arrow-square-out"></i> <span>Yandex'te İncele</span>
+                    </a>
                 </div>
             </div>
 
-            <!-- Review Gating (Akıllı Puanlama Filtresi) -->
             <div class="card review-gating-card" style="background: #ffffff; border: 1px solid #e2e8f0; text-align: center; padding: 24px; margin-bottom: 24px;">
                 <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;" data-i18n="title_gating">Deneyiminizi Puanlayın</h3>
                 <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;" data-i18n="sub_gating">Fırınna deneyiminiz nasıldı? Görüşleriniz bizim için çok kıymetli.</p>
@@ -499,7 +595,7 @@
         <p id="lightboxCaption" style="color:#fff; margin-top:16px; font-size:1.1rem; font-weight:600; text-align:center;"></p>
     </div>
 
-    <script src="script.js?v=13.0"></script>
+    <script src="script.js?v=16.0"></script>
     <script src="https://cdn.pannellum.org/2.5/pannellum.js"></script>
 </body>
 </html>

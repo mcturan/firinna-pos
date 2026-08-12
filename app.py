@@ -2427,8 +2427,77 @@ def get_web_settings():
 def save_web_settings():
     data = request.json
     with open(SETTINGS_FILE, 'w') as f:
-        json.dump(data, f, indent=4)
+        json.dump(data, f, indent=4, ensure_ascii=False)
     return jsonify({"success": True})
+
+@app.route('/api/web/status', methods=['GET'])
+def get_store_status():
+    """Public CORS-enabled real-time Store Status API for external crawlers & directories."""
+    settings = {}
+    if os.path.exists(SETTINGS_FILE):
+        try:
+            with open(SETTINGS_FILE, 'r') as f:
+                settings = json.load(f)
+        except Exception:
+            pass
+
+    manual_status = settings.get('manual_status', 'auto')
+    daily_hours = settings.get('daily_hours', {
+        "Pazartesi": {"open": "08:30", "close": "23:00", "active": True},
+        "Salı":      {"open": "08:30", "close": "23:00", "active": True},
+        "Çarşamba":  {"open": "08:30", "close": "23:00", "active": True},
+        "Perşembe":  {"open": "08:30", "close": "23:00", "active": True},
+        "Cuma":      {"open": "08:30", "close": "23:00", "active": True},
+        "Cumartesi": {"open": "08:30", "close": "23:00", "active": True},
+        "Pazar":     {"open": "08:30", "close": "23:00", "active": True}
+    })
+
+    now = datetime.now()
+    days_tr = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
+    current_day_tr = days_tr[now.weekday()]
+    current_hm = now.strftime("%H:%M")
+
+    today_cfg = daily_hours.get(current_day_tr, {"open": "08:30", "close": "23:00", "active": True})
+
+    if manual_status == 'closed':
+        is_open = False
+        badge = "🔴 ŞU AN KAPALI (Geçici Olarak Kapalı)"
+    elif manual_status == 'open':
+        is_open = True
+        badge = f"🟢 ŞU AN AÇIK ({today_cfg.get('close', '23:00')}'e Kadar)"
+    else:
+        # Automatic calculation based on current time & daily schedule
+        if not today_cfg.get('active', True):
+            is_open = False
+            badge = "🔴 ŞU AN KAPALI (Bugün Kapalı)"
+        else:
+            open_str = today_cfg.get('open', '08:30')
+            close_str = today_cfg.get('close', '23:00')
+            if open_str <= current_hm <= close_str:
+                is_open = True
+                badge = f"🟢 ŞU AN AÇIK ({close_str}'e Kadar)"
+            else:
+                is_open = False
+                badge = f"🔴 ŞU AN KAPALI (Açılış: {open_str})"
+
+    res = jsonify({
+        "status": "success",
+        "store_name": "Fırınna Cafe & Restaurant",
+        "is_open": is_open,
+        "status_text": "Açık" if is_open else "Kapalı",
+        "status_badge": badge,
+        "current_day": current_day_tr,
+        "current_time": current_hm,
+        "today_hours": f"{today_cfg.get('open', '08:30')} - {today_cfg.get('close', '23:00')}",
+        "hours": daily_hours,
+        "address": "Şahkulu Mah. Kumbaracı Yokuşu Sok. No:41A, Beyoğlu, İstanbul",
+        "phone": "+905456301214",
+        "website": "https://firinna.com"
+    })
+    res.headers['Access-Control-Allow-Origin'] = '*'
+    res.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+    res.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    return res
 
 @app.route('/api/web/upload-menu', methods=['POST'])
 def upload_menu():
