@@ -123,9 +123,13 @@
                             <button class="btn btn-success" onclick="openPaymentModal()">💰 Hesap Öde</button>
                             <button class="btn" style="background:#38a169;color:white;" onclick="openQuickPay()">⚡ Hızlı Öde</button>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                            <button class="btn" onclick="printKitchen()" style="background:#d69e2e;color:white;">👨‍🍳 Mutfak Fişi</button>
-                            <button class="btn" onclick="printReceipt()" style="background:#d69e2e;color:white;">📄 Sipariş Fişi</button>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                            <button class="btn" onclick="printKitchen()" style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color: #ffffff; border: 2px solid #9a3412; font-size: 1rem; font-weight: 800; padding: 0.85rem 0.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25); display: flex; align-items: center; justify-content: center; gap: 0.4rem; cursor: pointer;">
+                                <span style="font-size: 1.15rem;">👨‍🍳</span> <span>Mutfak Fişi</span>
+                            </button>
+                            <button class="btn" onclick="printReceipt()" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; border: 2px solid #1e40af; font-size: 1rem; font-weight: 800; padding: 0.85rem 0.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); display: flex; align-items: center; justify-content: center; gap: 0.4rem; cursor: pointer;">
+                                <span style="font-size: 1.15rem;">📄</span> <span>Sipariş Fişi</span>
+                            </button>
                         </div>
                         <button class="btn" onclick="cancelOrder()" style="background:#f56565;color:white;width:100%;">🗑️ Fiş İptal</button>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
