@@ -2714,6 +2714,8 @@ def toggle_product_signature(prod_id):
 
 @app.route('/api/web/products/<prod_id>', methods=['DELETE'])
 def delete_web_product(prod_id):
+    if not verify_admin_auth():
+        return jsonify({"success": False, "error": "Yetkisiz erişim! Lütfen giriş yapın."}), 401
     products = load_web_products()
     products = [p for p in products if p.get('id') != prod_id]
     save_web_products(products)
