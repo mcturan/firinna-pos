@@ -2481,15 +2481,43 @@ def change_password():
 
 @app.route('/api/web/reset-analytics', methods=['POST'])
 def reset_analytics():
+    data = request.json or {}
+    scope = data.get('scope', 'all')
+    start_date = data.get('startDate')
+    end_date = data.get('endDate')
+
     analytics_file = '/opt/firinna-pos/web_analytics.json'
-    empty_stats = {
-        "today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0, "last_date": "",
-        "devices": {}, "browsers": {}, "countries": {}, "referrers": {},
-        "recent_visitors": [], "repeat_visitors": 0, "new_visitors": 0, "os": {}, "peak_hours": {}
-    }
-    with open(analytics_file, 'w') as f:
-        json.dump(empty_stats, f, indent=4)
-    return jsonify({"success": True, "message": "Analitik verileri sıfırlandı."})
+    if not os.path.exists(analytics_file):
+        return jsonify({"success": True, "message": "Sıfırlanacak veri yok."})
+
+    try:
+        with open(analytics_file, 'r', encoding='utf-8') as f:
+            stats = json.load(f)
+
+        import datetime
+        today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+
+        if scope == 'all':
+            stats = {
+                "today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0, "map_clicks": 0, "last_date": "",
+                "devices": {}, "browsers": {}, "countries": {}, "referrers": {},
+                "recent_visitors": [], "repeat_visitors": 0, "new_visitors": 0, "os": {}, "peak_hours": {}, "menu_interests": {}
+            }
+        elif scope == 'today':
+            stats["today"] = 0
+            stats["recent_visitors"] = [v for v in stats.get("recent_visitors", []) if v.get("iso_date") != today_str]
+        elif scope == 'range' and start_date and end_date:
+            stats["recent_visitors"] = [
+                v for v in stats.get("recent_visitors", [])
+                if not (start_date <= (v.get("iso_date") or "") <= end_date)
+            ]
+
+        with open(analytics_file, 'w', encoding='utf-8') as f:
+            json.dump(stats, f, indent=4, ensure_ascii=False)
+
+        return jsonify({"success": True, "message": "İstatistikler başarıyla sıfırlandı/güncellendi."})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 # WEB ÜRÜN & MENÜ YÖNETİMİ APIS
 PRODUCTS_FILE = '/opt/firinna-pos/web_products.json'
