@@ -149,7 +149,8 @@ const i18n = {
     tr: {
         category: "Cafe & Restaurant",
         status_open: "Şu An Açık (08:00 - 23:00)",
-        btn_menu: "Dijital Menüyü İncele",
+        btn_menu: "📖 Dijital Menüyü İncele",
+        btn_gezi: "🗺️ İstanbul Gezi Rehberi & Rota",
         btn_reserve: "Hemen Masa Ayırt",
         btn_message: "Yöneticiye Mesaj İlet (Telegram)",
         title_about: "Hakkımızda",
@@ -253,7 +254,8 @@ const i18n = {
     en: {
         category: "Cafe & Restaurant",
         status_open: "Open Now (08:00 - 23:00)",
-        btn_menu: "View Digital Menu",
+        btn_menu: "📖 View Digital Menu",
+        btn_gezi: "🗺️ Istanbul Travel Guide & Route",
         btn_reserve: "Book a Table",
         btn_message: "Send us a Message",
         title_about: "About Us",
@@ -357,7 +359,8 @@ const i18n = {
     es: {
         category: "Cafetería y Restaurante",
         status_open: "Abierto Ahora (08:00 - 23:00)",
-        btn_menu: "Ver Menú Digital",
+        btn_menu: "📖 Ver Menú Digital",
+        btn_gezi: "🗺️ Guía y Ruta de Estambul",
         btn_reserve: "Reservar una Mesa",
         btn_message: "Enviarnos un Mensaje",
         title_about: "Sobre Nosotros",
@@ -461,7 +464,8 @@ const i18n = {
     ru: {
         category: "Кафе и Ресторан",
         status_open: "Сейчас открыто (08:00 - 23:00)",
-        btn_menu: "Посмотреть меню",
+        btn_menu: "📖 Посмотреть меню",
+        btn_gezi: "🗺️ Путеводитель и Маршрут по Стамбулу",
         btn_reserve: "Забронировать столик",
         btn_message: "Напишите нам",
         title_about: "О нас",
@@ -565,7 +569,8 @@ const i18n = {
     ar: {
         category: "مقهى ومطعم",
         status_open: "مفتوح الآن (08:00 - 23:00)",
-        btn_menu: "عرض القائمة الرقمية",
+        btn_menu: "📖 عرض القائمة الرقمية",
+        btn_gezi: "🗺️ دليل ومسار رحلة إسطنبول",
         btn_reserve: "احجز طاولة",
         btn_message: "ارسل لنا رسالة",
         title_about: "معلومات عنا",
@@ -669,7 +674,8 @@ const i18n = {
     zh: {
         category: "咖啡厅与餐厅",
         status_open: "营业中 (08:00 - 23:00)",
-        btn_menu: "查看电子菜单",
+        btn_menu: "📖 查看电子菜单",
+        btn_gezi: "🗺️ 伊斯坦布尔智能指南与路线",
         btn_reserve: "预订餐桌",
         btn_message: "给我们留言",
         title_about: "关于我们",
