@@ -71,6 +71,11 @@ def api_version():
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/web')
+@app.route('/web/')
+def web_home():
     return send_from_directory('web', 'index.html')
 
 @app.route('/menu')
