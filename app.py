@@ -2790,10 +2790,13 @@ def track_visit():
             action_name = f"🍽️ Ürün İnceleme ({item_name})"
             stats.setdefault("menu_interests", {})[item_name] = stats.get("menu_interests", {}).get(item_name, 0) + 1
 
-        # Ziyaretçi Günlükleri (Son 30 Kayıt)
+        # Ziyaretçi Günlükleri (Sürekli Kayıt - Limitsiz)
         recent = stats.setdefault("recent_visitors", [])
         recent.insert(0, {
+            "id": f"log_{int(now_dt.timestamp()*1000)}",
             "time": time_str,
+            "iso_date": now_dt.strftime("%Y-%m-%d"),
+            "raw_time": now_dt.strftime("%Y-%m-%d %H:%M:%S"),
             "ip": visitor_ip,
             "country": c_name,
             "device": f"{device_type} ({os_name})",
@@ -2801,7 +2804,7 @@ def track_visit():
             "action": action_name,
             "type": visitor_type
         })
-        stats["recent_visitors"] = recent[:30]
+        stats["recent_visitors"] = recent[:5000]
 
         # Sadece yeni bir sayfa görüntülemesinde sayaçları artır
         if event == 'pageview':
