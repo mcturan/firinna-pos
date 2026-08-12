@@ -13,6 +13,9 @@
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
+    <!-- Chart.js for Visual Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <!-- Admin CSS -->
     <link rel="stylesheet" href="/admin.css?v=3.5">
 </head>
@@ -114,6 +117,48 @@
                                 <i class="ph-fill ph-book-open" style="font-size:2rem; color:#f59e0b;"></i>
                                 <h4 style="margin:8px 0; color:#475569; font-size:0.85rem;">Menü / İletişim</h4>
                                 <p style="font-size:1.6rem; font-weight:800; color:#1e293b;" id="stat-menu">0</p>
+                            </div>
+                        </div>
+
+                        <!-- CANLI GÖRSEL GRAFİKLER (CHART.JS) -->
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px;">
+                            <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                                    <h4 style="margin:0; font-size:1rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                                        <i class="ph-bold ph-trend-up" style="color:#2563eb; font-size:1.2rem;"></i> Günlük Ziyaretçi Zaman Trendi
+                                    </h4>
+                                    <span style="font-size:0.78rem; background:#eff6ff; color:#1d4ed8; padding:3px 10px; border-radius:10px; font-weight:600;">Son 14 Gün</span>
+                                </div>
+                                <div style="height:260px; position:relative;">
+                                    <canvas id="chart-visit-trend"></canvas>
+                                </div>
+                            </div>
+                            <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+                                <h4 style="margin:0 0 14px 0; font-size:1rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                                    <i class="ph-bold ph-chart-pie-slice" style="color:#d97706; font-size:1.2rem;"></i> Trafik & Pazarlama Kaynakları
+                                </h4>
+                                <div style="height:260px; position:relative; display:flex; align-items:center; justify-content:center;">
+                                    <canvas id="chart-traffic-sources"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                            <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+                                <h4 style="margin:0 0 14px 0; font-size:1rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                                    <i class="ph-bold ph-device-mobile-camera" style="color:#10b981; font-size:1.2rem;"></i> Cihaz & Tarayıcı Dağılımı
+                                </h4>
+                                <div style="height:220px; position:relative;">
+                                    <canvas id="chart-devices"></canvas>
+                                </div>
+                            </div>
+                            <div style="background:#fff; padding:20px; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+                                <h4 style="margin:0 0 14px 0; font-size:1rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                                    <i class="ph-bold ph-map-pin" style="color:#ec4899; font-size:1.2rem;"></i> Şehir & Bölge Dağılımı
+                                </h4>
+                                <div style="height:220px; position:relative; display:flex; align-items:center; justify-content:center;">
+                                    <canvas id="chart-locations"></canvas>
+                                </div>
                             </div>
                         </div>
 

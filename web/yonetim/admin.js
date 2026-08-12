@@ -125,8 +125,154 @@ async function fetchAnalytics() {
         // Save raw visitors & render call-log grouped table
         currentRawVisitors = data.recent_visitors || [];
         renderGroupedVisitors();
+
+        // Render Chart.js Visual Charts
+        renderAnalyticsCharts(data);
     } catch (e) {
         console.error("Analitikler yüklenemedi", e);
+    }
+}
+
+let trendChartInstance = null;
+let trafficChartInstance = null;
+let devicesChartInstance = null;
+let locationsChartInstance = null;
+
+function renderAnalyticsCharts(data) {
+    if (typeof Chart === 'undefined') return;
+
+    // 1. Ziyaret Trend Grafiği (Son Günler)
+    const dateCounts = {};
+    const visitors = data.recent_visitors || [];
+    visitors.forEach(v => {
+        const iso = v.iso_date || (v.raw_time ? v.raw_time.split(' ')[0] : '');
+        if (iso) {
+            dateCounts[iso] = (dateCounts[iso] || 0) + 1;
+        }
+    });
+
+    const sortedDates = Object.keys(dateCounts).sort();
+    const recentDates = sortedDates.slice(-14);
+    const trendLabels = recentDates.map(d => {
+        const parts = d.split('-');
+        return parts.length === 3 ? `${parts[2]}.${parts[1]}` : d;
+    });
+    const trendValues = recentDates.map(d => dateCounts[d]);
+
+    const ctxTrend = document.getElementById('chart-visit-trend');
+    if (ctxTrend) {
+        if (trendChartInstance) trendChartInstance.destroy();
+        trendChartInstance = new Chart(ctxTrend, {
+            type: 'line',
+            data: {
+                labels: trendLabels.length ? trendLabels : ['Bugün'],
+                datasets: [{
+                    label: 'Ziyaretçi Sayısı',
+                    data: trendValues.length ? trendValues : [data.today || 0],
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#2563eb',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // 2. Trafik Kaynakları Doughnut Chart
+    const trafficData = {...(data.traffic_sources || {}), ...(data.referrers || {})};
+    const trafficLabels = Object.keys(trafficData);
+    const trafficValues = Object.values(trafficData);
+    const trafficColors = ['#d97706', '#2563eb', '#10b981', '#ec4899', '#8b5cf6', '#64748b'];
+
+    const ctxTraffic = document.getElementById('chart-traffic-sources');
+    if (ctxTraffic) {
+        if (trafficChartInstance) trafficChartInstance.destroy();
+        trafficChartInstance = new Chart(ctxTraffic, {
+            type: 'doughnut',
+            data: {
+                labels: trafficLabels.length ? trafficLabels : ['Henüz Veri Yok'],
+                datasets: [{
+                    data: trafficValues.length ? trafficValues : [1],
+                    backgroundColor: trafficColors.slice(0, Math.max(trafficLabels.length, 1))
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                }
+            }
+        });
+    }
+
+    // 3. Cihaz & Tarayıcı Bar Chart
+    const devData = {...(data.devices || {}), ...(data.browsers || {})};
+    const devLabels = Object.keys(devData).slice(0, 6);
+    const devValues = devLabels.map(k => devData[k]);
+
+    const ctxDev = document.getElementById('chart-devices');
+    if (ctxDev) {
+        if (devicesChartInstance) devicesChartInstance.destroy();
+        devicesChartInstance = new Chart(ctxDev, {
+            type: 'bar',
+            data: {
+                labels: devLabels.length ? devLabels : ['Henüz Veri Yok'],
+                datasets: [{
+                    label: 'Kullanım Sayısı',
+                    data: devValues.length ? devValues : [0],
+                    backgroundColor: '#10b981',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+    }
+
+    // 4. Şehir / Konum Doughnut Chart
+    const locData = {...(data.locations || {}), ...(data.countries || {})};
+    const locLabels = Object.keys(locData).slice(0, 6);
+    const locValues = locLabels.map(k => locData[k]);
+    const locColors = ['#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#64748b'];
+
+    const ctxLoc = document.getElementById('chart-locations');
+    if (ctxLoc) {
+        if (locationsChartInstance) locationsChartInstance.destroy();
+        locationsChartInstance = new Chart(ctxLoc, {
+            type: 'doughnut',
+            data: {
+                labels: locLabels.length ? locLabels : ['Henüz Veri Yok'],
+                datasets: [{
+                    data: locValues.length ? locValues : [1],
+                    backgroundColor: locColors.slice(0, Math.max(locLabels.length, 1))
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                }
+            }
+        });
     }
 }
 
