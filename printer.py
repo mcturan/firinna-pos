@@ -153,8 +153,12 @@ class ThermalPrinter:
             if qr_label:
                 data += CENTER
                 data += BOLD_ON
-                for wrapped_line in textwrap.wrap(qr_label, width=32):
-                    data += tr(f"{wrapped_line}\n").encode('ascii', errors='replace')
+                for line in qr_label.splitlines():
+                    if len(line) <= 44:
+                        data += tr(f"{line}\n").encode('ascii', errors='replace')
+                    else:
+                        for wl in textwrap.wrap(line, width=44):
+                            data += tr(f"{wl}\n").encode('ascii', errors='replace')
                 data += BOLD_OFF
                 data += b'\n'
             qr_bytes = self._image_to_escpos(qr_url, target_width=300)
