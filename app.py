@@ -2862,12 +2862,34 @@ def upload_gallery_photo():
     file.save(filepath)
     return jsonify({"success": True, "filename": filename})
 
+IP_GEO_CACHE = {}
+
+def get_ip_location(ip):
+    if not ip or ip in ['127.0.0.1', 'Gizli IP', 'localhost']:
+        return "📍 İstanbul / Türkiye (Yerel)"
+    if ip in IP_GEO_CACHE:
+        return IP_GEO_CACHE[ip]
+    try:
+        import urllib.request
+        req = urllib.request.urlopen(f'http://ip-api.com/json/{ip}?fields=status,country,city,regionName', timeout=1.5)
+        res = json.loads(req.read().decode('utf-8'))
+        if res.get('status') == 'success':
+            city = res.get('city') or res.get('regionName') or ''
+            country = res.get('country') or ''
+            loc_str = f"📍 {city} / {country}" if city else f"📍 {country}"
+            IP_GEO_CACHE[ip] = loc_str
+            return loc_str
+    except Exception:
+        pass
+    IP_GEO_CACHE[ip] = "🌐 Bilinmeyen Konum"
+    return IP_GEO_CACHE[ip]
+
 @app.route('/api/web/track-visit', methods=['POST'])
 def track_visit():
     analytics_file = '/opt/firinna-pos/web_analytics.json'
     try:
         if os.path.exists(analytics_file):
-            with open(analytics_file, 'r') as f:
+            with open(analytics_file, 'r', encoding='utf-8') as f:
                 stats = json.load(f)
         else:
             stats = {
@@ -2875,6 +2897,10 @@ def track_visit():
                 "devices": {"Mobil": 0, "Masaüstü": 0},
                 "browsers": {},
                 "countries": {},
+                "locations": {},
+                "traffic_sources": {},
+                "store_modes": {},
+                "lang_comparisons": {},
                 "referrers": {"Direkt Giriş": 0, "Google": 0, "Instagram": 0, "Diğer": 0}
             }
             
@@ -2895,7 +2921,6 @@ def track_visit():
         if not visitor_ip or visitor_ip == '127.0.0.1':
             visitor_ip = request.remote_addr or 'Gizli IP'
             
-        import datetime
         now_dt = datetime.datetime.now()
         months_tr = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
         time_str = f"{now_dt.day} {months_tr[now_dt.month - 1]} {now_dt.strftime('%H:%M')}"
@@ -2924,12 +2949,40 @@ def track_visit():
         elif 'safari' in ua: browser = "Apple Safari"
         elif 'firefox' in ua: browser = "Mozilla Firefox"
         
-        # Dil / Ülke Tespiti
-        lang = (data.get('language') or 'tr-TR').upper()[:2]
-        country_map = {"TR": "🇹🇷 Türkiye", "EN": "🇬🇧 İngiltere/ABD", "AR": "🇸🇦 Arap Ülkeleri", "RU": "🇷🇺 Rusya", "ZH": "🇨🇳 Çin"}
-        c_name = country_map.get(lang, f"🌐 {lang}")
+        # Dil / Ülke / Konum Tespiti
+        geo_location = get_ip_location(visitor_ip)
         
-        # Ziyaret Tipi (Yeni vs Tekrar Gelen)
+        # Pazarlama Kaynağı (Traffic Channels)
+        ref = (data.get('referrer') or '').lower()
+        url_query = (data.get('urlQuery') or '').lower()
+        
+        if 'src=qr' in url_query or 'table=' in url_query or 'qr' in ref:
+            traffic_source = "📲 Masa QR Kodu (Dükkan İçi)"
+            store_mode = "🏪 Masada Oturan Müşteri"
+        elif 'g.page' in ref or 'maps.google' in ref or 'google.com/maps' in ref:
+            traffic_source = "🗺️ Google Haritalar"
+            store_mode = "🌐 Dışarıdan İnceleyen"
+        elif 'google' in ref:
+            traffic_source = "🔍 Google Arama (SEO)"
+            store_mode = "🌐 Dışarıdan İnceleyen"
+        elif 'instagram' in ref:
+            traffic_source = "📸 Instagram Bio Link"
+            store_mode = "🌐 Dışarıdan İnceleyen"
+        elif ref == '' or ref == 'direct':
+            traffic_source = "🔗 Doğrudan (Direct)"
+            store_mode = "🌐 Dışarıdan İnceleyen"
+        else:
+            traffic_source = "🌐 Diğer Web Sitesi"
+            store_mode = "🌐 Dışarıdan İnceleyen"
+
+        # Kalma Süresi & Kaydırma Derinliği & Dil Karşılaştırması
+        scroll_depth = data.get('scrollDepth', 0)
+        time_spent_sec = data.get('timeSpentSeconds', 0)
+        user_device_lang = (data.get('language') or 'tr').upper()[:2]
+        selected_menu_lang = (data.get('selectedLanguage') or 'tr').upper()[:2]
+        lang_compare_str = f"{user_device_lang} ➔ {selected_menu_lang}"
+
+        # Ziyaret Tipi
         is_repeat = data.get('isRepeat', False)
         visitor_type = "🔄 Tekrar Gelen Misafir" if is_repeat else "✨ Yeni Ziyaretçi"
 
@@ -2946,12 +2999,13 @@ def track_visit():
         if event == 'menu': action_name = "📄 PDF Menü İndirme"
         elif event == 'action': action_name = "💬 WhatsApp / İletişim"
         elif event == 'map': action_name = "🗺️ Harita / Navigasyon Niyeti"
+        elif event == 'duration_update': action_name = f"⏱️ Sitede Kalma ({time_spent_sec}s)"
         elif event == 'item':
             item_name = data.get('item', 'Özel Lezzet')
             action_name = f"🍽️ Ürün İnceleme ({item_name})"
             stats.setdefault("menu_interests", {})[item_name] = stats.get("menu_interests", {}).get(item_name, 0) + 1
 
-        # Ziyaretçi Günlükleri (Sürekli Kayıt - Limitsiz)
+        # Ziyaretçi Günlükleri
         recent = stats.setdefault("recent_visitors", [])
         recent.insert(0, {
             "id": f"log_{int(now_dt.timestamp()*1000)}",
@@ -2959,11 +3013,17 @@ def track_visit():
             "iso_date": now_dt.strftime("%Y-%m-%d"),
             "raw_time": now_dt.strftime("%Y-%m-%d %H:%M:%S"),
             "ip": visitor_ip,
-            "country": c_name,
+            "country": geo_location,
+            "location": geo_location,
+            "traffic_source": traffic_source,
+            "store_mode": store_mode,
             "device": f"{device_type} ({os_name})",
             "browser": browser,
             "action": action_name,
-            "type": visitor_type
+            "type": visitor_type,
+            "scroll_depth": f"%{scroll_depth}",
+            "time_spent": f"{time_spent_sec} sn",
+            "lang_compare": lang_compare_str
         })
         stats["recent_visitors"] = recent[:5000]
 
@@ -2981,16 +3041,12 @@ def track_visit():
             stats.setdefault("devices", {})[device_type] = stats.get("devices", {}).get(device_type, 0) + 1
             stats.setdefault("os", {})[os_name] = stats.get("os", {}).get(os_name, 0) + 1
             stats.setdefault("browsers", {})[browser] = stats.get("browsers", {}).get(browser, 0) + 1
-            stats.setdefault("countries", {})[c_name] = stats.get("countries", {}).get(c_name, 0) + 1
+            stats.setdefault("locations", {})[geo_location] = stats.get("locations", {}).get(geo_location, 0) + 1
+            stats.setdefault("traffic_sources", {})[traffic_source] = stats.get("traffic_sources", {}).get(traffic_source, 0) + 1
+            stats.setdefault("store_modes", {})[store_mode] = stats.get("store_modes", {}).get(store_mode, 0) + 1
+            stats.setdefault("lang_comparisons", {})[lang_compare_str] = stats.get("lang_comparisons", {}).get(lang_compare_str, 0) + 1
             stats.setdefault("peak_hours", {})[hour_slot] = stats.get("peak_hours", {}).get(hour_slot, 0) + 1
-            
-            # Referans Kaynağı
-            ref = (data.get('referrer') or '').lower()
-            ref_name = "Direkt Giriş"
-            if 'google' in ref: ref_name = "Google Arama"
-            elif 'instagram' in ref: ref_name = "Instagram"
-            elif ref != '': ref_name = "Diğer Site"
-            stats.setdefault("referrers", {})[ref_name] = stats.get("referrers", {}).get(ref_name, 0) + 1
+            stats.setdefault("referrers", {})[traffic_source] = stats.get("referrers", {}).get(traffic_source, 0) + 1
             
         elif event == 'menu':
             stats["menu"] = stats.get("menu", 0) + 1
@@ -2999,8 +3055,8 @@ def track_visit():
         elif event == 'map':
             stats["map_clicks"] = stats.get("map_clicks", 0) + 1
             
-        with open(analytics_file, 'w') as f:
-            json.dump(stats, f)
+        with open(analytics_file, 'w', encoding='utf-8') as f:
+            json.dump(stats, f, indent=4, ensure_ascii=False)
             
         return jsonify({"success": True})
     except Exception as e:

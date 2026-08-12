@@ -772,6 +772,20 @@ const i18n = {
     }
 };
 
+let pageStartTime = Date.now();
+let maxScrollPct = 0;
+
+window.addEventListener('scroll', () => {
+    try {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (scrollHeight > 0) {
+            const currentPct = Math.round((scrollTop / scrollHeight) * 100);
+            if (currentPct > maxScrollPct) maxScrollPct = currentPct;
+        }
+    } catch(e) {}
+}, { passive: true });
+
 function trackEvent(eventName, extraData = {}) {
     try {
         let isRepeat = false;
@@ -781,13 +795,19 @@ function trackEvent(eventName, extraData = {}) {
             localStorage.setItem('firinna_vid', Date.now());
         }
         
+        const timeSpentSeconds = Math.round((Date.now() - pageStartTime) / 1000);
+
         const payload = {
             event: eventName,
             isRepeat: isRepeat,
             userAgent: navigator.userAgent,
-            language: navigator.language,
+            language: navigator.language || navigator.userLanguage,
+            selectedLanguage: localStorage.getItem('firinna_lang') || 'tr',
             referrer: document.referrer,
+            urlQuery: window.location.search,
             screenWidth: window.innerWidth,
+            scrollDepth: maxScrollPct,
+            timeSpentSeconds: timeSpentSeconds,
             ...extraData
         };
         fetch('/api/web/track-visit', {
@@ -797,6 +817,12 @@ function trackEvent(eventName, extraData = {}) {
         });
     } catch(e) {}
 }
+
+window.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        trackEvent('duration_update');
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     trackEvent('pageview');
