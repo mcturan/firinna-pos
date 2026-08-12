@@ -144,33 +144,51 @@
                             </div>
                         </div>
 
-                        <!-- CANLI ZİYARETÇİ LOG TABLOSU -->
+                        <!-- CANLI ZİYARETÇİ LOG TABLOSU (ARAMA KAYDI MODELİ) -->
                         <div style="margin-top: 24px; background:#fff; padding:20px; border-radius:8px; border:1px solid #e2e8f0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom:1px solid #f1f5f9; padding-bottom:10px; flex-wrap:wrap; gap:10px;">
                                 <h4 style="margin: 0; color:#1e293b; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
-                                    <i class="ph-bold ph-lightning" style="color:#eab308; font-size:1.3rem;"></i> Son Girilen Ziyaretçiler & Canlı IP Akışı (Son 30 Ziyaret)
+                                    <i class="ph-bold ph-phone-call" style="color:#2563eb; font-size:1.3rem;"></i> Cihaz Giriş Kayıtları (Arama Kaydı Mantığında Gruplanmış)
                                 </h4>
                                 <div style="display:flex; align-items:center; gap:12px;">
                                     <span style="font-size:0.8rem; background:#ecfdf5; color:#047857; padding:4px 12px; border-radius:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
-                                        <span class="pulse-dot" style="width:8px; height:8px; background:#10b981; border-radius:50%;"></span> Canlı İzleme Aktif
+                                        <span class="pulse-dot" style="width:8px; height:8px; background:#10b981; border-radius:50%;"></span> Canlı Akış Aktif
                                     </span>
-                                    <button class="btn" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; font-size:0.8rem; padding:4px 12px; border-radius:6px; cursor:pointer;" onclick="resetAnalyticsData()"><i class="ph-bold ph-trash"></i> İstatistikleri Sıfırla</button>
+                                    <button class="btn" style="background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; font-size:0.8rem; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:600;" onclick="openResetAnalyticsModal()"><i class="ph-bold ph-trash"></i> İstatistikleri Sıfırla...</button>
                                 </div>
                             </div>
+
+                            <!-- Zaman Filtresi Barı -->
+                            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
+                                <span style="font-weight:700; font-size:0.85rem; color:#334155; display:flex; align-items:center; gap:6px;"><i class="ph-bold ph-funnel" style="color:#2563eb;"></i> Zaman Filtresi:</span>
+                                <button id="btn-filter-all" class="btn active-filter-btn" onclick="setVisitorFilter('all')" style="font-size:0.8rem; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:600; background:#2563eb; color:#fff; border:none;">🌐 Tümü (Tüm Zamanlar)</button>
+                                <button id="btn-filter-today" class="btn" onclick="setVisitorFilter('today')" style="font-size:0.8rem; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:600; background:#fff; color:#475569; border:1px solid #cbd5e1;">📅 Bugün</button>
+                                <button id="btn-filter-range" class="btn" onclick="setVisitorFilter('range')" style="font-size:0.8rem; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:600; background:#fff; color:#475569; border:1px solid #cbd5e1;">🗓️ Belli Aralık</button>
+
+                                <div id="range-picker-container" style="display:none; align-items:center; gap:8px; margin-left:6px;">
+                                    <input type="date" id="filter-start-date" style="font-size:0.8rem; padding:4px 8px; border-radius:6px; border:1px solid #cbd5e1;">
+                                    <span style="font-size:0.85rem; color:#64748b; font-weight:600;">-</span>
+                                    <input type="date" id="filter-end-date" style="font-size:0.8rem; padding:4px 8px; border-radius:6px; border:1px solid #cbd5e1;">
+                                    <button class="btn btn-primary" onclick="applyCustomRangeFilter()" style="font-size:0.8rem; padding:5px 12px; border-radius:6px;">Filtrele</button>
+                                </div>
+                            </div>
+
                             <div style="overflow-x: auto;">
                                 <table style="width:100%; border-collapse:collapse; font-size:0.88rem; text-align:left;">
                                     <thead>
                                         <tr style="background:#f8fafc; color:#64748b; border-bottom:2px solid #e2e8f0;">
-                                            <th style="padding:10px;">Giriş Zamanı</th>
+                                            <th style="padding:10px;">Ziyaret Sayısı</th>
                                             <th style="padding:10px;">IP Adresi</th>
-                                            <th style="padding:10px;">Cihaz Dili / Uyruk</th>
+                                            <th style="padding:10px;">📍 Şehir / Konum</th>
+                                            <th style="padding:10px;">🎯 Trafik Kaynağı</th>
                                             <th style="padding:10px;">Cihaz Tipi</th>
                                             <th style="padding:10px;">Tarayıcı</th>
-                                            <th style="padding:10px;">Yapılan Eylem / Sayfa</th>
+                                            <th style="padding:10px;">Son Giriş Zamanı</th>
+                                            <th style="padding:10px; text-align:center;">İşlem</th>
                                         </tr>
                                     </thead>
                                     <tbody id="table-recent-visitors">
-                                        <tr><td colspan="6" style="padding:16px; text-align:center; color:#94a3b8;">Henüz canlı ziyaretçi verisi bulunmuyor.</td></tr>
+                                        <tr><td colspan="7" style="padding:16px; text-align:center; color:#94a3b8;">Henüz canlı ziyaretçi verisi bulunmuyor.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -200,28 +218,129 @@
                             <small style="color:#b91c1c;">Lütfen net bir tarih ve saat seçin. (Sitede geri sayım veya direkt saat gösterilir).</small>
                         </div>
 
-                        <div class="form-group">
-                            <label>Çalışma Saatleri (Açılış - Kapanış)</label>
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <input type="time" id="work_hours_start" class="form-control" style="width:150px;" required>
-                                <span> - </span>
-                                <input type="time" id="work_hours_end" class="form-control" style="width:150px;" required>
+                        <div class="form-group" style="background:#f8fafc; border:1px solid #e2e8f0; padding:20px; border-radius:12px; margin-bottom:24px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+                                <h4 style="margin:0; font-size:1.05rem; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                                    <i class="ph-bold ph-clock-user" style="color:#d97706;"></i> Haftalık Çalışma Günleri & Saatleri
+                                </h4>
+                            </div>
+                            <small style="color:#64748b; display:block; margin-bottom:14px;">Gün yanındaki tik seçili ise mekan o gün açıktır. Tik kaldırılırsa mekan o gün <strong>KAPALI</strong> olarak işaretlenir. Herhangi bir günün saatini veya durumunu <strong>"Tüm Günlere Kopyala"</strong> butonuna basarak tüm haftaya aktarabilirsiniz.</small>
+                            
+                            <div id="weekly-schedule-container" style="display:flex; flex-direction:column; gap:10px;">
+                                <!-- Pazartesi -->
+                                <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
+                                    <label style="display:flex; align-items:center; gap:8px; width:130px; font-weight:700; color:#0f172a; cursor:pointer;">
+                                        <input type="checkbox" id="day_active_Pazartesi" checked onchange="toggleDayRow('Pazartesi')">
+                                        <span>Pazartesi</span>
+                                    </label>
+                                    <div id="day_inputs_Pazartesi" style="display:flex; align-items:center; gap:8px;">
+                                        <input type="time" id="day_open_Pazartesi" class="form-control" style="width:130px;" value="08:30">
+                                        <span style="color:#64748b; font-weight:bold;">-</span>
+                                        <input type="time" id="day_close_Pazartesi" class="form-control" style="width:130px;" value="23:00">
+                                    </div>
+                                    <span id="day_closed_badge_Pazartesi" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Pazartesi')" title="Pazartesi saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
+                                </div>
+                                <!-- Salı -->
+                                <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
+                                    <label style="display:flex; align-items:center; gap:8px; width:130px; font-weight:700; color:#0f172a; cursor:pointer;">
+                                        <input type="checkbox" id="day_active_Salı" checked onchange="toggleDayRow('Salı')">
+                                        <span>Salı</span>
+                                    </label>
+                                    <div id="day_inputs_Salı" style="display:flex; align-items:center; gap:8px;">
+                                        <input type="time" id="day_open_Salı" class="form-control" style="width:130px;" value="08:30">
+                                        <span style="color:#64748b; font-weight:bold;">-</span>
+                                        <input type="time" id="day_close_Salı" class="form-control" style="width:130px;" value="23:00">
+                                    </div>
+                                    <span id="day_closed_badge_Salı" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Salı')" title="Salı saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
+                                </div>
+                                <!-- Çarşamba -->
+                                <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
+                                    <label style="display:flex; align-items:center; gap:8px; width:130px; font-weight:700; color:#0f172a; cursor:pointer;">
+                                        <input type="checkbox" id="day_active_Çarşamba" checked onchange="toggleDayRow('Çarşamba')">
+                                        <span>Çarşamba</span>
+                                    </label>
+                                    <div id="day_inputs_Çarşamba" style="display:flex; align-items:center; gap:8px;">
+                                        <input type="time" id="day_open_Çarşamba" class="form-control" style="width:130px;" value="08:30">
+                                        <span style="color:#64748b; font-weight:bold;">-</span>
+                                        <input type="time" id="day_close_Çarşamba" class="form-control" style="width:130px;" value="23:00">
+                                    </div>
+                                    <span id="day_closed_badge_Çarşamba" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Çarşamba')" title="Çarşamba saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
+                                </div>
+                                <!-- Perşembe -->
+                                <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
+                                    <label style="display:flex; align-items:center; gap:8px; width:130px; font-weight:700; color:#0f172a; cursor:pointer;">
+                                        <input type="checkbox" id="day_active_Perşembe" checked onchange="toggleDayRow('Perşembe')">
+                                        <span>Perşembe</span>
+                                    </label>
+                                    <div id="day_inputs_Perşembe" style="display:flex; align-items:center; gap:8px;">
+                                        <input type="time" id="day_open_Perşembe" class="form-control" style="width:130px;" value="08:30">
+                                        <span style="color:#64748b; font-weight:bold;">-</span>
+                                        <input type="time" id="day_close_Perşembe" class="form-control" style="width:130px;" value="23:00">
+                                    </div>
+                                    <span id="day_closed_badge_Perşembe" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Perşembe')" title="Perşembe saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
+                                </div>
+                                <!-- Cuma -->
+                                <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
+                                    <label style="display:flex; align-items:center; gap:8px; width:130px; font-weight:700; color:#0f172a; cursor:pointer;">
+                                        <input type="checkbox" id="day_active_Cuma" checked onchange="toggleDayRow('Cuma')">
+                                        <span>Cuma</span>
+                                    </label>
+                                    <div id="day_inputs_Cuma" style="display:flex; align-items:center; gap:8px;">
+                                        <input type="time" id="day_open_Cuma" class="form-control" style="width:130px;" value="08:30">
+                                        <span style="color:#64748b; font-weight:bold;">-</span>
+                                        <input type="time" id="day_close_Cuma" class="form-control" style="width:130px;" value="23:00">
+                                    </div>
+                                    <span id="day_closed_badge_Cuma" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Cuma')" title="Cuma saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
+                                </div>
+                                <!-- Cumartesi -->
+                                <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
+                                    <label style="display:flex; align-items:center; gap:8px; width:130px; font-weight:700; color:#0f172a; cursor:pointer;">
+                                        <input type="checkbox" id="day_active_Cumartesi" checked onchange="toggleDayRow('Cumartesi')">
+                                        <span>Cumartesi</span>
+                                    </label>
+                                    <div id="day_inputs_Cumartesi" style="display:flex; align-items:center; gap:8px;">
+                                        <input type="time" id="day_open_Cumartesi" class="form-control" style="width:130px;" value="08:30">
+                                        <span style="color:#64748b; font-weight:bold;">-</span>
+                                        <input type="time" id="day_close_Cumartesi" class="form-control" style="width:130px;" value="23:00">
+                                    </div>
+                                    <span id="day_closed_badge_Cumartesi" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Cumartesi')" title="Cumartesi saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
+                                </div>
+                                <!-- Pazar -->
+                                <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
+                                    <label style="display:flex; align-items:center; gap:8px; width:130px; font-weight:700; color:#0f172a; cursor:pointer;">
+                                        <input type="checkbox" id="day_active_Pazar" checked onchange="toggleDayRow('Pazar')">
+                                        <span>Pazar</span>
+                                    </label>
+                                    <div id="day_inputs_Pazar" style="display:flex; align-items:center; gap:8px;">
+                                        <input type="time" id="day_open_Pazar" class="form-control" style="width:130px;" value="08:30">
+                                        <span style="color:#64748b; font-weight:bold;">-</span>
+                                        <input type="time" id="day_close_Pazar" class="form-control" style="width:130px;" value="23:00">
+                                    </div>
+                                    <span id="day_closed_badge_Pazar" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Pazar')" title="Pazar saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
+                                </div>
                             </div>
                         </div>
                             
                             <div class="form-group">
                                 <label>Fiziksel Adres</label>
-                                <textarea id="address" name="address" class="form-control" rows="3" required></textarea>
+                                <textarea id="address" name="address" class="form-control" rows="3" required>Şahkulu Mah. Kumbaracı Yokuşu, No:41A&#10;Beyoğlu, İstanbul</textarea>
                             </div>
                             
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Telefon (Sıfır olmadan, örn: 905456301214)</label>
-                                    <input type="text" id="phone" name="phone" class="form-control" required>
+                                    <input type="text" id="phone" name="phone" class="form-control" value="905456301214" required>
                                 </div>
                                 <div class="form-group">
                                     <label>Instagram Linki</label>
-                                    <input type="url" id="instagram" name="instagram" class="form-control">
+                                    <input type="url" id="instagram" name="instagram" class="form-control" value="https://instagram.com/firinnacafe">
                                 </div>
                             </div>
 
@@ -229,19 +348,19 @@
                                 <h4 style="font-size:0.95rem; font-weight:700; color:#334155; margin-bottom:12px;"><i class="ph-bold ph-star"></i> Doğrudan Yorum / Puanlama Linkleri (5 Yıldız Butonları İçin)</h4>
                                 <div class="form-group" style="margin-bottom:12px;">
                                     <label style="font-size:0.85rem;">Google Doğrudan Yorum Linki (writereview?placeid=...)</label>
-                                    <input type="url" id="google_review_url" name="google_review_url" class="form-control" placeholder="https://search.google.com/local/writereview?placeid=...">
+                                    <input type="url" id="google_review_url" name="google_review_url" class="form-control" value="https://g.page/r/CYCTLUWSsIhDEBM/review" placeholder="https://search.google.com/local/writereview?placeid=...">
                                 </div>
                                 <div class="form-group" style="margin-bottom:12px;">
                                     <label style="font-size:0.85rem;">Yandex Doğrudan Yorum Linki (İsteğe Bağlı)</label>
-                                    <input type="url" id="yandex_review_url" name="yandex_review_url" class="form-control" placeholder="https://yandex.com.tr/maps/org/...">
+                                    <input type="url" id="yandex_review_url" name="yandex_review_url" class="form-control" value="https://yandex.com.tr/maps/org/firinna/37863615675/reviews/?add-review=true" placeholder="https://yandex.com.tr/maps/org/...">
                                 </div>
                                 <div class="form-group" style="margin-bottom:12px;">
                                     <label style="font-size:0.85rem;">TripAdvisor Doğrudan Yorum Linki (İsteğe Bağlı)</label>
-                                    <input type="url" id="tripadvisor_review_url" name="tripadvisor_review_url" class="form-control" placeholder="https://www.tripadvisor.com.tr/UserReviewEdit-...">
+                                    <input type="url" id="tripadvisor_review_url" name="tripadvisor_review_url" class="form-control" value="" placeholder="https://www.tripadvisor.com.tr/UserReviewEdit-...">
                                 </div>
                                 <div class="form-group" style="margin-bottom:0;">
                                     <label style="font-size:0.85rem;">Grup & Özel Etkinlik Duyuru Metni (WhatsApp Üstü)</label>
-                                    <textarea id="group_event_text" name="group_event_text" class="form-control" rows="2" placeholder="Grup rezervasyonları için doğrudan WhatsApp'tan iletişime geçebilirsiniz."></textarea>
+                                    <textarea id="group_event_text" name="group_event_text" class="form-control" rows="2" placeholder="Grup rezervasyonları için doğrudan WhatsApp'tan iletişime geçebilirsiniz.">Normal saatler harici grup rezervasyonu ve özel mini organizasyonlar için doğrudan WhatsApp'tan iletişime geçebilirsiniz.</textarea>
                                 </div>
                             </div>
                             
@@ -336,6 +455,28 @@
                             </button>
                         </div>
 
+                        <!-- KATEGORİ YÖNETİMİ BÖLÜMÜ -->
+                        <div style="background:#fff7ed; border:1px solid #fed7aa; padding:16px; border-radius:8px; margin-bottom:24px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <h4 style="margin:0; color:#9a3412; font-size:0.95rem; display:flex; align-items:center; gap:6px;">
+                                    <i class="ph-bold ph-folders" style="color:#ea580c;"></i> Menü Kategorileri Yönetimi
+                                </h4>
+                            </div>
+                            
+                            <form id="categoryForm" onsubmit="saveWebCategory(event)" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
+                                <input type="hidden" id="cat_id" value="">
+                                <input type="text" id="cat_name" class="form-control" placeholder="Yeni Kategori Adı (Örn: Çorbalar & Salatalar)" style="flex:1; min-width:220px;" required>
+                                <button type="submit" class="btn btn-primary" style="background:#ea580c; border:none; padding:8px 16px; white-space:nowrap;">
+                                    <i class="ph-bold ph-plus"></i> Kategoriyi Kaydet
+                                </button>
+                                <button type="button" class="btn" onclick="resetCategoryForm()" style="background:#e2e8f0; color:#475569; padding:8px 12px;">Temizle</button>
+                            </form>
+
+                            <div id="category-badges-container" style="display:flex; flex-wrap:wrap; gap:8px;">
+                                <div style="color:#9a3412; font-size:0.85rem;">Kategoriler yükleniyor...</div>
+                            </div>
+                        </div>
+
                         <!-- ÜRÜN EKLE / DÜZENLE FORMU -->
                         <div id="product-form-card" style="background:#f8fafc; border:1px solid #cbd5e1; padding:20px; border-radius:8px; margin-bottom:24px;">
                             <h4 id="prod-form-heading" style="margin-top:0; margin-bottom:16px; color:#1e293b; font-size:1rem; display:flex; align-items:center; gap:8px;">
@@ -353,10 +494,7 @@
                                     <div class="form-group" style="margin:0;">
                                         <label style="font-size:0.85rem; font-weight:600;">Kategori</label>
                                         <select id="prod_category" class="form-control">
-                                            <option value="İçecekler & Tatlılar">İçecekler & Tatlılar</option>
-                                            <option value="Fırından Sıcak Sıcak">Fırından Sıcak Sıcak</option>
-                                            <option value="Kahvaltılıklar">Kahvaltılıklar</option>
-                                            <option value="Ana Yemekler">Ana Yemekler</option>
+                                            <!-- JS ile yüklenir -->
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin:0;">
@@ -370,16 +508,39 @@
                                     <textarea id="prod_description" class="form-control" rows="3" placeholder="Örn: En seçkin Türk ve Seylan çayı karışımı içinde bergamot ve kuru gül goncaları ile demlenir." required></textarea>
                                 </div>
 
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:8px;">🏷️ Diyet & Alerjen Etiketleri (Taglar)</label>
+                                    <div style="display:flex; flex-wrap:wrap; gap:10px; background:#fff; padding:12px; border-radius:6px; border:1px solid #cbd5e1;">
+                                        <label style="font-size:0.82rem; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="prod-tag-cb" value="vegetarian"> 🌱 Vejetaryen</label>
+                                        <label style="font-size:0.82rem; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="prod-tag-cb" value="vegan"> 🥑 Vegan</label>
+                                        <label style="font-size:0.82rem; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="prod-tag-cb" value="gluten"> 🌾 Gluten İçerir</label>
+                                        <label style="font-size:0.82rem; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="prod-tag-cb" value="gluten_free"> 🌾🚫 Glutensiz</label>
+                                        <label style="font-size:0.82rem; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="prod-tag-cb" value="dairy"> 🥛 Süt Ürünü / Laktoz</label>
+                                        <label style="font-size:0.82rem; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="prod-tag-cb" value="nuts"> 🥜 Kuruyemiş</label>
+                                        <label style="font-size:0.82rem; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="prod-tag-cb" value="spicy"> 🌶️ Acı</label>
+                                        <label style="font-size:0.82rem; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="prod-tag-cb" value="halal"> 🥩 %100 Helal</label>
+                                        <label style="font-size:0.82rem; display:inline-flex; align-items:center; gap:4px; cursor:pointer;"><input type="checkbox" class="prod-tag-cb" value="sugar_free"> 🍯 Şekersiz</label>
+                                    </div>
+                                </div>
+
                                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:16px;">
                                     <div class="form-group" style="margin:0; flex:1; min-width:250px;">
                                         <label style="font-size:0.85rem; font-weight:600;">Ürün Fotoğrafı (Yükle veya Seç)</label>
                                         <input type="file" id="prod_image_file" accept="image/*" class="form-control" style="padding:4px;">
                                     </div>
-                                    <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:10px 14px; border-radius:6px; border:1px solid #cbd5e1; margin-top:20px;">
-                                        <input type="checkbox" id="prod_is_signature" style="width:18px; height:18px; cursor:pointer;">
-                                        <label for="prod_is_signature" style="font-size:0.9rem; font-weight:700; color:#d97706; cursor:pointer; margin:0; display:flex; align-items:center; gap:4px;">
-                                            ⭐ İmza Lezzetlerde Göster
-                                        </label>
+                                    <div style="display:flex; align-items:center; gap:16px; margin-top:20px; flex-wrap:wrap;">
+                                        <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:10px 14px; border-radius:6px; border:1px solid #cbd5e1;">
+                                            <input type="checkbox" id="prod_is_active" checked style="width:18px; height:18px; cursor:pointer;">
+                                            <label for="prod_is_active" style="font-size:0.9rem; font-weight:700; color:#166534; cursor:pointer; margin:0; display:flex; align-items:center; gap:4px;">
+                                                ✅ Ürün Satışta / Etkin
+                                            </label>
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:10px 14px; border-radius:6px; border:1px solid #cbd5e1;">
+                                            <input type="checkbox" id="prod_is_signature" style="width:18px; height:18px; cursor:pointer;">
+                                            <label for="prod_is_signature" style="font-size:0.9rem; font-weight:700; color:#d97706; cursor:pointer; margin:0; display:flex; align-items:center; gap:4px;">
+                                                ⭐ İmza Lezzetlerde Göster
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -393,10 +554,29 @@
                             </form>
                         </div>
 
-                        <!-- KAYITLI ÜRÜNLER LİSTESİ -->
-                        <h4 style="margin-bottom:12px; color:#334155;"><i class="ph-bold ph-list-bullets"></i> Kayıtlı Ürün Listesi</h4>
+                        <!-- KAYITLI ÜRÜNLER LİSTESİ & FİLTRELER -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+                            <h4 style="margin:0; color:#334155;"><i class="ph-bold ph-check-circle" style="color:#166534;"></i> Satışta Olan Etkin Ürünler</h4>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                                <input type="text" id="prod-search-input" onkeyup="filterAdminProducts()" placeholder="Ürün Ara..." class="form-control" style="width:180px; padding:6px 12px; font-size:0.85rem;">
+                                <select id="prod-category-filter" onchange="filterAdminProducts()" class="form-control" style="width:180px; padding:6px 12px; font-size:0.85rem;">
+                                    <option value="ALL">Tüm Kategoriler</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div id="admin-products-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
                             <div style="color:#94a3b8; font-size:0.9rem;">Ürünler yükleniyor...</div>
+                        </div>
+
+                        <!-- ETKİN OLMAYAN / PASİF ÜRÜNLER SEKSİYONU -->
+                        <div id="admin-inactive-products-section" style="margin-top:32px; padding-top:24px; border-top:2px dashed #cbd5e1;">
+                            <h4 style="margin:0 0 16px 0; color:#991b1b; display:flex; align-items:center; gap:8px;">
+                                <i class="ph-bold ph-eye-slash" style="color:#dc2626;"></i> Etkin Olmayan / Pasif Ürünler
+                            </h4>
+                            <div id="admin-inactive-products-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+                                <div style="color:#94a3b8; font-size:0.9rem;">Pasif ürün bulunmuyor.</div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -494,7 +674,100 @@
         
     </div>
 
-    <script src="/admin.js?v=6.0"></script>
+    <!-- ZİYARETÇİ DETAYLARI MODALI (Giriş Geçmişi / Arama Kaydı) -->
+    <div id="visitorDetailsModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.65); backdrop-filter:blur(4px); z-index:99999; align-items:center; justify-content:center;">
+        <div style="background:#fff; width:90%; max-width:700px; border-radius:12px; padding:24px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1); max-height:85vh; display:flex; flex-direction:column;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
+                <h3 style="margin:0; font-size:1.1rem; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                    <i class="ph-bold ph-phone-incoming" style="color:#2563eb;"></i> Cihaz Giriş Geçmişi & Eylem Detayları
+                </h3>
+                <span onclick="closeVisitorDetailsModal()" style="cursor:pointer; font-size:1.5rem; color:#64748b; font-weight:bold;">&times;</span>
+            </div>
+            
+            <div id="visitor-details-summary" style="background:#f8fafc; padding:12px 16px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:16px; font-size:0.88rem; color:#334155;">
+                <!-- JS Populated -->
+            </div>
+
+            <div style="flex:1; overflow-y:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:0.85rem; text-align:left;">
+                    <thead>
+                        <tr style="background:#f1f5f9; color:#475569; position:sticky; top:0;">
+                            <th style="padding:10px;">Giriş Zamanı</th>
+                            <th style="padding:10px;">Yapılan Eylem / Sayfa</th>
+                            <th style="padding:10px;">Misafir Tipi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="visitor-details-table-body">
+                        <!-- JS Populated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top:16px; text-align:right; border-top:1px solid #e2e8f0; padding-top:12px;">
+                <button class="btn btn-primary" onclick="closeVisitorDetailsModal()" style="padding:6px 16px;">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- İSTATİSTİK SIFIRLAMA SEÇENEKLERİ MODALI -->
+    <div id="resetAnalyticsModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.65); backdrop-filter:blur(4px); z-index:99999; align-items:center; justify-content:center;">
+        <div style="background:#fff; width:90%; max-width:520px; border-radius:12px; padding:24px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
+                <h3 style="margin:0; font-size:1.1rem; color:#dc2626; display:flex; align-items:center; gap:8px;">
+                    <i class="ph-bold ph-trash"></i> İstatistik Sıfırlama Seçenekleri
+                </h3>
+                <span onclick="closeResetAnalyticsModal()" style="cursor:pointer; font-size:1.5rem; color:#64748b; font-weight:bold;">&times;</span>
+            </div>
+
+            <p style="font-size:0.9rem; color:#475569; margin-bottom:16px;">
+                Hangi zaman dilimine ait ziyaretçi verilerini ve istatistikleri sıfırlamak istediğinizi seçin:
+            </p>
+
+            <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+                <label style="display:flex; align-items:center; gap:10px; padding:12px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer;">
+                    <input type="radio" name="resetScope" value="all" checked onchange="toggleResetScopeInputs()">
+                    <div>
+                        <strong style="color:#0f172a; font-size:0.95rem;">🌐 Tümünü Sıfırla (Tüm Zamanlar)</strong>
+                        <div style="font-size:0.8rem; color:#64748b;">Tüm sayaçları, cihaz verilerini ve ziyaretçi geçmişini tamamen temizler.</div>
+                    </div>
+                </label>
+
+                <label style="display:flex; align-items:center; gap:10px; padding:12px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer;">
+                    <input type="radio" name="resetScope" value="today" onchange="toggleResetScopeInputs()">
+                    <div>
+                        <strong style="color:#0f172a; font-size:0.95rem;">📅 Sadece Bugünkü Verileri Sıfırla</strong>
+                        <div style="font-size:0.8rem; color:#64748b;">Sadece bugün girilen ziyaretçileri ve bugünün sayacını sıfırlar.</div>
+                    </div>
+                </label>
+
+                <label style="display:flex; align-items:center; gap:10px; padding:12px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer;">
+                    <input type="radio" name="resetScope" value="range" onchange="toggleResetScopeInputs()">
+                    <div>
+                        <strong style="color:#0f172a; font-size:0.95rem;">🗓️ Belli Aralık Sıfırla</strong>
+                        <div style="font-size:0.8rem; color:#64748b;">Seçeceğiniz iki tarih arasındaki tüm ziyaretçi kayıtlarını siler.</div>
+                    </div>
+                </label>
+
+                <div id="reset-range-inputs" style="display:none; gap:10px; align-items:center; background:#eff6ff; padding:12px; border-radius:8px; border:1px solid #bfdbfe;">
+                    <div style="flex:1;">
+                        <label style="font-size:0.75rem; color:#1e40af; font-weight:700;">Başlangıç Tarihi</label>
+                        <input type="date" id="reset-start-date" class="form-control" style="font-size:0.8rem; padding:4px 8px;">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-size:0.75rem; color:#1e40af; font-weight:700;">Bitiş Tarihi</label>
+                        <input type="date" id="reset-end-date" class="form-control" style="font-size:0.8rem; padding:4px 8px;">
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #e2e8f0; padding-top:14px;">
+                <button class="btn" onclick="closeResetAnalyticsModal()" style="background:#f1f5f9; color:#475569;">Vazgeç</button>
+                <button class="btn" style="background:#dc2626; color:#fff; font-weight:600;" onclick="confirmResetAnalytics()">⚠️ Seçilenleri Sıfırla</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js?v=15.0"></script>
     <script>
         if (typeof fetchAnalytics === 'function') {
             fetchAnalytics();
