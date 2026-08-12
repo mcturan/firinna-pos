@@ -71,12 +71,22 @@ def api_version():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory('web', 'index.html')
+
+@app.route('/menu')
+@app.route('/menu.html')
+def menu_web_page():
+    return send_from_directory('web', 'menu.html')
 
 @app.route('/gezi')
 @app.route('/gezi.html')
-def gezi_page():
+def gezi_web_page():
     return send_from_directory('web', 'gezi.html')
+
+@app.route('/admin')
+@app.route('/admin.html')
+def admin_web_page():
+    return send_from_directory('web', 'admin.html')
 
 # Yönetim sayfaları
 @app.route('/products')
