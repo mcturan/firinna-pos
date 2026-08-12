@@ -2444,6 +2444,24 @@ def upload_menu():
     file.save(filepath)
     return jsonify({"success": True, "filename": filename})
 
+import secrets
+VALID_ADMIN_TOKENS = set()
+
+def verify_admin_auth():
+    token = request.headers.get('X-Admin-Token') or request.headers.get('Authorization', '').replace('Bearer ', '').strip()
+    if token and token in VALID_ADMIN_TOKENS:
+        return True
+    auth = request.authorization
+    if auth and auth.password:
+        current_pass = "FirinnaPos2026!"
+        if os.path.exists(SETTINGS_FILE):
+            with open(SETTINGS_FILE, 'r') as f:
+                settings = json.load(f)
+                current_pass = settings.get('admin_password', "FirinnaPos2026!")
+        if auth.password == current_pass:
+            return True
+    return False
+
 @app.route('/api/web/admin-login', methods=['POST'])
 def admin_login():
     data = request.json or {}
@@ -2454,7 +2472,9 @@ def admin_login():
             settings = json.load(f)
             current_pass = settings.get('admin_password', "FirinnaPos2026!")
     if password == current_pass:
-        return jsonify({"success": True})
+        token = secrets.token_hex(24)
+        VALID_ADMIN_TOKENS.add(token)
+        return jsonify({"success": True, "token": token})
     return jsonify({"success": False, "error": "Hatalı şifre!"})
 
 @app.route('/api/web/change-password', methods=['POST'])

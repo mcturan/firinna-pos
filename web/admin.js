@@ -118,30 +118,225 @@ async function fetchAnalytics() {
         
         renderList('list-countries', data.countries);
         
-        // Render Recent Visitors Log Table
-        const tableEl = document.getElementById('table-recent-visitors');
-        if (tableEl) {
-            if (data.recent_visitors && data.recent_visitors.length > 0) {
-                tableEl.innerHTML = '';
-                data.recent_visitors.forEach(v => {
-                    const row = document.createElement('tr');
-                    row.style.borderBottom = '1px solid #f1f5f9';
-                    row.innerHTML = `
-                        <td style="padding:10px; font-weight:600; color:#334155;">${v.time || '-'}</td>
-                        <td style="padding:10px; font-family:monospace; color:#2563eb; font-weight:600;">${v.ip || '-'}</td>
-                        <td style="padding:10px;">${v.country || '-'}</td>
-                        <td style="padding:10px;">${v.device || '-'}</td>
-                        <td style="padding:10px; color:#475569;">${v.browser || '-'}</td>
-                        <td style="padding:10px;"><span style="background:#f1f5f9; color:#0f172a; padding:3px 8px; border-radius:6px; font-weight:600; font-size:0.8rem;">${v.action || 'Ziyaret'}</span></td>
-                    `;
-                    tableEl.appendChild(row);
-                });
-            } else {
-                tableEl.innerHTML = '<tr><td colspan="6" style="padding:16px; text-align:center; color:#94a3b8;">Henüz canlı ziyaretçi verisi bulunmuyor.</td></tr>';
-            }
-        }
+        // Save raw visitors & render call-log grouped table
+        currentRawVisitors = data.recent_visitors || [];
+        renderGroupedVisitors();
     } catch (e) {
         console.error("Analitikler yüklenemedi", e);
+    }
+}
+
+// ARMA KAYDI MODELİ İLE ZİYARETÇİ GRUPLAMA VE FİLTRELEME MANTIĞI
+let currentRawVisitors = [];
+let visitorFilterMode = 'all';
+let filterStartDate = '';
+let filterEndDate = '';
+let groupedVisitorsMap = {};
+
+function setVisitorFilter(mode) {
+    visitorFilterMode = mode;
+    document.querySelectorAll('.btn-filter, #btn-filter-all, #btn-filter-today, #btn-filter-range').forEach(btn => {
+        btn.style.background = '#fff';
+        btn.style.color = '#475569';
+        btn.style.border = '1px solid #cbd5e1';
+    });
+
+    const activeBtn = document.getElementById(`btn-filter-${mode}`);
+    if (activeBtn) {
+        activeBtn.style.background = '#2563eb';
+        activeBtn.style.color = '#fff';
+        activeBtn.style.border = 'none';
+    }
+
+    const rangeContainer = document.getElementById('range-picker-container');
+    if (rangeContainer) {
+        rangeContainer.style.display = (mode === 'range') ? 'inline-flex' : 'none';
+    }
+
+    renderGroupedVisitors();
+}
+
+function applyCustomRangeFilter() {
+    filterStartDate = document.getElementById('filter-start-date').value;
+    filterEndDate = document.getElementById('filter-end-date').value;
+    if (!filterStartDate || !filterEndDate) {
+        alert("Lütfen başlangıç ve bitiş tarihlerini seçin.");
+        return;
+    }
+    renderGroupedVisitors();
+}
+
+function renderGroupedVisitors() {
+    const tableEl = document.getElementById('table-recent-visitors');
+    if (!tableEl) return;
+
+    if (!currentRawVisitors || currentRawVisitors.length === 0) {
+        tableEl.innerHTML = '<tr><td colspan="7" style="padding:16px; text-align:center; color:#94a3b8;">Henüz canlı ziyaretçi verisi bulunmuyor.</td></tr>';
+        return;
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Raw ziyaretçileri seçilen zaman filtresine göre süz
+    let filteredVisitors = currentRawVisitors.filter(v => {
+        const iso = v.iso_date || '';
+        if (visitorFilterMode === 'today') {
+            return iso === todayStr || (v.time && v.time.includes('Ağustos')); // bugün kontrolü
+        } else if (visitorFilterMode === 'range') {
+            if (filterStartDate && filterEndDate && iso) {
+                return iso >= filterStartDate && iso <= filterEndDate;
+            }
+        }
+        return true;
+    });
+
+    if (filteredVisitors.length === 0) {
+        tableEl.innerHTML = '<tr><td colspan="7" style="padding:16px; text-align:center; color:#94a3b8;">Seçilen zaman filtresinde ziyaretçi verisi bulunamadı.</td></tr>';
+        return;
+    }
+
+    // IP + Cihaz + Tarayıcı kombinasyonuna göre GRUPLA (Telefondaki Arama Kaydı Mantığı)
+    groupedVisitorsMap = {};
+    filteredVisitors.forEach(v => {
+        const key = `${v.ip || 'Gizli IP'}___${v.device || ''}___${v.browser || ''}`;
+        if (!groupedVisitorsMap[key]) {
+            groupedVisitorsMap[key] = {
+                key: key,
+                ip: v.ip || 'Gizli IP',
+                country: v.country || '-',
+                device: v.device || '-',
+                browser: v.browser || '-',
+                latest_time: v.time || '-',
+                visits: []
+            };
+        }
+        groupedVisitorsMap[key].visits.push(v);
+    });
+
+    const groups = Object.values(groupedVisitorsMap);
+
+    tableEl.innerHTML = '';
+    groups.forEach((g) => {
+        const count = g.visits.length;
+        const row = document.createElement('tr');
+        row.style.borderBottom = '1px solid #f1f5f9';
+        row.style.transition = 'background 0.2s ease';
+        row.onmouseenter = () => row.style.background = '#f8fafc';
+        row.onmouseleave = () => row.style.background = '#ffffff';
+
+        row.innerHTML = `
+            <td style="padding:10px;">
+                <span onclick="showVisitorGroupDetails('${g.key}')" title="Tüm giriş detaylarını gör" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-weight:700; padding:4px 10px; border-radius:12px; font-size:0.82rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                    <i class="ph-bold ph-phone-incoming" style="font-size:0.95rem;"></i> ${count} Ziyaret / Giriş
+                </span>
+            </td>
+            <td style="padding:10px; font-family:monospace; color:#2563eb; font-weight:700; cursor:pointer;" onclick="showVisitorGroupDetails('${g.key}')">${g.ip}</td>
+            <td style="padding:10px; font-weight:500;">${g.country}</td>
+            <td style="padding:10px; color:#334155;">${g.device}</td>
+            <td style="padding:10px; color:#475569;">${g.browser}</td>
+            <td style="padding:10px; font-weight:600; color:#475569;">${g.latest_time}</td>
+            <td style="padding:10px; text-align:center;">
+                <button class="btn btn-primary" onclick="showVisitorGroupDetails('${g.key}')" style="font-size:0.78rem; padding:5px 12px; border-radius:6px; background:#2563eb; font-weight:600;">
+                    <i class="ph-bold ph-list-magnifying-glass"></i> Detaylar (${count})
+                </button>
+            </td>
+        `;
+        tableEl.appendChild(row);
+    });
+}
+
+function showVisitorGroupDetails(key) {
+    const group = groupedVisitorsMap[key];
+    if (!group) return;
+
+    const summaryEl = document.getElementById('visitor-details-summary');
+    if (summaryEl) {
+        summaryEl.innerHTML = `
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                <div><strong>IP Adresi:</strong> <span style="color:#2563eb; font-family:monospace; font-weight:700;">${group.ip}</span></div>
+                <div><strong>Cihaz:</strong> ${group.device}</div>
+                <div><strong>Tarayıcı:</strong> ${group.browser}</div>
+                <div><strong>Toplam Giriş:</strong> <span style="color:#047857; font-weight:700;">${group.visits.length} Kez</span></div>
+            </div>
+        `;
+    }
+
+    const tbody = document.getElementById('visitor-details-table-body');
+    if (tbody) {
+        tbody.innerHTML = '';
+        group.visits.forEach(v => {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid #f1f5f9';
+            tr.innerHTML = `
+                <td style="padding:8px 10px; font-weight:600; color:#334155;">${v.time || '-'}</td>
+                <td style="padding:8px 10px;"><span style="background:#eff6ff; color:#1d4ed8; padding:3px 8px; border-radius:6px; font-weight:600; font-size:0.8rem;">${v.action || 'Ziyaret'}</span></td>
+                <td style="padding:8px 10px; color:#64748b; font-size:0.82rem;">${v.type || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    const modal = document.getElementById('visitorDetailsModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeVisitorDetailsModal() {
+    const modal = document.getElementById('visitorDetailsModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function openResetAnalyticsModal() {
+    const modal = document.getElementById('resetAnalyticsModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeResetAnalyticsModal() {
+    const modal = document.getElementById('resetAnalyticsModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function toggleResetScopeInputs() {
+    const selected = document.querySelector('input[name="resetScope"]:checked').value;
+    const inputsDiv = document.getElementById('reset-range-inputs');
+    if (inputsDiv) {
+        inputsDiv.style.display = (selected === 'range') ? 'flex' : 'none';
+    }
+}
+
+async function confirmResetAnalytics() {
+    const scope = document.querySelector('input[name="resetScope"]:checked').value;
+    const startDate = document.getElementById('reset-start-date').value;
+    const endDate = document.getElementById('reset-end-date').value;
+
+    if (scope === 'range' && (!startDate || !endDate)) {
+        alert("Lütfen sıfırlanacak başlangıç ve bitiş tarihlerini seçin.");
+        return;
+    }
+
+    if (!confirm("Seçilen kapsamdaki istatistik verilerini sıfırlamak istediğinize emin misiniz?")) {
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/web/reset-analytics', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                scope: scope,
+                startDate: startDate,
+                endDate: endDate
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(data.message || "İstatistikler sıfırlandı.");
+            closeResetAnalyticsModal();
+            fetchAnalytics();
+        } else {
+            alert("Hata: " + (data.error || "Sıfırlanamadı"));
+        }
+    } catch (e) {
+        alert("Bir hata oluştu: " + e.message);
     }
 }
 
