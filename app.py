@@ -2624,6 +2624,8 @@ def get_web_products():
 
 @app.route('/api/web/products', methods=['POST'])
 def save_web_product():
+    if not verify_admin_auth():
+        return jsonify({"success": False, "error": "Yetkisiz erişim! Lütfen giriş yapın."}), 401
     import time
     products = load_web_products()
     prod_id = request.form.get('id')
@@ -2682,6 +2684,8 @@ def save_web_product():
 
 @app.route('/api/web/products/<prod_id>/toggle-active', methods=['POST'])
 def toggle_web_product_active(prod_id):
+    if not verify_admin_auth():
+        return jsonify({"success": False, "error": "Yetkisiz erişim! Lütfen giriş yapın."}), 401
     products = load_web_products()
     for p in products:
         if p.get('id') == prod_id:
@@ -2692,6 +2696,8 @@ def toggle_web_product_active(prod_id):
 
 @app.route('/api/web/products/<prod_id>/toggle-signature', methods=['POST'])
 def toggle_product_signature(prod_id):
+    if not verify_admin_auth():
+        return jsonify({"success": False, "error": "Yetkisiz erişim! Lütfen giriş yapın."}), 401
     products = load_web_products()
     found = False
     new_state = False
