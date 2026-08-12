@@ -220,13 +220,10 @@
                         <div class="form-group" style="background:#f8fafc; border:1px solid #e2e8f0; padding:20px; border-radius:12px; margin-bottom:24px;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
                                 <h4 style="margin:0; font-size:1.05rem; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
-                                    <i class="ph-bold ph-clock-user" style="color:#d97706;"></i> Haftalık Çalışma Günleri & Saatleri (Google Business Tarzı)
+                                    <i class="ph-bold ph-clock-user" style="color:#d97706;"></i> Haftalık Çalışma Günleri & Saatleri
                                 </h4>
-                                <button type="button" class="btn" onclick="applyAllDaysSchedule('08:30', '23:00')" style="background:#fffbe0; color:#b45309; border:1px solid #fde68a; font-weight:700; font-size:0.8rem; padding:6px 14px; border-radius:20px; cursor:pointer;">
-                                    ⚡ Tüm Günleri 08:30 - 23:00 Yap
-                                </button>
                             </div>
-                            <small style="color:#64748b; display:block; margin-bottom:14px;">Gün yanındaki tik seçili ise mekan o gün açıktır. Tik kaldırılırsa mekan o gün <strong>KAPALI</strong> olarak işaretlenir.</small>
+                            <small style="color:#64748b; display:block; margin-bottom:14px;">Gün yanındaki tik seçili ise mekan o gün açıktır. Tik kaldırılırsa mekan o gün <strong>KAPALI</strong> olarak işaretlenir. Herhangi bir günün saatini veya durumunu <strong>"Tüm Günlere Kopyala"</strong> butonuna basarak tüm haftaya aktarabilirsiniz.</small>
                             
                             <div id="weekly-schedule-container" style="display:flex; flex-direction:column; gap:10px;">
                                 <!-- Pazartesi -->
@@ -241,6 +238,7 @@
                                         <input type="time" id="day_close_Pazartesi" class="form-control" style="width:130px;" value="23:00">
                                     </div>
                                     <span id="day_closed_badge_Pazartesi" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Pazartesi')" title="Pazartesi saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
                                 </div>
                                 <!-- Salı -->
                                 <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
@@ -254,6 +252,7 @@
                                         <input type="time" id="day_close_Salı" class="form-control" style="width:130px;" value="23:00">
                                     </div>
                                     <span id="day_closed_badge_Salı" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Salı')" title="Salı saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
                                 </div>
                                 <!-- Çarşamba -->
                                 <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
@@ -267,6 +266,7 @@
                                         <input type="time" id="day_close_Çarşamba" class="form-control" style="width:130px;" value="23:00">
                                     </div>
                                     <span id="day_closed_badge_Çarşamba" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Çarşamba')" title="Çarşamba saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
                                 </div>
                                 <!-- Perşembe -->
                                 <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
@@ -280,6 +280,7 @@
                                         <input type="time" id="day_close_Perşembe" class="form-control" style="width:130px;" value="23:00">
                                     </div>
                                     <span id="day_closed_badge_Perşembe" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Perşembe')" title="Perşembe saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
                                 </div>
                                 <!-- Cuma -->
                                 <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
@@ -293,6 +294,7 @@
                                         <input type="time" id="day_close_Cuma" class="form-control" style="width:130px;" value="23:00">
                                     </div>
                                     <span id="day_closed_badge_Cuma" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Cuma')" title="Cuma saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
                                 </div>
                                 <!-- Cumartesi -->
                                 <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
@@ -306,6 +308,7 @@
                                         <input type="time" id="day_close_Cumartesi" class="form-control" style="width:130px;" value="23:00">
                                     </div>
                                     <span id="day_closed_badge_Cumartesi" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Cumartesi')" title="Cumartesi saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
                                 </div>
                                 <!-- Pazar -->
                                 <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; flex-wrap:wrap;">
@@ -319,23 +322,24 @@
                                         <input type="time" id="day_close_Pazar" class="form-control" style="width:130px;" value="23:00">
                                     </div>
                                     <span id="day_closed_badge_Pazar" style="display:none; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">🔴 KAPALI</span>
+                                    <button type="button" class="btn" onclick="copyScheduleFromDay('Pazar')" title="Pazar saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
                                 </div>
                             </div>
                         </div>
                             
                             <div class="form-group">
                                 <label>Fiziksel Adres</label>
-                                <textarea id="address" name="address" class="form-control" rows="3" required></textarea>
+                                <textarea id="address" name="address" class="form-control" rows="3" required>Şahkulu Mah. Kumbaracı Yokuşu, No:41A&#10;Beyoğlu, İstanbul</textarea>
                             </div>
                             
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Telefon (Sıfır olmadan, örn: 905456301214)</label>
-                                    <input type="text" id="phone" name="phone" class="form-control" required>
+                                    <input type="text" id="phone" name="phone" class="form-control" value="905456301214" required>
                                 </div>
                                 <div class="form-group">
                                     <label>Instagram Linki</label>
-                                    <input type="url" id="instagram" name="instagram" class="form-control">
+                                    <input type="url" id="instagram" name="instagram" class="form-control" value="https://instagram.com/firinnacafe">
                                 </div>
                             </div>
 
@@ -343,19 +347,19 @@
                                 <h4 style="font-size:0.95rem; font-weight:700; color:#334155; margin-bottom:12px;"><i class="ph-bold ph-star"></i> Doğrudan Yorum / Puanlama Linkleri (5 Yıldız Butonları İçin)</h4>
                                 <div class="form-group" style="margin-bottom:12px;">
                                     <label style="font-size:0.85rem;">Google Doğrudan Yorum Linki (writereview?placeid=...)</label>
-                                    <input type="url" id="google_review_url" name="google_review_url" class="form-control" placeholder="https://search.google.com/local/writereview?placeid=...">
+                                    <input type="url" id="google_review_url" name="google_review_url" class="form-control" value="https://g.page/r/CYCTLUWSsIhDEBM/review" placeholder="https://search.google.com/local/writereview?placeid=...">
                                 </div>
                                 <div class="form-group" style="margin-bottom:12px;">
                                     <label style="font-size:0.85rem;">Yandex Doğrudan Yorum Linki (İsteğe Bağlı)</label>
-                                    <input type="url" id="yandex_review_url" name="yandex_review_url" class="form-control" placeholder="https://yandex.com.tr/maps/org/...">
+                                    <input type="url" id="yandex_review_url" name="yandex_review_url" class="form-control" value="https://yandex.com.tr/maps/org/firinna/37863615675/reviews/?add-review=true" placeholder="https://yandex.com.tr/maps/org/...">
                                 </div>
                                 <div class="form-group" style="margin-bottom:12px;">
                                     <label style="font-size:0.85rem;">TripAdvisor Doğrudan Yorum Linki (İsteğe Bağlı)</label>
-                                    <input type="url" id="tripadvisor_review_url" name="tripadvisor_review_url" class="form-control" placeholder="https://www.tripadvisor.com.tr/UserReviewEdit-...">
+                                    <input type="url" id="tripadvisor_review_url" name="tripadvisor_review_url" class="form-control" value="" placeholder="https://www.tripadvisor.com.tr/UserReviewEdit-...">
                                 </div>
                                 <div class="form-group" style="margin-bottom:0;">
                                     <label style="font-size:0.85rem;">Grup & Özel Etkinlik Duyuru Metni (WhatsApp Üstü)</label>
-                                    <textarea id="group_event_text" name="group_event_text" class="form-control" rows="2" placeholder="Grup rezervasyonları için doğrudan WhatsApp'tan iletişime geçebilirsiniz."></textarea>
+                                    <textarea id="group_event_text" name="group_event_text" class="form-control" rows="2" placeholder="Grup rezervasyonları için doğrudan WhatsApp'tan iletişime geçebilirsiniz.">Normal saatler harici grup rezervasyonu ve özel mini organizasyonlar için doğrudan WhatsApp'tan iletişime geçebilirsiniz.</textarea>
                                 </div>
                             </div>
                             

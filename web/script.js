@@ -151,7 +151,8 @@ const i18n = {
         status_open: "Şu An Açık (08:00 - 23:00)",
         btn_menu: "Dijital Menüyü İncele",
         btn_reserve: "Hemen Masa Ayırt",
-             title_about: "Hakkımızda",
+        btn_message: "Yöneticiye Mesaj İlet (Telegram)",
+        title_about: "Hakkımızda",
         slogan_about: "GELENEKSEL TATLARA BENZERSİZ DOKUNUŞLAR",
         text_about: "DEĞERLİ MİSAFİRİMİZ, FIRINNA'YA HOŞ GELDİNİZ.\n\nGalata’nın 150 yıllık büyüleyici ve tarihi dokusunda, Kumbaracı Yokuşu'nun huzur veren atmosferinde yer alan Fırınna Cafe & Restaurant; İstiklal’in gürültüsünden kaçıp nefes alabileceğiniz özel bir lezzet durağıdır.\n\nÖzenle seçilmiş malzemelerimiz, fırınımızdan çıkan taze lezzetlerimiz, leziz kahve çeşitlerimiz ve ev yapımı tatlılarımızla geleneksel tarifleri modern dokunuşlarla sunuyoruz.\n\nBurada acele yok! Samimi, misafirperver ve evcil hayvan dostu ekibimizle, 150 yıllık bu tarihi yapının sıcaklığında güzel sohbetlerin ve huzurlu anların tadını çıkarın. Tarihi İstanbul gezinizde tatlı bir anı olabilmek bizim en büyük mutluluğumuz.",
         title_top_reviews: "Müşterilerimizin Gözünden",
@@ -846,8 +847,83 @@ function switchGalleryTab(tab) {
     }
 }
 
+const DAYS_I18N = {
+    tr: { "Pazartesi": "Pazartesi", "Salı": "Salı", "Çarşamba": "Çarşamba", "Perşembe": "Perşembe", "Cuma": "Cuma", "Cumartesi": "Cumartesi", "Pazar": "Pazar" },
+    en: { "Pazartesi": "Monday", "Salı": "Tuesday", "Çarşamba": "Wednesday", "Perşembe": "Thursday", "Cuma": "Friday", "Cumartesi": "Saturday", "Pazar": "Sunday" },
+    es: { "Pazartesi": "Lunes", "Salı": "Martes", "Çarşamba": "Miércoles", "Perşembe": "Jueves", "Cuma": "Viernes", "Cumartesi": "Sábado", "Pazar": "Domingo" },
+    ru: { "Pazartesi": "Понедельник", "Salı": "Вторник", "Çarşamba": "Среда", "Perşembe": "Четверг", "Cuma": "Пятница", "Cumartesi": "Суббота", "Pazar": "Воскресенье" },
+    ar: { "Pazartesi": "الإثنين", "Salı": "الثلاثاء", "Çarşamba": "الأربعاء", "Perşembe": "الخميس", "Cuma": "الجمعة", "Cumartesi": "السبت", "Pazar": "الأحد" },
+    zh: { "Pazartesi": "星期一", "Salı": "星期二", "Çarşamba": "星期三", "Perşembe": "星期四", "Cuma": "星期五", "Cumartesi": "星期六", "Pazar": "星期日" }
+};
+
+const STATUS_I18N = {
+    tr: { today: "(Bugün)", today_closed: "(Bugün - Kapalı)", closed: "Kapalı" },
+    en: { today: "(Today)", today_closed: "(Today - Closed)", closed: "Closed" },
+    es: { today: "(Hoy)", today_closed: "(Hoy - Cerrado)", closed: "Cerrado" },
+    ru: { today: "(Сегодня)", today_closed: "(Сегодня - Закрыто)", closed: "Закрыто" },
+    ar: { today: "(اليوم)", today_closed: "(اليوم - مغلق)", closed: "مغلق" },
+    zh: { today: "(今天)", today_closed: "(今天 - 已关闭)", closed: "已关闭" }
+};
+
 let currentLang = 'tr';
 let cachedTableData = null;
+let latestStatusData = null;
+
+function renderPublicScheduleTable(statusData) {
+    if (!statusData) return;
+    latestStatusData = statusData;
+    const tableBody = document.getElementById('public-hours-table-body');
+    if (!tableBody || !statusData.hours) return;
+
+    tableBody.innerHTML = '';
+    const days = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
+    const curLang = (typeof currentLang !== 'undefined' && DAYS_I18N[currentLang]) ? currentLang : 'tr';
+    const dayMap = DAYS_I18N[curLang];
+    const statMap = STATUS_I18N[curLang];
+
+    days.forEach(d => {
+        const cfg = statusData.hours[d] || { open: "08:30", close: "23:00", active: true };
+        const isToday = (d === statusData.current_day);
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #f1f5f9';
+        
+        let dot = '';
+        let todayBadge = '';
+        let rowBg = '';
+        let dayColor = '#334155';
+        let timeColor = '#475569';
+        let timeFontWeight = '600';
+
+        if (isToday) {
+            if (statusData.is_open) {
+                rowBg = '#ecfdf5';
+                dayColor = '#065f46';
+                timeColor = '#047857';
+                timeFontWeight = '800';
+                dot = '<span class="pulse-dot" style="display:inline-block; vertical-align:middle; margin-right:4px;"></span> ';
+                todayBadge = `<span style="color:#059669; font-size:0.75rem; font-weight:700; margin-left:4px;">${statMap.today}</span>`;
+            } else {
+                rowBg = '#fef2f2';
+                dayColor = '#991b1b';
+                timeColor = '#b91c1c';
+                timeFontWeight = '800';
+                dot = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#ef4444; vertical-align:middle; margin-right:6px;"></span> ';
+                todayBadge = `<span style="color:#dc2626; font-size:0.75rem; font-weight:700; margin-left:4px;">${statMap.today_closed}</span>`;
+            }
+            tr.style.background = rowBg;
+            tr.style.fontWeight = '700';
+        }
+        
+        const translatedDayName = dayMap[d] || d;
+        const timeStr = (cfg.active !== false) ? `${cfg.open || '08:30'} - ${cfg.close || '23:00'}` : `<span style="color:#dc2626; font-weight:700;">🔴 ${statMap.closed}</span>`;
+        
+        tr.innerHTML = `
+            <td style="padding:8px 4px; color:${dayColor}; white-space:nowrap; width:55%;">${dot}<span>${translatedDayName}</span>${todayBadge}</td>
+            <td style="padding:8px 4px; text-align:right; color:${timeColor}; font-weight:${timeFontWeight}; white-space:nowrap; width:45%;"><span style="white-space:nowrap;">${timeStr}</span></td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
 
 function changeLang(lang) {
     currentLang = lang;
@@ -881,6 +957,7 @@ function changeLang(lang) {
     }
 
     renderTableStatusText();
+    if (latestStatusData) renderPublicScheduleTable(latestStatusData);
 }
 
 // FETCH SETTINGS
@@ -889,84 +966,28 @@ async function fetchWebSettings() {
         const res = await fetch('/api/web/settings');
         const data = await res.json();
         
-        function updateWorkHours(settingsData) {
-            const element = document.getElementById('dynamic_work_hours');
-            if (!element) return;
-            
-            const hours = settingsData.work_hours;
-            const manualStatus = settingsData.manual_status || 'auto';
-            
-            if (manualStatus === 'open') {
-                element.innerHTML = `<span class="pulse-dot"></span> Şu An Açık (${hours})`;
-                element.parentElement.style.background = '#ecfdf5';
-                element.parentElement.style.color = '#059669';
-                return;
-            } else if (manualStatus === 'closed') {
-                let closedUntil = settingsData.closed_until || 'Belirsiz';
-                if(closedUntil !== 'Belirsiz' && closedUntil.includes('T')) {
-                    const d = new Date(closedUntil);
-                    if(!isNaN(d)) {
-                        closedUntil = d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' }) + ' ' + d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute:'2-digit' });
-                    }
-                }
-                element.innerHTML = `<span class="pulse-dot" style="background:#ef4444; box-shadow:none; animation:none;"></span> Kapalı (Açılış: ${closedUntil})`;
-                element.parentElement.style.background = '#fef2f2';
-                element.parentElement.style.color = '#dc2626';
-                return;
-            }
-            
-            // Auto Mode
-            if (hours) {
-                const now = new Date();
-                const currentHour = now.getHours();
-                const currentMinute = now.getMinutes();
-                
-                const parts = hours.split('-');
-                if(parts.length === 2) {
-                    const openTime = parts[0].trim();
-                    const closeTime = parts[1].trim();
-                    const [openH, openM] = openTime.split(':').map(Number);
-                    const [closeH, closeM] = closeTime.split(':').map(Number);
-                    
-                    const nowTotal = currentHour * 60 + currentMinute;
-                    const openTotal = openH * 60 + openM;
-                    let closeTotal = closeH * 60 + closeM;
-                    
-                    if(closeTotal < openTotal) {
-                        closeTotal += 24 * 60;
-                    }
-                    
-                    let isOpen = false;
-                    if(closeH < openH) {
-                        if(nowTotal >= openTotal || nowTotal < (closeH * 60 + closeM)) {
-                            isOpen = true;
-                        }
-                    } else {
-                        if(nowTotal >= openTotal && nowTotal < closeTotal) {
-                            isOpen = true;
-                        }
-                    }
-                    
-                    if(isOpen) {
-                        element.innerHTML = `<span class="pulse-dot"></span> Şu An Açık (${hours})`;
+        // Fetch Live Status & Hours Schedule Table
+        try {
+            const resStatus = await fetch('/api/web/status');
+            if (resStatus.ok) {
+                const statusData = await resStatus.json();
+                const element = document.getElementById('dynamic_work_hours');
+                if (element) {
+                    if (statusData.is_open) {
+                        element.innerHTML = `<span class="pulse-dot"></span> ${statusData.status_badge}`;
                         element.parentElement.style.background = '#ecfdf5';
                         element.parentElement.style.color = '#059669';
                     } else {
-                        let nextOpenDay = "Bugün";
-                        if(nowTotal >= closeTotal || (closeH < openH && nowTotal >= (closeH * 60 + closeM) && nowTotal < openTotal)) {
-                            nextOpenDay = "Yarın";
-                        }
-                        element.innerHTML = `<span class="pulse-dot" style="background:#ef4444; box-shadow:none; animation:none;"></span> Kapalı (Açılış: ${nextOpenDay} ${openTime})`;
+                        element.innerHTML = `<span class="pulse-dot" style="background:#ef4444; box-shadow:none; animation:none;"></span> ${statusData.status_badge}`;
                         element.parentElement.style.background = '#fef2f2';
                         element.parentElement.style.color = '#dc2626';
                     }
-                } else {
-                    element.innerText = hours;
                 }
+
+                // Render Public Schedule Table (Highlight Today in Green with Pulse Dot)
+                renderPublicScheduleTable(statusData);
             }
-        }
-        
-        updateWorkHours(data);
+        } catch(stErr) { console.log('Status fetch error:', stErr); }
         if (data.address) {
             document.getElementById('dynamic_address').innerText = data.address;
         }
@@ -1151,11 +1172,11 @@ function renderDynamicSignatureGallery() {
         const img = p.image_url.startsWith('http') || p.image_url.startsWith('drink_') || p.image_url.startsWith('prod_') || p.image_url.startsWith('food_') ? p.image_url : p.image_url;
 
         return `
-            <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 10px; height: 140px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:all 0.3s ease;" onclick="goToMenuProduct('${p.id}')" title="${p.title} - Menüde İncele">
-                <img src="${img}" alt="${p.title}" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
-                <span style="position:absolute; top:6px; right:6px; background:#f59e0b; color:#fff; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:10px;">⭐ İmza</span>
-                <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.85), transparent); padding:16px 8px 6px; color:#fff;">
-                    <div style="font-size:0.85rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title}</div>
+            <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 12px; height: 220px; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.1); transition:all 0.3s ease;" onclick="goToMenuProduct('${p.id}')" title="${p.title} - Menüde İncele">
+                <img src="${img}" alt="${p.title}" class="gallery-img" style="width:100%; height:100%; object-fit:cover; object-position:center; transition:transform 0.3s ease;">
+                <span style="position:absolute; top:8px; right:8px; background:#f59e0b; color:#fff; font-size:0.75rem; font-weight:800; padding:3px 8px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.2);">⭐ İmza Lezzet</span>
+                <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(15,23,42,0.92), transparent); padding:20px 10px 8px; color:#fff;">
+                    <div style="font-size:0.92rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title}</div>
                     <div style="font-size:0.72rem; color:#fde68a; font-weight:600; display:flex; align-items:center; gap:4px; margin-top:2px;">
                         <span>Menüde Gör</span> <i class="ph-bold ph-arrow-right"></i>
                     </div>

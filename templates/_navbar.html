@@ -36,6 +36,7 @@
     <div class="nav-links">
         <a href="/" {% if request.path == '/' %}class="active"{% endif %}>Siparişler</a>
         <a href="/kitchen" {% if request.path == '/kitchen' %}class="active"{% endif %}>Mutfak</a>
+        <a href="/notes" {% if request.path == '/notes' %}class="active"{% endif %}>📋 Notlar</a>
         <button class="alert-btn" onclick="toggleAlertPanel()" id="alertBtn" title="Stok Uyarıları">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>

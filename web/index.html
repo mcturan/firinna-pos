@@ -91,7 +91,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=21.0">
 
     <!-- Schema.org JSON-LD Structured Data (Google Rich Snippets, Local Business & AI GEO Crawlers) -->
     <script type="application/ld+json">
@@ -209,58 +209,61 @@
                     <span class="badge"><i class="ph-fill ph-money"></i> <span data-i18n="badge_price">Uygun Fiyat</span></span>
                 </div>
 
-                <div class="status-badge"><span class="pulse-dot"></span><span data-i18n="status_open" id="dynamic_work_hours">Şu An Açık (08:30 - 23:00)</span></div>
-                
-                <!-- HAFTALIK ÇALIŞMA GÜNLERİ TABLOSU (GOOGLE BUSINESS UYUMLU) -->
-                <div style="margin-top: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; width: 100%; box-sizing: border-box;">
-                    <div style="font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                        <span style="display: flex; align-items: center; gap: 6px;">
-                            <i class="ph-bold ph-calendar-blank" style="color: #d97706;"></i> Çalışma Günleri & Saatleri
-                        </span>
-                        <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">Her Gün Açık</span>
+                <!-- DİJİTAL MENÜ BUTONU (Hero Kartı İçinde Ana Eylem) -->
+                <a href="menu.html" class="btn btn-primary" id="menu-link" style="margin-top: 16px; margin-bottom: 8px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff !important; border: 2px solid #f59e0b; font-size: 1.1rem; font-weight: 800; padding: 16px 20px; box-shadow: 0 8px 25px rgba(15, 23, 42, 0.3); border-radius: 14px; width: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="ph-bold ph-book-open" style="color: #f59e0b; font-size: 1.5rem;"></i>
+                    <span data-i18n="btn_menu" style="color: #ffffff;">İnteraktif Menüyü İncele</span>
+                </a>
+            </div>
+
+            <!-- 2. ÇALIŞMA SAATLERİ & HIZLI İŞLEMLER -->
+            <div class="card action-card">
+                <!-- HAFTALIK ÇALIŞMA GÜNLERİ TABLOSU -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; width: 100%; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 16px;">
+                    <div style="font-weight: 700; font-size: 0.9rem; color: #0f172a; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                        <i class="ph-bold ph-calendar-blank" style="color: #d97706; font-size: 1.05rem;"></i> 
+                        <span>Çalışma Günleri & Saatleri</span>
                     </div>
-                    <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem; text-align: left;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem; text-align: left; table-layout: fixed;">
                         <tbody id="public-hours-table-body">
-                            <tr style="border-bottom: 1px solid #f1f5f9; background: #fffbe0; font-weight: 700;">
-                                <td style="padding: 6px 0; color: #334155;">Pazartesi <span style="background: #d97706; color: #fff; font-size: 0.68rem; padding: 2px 6px; border-radius: 10px; margin-left: 6px;">📍 Bugün</span></td>
-                                <td style="padding: 6px 0; text-align: right; color: #b45309; font-weight: 800;">08:30 - 23:00</td>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background: #ecfdf5; font-weight: 700;">
+                                <td style="padding: 8px 4px; color: #065f46; white-space: nowrap; width: 55%;">
+                                    <span class="pulse-dot" style="display:inline-block; vertical-align:middle; margin-right:4px;"></span> 
+                                    <span>Çarşamba</span>
+                                    <span style="color:#059669; font-size:0.75rem; font-weight:700; margin-left:4px;">(Bugün)</span>
+                                </td>
+                                <td style="padding: 8px 4px; text-align: right; color: #047857; font-weight: 800; white-space: nowrap; width: 45%;">
+                                    <span style="white-space:nowrap;">08:30 - 23:00</span>
+                                </td>
                             </tr>
                             <tr style="border-bottom: 1px solid #f1f5f9;">
-                                <td style="padding: 6px 0; color: #334155;">Salı</td>
-                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                                <td style="padding: 6px 4px; color: #334155; white-space: nowrap;">Perşembe</td>
+                                <td style="padding: 6px 4px; text-align: right; color: #475569; font-weight: 600; white-space: nowrap;">08:30 - 23:00</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #f1f5f9;">
-                                <td style="padding: 6px 0; color: #334155;">Çarşamba</td>
-                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                                <td style="padding: 6px 4px; color: #334155; white-space: nowrap;">Cuma</td>
+                                <td style="padding: 6px 4px; text-align: right; color: #475569; font-weight: 600; white-space: nowrap;">08:30 - 23:00</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #f1f5f9;">
-                                <td style="padding: 6px 0; color: #334155;">Perşembe</td>
-                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                                <td style="padding: 6px 4px; color: #334155; white-space: nowrap;">Cumartesi</td>
+                                <td style="padding: 6px 4px; text-align: right; color: #475569; font-weight: 600; white-space: nowrap;">08:30 - 23:00</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #f1f5f9;">
-                                <td style="padding: 6px 0; color: #334155;">Cuma</td>
-                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                                <td style="padding: 6px 4px; color: #334155; white-space: nowrap;">Pazar</td>
+                                <td style="padding: 6px 4px; text-align: right; color: #475569; font-weight: 600; white-space: nowrap;">08:30 - 23:00</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #f1f5f9;">
-                                <td style="padding: 6px 0; color: #334155;">Cumartesi</td>
-                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                                <td style="padding: 6px 4px; color: #334155; white-space: nowrap;">Pazartesi</td>
+                                <td style="padding: 6px 4px; text-align: right; color: #475569; font-weight: 600; white-space: nowrap;">08:30 - 23:00</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #f1f5f9;">
-                                <td style="padding: 6px 0; color: #334155;">Pazar</td>
-                                <td style="padding: 6px 0; text-align: right; color: #475569; font-weight: 600;">08:30 - 23:00</td>
+                                <td style="padding: 6px 4px; color: #334155; white-space: nowrap;">Salı</td>
+                                <td style="padding: 6px 4px; text-align: right; color: #475569; font-weight: 600; white-space: nowrap;">08:30 - 23:00</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-            </div>
 
-            <!-- 2. HIZLI İŞLEMLER -->
-            <div class="card action-card">
-                <a href="menu.html" class="btn btn-primary" id="menu-link" style="margin-bottom: 16px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff !important; border: 2px solid #f59e0b; font-size: 1.05rem; font-weight: 800; padding: 16px 20px; box-shadow: 0 8px 25px rgba(15, 23, 42, 0.3); border-radius: 14px;">
-                    <i class="ph-bold ph-book-open" style="color: #f59e0b; font-size: 1.5rem;"></i>
-                    <span data-i18n="btn_menu" style="color: #ffffff;">İnteraktif Menüyü İncele</span>
-                </a>
-                
                 <div class="table-status-box" style="padding: 12px; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;">
                     <i class="ph-fill ph-armchair" style="color:#2ecc71; font-size:1.5rem;"></i>
                     <span id="live-table-status" style="font-weight: 600; color: #27ae60; font-size: 0.95rem;">Canlı Masa Durumu Yükleniyor...</span>
@@ -295,9 +298,9 @@
                     </a>
                 </div>
 
-                <!-- Yandex 3D Görünümlü Mini Harita -->
+                <!-- Google Haritalar Mini Harita -->
                 <div style="width: 100%; height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border-color);">
-                    <iframe src="https://yandex.com/map-widget/v1/?ll=28.976906%2C41.028328&z=17.5&pt=28.976906%2C41.028328%2Cpm2amm&l=map%2Cstl%3A3d" width="100%" height="100%" style="border:0;" allowfullscreen="true" loading="lazy"></iframe>
+                    <iframe src="https://maps.google.com/maps?q=41.028328,28.976906+(F%C4%B1r%C4%B1nna+Cafe+%26+Restaurant)&amp;t=&amp;z=17&amp;ie=UTF8&amp;iwloc=B&amp;output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                 </div>
 
                 <div style="border-top: 1px solid var(--border-color); margin: 16px 0;"></div>
@@ -350,15 +353,15 @@
                     <i class="ph-fill ph-house-line"></i> <span data-i18n="gal_title_interior">İç Mekan & Atmosfer</span>
                 </h4>
                 <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
-                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 10px; height: 200px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
                         <img src="gallery_interior.jpg" alt="150 Yıllık Tarihi Galata İç Mekanı" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
                         <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;" data-i18n="gal_lbl_interior_history">Tarihi İç Mekan</span>
                     </div>
-                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 10px; height: 200px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
                         <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80" alt="Galata Ahşap Masalar" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
                         <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;" data-i18n="gal_lbl_warm_tables">Sıcak Masalar</span>
                     </div>
-                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 10px; height: 200px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
                         <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80" alt="Barista & Detaylar" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
                         <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;" data-i18n="gal_lbl_details">Mekan Detayları</span>
                     </div>
@@ -369,15 +372,15 @@
                     <i class="ph-fill ph-map-pin"></i> <span data-i18n="gal_title_exterior">Dış Mekan & Kumbaracı Yokuşu</span>
                 </h4>
                 <div class="gallery-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 10px; height: 200px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
                         <img src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?auto=format&fit=crop&w=600&q=80" alt="Kumbaracı Yokuşu Sokağı" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
                         <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;" data-i18n="gal_lbl_street">Kumbaracı Yokuşu</span>
                     </div>
-                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 10px; height: 200px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
                         <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=600&q=80" alt="Galata Sokak Masaları" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
                         <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;" data-i18n="gal_lbl_outdoor_seating">Dış Masa Alanı</span>
                     </div>
-                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
+                    <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 10px; height: 200px; cursor:pointer;" onclick="window.open('https://maps.google.com/?q=Firinna', '_blank')" title="Google Haritalar'da Gör">
                         <img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=600&q=80" alt="Tarihi Galata Cephesi" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
                         <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;" data-i18n="gal_lbl_historic_building">Tarihi Binası</span>
                     </div>
@@ -526,11 +529,14 @@
                 </div>
             </div>
 
-            <div class="card review-gating-card" style="background: #ffffff; border: 1px solid #e2e8f0; text-align: center; padding: 24px; margin-bottom: 24px;">
-                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;" data-i18n="title_gating">Deneyiminizi Puanlayın</h3>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;" data-i18n="sub_gating">Fırınna deneyiminiz nasıldı? Görüşleriniz bizim için çok kıymetli.</p>
+            <div class="card review-gating-card" style="background: linear-gradient(135deg, #fffbe0 0%, #fef3c7 100%); border: 2px solid #f59e0b; text-align: center; padding: 28px 20px; margin-bottom: 24px; border-radius: 20px; box-shadow: 0 10px 30px rgba(245, 158, 11, 0.18);">
+                <div style="display:inline-flex; align-items:center; gap:6px; background:#d97706; color:#ffffff; font-size:0.78rem; font-weight:800; padding:5px 14px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; box-shadow: 0 2px 8px rgba(217,119,6,0.3);">
+                    <i class="ph-fill ph-sparkle"></i> <span>Müşteri Memnuniyeti</span>
+                </div>
+                <h3 style="font-size: 1.45rem; font-weight: 800; color: #78350f; margin-bottom: 6px; text-shadow: 0 1px 2px rgba(255,255,255,0.8);" data-i18n="title_gating">⭐ Deneyiminizi Puanlayın</h3>
+                <p style="font-size: 0.95rem; color: #92400e; font-weight: 600; margin-bottom: 18px;" data-i18n="sub_gating">Fırınna deneyiminiz nasıldı? Görüşleriniz bizim için çok kıymetli.</p>
                 
-                <div class="interactive-stars" style="font-size: 2.2rem; color: #cbd5e1; cursor: pointer; display: flex; justify-content: center; gap: 8px; margin-bottom: 16px;">
+                <div class="interactive-stars" style="font-size: 2.8rem; color: #fbbf24; cursor: pointer; display: flex; justify-content: center; gap: 10px; margin-bottom: 16px; filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.4));">
                     <i class="ph-fill ph-star" data-star="1" onclick="rateExperience(1)"></i>
                     <i class="ph-fill ph-star" data-star="2" onclick="rateExperience(2)"></i>
                     <i class="ph-fill ph-star" data-star="3" onclick="rateExperience(3)"></i>
@@ -539,7 +545,7 @@
                 </div>
 
                 <!-- 5 Yıldız Sonuç Box -->
-                <div id="gating-high" style="display: none; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; border-radius: 8px;">
+                <div id="gating-high" style="display: none; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; border-radius: 8px; margin-top:16px;">
                     <p style="color: #166534; font-weight: 700; margin-bottom: 14px;" data-i18n="gating_high_msg">🎉 Harika! Beğenmenize çok sevindik. Bize aşağıdaki platformlardan 5 yıldızlı yorum vererek destek olmak ister misiniz?</p>
                     <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
                         <a href="https://g.page/r/CYCTLUWSsIhDEBM/review" id="gating_google_btn" target="_blank" class="btn btn-primary" style="background: #4285F4; border: none; padding: 10px 18px; font-size: 0.9rem; border-radius: 24px; display: inline-flex; align-items: center; gap: 6px;">
@@ -555,7 +561,7 @@
                 </div>
 
                 <!-- 1-4 Yıldız Sonuç Box -->
-                <div id="gating-low" style="display: none; background: #fffbebf; border: 1px solid #fef3c7; padding: 16px; border-radius: 8px;">
+                <div id="gating-low" style="display: none; background: #fffbebf; border: 1px solid #fef3c7; padding: 16px; border-radius: 8px; margin-top:16px;">
                     <p style="color: #92400e; font-weight: 700; margin-bottom: 8px;" data-i18n="gating_low_title">Görüşleriniz Bizim İçin Çok Değerli!</p>
                     <p style="color: #b45309; font-size: 0.9rem; margin-bottom: 12px;" data-i18n="gating_low_msg">Yaşadığınız aksaklığı veya önerinizi doğrudan işletme yöneticimize iletebilirsiniz:</p>
                     <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">

@@ -2,22 +2,50 @@
     "address": "Şahkulu Mah. Kumbaracı Yokuşu, No:41A\nBeyoğlu, İstanbul",
     "admin_password": "FirinnaPos2026!",
     "baidu": "https://map.baidu.com/",
+    "closed_until": "",
+    "daily_hours": {
+        "Pazartesi": {
+            "open": "11:00",
+            "close": "19:15",
+            "active": true
+        },
+        "Salı": {
+            "open": "11:00",
+            "close": "19:15",
+            "active": true
+        },
+        "Çarşamba": {
+            "open": "11:00",
+            "close": "19:15",
+            "active": true
+        },
+        "Perşembe": {
+            "open": "11:00",
+            "close": "19:15",
+            "active": true
+        },
+        "Cuma": {
+            "open": "11:00",
+            "close": "19:15",
+            "active": true
+        },
+        "Cumartesi": {
+            "open": "11:00",
+            "close": "19:15",
+            "active": true
+        },
+        "Pazar": {
+            "open": "11:00",
+            "close": "19:15",
+            "active": true
+        }
+    },
     "google_review_url": "https://g.page/r/CYCTLUWSsIhDEBM/review",
     "group_event_text": "Normal saatler harici grup rezervasyonu ve özel mini organizasyonlar için doğrudan WhatsApp'tan iletişime geçebilirsiniz.",
     "instagram": "https://instagram.com/firinnacafe",
+    "manual_status": "auto",
     "phone": "905456301214",
     "tripadvisor_review_url": "",
-    "work_hours": "08:30 - 23:00",
-    "daily_hours": {
-        "Pazartesi": {"open": "08:30", "close": "23:00", "active": true},
-        "Salı": {"open": "08:30", "close": "23:00", "active": true},
-        "Çarşamba": {"open": "08:30", "close": "23:00", "active": true},
-        "Perşembe": {"open": "08:30", "close": "23:00", "active": true},
-        "Cuma": {"open": "08:30", "close": "23:00", "active": true},
-        "Cumartesi": {"open": "08:30", "close": "23:00", "active": true},
-        "Pazar": {"open": "08:30", "close": "23:00", "active": true}
-    },
-    "manual_status": "auto",
-    "closed_until": "",
+    "work_hours": "11:00 - 19:15",
     "yandex_review_url": "https://yandex.com.tr/maps/org/firinna/37863615675/reviews/?add-review=true"
 }

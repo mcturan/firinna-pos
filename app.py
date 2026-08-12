@@ -768,6 +768,10 @@ def api_send_daily_close_telegram():
 def kitchen_page():
     return render_template('kitchen.html')
 
+@app.route('/notes')
+def notes_page():
+    return render_template('notes.html')
+
 @app.route('/api/kitchen/orders', methods=['GET'])
 def api_kitchen_orders():
     return jsonify(db.get_kitchen_orders())

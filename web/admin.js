@@ -45,6 +45,8 @@ function initAdmin() {
             } else if (targetId === 'products-mgmt') {
                 loadWebCategories();
                 loadWebProducts();
+            } else if (targetId === 'settings') {
+                fetchSettings();
             }
         });
     });
@@ -367,6 +369,7 @@ function renderAdminSchedule(dailyHours = {}) {
             <span id="day_closed_badge_${day}" style="display:${!isChecked ? 'inline-block' : 'none'}; color:#dc2626; font-weight:700; font-size:0.85rem; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">
                 🔴 KAPALI
             </span>
+            <button type="button" class="btn" onclick="copyScheduleFromDay('${day}')" title="${day} saatlerini ve durumunu diğer tüm günlere kopyala" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:600; font-size:0.78rem; padding:4px 10px; border-radius:6px; margin-left:auto; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="ph-bold ph-copy"></i> Tüm Günlere Kopyala</button>
         `;
         container.appendChild(row);
     });
@@ -378,16 +381,25 @@ function toggleDayRow(day) {
     document.getElementById(`day_closed_badge_${day}`).style.display = !active ? 'inline-block' : 'none';
 }
 
-function applyAllDaysSchedule(openTime, closeTime) {
-    DAYS_LIST.forEach(day => {
-        const chk = document.getElementById(`day_active_${day}`);
-        if (chk) chk.checked = true;
-        const openInp = document.getElementById(`day_open_${day}`);
-        if (openInp) openInp.value = openTime;
-        const closeInp = document.getElementById(`day_close_${day}`);
-        if (closeInp) closeInp.value = closeTime;
-        toggleDayRow(day);
+function copyScheduleFromDay(sourceDay) {
+    const isChecked = document.getElementById(`day_active_${sourceDay}`).checked;
+    const openVal = document.getElementById(`day_open_${sourceDay}`).value;
+    const closeVal = document.getElementById(`day_close_${sourceDay}`).value;
+    
+    DAYS_LIST.forEach(targetDay => {
+        if (targetDay !== sourceDay) {
+            const chk = document.getElementById(`day_active_${targetDay}`);
+            if (chk) chk.checked = isChecked;
+            const openInp = document.getElementById(`day_open_${targetDay}`);
+            if (openInp) openInp.value = openVal;
+            const closeInp = document.getElementById(`day_close_${targetDay}`);
+            if (closeInp) closeInp.value = closeVal;
+            toggleDayRow(targetDay);
+        }
     });
+    
+    const statusTxt = isChecked ? `${openVal} - ${closeVal}` : 'Kapalı';
+    alert(`✅ ${sourceDay} gününün çalışma saatleri (${statusTxt}) diğer tüm günlere başarıyla kopyalandı! Kaydetmek için sayfanın altındaki "Değişiklikleri Kaydet" butonuna basabilirsiniz.`);
 }
 
 // Ayarları API'den Çek
@@ -398,28 +410,21 @@ async function fetchSettings() {
         
         renderAdminSchedule(data.daily_hours || {});
         
-        if (data.work_hours) {
-            const parts = data.work_hours.split('-');
-            if(parts.length === 2) {
-                document.getElementById('work_hours_start').value = parts[0].trim();
-                document.getElementById('work_hours_end').value = parts[1].trim();
-            }
-        }
-        if (data.address) document.getElementById('address').value = data.address;
-        if (data.phone) document.getElementById('phone').value = data.phone;
-        if (data.instagram) document.getElementById('instagram').value = data.instagram;
-        if (data.google_review_url) document.getElementById('google_review_url').value = data.google_review_url;
-        if (data.yandex_review_url) document.getElementById('yandex_review_url').value = data.yandex_review_url;
-        if (data.tripadvisor_review_url) document.getElementById('tripadvisor_review_url').value = data.tripadvisor_review_url;
+        if (data.address && document.getElementById('address')) document.getElementById('address').value = data.address;
+        if (data.phone && document.getElementById('phone')) document.getElementById('phone').value = data.phone;
+        if (data.instagram && document.getElementById('instagram')) document.getElementById('instagram').value = data.instagram;
+        if (data.google_review_url && document.getElementById('google_review_url')) document.getElementById('google_review_url').value = data.google_review_url;
+        if (data.yandex_review_url && document.getElementById('yandex_review_url')) document.getElementById('yandex_review_url').value = data.yandex_review_url;
+        if (data.tripadvisor_review_url && document.getElementById('tripadvisor_review_url')) document.getElementById('tripadvisor_review_url').value = data.tripadvisor_review_url;
         if (data.group_event_text && document.getElementById('group_event_text')) document.getElementById('group_event_text').value = data.group_event_text;
         
-        if (data.manual_status) {
+        if (data.manual_status && document.querySelector(`input[name="manual_status"][value="${data.manual_status}"]`)) {
             document.querySelector(`input[name="manual_status"][value="${data.manual_status}"]`).checked = true;
-            if(data.manual_status === 'closed') {
+            if(data.manual_status === 'closed' && document.getElementById('closed_until_div')) {
                 document.getElementById('closed_until_div').style.display = 'block';
             }
         }
-        if (data.closed_until) {
+        if (data.closed_until && document.getElementById('closed_until')) {
             document.getElementById('closed_until').value = data.closed_until;
         }
     } catch (e) {
