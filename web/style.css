@@ -482,9 +482,8 @@ img, iframe, video, object, embed, table {
     max-width: 100% !important;
 }
 
-.dashboard, .dashboard > *, aside.left-col, main.main-content, .card, section {
-    min-width: 0 !important;
-    max-width: 100% !important;
+.dashboard > *, aside.left-col, main.main-content, .card, section {
+    min-width: 0;
 }
 
 @media (max-width: 992px) {

@@ -64,9 +64,10 @@
         .ikram    { color: #555; font-style: italic; }
         .logo-wrap{ text-align: center; margin-bottom: 10px; }
         .logo-wrap img { max-width: 180px; max-height: 90px; object-fit: contain; }
-        .qr-wrap  { text-align: center; margin-top: 10px; }
-        .qr-wrap img { width: 120px; height: 120px; }
-        .qr-label { font-size: 10px; color: #666; margin-top: 4px; }
+        .qr-wrap  { text-align: center; margin-top: 14px; margin-bottom: 6px; }
+        .qr-label { font-size: 12px; font-weight: bold; color: #000; margin-bottom: 8px; line-height: 1.4; }
+        .qr-box   { display: inline-block; padding: 8px; background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; }
+        .qr-box img { width: 145px; height: 145px; display: block; image-rendering: pixelated; }
         @media print {
             body { border: none; margin: 0; padding: 8px; width: 100%; box-shadow: none; }
             body::before, body::after { display: none; }
@@ -128,10 +129,14 @@
 <div class="center" style="white-space:pre-line;font-size:12px;line-height:1.6;">{{ footer_note }}</div>
 
 {% if qr_image_url %}
-<hr class="sep-dash" style="margin-top:10px;">
+<hr class="sep-dash" style="margin-top:14px; margin-bottom:12px;">
 <div class="qr-wrap">
-    <img src="{{ qr_image_url }}" alt="QR">
-    <div class="qr-label">{{ qr_label }}</div>
+    {% if qr_label %}
+    <div class="qr-label">⭐ {{ qr_label }} ⭐</div>
+    {% endif %}
+    <div class="qr-box">
+        <img src="{{ qr_image_url }}" alt="QR">
+    </div>
 </div>
 {% endif %}
 

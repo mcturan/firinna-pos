@@ -148,12 +148,16 @@ class ThermalPrinter:
         qr_url = db.get_setting('receipt_qr_image_url', '')
         qr_label = db.get_setting('receipt_qr_label', '')
         if qr_url:
-            qr_bytes = self._image_to_escpos(qr_url, target_width=200)
-            if qr_bytes:
-                data += qr_bytes
+            data += "\n------------------------------------------\n".encode('ascii', errors='replace')
             if qr_label:
                 data += CENTER
-                data += tr(qr_label).encode('ascii', errors='replace') + b'\n'
+                data += BOLD_ON
+                data += tr(f"{qr_label}\n").encode('ascii', errors='replace')
+                data += BOLD_OFF
+                data += b'\n'
+            qr_bytes = self._image_to_escpos(qr_url, target_width=240)
+            if qr_bytes:
+                data += qr_bytes
 
         data += "\n\n".encode('ascii', errors='replace')
         data += CUT
