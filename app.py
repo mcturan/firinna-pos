@@ -73,6 +73,11 @@ def api_version():
 def index():
     return render_template('index.html')
 
+@app.route('/gezi')
+@app.route('/gezi.html')
+def gezi_page():
+    return send_from_directory('web', 'gezi.html')
+
 # Yönetim sayfaları
 @app.route('/products')
 def products_page():

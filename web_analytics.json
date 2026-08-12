@@ -1,16 +1,16 @@
 {
-    "today": 77,
-    "month": 77,
-    "total": 77,
+    "today": 79,
+    "month": 79,
+    "total": 79,
     "menu": 1,
     "actions": 0,
     "last_date": "2026-08-12",
     "devices": {
-        "💻 Masaüstü": 47,
+        "💻 Masaüstü": 49,
         "📱 Mobil": 30
     },
     "browsers": {
-        "Google Chrome": 70,
+        "Google Chrome": 72,
         "Apple Safari": 5,
         "Microsoft Edge": 2
     },
@@ -23,9 +23,65 @@
         "Diğer Site": 21,
         "Google Arama": 31,
         "Direkt Giriş": 24,
-        "📲 Masa QR Kodu (Dükkan İçi)": 1
+        "📲 Masa QR Kodu (Dükkan İçi)": 1,
+        "🔍 Google Arama (SEO)": 1,
+        "🌐 Diğer Web Sitesi": 1
     },
     "recent_visitors": [
+        {
+            "id": "log_1786555524252",
+            "time": "12 Ağustos 20:25",
+            "iso_date": "2026-08-12",
+            "raw_time": "2026-08-12 20:25:24",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🔍 Google Arama (SEO)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (520s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%100",
+            "time_spent": "520 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1786555197660",
+            "time": "12 Ağustos 20:19",
+            "iso_date": "2026-08-12",
+            "raw_time": "2026-08-12 20:19:57",
+            "ip": "66.220.149.33",
+            "country": "📍 Prineville / United States",
+            "location": "📍 Prineville / United States",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Windows PC)",
+            "browser": "Google Chrome",
+            "action": "Ana Sayfa İnceleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
+        {
+            "id": "log_1786555004700",
+            "time": "12 Ağustos 20:16",
+            "iso_date": "2026-08-12",
+            "raw_time": "2026-08-12 20:16:44",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🔍 Google Arama (SEO)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "Ana Sayfa İnceleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ TR"
+        },
         {
             "id": "log_1786553981683",
             "time": "12 Ağustos 19:59",
@@ -1122,29 +1178,36 @@
             "type": "🔄 Tekrar Gelen Misafir"
         }
     ],
-    "repeat_visitors": 65,
-    "new_visitors": 12,
+    "repeat_visitors": 66,
+    "new_visitors": 13,
     "os": {
-        "Linux": 43,
-        "Windows PC": 4,
+        "Linux": 44,
+        "Windows PC": 5,
         "Apple iOS": 5,
         "Android OS": 25
     },
     "peak_hours": {
         "14:00 - 17:00 (İkindi Kahve/Tatlı)": 35,
-        "17:00 - 20:00 (Akşam Yemeği)": 42
+        "17:00 - 20:00 (Akşam Yemeği)": 42,
+        "20:00 - 23:00 (Gece Keyfi)": 2
     },
     "map_clicks": 1,
     "locations": {
-        "📍 İstanbul / Türkiye (Yerel)": 1
+        "📍 İstanbul / Türkiye (Yerel)": 1,
+        "📍 Kartal / Türkiye": 1,
+        "📍 Prineville / United States": 1
     },
     "traffic_sources": {
-        "📲 Masa QR Kodu (Dükkan İçi)": 1
+        "📲 Masa QR Kodu (Dükkan İçi)": 1,
+        "🔍 Google Arama (SEO)": 1,
+        "🌐 Diğer Web Sitesi": 1
     },
     "store_modes": {
-        "🏪 Masada Oturan Müşteri": 1
+        "🏪 Masada Oturan Müşteri": 1,
+        "🌐 Dışarıdan İnceleyen": 2
     },
     "lang_comparisons": {
-        "TR ➔ TR": 1
+        "TR ➔ TR": 2,
+        "EN ➔ TR": 1
     }
 }
