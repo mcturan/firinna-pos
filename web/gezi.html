@@ -893,7 +893,7 @@
                 </tr>
                 <tr>
                     <td class="label">☕ Lezzet Durağı:</td>
-                    <td class="val">Fırınna Cafe & Restaurant (Sınırsız Çay & Pizza Molası)</td>
+                    <td class="val"><img src="logo.png" style="height:20px; vertical-align:middle; border-radius:4px; margin-right:4px;" alt="Fırınna Logo"><strong>Fırınna Cafe & Restaurant</strong> (Sınırsız Çay & Pizza Molası)</td>
                 </tr>
             </table>
         </div>
@@ -1786,7 +1786,7 @@
                 itemDiv.innerHTML = `
                     <div class="timeline-dot"></div>
                     <span class="time-badge">${item.time}</span>
-                    <h4 class="timeline-title">${item.title}</h4>
+                    <h4 class="timeline-title">${item.featured ? '<img src="logo.png" style="height:22px; vertical-align:middle; border-radius:4px; margin-right:4px;" alt="Fırınna Logo">' : ''}${item.title}</h4>
                     <p class="timeline-desc">${item.desc}</p>
                     ${item.alt ? `<div class="alt-box">${item.alt}</div>` : ''}
                     ${item.tip ? `<div class="tip-box">${item.tip}</div>` : ''}
