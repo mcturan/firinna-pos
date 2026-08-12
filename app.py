@@ -2076,6 +2076,7 @@ def start_telegram_auto_send():
                             f"🧾 Masa Sayısı: {report.get('order_count',0)} ({report.get('cash_order_count',0)} Nakit, {report.get('card_order_count',0)} Kart, {report.get('mixed_order_count',0)} Parçalı)\n\n"
                             f"📦 En Çok Satanlar:\n{top_txt}"
                             f"{open_warn}"
+                            f"{get_tomorrow_schedule_alert()}"
                         )
                         try:
                             import telegram_notify
