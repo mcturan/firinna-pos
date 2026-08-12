@@ -901,6 +901,22 @@ function renderPublicScheduleTable(statusData) {
     const tableBody = document.getElementById('public-hours-table-body');
     if (!tableBody || !statusData.hours) return;
 
+    // UPDATE HEADER BADGE
+    const headerBadge = document.getElementById('today-status-header-badge');
+    if (headerBadge) {
+        if (statusData.is_open) {
+            headerBadge.style.background = '#ecfdf5';
+            headerBadge.style.color = '#065f46';
+            headerBadge.style.borderColor = '#a7f3d0';
+            headerBadge.innerHTML = '🟢 Bugün Açık';
+        } else {
+            headerBadge.style.background = '#fef2f2';
+            headerBadge.style.color = '#991b1b';
+            headerBadge.style.borderColor = '#fca5a5';
+            headerBadge.innerHTML = '🔴 Bugün Kapalı';
+        }
+    }
+
     tableBody.innerHTML = '';
     const days = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
     const curLang = (typeof currentLang !== 'undefined' && DAYS_I18N[currentLang]) ? currentLang : 'tr';
@@ -914,7 +930,6 @@ function renderPublicScheduleTable(statusData) {
         tr.style.borderBottom = '1px solid #f1f5f9';
         
         let dot = '';
-        let todayBadge = '';
         let rowBg = '';
         let dayColor = '#334155';
         let timeColor = '#475569';
@@ -926,15 +941,13 @@ function renderPublicScheduleTable(statusData) {
                 dayColor = '#065f46';
                 timeColor = '#047857';
                 timeFontWeight = '800';
-                dot = '<span class="pulse-dot" style="display:inline-block; vertical-align:middle; margin-right:4px;"></span> ';
-                todayBadge = `<span style="color:#059669; font-size:0.75rem; font-weight:700; margin-left:4px;">${statMap.today}</span>`;
+                dot = '<span class="pulse-dot" style="display:inline-block; vertical-align:middle; margin-right:6px;"></span> ';
             } else {
                 rowBg = '#fef2f2';
                 dayColor = '#991b1b';
                 timeColor = '#b91c1c';
                 timeFontWeight = '800';
                 dot = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#ef4444; vertical-align:middle; margin-right:6px;"></span> ';
-                todayBadge = `<span style="color:#dc2626; font-size:0.75rem; font-weight:700; margin-left:4px;">${statMap.today_closed}</span>`;
             }
             tr.style.background = rowBg;
             tr.style.fontWeight = '700';
@@ -944,8 +957,8 @@ function renderPublicScheduleTable(statusData) {
         const timeStr = (cfg.active !== false) ? `${cfg.open || '08:30'} - ${cfg.close || '23:00'}` : `<span style="color:#dc2626; font-weight:700;">🔴 ${statMap.closed}</span>`;
         
         tr.innerHTML = `
-            <td style="padding:8px 4px; color:${dayColor}; white-space:nowrap; width:55%;">${dot}<span>${translatedDayName}</span>${todayBadge}</td>
-            <td style="padding:8px 4px; text-align:right; color:${timeColor}; font-weight:${timeFontWeight}; white-space:nowrap; width:45%;"><span style="white-space:nowrap;">${timeStr}</span></td>
+            <td style="padding:8px 6px; color:${dayColor}; white-space:nowrap; width:50%;">${dot}<span>${translatedDayName}</span></td>
+            <td style="padding:8px 6px; text-align:right; color:${timeColor}; font-weight:${timeFontWeight}; white-space:nowrap; width:50%;"><span style="white-space:nowrap;">${timeStr}</span></td>
         `;
         tableBody.appendChild(tr);
     });

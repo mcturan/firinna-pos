@@ -225,9 +225,14 @@
             <div class="card action-card">
                 <!-- HAFTALIK ÇALIŞMA GÜNLERİ TABLOSU -->
                 <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; width: 100%; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 16px;">
-                    <div style="font-weight: 700; font-size: 0.9rem; color: #0f172a; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
-                        <i class="ph-bold ph-calendar-blank" style="color: #d97706; font-size: 1.05rem;"></i> 
-                        <span>Çalışma Günleri & Saatleri</span>
+                    <div style="font-weight: 700; font-size: 0.9rem; color: #0f172a; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <i class="ph-bold ph-calendar-blank" style="color: #d97706; font-size: 1.05rem;"></i> 
+                            <span>Çalışma Günleri & Saatleri</span>
+                        </div>
+                        <div id="today-status-header-badge" style="font-size: 0.75rem; font-weight: 800; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 12px; white-space: nowrap;">
+                            🟢 Bugün Açık
+                        </div>
                     </div>
                     <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem; text-align: left; table-layout: fixed;">
                         <tbody id="public-hours-table-body">
