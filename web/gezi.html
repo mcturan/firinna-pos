@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="Nokta atışı başlangıç merkezli (Taksim, Galata, Eminönü, Sultanahmet, Kadıköy, Moda) akıllı İstanbul gezi rotası ve Fırınna Cafe Sınırsız Çay İkramı.">
-    <meta name="keywords" content="İstanbul gezi rehberi, nokta atışı istanbul rotası, taksim galata eminönü gezi rehberi, Karaköy Güllüoğlu baklava, Fırınna cafe">
+    <meta name="description" content="Süre ve başlangıç noktanıza göre mantıklı Hedef Bölge filtreli (Moda, Caddebostan, Polonezköy, Sultanahmet, Galata) akıllı İstanbul gezi rotası.">
+    <meta name="keywords" content="İstanbul gezi rehberi, hedef bölge gezi rotası, moda caddebostan polonezköy gezi rehberi, Karaköy Güllüoğlu baklava, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
     <meta property="og:title" content="İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe">
-    <meta property="og:description" content="Başlangıç merkezinizi seçin; canlı harita destekli rotanızı oluşturup yüksek kaliteli VIP Dijital Seyahat Biletinizi indirin!">
+    <meta property="og:description" content="Başlangıç noktanızı, sürenizi ve gezmek istediğiniz mantıklı bölgeyi seçin; VIP Dijital Seyahat Biletinizi anında indirin!">
     <meta property="og:image" content="https://firinna.com/galata_cafe_bg_new.jpg">
     <meta property="og:url" content="https://firinna.com/gezi">
     <meta property="og:type" content="website">
@@ -899,7 +899,7 @@
         </div>
 
         <h1><i class="ph-bold ph-compass"></i> Akıllı İstanbul Gezi & Rota Planlayıcı</h1>
-        <p>Nokta atışı başlangıç merkezli canlı harita destekli rotalar ve Fırınna Cafe'de sınırsız çay ikramı!</p>
+        <p>Başlangıç merkezinize ve istediğiniz hedefe özel canlı rotalar ve Fırınna Cafe'de sınırsız çay ikramı!</p>
     </header>
 
     <!-- PERFECT LOCATION-FIRST MASTER WIZARD FORM -->
@@ -919,7 +919,7 @@
 
         <!-- STEP 1: SPECIFIC STARTING HUBS (NOKTA ATIŞI MERKEZLER) -->
         <div class="step-label">
-            <span class="num">1</span> <span>Neredesiniz / Nereden Başlayacaksınız? (Nokta Atışı Merkez Seçin):</span>
+            <span class="num">1</span> <span>Neredesiniz / Nereden Başlayacaksınız? (Başlangıç Merkeziniz):</span>
         </div>
         <div class="options-grid" id="grid-start">
             <div class="option-pill active" onclick="selectStartOption('taksim')">
@@ -1003,6 +1003,14 @@
             </div>
         </div>
 
+        <!-- STEP 4: TARGET REGION / DESTINATION (DYNAMICALLY FILTERED BASED ON STEPS 1, 2 & 3) -->
+        <div class="step-label">
+            <span class="num">4</span> <span>Gezmek İstediniz Hedef Bölge & Yön (Mantıklı Seçenekler):</span>
+        </div>
+        <div class="options-grid" id="grid-region">
+            <!-- Dynamically populated by updateRegionOptions() -->
+        </div>
+
         <!-- DYNAMIC SUMMARY PREVIEW CARD & TABLE (WHAT'S INCLUDED) -->
         <div class="summary-preview-card" id="summary-preview-card">
             <h4 style="margin:0 0 6px; color:#0f172a; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
@@ -1022,8 +1030,8 @@
                     <td class="val" id="summary-val-time">Yarım Gün (3-4 Saat)</td>
                 </tr>
                 <tr>
-                    <td class="label">📍 Örnek Duraklar:</td>
-                    <td class="val" id="summary-val-stops">Taksim ➔ İstiklal ➔ Kamondo Merdivenleri ➔ Fırınna Cafe</td>
+                    <td class="label">🗺️ Gezilecek Bölge:</td>
+                    <td class="val" id="summary-val-region">🏛️ Galata - Pera - İstiklal Hattı</td>
                 </tr>
                 <tr>
                     <td class="label">☕ Lezzet Durağı:</td>
@@ -1116,6 +1124,7 @@
                 <div class="pass-info-box">
                     <div class="pass-info-row">📍 <strong>Başlangıç Konumu:</strong> <span id="pass-val-start">Moda / Kadıköy</span></div>
                     <div class="pass-info-row">🎯 <strong>Seyahat Konsepti:</strong> <span id="pass-val-concept">Tarih & Şehir Klasikleri</span></div>
+                    <div class="pass-info-row">🗺️ <strong>Hedef Bölge:</strong> <span id="pass-val-region">Moda Sahil Kordonu</span></div>
                     <div class="pass-info-row">🌤️ <strong>Hava Durumu:</strong> <span id="pass-val-weather">23°C Açık & Güneşli</span></div>
                     <div class="pass-info-row">⏱️ <strong>Tahmini Süre:</strong> <span id="pass-val-time">Yarım Gün (3-4 Saat)</span></div>
                 </div>
@@ -1263,6 +1272,7 @@
         let selectedStart = 'taksim';
         let selectedConcept = 'historical';
         let selectedTime = 'half';
+        let selectedRegion = 'galata_pera';
 
         let systemWorkHours = '11:00 - 19:15';
         let systemPhone = '905456301214';
@@ -1367,6 +1377,7 @@
             selectedStart = startVal;
             document.querySelectorAll('#grid-start .option-pill').forEach(p => p.classList.remove('active'));
             event.currentTarget.classList.add('active');
+            updateRegionOptions();
             updateSummaryPreview();
         }
 
@@ -1375,6 +1386,7 @@
             selectedConcept = conceptVal;
             document.querySelectorAll('#grid-concept .option-pill').forEach(p => p.classList.remove('active'));
             event.currentTarget.classList.add('active');
+            updateRegionOptions();
             updateSummaryPreview();
         }
 
@@ -1383,7 +1395,78 @@
             selectedTime = timeVal;
             document.querySelectorAll('#grid-time .option-pill').forEach(p => p.classList.remove('active'));
             event.currentTarget.classList.add('active');
+            updateRegionOptions();
             updateSummaryPreview();
+        }
+
+        // STEP 4: REGION SELECTION
+        function selectRegionOption(regionKey) {
+            selectedRegion = regionKey;
+            document.querySelectorAll('#grid-region .option-pill').forEach(p => p.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            updateSummaryPreview();
+        }
+
+        // DYNAMICALLY FILTER STEP 4 TARGET REGIONS BASED ON STEPS 1, 2 & 3
+        function updateRegionOptions() {
+            const gridRegion = document.getElementById('grid-region');
+            gridRegion.innerHTML = '';
+
+            let regionOptions = [];
+
+            // ANADOLU START (KADIKÖY / MODA)
+            if (selectedStart === 'kadikoy' || selectedStart === 'moda') {
+                if (selectedTime === 'half') {
+                    regionOptions = [
+                        { key: 'moda_caddebostan', title: '🌊 Moda - Kalamış - Caddebostan Sahil Kordonu', desc: 'Deniz manzaralı sahil yürüyüşü & çimler' },
+                        { key: 'bosphorus_asian', title: '⛵ Boğaz Kıyısı: Kuzguncuk, Üsküdar & Beylerbeyi', desc: 'Vapurla 15 dk tarihi yalılar ve çay molası' },
+                        { key: 'galata_firinna', title: '🌉 Vapurla Karaköy & Galata (Fırınna Cafe Mola)', desc: '15 dk nostaljik vapurla Galata geçişi' }
+                    ];
+                } else {
+                    regionOptions = [
+                        { key: 'polonezkoy_riva', title: '🌲 Polonezköy Tabiat Parkı & Riva (Özel Araçlı Doğa)', desc: 'Geniş orman yürüyüş kulvarı & nehir kıyısı' },
+                        { key: 'buyukada_islands', title: '⛵ Büyükada Çam Ormanları & Aya Yorgi (Vapur + Bisiklet)', desc: 'Ada çamlıkları ve bisiklet turu' },
+                        { key: 'belgrad_forest', title: '🌳 Belgrad Ormanı & Neşet Suyu (Avrupa Doğa)', desc: '6 km kauçuk koşu ve yürüyüş kulvarı' }
+                    ];
+                }
+            } 
+            // AVRUPA START (TAKSİM, GALATA, EMİNÖNÜ, SULTANAHMET, KAPALIÇARŞI, NİŞANTAŞI)
+            else {
+                if (selectedConcept === 'nature') {
+                    if (selectedTime === 'half') {
+                        regionOptions = [
+                            { key: 'macka_nisantasi', title: '🌳 Nişantaşı & Maçka Demokrasi Parkı (Teleferikli)', desc: 'Lüks caddeler ve park kulvarı' },
+                            { key: 'gulhane_sarayburnu', title: '🌿 Tarihi Gülhane Parkı & Sarayburnu Sahil', desc: 'Asırlık çınar ağaçları ve deniz havası' },
+                            { key: 'yildiz_besiktas', title: '🌳 Yıldız Parkı Tarihi Koruları & Beşiktaş Sahil', desc: 'Tarihi köşkler ve Boğaz kordonu' }
+                        ];
+                    } else {
+                        regionOptions = [
+                            { key: 'belgrad_forest', title: '🌲 Belgrad Ormanı & Neşet Suyu 6km Koşu Kulvarı', desc: 'İstanbul akciğeri kauçuk parkur' },
+                            { key: 'ataturk_arboretum', title: '🌿 Atatürk Arboretumu (Bahçeköy Canlı Müze)', desc: 'Göletli nadir ağaç türleri müzesi' },
+                            { key: 'buyukada_islands', title: '⛵ Büyükada Çam Ormanları & Aya Yorgi', desc: 'Vapurla Ada doğa turu' }
+                        ];
+                    }
+                } else {
+                    regionOptions = [
+                        { key: 'galata_pera', title: '🏛️ Galata - Pera - İstiklal Tarihi Hattı', desc: 'Galata Kulesi, Kamondo & Fırınna Cafe' },
+                        { key: 'eminonu_historic', title: '🕌 Eminönü, Mısır Çarşısı & Galata Köprüsü', desc: 'Baharat kokuları & Haliç yürüyüşü' },
+                        { key: 'sultanahmet_classic', title: '🕌 Sultanahmet & Yerebatan Bizans Su Sarayı', desc: 'Ayasofya & Hipodrom meydanı' }
+                    ];
+                }
+            }
+
+            // Render region pills
+            selectedRegion = regionOptions[0].key;
+            regionOptions.forEach((reg, idx) => {
+                const div = document.createElement('div');
+                div.className = `option-pill ${idx === 0 ? 'active' : ''}`;
+                div.onclick = () => selectRegionOption(reg.key);
+                div.innerHTML = `
+                    <div class="title">${reg.title}</div>
+                    <div class="desc">${reg.desc}</div>
+                `;
+                gridRegion.appendChild(div);
+            });
         }
 
         function getStartLabelName(startKey) {
@@ -1400,9 +1483,28 @@
             return map[startKey] || '📍 Taksim Meydanı';
         }
 
+        function getRegionLabelName(regionKey) {
+            const map = {
+                galata_pera: '🏛️ Galata - Pera - İstiklal Hattı',
+                eminonu_historic: '🕌 Eminönü, Mısır Çarşısı & Galata Köprüsü',
+                sultanahmet_classic: '🕌 Sultanahmet & Yerebatan Sarnıcı',
+                moda_caddebostan: '🌊 Moda - Kalamış - Caddebostan Sahil Kordonu',
+                bosphorus_asian: '⛵ Boğaz Kıyısı: Kuzguncuk & Üsküdar',
+                galata_firinna: '🌉 Vapurla Karaköy & Galata (Fırınna Mola)',
+                polonezkoy_riva: '🌲 Polonezköy Tabiat Parkı & Riva (Özel Araçlı)',
+                buyukada_islands: '⛵ Büyükada Çam Ormanları & Aya Yorgi',
+                belgrad_forest: '🌲 Belgrad Ormanı & Neşet Suyu',
+                macka_nisantasi: '🌳 Nişantaşı & Maçka Demokrasi Parkı',
+                gulhane_sarayburnu: '🌿 Tarihi Gülhane Parkı & Sarayburnu',
+                yildiz_besiktas: '🌳 Yıldız Parkı & Beşiktaş Sahil'
+            };
+            return map[regionKey] || '🏛️ Galata - Pera - İstiklal Hattı';
+        }
+
         function updateSummaryPreview() {
             let startName = getStartLabelName(selectedStart);
             let conceptTxt = "🏛️ Tarih, Kültür & Şehir Klasikleri";
+            let regionTxt = getRegionLabelName(selectedRegion);
             let stopsTxt = "Taksim Meydanı ➔ İstiklal ➔ Kamondo Merdivenleri ➔ Fırınna Cafe";
 
             if (selectedStart === 'galata') stopsTxt = "Fırınna Cafe ➔ Galata Kulesi ➔ Kamondo Merdivenleri ➔ Karaköy";
@@ -1420,6 +1522,7 @@
             document.getElementById('summary-val-start').innerText = startName;
             document.getElementById('summary-val-concept').innerText = conceptTxt;
             document.getElementById('summary-val-time').innerText = timeTxt;
+            document.getElementById('summary-val-region').innerText = regionTxt;
             document.getElementById('summary-val-stops').innerText = stopsTxt;
         }
 
@@ -1520,6 +1623,7 @@
 
         // INITIALIZATION ON PAGE LOAD
         document.addEventListener('DOMContentLoaded', function() {
+            updateRegionOptions();
             updateSummaryPreview();
         });
 
@@ -1543,6 +1647,7 @@
                 }
             });
 
+            updateRegionOptions();
             updateSummaryPreview();
             renderItinerary(true);
         }
@@ -1634,6 +1739,7 @@
             document.getElementById('pass-val-start').innerText = startLabelName;
             document.getElementById('pass-val-concept').innerText = conceptTextReadable;
             document.getElementById('pass-val-time').innerText = timeTextReadable;
+            document.getElementById('pass-val-region').innerText = getRegionLabelName(selectedRegion);
 
             const passWaypointsContainer = document.getElementById('pass-waypoints-container');
             passWaypointsContainer.innerHTML = '';
