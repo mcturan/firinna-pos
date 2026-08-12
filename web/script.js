@@ -353,6 +353,110 @@ const i18n = {
         badge_gluten: "Contains Gluten",
         badge_dairy: "Contains Dairy"
     },
+    es: {
+        category: "Cafetería y Restaurante",
+        status_open: "Abierto Ahora (08:00 - 23:00)",
+        btn_menu: "Ver Menú Digital",
+        btn_reserve: "Reservar una Mesa",
+        btn_message: "Enviarnos un Mensaje",
+        title_about: "Sobre Nosotros",
+        slogan_about: "TOQUES ÚNICOS A SABORES TRADICIONALES",
+        text_about: "ESTIMADO CLIENTE, BIENVENIDO A FIRINNA.\n\nUbicado en la atmósfera histórica de 150 años de Galata, en la tranquila calle Kumbaracı Yokuşu, Fırınna Cafe & Restaurant es un rincón culinario especial para alejarse del bullicio de la calle Istiklal.\n\nCon ingredientes cuidadosamente seleccionados, especialidades recién horneadas, ricas variedades de café y postres caseros, damos vida a las recetas tradicionales con toques modernos.\n\n¡Aquí no hay prisas! Con nuestro equipo hospitalario y amigable con las mascotas (Pet-Friendly), disfrute de cálidas conversaciones y momentos de paz en el ambiente de nuestro edificio histórico de 150 años.",
+        title_top_reviews: "De Nuestros Clientes",
+        title_gating: "Evalúe su Experiencia",
+        sub_gating: "¿Cómo fue su experiencia en Firinna? Sus comentarios son muy valiosos para nosotros.",
+        gating_high_msg: "🎉 ¡Maravilloso! Nos alegra mucho que le haya gustado. ¿Le gustaría apoyarnos con una reseña de 5 estrellas en estas plataformas?",
+        gating_low_title: "¡Sus Comentarios son Muy Valiosos!",
+        gating_low_msg: "Puede enviar cualquier sugerencia o problema directamente a nuestro gerente:",
+        btn_google_review: "Valorar con 5 Estrellas en Google",
+        btn_yandex_review: "Valorar en Yandex",
+        btn_tripadvisor_review: "Valorar en TripAdvisor",
+        google_perfect: "Excelente en Google",
+        yandex_perfect: "Excelente en Yandex",
+        btn_inspect: "Revisar",
+        btn_see_all_google_photos: "Ver Todas las Fotos en Google Maps (100+)",
+        table_available: "Actualmente hay {N} mesas disponibles, ¡bienvenido!",
+        table_full: "Actualmente todas las mesas están ocupadas.",
+        table_offline: "Estado de las mesas no disponible.",
+        text_group_events: "<strong>Eventos de Grupo y Privados:</strong> Para reservas de grupos fuera del horario habitual, <a href='https://wa.me/905456301214' target='_blank' style='color:#059669; font-weight:700; text-decoration:underline;'>Contacte por WhatsApp</a>.",
+        review_1: "Un lugar histórico y maravilloso para escapar del ruido de Istiklal. ¡Sus pizzas son legendarias!",
+        review_2: "Debes probar el menemen Çakallı. El personal es muy amable y es genial que acepten mascotas.",
+        review_3: "El mejor lugar en Galata para tomar café y postres. El personal es muy atento.",
+        title_virtual_tour: "Recorrido Virtual (360°)",
+        text_virtual_tour: "Explore nuestro edificio histórico de 150 años desde donde se encuentre.",
+        title_faq: "Preguntas Frecuentes",
+        faq_q1: "🐾 ¿Se aceptan mascotas?",
+        faq_a1: "¡Sí! Fırınna es 100% amigable con las mascotas (Pet-Friendly). Le invitamos a disfrutar con sus mascotas tanto en el jardín exterior como en el interior.",
+        faq_q2: "💳 ¿Qué métodos de pago aceptan?",
+        faq_a2: "Aceptamos todas las tarjetas de crédito, débito, pagos móviles sin contacto (Apple Pay / Google Pay) y efectivo.",
+        faq_q3: "🥗 ¿Tienen opciones Vegetarianas o Sin Gluten?",
+        faq_a3: "¡Sí! Nuestro menú ofrece pizzas gourmet vegetarianas al horno de piedra, desayunos variados y alternativas sin gluten/veganas.",
+        faq_q4: "🕒 ¿Podemos hacer reservas de grupo o eventos privados?",
+        faq_a4: "¡Sí! Para cumpleaños, reuniones de empresa o mini eventos privados, contáctenos directamente por WhatsApp.",
+        title_location: "Ubicación",
+        title_contact: "Contacto y Ubicación",
+        title_gallery: "Ambiente y Sabores",
+        gal_title_interior: "Interior y Ambiente",
+        gal_title_exterior: "Exterior y Calle Kumbaracı",
+        gal_title_signature: "Nuestros Sabores Especiales",
+        gal_lbl_interior_history: "Interior Histórico",
+        gal_lbl_warm_tables: "Mesas Acogedoras",
+        gal_lbl_details: "Detalles del Local",
+        gal_lbl_street: "Calle Kumbaracı",
+        gal_lbl_outdoor_seating: "Mesas Exteriores",
+        gal_lbl_historic_building: "Edificio Histórico",
+        gal_lbl_fresh_tea: "Té Turco Fresco",
+        gal_lbl_turkish_coffee: "Café Turco",
+        gal_lbl_menemen: "Menemen en Sartén",
+        gal_lbl_pizza: "Pizza al Horno de Piedra",
+        gal_lbl_lemonade: "Limonada Casera",
+        gal_lbl_glintwein: "Vino Caliente Especial",
+        badge_historic_tr: "Cafetería Histórica Turca",
+        badge_halal: "100% Halal",
+        badge_quality: "Mejor Calidad",
+        badge_price: "Precio Justo",
+        title_reviews: "Ubicación y Reseñas Recientes",
+        btn_google: "Leer Reseñas Recientes en Google",
+        btn_yandex: "Ver en Yandex Maps",
+        btn_baidu: "Ver en Baidu Maps",
+        modal_res_title: "Reserva de Mesa",
+        label_name: "Nombre Completo",
+        label_phone: "Teléfono",
+        label_date: "Fecha",
+        label_time: "Hora (08:00-23:00)",
+        label_guests: "Número de Personas",
+        label_note: "Petición Especial / Nota (Opcional)",
+        btn_submit: "Enviar Solicitud",
+        modal_msg_title: "Enviarnos un Mensaje",
+        label_message: "Su Mensaje",
+        btn_submit_msg: "Enviar Mensaje",
+        footer_rights: "Todos los derechos reservados.",
+        menu_header_title: "Sabores Especiales",
+        menu_header_sub: "Con el toque de Firinna...",
+        menu_back: "Inicio",
+        menu_intro: "Puede visitar nuestro local o consultar con nuestro personal para conocer todas las opciones del menú. A continuación puede revisar nuestros sabores especiales más populares.",
+        menu_download: "Descargar Menú con Precios (PDF)",
+        cat_food: "Caliente del Horno",
+        cat_drinks: "Bebidas y Postres",
+        item_pizza: "Pizza al Horno de Piedra",
+        desc_pizza: "Masa especial fermentada, salsa de tomate italiana y exquisito queso mozzarella horneado en horno de leña.",
+        item_menemen: "Famoso Menemen Çakallı",
+        desc_menemen: "Preparado solo con yemas de huevo, abundante queso cheddar y mantequilla, un desayuno legendario.",
+        item_toast: "Tostada de Bazlama al Horno",
+        desc_toast: "Servida crujiente del horno de piedra con queso cheddar y salchicha/carne especial entre pan de aldea.",
+        item_coffee: "Café Turco Especial",
+        desc_coffee: "Café Arábica fresco de primera calidad, tostado y molido, preparado magistralmente y servido con la famosa delicia turca (lokum).",
+        item_tea: "Té Mezcla con Capullos de Rosa",
+        desc_tea: "Infusionado con una mezcla premium de té turco y ceilán, bergamota y capullos de rosa secos.",
+        item_lemonade: "Limonada Casera Especial",
+        desc_lemonade: "Limonada casera helada infusionada con hibisco, canela, anís estrellado y azafrán iraní auténtico.",
+        item_cake: "Pastel Caliente con Salsa de Chocolate",
+        desc_cake: "Tiernos por dentro, con abundante cacao y cubierto con salsa de chocolate caliente, un sabor imprescindible.",
+        badge_veg: "Vegetariano",
+        badge_vegan: "Vegano",
+        badge_gluten: "Contiene Gluten",
+        badge_dairy: "Contiene Lácteos"
+    },
     ru: {
         category: "Кафе и Ресторан",
         status_open: "Сейчас открыто (08:00 - 23:00)",
@@ -382,6 +486,17 @@ const i18n = {
         review_1: "Замечательное, историческое место, где можно спрятаться от шума Истикляля и перевести дух. Их пицца легендарна!",
         review_2: "Вы должны попробовать менемен Чакаллы. Персонал очень улыбчивый, и здорово, что к ним можно с питомцами.",
         review_3: "Лучшее место в Галате для кофе и десертов. Персонал очень внимателен.",
+        title_virtual_tour: "Виртуальный тур (360°)",
+        text_virtual_tour: "Исследуйте наше 150-летнее историческое здание, не выходя из дома.",
+        title_faq: "Часто задаваемые вопросы",
+        faq_q1: "🐾 Разрешено ли с домашними животными?",
+        faq_a1: "Да! Fırınna на 100% pet-friendly заведение. Вы можете приятно провести время со своими питомцами как в нашем саду, так и в зале.",
+        faq_q2: "💳 Какие способы оплаты вы принимаете?",
+        faq_a2: "Мы принимаем все основные кредитные и дебетовые карты, бесконтактную оплату (Apple Pay / Google Pay) и наличные.",
+        faq_q3: "🥗 Есть ли вегетарианские или безглютеновые блюда?",
+        faq_a3: "Да! В нашем меню есть вегетарианская пицца из каменной печи, богатый завтрак и безглютеновые/веганские альтернативы.",
+        faq_q4: "🕒 Можно ли забронировать стол для группы или провести мероприятие?",
+        faq_a4: "Да, для дней рождения, встреч или частных мероприятий свяжитесь с нами напрямую через WhatsApp.",
         title_location: "Расположение",
         title_contact: "Контакты и расположение",
         title_gallery: "Атмосфера и Вкус",
@@ -475,6 +590,8 @@ const i18n = {
         review_1: "مكان تاريخي رائع للهروب من ضجيج الاستقلال وأخذ قسط من الراحة. البيتزا الخاصة بهم أسطورية!",
         review_2: "يجب أن تجرب مينيمين تشاكالي. الموظفون مبتسمون للغاية ومن الرائع أنهم يسمحون بالحيوانات الأليفة.",
         review_3: "أفضل مكان في غلطة لتناول القهوة والحلويات. فريق العمل مهتم جدا.",
+        title_virtual_tour: "جولة افتراضية (360 درجة)",
+        text_virtual_tour: "استكشف مبنانا التاريخي الممتد لـ 150 عامًا من مكانك.",
         title_faq: "الأسئلة الشائعة",
         faq_q1: "🐾 هل يُسمح باصطحاب الحيوانات الأليفة؟",
         faq_a1: "نعم! مقهى فرنة صديق للحيوانات الأليفة. يمكنك الاستمتاع بفيض الأجواء الجميلة برفقة أليفك في الحديقة الخارجية والقاعة الداخلية.",
@@ -577,6 +694,8 @@ const i18n = {
         review_1: "一个美妙的、充满历史感的地方，在这里可以逃离Istiklal的喧嚣，稍作喘息。他们的比萨堪称传奇！",
         review_2: "你一定要尝尝Çakallı menemen。员工都面带微笑，而且这里对宠物很友好，真是太棒了。",
         review_3: "Galata喝咖啡和吃甜点的最佳去处。员工非常周到。",
+        title_virtual_tour: "虚拟全景导览 (360°)",
+        text_virtual_tour: "从您所在的位置探索我们拥有150年历史的古老建筑。",
         title_faq: "常见问题解答",
         faq_q1: "🐾 是否允许携带宠物？",
         faq_a1: "是的！Fırınna 是宠物友好型餐厅。欢迎您带着宠物在我们的户外花园和室内用餐。",
@@ -1017,6 +1136,10 @@ const FRONTEND_TAG_MAP = {
     'sugar_free': { label: '🍯 Şekersiz', bg: '#fdf4ff', color: '#86198f' }
 };
 
+function goToMenuProduct(prodId) {
+    window.location.href = `menu.html?product=${encodeURIComponent(prodId)}`;
+}
+
 function renderDynamicSignatureGallery() {
     const signatureGrid = document.getElementById('signature-gallery-grid');
     if (!signatureGrid) return;
@@ -1025,15 +1148,18 @@ function renderDynamicSignatureGallery() {
     if (!signatureProducts || signatureProducts.length === 0) return;
 
     signatureGrid.innerHTML = signatureProducts.map(p => {
-        const img = p.image_url.startsWith('http') || p.image_url.startsWith('drink_') || p.image_url.startsWith('prod_') ? p.image_url : p.image_url;
-        const titleEscaped = (p.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        const descEscaped = (p.description || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        const tagsStr = (p.tags || []).join(',');
+        const img = p.image_url.startsWith('http') || p.image_url.startsWith('drink_') || p.image_url.startsWith('prod_') || p.image_url.startsWith('food_') ? p.image_url : p.image_url;
 
         return `
-            <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 8px; height: 130px; cursor:pointer;" onclick="openLightbox('${img}', '${titleEscaped}', '${descEscaped}', '${tagsStr}')">
+            <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 10px; height: 140px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:all 0.3s ease;" onclick="goToMenuProduct('${p.id}')" title="${p.title} - Menüde İncele">
                 <img src="${img}" alt="${p.title}" class="gallery-img" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
-                <span style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.65); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500;">${p.title}</span>
+                <span style="position:absolute; top:6px; right:6px; background:#f59e0b; color:#fff; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:10px;">⭐ İmza</span>
+                <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.85), transparent); padding:16px 8px 6px; color:#fff;">
+                    <div style="font-size:0.85rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title}</div>
+                    <div style="font-size:0.72rem; color:#fde68a; font-weight:600; display:flex; align-items:center; gap:4px; margin-top:2px;">
+                        <span>Menüde Gör</span> <i class="ph-bold ph-arrow-right"></i>
+                    </div>
+                </div>
             </div>
         `;
     }).join('');
