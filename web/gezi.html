@@ -657,18 +657,7 @@
                     <span class="num">3</span> <span>Gezi İçin Ne Kadar Vaktiniz Var? (Zaman Kısıtı):</span>
                 </div>
                 <div class="options-grid" id="grid-time">
-                    <div class="option-pill" onclick="selectDurationOption('half')">
-                        <div class="title">⏱️ Yarım Gün (3-4 Saat)</div>
-                        <div class="desc">Nokta atışı çevre veya birleşik tur</div>
-                    </div>
-                    <div class="option-pill" onclick="selectDurationOption('1day')">
-                        <div class="title">🗓️ 1 Tam Gün (6-8 Saat)</div>
-                        <div class="desc">Çift bölge birleşik tur</div>
-                    </div>
-                    <div class="option-pill" onclick="selectDurationOption('2days')">
-                        <div class="title">🗺️ 2-3 Günlük Rehber</div>
-                        <div class="desc">Tüm İstanbul programı</div>
-                    </div>
+                    <!-- Dynamically populated according to concept -->
                 </div>
             </div>
 
@@ -721,28 +710,13 @@
                 </div>
             </div>
 
-            <!-- STEP 5: DEPARTURE TIME (SAAT) -->
+            <!-- STEP 5: DEPARTURE TIME (SAAT - DYNAMICALLY POPULATED TO AVOID ABSURD MORNING TIMES FOR NIGHTLIFE!) -->
             <div class="step-container" id="step-container-5" style="display: none;">
                 <div class="step-label">
                     <span class="num">5</span> <span>Gezinize Başlama Saati:</span>
                 </div>
                 <div class="options-grid" id="grid-start-time">
-                    <div class="option-pill" onclick="selectStartTimeOption('10:00')">
-                        <div class="title">☕ 10:00</div>
-                        <div class="desc">Sabah kahvaltılı</div>
-                    </div>
-                    <div class="option-pill" onclick="selectStartTimeOption('11:30')">
-                        <div class="title">🍳 11:30</div>
-                        <div class="desc">Öğleye doğru</div>
-                    </div>
-                    <div class="option-pill" onclick="selectStartTimeOption('14:00')">
-                        <div class="title">☀️ 14:00</div>
-                        <div class="desc">Öğleden sonra</div>
-                    </div>
-                    <div class="option-pill" onclick="selectStartTimeOption('17:30')">
-                        <div class="title">🌆 17:30</div>
-                        <div class="desc">Gün batımı & barlar</div>
-                    </div>
+                    <!-- Dynamically populated according to concept -->
                 </div>
             </div>
 
@@ -857,17 +831,6 @@
         let systemPhone = '905456301214';
         let liveWeatherText = '☀️ İstanbul 24°C (Açık)';
 
-        const POPULAR_HUBS = [
-            "Taksim Meydanı / İstiklal Başı",
-            "Galata / Kumbaracı Yokuşu (Fırınna Yakını)",
-            "Beşiktaş İskele & Meydan",
-            "Balat Meydanı & Kiremit Sokak",
-            "Eminönü Meydanı & İskele",
-            "Sultanahmet / Ayasofya Meydanı",
-            "Kadıköy İskele / Barlar Sokağı",
-            "Moda Sahil / Çay Bahçesi"
-        ];
-
         // FETCH LIVE WEATHER
         if (window.fetch) {
             fetch('https://api.open-meteo.com/v1/forecast?latitude=41.0082&longitude=28.9784&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=Europe%2FIstanbul')
@@ -909,8 +872,12 @@
             selectedConcept = conceptVal;
             document.querySelectorAll('#grid-concept .option-pill').forEach(p => p.classList.remove('active'));
             event.currentTarget.classList.add('active');
-            
+
+            // DYNAMICALLY RE-POPULATE REGIONS, DURATIONS AND START TIMES FOR REALISM!
             updateRegionOptions();
+            updateDurationOptions();
+            updateStartTimeOptions();
+
             revealStep(2);
             updateSummaryPreview();
         }
@@ -956,6 +923,7 @@
             generateSmartItinerary();
         }
 
+        // LOGIC FIX 1: DYNAMIC REGION SELECTION ACCORDING TO CONCEPT
         function updateRegionOptions() {
             const gridRegion = document.getElementById('grid-region');
             gridRegion.innerHTML = '';
@@ -999,6 +967,67 @@
             });
         }
 
+        // LOGIC FIX 2: DYNAMIC DURATION SELECTION ACCORDING TO CONCEPT
+        function updateDurationOptions() {
+            const gridTime = document.getElementById('grid-time');
+            gridTime.innerHTML = '';
+            let timeOptions = [];
+
+            if (selectedConcept === 'nightlife') {
+                timeOptions = [
+                    { key: 'half', title: '⏱️ Yarım Gün / Akşam Bar Turu (3-4 Saat)', desc: 'Publar, kokteyl barları ve akşam keyfi' },
+                    { key: '1day', title: '🌙 Gece Yarısına Kadar Kapsamlı Eğlence (6-7 Saat)', desc: 'İş çıkışından gece kulüplerine tam tur' }
+                ];
+            } else {
+                timeOptions = [
+                    { key: 'half', title: '⏱️ Yarım Gün (3-4 Saat)', desc: 'Nokta atışı çevre veya birleşik tur' },
+                    { key: '1day', title: '🗓️ 1 Tam Gün (6-8 Saat)', desc: 'Çift bölge birleşik tur' },
+                    { key: '2days', title: '🗺️ 2-3 Günlük Rehber', desc: 'Tüm İstanbul programı' }
+                ];
+            }
+
+            selectedTime = timeOptions[0].key;
+            timeOptions.forEach((t, idx) => {
+                const div = document.createElement('div');
+                div.className = `option-pill ${idx === 0 ? 'active' : ''}`;
+                div.onclick = () => selectDurationOption(t.key);
+                div.innerHTML = `<div class="title">${t.title}</div><div class="desc">${t.desc}</div>`;
+                gridTime.appendChild(div);
+            });
+        }
+
+        // LOGIC FIX 3: DYNAMIC START TIME SELECTION ACCORDING TO CONCEPT (NO MORNING TIMES FOR NIGHTLIFE!)
+        function updateStartTimeOptions() {
+            const gridStartTime = document.getElementById('grid-start-time');
+            gridStartTime.innerHTML = '';
+            let timeOptions = [];
+
+            if (selectedConcept === 'nightlife') {
+                timeOptions = [
+                    { time: '18:30', title: '🌆 18:30', desc: 'İş Çıkışı / Gün Batımı & İlk Kadeh' },
+                    { time: '20:30', title: '🌙 20:30', desc: 'Akşam Yemeği & Pub’lar Sokağı' },
+                    { time: '22:00', title: '🍸 22:00', desc: 'Gece Kulüpleri & Canlı Müzik' }
+                ];
+                selectedStartTime = '18:30';
+            } else {
+                timeOptions = [
+                    { time: '10:00', title: '☕ 10:00', desc: 'Sabah kahvaltılı' },
+                    { time: '11:30', title: '🍳 11:30', desc: 'Öğleye doğru' },
+                    { time: '14:00', title: '☀️ 14:00', desc: 'Öğleden sonra' },
+                    { time: '17:00', title: '🌆 17:00', desc: 'Gün batımı yürüyüşü' }
+                ];
+                selectedStartTime = '11:30';
+            }
+
+            timeOptions.forEach((t, idx) => {
+                const div = document.createElement('div');
+                div.className = `option-pill ${idx === 0 ? 'active' : ''}`;
+                div.onclick = () => selectStartTimeOption(t.time);
+                div.innerHTML = `<div class="title">${t.title}</div><div class="desc">${t.desc}</div>`;
+                gridStartTime.appendChild(div);
+            });
+        }
+
         function getStartLabelName(startKey) {
             const map = {
                 taksim: '📍 Taksim Meydanı',
@@ -1017,17 +1046,17 @@
             const map = {
                 express_balat_eminonu: '⚡ Hızlı Gezi: Balat & Eminönü Birleşik Tur',
                 balat_fener: '📸 Balat & Fener Renkli Sokaklar',
-                besiktas_akaretler: '🏛️ Beşiktaş & Akaretler Sıraevler',
+                besiktas_akaretler: '🏛️ Beşiktaş & Akaretler Kulvarı',
                 bosphorus_besiktas_combo: '⛵ Beşiktaş + Ortaköy Boğaz Turu',
                 sultanahmet_galata_combo: '👑 Sultanahmet + Galata Birleşik Mega Turu',
                 galata_moda_combo: '🌉 Galata/Pera + Vapurla Moda',
                 grand_istanbul_3days: '🗺️ 3 Günlük Tüm İstanbul Turu',
-                galata_pera: '🏛️ Galata & Pera Çevre Turu',
+                galata_pera: '🏛️ Galata & Pera Barları / Sokakları',
                 eminonu_historic: '🕌 Eminönü & Mısır Çarşısı',
                 sultanahmet_classic: '🕌 Sultanahmet & Yerebatan Sarnıcı',
-                moda_caddebostan: '🌊 Moda Sahili & Kordonu'
+                moda_caddebostan: '🌊 Moda Sahili & Barlar Sokağı'
             };
-            return map[regionKey] || '🏛️ Beşiktaş & Akaretler Sıraevler';
+            return map[regionKey] || '🏛️ Beşiktaş & Akaretler Kulvarı';
         }
 
         function updateSummaryPreview() {
@@ -1047,7 +1076,7 @@
             if (elStart) elStart.innerText = startName;
 
             const elTimeStart = document.getElementById('summary-val-start-time');
-            if (elTimeStart) elTimeStart.innerText = selectedStartTime || '11:30';
+            if (elTimeStart) elTimeStart.innerText = selectedStartTime || (selectedConcept === 'nightlife' ? '18:30' : '11:30');
 
             const elConcept = document.getElementById('summary-val-concept');
             if (elConcept) elConcept.innerText = conceptTxt;
@@ -1068,35 +1097,35 @@
                         title: '📍 1. DURAK: Beşiktaş Çarşısı Köyiçi Pub’lar Sokağı & Kazan Pub',
                         category: 'nightlife',
                         whyVisit: 'İstanbul’un en canlı mahalle pub kültürü, barlar sokağı ve samimi mahalle atmosferi.',
-                        mustDo: 'Beşiktaş Çarşısı içindeki tarihi Kazan Pub veya Köyiçi publarında soğuk fıçı bira söyleyin ve maç/akşam coşkusuna katılın.',
+                        mustDo: 'Beşiktaş Çarşısı içindeki tarihi Kazan Pub veya Köyiçi publarında soğuk fıçı bira söyleyin ve akşam coşkusuna katılın.',
                         mustEat: 'Kazan Pub patates tabağı, sıcak sosis ve fıçı bira.',
                         mapQuery: 'Kazan+Pub+Besiktas+Istanbul'
                     },
                     {
-                        offsetMin: 60,
+                        offsetMin: 70,
                         title: '🍸 2. DURAK: Tarihi Akaretler Craft Kokteyl & Lounge Barları',
                         category: 'nightlife',
                         whyVisit: 'Neoklasik sıra evlerin altında İstanbul’un en şık craft kokteyl mekanları ve DJ performans alanları.',
-                        mustDo: 'Akaretler caddesindeki özel tasarım kokteyl barlarında imza kokteylleri tadın ve ışıklandırılmış tarihi sıra evler önünde fotoğraf çekilin.',
+                        mustDo: 'Akaretler caddesindeki özel tasarım kokteyl barlarında imza kokteylleri tadın ve ışıklandırılmış sıra evler önünde fotoğraf çekilin.',
                         mustEat: 'İmza neoklasik kokteyller ve yanında artisan şarküteri tabağı.',
                         mapQuery: 'Akaretler+Besiktas+Istanbul'
                     },
                     {
-                        offsetMin: 120,
-                        title: '🎷 3. DURAK: Beşiktaş Cihangir & Asmalımescit Barlarına Geçiş',
+                        offsetMin: 140,
+                        title: '🎷 3. DURAK: Beyoğlu Asmalımescit Canlı Müzik & Caz Barlarına Geçiş',
                         category: 'nightlife',
                         whyVisit: 'Geceyi Galata/Beyoğlu’nun canlı müzik mekanlarında tamamlamak için stratejik bağlantı.',
-                        mustDo: 'Taksi veya dolmuşla 8 dakikada Galata Kumbaracı veya Asmalımescit’e geçerek canlı caz/rock mekanlarına adımı atın.',
+                        mustDo: 'Taksi veya dolmuşla 8 dakikada Kumbaracı veya Asmalımescit’e geçerek canlı caz/rock mekanlarına adım atın.',
                         mustEat: 'Gece yarısı sokak lezzeti ıslak hamburger.',
                         mapQuery: 'Asmalimescit+Beyoglu+Istanbul'
                     },
                     {
-                        offsetMin: 180,
+                        offsetMin: 200,
                         featured: true,
-                        title: 'FIRINNA CAFE & RESTAURANT — Gece Öncesi Çay, Pizza & Enerji Molası 🍵',
+                        title: 'FIRINNA CAFE & RESTAURANT — Gündüz Kahvaltısı / Akşam Lezzet Durağı 🍵',
                         category: 'gourmet',
-                        whyVisit: 'Kumbaracı Yokuşu No:41A’da fırından taze çıkan İtalyan pizza ve çay ile geceye enerji depolayın.',
-                        mustDo: 'Sıcak menemen ve taş fırın pizzanızı yudumlayın.',
+                        whyVisit: 'Kumbaracı Yokuşu No:41A’da gündüz (11:00-19:15) taze menemen ve İtalyan pizza molası.',
+                        mustDo: 'Gece eğlencesi öncesinde veya gündüzünde fırından taze çıkan İtalyan pizzamızı tadın.',
                         mustEat: 'Bakır sahanda sucuklu menemen, taş fırın pizza ve demlik çay.',
                         mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
                     }
@@ -1235,7 +1264,7 @@
 
             let finalPOIs = [];
             const startLabelName = getStartLabelName(selectedStart || 'besiktas');
-            const startTimeVal = selectedStartTime || '11:30';
+            const startTimeVal = selectedStartTime || (selectedConcept === 'nightlife' ? '18:30' : '11:30');
 
             if (hotelNameInput) {
                 finalPOIs.push({
@@ -1362,6 +1391,11 @@
             container.style.display = 'block';
             container.scrollIntoView({ behavior: 'smooth' });
         }
+
+        // INITIALIZE DEFAULT OPTIONS ON LOAD
+        updateRegionOptions();
+        updateDurationOptions();
+        updateStartTimeOptions();
     </script>
 </body>
 </html>
