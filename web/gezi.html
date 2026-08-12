@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="Konakladığınız yere ve zamanınıza göre kişiselleştirilmiş İstanbul gezi rotası. Otelinizden başlayan akıllı rehber ve Google Haritalar navigasyonu.">
-    <meta name="keywords" content="İstanbul gezi rehberi, otelden gezi rotası, Galata gezilecek yerler, İstanbulkart ulaşım rehberi, Fırınna cafe">
+    <meta name="description" content="Konakladığınız yere ve zamanınıza göre kişiselleştirilmiş İstanbul gezi rotası. Müzeler, camiler, kiliseler, fotoğraf mahalleleri, akşam eğlence noktaları ve sınırsız çay ikramı.">
+    <meta name="keywords" content="İstanbul gezi rehberi, Balat renkli evler, İstanbul ibadethaneler, Cihangir gece hayatı, İstanbulkart ulaşım rehberi, Fırınna cafe sınırsız çay">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
     <meta property="og:title" content="İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe">
-    <meta property="og:description" content="Kaldığınız konumu seçin, kişiselleştirilmiş İstanbul gezi rotanızı ve ikram kuponunuzu anında alın!">
+    <meta property="og:description" content="Kaldığınız konumu ve ilgi alanlarınızı seçin; rotanızı ve Fırınna Sınırsız Çay ikram kartınızı anında alın!">
     <meta property="og:image" content="https://firinna.com/galata_cafe_bg_new.jpg">
     <meta property="og:url" content="https://firinna.com/gezi">
     <meta property="og:type" content="website">
@@ -42,10 +42,10 @@
         },
         {
           "@type": "Question",
-          "name": "Galata ve Pera bölgesinde en iyi lezzet durağı neresidir?",
+          "name": "Galata Fırınna Cafe'de Gezi Rehberi ikramı nedir?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Galata Kumbaracı Yokuşu No:41A adresindeki Fırınna Cafe & Restaurant; bakır sahanda Çakallı Menemeni, çıtır bazlama tost, taş fırın İtalyan pizza ve demli çay lezzetleriyle Galata'nın en otantik mola mekanıdır."
+            "text": "Gezi rehberi ekranındaki dijital VIP kupon kodunu gösteren misafirlerimize ve tüm gruplarına yemek siparişleriyle birlikte sınırsız taze demli çay ikram edilmektedir."
           }
         }
       ]
@@ -175,9 +175,9 @@
             font-weight: 400;
         }
 
-        /* WIZARD CARD (SPACIOUS & ELEGANT) */
+        /* WIZARD CARD */
         .wizard-card {
-            max-width: 900px;
+            max-width: 920px;
             margin: -2rem auto 3rem;
             background: white;
             border-radius: 18px;
@@ -324,9 +324,9 @@
             transform: translateY(-2px);
         }
 
-        /* ITINERARY RESULT TIMELINE (SPACIOUS) */
+        /* ITINERARY RESULT TIMELINE */
         .itinerary-container {
-            max-width: 900px;
+            max-width: 920px;
             margin: 0 auto 3.5rem;
             display: none;
         }
@@ -419,6 +419,9 @@
             font-weight: 800;
             color: #0f172a;
             margin: 0 0 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .timeline-desc {
@@ -476,7 +479,7 @@
             flex: 1;
         }
 
-        /* DIGITAL VIP PERK TICKET CARD */
+        /* VIP UNLIMITED TEA TICKET CARD */
         .vip-ticket-card {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: white;
@@ -490,11 +493,11 @@
         }
 
         .vip-ticket-card::after {
-            content: 'FIRINNA VIP';
+            content: 'UNLIMITED TEA';
             position: absolute;
-            right: -20px;
-            bottom: -20px;
-            font-size: 4.5rem;
+            right: -25px;
+            bottom: -25px;
+            font-size: 4rem;
             font-weight: 900;
             color: rgba(255,255,255,0.03);
             pointer-events: none;
@@ -526,13 +529,13 @@
         }
 
         .ticket-body .gift-icon {
-            font-size: 3rem;
+            font-size: 3.2rem;
             animation: floatIcon 3s ease-in-out infinite;
         }
 
         /* PRACTICAL TRAVEL GUIDE & FAQ SECTION */
         .practical-guide-section {
-            max-width: 900px;
+            max-width: 920px;
             margin: 3rem auto 4rem;
             padding: 0 1rem;
         }
@@ -668,7 +671,7 @@
         <p>Otellerinizden başlayan akıllı rota planlayıcısı, İstanbulkart ve ulaşım rehberi. Fırınna Cafe lezzet molası ve Google Haritalar navigasyonu hazır!</p>
     </header>
 
-    <!-- WIZARD FORM (SPACIOUS & ELEGANT) -->
+    <!-- WIZARD FORM -->
     <main class="wizard-card">
         
         <!-- STEP 1: ACCOMMODATION / STARTING POINT -->
@@ -708,13 +711,17 @@
                 <div class="title">🕌 Tarihi Yarımada</div>
                 <div class="desc">Ayasofya, Süleymaniye, Çarşı</div>
             </div>
+            <div class="option-pill" onclick="selectSingleOption('grid-region', this, 'balat')">
+                <div class="title">📸 Balat & Fener</div>
+                <div class="desc">Renkli Evler & Demir Kilise</div>
+            </div>
             <div class="option-pill" onclick="selectSingleOption('grid-region', this, 'moda')">
                 <div class="title">⛵ Kadıköy & Moda</div>
                 <div class="desc">Vapur Yolculuğu & Sahil</div>
             </div>
             <div class="option-pill" onclick="selectSingleOption('grid-region', this, 'all_city')">
                 <div class="title">🗺️ Tüm İstanbul Rotası</div>
-                <div class="desc">Galata + Yarımada + Moda</div>
+                <div class="desc">Galata + Yarımada + Balat + Moda</div>
             </div>
         </div>
 
@@ -742,17 +749,23 @@
             <span class="num">4</span> <span>İlgi Alanlarınız:</span>
         </div>
         <div class="options-grid" id="grid-interests">
-            <div class="option-pill active" onclick="toggleMultiOption(this, 'history')">
-                <div class="title">🏛️ Tarih & Simgesel Yapılar</div>
+            <div class="option-pill active" onclick="toggleMultiOption(this, 'museums')">
+                <div class="title">🏛️ Müzeler & Saraylar</div>
+            </div>
+            <div class="option-pill active" onclick="toggleMultiOption(this, 'worship')">
+                <div class="title">🕌 İbadethaneler (Cami, Kilise, Havra)</div>
             </div>
             <div class="option-pill active" onclick="toggleMultiOption(this, 'photo')">
-                <div class="title">📸 Fotoğraf & Manzara Noktaları</div>
+                <div class="title">📸 Renkli Mahalleler & Çift Yürüyüşleri 👫</div>
+            </div>
+            <div class="option-pill" onclick="toggleMultiOption(this, 'nightlife')">
+                <div class="title">🎷 Gece Hayatı & Akşam Barları</div>
+            </div>
+            <div class="option-pill" onclick="toggleMultiOption(this, 'shows')">
+                <div class="title">🎭 Kültür, Tiyatro & Semazen Gösterisi</div>
             </div>
             <div class="option-pill active" onclick="toggleMultiOption(this, 'gourmet')">
                 <div class="title">☕ Kahve, Çay & Lezzet Molası</div>
-            </div>
-            <div class="option-pill" onclick="toggleMultiOption(this, 'shopping')">
-                <div class="title">🛍️ Tarihi Çarşılar & Pasajlar</div>
             </div>
         </div>
 
@@ -796,22 +809,22 @@
             </a>
         </div>
 
-        <!-- VIP DIGITAL PERK TICKET CARD -->
+        <!-- VIP DIGITAL UNLIMITED TEA TICKET CARD -->
         <div class="vip-ticket-card">
             <div class="ticket-header">
                 <span style="font-weight:800; font-size:1rem; color:#fbbf24; display:flex; align-items:center; gap:8px;">
-                    <i class="ph-bold ph-ticket"></i> FIRINNA GEZİ ROTA İKRAM KUPONU
+                    <i class="ph-bold ph-ticket"></i> FIRINNA VIP GRUP İKRAM KARTI
                 </span>
-                <span class="ticket-code-badge" id="ticket-code">#FIRINNA-GEZI-8842</span>
+                <span class="ticket-code-badge" id="ticket-code">#FIRINNA-TEA-9921</span>
             </div>
             <div class="ticket-body">
-                <div class="gift-icon">🎁</div>
+                <div class="gift-icon">🍵</div>
                 <div>
-                    <h4 style="margin:0 0 4px; color:#ffffff; font-size:1.1rem;">Fırınna Cafe'de İkram Çay / Limonata Kazanacaksınız!</h4>
-                    <p style="margin:0 0 12px; font-size:0.88rem; color:#cbd5e1;">Bu gezi rotasındaki lezzet durağımız olan <strong>Fırınna Cafe & Restaurant</strong>'a geldiğinizde bu dijital kartı kasadaki arkadaşımıza göstermeniz yeterlidir.</p>
+                    <h4 style="margin:0 0 4px; color:#ffffff; font-size:1.15rem;">Yemekle Birlikte Tüm Grubunuza SINIRSIZ ÇAY HEDİYE!</h4>
+                    <p style="margin:0 0 12px; font-size:0.88rem; color:#cbd5e1;">Bu gezi rotasıyla gelen misafirlerimize ve tüm arkadaş grubunuza <strong>Fırınna Cafe & Restaurant</strong>'ta yemek siparişinizle birlikte <strong>SINIRSIZ DEMLİ TÜRK ÇAYI İKRAMIMIZDIR!</strong> Kodu gösterin yeterlidir.</p>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <a href="menu" style="background:#f59e0b; color:#0f172a; font-size:0.82rem; font-weight:800; padding:6px 14px; border-radius:8px; text-decoration:none;">📄 Menüyü İncele</a>
-                        <a href="https://maps.google.com/?q=Firinna+Cafe+Restaurant+Galata" target="_blank" style="background:rgba(255,255,255,0.15); color:#fff; font-size:0.82rem; font-weight:700; padding:6px 14px; border-radius:8px; text-decoration:none; border:1px solid rgba(255,255,255,0.2);">📍 Bize Yol Tarifi Al</a>
+                        <a href="menu" style="background:#f59e0b; color:#0f172a; font-size:0.84rem; font-weight:800; padding:6px 16px; border-radius:8px; text-decoration:none;">📄 Menüyü İncele</a>
+                        <a href="https://maps.google.com/?q=Firinna+Cafe+Restaurant+Galata" target="_blank" style="background:rgba(255,255,255,0.15); color:#fff; font-size:0.84rem; font-weight:700; padding:6px 16px; border-radius:8px; text-decoration:none; border:1px solid rgba(255,255,255,0.2);">📍 Bize Yol Tarifi Al</a>
                     </div>
                 </div>
             </div>
@@ -852,7 +865,7 @@
                 <p>
                     • <strong>Yürüyüş Ayakkabısı:</strong> Galata taş sokakları için rahat spor ayakkabı şarttır.<br>
                     • <strong>Müze Sıraları:</strong> Topkapı Sarayı ve Yerebatan Sarnıcı için biletleri online alın.<br>
-                    • <strong>Genel Yemek Durakları:</strong> Sultanahmet'te meşhur köfte, Eminönü sahilinde balık-ekmek, Galata'da Fırınna Cafe'de İtalyan Pizza keyfi!
+                    • <strong>Genel Yemek Durakları:</strong> Sultanahmet'te meşhur köfte, Eminönü sahilinde balık-ekmek, Galata'da Fırınna Cafe'de İtalyan Pizza & Sınırsız Çay keyfi!
                 </p>
             </div>
         </div>
@@ -885,11 +898,11 @@
 
             <div class="faq-item">
                 <div class="faq-question">
-                    <span>☕ Galata ve Pera bölgesinde nerede mola vermeliyim?</span>
+                    <span>☕ Galata Fırınna Cafe'de Sınırsız Çay ikramından nasıl faydalanabilirim?</span>
                     <i class="ph-bold ph-caret-down"></i>
                 </div>
                 <div class="faq-answer">
-                    Kumbaracı Yokuşu No:41A adresindeki <strong>Fırınna Cafe & Restaurant</strong>; bakır sahanda Çakallı Menemeni, taş fırın İtalyan pizzası ve demli çayıyla en keyifli mola durağıdır.
+                    Kumbaracı Yokuşu No:41A adresindeki <strong>Fırınna Cafe & Restaurant</strong>'a geldiğinizde gezi rehberi ekranındaki dijital VIP kupon kodunu kasadaki arkadaşımıza göstermeniz yeterlidir. Yemek siparişi veren tüm masaya taze demli çay sınırsız olarak ikram edilmektedir.
                 </div>
             </div>
 
@@ -914,7 +927,7 @@
         let selectedStart = 'beyoglu';
         let selectedRegion = 'galata';
         let selectedTime = 'half';
-        let selectedInterests = ['history', 'photo', 'gourmet'];
+        let selectedInterests = ['museums', 'worship', 'photo', 'gourmet'];
 
         function selectSingleOption(gridId, el, val) {
             document.querySelectorAll(`#${gridId} .option-pill`).forEach(p => p.classList.remove('active'));
@@ -933,14 +946,14 @@
             }
         }
 
-        // DATABASE OF iconic ISTANBUL PLACES
+        // EXPANDED POI DATABASE
         const POI_DATABASE = {
             galata: [
                 {
                     time: '09:00',
                     title: '🚋 Taksim Meydanı & Tarihi Nostaljik Tramvay (T2)',
                     category: 'photo',
-                    desc: 'Taksim Meydanı’ndan başlayıp tarihi kırmızı tramvayla İstiklal Caddesi ve Tünel Meydanı’na yolculuk.',
+                    desc: 'Taksim Meydanı’ndan başlayıp kırmızı tramvayla İstiklal Caddesi ve Tünel Meydanı’na yolculuk.',
                     tip: '📸 Tuyo: Tramvay önünde ikonik İstanbul karesi çekin.',
                     closedNote: '📌 Her gün 07:00 - 22:30 arası sefer yapar.',
                     mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul'
@@ -948,7 +961,7 @@
                 {
                     time: '09:45',
                     title: '🗼 Galata Kulesi & Tarihi Taş Sokaklar',
-                    category: 'history',
+                    category: 'museums',
                     desc: 'Cenevizlilerden kalan 670 yıllık kule ve çevresindeki dar otantik taş sokaklar.',
                     tip: '📸 Tuyo: Kule çevresindeki taş sokakları keşfedin.',
                     closedNote: '📌 Her gün ziyarete açıktır (08:30 - 22:00).',
@@ -957,56 +970,65 @@
                 {
                     time: '10:45',
                     featured: true,
-                    title: '🍳 FIRINNA CAFE & RESTAURANT — Kahvaltı & Çay Molası',
+                    title: '🍳 FIRINNA CAFE & RESTAURANT — Kahvaltı & Sınırsız Çay Molası 🍵',
                     category: 'gourmet',
-                    desc: 'Kumbaracı Yokuşu No:41A’da bakır sahanda Çakallı Menemeni, çıtır bazlama tost ve demli Türk çayı.',
-                    tip: '⭐ VIP Rota Ödülü: Bu ekrandaki kuponu gösteren misafirlerimize ikram Çay/Limonata verilir!',
+                    desc: 'Kumbaracı Yokuşu No:41A’da bakır sahanda Çakallı Menemeni, çıtır bazlama tost ve tüm grubunuza sınırsız demli Türk çayı.',
+                    tip: '⭐ VIP Rota Ödülü: Yemekle birlikte tüm grubunuza SINIRSIZ ÇAY HEDİYE!',
                     closedNote: '📌 Haftanın 7 Günü Açıktır (08:30 - 23:00).',
                     mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
                 },
                 {
                     time: '12:00',
-                    title: '🪜 Kamondo Merdivenleri & Bankalar Caddesi',
+                    title: '🪜 Kamondo Merdivenleri & Bankalar Caddesi 👫',
                     category: 'photo',
-                    desc: '1850’li yılların art nouveau tarzı tarihi dalgalı merdivenleri.',
+                    desc: '1850’li yılların art nouveau tarzı tarihi dalgalı merdivenlerinde çift yürüyüşü ve fotoğraf molası.',
                     tip: '📸 Tuyo: Aşağıdan yukarıya doğru çekim açısı en popüler karedir.',
                     closedNote: '📌 Açık kamusal alandır.',
                     mapQuery: 'Kamondo+Merdivenleri+Karakoy+Istanbul'
                 },
                 {
                     time: '13:00',
-                    title: '🚇 Tarihi Tünel Füniküleri (1875)',
-                    category: 'history',
-                    desc: 'Dünyanın en eski 2. metrosu ile Karaköy’den İstiklal’e 90 saniyede çıkış.',
-                    tip: '💡 Tuyo: 150 yıllık nostaljik vagon yapısını inceleyin.',
-                    closedNote: '📌 Her gün 07:00 - 22:45 arası açıktır.',
-                    mapQuery: 'Tunel+Meydani+Beyoglu+Istanbul'
+                    title: '⛪ St. Antuan Katolik Kilisesi & Neve Şalom Havrası',
+                    category: 'worship',
+                    desc: 'İstiklal Caddesi’ndeki neogotik mimari harikası St. Antuan Kilisesi ve tarihi Neve Şalom Havrası.',
+                    tip: '💡 Tuyo: Kilise avlusundaki sakin otantik atmosferi hissedin.',
+                    closedNote: '📌 İbadet saatlerinde ziyarete saygı gösterilmelidir.',
+                    mapQuery: 'St.+Antuan+Church+Beyoglu+Istanbul'
                 },
                 {
                     time: '14:30',
                     featured: true,
-                    title: '🍕 FIRINNA CAFE & RESTAURANT — Taş Fırın İtalyan Pizza & Türk Kahvesi',
+                    title: '🍕 FIRINNA CAFE & RESTAURANT — Taş Fırın Pizza & Sınırsız Çay Keyfi 🍵',
                     category: 'gourmet',
-                    desc: 'Taş fırında pişen nefis pizzalar, taze demli çay ve Közde Türk Kahvesi keyfi.',
+                    desc: 'Taş fırında pişen nefis pizzalar, ikindi Türk kahvesi ve sınırsız taze demli çay ikramı.',
                     tip: '☕ Yürüyüş sonrası Kumbaracı Yokuşu’nda otantik dinlenme.',
                     closedNote: '📌 Haftanın 7 Günü Açıktır (08:30 - 23:00).',
                     mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
                 },
                 {
                     time: '16:00',
-                    title: '🚢 Karaköy veya Eminönü’nden Şehir Hatları Boğaz Vapur Turu',
+                    title: '⛵ Karaköy veya Eminönü’nden Şehir Hatları Boğaz Vapur Turu',
                     category: 'photo',
                     desc: 'Nostaljik vapur ile Kız Kulesi, Ortaköy ve Boğaz yalılarını izleyerek 1.5 saatlik tur.',
                     tip: '⛵ Tuyo: Vapurun sol açık tarafında oturmak en iyi manzarayı verir.',
                     closedNote: '📌 Şehir Hatları turları her gün düzenlenir.',
                     mapQuery: 'Karakoy+Sehir+Hatlari+Iskele+Istanbul'
+                },
+                {
+                    time: '19:00',
+                    title: '🎷 Cihangir & Asmalımescit Akşam Canlı Müzik & Barlar 🍻',
+                    category: 'nightlife',
+                    desc: 'Tarihi Beyoğlu sokaklarında canlı caz müzik, otantik barlar ve akşam sosyalleşme mekanları.',
+                    tip: '🍸 Tuyo: Asmalımescit ve Cihangir ara sokaklarında canlı müzik dinleyebilirsiniz.',
+                    closedNote: '📌 Akşam saatlerinde hareketlenir.',
+                    mapQuery: 'Asmalimescit+Beyoglu+Istanbul'
                 }
             ],
             historical: [
                 {
                     time: '09:00',
                     title: '🕌 Ayasofya-i Kebir Cami-i Şerifi',
-                    category: 'history',
+                    category: 'worship',
                     desc: '1500 yıllık dünya mimarlık mirası mimari şaheser.',
                     tip: '📌 Tuyo: Erken saatte sıra beklemeden ziyaret önerilir.',
                     closedNote: '⚠️ İbadet saatlerinde ve Cuma namazında ziyarete ara verilir.',
@@ -1015,7 +1037,7 @@
                 {
                     time: '10:15',
                     title: '💧 Yerebatan Sarnıcı (Basilica Cistern)',
-                    category: 'history',
+                    category: 'museums',
                     desc: 'Bizans yeraltı su sarayı ve Medusa başları.',
                     tip: '💡 Tuyo: Işıklandırma ve heykeller büyüleyicidir.',
                     closedNote: '📌 Haftanın 7 günü açıktır (09:00 - 22:00).',
@@ -1024,7 +1046,7 @@
                 {
                     time: '11:30',
                     title: '🏰 Topkapı Sarayı Mukaddes Emanetler',
-                    category: 'history',
+                    category: 'museums',
                     desc: 'Osmanlı idare merkezi, Kutsal Emanetler ve Harem dairesi.',
                     tip: '👑 Avludan Boğaz manzarasını izleyin.',
                     closedNote: '⚠️ KAPALI GÜN: SALI günleri kapalıdır!',
@@ -1041,7 +1063,7 @@
                 {
                     time: '14:00',
                     title: '🕌 Süleymaniye Cami & Kanuni - Hürrem Sultan Türbeleri',
-                    category: 'history',
+                    category: 'worship',
                     desc: 'Mimar Sinan’ın kalfalık eseri. Haliç manzarası, Kanuni Sultan Süleyman ve Hürrem Sultan’ın yan yana türbeleri.',
                     tip: '💡 Tuyo: Hürrem Sultan Türbesi çinilerini ve Sinan’ın türbesini görün.',
                     closedNote: '📌 Namaz vakitleri hariç her gün ücretsiz gezilebilir.',
@@ -1059,10 +1081,49 @@
                 {
                     time: '16:30',
                     featured: true,
-                    title: '🍕 FIRINNA CAFE & RESTAURANT — Akşam Yemeği & Pizza Molası',
+                    title: '🍕 FIRINNA CAFE & RESTAURANT — Akşam Yemeği & Sınırsız Çay Keyfi 🍵',
                     category: 'gourmet',
-                    desc: 'Galata Köprüsü üzerinden yürüyerek veya T1 tramvayı ile 8 dk’da Fırınna Cafe’ye varış. Taş fırın pizza & ikram çay keyfi.',
-                    tip: '⭐ Rota Ödülü: İkram Çay veya Soğuk Limonatanızı istemeyi unutmayın!',
+                    desc: 'Galata Köprüsü üzerinden yürüyerek veya T1 tramvayı ile 8 dk’da Fırınna Cafe’ye varış. Taş fırın pizza & grubunuza sınırsız çay ikramı.',
+                    tip: '⭐ VIP Rota Ödülü: Yemekle birlikte tüm grubunuza SINIRSIZ ÇAY HEDİYE!',
+                    closedNote: '📌 Haftanın 7 Günü Açıktır (08:30 - 23:00).',
+                    mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                },
+                {
+                    time: '19:00',
+                    title: '🎭 Hodjapasha Tarihi Semazen Gösterisi (Whirling Dervishes) 🎭',
+                    category: 'shows',
+                    desc: 'Sirkeci’de 550 yıllık tarihi hamam yapısında geleneksel tasavvuf Semazen gösterisi.',
+                    tip: '🎟️ Tuyo: Yabancı misafirler ve turistler için en popüler akşam gösterisidir.',
+                    closedNote: '📌 Biletler önceden rezervasyon gerektirir.',
+                    mapQuery: 'Hodjapasha+Sirkeci+Istanbul'
+                }
+            ],
+            balat: [
+                {
+                    time: '10:00',
+                    title: '🏡 Fener & Balat Renkli Tarihi Evler 👫',
+                    category: 'photo',
+                    desc: 'Haliç kıyısındaki tarihi arnavut kaldırımlı sokaklarda renkli ahşap evler ve çift yürüyüşü.',
+                    tip: '📸 Tuyo: Merdivenli Yokuş ve Kiremit Caddesi fotoğraf noktalarıdır.',
+                    closedNote: '📌 Her gün açık tarihi mahalledir.',
+                    mapQuery: 'Balat+Renkli+Evler+Fatih+Istanbul'
+                },
+                {
+                    time: '11:15',
+                    title: '⛪ Sveti Stefan Bulgar Demir Kilisesi & Rum Patrikhanesi',
+                    category: 'worship',
+                    desc: 'Dünyadaki tek tamamen dökme demirden yapılmış Bulgar Kilisesi ve Fener Rum Patrikhanesi.',
+                    tip: '⛪ Tuyo: Haliç kıyısındaki demir mimari harikasını fotoğraflayın.',
+                    closedNote: '📌 Ziyarete açıktır (09:00 - 17:00).',
+                    mapQuery: 'Bulgar+Demir+Kilisesi+Balat+Istanbul'
+                },
+                {
+                    time: '13:00',
+                    featured: true,
+                    title: '🍳 FIRINNA CAFE & RESTAURANT — Balat Gezisi Sonrası Lezzet Molası 🍵',
+                    category: 'gourmet',
+                    desc: 'Haliç vapur hattı veya otobüsle 10 dakikada Galata Kumbaracı Yokuşu’ndaki Fırınna Cafe’ye geçiş. Çakallı menemeni & sınırsız demli çay.',
+                    tip: '⭐ VIP Rota Ödülü: Yemekle birlikte tüm grubunuza SINIRSIZ ÇAY HEDİYE!',
                     closedNote: '📌 Haftanın 7 Günü Açıktır (08:30 - 23:00).',
                     mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
                 }
@@ -1071,16 +1132,16 @@
                 {
                     time: '10:00',
                     featured: true,
-                    title: '🍳 FIRINNA CAFE & RESTAURANT — Güne Başlangıç Kahvaltısı',
+                    title: '🍳 FIRINNA CAFE & RESTAURANT — Güne Başlangıç Kahvaltısı & Sınırsız Çay 🍵',
                     category: 'gourmet',
-                    desc: 'Anadolu yakasına geçmeden önce Galata Kumbaracı Yokuşu’nda Fırınna’da mükemmel menemen ve çay molası.',
-                    tip: '⭐ VIP Rota Ödülü: İkram Çay/Limonata hakkınız mevcuttur!',
+                    desc: 'Anadolu yakasına geçmeden önce Galata Kumbaracı Yokuşu’nda Fırınna’da mükemmel menemen ve tüm grubunuza sınırsız çay.',
+                    tip: '⭐ VIP Rota Ödülü: Yemekle birlikte tüm grubunuza SINIRSIZ ÇAY HEDİYE!',
                     closedNote: '📌 Haftanın 7 Günü Açıktır (08:30 - 23:00).',
                     mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
                 },
                 {
                     time: '11:15',
-                    title: '⛵ Karaköy - Kadıköy Nostaljik Vapur Yolculuğu',
+                    title: '⛵ Karaköy - Kadıköy Nostaljik Vapur Yolculuğu 👫',
                     category: 'photo',
                     desc: 'Karaköy İskelesi’nden vapurla Kız Kulesi ve Boğaz manzarası eşliğinde martılara simit atarak Kadıköy’e geçiş.',
                     tip: '⛵ Vapurun üst açık güvertesi en güzel manzarayı sunar.',
@@ -1100,10 +1161,19 @@
                     time: '14:00',
                     title: '🚋 Bahariye Caddesi, Süreyya Operası & Tarihi Çarşı',
                     category: 'shopping',
-                    desc: 'Süreyya Operası, boğa heykeli, sanat galerileri ve tarihi Kadıköy çarşısında baklava & helva molası.',
+                    desc: 'Süreyya Operası, boğa heykeli, sanat galerileri ve tarihi Kadıköy çarşısı.',
                     tip: '🚶 Kadıköy Çarşı içindeki sahafları ve plakçıları gezin.',
                     closedNote: '📌 Çarşı ve caddeler her gün canlıdır.',
                     mapQuery: 'Bahariye+Caddesi+Kadikoy+Istanbul'
+                },
+                {
+                    time: '19:00',
+                    title: '🍻 Kadıköy Moda Barlar Sokağı (Kadife Sokak) 🍻',
+                    category: 'nightlife',
+                    desc: 'Kadıköy’ün meşhur barlar caddesinde canlı performanslar, otantik publar ve akşam sosyalleşme.',
+                    tip: '🍻 Tuyo: Kadife Sokak ve çevresindeki mekanları keşfedin.',
+                    closedNote: '📌 Akşam saatlerinde hareketlidir.',
+                    mapQuery: 'Kadife+Sokak+Kadikoy+Istanbul'
                 }
             ]
         };
@@ -1113,13 +1183,11 @@
         }
 
         function generateSurpriseItinerary() {
-            // Randomly select region & time
-            const regions = ['galata', 'historical', 'moda'];
+            const regions = ['galata', 'historical', 'balat', 'moda'];
             const times = ['half', '1day'];
             selectedRegion = regions[Math.floor(Math.random() * regions.length)];
             selectedTime = times[Math.floor(Math.random() * times.length)];
             
-            // Update UI pills
             document.querySelectorAll('#grid-region .option-pill').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('#grid-time .option-pill').forEach(p => p.classList.remove('active'));
 
@@ -1132,11 +1200,10 @@
             const hotelNameInput = document.getElementById('hotel-name-input').value.trim();
             listEl.innerHTML = '';
 
-            // Trigger Confetti Animation
             if (typeof confetti === 'function') {
                 confetti({
-                    particleCount: 70,
-                    spread: 60,
+                    particleCount: 80,
+                    spread: 70,
                     origin: { y: 0.6 }
                 });
             }
@@ -1147,26 +1214,23 @@
                 poiList = [
                     ...POI_DATABASE['galata'].slice(0, 3),
                     ...POI_DATABASE['historical'].slice(0, 3),
+                    ...POI_DATABASE['balat'].slice(0, 2),
                     ...POI_DATABASE['moda'].slice(1, 3)
                 ];
             }
 
-            // Smart Fırınna positioning based on starting point
             let filtered = [...poiList];
 
             if (selectedTime === 'half') {
                 filtered = filtered.slice(0, 4);
             }
 
-            // Update Start Desc Text
             const startText = hotelNameInput ? `"${hotelNameInput}" konumunuzdan başlayan` : `Seçtiğiniz başlangıç noktasından`;
-            document.getElementById('result-start-desc').innerText = `${startText} kişiselleştirilmiş rota ve Fırınna Cafe lezzet molanız hazır.`;
+            document.getElementById('result-start-desc').innerText = `${startText} kişiselleştirilmiş rota ve Fırınna Cafe sınırsız çay ikramlı lezzet molanız hazır.`;
 
-            // Generate Random Coupon Code
             const randomCode = Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('ticket-code').innerText = `#FIRINNA-GEZI-${randomCode}`;
+            document.getElementById('ticket-code').innerText = `#FIRINNA-TEA-${randomCode}`;
 
-            // Build Google Maps Dir URL
             const waypoints = filtered.map(p => p.mapQuery).join('/');
             const gmapsUrl = `https://www.google.com/maps/dir/${waypoints}`;
 
@@ -1176,7 +1240,6 @@
             const waText = encodeURIComponent(`🗺️ Akıllı İstanbul Gezi Rotam Hazır!\n\n${filtered.map(f => `${f.time} - ${f.title}`).join('\n')}\n\n📍 Haritada Aç: ${gmapsUrl}`);
             document.getElementById('btn-whatsapp-share').href = `https://api.whatsapp.com/send?text=${waText}`;
 
-            // Render Timeline
             filtered.forEach(item => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = `timeline-item ${item.featured ? 'featured' : ''}`;
