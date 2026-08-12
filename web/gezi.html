@@ -4,16 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="Esnek saatli, çok günlük (1 Tam Gün, 2-3 Günlük) akıllı İstanbul gezi rehberi, canlı haritalar ve Fırınna Cafe VIP ikram hakkı.">
-    <meta name="keywords" content="İstanbul gezi rehberi, 2-3 günlük istanbul rotası, 1 günlük istanbul gezi rehberi, Karaköy Güllüoğlu baklava, Fırınna cafe">
+    <meta name="description" content="İstiklal Caddesi nostaljik tramvay rotası, Galata, Sultanahmet, Kadıköy gezi rehberi, canlı haritalar ve Fırınna Cafe VIP ikram kartı.">
+    <meta name="keywords" content="İstanbul gezi rehberi, nostaljik tramvay istanbul, galata kulesi gezi rehberi, Karaköy Güllüoğlu baklava, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
     <meta property="og:title" content="İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe">
-    <meta property="og:description" content="Başlangıç merkezinizi, sürenizi ve rotanızı seçin; VIP Dijital Seyahat Biletinizi anında indirin!">
-    <meta property="og:image" content="https://firinna.com/galata_cafe_bg_new.jpg">
+    <meta property="og:description" content="Başlangıç merkezinizi, gezi saatinizi ve sürenizi seçin; VIP Dijital Seyahat Biletinizi anında indirin!">
+    <meta property="og:image" content="https://firinna.com/banner.jpg">
     <meta property="og:url" content="https://firinna.com/gezi">
     <meta property="og:type" content="website">
+
+    <link rel="icon" type="image/png" href="logo.png">
+    
+    <!-- Exact Main Page Style & Theme -->
+    <link rel="stylesheet" href="style.css?v=22.0">
 
     <!-- Canvas Confetti & HTML2Canvas for Image Downloads -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -46,15 +51,12 @@
           "name": "Galata Fırınna Cafe'nin çalışma saatleri nedir?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Fırınna Cafe & Restaurant haftanın 7 günü 11:00 - 19:15 saatleri arasında hizmet vermektedir. Mesai saatleri dışındaki grup etkinlikleri ve masa rezervasyonları için WhatsApp hattından iletişime geçebilirsiniz."
+            "text": "Fırınna Cafe & Restaurant haftanın 7 günü 11:00 - 19:15 saatleri arasında hizmet vermektedir. Mesai saatleri dışındaki grup etkinlikleri ve masa rezervasyonu için WhatsApp hattından iletişime geçebilirsiniz."
           }
         }
       ]
     }
     </script>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="logo.png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,147 +67,54 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        :root {
-            --primary-amber: #d97706;
-            --primary-dark: #0f172a;
-            --accent-gold: #f59e0b;
-            --bg-light: #f8fafc;
-            --border-color: #e2e8f0;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-light);
-            color: #334155;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ANIMATIONS */
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(217, 119, 6, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
-        }
-
-        @keyframes floatIcon {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-6px); }
-        }
-
-        /* CORPORATE LUXURY HEADER */
-        .guide-header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+        /* İSTANBUL NOSTALJİK TRAMVAY & MOTİF SANATI ÖZEL STİLLERİ */
+        .tram-hero-banner {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 18px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
             color: white;
-            padding: 2.2rem 1.25rem 3.8rem;
-            text-align: center;
-            border-bottom: 2px solid #d97706;
             position: relative;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
         }
 
-        .nav-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 960px;
-            margin: 0 auto 1.5rem;
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: white;
-            font-weight: 800;
-            font-size: 1.15rem;
-        }
-
-        /* LOGO BACKGROUND CONTRAST FIX CONTAINER */
-        .nav-logo-box {
-            background: #ffffff;
-            padding: 5px 12px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border: 1px solid #f59e0b;
-        }
-
-        .nav-logo-box img {
-            height: 32px;
-            border-radius: 4px;
-        }
-
-        .nav-logo-box span {
-            color: #0f172a;
-            font-weight: 800;
-            font-size: 0.95rem;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            background: rgba(255,255,255,0.1);
-            color: #f1f5f9;
-            padding: 8px 16px;
-            border-radius: 20px;
-            text-decoration: none;
+        .tram-graphic-badge {
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
             font-size: 0.85rem;
-            font-weight: 700;
-            transition: all 0.2s ease;
-            border: 1px solid rgba(255,255,255,0.15);
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 20px;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            margin-bottom: 12px;
         }
 
-        .nav-btn:hover {
-            background: #f59e0b;
-            color: #0f172a;
-            border-color: #f59e0b;
-            transform: translateY(-2px);
-        }
-
-        .guide-header h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.3rem;
-            margin: 0 0 0.6rem;
+        .motif-star-icon {
+            font-size: 1.2rem;
             color: #fbbf24;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            letter-spacing: 0.5px;
+            vertical-align: middle;
         }
 
-        .guide-header p {
-            font-size: 1.05rem;
-            max-width: 680px;
-            margin: 0 auto;
-            color: #cbd5e1;
-            font-weight: 500;
+        /* WIZARD CARD MAIN OVERRIDE FOR PERFECT MATCH WITH DASHBOARD */
+        .gezi-dashboard {
+            max-width: 1000px;
+            margin: -60px auto 40px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 5;
         }
 
-        /* WIZARD CARD */
-        .wizard-card {
-            max-width: 960px;
-            margin: -2rem auto 3rem;
-            background: white;
+        .wizard-card-main {
+            background: #ffffff;
             border-radius: 18px;
-            padding: 2rem;
-            box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
-            border: 1px solid var(--border-color);
+            padding: 2.2rem;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
         }
 
         .surprise-banner-btn {
@@ -348,10 +257,6 @@
             transition: background 0.15s;
         }
 
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
-
         .suggestion-item:hover {
             background: #fef3c7;
             color: #92400e;
@@ -443,7 +348,7 @@
 
         /* ITINERARY RESULT TIMELINE */
         .itinerary-container {
-            max-width: 960px;
+            max-width: 1000px;
             margin: 0 auto 3.5rem;
             display: none;
         }
@@ -474,7 +379,6 @@
             gap: 6px;
         }
 
-        /* MULTI DAY TABS STYLING */
         .day-header-badge {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #fbbf24;
@@ -490,7 +394,6 @@
             box-shadow: 0 4px 14px rgba(0,0,0,0.06);
         }
 
-        /* EMBEDDED INTERACTIVE MAP STYLING */
         .embedded-map-card {
             background: white;
             border: 1px solid var(--border-color);
@@ -672,7 +575,6 @@
             color: white;
         }
 
-        /* HIGH END COLORFUL DEDICATED DIGITAL VIP PASS VOUCHER CARD (FOR BEAUTIFUL PNG OUTPUT) */
         .vip-travel-pass-card {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: white;
@@ -785,10 +687,6 @@
             gap: 10px;
         }
 
-        .pass-waypoint-item:last-child {
-            border-bottom: none;
-        }
-
         .pass-footer {
             display: flex;
             justify-content: space-between;
@@ -799,9 +697,8 @@
             padding-top: 10px;
         }
 
-        /* PRACTICAL TRAVEL GUIDE, SHOPPING & FAQ SECTION */
         .practical-guide-section {
-            max-width: 960px;
+            max-width: 1000px;
             margin: 3rem auto 4rem;
             padding: 0 1rem;
         }
@@ -879,10 +776,6 @@
             border-bottom: 1px solid #f1f5f9;
         }
 
-        .faq-item:last-child {
-            border-bottom: none;
-        }
-
         .faq-question {
             padding: 1.1rem 1.4rem;
             font-weight: 700;
@@ -909,8 +802,7 @@
         }
 
         @media (max-width: 640px) {
-            .guide-header h1 { font-size: 1.6rem; }
-            .wizard-card { padding: 1.2rem; margin-top: -1.2rem; }
+            .wizard-card-main { padding: 1.2rem; }
             .options-grid { grid-template-columns: 1fr 1fr; }
             .btn-group-wizard { flex-direction: column; }
             .actions-bar { flex-direction: column; }
@@ -922,418 +814,460 @@
 </head>
 <body>
 
-    <!-- CORPORATE LUXURY HEADER WITH HIGH-CONTRAST LOGO CONTAINER -->
-    <header class="guide-header">
-        <div class="nav-bar">
-            <a href="/" class="nav-brand">
-                <div class="nav-logo-box">
-                    <img src="logo.png" alt="Fırınna Logo">
-                    <span>FIRINNA</span>
-                </div>
-            </a>
-            <div class="nav-links">
-                <a href="/" class="nav-btn"><i class="ph-bold ph-house"></i> Ana Sayfa</a>
-                <a href="menu" class="nav-btn"><i class="ph-bold ph-book-open"></i> Menü</a>
-            </div>
+    <!-- 1. MAIN PAGE TOP DECORATIVE BANNER WITH ISTANBUL BACKGROUND & LANGUAGE SELECTOR -->
+    <div class="top-banner">
+        <img src="banner.jpg" alt="Galata Istanbul" class="banner-img">
+        <div class="banner-overlay"></div>
+        <div class="lang-selector">
+            <button class="active">TR</button>
+            <button>EN</button>
+            <button>ES</button>
+            <button>RU</button>
+            <button>AR</button>
+            <button>ZH</button>
         </div>
+    </div>
 
-        <h1><i class="ph-bold ph-compass"></i> Akıllı İstanbul Gezi & Rota Rehberi</h1>
-        <p>Kişiselleştirilmiş canlı harita rotaları, esnek gezi saatleri ve Fırınna Cafe'de VIP ikram kartınız.</p>
-    </header>
-
-    <!-- PERFECT LOCATION-FIRST MASTER WIZARD FORM -->
-    <main class="wizard-card">
+    <!-- 2. MAIN CONTAINER MATCHING INDEX.HTML DASHBOARD -->
+    <div class="gezi-dashboard">
         
-        <!-- SURPRISE ROUTE PROMINENT QUICK ACTION BANNER AT TOP -->
-        <div class="surprise-banner-btn" onclick="generateSurpriseItinerary()">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-size:1.8rem; animation: floatIcon 2.5s infinite;">🎲</span>
-                <div>
-                    <strong style="font-size:1.05rem; color:#fbbf24; display:block;">Kararsız mısınız? Sürpriz Rota Oluşturun!</strong>
-                    <span style="font-size:0.85rem; color:#cbd5e1;">Merkezinizi ve saatinizi seçin, sistem size özel sürpriz efsane bir rota çıkarsın!</span>
-                </div>
-            </div>
-            <span style="background:#f59e0b; color:#0f172a; font-weight:800; padding:8px 16px; border-radius:10px; font-size:0.85rem; display:inline-block; white-space:nowrap; margin-top:4px;">🎲 Sürpriz Yap!</span>
-        </div>
-
-        <!-- STEP 1: SPECIFIC STARTING HUBS (NOKTA ATIŞI MERKEZLER) -->
-        <div class="step-label">
-            <span class="num">1</span> <span>Neredesiniz / Nereden Başlayacaksınız? (Başlangıç Merkeziniz):</span>
-        </div>
-        <div class="options-grid" id="grid-start">
-            <div class="option-pill active" onclick="selectStartOption('taksim')">
-                <div class="title">📍 Taksim Meydanı</div>
-                <div class="desc">İstiklal Caddesi başlangıcı</div>
-            </div>
-            <div class="option-pill" onclick="selectStartOption('galata')">
-                <div class="title">📍 Galata / Kumbaracı</div>
-                <div class="desc">Fırınna Cafe kapı komşusu</div>
-            </div>
-            <div class="option-pill" onclick="selectStartOption('eminonu')">
-                <div class="title">📍 Eminönü Meydanı</div>
-                <div class="desc">İskele ve Mısır Çarşısı</div>
-            </div>
-            <div class="option-pill" onclick="selectStartOption('sultanahmet')">
-                <div class="title">📍 Sultanahmet</div>
-                <div class="desc">Ayasofya & Yerebatan çevresi</div>
-            </div>
-            <div class="option-pill" onclick="selectStartOption('kapalicarsi')">
-                <div class="title">📍 Kapalıçarşı</div>
-                <div class="desc">Nuruosmaniye Kral Yolu</div>
-            </div>
-            <div class="option-pill" onclick="selectStartOption('nisantasi')">
-                <div class="title">📍 Nişantaşı</div>
-                <div class="desc">Abdi İpekçi & Maçka</div>
-            </div>
-            <div class="option-pill" onclick="selectStartOption('kadikoy')">
-                <div class="title">📍 Kadıköy İskele</div>
-                <div class="desc">Rıhtım & Çarşı içi</div>
-            </div>
-            <div class="option-pill" onclick="selectStartOption('moda')">
-                <div class="title">📍 Moda Sahil</div>
-                <div class="desc">Tarihi Çay Bahçesi & Çimler</div>
-            </div>
-        </div>
-
-        <div class="input-hotel-container">
-            <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="🔎 Veya otelinizin, Airbnb evinizin adını serbestçe yazın (Örn: Tomtom Suites, Ada Karaköy, Limonlu Bahçe Sokak)..." autocomplete="off">
-            <div id="hotel-suggestions" class="suggestions-dropdown"></div>
-        </div>
-
-        <!-- STEP 2: FLEXIBLE DEPARTURE TIME SELECTOR -->
-        <div class="step-label">
-            <span class="num">2</span> <span>Gezinize Başlamak İstediğiniz Saat (Esnek Gezi Zamanı):</span>
-        </div>
-        <div class="options-grid" id="grid-start-time">
-            <div class="option-pill" onclick="selectStartTimeOption('10:00')">
-                <div class="title">☕ 10:00 (Sabah Kahvaltılı)</div>
-                <div class="desc">Erken kalkanlar & kahvaltı keyfi</div>
-            </div>
-            <div class="option-pill active" onclick="selectStartTimeOption('11:30')">
-                <div class="title">🍳 11:30 (Öğleye Doğru)</div>
-                <div class="desc">Rahat uyanıp yola çıkanlar</div>
-            </div>
-            <div class="option-pill" onclick="selectStartTimeOption('14:00')">
-                <div class="title">☀️ 14:00 (Öğleden Sonra)</div>
-                <div class="desc">Öğle yemeği sonrası gezi</div>
-            </div>
-            <div class="option-pill" onclick="selectStartTimeOption('17:30')">
-                <div class="title">🌆 17:30 (Akşamüstü & Gün Batımı)</div>
-                <div class="desc">Gün batımı, akşam yemeği & barlar</div>
-            </div>
-        </div>
-
-        <!-- STEP 3: TRAVEL CONCEPT / PURPOSE -->
-        <div class="step-label">
-            <span class="num">3</span> <span>Seyahat Amacınız & Tarzınız Nedir? (Konsept):</span>
-        </div>
-        <div class="options-grid" id="grid-concept">
-            <div class="option-pill active" onclick="selectConceptOption('historical')">
-                <div class="title">🏛️ Tarih, Kültür & Şehir Klasikleri</div>
-                <div class="desc">Ayasofya, Sultanahmet, Galata & Çarşılar</div>
-            </div>
-            <div class="option-pill" onclick="selectConceptOption('nature')">
-                <div class="title">🌲 Doğa Gezisi, Orman Koşusu & Yürüyüş 🏃</div>
-                <div class="desc">Moda Sahil, Belgrad Ormanı & Park Yürüyüşleri</div>
-            </div>
-            <div class="option-pill" onclick="selectConceptOption('photo')">
-                <div class="title">📸 Renkli Mahalleler & Çift Yürüyüşleri 👫</div>
-                <div class="desc">Fener, Balat, Galata Taş Sokaklar & Moda Sahil</div>
-            </div>
-            <div class="option-pill" onclick="selectConceptOption('nightlife')">
-                <div class="title">🎷 Gece Hayatı & Akşam Barları 🍻</div>
-                <div class="desc">Asmalımescit, Cihangir & Kadife Sokak Barları</div>
-            </div>
-        </div>
-
-        <!-- STEP 4: DURATION (TIME AVAILABLE) -->
-        <div class="step-label">
-            <span class="num">4</span> <span>Zamanınız Kaç Gün / Saat?</span>
-        </div>
-        <div class="options-grid" id="grid-time">
-            <div class="option-pill active" onclick="selectDurationOption('half')">
-                <div class="title">⏱️ Yarım Gün / Kısa Mola (3-4 Saat)</div>
-                <div class="desc">Hızlı ve süzme yakın çevre turu</div>
-            </div>
-            <div class="option-pill" onclick="selectDurationOption('1day')">
-                <div class="title">🗓️ 1 Tam Gün (6-8 Saat Kapsamlı)</div>
-                <div class="desc">Dolu dolu tüm gün seyahat kulvarı</div>
-            </div>
-            <div class="option-pill" onclick="selectDurationOption('2days')">
-                <div class="title">🗺️ 2-3 Günlük Seyahat Rehberi</div>
-                <div class="desc">Gün gün bölünmüş İstanbul turu</div>
-            </div>
-        </div>
-
-        <!-- STEP 5: TARGET REGION / DESTINATION (DYNAMICALLY FILTERED) -->
-        <div class="step-label">
-            <span class="num">5</span> <span>Gezmek İstediniz Hedef Bölge & Yön (Mantıklı Seçenekler):</span>
-        </div>
-        <div class="options-grid" id="grid-region">
-            <!-- Dynamically populated by updateRegionOptions() -->
-        </div>
-
-        <!-- DYNAMIC SUMMARY PREVIEW CARD & TABLE (WHAT'S INCLUDED) -->
-        <div class="summary-preview-card" id="summary-preview-card">
-            <h4 style="margin:0 0 6px; color:#0f172a; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
-                <i class="ph-bold ph-clipboard-text" style="color:#d97706;"></i> 📋 Seçilen Rota Detay Özeti (Neler Dahil?)
-            </h4>
-            <table class="summary-table">
-                <tr>
-                    <td class="label">📍 Başlangıç Noktası:</td>
-                    <td class="val" id="summary-val-start">📍 Taksim Meydanı</td>
-                </tr>
-                <tr>
-                    <td class="label">⏰ Başlangıç Saati:</td>
-                    <td class="val" id="summary-val-start-time">11:30 (Öğleye Doğru)</td>
-                </tr>
-                <tr>
-                    <td class="label">🎯 Gezi Konsepti:</td>
-                    <td class="val" id="summary-val-concept">🏛️ Tarih, Kültür & Şehir Klasikleri</td>
-                </tr>
-                <tr>
-                    <td class="label">⏱️ Tahmini Süre:</td>
-                    <td class="val" id="summary-val-time">Yarım Gün (3-4 Saat)</td>
-                </tr>
-                <tr>
-                    <td class="label">🗺️ Gezilecek Bölge:</td>
-                    <td class="val" id="summary-val-region">🏛️ Galata - Pera - İstiklal Hattı</td>
-                </tr>
-                <tr>
-                    <td class="label">☕ Lezzet Durağı:</td>
-                    <td class="val"><img src="logo.png" style="height:20px; vertical-align:middle; border-radius:4px; margin-right:4px;" alt="Fırınna Logo"><strong>Fırınna Cafe & Restaurant</strong> (Sınırsız Çay & Pizza Molası)</td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="btn-group-wizard">
-            <button class="btn-generate" onclick="generateSmartItinerary()">
-                <i class="ph-bold ph-sparkle"></i> <span>Kişiselleştirilmiş Rotamı Oluştur</span>
-            </button>
-            <button class="btn-surprise" onclick="generateSurpriseItinerary()">
-                <i class="ph-bold ph-dice-five"></i> <span>🎲 Sürpriz Rota!</span>
-            </button>
-        </div>
-    </main>
-
-    <!-- GENERATED RESULT -->
-    <section class="itinerary-container" id="itinerary-result">
-        
-        <div class="result-banner">
-            <div>
-                <h3 style="margin:0; color:#065f46; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
-                    <i class="ph-bold ph-check-circle" style="font-size:1.4rem;"></i> Akıllı İstanbul Rotanız Hazır!
-                </h3>
-                <p style="margin:4px 0 0; color:#047857; font-size:0.88rem;" id="result-start-desc">Konumunuza en uygun başlangıç ve Fırınna Cafe lezzet molası planlandı.</p>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <span class="weather-live-badge" id="weather-display">🌤️ İstanbul Hava Durumu Yükleniyor...</span>
-            </div>
-        </div>
-
-        <!-- EMBEDDED INTERACTIVE MAP ON PAGE -->
-        <div class="embedded-map-card">
-            <div class="embedded-map-header">
-                <strong style="color:#0f172a; font-size:0.98rem; display:flex; align-items:center; gap:8px;">
-                    <i class="ph-bold ph-map-trifold" style="color:#d97706;"></i> 🗺️ İnteraktif Canlı Harita Önizlemesi
-                </strong>
-                <div style="display:flex; gap:8px;">
-                    <a href="#" id="btn-gmaps-link" target="_blank" class="btn-action-custom btn-map-launch" style="font-size:0.82rem; padding:6px 12px;">
-                        <i class="ph-bold ph-google-logo"></i> Google Maps
-                    </a>
-                    <a href="#" id="btn-yandex-link" target="_blank" class="btn-action-custom btn-yandex-launch" style="font-size:0.82rem; padding:6px 12px;">
-                        <i class="ph-bold ph-navigation-arrow"></i> Yandex Navigasyon
-                    </a>
-                </div>
-            </div>
-            <iframe id="live-map-iframe" src="" width="100%" height="320" style="border:0; border-radius:12px;" allowfullscreen="" loading="lazy"></iframe>
-        </div>
-
-        <!-- TIMELINE LIST CONTAINER -->
-        <div class="timeline" id="timeline-list">
-            <!-- Rendered by JS -->
-        </div>
-
-        <!-- ACTIONS & SHARE -->
-        <div class="actions-bar">
-            <a href="#" id="btn-gmaps-launch-main" target="_blank" class="btn-action-custom btn-map-launch">
-                <i class="ph-bold ph-map-pin"></i> <span>🚀 Google Haritalar</span>
+        <!-- CENTERED FIRINNA BRAND PROFILE CARD (EXACTLY MATCHING INDEX.HTML) -->
+        <div class="card profile-card" style="text-align: center; margin-bottom: 2rem;">
+            <a href="/" style="display:inline-block;">
+                <img src="logo.png" alt="Fırınna Logo" class="profile-logo" style="margin: 0 auto; display: block;">
             </a>
-            <a href="#" id="btn-yandex-launch-main" target="_blank" class="btn-action-custom btn-yandex-launch">
-                <i class="ph-bold ph-navigation-arrow"></i> <span>🟡 Yandex Navigasyon</span>
-            </a>
-            <button onclick="downloadItineraryAsImage()" class="btn-action-custom btn-download-png">
-                <i class="ph-bold ph-download-simple"></i> <span>📸 VIP Biletini Resim (PNG) İndir</span>
-            </button>
-            <a href="#" id="btn-whatsapp-share" target="_blank" class="btn-action-custom btn-whatsapp-share">
-                <i class="ph-bold ph-whatsapp-logo"></i> <span>📱 WhatsApp</span>
-            </a>
-            <a href="#" id="btn-telegram-share" target="_blank" class="btn-action-custom btn-telegram-share">
-                <i class="ph-bold ph-telegram-logo"></i> <span>✈️ Telegram</span>
-            </a>
+            <p class="profile-category" style="margin-top: -6px; margin-bottom: 14px; font-weight: 600; letter-spacing: 0.5px; color:#6b7280;">Cafe & Restaurant</p>
+            
+            <!-- BADGES -->
+            <div class="badges" style="justify-content: center; margin-bottom: 16px;">
+                <span class="badge" style="background: rgba(220, 38, 38, 0.08); color: #b91c1c; border-color: rgba(220, 38, 38, 0.25); display: inline-flex; align-items: center; gap: 4px;">
+                    <svg width="13" height="13" viewBox="0 0 100 100" fill="#b91c1c" style="vertical-align: middle;">
+                        <path d="M40,15 A35,35 0 1,0 75,85 A42,42 0 1,1 40,15 Z M72,40 L76,50 L87,50 L78,56 L81,67 L72,60 L63,67 L66,56 L57,50 L68,50 Z"/>
+                    </svg>
+                    <span>Tarihi Türk Cafesi</span>
+                </span>
+                <span class="badge"><i class="ph-fill ph-seal-check"></i> %100 Helal</span>
+                <span class="badge"><i class="ph-fill ph-star"></i> En İyi Kalite</span>
+                <span class="badge"><i class="ph-fill ph-money"></i> Uygun Fiyat</span>
+            </div>
+
+            <!-- DIRECT NAVIGATION LINKS BACK TO HOME & MENU -->
+            <div style="display:flex; gap:10px; max-width:500px; margin:12px auto 0;">
+                <a href="/" class="btn" style="flex:1; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff !important; border: 1.5px solid #cbd5e1; font-size: 0.95rem; font-weight: 800; padding: 12px; border-radius: 12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <i class="ph-bold ph-house" style="color:#f59e0b;"></i> Ana Sayfa
+                </a>
+                <a href="menu.html" class="btn" style="flex:1; background: linear-gradient(135deg, #d97706 0%, #b45309 100%); color: #ffffff !important; border: 1.5px solid #92400e; font-size: 0.95rem; font-weight: 800; padding: 12px; border-radius: 12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <i class="ph-bold ph-book-open" style="color:#ffffff;"></i> Menüyü Gör
+                </a>
+            </div>
         </div>
 
-        <!-- HIGH END DEDICATED DIGITAL VIP TRAVEL PASS VOUCHER CARD (FOR BEAUTIFUL PNG OUTPUT) -->
-        <div class="vip-travel-pass-card" id="printable-vip-voucher">
-            <div class="pass-header">
-                <div class="pass-brand">
-                    <img src="logo.png" alt="Fırınna Cafe Logo">
+        <!-- 3. ISTANBUL NOSTALGIC TRAMWAY & SELÇUKLU MOTIFS HERO BANNER -->
+        <div class="tram-hero-banner">
+            <div class="tram-graphic-badge">
+                <span class="motif-star-icon">✴</span>
+                <span>🚋 İSTİKLAL CADDESİ NOSTALJİK TRAMVAYI & GALATA ROTALARI</span>
+                <span class="motif-star-icon">✴</span>
+            </div>
+            <h1 style="font-family:'Playfair Display', serif; font-size:1.85rem; color:#fbbf24; margin:0 0 8px; display:flex; align-items:center; gap:10px;">
+                <i class="ph-bold ph-compass" style="color:#f59e0b;"></i> Akıllı İstanbul Gezi & Rota Rehberi
+            </h1>
+            <p style="margin:0; font-size:0.95rem; color:#cbd5e1; line-height:1.6;">
+                Galata Kumbaracı Yokuşu'nda 150 yıllık tarihi atmosfer, canlı haritalı rotalar ve Fırınna Cafe VIP ikram kartınız.
+            </p>
+        </div>
+
+        <!-- 4. PERFECT LOCATION-FIRST MASTER WIZARD FORM -->
+        <main class="wizard-card-main">
+            
+            <!-- SURPRISE ROUTE PROMINENT QUICK ACTION BANNER AT TOP -->
+            <div class="surprise-banner-btn" onclick="generateSurpriseItinerary()">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span style="font-size:1.8rem; animation: floatIcon 2.5s infinite;">🎲</span>
                     <div>
-                        <h3 class="pass-brand-title">FIRINNA CAFE & RESTAURANT</h3>
-                        <div class="pass-brand-sub">Kumbaracı Yokuşu No:41A, Beyoğlu / Galata, İstanbul</div>
+                        <strong style="font-size:1.05rem; color:#fbbf24; display:block;">Kararsız mısınız? Sürpriz Rota Oluşturun!</strong>
+                        <span style="font-size:0.85rem; color:#cbd5e1;">Merkezinizi ve saatinizi seçin, sistem size özel sürpriz efsane bir rota çıkarsın!</span>
                     </div>
                 </div>
-                <div class="pass-code-tag" id="pass-code-display">#FIRINNA-TEA-9921</div>
+                <span style="background:#f59e0b; color:#0f172a; font-weight:800; padding:8px 16px; border-radius:10px; font-size:0.85rem; display:inline-block; white-space:nowrap; margin-top:4px;">🎲 Sürpriz Yap!</span>
             </div>
 
-            <div class="pass-grid">
-                <div class="pass-info-box">
-                    <div class="pass-info-row">📍 <strong>Başlangıç Konumu:</strong> <span id="pass-val-start">Moda / Kadıköy</span></div>
-                    <div class="pass-info-row">⏰ <strong>Gezi Başlangıç Saati:</strong> <span id="pass-val-start-time">11:30</span></div>
-                    <div class="pass-info-row">🎯 <strong>Seyahat Konsepti:</strong> <span id="pass-val-concept">Tarih & Şehir Klasikleri</span></div>
-                    <div class="pass-info-row">🗺️ <strong>Hedef Bölge:</strong> <span id="pass-val-region">Moda Sahil Kordonu</span></div>
-                    <div class="pass-info-row">🌤️ <strong>Hava Durumu:</strong> <span id="pass-val-weather">23°C Açık & Güneşli</span></div>
-                    <div class="pass-info-row">⏱️ <strong>Tahmini Süre:</strong> <span id="pass-val-time">Yarım Gün (3-4 Saat)</span></div>
+            <!-- STEP 1: SPECIFIC STARTING HUBS (NOKTA ATIŞI MERKEZLER) -->
+            <div class="step-label">
+                <span class="num">1</span> <span>Neredesiniz / Nereden Başlayacaksınız? (Başlangıç Merkeziniz):</span>
+            </div>
+            <div class="options-grid" id="grid-start">
+                <div class="option-pill active" onclick="selectStartOption('taksim')">
+                    <div class="title">📍 Taksim Meydanı</div>
+                    <div class="desc">İstiklal Caddesi başlangıcı</div>
                 </div>
-                <div class="pass-perk-box">
-                    <div style="font-size:2.2rem; margin-bottom:2px;">🍵</div>
-                    <strong style="font-size:0.95rem; line-height:1.3; display:block;">Yemekle Birlikte Tüm Grubunuza SINIRSIZ ÇAY HEDİYE!</strong>
+                <div class="option-pill" onclick="selectStartOption('galata')">
+                    <div class="title">📍 Galata / Kumbaracı</div>
+                    <div class="desc">Fırınna Cafe kapı komşusu</div>
+                </div>
+                <div class="option-pill" onclick="selectStartOption('eminonu')">
+                    <div class="title">📍 Eminönü Meydanı</div>
+                    <div class="desc">İskele ve Mısır Çarşısı</div>
+                </div>
+                <div class="option-pill" onclick="selectStartOption('sultanahmet')">
+                    <div class="title">📍 Sultanahmet</div>
+                    <div class="desc">Ayasofya & Yerebatan çevresi</div>
+                </div>
+                <div class="option-pill" onclick="selectStartOption('kapalicarsi')">
+                    <div class="title">📍 Kapalıçarşı</div>
+                    <div class="desc">Nuruosmaniye Kral Yolu</div>
+                </div>
+                <div class="option-pill" onclick="selectStartOption('nisantasi')">
+                    <div class="title">📍 Nişantaşı</div>
+                    <div class="desc">Abdi İpekçi & Maçka</div>
+                </div>
+                <div class="option-pill" onclick="selectStartOption('kadikoy')">
+                    <div class="title">📍 Kadıköy İskele</div>
+                    <div class="desc">Rıhtım & Çarşı içi</div>
+                </div>
+                <div class="option-pill" onclick="selectStartOption('moda')">
+                    <div class="title">📍 Moda Sahil</div>
+                    <div class="desc">Tarihi Çay Bahçesi & Çimler</div>
                 </div>
             </div>
 
-            <div style="font-size:0.85rem; font-weight:800; color:#fbbf24; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
-                <i class="ph-bold ph-list-numbers"></i> ROTA DURAKLARI VE ZAMAN ÇİZELGESİ:
+            <div class="input-hotel-container">
+                <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="🔎 Veya otelinizin, Airbnb evinizin adını serbestçe yazın (Örn: Tomtom Suites, Ada Karaköy, Limonlu Bahçe Sokak)..." autocomplete="off">
+                <div id="hotel-suggestions" class="suggestions-dropdown"></div>
             </div>
-            <div class="pass-waypoints-list" id="pass-waypoints-container">
+
+            <!-- STEP 2: FLEXIBLE DEPARTURE TIME SELECTOR -->
+            <div class="step-label">
+                <span class="num">2</span> <span>Gezinize Başlamak İstediğiniz Saat (Esnek Gezi Zamanı):</span>
+            </div>
+            <div class="options-grid" id="grid-start-time">
+                <div class="option-pill" onclick="selectStartTimeOption('10:00')">
+                    <div class="title">☕ 10:00 (Sabah Kahvaltılı)</div>
+                    <div class="desc">Erken kalkanlar & kahvaltı keyfi</div>
+                </div>
+                <div class="option-pill active" onclick="selectStartTimeOption('11:30')">
+                    <div class="title">🍳 11:30 (Öğleye Doğru)</div>
+                    <div class="desc">Rahat uyanıp yola çıkanlar</div>
+                </div>
+                <div class="option-pill" onclick="selectStartTimeOption('14:00')">
+                    <div class="title">☀️ 14:00 (Öğleden Sonra)</div>
+                    <div class="desc">Öğle yemeği sonrası gezi</div>
+                </div>
+                <div class="option-pill" onclick="selectStartTimeOption('17:30')">
+                    <div class="title">🌆 17:30 (Akşamüstü & Gün Batımı)</div>
+                    <div class="desc">Gün batımı, akşam yemeği & barlar</div>
+                </div>
+            </div>
+
+            <!-- STEP 3: TRAVEL CONCEPT / PURPOSE -->
+            <div class="step-label">
+                <span class="num">3</span> <span>Seyahat Amacınız & Tarzınız Nedir? (Konsept):</span>
+            </div>
+            <div class="options-grid" id="grid-concept">
+                <div class="option-pill active" onclick="selectConceptOption('historical')">
+                    <div class="title">🏛️ Tarih, Kültür & Şehir Klasikleri</div>
+                    <div class="desc">Ayasofya, Sultanahmet, Galata & Çarşılar</div>
+                </div>
+                <div class="option-pill" onclick="selectConceptOption('nature')">
+                    <div class="title">🌲 Doğa Gezisi, Orman Koşusu & Yürüyüş 🏃</div>
+                    <div class="desc">Moda Sahil, Belgrad Ormanı & Park Yürüyüşleri</div>
+                </div>
+                <div class="option-pill" onclick="selectConceptOption('photo')">
+                    <div class="title">📸 Renkli Mahalleler & Çift Yürüyüşleri 👫</div>
+                    <div class="desc">Fener, Balat, Galata Taş Sokaklar & Moda Sahil</div>
+                </div>
+                <div class="option-pill" onclick="selectConceptOption('nightlife')">
+                    <div class="title">🎷 Gece Hayatı & Akşam Barları 🍻</div>
+                    <div class="desc">Asmalımescit, Cihangir & Kadife Sokak Barları</div>
+                </div>
+            </div>
+
+            <!-- STEP 4: DURATION (TIME AVAILABLE) -->
+            <div class="step-label">
+                <span class="num">4</span> <span>Zamanınız Kaç Gün / Saat?</span>
+            </div>
+            <div class="options-grid" id="grid-time">
+                <div class="option-pill active" onclick="selectDurationOption('half')">
+                    <div class="title">⏱️ Yarım Gün / Kısa Mola (3-4 Saat)</div>
+                    <div class="desc">Hızlı ve süzme yakın çevre turu</div>
+                </div>
+                <div class="option-pill" onclick="selectDurationOption('1day')">
+                    <div class="title">🗓️ 1 Tam Gün (6-8 Saat Kapsamlı)</div>
+                    <div class="desc">Dolu dolu tüm gün seyahat kulvarı</div>
+                </div>
+                <div class="option-pill" onclick="selectDurationOption('2days')">
+                    <div class="title">🗺️ 2-3 Günlük Seyahat Rehberi</div>
+                    <div class="desc">Gün gün bölünmüş İstanbul turu</div>
+                </div>
+            </div>
+
+            <!-- STEP 5: TARGET REGION / DESTINATION (DYNAMICALLY FILTERED) -->
+            <div class="step-label">
+                <span class="num">5</span> <span>Gezmek İstediniz Hedef Bölge & Yön (Mantıklı Seçenekler):</span>
+            </div>
+            <div class="options-grid" id="grid-region">
+                <!-- Dynamically populated by updateRegionOptions() -->
+            </div>
+
+            <!-- DYNAMIC SUMMARY PREVIEW CARD & TABLE (WHAT'S INCLUDED) -->
+            <div class="summary-preview-card" id="summary-preview-card">
+                <h4 style="margin:0 0 6px; color:#0f172a; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
+                    <i class="ph-bold ph-clipboard-text" style="color:#d97706;"></i> 📋 Seçilen Rota Detay Özeti (Neler Dahil?)
+                </h4>
+                <table class="summary-table">
+                    <tr>
+                        <td class="label">📍 Başlangıç Noktası:</td>
+                        <td class="val" id="summary-val-start">📍 Taksim Meydanı</td>
+                    </tr>
+                    <tr>
+                        <td class="label">⏰ Başlangıç Saati:</td>
+                        <td class="val" id="summary-val-start-time">11:30 (Öğleye Doğru)</td>
+                    </tr>
+                    <tr>
+                        <td class="label">🎯 Gezi Konsepti:</td>
+                        <td class="val" id="summary-val-concept">🏛️ Tarih, Kültür & Şehir Klasikleri</td>
+                    </tr>
+                    <tr>
+                        <td class="label">⏱️ Tahmini Süre:</td>
+                        <td class="val" id="summary-val-time">Yarım Gün (3-4 Saat)</td>
+                    </tr>
+                    <tr>
+                        <td class="label">🗺️ Gezilecek Bölge:</td>
+                        <td class="val" id="summary-val-region">🏛️ Galata - Pera - İstiklal Hattı</td>
+                    </tr>
+                    <tr>
+                        <td class="label">☕ Lezzet Durağı:</td>
+                        <td class="val"><img src="logo.png" style="height:20px; vertical-align:middle; border-radius:4px; margin-right:4px;" alt="Fırınna Logo"><strong>Fırınna Cafe & Restaurant</strong> (Sınırsız Çay & Pizza Molası)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="btn-group-wizard">
+                <button class="btn-generate" onclick="generateSmartItinerary()">
+                    <i class="ph-bold ph-sparkle"></i> <span>Kişiselleştirilmiş Rotamı Oluştur</span>
+                </button>
+                <button class="btn-surprise" onclick="generateSurpriseItinerary()">
+                    <i class="ph-bold ph-dice-five"></i> <span>🎲 Sürpriz Rota!</span>
+                </button>
+            </div>
+        </main>
+
+        <!-- GENERATED RESULT -->
+        <section class="itinerary-container" id="itinerary-result">
+            
+            <div class="result-banner">
+                <div>
+                    <h3 style="margin:0; color:#065f46; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+                        <i class="ph-bold ph-check-circle" style="font-size:1.4rem;"></i> Akıllı İstanbul Rotanız Hazır!
+                    </h3>
+                    <p style="margin:4px 0 0; color:#047857; font-size:0.88rem;" id="result-start-desc">Konumunuza en uygun başlangıç ve Fırınna Cafe lezzet molası planlandı.</p>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <span class="weather-live-badge" id="weather-display">🌤️ İstanbul Hava Durumu Yükleniyor...</span>
+                </div>
+            </div>
+
+            <!-- EMBEDDED INTERACTIVE MAP ON PAGE -->
+            <div class="embedded-map-card">
+                <div class="embedded-map-header">
+                    <strong style="color:#0f172a; font-size:0.98rem; display:flex; align-items:center; gap:8px;">
+                        <i class="ph-bold ph-map-trifold" style="color:#d97706;"></i> 🗺️ İnteraktif Canlı Harita Önizlemesi
+                    </strong>
+                    <div style="display:flex; gap:8px;">
+                        <a href="#" id="btn-gmaps-link" target="_blank" class="btn-action-custom btn-map-launch" style="font-size:0.82rem; padding:6px 12px;">
+                            <i class="ph-bold ph-google-logo"></i> Google Maps
+                        </a>
+                        <a href="#" id="btn-yandex-link" target="_blank" class="btn-action-custom btn-yandex-launch" style="font-size:0.82rem; padding:6px 12px;">
+                            <i class="ph-bold ph-navigation-arrow"></i> Yandex Navigasyon
+                        </a>
+                    </div>
+                </div>
+                <iframe id="live-map-iframe" src="" width="100%" height="320" style="border:0; border-radius:12px;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+
+            <!-- TIMELINE LIST CONTAINER -->
+            <div class="timeline" id="timeline-list">
                 <!-- Rendered by JS -->
             </div>
 
-            <div class="pass-footer">
-                <span>📌 Garsonunuza bu bilet kodunu göstermeniz yeterlidir.</span>
-                <span>🌐 firinna.com/gezi | Tel: +90 545 630 12 14</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- PRACTICAL TRAVEL GUIDE, SHOPPING & FAQ SECTION -->
-    <section class="practical-guide-section">
-        
-        <!-- NE NEREDEN ALINIR SECTION -->
-        <h2 class="section-header-title">
-            <i class="ph-bold ph-shopping-bag" style="color:#d97706;"></i> 🛍️ Ne Nereden Alınır? (Orijinal Hediyelik & Alışveriş Rehberi)
-        </h2>
-
-        <div class="info-card" style="margin-bottom: 2.5rem; background: #fffdf5; border: 1.5px solid #f59e0b;">
-            <p style="margin-bottom:1rem; font-size:0.92rem; color:#78350f; font-weight:600;">İstanbul'dan dönmeden önce almanız gereken en otantik ürünler ve güvenilir adresler:</p>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
-                <div style="background:#fff; padding:14px; border-radius:12px; border:1px solid #fef3c7;">
-                    <strong style="color:#0f172a; font-size:0.95rem; display:block; margin-bottom:4px;">🥮 Meşhur Karaköy Baklavası:</strong>
-                    <p style="margin:0; font-size:0.85rem; color:#475569;"><strong>Karaköy Güllüoğlu</strong> (Karaköy Rıhtım Caddesi — 1871'den beri meşhur fıstıklı ve cevizli Karaköy Baklavası).</p>
-                </div>
-                <div style="background:#fff; padding:14px; border-radius:12px; border:1px solid #fef3c7;">
-                    <strong style="color:#0f172a; font-size:0.95rem; display:block; margin-bottom:4px;">☕ Taze Kurukahve & Bakır Cezve:</strong>
-                    <p style="margin:0; font-size:0.85rem; color:#475569;">Tarihi Mısır Çarşısı Tahmis Sokak (Özellikle Kurukahveci Mehmet Efendi ve el yapımı dövme bakır cezveler).</p>
-                </div>
-                <div style="background:#fff; padding:14px; border-radius:12px; border:1px solid #fef3c7;">
-                    <strong style="color:#0f172a; font-size:0.95rem; display:block; margin-bottom:4px;">🍬 Geleneksel Türk Lokumu & Çay:</strong>
-                    <p style="margin:0; font-size:0.85rem; color:#475569;">Mısır Çarşısı & Kapalıçarşı Bedestenleri (Antep fıstıklı, güllü ve safranlı çifte kavrulmuş lokumlar).</p>
-                </div>
-                <div style="background:#fff; padding:14px; border-radius:12px; border:2px solid #d97706; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.12);">
-                    <strong style="color:#b45309; font-size:0.95rem; display:block; margin-bottom:4px;">🛋️ Tarihi Türk Halısı & İpek Kilim:</strong>
-                    <p style="margin:0 0 6px; font-size:0.85rem; color:#475569;"><strong>Anka Carpets</strong> (Fırınna Misafirlerine Özel VIP Kod: <span style="background:#f59e0b; color:#0f172a; font-weight:800; padding:2px 8px; border-radius:6px;">#ANKA-FIRINNA-VIP</span> ile <strong>%15 İndirim</strong> ve Ücretsiz Uluslararası Kargo Desteği!).</p>
-                </div>
-            </div>
-        </div>
-
-        <h2 class="section-header-title">
-            <i class="ph-bold ph-lightbulb" style="color:#d97706;"></i> 🧳 İstanbul Seyahat Hazırlığı & Ulaşım İpuçları
-        </h2>
-
-        <div class="info-cards-grid">
-            <!-- CARD 1: İSTANBULKART -->
-            <div class="info-card">
-                <h4><i class="ph-bold ph-credit-card" style="color:#2563eb;"></i> 💳 İstanbulkart Nasıl & Nereden Alınır?</h4>
-                <p>
-                    <strong>Nereden Alınır?</strong> Havalimanları (IST & SAW), tüm Metro, Tramvay ve Vapur iskelelerindeki sarı/siyah <strong>Biletmatik</strong> otomatlarından alınabilir.<br>
-                    <strong>💳 Temassız Kredi Kartı:</strong> Fiziksel kart almadan tüm turnikelerde <strong>Temassız Visa/Mastercard</strong> basabilirsiniz!
-                </p>
+            <!-- ACTIONS & SHARE -->
+            <div class="actions-bar">
+                <a href="#" id="btn-gmaps-launch-main" target="_blank" class="btn-action-custom btn-map-launch">
+                    <i class="ph-bold ph-map-pin"></i> <span>🚀 Google Haritalar</span>
+                </a>
+                <a href="#" id="btn-yandex-launch-main" target="_blank" class="btn-action-custom btn-yandex-launch">
+                    <i class="ph-bold ph-navigation-arrow"></i> <span>🟡 Yandex Navigasyon</span>
+                </a>
+                <button onclick="downloadItineraryAsImage()" class="btn-action-custom btn-download-png">
+                    <i class="ph-bold ph-download-simple"></i> <span>📸 VIP Biletini Resim (PNG) İndir</span>
+                </button>
+                <a href="#" id="btn-whatsapp-share" target="_blank" class="btn-action-custom btn-whatsapp-share">
+                    <i class="ph-bold ph-whatsapp-logo"></i> <span>📱 WhatsApp</span>
+                </a>
+                <a href="#" id="btn-telegram-share" target="_blank" class="btn-action-custom btn-telegram-share">
+                    <i class="ph-bold ph-telegram-logo"></i> <span>✈️ Telegram</span>
+                </a>
             </div>
 
-            <!-- CARD 2: MOBİL UYGULAMALAR -->
-            <div class="info-card">
-                <h4><i class="ph-bold ph-device-mobile-camera" style="color:#16a34a;"></i> 📱 En Gerekli 4 Mobil Uygulama</h4>
-                <p>İstanbul'da en hızlı seyahat etmek için telefonunuzda bulunması gereken uygulamalar:</p>
-                <div class="app-badge-list">
-                    <span class="app-badge">🗺️ Moovit (Otobüs/Metro)</span>
-                    <span class="app-badge">⛵ Şehir Hatları (Vapur Saatleri)</span>
-                    <span class="app-badge">💳 İstanbulkart Mobil (TL Yükleme)</span>
-                    <span class="app-badge">📍 Google Maps (Navigasyon)</span>
+            <!-- HIGH END DEDICATED DIGITAL VIP TRAVEL PASS VOUCHER CARD (FOR BEAUTIFUL PNG OUTPUT) -->
+            <div class="vip-travel-pass-card" id="printable-vip-voucher">
+                <div class="pass-header">
+                    <div class="pass-brand">
+                        <img src="logo.png" alt="Fırınna Cafe Logo">
+                        <div>
+                            <h3 class="pass-brand-title">FIRINNA CAFE & RESTAURANT</h3>
+                            <div class="pass-brand-sub">Kumbaracı Yokuşu No:41A, Beyoğlu / Galata, İstanbul</div>
+                        </div>
+                    </div>
+                    <div class="pass-code-tag" id="pass-code-display">#FIRINNA-TEA-9921</div>
+                </div>
+
+                <div class="pass-grid">
+                    <div class="pass-info-box">
+                        <div class="pass-info-row">📍 <strong>Başlangıç Konumu:</strong> <span id="pass-val-start">Moda / Kadıköy</span></div>
+                        <div class="pass-info-row">⏰ <strong>Gezi Başlangıç Saati:</strong> <span id="pass-val-start-time">11:30</span></div>
+                        <div class="pass-info-row">🎯 <strong>Seyahat Konsepti:</strong> <span id="pass-val-concept">Tarih & Şehir Klasikleri</span></div>
+                        <div class="pass-info-row">🗺️ <strong>Hedef Bölge:</strong> <span id="pass-val-region">Moda Sahil Kordonu</span></div>
+                        <div class="pass-info-row">🌤️ <strong>Hava Durumu:</strong> <span id="pass-val-weather">23°C Açık & Güneşli</span></div>
+                        <div class="pass-info-row">⏱️ <strong>Tahmini Süre:</strong> <span id="pass-val-time">Yarım Gün (3-4 Saat)</span></div>
+                    </div>
+                    <div class="pass-perk-box">
+                        <div style="font-size:2.2rem; margin-bottom:2px;">🍵</div>
+                        <strong style="font-size:0.95rem; line-height:1.3; display:block;">Yemekle Birlikte Tüm Grubunuza SINIRSIZ ÇAY HEDİYE!</strong>
+                    </div>
+                </div>
+
+                <div style="font-size:0.85rem; font-weight:800; color:#fbbf24; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                    <i class="ph-bold ph-list-numbers"></i> ROTA DURAKLARI VE ZAMAN ÇİZELGESİ:
+                </div>
+                <div class="pass-waypoints-list" id="pass-waypoints-container">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <div class="pass-footer">
+                    <span>📌 Garsonunuza bu bilet kodunu göstermeniz yeterlidir.</span>
+                    <span>🌐 firinna.com/gezi | Tel: +90 545 630 12 14</span>
                 </div>
             </div>
+        </section>
 
-            <!-- CARD 3: PRATİK TAVSİYELER -->
-            <div class="info-card">
-                <h4><i class="ph-bold ph-sneaker" style="color:#d97706;"></i> 👟 Galata & İstanbul İpuçları</h4>
-                <p>
-                    • <strong>Yürüyüş Ayakkabısı:</strong> Galata taş sokakları için rahat spor ayakkabı şarttır.<br>
-                    • <strong>Müze Sıraları:</strong> Topkapı Sarayı ve Yerebatan Sarnıcı için biletleri online alın.<br>
-                    • <strong>Genel Yemek Durakları:</strong> Sultanahmet'te meşhur köfte, Karaköy'de Güllüoğlu Baklava, Galata'da Fırınna Cafe'de İtalyan Pizza & Sınırsız Çay keyfi!
-                </p>
-            </div>
-        </div>
+        <!-- PRACTICAL TRAVEL GUIDE, SHOPPING & FAQ SECTION -->
+        <section class="practical-guide-section">
+            
+            <!-- NE NEREDEN ALINIR SECTION -->
+            <h2 class="section-header-title">
+                <i class="ph-bold ph-shopping-bag" style="color:#d97706;"></i> 🛍️ Ne Nereden Alınır? (Orijinal Hediyelik & Alışveriş Rehberi)
+            </h2>
 
-        <!-- FREQUENTLY ASKED QUESTIONS -->
-        <h3 style="font-size:1.2rem; font-weight:800; color:#0f172a; margin-bottom:1.2rem; display:flex; align-items:center; gap:8px;">
-            <i class="ph-bold ph-question" style="color:#d97706;"></i> Sıkça Sorulan Sorular (İstanbul Seyahat FAQ)
-        </h3>
-
-        <div class="faq-accordion">
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>🥮 İstanbul'da meşhur baklava nerede yenir?</span>
-                    <i class="ph-bold ph-caret-down"></i>
-                </div>
-                <div class="faq-answer">
-                    Karaköy Rıhtım Caddesi üzerindeki <strong>Karaköy Güllüoğlu</strong> mağazasından 1871'den beri taze fıstıklı ve cevizli geleneksel baklava yiyebilirsiniz.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>🛍️ Otantik Türk Halısı ve Kilim nereden alınır, indirim kodu nedir?</span>
-                    <i class="ph-bold ph-caret-down"></i>
-                </div>
-                <div class="faq-answer">
-                    Anka Carpets mağazasından <strong>#ANKA-FIRINNA-VIP</strong> özel indirim kodunu söyleyerek %15 VIP İndirimi ve Ücretsiz Uluslararası Kargo Desteği ile orijinal Türk halısı ve ipek kilim satın alabilirsiniz.
+            <div class="info-card" style="margin-bottom: 2.5rem; background: #fffdf5; border: 1.5px solid #f59e0b;">
+                <p style="margin-bottom:1rem; font-size:0.92rem; color:#78350f; font-weight:600;">İstanbul'dan dönmeden önce almanız gereken en otantik ürünler ve güvenilir adresler:</p>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
+                    <div style="background:#fff; padding:14px; border-radius:12px; border:1px solid #fef3c7;">
+                        <strong style="color:#0f172a; font-size:0.95rem; display:block; margin-bottom:4px;">🥮 Meşhur Karaköy Baklavası:</strong>
+                        <p style="margin:0; font-size:0.85rem; color:#475569;"><strong>Karaköy Güllüoğlu</strong> (Karaköy Rıhtım Caddesi — 1871'den beri meşhur fıstıklı ve cevizli Karaköy Baklavası).</p>
+                    </div>
+                    <div style="background:#fff; padding:14px; border-radius:12px; border:1px solid #fef3c7;">
+                        <strong style="color:#0f172a; font-size:0.95rem; display:block; margin-bottom:4px;">☕ Taze Kurukahve & Bakır Cezve:</strong>
+                        <p style="margin:0; font-size:0.85rem; color:#475569;">Tarihi Mısır Çarşısı Tahmis Sokak (Özellikle Kurukahveci Mehmet Efendi ve el yapımı dövme bakır cezveler).</p>
+                    </div>
+                    <div style="background:#fff; padding:14px; border-radius:12px; border:1px solid #fef3c7;">
+                        <strong style="color:#0f172a; font-size:0.95rem; display:block; margin-bottom:4px;">🍬 Geleneksel Türk Lokumu & Çay:</strong>
+                        <p style="margin:0; font-size:0.85rem; color:#475569;">Mısır Çarşısı & Kapalıçarşı Bedestenleri (Antep fıstıklı, güllü ve safranlı çifte kavrulmuş lokumlar).</p>
+                    </div>
+                    <div style="background:#fff; padding:14px; border-radius:12px; border:2px solid #d97706; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.12);">
+                        <strong style="color:#b45309; font-size:0.95rem; display:block; margin-bottom:4px;">🛋️ Tarihi Türk Halısı & İpek Kilim:</strong>
+                        <p style="margin:0 0 6px; font-size:0.85rem; color:#475569;"><strong>Anka Carpets</strong> (Fırınna Misafirlerine Özel VIP Kod: <span style="background:#f59e0b; color:#0f172a; font-weight:800; padding:2px 8px; border-radius:6px;">#ANKA-FIRINNA-VIP</span> ile <strong>%15 İndirim</strong> ve Ücretsiz Uluslararası Kargo Desteği!).</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>👑 İstanbul'da gezilmesi şart olan 'Kral Yolu' rotası nerelerden geçer?</span>
-                    <i class="ph-bold ph-caret-down"></i>
+            <h2 class="section-header-title">
+                <i class="ph-bold ph-lightbulb" style="color:#d97706;"></i> 🧳 İstanbul Seyahat Hazırlığı & Ulaşım İpuçları
+            </h2>
+
+            <div class="info-cards-grid">
+                <div class="info-card">
+                    <h4><i class="ph-bold ph-credit-card" style="color:#2563eb;"></i> 💳 İstanbulkart Nasıl & Nereden Alınır?</h4>
+                    <p>
+                        <strong>Nereden Alınır?</strong> Havalimanları (IST & SAW), tüm Metro, Tramvay ve Vapur iskelelerindeki sarı/siyah <strong>Biletmatik</strong> otomatlarından alınabilir.<br>
+                        <strong>💳 Temassız Kredi Kartı:</strong> Fiziksel kart almadan tüm turnikelerde <strong>Temassız Visa/Mastercard</strong> basabilirsiniz!
+                    </p>
                 </div>
-                <div class="faq-answer">
-                    Kapalıçarşı Nuruosmaniye Kapısı'ndan başlar; Sultanahmet Meydanı, Mısır Çarşısı, tarihi Galata Köprüsü yürüyüşü, Karaköy, Kamondo Merdivenleri, Fırınna Cafe & Restaurant lezzet molası, Tarihi Tünel Füniküleri, Şişhane ve İstiklal Caddesi üzerinden Taksim Meydanı'na uzanır.
+
+                <div class="info-card">
+                    <h4><i class="ph-bold ph-device-mobile-camera" style="color:#16a34a;"></i> 📱 En Gerekli 4 Mobil Uygulama</h4>
+                    <p>İstanbul'da en hızlı seyahat etmek için telefonunuzda bulunması gereken uygulamalar:</p>
+                    <div class="app-badge-list">
+                        <span class="app-badge">🗺️ Moovit (Otobüs/Metro)</span>
+                        <span class="app-badge">⛵ Şehir Hatları (Vapur Saatleri)</span>
+                        <span class="app-badge">💳 İstanbulkart Mobil (TL Yükleme)</span>
+                        <span class="app-badge">📍 Google Maps (Navigasyon)</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h4><i class="ph-bold ph-sneaker" style="color:#d97706;"></i> 👟 Galata & İstanbul İpuçları</h4>
+                    <p>
+                        • <strong>Yürüyüş Ayakkabısı:</strong> Galata taş sokakları için rahat spor ayakkabı şarttır.<br>
+                        • <strong>Müze Sıraları:</strong> Topkapı Sarayı ve Yerebatan Sarnıcı için biletleri online alın.<br>
+                        • <strong>Genel Yemek Durakları:</strong> Sultanahmet'te meşhur köfte, Karaköy'de Güllüoğlu Baklava, Galata'da Fırınna Cafe'de İtalyan Pizza & Sınırsız Çay keyfi!
+                    </p>
                 </div>
             </div>
 
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>⏰ Galata Fırınna Cafe'nin çalışma saatleri nedir?</span>
-                    <i class="ph-bold ph-caret-down"></i>
+            <!-- FREQUENTLY ASKED QUESTIONS -->
+            <h3 style="font-size:1.2rem; font-weight:800; color:#0f172a; margin-bottom:1.2rem; display:flex; align-items:center; gap:8px;">
+                <i class="ph-bold ph-question" style="color:#d97706;"></i> Sıkça Sorulan Sorular (İstanbul Seyahat FAQ)
+            </h3>
+
+            <div class="faq-accordion">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>🥮 İstanbul'da meşhur baklava nerede yenir?</span>
+                        <i class="ph-bold ph-caret-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Karaköy Rıhtım Caddesi üzerindeki <strong>Karaköy Güllüoğlu</strong> mağazasından 1871'den beri taze fıstıklı ve cevizli geleneksel baklava yiyebilirsiniz.
+                    </div>
                 </div>
-                <div class="faq-answer">
-                    Fırınna Cafe & Restaurant sistem kayıtlarına göre haftanın 7 günü <strong id="faq-hours-text">11:00 - 19:15</strong> saatleri arasında hizmet vermektedir. Çalışma saatleri haricindeki grup organizasyonları ve masa rezervasyonu için WhatsApp hattımızdan iletişime geçebilirsiniz.
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>🛍️ Otantik Türk Halısı ve Kilim nereden alınır, indirim kodu nedir?</span>
+                        <i class="ph-bold ph-caret-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Anka Carpets mağazasından <strong>#ANKA-FIRINNA-VIP</strong> özel indirim kodunu söyleyerek %15 VIP İndirimi ve Ücretsiz Uluslararası Kargo Desteği ile orijinal Türk halısı ve ipek kilim satın alabilirsiniz.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>👑 İstanbul'da gezilmesi şart olan 'Kral Yolu' rotası nerelerden geçer?</span>
+                        <i class="ph-bold ph-caret-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Kapalıçarşı Nuruosmaniye Kapısı'ndan başlar; Sultanahmet Meydanı, Mısır Çarşısı, tarihi Galata Köprüsü yürüyüşü, Karaköy, Kamondo Merdivenleri, Fırınna Cafe & Restaurant lezzet molası, Tarihi Tünel Füniküleri, Şişhane ve İstiklal Caddesi üzerinden Taksim Meydanı'na uzanır.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>⏰ Galata Fırınna Cafe'nin çalışma saatleri nedir?</span>
+                        <i class="ph-bold ph-caret-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Fırınna Cafe & Restaurant sistem kayıtlarına göre haftanın 7 günü <strong id="faq-hours-text">11:00 - 19:15</strong> saatleri arasında hizmet vermektedir. Çalışma saatleri haricindeki grup organizasyonları ve masa rezervasyonu için WhatsApp hattımızdan iletişime geçebilirsiniz.
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <footer style="background:#0f172a; color:#64748b; padding:2rem 1rem; text-align:center; margin-top:3rem; border-top:1px solid #1e293b; font-size:0.84rem;">
-        <p style="color:#cbd5e1; margin-bottom:0.4rem; font-weight:600;">Fırınna Cafe & Restaurant — Kumbaracı Yokuşu No:41A, Beyoğlu, İstanbul</p>
-        <p style="margin:0;">© 2026 Fırınna Cafe. Galata'nın en keyifli geleneksel kahvaltı ve mola durağı.</p>
-    </footer>
+        <footer style="background:#0f172a; color:#64748b; padding:2rem 1rem; text-align:center; margin-top:3rem; border-top:1px solid #1e293b; font-size:0.84rem; border-radius:14px;">
+            <p style="color:#cbd5e1; margin-bottom:0.4rem; font-weight:600;">Fırınna Cafe & Restaurant — Kumbaracı Yokuşu No:41A, Beyoğlu, İstanbul</p>
+            <p style="margin:0;">© 2026 Fırınna Cafe. Galata'nın en keyifli geleneksel kahvaltı ve mola durağı.</p>
+        </footer>
+    </div>
 
     <script>
         let selectedStart = 'taksim';
@@ -1605,7 +1539,6 @@
 
         // COMPREHENSIVE MULTI-DURATION POIS DATABASE
         const POIS_DATABASE = {
-            // YARIM GÜN (HALF DAY)
             half: [
                 { offsetMin: 0, title: '📍 Başlangıç Merkeziniz & Çevre Keşfi', category: 'photo', desc: 'Seçtiğiniz lokasyondan yürüyüş ve gezi başlangıcı.', mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul' },
                 { offsetMin: 60, title: '🚋 Tarihi Semt Sokakları & Kültürel Durak', category: 'photo', desc: 'Caddeler, nostaljik yapılardan taş sokaklara geçiş.', alt: '💡 Alternatif: Tarihi pasajlar & çay molası', mapQuery: 'Cicek+Pasaji+Beyoglu+Istanbul' },
@@ -1613,7 +1546,6 @@
                 { offsetMin: 180, featured: true, title: 'FIRINNA CAFE & RESTAURANT', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da bakır sahanda menemen, taş fırın pizza & sınırsız Türk çayı.', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' }
             ],
 
-            // 1 TAM GÜN (FULL DAY: 6-8 HOURS / 7 STOPS)
             '1day': [
                 { offsetMin: 0, title: '📍 1. DURAK: Başlangıç Merkezinizde Güne Başlangıç', category: 'photo', desc: 'Sabah tazeliğinde tarihi caddeler ve meydan turu.', mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul' },
                 { offsetMin: 60, title: '🏛️ 2. DURAK: Tarihi Mimari & Sanat Galerileri Yürüyüşü', category: 'museums', desc: 'Çiçek Pasajı, St. Antuan Kilisesi ve Pera caddesi gezisi.', mapQuery: 'St+Antuan+Kilisesi+Beyoglu+Istanbul' },
@@ -1624,22 +1556,18 @@
                 { offsetMin: 410, title: '🌇 7. DURAK: Gün Batımı Vapuru & Akşam Barları', category: 'photo', desc: 'Kız Kulesi manzaralı gün batımı veya Cihangir akşamı.', mapQuery: 'Karakoy+Iskele+Istanbul' }
             ],
 
-            // 2-3 GÜNLÜK SEAHAT REHBERİ (MULTI-DAY BREAKDOWN)
             '2days': [
-                // DAY 1
                 { dayTitle: '🗓️ 1. GÜN: Tarihi Pera, Galata & Fırınna Lezzet Kulvarı' },
                 { offsetMin: 0, title: '📍 1. Gün (10:00): İstiklal Caddesi & Çiçek Pasajı Başlangıç', category: 'photo', desc: 'Tarihi binalar ve nostaljik tramvay kulvarı yürüyüşü.', mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul' },
                 { offsetMin: 90, featured: true, title: 'FIRINNA CAFE & RESTAURANT — 1. Gün Öğle Yemeği & Sınırsız Çay 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da lezzet molası.', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' },
                 { offsetMin: 180, title: '🗼 1. Gün (15:00): Galata Kulesi & Kamondo Merdivenleri', category: 'museums', desc: 'Galata Kulesi seyir kulvarı ve taş sokaklar.', mapQuery: 'Galata+Kulesi+Beyoglu+Istanbul' },
                 { offsetMin: 270, title: '🎷 1. Gün Akşamı (18:30): Asmalımescit & Cihangir Sanat Barları', category: 'photo', desc: 'Gece hayatı ve barlar sokağı.', mapQuery: 'Asmalimescit+Beyoglu+Istanbul' },
 
-                // DAY 2
                 { dayTitle: '🗓️ 2. GÜN: Sultanahmet Tarihi Yarımada & Mısır Çarşısı' },
                 { offsetMin: 1440, title: '🕌 2. Gün (10:00): Ayasofya-i Kebir & Yerebatan Sarnıcı', category: 'worship', desc: 'Bizans su sarayı ve Ayasofya meydanı.', mapQuery: 'Hagia+Sophia+Sultanahmet+Istanbul' },
                 { offsetMin: 1560, title: '🌿 2. Gün (13:00): Tarihi Gülhane Parkı & Sarayburnu', category: 'nature_sports', desc: 'Asırlık çınarlar ve deniz havası.', mapQuery: 'Gulhane+Parki+Sultanahmet+Istanbul' },
                 { offsetMin: 1680, title: '🛍️ 2. Gün (16:00): Kapalıçarşı Kral Yolu & Mısır Çarşısı', category: 'shopping', desc: 'Otantik Türk lokumu, kahve ve hediyelikler.', mapQuery: 'Grand+Bazaar+Nuruosmaniye+Istanbul' },
 
-                // DAY 3
                 { dayTitle: '🗓️ 3. GÜN: Anadolu Yakası — Kadıköy Moda Sahili & Boğaz Vapuru' },
                 { offsetMin: 2880, title: '⛵ 3. Gün (11:00): Karaköy-Kadıköy Nostaljik Vapur Yolculuğu', category: 'photo', desc: 'Kız Kulesi manzarası ile Boğaz geçişi.', mapQuery: 'Karakoy+Iskele+Istanbul' },
                 { offsetMin: 2970, title: '🌊 3. Gün (13:00): Moda Sahil Parkı & Çimler Yürüyüşü', category: 'nature_sports', desc: 'Deniz kıyısı yürüyüş kulvarı ve tarihi çay bahçesi.', mapQuery: 'Moda+Sahil+Parki+Kadikoy+Istanbul' }
@@ -1703,14 +1631,12 @@
                 });
             }
 
-            // ACCURATELY PICK POIS DATABASE ACCORDING TO SELECTED DURATION (half, 1day, 2days)
             let rawPOIs = POIS_DATABASE[selectedTime] || POIS_DATABASE['half'];
 
             let finalPOIs = [];
             const startLabelName = hotelNameInput || getStartLabelName(selectedStart);
             const mapOriginQuery = hotelNameInput ? encodeURIComponent(`${hotelNameInput}, İstanbul`) : encodeURIComponent(startLabelName);
 
-            // 1. START ITEM
             finalPOIs.push({
                 time: selectedStartTime,
                 hotelStart: true,
@@ -1721,17 +1647,15 @@
                 mapQuery: mapOriginQuery
             });
 
-            // REAL TIME CHECK FOR FIRINNA CAFE
             const now = new Date();
             const currentHour = now.getHours();
             const currentMin = now.getMinutes();
             const currentTotalMin = currentHour * 60 + currentMin;
             const isFirinnaOpenNow = currentTotalMin >= 660 && currentTotalMin <= 1155;
 
-            // PROCESS POIS
             rawPOIs.forEach(poi => {
                 if (poi.dayTitle) {
-                    finalPOIs.push(poi); // Day header
+                    finalPOIs.push(poi);
                     return;
                 }
 
@@ -1763,7 +1687,6 @@
             const fullTicketCode = `#FIRINNA-TEA-${randomCode}`;
             document.getElementById('pass-code-display').innerText = fullTicketCode;
 
-            // MAP LINKS
             const mapPOIsOnly = finalPOIs.filter(p => p.mapQuery);
             const waypointsQueries = mapPOIsOnly.map(p => p.mapQuery);
             const gmapsUrl = `https://www.google.com/maps/dir/${waypointsQueries.join('/')}`;
@@ -1777,7 +1700,6 @@
 
             document.getElementById('live-map-iframe').src = `https://maps.google.com/maps?q=${waypointsQueries[0]}&output=embed`;
 
-            // PASS VOUCHER FIELDS
             let timeTextReadable = "Yarım Gün (3-4 Saat)";
             if (selectedTime === '1day') timeTextReadable = "1 Tam Gün (6-8 Saat Kapsamlı)";
             else if (selectedTime === '2days') timeTextReadable = "2-3 Günlük Seyahat Rehberi";
@@ -1832,7 +1754,7 @@
                     ${closedTagHtml}
                     ${item.featured ? `
                         <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
-                            <a href="menu" style="background:#0f172a; color:#fff; font-size:0.8rem; font-weight:700; padding:6px 14px; border-radius:6px; text-decoration:none;">📄 Menüyü Gör</a>
+                            <a href="menu.html" style="background:#0f172a; color:#fff; font-size:0.8rem; font-weight:700; padding:6px 14px; border-radius:6px; text-decoration:none;">📄 Menüyü Gör</a>
                             <a href="https://maps.google.com/?q=Firinna+Cafe+Restaurant+Galata" target="_blank" style="background:#d97706; color:#fff; font-size:0.8rem; font-weight:700; padding:6px 14px; border-radius:6px; text-decoration:none;">📍 Bize Yol Tarifi</a>
                             <a href="https://wa.me/${systemPhone}?text=Merhaba,%20Fırınna'dan%20Masa%20Rezervasyonu%20yaptırmak%20istiyorum." target="_blank" style="background:#25d366; color:#fff; font-size:0.8rem; font-weight:700; padding:6px 14px; border-radius:6px; text-decoration:none;">📱 Masa Rezervasyonu Yap</a>
                         </div>
@@ -1846,7 +1768,6 @@
                 passWaypointsContainer.appendChild(passWp);
             });
 
-            // SHARE PAYLOADS
             const shareTitle = `🗺️ ${startLabelName} Başlangıçlı (${timeTextReadable}) İstanbul Gezi Rotam!\n\n${liveWeatherText}\n🎟️ Sınırsız Çay Kuponu: ${fullTicketCode}\n\n📍 Haritada Aç: ${gmapsUrl}`;
             const waText = encodeURIComponent(shareTitle);
             const tgText = encodeURIComponent(shareTitle);
@@ -1873,7 +1794,6 @@
             }
         }
 
-        // DOWNLOAD DEDICATED HIGH-QUALITY COLORTUL VIP TRAVEL PASS & VOUCHER AS PNG IMAGE
         function downloadItineraryAsImage() {
             const passCard = document.getElementById('printable-vip-voucher');
             if (!passCard || typeof html2canvas !== 'function') return;
