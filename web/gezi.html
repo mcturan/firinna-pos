@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="Mantıklı konsept ve süre seçimiyle İstanbul gezi rotası. Tarih, Doğa/Orman koşuları, Renkli Mahalleler, Rota Özeti Tablosu ve Fırınna Cafe Sınırsız Çay İkramı.">
-    <meta name="keywords" content="İstanbul gezi rehberi, mantıklı gezi rotaları, Belgrad Ormanı koşu parkuru, Karaköy Güllüoğlu baklava, Fırınna cafe">
+    <meta name="description" content="Konum odaklı akıllı İstanbul gezi rotası. Kadıköy, Sultanahmet, Beyoğlu başlangıçlı Doğa, Tarih ve Gece Hayatı rotaları ve Fırınna Cafe Sınırsız Çay İkramı.">
+    <meta name="keywords" content="İstanbul gezi rehberi, Kadıköy Moda doğa yürüyüşü, Belgrad Ormanı koşu parkuru, Karaköy Güllüoğlu baklava, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
     <meta property="og:title" content="İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe">
-    <meta property="og:description" content="Seyahat amacınızı ve sürenizi seçin; tam uyumlu kişiselleştirilmiş İstanbul rotanızı ve Fırınna Sınırsız Çay ikram kartınızı anında alın!">
+    <meta property="og:description" content="Konumunuzu, seyahat amacınızı ve sürenizi seçin; konuma tam uyumlu kişiselleştirilmiş İstanbul rotanızı ve Fırınna Sınırsız Çay ikram kartınızı anında alın!">
     <meta property="og:image" content="https://firinna.com/galata_cafe_bg_new.jpg">
     <meta property="og:url" content="https://firinna.com/gezi">
     <meta property="og:type" content="website">
@@ -256,7 +256,7 @@
 
         .input-hotel-container {
             position: relative;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.8rem;
         }
 
         .input-hotel-box {
@@ -749,24 +749,52 @@
         </div>
 
         <h1><i class="ph-bold ph-compass"></i> Akıllı İstanbul Gezi & Rota Planlayıcı</h1>
-        <p>Mantıklı seyahat konsepti, saatinize özel rotalar ve Fırınna Cafe'de sınırsız çay ikramı!</p>
+        <p>Konumunuzdan başlayan mantıklı seyahat rotaları ve Fırınna Cafe'de sınırsız çay ikramı!</p>
     </header>
 
-    <!-- MASTER HIERARCHY WIZARD FORM -->
+    <!-- PERFECT LOCATION-FIRST MASTER WIZARD FORM -->
     <main class="wizard-card">
         
-        <!-- STEP 1: TRAVEL CONCEPT / PURPOSE (TOP LEVEL MASTER MODE) -->
+        <!-- STEP 1: STARTING LOCATION FIRST (CRITICAL TOP LEVEL) -->
         <div class="step-label">
-            <span class="num">1</span> <span>Seyahat Amacınız & Tarzınız Nedir? (Ana Konsept):</span>
+            <span class="num">1</span> <span>Neredesiniz / Nereden Başlayacaksınız? (Başlangıç Konumu):</span>
+        </div>
+        <div class="options-grid" id="grid-start">
+            <div class="option-pill active" onclick="selectStartOption('beyoglu')">
+                <div class="title">🏡 Beyoğlu / Galata / Taksim</div>
+                <div class="desc">Fırınna Cafe yakınında konaklama</div>
+            </div>
+            <div class="option-pill" onclick="selectStartOption('kadikoy')">
+                <div class="title">⛵ Kadıköy / Moda (Anadolu)</div>
+                <div class="desc">Anadolu yakasından başlangıç</div>
+            </div>
+            <div class="option-pill" onclick="selectStartOption('sultanahmet')">
+                <div class="title">🕌 Sultanahmet / Cankurtaran</div>
+                <div class="desc">Tarihi yarımadada konaklama</div>
+            </div>
+            <div class="option-pill" onclick="selectStartOption('karakoy_besiktas')">
+                <div class="title">🌊 Karaköy / Port / Beşiktaş</div>
+                <div class="desc">Boğaz ve sahil hattı</div>
+            </div>
+        </div>
+
+        <div class="input-hotel-container">
+            <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="🔎 Veya otelinizin, Airbnb evinizin adını yazın (Örn: Moda Airbnb, Tomtom Suites, Limonlu Bahçe Sokak)..." autocomplete="off">
+            <div id="hotel-suggestions" class="suggestions-dropdown"></div>
+        </div>
+
+        <!-- STEP 2: TRAVEL CONCEPT / PURPOSE -->
+        <div class="step-label">
+            <span class="num">2</span> <span>Seyahat Amacınız & Tarzınız Nedir? (Konsept):</span>
         </div>
         <div class="options-grid" id="grid-concept">
             <div class="option-pill active" onclick="selectConceptOption('historical')">
                 <div class="title">🏛️ Tarih, Kültür & Şehir Klasikleri</div>
-                <div class="desc">Kral Yolu, Ayasofya, Sultanahmet & Çarşılar</div>
+                <div class="desc">Ayasofya, Sultanahmet, Galata & Çarşılar</div>
             </div>
             <div class="option-pill" onclick="selectConceptOption('nature')">
                 <div class="title">🌲 Doğa Gezisi, Orman Koşusu & Yürüyüş 🏃</div>
-                <div class="desc">Belgrad Ormanı 6km Parkur, Arboretüm & Parklar</div>
+                <div class="desc">Moda Sahil, Belgrad Ormanı & Park Yürüyüşleri</div>
             </div>
             <div class="option-pill" onclick="selectConceptOption('photo')">
                 <div class="title">📸 Renkli Mahalleler & Çift Yürüyüşleri 👫</div>
@@ -774,55 +802,27 @@
             </div>
             <div class="option-pill" onclick="selectConceptOption('nightlife')">
                 <div class="title">🎷 Gece Hayatı & Akşam Barları 🍻</div>
-                <div class="desc">Asmalımescit, Cihangir Caz Barları & Kadife Sokak</div>
+                <div class="desc">Asmalımescit, Cihangir & Kadife Sokak Barları</div>
             </div>
         </div>
 
-        <!-- STEP 2: DURATION (TIME AVAILABLE) -->
+        <!-- STEP 3: DURATION (TIME AVAILABLE) -->
         <div class="step-label">
-            <span class="num">2</span> <span>Zamanınız Kaç Gün / Saat?</span>
+            <span class="num">3</span> <span>Zamanınız Kaç Gün / Saat?</span>
         </div>
         <div class="options-grid" id="grid-time">
             <div class="option-pill active" onclick="selectDurationOption('half')">
                 <div class="title">⏱️ Yarım Gün / Kısa Mola (3-4 Saat)</div>
-                <div class="desc">Hızlı ve süzme şehir deneyimi</div>
+                <div class="desc">Hızlı ve süzme yakın çevre turu</div>
             </div>
             <div class="option-pill" onclick="selectDurationOption('1day')">
                 <div class="title">🗓️ 1 Tam Gün (6-8 Saat)</div>
-                <div class="desc">Dolu dolu kapsamlı gezi</div>
+                <div class="desc">Dolu dolu kapsamlı seyahat</div>
             </div>
             <div class="option-pill" onclick="selectDurationOption('2days')">
-                <div class="title">🗺️ 2-3 Günlük Seyahat</div>
-                <div class="desc">Geniş doğa, adalar & şehir turu</div>
+                <div class="title">🗺️ 2-3 Günlük Gezi</div>
+                <div class="desc">Ormanlar, Adalar & Şehir Turu</div>
             </div>
-        </div>
-
-        <!-- STEP 3: STARTING POINT -->
-        <div class="step-label">
-            <span class="num">3</span> <span>Kaldığınız Yer / Başlangıç Noktanız:</span>
-        </div>
-        <div class="options-grid" id="grid-start">
-            <div class="option-pill active" onclick="selectSingleOption('grid-start', this, 'beyoglu')">
-                <div class="title">🏡 Beyoğlu / Galata (Fırınna Yakını)</div>
-                <div class="desc">Kumbaracı Yokuşu'na yürüme mesafesi</div>
-            </div>
-            <div class="option-pill" onclick="selectSingleOption('grid-start', this, 'sultanahmet')">
-                <div class="title">🕌 Sultanahmet / Cankurtaran</div>
-                <div class="desc">Tarihi merkezde konaklama</div>
-            </div>
-            <div class="option-pill" onclick="selectSingleOption('grid-start', this, 'karakoy_besiktas')">
-                <div class="title">🌊 Karaköy / Port / Beşiktaş</div>
-                <div class="desc">Boğaz ve sahil hattı</div>
-            </div>
-            <div class="option-pill" onclick="selectSingleOption('grid-start', this, 'kadikoy')">
-                <div class="title">⛵ Kadıköy / Moda</div>
-                <div class="desc">Anadolu yakasından başlangıç</div>
-            </div>
-        </div>
-
-        <div class="input-hotel-container">
-            <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="🔎 Otelinizin, Airbnb evinizin veya sokağınızın adını serbestçe yazın (Örn: Galata Airbnb, Tomtom Suites, Limonlu Bahçe Sokak)..." autocomplete="off">
-            <div id="hotel-suggestions" class="suggestions-dropdown"></div>
         </div>
 
         <!-- DYNAMIC SUMMARY PREVIEW CARD & TABLE (WHAT'S INCLUDED) -->
@@ -832,6 +832,10 @@
             </h4>
             <table class="summary-table">
                 <tr>
+                    <td class="label">📍 Başlangıç Noktası:</td>
+                    <td class="val" id="summary-val-start">🏡 Beyoğlu / Galata / Taksim</td>
+                </tr>
+                <tr>
                     <td class="label">🎯 Gezi Konsepti:</td>
                     <td class="val" id="summary-val-concept">🏛️ Tarih, Kültür & Şehir Klasikleri</td>
                 </tr>
@@ -840,16 +844,12 @@
                     <td class="val" id="summary-val-time">Yarım Gün (3-4 Saat)</td>
                 </tr>
                 <tr>
-                    <td class="label">📍 Duraklar & Rota:</td>
+                    <td class="label">📍 Örnek Duraklar:</td>
                     <td class="val" id="summary-val-stops">Galata Kulesi ➔ Kamondo Merdivenleri ➔ Fırınna Cafe Lezzet Molası</td>
                 </tr>
                 <tr>
                     <td class="label">☕ Lezzet Durağı:</td>
                     <td class="val">Fırınna Cafe & Restaurant (Sınırsız Çay & Pizza Molası)</td>
-                </tr>
-                <tr>
-                    <td class="label">👟 Tavsiye & Ulaşım:</td>
-                    <td class="val" id="summary-val-tips">Yürüyüş ve tramvay ile rahat parkur. Spor ayakkabı önerilir.</td>
                 </tr>
             </table>
         </div>
@@ -1037,9 +1037,9 @@
     </footer>
 
     <script>
+        let selectedStart = 'beyoglu';
         let selectedConcept = 'historical';
         let selectedTime = 'half';
-        let selectedStart = 'beyoglu';
 
         let systemWorkHours = '11:00 - 19:15';
         let systemPhone = '905456301214';
@@ -1111,7 +1111,15 @@
                 }).catch(e => {});
         }
 
-        // MASTER LEVEL 1: CONCEPT SELECTION
+        // STEP 1: START LOCATION SELECTION
+        function selectStartOption(startVal) {
+            selectedStart = startVal;
+            document.querySelectorAll('#grid-start .option-pill').forEach(p => p.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            updateSummaryPreview();
+        }
+
+        // STEP 2: CONCEPT SELECTION
         function selectConceptOption(conceptVal) {
             selectedConcept = conceptVal;
             document.querySelectorAll('#grid-concept .option-pill').forEach(p => p.classList.remove('active'));
@@ -1119,7 +1127,7 @@
             updateSummaryPreview();
         }
 
-        // MASTER LEVEL 2: DURATION SELECTION
+        // STEP 3: DURATION SELECTION
         function selectDurationOption(timeVal) {
             selectedTime = timeVal;
             document.querySelectorAll('#grid-time .option-pill').forEach(p => p.classList.remove('active'));
@@ -1127,408 +1135,508 @@
             updateSummaryPreview();
         }
 
-        // MASTER LEVEL 3: START POINT SELECTION
-        function selectSingleOption(gridId, el, val) {
-            document.querySelectorAll(`#${gridId} .option-pill`).forEach(p => p.classList.remove('active'));
-            el.classList.add('active');
-            if (gridId === 'grid-start') selectedStart = val;
-            updateSummaryPreview();
-        }
-
         function updateSummaryPreview() {
-            let conceptTxt = "🏛️ Tarih, Kültür & Şehir Klasikleri";
-            let stopsTxt = "Kapalıçarşı ➔ Sultanahmet ➔ Galata Köprüsü ➔ Fırınna Cafe ➔ Tünel";
-            let tipTxt = "Yürüyüş ve tramvay ile tarihi şehir turu. Spor ayakkabı önerilir.";
+            let startName = "🏡 Beyoğlu / Galata / Taksim";
+            if (selectedStart === 'kadikoy') startName = "⛵ Kadıköy / Moda (Anadolu)";
+            else if (selectedStart === 'sultanahmet') startName = "🕌 Sultanahmet / Cankurtaran";
+            else if (selectedStart === 'karakoy_besiktas') startName = "🌊 Karaköy / Port / Beşiktaş";
 
+            let conceptTxt = "🏛️ Tarih, Kültür & Şehir Klasikleri";
+            let stopsTxt = "Kapalıçarşı ➔ Sultanahmet ➔ Galata Köprüsü ➔ Fırınna Cafe";
+            
             if (selectedConcept === 'nature') {
                 conceptTxt = "🌲 Doğa Gezisi, Orman Koşusu & Yürüyüş 🏃";
-                stopsTxt = "Belgrad Ormanı 6km Parkuru ➔ Arboretüm ➔ Maçka Parkı ➔ Fırınna Cafe";
-                tipTxt = "Temiz hava orman yürüyüşü & koşu kulvarı. Spor kıyafet şarttır.";
+                if (selectedStart === 'kadikoy') {
+                    stopsTxt = "Moda Sahil Parkı & Kayalıklar ➔ Fenerbahçe Parkı ➔ Vapurla Karaköy ➔ Fırınna Cafe";
+                } else if (selectedStart === 'sultanahmet') {
+                    stopsTxt = "Tarihi Gülhane Parkı ➔ Sarayburnu Sahil Yolu ➔ Galata Köprüsü ➔ Fırınna Cafe";
+                } else {
+                    stopsTxt = "Nişantaşı & Maçka Demokrasi Parkı ➔ Teleferik ➔ Yıldız Parkı ➔ Fırınna Cafe";
+                }
             } else if (selectedConcept === 'photo') {
                 conceptTxt = "📸 Renkli Mahalleler & Çift Yürüyüşleri 👫";
-                stopsTxt = "Fener & Balat Renkli Evler ➔ Galata Kulesi ➔ Kamondo ➔ Fırınna Cafe ➔ Moda Sahil";
-                tipTxt = "Büyüleyici fotoğraf noktaları & romantik vapur yürüyüşü.";
+                if (selectedStart === 'kadikoy') {
+                    stopsTxt = "Moda Sahil Parkı ➔ Bahariye Caddesi ➔ Nostaljik Vapur ➔ Galata & Fırınna Cafe";
+                } else {
+                    stopsTxt = "Fener & Balat Renkli Evler ➔ Galata Kulesi ➔ Kamondo Merdivenleri ➔ Fırınna Cafe";
+                }
             } else if (selectedConcept === 'nightlife') {
                 conceptTxt = "🎷 Gece Hayatı & Akşam Barları 🍻";
-                stopsTxt = "Galata Taş Sokaklar ➔ Fırınna Pizza & Çay ➔ Asmalımescit & Cihangir Canlı Caz Barları";
-                tipTxt = "Akşam saatlerinde canlı müzik ve sosyalleşme rotası.";
+                if (selectedStart === 'kadikoy') {
+                    stopsTxt = "Kadıköy Moda Sahil ➔ Fırınna Cafe Pizza ➔ Kadife Barlar Sokağı";
+                } else {
+                    stopsTxt = "Galata Taş Sokaklar ➔ Fırınna Cafe Pizza & Çay ➔ Asmalımescit & Cihangir Canlı Barlar";
+                }
             }
 
-            let timeTxt = "Yarım Gün / Kısa Mola (3-4 Saat)";
+            let timeTxt = "Yarım Gün (3-4 Saat)";
             if (selectedTime === '1day') timeTxt = "1 Tam Gün (6-8 Saat)";
-            else if (selectedTime === '2days') timeTxt = "2-3 Günlük Seyahat";
+            else if (selectedTime === '2days') timeTxt = "2-3 Günlük Gezi";
 
+            document.getElementById('summary-val-start').innerText = startName;
             document.getElementById('summary-val-concept').innerText = conceptTxt;
             document.getElementById('summary-val-time').innerText = timeTxt;
             document.getElementById('summary-val-stops').innerText = stopsTxt;
-            document.getElementById('summary-val-tips').innerText = tipTxt;
         }
 
-        // ACCURATE CONCEPT-STRICT POI DATABASE
-        const STRICT_POIS = {
-            historical: {
-                half: [
-                    {
-                        time: '09:30',
-                        title: '🗼 Galata Kulesi & Tarihi Taş Sokaklar',
-                        category: 'museums',
-                        desc: 'Cenevizlilerden kalan 670 yıllık ikonik kule ve çevresindeki otantik taş sokaklar.',
-                        tip: '📸 Tuyo: Kule çevresindeki taş sokakları keşfedin.',
-                        closedNote: '📌 Her gün ziyarete açıktır (08:30 - 22:00).',
-                        mapQuery: 'Galata+Kulesi+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '10:45',
-                        title: '🪜 Kamondo Merdivenleri & Bankalar Caddesi',
-                        category: 'photo',
-                        desc: '1850’li yılların art nouveau tarzı tarihi dalgalı merdivenleri.',
-                        mapQuery: 'Kamondo+Merdivenleri+Karakoy+Istanbul'
-                    },
-                    {
-                        time: '11:45',
-                        featured: true,
-                        title: '🍳 FIRINNA CAFE & RESTAURANT — Kahvaltı & Sınırsız Çay Molası 🍵',
-                        category: 'gourmet',
-                        desc: 'Kumbaracı Yokuşu No:41A’da bakır sahanda Çakallı Menemeni, çıtır bazlama tost ve tüm grubunuza sınırsız demli Türk çayı.',
-                        tip: '⭐ VIP Rota Ödülü: Yemekle birlikte tüm grubunuza SINIRSIZ ÇAY HEDİYE!',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '13:00',
-                        title: '🕌 Ayasofya-i Kebir Cami & Yerebatan Sarnıcı',
-                        category: 'worship',
-                        desc: '1500 yıllık dünya mimarlık mirası ve Bizans yeraltı su sarayı Yerebatan Sarnıcı.',
-                        mapQuery: 'Hagia+Sophia+Sultanahmet+Istanbul'
-                    }
-                ],
-                '1day': [
-                    {
-                        time: '09:00',
-                        title: '🛍️ Kapalıçarşı Nuruosmaniye Kapısı (Kral Yolu Başlangıcı)',
-                        category: 'shopping',
-                        desc: '61 sokaklık dünyanın en büyük kapalı çarşısı ve tarihi zanaatkarlar.',
-                        closedNote: '⚠️ KAPALI GÜN: PAZAR günleri kapalıdır!',
-                        mapQuery: 'Grand+Bazaar+Nuruosmaniye+Istanbul'
-                    },
-                    {
-                        time: '10:15',
-                        title: '🕌 Sultanahmet Meydanı, Ayasofya & Yerebatan Sarnıcı',
-                        category: 'worship',
-                        desc: 'İmparatorluklar kalbi Ayasofya ve yeraltı su sarayı Yerebatan Sarnıcı.',
-                        mapQuery: 'Hagia+Sophia+Sultanahmet+Istanbul'
-                    },
-                    {
-                        time: '11:45',
-                        title: '🛍️ Mısır Çarşısı & Tarihi Eminönü Meydanı',
-                        category: 'shopping',
-                        desc: '1660’tan kalan baharat kokulu tarihi çarşı.',
-                        mapQuery: 'Misir+Carsisi+Eminonu+Istanbul'
-                    },
-                    {
-                        time: '12:45',
-                        title: '🌉 Tarihi Galata Köprüsü Yürüyüşü 👫',
-                        category: 'photo',
-                        desc: 'Eminönü’nden Karaköy’e Haliç üzerinden olta balıkçıları manzaralı yürüyüş.',
-                        mapQuery: 'Galata+Bridge+Istanbul'
-                    },
-                    {
-                        time: '13:30',
-                        title: '🪜 Karaköy & Kamondo Merdivenleri',
-                        category: 'photo',
-                        desc: 'Art nouveau tarzı tarihi dalgalı merdivenler.',
-                        mapQuery: 'Kamondo+Merdivenleri+Karakoy+Istanbul'
-                    },
-                    {
-                        time: '14:15',
-                        featured: true,
-                        title: '🍕 FIRINNA CAFE & RESTAURANT — Lezzet Molası & Sınırsız Çay 🍵',
-                        category: 'gourmet',
-                        desc: 'Kumbaracı Yokuşu No:41A’da bakır sahanda Çakallı Menemeni, taş fırın pizza ve sınırsız demli çay!',
-                        tip: '⭐ VIP Rota Ödülü: Yemekle birlikte tüm grubunuza SINIRSIZ ÇAY HEDİYE!',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '15:45',
-                        title: '🚇 Tarihi Tünel Füniküleri (1875) & İstiklal Caddesi',
-                        category: 'museums',
-                        desc: 'Dünyanın en eski 2. metrosu olan Tünel ile İstiklal Caddesi ve Taksim Meydanı.',
-                        mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul'
-                    }
-                ],
-                '2days': [
-                    {
-                        time: '09:00',
-                        title: '🏰 Topkapı Sarayı & Mukaddes Emanetler',
-                        category: 'museums',
-                        desc: 'Osmanlı sarayı, Kutsal Emanetler ve Boğaz manzarası.',
-                        closedNote: '⚠️ KAPALI GÜN: SALI günleri kapalıdır!',
-                        mapQuery: 'Topkapi+Palace+Museum+Istanbul'
-                    },
-                    {
-                        time: '11:00',
-                        title: '🕌 Süleymaniye Cami & Kanuni - Hürrem Sultan Türbeleri',
-                        category: 'worship',
-                        desc: 'Mimar Sinan’ın şaheseri. Kanuni Sultan Süleyman ve Hürrem Sultan’ın türbeleri.',
-                        mapQuery: 'Suleymaniye+Mosque+Istanbul'
-                    },
-                    {
-                        time: '13:00',
-                        featured: true,
-                        title: '🍳 FIRINNA CAFE & RESTAURANT — Lezzet Molası & Sınırsız Çay 🍵',
-                        category: 'gourmet',
-                        desc: 'Kumbaracı Yokuşu No:41A’da taş fırın pizza & sınırsız çay ikramı.',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '15:00',
-                        title: '🎭 Hodjapasha Tarihi Semazen Gösterisi 🎭',
-                        category: 'shows',
-                        desc: 'Sirkeci’de 550 yıllık tarihi yapılarda Semazen gösterisi.',
-                        mapQuery: 'Hodjapasha+Sirkeci+Istanbul'
-                    }
-                ]
+        // 100% ACCURATE MATRIX DATABASE: STRICT_POIS[startLocation][concept][duration]
+        const MATRIX_POIS = {
+            // ==================== 1. KADIKÖY / MODA START ====================
+            kadikoy: {
+                nature: {
+                    half: [
+                        {
+                            time: '09:30',
+                            title: '🌊 Kadıköy Moda Sahil Parkı & Kayalıklar Yürüyüşü 👫',
+                            category: 'nature_sports',
+                            desc: 'Marmara Denizi ve Adalar manzaralı yemyeşil çimlerde sahil yürüyüşü.',
+                            tip: '🌊 Tuyo: Sahil kulvarında deniz havası eşliğinde yürüyüş.',
+                            mapQuery: 'Moda+Sahil+Parki+Kadikoy+Istanbul'
+                        },
+                        {
+                            time: '11:00',
+                            title: '🌲 Fenerbahçe Parkı & Kalamış Marina Doğa Kulvarı 🏃',
+                            category: 'nature_sports',
+                            desc: 'Tarihi sakız ağaçları, Kalamış marina ve sahil spor kulvarı.',
+                            mapQuery: 'Fenerbahce+Parki+Kadikoy+Istanbul'
+                        },
+                        {
+                            time: '12:30',
+                            title: '⛵ Kadıköy İskelesi’nden Nostaljik Vapurla Karaköy’e Geçiş',
+                            category: 'photo',
+                            desc: 'Karaköy vapur turu ile Kız Kulesi manzarası ve martılara simit atma keyfi.',
+                            mapQuery: 'Kadikoy+Vapur+Iskele+Istanbul'
+                        },
+                        {
+                            time: '13:15',
+                            featured: true,
+                            title: '🍳 FIRINNA CAFE & RESTAURANT — Sahil Yürüyüşü Sonrası Lezzet Molası & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Karaköy iskelesinden 5 dk yürüme mesafesinde Galata Kumbaracı Yokuşu No:41A’da bakır sahanda Çakallı Menemeni, taş fırın pizza ve tüm grubunuza sınırsız demli Türk çayı!',
+                            tip: '⭐ VIP Rota Ödülü: Yemekle birlikte tüm grubunuza SINIRSIZ ÇAY HEDİYE!',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ],
+                    '1day': [
+                        {
+                            time: '09:00',
+                            title: '🌊 Moda Sahil Parkı & Fenerbahçe Korusu Doğa Yürüyüşü 🏃',
+                            category: 'nature_sports',
+                            desc: 'Moda ve Fenerbahçe sahil kulvarlarında sabah spor ve doğa yürüyüşü.',
+                            mapQuery: 'Moda+Sahil+Parki+Kadikoy+Istanbul'
+                        },
+                        {
+                            time: '11:00',
+                            title: '⛵ Kadıköy/Bostancı Vapuru ile Büyükada Çam Ormanları Geçişi 🚲',
+                            category: 'nature_sports',
+                            desc: 'Vapurla adaya geçiş; çam ormanları arasında elektrikli bisiklet doğa turu ve Aya Yorgi tırmanışı.',
+                            mapQuery: 'Buyukada+Aya+Yorgi+Kilisesi+Istanbul'
+                        },
+                        {
+                            time: '15:30',
+                            featured: true,
+                            title: '🍳 FIRINNA CAFE & RESTAURANT — Ada Dönüşü Galata Lezzet Molası & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Karaköy vapur iskelesinden 5 dk mesafede Fırınna Cafe’de pizza, menemen & sınırsız çay keyfi.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ],
+                    '2days': [
+                        {
+                            time: '09:00',
+                            title: '🌲 Belgrad Ormanı & Neşet Suyu 6km Koşu Parkuru 🏃',
+                            category: 'nature_sports',
+                            desc: 'İstanbul’un akciğeri 6 km’lik kauçuk koşu kulvarında doğa sporu.',
+                            mapQuery: 'Belgrad+Ormani+Neset+Suyu+Koşu+Parkuru+Istanbul'
+                        },
+                        {
+                            time: '12:00',
+                            title: '⛵ Büyükada Çam Ormanları & Aya Yorgi Bisiklet Turu',
+                            category: 'nature_sports',
+                            desc: 'Adalar manzarası eşliğinde doğa turu.',
+                            mapQuery: 'Buyukada+Aya+Yorgi+Kilisesi+Istanbul'
+                        },
+                        {
+                            time: '15:00',
+                            featured: true,
+                            title: '🍳 FIRINNA CAFE & RESTAURANT — Galata Enerji Molası 🍵',
+                            category: 'gourmet',
+                            desc: 'Galata Kumbaracı Yokuşu’nda menemen, pizza & sınırsız çay.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ]
+                },
+                historical: {
+                    half: [
+                        {
+                            time: '09:30',
+                            title: '⛵ Kadıköy Vapuru ile Eminönü’ne Geçiş',
+                            category: 'photo',
+                            desc: 'Boğaz ve Kız Kulesi manzaralı nostaljik deniz yolculuğu.',
+                            mapQuery: 'Kadikoy+Vapur+Iskele+Istanbul'
+                        },
+                        {
+                            time: '10:30',
+                            title: '🕌 Sultanahmet Meydanı & Ayasofya-i Kebir Cami',
+                            category: 'worship',
+                            desc: '1500 yıllık dünya mimarlık mirası şaheser.',
+                            mapQuery: 'Hagia+Sophia+Sultanahmet+Istanbul'
+                        },
+                        {
+                            time: '12:00',
+                            title: '🌉 Tarihi Galata Köprüsü Yürüyüşü 👫',
+                            category: 'photo',
+                            desc: 'Haliç ve Süleymaniye manzarası eşliğinde yürüyüş.',
+                            mapQuery: 'Galata+Bridge+Istanbul'
+                        },
+                        {
+                            time: '12:45',
+                            featured: true,
+                            title: '🍕 FIRINNA CAFE & RESTAURANT — Tarih Turu Sonrası Pizza & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Kumbaracı Yokuşu No:41A’da taş fırın pizza ve grubunuza sınırsız çay ikramı.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ],
+                    '1day': [
+                        {
+                            time: '09:00',
+                            title: '⛵ Kadıköy’den Vapurla Eminönü Tarihi Çarşılar Geçişi',
+                            category: 'shopping',
+                            desc: 'Mısır Çarşısı baharat kokuları ve taze çekilmiş Türk kahvesi.',
+                            mapQuery: 'Misir+Carsisi+Eminonu+Istanbul'
+                        },
+                        {
+                            time: '10:30',
+                            title: '🕌 Ayasofya, Sultanahmet & Yerebatan Sarnıcı',
+                            category: 'worship',
+                            desc: 'Bizans su sarayı Yerebatan ve Ayasofya mimarisi.',
+                            mapQuery: 'Yerebatan+Sarnici+Sultanahmet+Istanbul'
+                        },
+                        {
+                            time: '13:00',
+                            title: '🛍️ Kapalıçarşı Nuruosmaniye Bedesteni',
+                            category: 'shopping',
+                            desc: 'Dünyanın en büyük tarihi kapalı çarşısı.',
+                            mapQuery: 'Grand+Bazaar+Nuruosmaniye+Istanbul'
+                        },
+                        {
+                            time: '14:30',
+                            featured: true,
+                            title: '🍕 FIRINNA CAFE & RESTAURANT — Kral Yolu Mola & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Kumbaracı Yokuşu’nda taş fırın pizza & sınırsız çay.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ]
+                },
+                photo: {
+                    half: [
+                        {
+                            time: '10:00',
+                            title: '🌊 Moda Sahil Parkı & Bahariye Caddesi Fotoğraf Turu 👫',
+                            category: 'photo',
+                            desc: 'Kadıköy Boğa Heykeli, nostaljik tramvay kulvarı ve sahil kayalıkları.',
+                            mapQuery: 'Moda+Sahil+Parki+Kadikoy+Istanbul'
+                        },
+                        {
+                            time: '11:45',
+                            title: '⛵ Vapur Yolculuğu ile Galata & Kamondo Merdivenleri',
+                            category: 'photo',
+                            desc: 'Vapurla Karaköy’e geçiş, Kamondo merdivenleri karesi.',
+                            mapQuery: 'Kamondo+Merdivenleri+Karakoy+Istanbul'
+                        },
+                        {
+                            time: '12:45',
+                            featured: true,
+                            title: '🍳 FIRINNA CAFE & RESTAURANT — Fotoğraf Molası & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Kumbaracı Yokuşu No:41A’da kahvaltı, pizza & sınırsız çay.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ]
+                },
+                nightlife: {
+                    half: [
+                        {
+                            time: '17:30',
+                            title: '⛵ Kadıköy’den Vapurla Karaköy’e Akşam Geçişi',
+                            category: 'photo',
+                            desc: 'Gün batımında Boğaz manzaralı vapur yolculuğu.',
+                            mapQuery: 'Karakoy+Vapur+Iskele+Istanbul'
+                        },
+                        {
+                            time: '18:30',
+                            featured: true,
+                            title: '🍕 FIRINNA CAFE & RESTAURANT — Akşam Yemeği & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Taş fırın pizzalar & sıcak Türk kahvesi.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        },
+                        {
+                            time: '20:00',
+                            title: '🍻 Kadıköy Moda Barlar Sokağı (Kadife Sokak) & Asmalımescit 🍻',
+                            category: 'nightlife',
+                            desc: 'Canlı caz mekanları ve akşam barları.',
+                            mapQuery: 'Kadife+Sokak+Kadikoy+Istanbul'
+                        }
+                    ]
+                }
             },
-            nature: {
-                half: [
-                    {
-                        time: '09:30',
-                        title: '🏃 Nişantaşı Lüks Caddeler & Maçka Demokrasi Parkı Yürüyüşü 🏃',
-                        category: 'nature_sports',
-                        desc: 'Maçka Parkı yeşillikleri ve spor kulvarında doğa yürüyüşü.',
-                        mapQuery: 'Macka+Demokrasi+Parki+Nisantasi+Istanbul'
-                    },
-                    {
-                        time: '11:30',
-                        title: '🚡 Maçka - Taşkışla Teleferik Yolculuğu & Yıldız Parkı',
-                        category: 'nature_sports',
-                        desc: 'Park üstünden panoramik teleferik ve tarihi Yıldız Parkı çam ormanları.',
-                        mapQuery: 'Yildiz+Parki+Besiktas+Istanbul'
-                    },
-                    {
-                        time: '13:00',
-                        featured: true,
-                        title: '🍳 FIRINNA CAFE & RESTAURANT — Doğa Yürüyüşü Sonrası Enerji & Sınırsız Çay 🍵',
-                        category: 'gourmet',
-                        desc: 'Kumbaracı Yokuşu No:41A’da sıcak menemen, taş fırın pizza & sınırsız demli çay.',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    }
-                ],
-                '1day': [
-                    {
-                        time: '09:00',
-                        title: '🌲 Belgrad Ormanı & Neşet Suyu 6km Koşu Parkuru 🏃',
-                        category: 'nature_sports',
-                        desc: 'İstanbul’un akciğeri. 6 km’lik kauçuk koşu ve yürüyüş kulvarı.',
-                        mapQuery: 'Belgrad+Ormani+Neset+Suyu+Koşu+Parkuru+Istanbul'
-                    },
-                    {
-                        time: '11:30',
-                        title: '🌿 Atatürk Arboretumu (Bahçeköy Canlı Ağaç Müzesi)',
-                        category: 'nature_sports',
-                        desc: 'Binlerce nadir ağaç ve bitki türünün bulunduğu göletli büyüleyici canlı doğa müzesi.',
-                        closedNote: '⚠️ KAPALI GÜN: PAZARTESİ günleri kapalıdır!',
-                        mapQuery: 'Ataturk+Arboretumu+Bahcekoy+Istanbul'
-                    },
-                    {
-                        time: '13:30',
-                        featured: true,
-                        title: '🍳 FIRINNA CAFE & RESTAURANT — Orman Gezisi Sonrası Enerji & Sınırsız Çay 🍵',
-                        category: 'gourmet',
-                        desc: 'Orman gezisi sonrası Kumbaracı Yokuşu’ndaki Fırınna Cafe’ye geçiş. Sıcak menemen, taş fırın pizza & sınırsız demli çay.',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    }
-                ],
-                '2days': [
-                    {
-                        time: '09:00',
-                        title: '🌲 Belgrad Ormanı Neşet Suyu Koşu Parkuru 🏃',
-                        category: 'nature_sports',
-                        desc: '6 km kauçuk kaplı koşu kulvarında doğa sporu.',
-                        mapQuery: 'Belgrad+Ormani+Neset+Suyu+Koşu+Parkuru+Istanbul'
-                    },
-                    {
-                        time: '12:00',
-                        title: '⛵ Büyükada Çam Ormanları & Aya Yorgi Tırmanış Yürüyüşü 🚲',
-                        category: 'nature_sports',
-                        desc: 'Vapurla adaya geçiş; çam ormanları arasında bisiklet ve Yücetepe Aya Yorgi tırmanışı.',
-                        mapQuery: 'Buyukada+Aya+Yorgi+Kilisesi+Istanbul'
-                    },
-                    {
-                        time: '15:30',
-                        featured: true,
-                        title: '🍳 FIRINNA CAFE & RESTAURANT — Ada Dönüşü Galata Mola 🍵',
-                        category: 'gourmet',
-                        desc: 'Karaköy iskelesinden 5 dk’da Fırınna Cafe’ye geçiş ve sınırsız çay keyfi.',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    }
-                ]
+
+            // ==================== 2. BEYOĞLU / GALATA / TAKSİM START ====================
+            beyoglu: {
+                nature: {
+                    half: [
+                        {
+                            time: '09:30',
+                            title: '🏃 Nişantaşı Lüks Caddeler & Maçka Demokrasi Parkı Yürüyüşü 🏃',
+                            category: 'nature_sports',
+                            desc: 'Maçka Parkı yemyeşil kulvarında doğa yürüyüşü.',
+                            mapQuery: 'Macka+Demokrasi+Parki+Nisantasi+Istanbul'
+                        },
+                        {
+                            time: '11:00',
+                            title: '🚡 Maçka - Taşkışla Teleferik Yolculuğu & Yıldız Parkı Koruları',
+                            category: 'nature_sports',
+                            desc: 'Teleferik yolculuğu ve tarihi Yıldız Parkı çam ormanları.',
+                            mapQuery: 'Yildiz+Parki+Besiktas+Istanbul'
+                        },
+                        {
+                            time: '12:30',
+                            featured: true,
+                            title: '🍳 FIRINNA CAFE & RESTAURANT — Kumbaracı Yokuşu Enerji Molası & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Kumbaracı Yokuşu No:41A’da bakır sahanda Çakallı Menemeni, taş fırın pizza ve tüm grubunuza sınırsız demli Türk çayı!',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ],
+                    '1day': [
+                        {
+                            time: '09:00',
+                            title: '🌲 Belgrad Ormanı & Neşet Suyu 6km Koşu Parkuru 🏃',
+                            category: 'nature_sports',
+                            desc: 'İstanbul’un akciğeri 6 km’lik kauçuk koşu kulvarı.',
+                            mapQuery: 'Belgrad+Ormani+Neset+Suyu+Koşu+Parkuru+Istanbul'
+                        },
+                        {
+                            time: '11:30',
+                            title: '🌿 Atatürk Arboretumu (Bahçeköy Canlı Ağaç Müzesi)',
+                            category: 'nature_sports',
+                            desc: 'Binlerce nadir ağaç türünün bulunduğu göletli doğa müzesi.',
+                            closedNote: '⚠️ KAPALI GÜN: PAZARTESİ günleri kapalıdır!',
+                            mapQuery: 'Ataturk+Arboretumu+Bahcekoy+Istanbul'
+                        },
+                        {
+                            time: '13:30',
+                            featured: true,
+                            title: '🍳 FIRINNA CAFE & RESTAURANT — Orman Gezisi Sonrası Enerji & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Kumbaracı Yokuşu No:41A’da menemen, pizza & sınırsız çay.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ]
+                },
+                historical: {
+                    half: [
+                        {
+                            time: '09:30',
+                            title: '🗼 Galata Kulesi & Tarihi Taş Sokaklar',
+                            category: 'museums',
+                            desc: 'Cenevizlilerden kalan 670 yıllık ikonik kule.',
+                            mapQuery: 'Galata+Kulesi+Beyoglu+Istanbul'
+                        },
+                        {
+                            time: '10:30',
+                            title: '🪜 Kamondo Merdivenleri & Bankalar Caddesi',
+                            category: 'photo',
+                            desc: 'Art nouveau tarzı tarihi dalgalı merdivenler.',
+                            mapQuery: 'Kamondo+Merdivenleri+Karakoy+Istanbul'
+                        },
+                        {
+                            time: '11:30',
+                            featured: true,
+                            title: '🍳 FIRINNA CAFE & RESTAURANT — Kahvaltı & Sınırsız Çay Molası 🍵',
+                            category: 'gourmet',
+                            desc: 'Kumbaracı Yokuşu No:41A’da menemen, tost & sınırsız çay.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        },
+                        {
+                            time: '12:45',
+                            title: '🕌 Ayasofya-i Kebir Cami & Yerebatan Sarnıcı',
+                            category: 'worship',
+                            desc: 'Ayasofya ve Bizans su sarayı Yerebatan.',
+                            mapQuery: 'Hagia+Sophia+Sultanahmet+Istanbul'
+                        }
+                    ]
+                },
+                photo: {
+                    half: [
+                        {
+                            time: '10:00',
+                            title: '🏡 Fener & Balat Renkli Tarihi Evler 👫',
+                            category: 'photo',
+                            desc: 'Haliç kıyısındaki tarihi arnavut kaldırımlı renkli evler.',
+                            mapQuery: 'Balat+Renkli+Evler+Fatih+Istanbul'
+                        },
+                        {
+                            time: '11:30',
+                            title: '🗼 Galata Taş Sokakları & Kamondo Merdivenleri',
+                            category: 'photo',
+                            desc: 'Otantik taş sokaklar ve merdiven karesi.',
+                            mapQuery: 'Kamondo+Merdivenleri+Karakoy+Istanbul'
+                        },
+                        {
+                            time: '12:30',
+                            featured: true,
+                            title: '🍳 FIRINNA CAFE & RESTAURANT — Fotoğraf Molası & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Kumbaracı Yokuşu No:41A’da lezzet molası.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ]
+                },
+                nightlife: {
+                    half: [
+                        {
+                            time: '17:00',
+                            title: '🗼 Galata Taş Sokaklar & İkindi Gezintisi',
+                            category: 'photo',
+                            desc: 'Galata Kulesi çevresi otantik tasarım dükkanları.',
+                            mapQuery: 'Galata+Kulesi+Beyoglu+Istanbul'
+                        },
+                        {
+                            time: '18:15',
+                            featured: true,
+                            title: '🍕 FIRINNA CAFE & RESTAURANT — Akşam Yemeği & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Taş fırın pizzalar & demli Türk çayı.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        },
+                        {
+                            time: '19:45',
+                            title: '🎷 Asmalımescit & Cihangir Canlı Caz & Barlar 🍻',
+                            category: 'nightlife',
+                            desc: 'Tarihi Beyoğlu sokaklarında canlı müzik barları.',
+                            mapQuery: 'Asmalimescit+Beyoglu+Istanbul'
+                        }
+                    ]
+                }
             },
-            photo: {
-                half: [
-                    {
-                        time: '10:00',
-                        title: '🏡 Fener & Balat Renkli Tarihi Evler 👫',
-                        category: 'photo',
-                        desc: 'Haliç kıyısındaki arnavut kaldırımlı sokaklarda renkli ahşap evler.',
-                        mapQuery: 'Balat+Renkli+Evler+Fatih+Istanbul'
-                    },
-                    {
-                        time: '11:30',
-                        title: '🪜 Karaköy & Kamondo Merdivenleri',
-                        category: 'photo',
-                        desc: 'Art nouveau tarzı tarihi dalgalı merdivenlerde fotoğraf çekimi.',
-                        mapQuery: 'Kamondo+Merdivenleri+Karakoy+Istanbul'
-                    },
-                    {
-                        time: '12:30',
-                        featured: true,
-                        title: '🍳 FIRINNA CAFE & RESTAURANT — Lezzet Molası & Sınırsız Çay 🍵',
-                        category: 'gourmet',
-                        desc: 'Kumbaracı Yokuşu’nda otantik Fırınna Cafe lezzet molası.',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    }
-                ],
-                '1day': [
-                    {
-                        time: '10:00',
-                        title: '🏡 Fener & Balat Renkli Tarihi Evler 👫',
-                        category: 'photo',
-                        desc: 'Renkli ahşap evler ve fotoğraf sokakları.',
-                        mapQuery: 'Balat+Renkli+Evler+Fatih+Istanbul'
-                    },
-                    {
-                        time: '11:45',
-                        title: '🌉 Tarihi Galata Köprüsü & Karaköy Taş Sokaklar',
-                        category: 'photo',
-                        desc: 'Köprü üstünden Boğaz ve Haliç manzaralı yürüyüş.',
-                        mapQuery: 'Galata+Bridge+Istanbul'
-                    },
-                    {
-                        time: '12:45',
-                        featured: true,
-                        title: '🍕 FIRINNA CAFE & RESTAURANT — Öğle Yemeği & Sınırsız Çay 🍵',
-                        category: 'gourmet',
-                        desc: 'Kumbaracı Yokuşu No:41A’da taş fırın pizza & demli çay.',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '14:30',
-                        title: '⛵ Karaköy - Kadıköy Nostaljik Vapur Yolculuğu & Moda Sahil',
-                        category: 'photo',
-                        desc: 'Kız Kulesi manzaralı vapur yolculuğu ve Moda sahil çimleri.',
-                        mapQuery: 'Moda+Sahil+Parki+Kadikoy+Istanbul'
-                    }
-                ],
-                '2days': [
-                    {
-                        time: '10:00',
-                        title: '🏡 Balat & Fener Renkli Mahalleler',
-                        category: 'photo',
-                        desc: 'Renkli evler ve merdivenli yokuşlar.',
-                        mapQuery: 'Balat+Renkli+Evler+Fatih+Istanbul'
-                    },
-                    {
-                        time: '12:30',
-                        featured: true,
-                        title: '🍳 FIRINNA CAFE & RESTAURANT — Galata Mola 🍵',
-                        category: 'gourmet',
-                        desc: 'Galata Kumbaracı Yokuşu’nda menemen & sınırsız çay.',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '15:00',
-                        title: '⛵ Büyükada Çam Ormanları Fotoğraf Gezisi',
-                        category: 'photo',
-                        desc: 'Büyükada tarihi konakları ve çam ormanı sahil yolu.',
-                        mapQuery: 'Buyukada+Istanbul'
-                    }
-                ]
+
+            // ==================== 3. SULTANAHMET / YARIMADA START ====================
+            sultanahmet: {
+                nature: {
+                    half: [
+                        {
+                            time: '09:30',
+                            title: '🌿 Tarihi Gülhane Parkı & Asırlık Ağaçlar Yürüyüşü 🏃',
+                            category: 'nature_sports',
+                            desc: 'Saray avlusundan Gülhane parkına asırlık çınar ağaçları yürüyüşü.',
+                            mapQuery: 'Gulhane+Parki+Sultanahmet+Istanbul'
+                        },
+                        {
+                            time: '11:00',
+                            title: '🌊 Sarayburnu Sahil Yolu & Boğaz Manzarası Yürüyüşü',
+                            category: 'nature_sports',
+                            desc: 'Boğaz ve Marmara Denizi birleşim kulvarında deniz havası.',
+                            mapQuery: 'Sarayburnu+Parki+Istanbul'
+                        },
+                        {
+                            time: '12:30',
+                            title: '🌉 Galata Köprüsü Üzerinden Kumbaracı Yokuşu’na Tırmanış',
+                            category: 'photo',
+                            desc: 'Eminönü’nden Karaköy’e köprü yürüyüşü.',
+                            mapQuery: 'Galata+Bridge+Istanbul'
+                        },
+                        {
+                            time: '13:15',
+                            featured: true,
+                            title: '🍳 FIRINNA CAFE & RESTAURANT — Park Yürüyüşü Sonrası Lezzet Molası & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Kumbaracı Yokuşu No:41A’da Çakallı Menemeni, pizza & sınırsız demli çay.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ]
+                },
+                historical: {
+                    half: [
+                        {
+                            time: '09:00',
+                            title: '🕌 Ayasofya-i Kebir Cami & Yerebatan Sarnıcı',
+                            category: 'worship',
+                            desc: '1500 yıllık mimari harikası Ayasofya ve yeraltı su sarayı.',
+                            mapQuery: 'Hagia+Sophia+Sultanahmet+Istanbul'
+                        },
+                        {
+                            time: '11:00',
+                            title: '🛍️ Mısır Çarşısı & Eminönü Tarihi Meydanı',
+                            category: 'shopping',
+                            desc: 'Baharat kokulu Mısır Çarşısı ve lokumcular.',
+                            mapQuery: 'Misir+Carsisi+Eminonu+Istanbul'
+                        },
+                        {
+                            time: '12:15',
+                            title: '🌉 Tarihi Galata Köprüsü Yürüyüşü',
+                            category: 'photo',
+                            desc: 'Haliç manzarası eşliğinde Galata yönüne geçiş.',
+                            mapQuery: 'Galata+Bridge+Istanbul'
+                        },
+                        {
+                            time: '13:00',
+                            featured: true,
+                            title: '🍕 FIRINNA CAFE & RESTAURANT — Tarih Gezisi Sonrası Pizza & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Kumbaracı Yokuşu No:41A’da pizza & sınırsız çay ikramı.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ]
+                }
             },
-            nightlife: {
-                half: [
-                    {
-                        time: '17:00',
-                        title: '🗼 Galata Taş Sokaklar & İkindi Gezintisi',
-                        category: 'photo',
-                        desc: 'Galata Kulesi çevresindeki otantik tasarım dükkanları.',
-                        mapQuery: 'Galata+Kulesi+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '18:15',
-                        featured: true,
-                        title: '🍕 FIRINNA CAFE & RESTAURANT — Akşam Yemeği & Sınırsız Çay 🍵',
-                        category: 'gourmet',
-                        desc: 'Taş fırın pizzalar, İtalyan lezzetler ve sıcak demli Türk çayı.',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '19:45',
-                        title: '🎷 Asmalımescit & Cihangir Canlı Caz & Barlar 🍻',
-                        category: 'nightlife',
-                        desc: 'Tarihi Beyoğlu sokaklarında canlı müzik ve akşam sosyalleşme mekanları.',
-                        mapQuery: 'Asmalimescit+Beyoglu+Istanbul'
-                    }
-                ],
-                '1day': [
-                    {
-                        time: '16:00',
-                        title: '🏙️ İstiklal Caddesi, Tünel & Galata Yürüyüşü',
-                        category: 'photo',
-                        desc: 'Akşamüstü İstiklal Caddesi canlı atmosferi.',
-                        mapQuery: 'Tunel+Meydani+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '18:00',
-                        featured: true,
-                        title: '🍕 FIRINNA CAFE & RESTAURANT — Akşam Yemeği & Sınırsız Çay 🍵',
-                        category: 'gourmet',
-                        desc: 'Kumbaracı Yokuşu No:41A’da taş fırın pizza ve demli çay.',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '20:00',
-                        title: '🎷 Asmalımescit, Cihangir & Kadıköy Kadife Barlar Sokağı 🍻',
-                        category: 'nightlife',
-                        desc: 'Canlı performans barları, caz kulüpleri ve gece hayatı.',
-                        mapQuery: 'Kadife+Sokak+Kadikoy+Istanbul'
-                    }
-                ],
-                '2days': [
-                    {
-                        time: '17:00',
-                        title: '🌆 Karaköy Rıhtım & Galata Akşam Yürüyüşü',
-                        category: 'photo',
-                        desc: 'Boğaz ışıkları eşliğinde akşamüstü yürüyüşü.',
-                        mapQuery: 'Karakoy+Istanbul'
-                    },
-                    {
-                        time: '18:30',
-                        featured: true,
-                        title: '🍕 FIRINNA CAFE & RESTAURANT — Akşam Yemeği & Sınırsız Çay 🍵',
-                        category: 'gourmet',
-                        desc: 'Akşam yemeği ve grubunuza sınırsız çay ikramı.',
-                        closedNoteDynamic: true,
-                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
-                    },
-                    {
-                        time: '20:00',
-                        title: '🎷 Beyoğlu & Kadıköy Gece Hayatı & Canlı Müzik 🍻',
-                        category: 'nightlife',
-                        desc: 'Canlı caz mekanları ve otantik publar.',
-                        mapQuery: 'Asmalimescit+Beyoglu+Istanbul'
-                    }
-                ]
+
+            // ==================== 4. KARAKÖY / PORT / BEŞİKTAŞ START ====================
+            karakoy_besiktas: {
+                nature: {
+                    half: [
+                        {
+                            time: '09:30',
+                            title: '🌳 Yıldız Parkı Tarihi Korular & Ihlamur Kasrı Yürüyüşü 🏃',
+                            category: 'nature_sports',
+                            desc: 'Tarihi köşkler ve çam ağaçları arasında doğa yürüyüşü.',
+                            mapQuery: 'Yildiz+Parki+Besiktas+Istanbul'
+                        },
+                        {
+                            time: '11:30',
+                            title: '🌊 Beşiktaş Sahil Kordon Yürüyüşü',
+                            category: 'nature_sports',
+                            desc: 'Boğaz manzarası eşliğinde Beşiktaş sahil yürüyüş kulvarı.',
+                            mapQuery: 'Besiktas+Sahil+Istanbul'
+                        },
+                        {
+                            time: '12:45',
+                            featured: true,
+                            title: '🍳 FIRINNA CAFE & RESTAURANT — Sahil Yürüyüşü Sonrası Lezzet Molası & Sınırsız Çay 🍵',
+                            category: 'gourmet',
+                            desc: 'Karaköy’den 5 dk yürüme mesafesindeki Fırınna Cafe’de pizza, menemen & sınırsız çay.',
+                            closedNoteDynamic: true,
+                            mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                        }
+                    ]
+                }
             }
         };
 
@@ -1542,11 +1650,15 @@
         }
 
         function generateSurpriseItinerary() {
+            const starts = ['beyoglu', 'kadikoy', 'sultanahmet', 'karakoy_besiktas'];
             const concepts = ['historical', 'nature', 'photo', 'nightlife'];
-            const times = ['half', '1day', '2days'];
+            const times = ['half', '1day'];
+            
+            selectedStart = starts[Math.floor(Math.random() * starts.length)];
             selectedConcept = concepts[Math.floor(Math.random() * concepts.length)];
             selectedTime = times[Math.floor(Math.random() * times.length)];
             
+            document.querySelectorAll('#grid-start .option-pill').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('#grid-concept .option-pill').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('#grid-time .option-pill').forEach(p => p.classList.remove('active'));
 
@@ -1568,29 +1680,34 @@
                 });
             }
 
-            // GET ACCURATE STRICT POIS ACCORDING TO SELECTED CONCEPT & DURATION
-            const conceptPois = (STRICT_POIS[selectedConcept] && STRICT_POIS[selectedConcept][selectedTime]) 
-                                || STRICT_POIS['historical']['half'];
+            // FETCH EXACT MATCH FROM LOCATION-AWARE MATRIX DATABASE
+            let locationGroup = MATRIX_POIS[selectedStart] || MATRIX_POIS['beyoglu'];
+            let conceptGroup = locationGroup[selectedConcept] || locationGroup['historical'] || MATRIX_POIS['beyoglu']['historical'];
+            let matchedPois = conceptGroup[selectedTime] || conceptGroup['half'] || MATRIX_POIS['beyoglu']['historical']['half'];
 
             let finalPOIs = [];
 
-            // 1. HOTEL / STARTING POINT INTEGRATION AT TOP
-            if (hotelNameInput) {
-                finalPOIs.push({
-                    time: '08:30',
-                    hotelStart: true,
-                    title: `🏨 Konaklama / Başlangıç: ${hotelNameInput}`,
-                    category: 'hotel',
-                    desc: `Rotanız doğrudan "${hotelNameInput}" konumunuzdan başlayıp Google Haritalar navigasyonuyla adım adım ilerliyor.`,
-                    tip: '📍 Otelinizden/konumunuzdan başlayarak navigasyonu başlatabilirsiniz.',
-                    mapQuery: encodeURIComponent(hotelNameInput)
-                });
-            }
+            // 1. STARTING HOTEL/LOCATION ITEM AT TOP
+            const startLabelName = hotelNameInput || (
+                selectedStart === 'kadikoy' ? 'Kadıköy / Moda' :
+                selectedStart === 'sultanahmet' ? 'Sultanahmet / Yarımada' :
+                selectedStart === 'karakoy_besiktas' ? 'Karaköy / Beşiktaş' : 'Beyoğlu / Galata / Taksim'
+            );
 
-            finalPOIs.push(...conceptPois);
+            finalPOIs.push({
+                time: '08:30',
+                hotelStart: true,
+                title: `🏡 Başlangıç Noktanız: ${startLabelName}`,
+                category: 'hotel',
+                desc: `Rotanız doğrudan "${startLabelName}" konumunuzdan başlayıp Google Haritalar navigasyonuyla adım adım ilerliyor.`,
+                tip: '📍 Konumunuzdan başlayarak doğrudan harita navigasyonunu başlatabilirsiniz.',
+                mapQuery: encodeURIComponent(startLabelName)
+            });
 
-            const startText = hotelNameInput ? `"${hotelNameInput}" konumunuzdan başlayan` : `Seçtiğiniz konsept ve sürenize özel`;
-            document.getElementById('result-start-desc').innerText = `${startText} tam filtreli tutarlı gezi rotanız ve Fırınna Cafe sınırsız çay ikramlı lezzet molanız hazır.`;
+            finalPOIs.push(...matchedPois);
+
+            const startText = `"${startLabelName}" konumunuzdan başlayan`;
+            document.getElementById('result-start-desc').innerText = `${startText} kişiselleştirilmiş konuma tam uyumlu gezi rotanız ve Fırınna Cafe sınırsız çay ikramlı lezzet molanız hazır.`;
 
             const randomCode = Math.floor(1000 + Math.random() * 9000);
             document.getElementById('ticket-code').innerText = `#FIRINNA-TEA-${randomCode}`;
@@ -1644,11 +1761,11 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         event: 'action',
-                        item: `Gezi Rehberi Rota Oluşturma (${selectedConcept})`,
+                        item: `Gezi Rehberi Rota Oluşturma (${selectedStart} - ${selectedConcept})`,
                         selectedRegion: selectedConcept,
                         selectedTime: selectedTime,
                         startPoint: selectedStart,
-                        hotelName: hotelNameInput || 'Serbest Konum'
+                        hotelName: startLabelName
                     })
                 }).catch(e => {});
             }
