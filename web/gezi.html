@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="İstiklal Caddesi nostaljik tramvay rotası, Galata, Sultanahmet, Kadıköy gezi rehberi, canlı haritalar ve Fırınna Cafe VIP ikram kartı.">
-    <meta name="keywords" content="İstanbul gezi rehberi, nostaljik tramvay istanbul, galata kulesi gezi rehberi, Karaköy Güllüoğlu baklava, Fırınna cafe">
+    <meta name="description" content="Kademeli açılan akıllı İstanbul gezi rehberi, canlı haritalar ve Fırınna Cafe VIP ikram kartı.">
+    <meta name="keywords" content="İstanbul gezi rehberi, kademeli rota planlayıcı, galata kulesi gezi rehberi, Karaköy Güllüoğlu baklava, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
     <meta property="og:title" content="İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe">
-    <meta property="og:description" content="Başlangıç merkezinizi, gezi saatinizi ve sürenizi seçin; VIP Dijital Seyahat Biletinizi anında indirin!">
-    <meta property="og:image" content="https://firinna.com/banner.jpg">
+    <meta property="og:description" content="Adım adım seyahat tercihlerinizi seçin; canlı harita rotanızı ve VIP İkram Biletinizi oluşturun!">
+    <meta property="og:image" content="https://firinna.com/logo.png">
     <meta property="og:url" content="https://firinna.com/gezi">
     <meta property="og:type" content="website">
 
@@ -67,53 +67,88 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        /* İSTANBUL NOSTALJİK TRAMVAY & MOTİF SANATI ÖZEL STİLLERİ */
-        .tram-hero-banner {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border: 2px solid #f59e0b;
-            border-radius: 18px;
-            padding: 1.8rem;
-            margin-bottom: 2rem;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
+        /* ANIMATIONS FOR PROGRESSIVE STEP REVEAL */
+        @keyframes stepFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .tram-graphic-badge {
-            background: rgba(220, 38, 38, 0.15);
-            border: 1px solid #ef4444;
-            color: #fca5a5;
-            font-size: 0.85rem;
+        .step-container {
+            animation: stepFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* SLEEK COMPACT TOP NAV BAR */
+        .gezi-compact-nav {
+            background: #0f172a;
+            border-bottom: 2px solid #d97706;
+            padding: 12px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .gezi-compact-container {
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gezi-brand-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
             font-weight: 800;
+            font-size: 1.05rem;
+        }
+
+        .gezi-brand-link img {
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid #f59e0b;
+            background: white;
+            padding: 2px;
+        }
+
+        .gezi-nav-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .gezi-nav-btn-link {
+            background: rgba(255,255,255,0.08);
+            color: #cbd5e1;
             padding: 6px 14px;
             border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 6px;
         }
 
-        .motif-star-icon {
-            font-size: 1.2rem;
-            color: #fbbf24;
-            vertical-align: middle;
+        .gezi-nav-btn-link:hover {
+            background: #f59e0b;
+            color: #0f172a;
+            border-color: #f59e0b;
         }
 
-        /* WIZARD CARD MAIN OVERRIDE FOR PERFECT MATCH WITH DASHBOARD */
-        .gezi-dashboard {
-            max-width: 1000px;
-            margin: -60px auto 40px;
-            padding: 0 20px;
-            position: relative;
-            z-index: 5;
+        /* MAIN CLEAN CONTAINER */
+        .gezi-dashboard-clean {
+            max-width: 960px;
+            margin: 2rem auto 4rem;
+            padding: 0 16px;
         }
 
-        .wizard-card-main {
+        .wizard-card-clean {
             background: #ffffff;
             border-radius: 18px;
-            padding: 2.2rem;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
             border: 1px solid #e2e8f0;
         }
 
@@ -121,8 +156,8 @@
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             border: 2px solid #f59e0b;
             border-radius: 14px;
-            padding: 14px 18px;
-            margin-bottom: 2rem;
+            padding: 12px 18px;
+            margin-bottom: 1.8rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -134,7 +169,6 @@
         .surprise-banner-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(245, 158, 11, 0.25);
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
         }
 
         .step-label {
@@ -348,7 +382,7 @@
 
         /* ITINERARY RESULT TIMELINE */
         .itinerary-container {
-            max-width: 1000px;
+            max-width: 960px;
             margin: 0 auto 3.5rem;
             display: none;
         }
@@ -698,7 +732,7 @@
         }
 
         .practical-guide-section {
-            max-width: 1000px;
+            max-width: 960px;
             margin: 3rem auto 4rem;
             padding: 0 1rem;
         }
@@ -802,7 +836,7 @@
         }
 
         @media (max-width: 640px) {
-            .wizard-card-main { padding: 1.2rem; }
+            .wizard-card-clean { padding: 1.2rem; }
             .options-grid { grid-template-columns: 1fr 1fr; }
             .btn-group-wizard { flex-direction: column; }
             .actions-bar { flex-direction: column; }
@@ -814,245 +848,215 @@
 </head>
 <body>
 
-    <!-- 1. MAIN PAGE TOP DECORATIVE BANNER WITH ISTANBUL BACKGROUND & LANGUAGE SELECTOR -->
-    <div class="top-banner">
-        <img src="banner.jpg" alt="Galata Istanbul" class="banner-img">
-        <div class="banner-overlay"></div>
-        <div class="lang-selector">
-            <button class="active">TR</button>
-            <button>EN</button>
-            <button>ES</button>
-            <button>RU</button>
-            <button>AR</button>
-            <button>ZH</button>
-        </div>
-    </div>
-
-    <!-- 2. MAIN CONTAINER MATCHING INDEX.HTML DASHBOARD -->
-    <div class="gezi-dashboard">
-        
-        <!-- CENTERED FIRINNA BRAND PROFILE CARD (EXACTLY MATCHING INDEX.HTML) -->
-        <div class="card profile-card" style="text-align: center; margin-bottom: 2rem;">
-            <a href="/" style="display:inline-block;">
-                <img src="logo.png" alt="Fırınna Logo" class="profile-logo" style="margin: 0 auto; display: block;">
+    <!-- SLEEK COMPACT TOP NAV BAR -->
+    <header class="gezi-compact-nav">
+        <div class="gezi-compact-container">
+            <a href="/" class="gezi-brand-link">
+                <img src="logo.png" alt="Fırınna Logo">
+                <span>FIRINNA CAFE & RESTAURANT</span>
             </a>
-            <p class="profile-category" style="margin-top: -6px; margin-bottom: 14px; font-weight: 600; letter-spacing: 0.5px; color:#6b7280;">Cafe & Restaurant</p>
-            
-            <!-- BADGES -->
-            <div class="badges" style="justify-content: center; margin-bottom: 16px;">
-                <span class="badge" style="background: rgba(220, 38, 38, 0.08); color: #b91c1c; border-color: rgba(220, 38, 38, 0.25); display: inline-flex; align-items: center; gap: 4px;">
-                    <svg width="13" height="13" viewBox="0 0 100 100" fill="#b91c1c" style="vertical-align: middle;">
-                        <path d="M40,15 A35,35 0 1,0 75,85 A42,42 0 1,1 40,15 Z M72,40 L76,50 L87,50 L78,56 L81,67 L72,60 L63,67 L66,56 L57,50 L68,50 Z"/>
-                    </svg>
-                    <span>Tarihi Türk Cafesi</span>
-                </span>
-                <span class="badge"><i class="ph-fill ph-seal-check"></i> %100 Helal</span>
-                <span class="badge"><i class="ph-fill ph-star"></i> En İyi Kalite</span>
-                <span class="badge"><i class="ph-fill ph-money"></i> Uygun Fiyat</span>
-            </div>
-
-            <!-- DIRECT NAVIGATION LINKS BACK TO HOME & MENU -->
-            <div style="display:flex; gap:10px; max-width:500px; margin:12px auto 0;">
-                <a href="/" class="btn" style="flex:1; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff !important; border: 1.5px solid #cbd5e1; font-size: 0.95rem; font-weight: 800; padding: 12px; border-radius: 12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <i class="ph-bold ph-house" style="color:#f59e0b;"></i> Ana Sayfa
-                </a>
-                <a href="menu.html" class="btn" style="flex:1; background: linear-gradient(135deg, #d97706 0%, #b45309 100%); color: #ffffff !important; border: 1.5px solid #92400e; font-size: 0.95rem; font-weight: 800; padding: 12px; border-radius: 12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <i class="ph-bold ph-book-open" style="color:#ffffff;"></i> Menüyü Gör
-                </a>
+            <div class="gezi-nav-btns">
+                <a href="/" class="gezi-nav-btn-link"><i class="ph-bold ph-house"></i> Ana Sayfa</a>
+                <a href="menu.html" class="gezi-nav-btn-link"><i class="ph-bold ph-book-open"></i> Menü</a>
             </div>
         </div>
+    </header>
 
-        <!-- 3. ISTANBUL NOSTALGIC TRAMWAY & SELÇUKLU MOTIFS HERO BANNER -->
-        <div class="tram-hero-banner">
-            <div class="tram-graphic-badge">
-                <span class="motif-star-icon">✴</span>
-                <span>🚋 İSTİKLAL CADDESİ NOSTALJİK TRAMVAYI & GALATA ROTALARI</span>
-                <span class="motif-star-icon">✴</span>
-            </div>
-            <h1 style="font-family:'Playfair Display', serif; font-size:1.85rem; color:#fbbf24; margin:0 0 8px; display:flex; align-items:center; gap:10px;">
-                <i class="ph-bold ph-compass" style="color:#f59e0b;"></i> Akıllı İstanbul Gezi & Rota Rehberi
-            </h1>
-            <p style="margin:0; font-size:0.95rem; color:#cbd5e1; line-height:1.6;">
-                Galata Kumbaracı Yokuşu'nda 150 yıllık tarihi atmosfer, canlı haritalı rotalar ve Fırınna Cafe VIP ikram kartınız.
-            </p>
-        </div>
-
-        <!-- 4. PERFECT LOCATION-FIRST MASTER WIZARD FORM -->
-        <main class="wizard-card-main">
+    <!-- MAIN CLEAN PROGRESSIVE DISCOVERY CONTAINER -->
+    <div class="gezi-dashboard-clean">
+        
+        <main class="wizard-card-clean">
             
-            <!-- SURPRISE ROUTE PROMINENT QUICK ACTION BANNER AT TOP -->
+            <!-- HEADER TITLE -->
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <h1 style="font-family:'Playfair Display', serif; font-size:1.9rem; color:#0f172a; margin:0 0 6px; display:flex; align-items:center; justify-content:center; gap:10px;">
+                    <i class="ph-bold ph-compass" style="color:#d97706;"></i> Akıllı İstanbul Gezi & Rota Rehberi
+                </h1>
+                <p style="margin:0; font-size:0.92rem; color:#64748b;">Gezinize özel canlı haritalar, esnek gezi saatleri ve Fırınna Cafe'de VIP ikram kartınız.</p>
+            </div>
+
+            <!-- QUICK SURPRISE ROUTE BUTTON -->
             <div class="surprise-banner-btn" onclick="generateSurpriseItinerary()">
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-size:1.8rem; animation: floatIcon 2.5s infinite;">🎲</span>
+                    <span style="font-size:1.6rem; animation: floatIcon 2.5s infinite;">🎲</span>
                     <div>
-                        <strong style="font-size:1.05rem; color:#fbbf24; display:block;">Kararsız mısınız? Sürpriz Rota Oluşturun!</strong>
-                        <span style="font-size:0.85rem; color:#cbd5e1;">Merkezinizi ve saatinizi seçin, sistem size özel sürpriz efsane bir rota çıkarsın!</span>
+                        <strong style="font-size:0.98rem; color:#fbbf24; display:block;">Kararsız mısınız? Sürpriz Rota Oluşturun!</strong>
+                        <span style="font-size:0.82rem; color:#cbd5e1;">Hızlıca sürpriz efsane bir rota çıkarır.</span>
                     </div>
                 </div>
-                <span style="background:#f59e0b; color:#0f172a; font-weight:800; padding:8px 16px; border-radius:10px; font-size:0.85rem; display:inline-block; white-space:nowrap; margin-top:4px;">🎲 Sürpriz Yap!</span>
+                <span style="background:#f59e0b; color:#0f172a; font-weight:800; padding:6px 14px; border-radius:10px; font-size:0.82rem; display:inline-block; white-space:nowrap;">🎲 Sürpriz Yap!</span>
             </div>
 
-            <!-- STEP 1: SPECIFIC STARTING HUBS (NOKTA ATIŞI MERKEZLER) -->
-            <div class="step-label">
-                <span class="num">1</span> <span>Neredesiniz / Nereden Başlayacaksınız? (Başlangıç Merkeziniz):</span>
-            </div>
-            <div class="options-grid" id="grid-start">
-                <div class="option-pill active" onclick="selectStartOption('taksim')">
-                    <div class="title">📍 Taksim Meydanı</div>
-                    <div class="desc">İstiklal Caddesi başlangıcı</div>
+            <!-- STEP 1: STARTING LOCATION (ALWAYS VISIBLE AT START) -->
+            <div class="step-container" id="step-container-1">
+                <div class="step-label">
+                    <span class="num">1</span> <span>Neredesiniz / Nereden Başlayacaksınız? (Başlangıç Merkeziniz):</span>
                 </div>
-                <div class="option-pill" onclick="selectStartOption('galata')">
-                    <div class="title">📍 Galata / Kumbaracı</div>
-                    <div class="desc">Fırınna Cafe kapı komşusu</div>
+                <div class="options-grid" id="grid-start">
+                    <div class="option-pill" onclick="selectStartOption('taksim')">
+                        <div class="title">📍 Taksim Meydanı</div>
+                        <div class="desc">İstiklal Caddesi başlangıcı</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartOption('galata')">
+                        <div class="title">📍 Galata / Kumbaracı</div>
+                        <div class="desc">Fırınna Cafe kapı komşusu</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartOption('eminonu')">
+                        <div class="title">📍 Eminönü Meydanı</div>
+                        <div class="desc">İskele ve Mısır Çarşısı</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartOption('sultanahmet')">
+                        <div class="title">📍 Sultanahmet</div>
+                        <div class="desc">Ayasofya & Yerebatan çevresi</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartOption('kapalicarsi')">
+                        <div class="title">📍 Kapalıçarşı</div>
+                        <div class="desc">Nuruosmaniye Kral Yolu</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartOption('nisantasi')">
+                        <div class="title">📍 Nişantaşı</div>
+                        <div class="desc">Abdi İpekçi & Maçka</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartOption('kadikoy')">
+                        <div class="title">📍 Kadıköy İskele</div>
+                        <div class="desc">Rıhtım & Çarşı içi</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartOption('moda')">
+                        <div class="title">📍 Moda Sahil</div>
+                        <div class="desc">Tarihi Çay Bahçesi & Çimler</div>
+                    </div>
                 </div>
-                <div class="option-pill" onclick="selectStartOption('eminonu')">
-                    <div class="title">📍 Eminönü Meydanı</div>
-                    <div class="desc">İskele ve Mısır Çarşısı</div>
-                </div>
-                <div class="option-pill" onclick="selectStartOption('sultanahmet')">
-                    <div class="title">📍 Sultanahmet</div>
-                    <div class="desc">Ayasofya & Yerebatan çevresi</div>
-                </div>
-                <div class="option-pill" onclick="selectStartOption('kapalicarsi')">
-                    <div class="title">📍 Kapalıçarşı</div>
-                    <div class="desc">Nuruosmaniye Kral Yolu</div>
-                </div>
-                <div class="option-pill" onclick="selectStartOption('nisantasi')">
-                    <div class="title">📍 Nişantaşı</div>
-                    <div class="desc">Abdi İpekçi & Maçka</div>
-                </div>
-                <div class="option-pill" onclick="selectStartOption('kadikoy')">
-                    <div class="title">📍 Kadıköy İskele</div>
-                    <div class="desc">Rıhtım & Çarşı içi</div>
-                </div>
-                <div class="option-pill" onclick="selectStartOption('moda')">
-                    <div class="title">📍 Moda Sahil</div>
-                    <div class="desc">Tarihi Çay Bahçesi & Çimler</div>
-                </div>
-            </div>
 
-            <div class="input-hotel-container">
-                <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="🔎 Veya otelinizin, Airbnb evinizin adını serbestçe yazın (Örn: Tomtom Suites, Ada Karaköy, Limonlu Bahçe Sokak)..." autocomplete="off">
-                <div id="hotel-suggestions" class="suggestions-dropdown"></div>
-            </div>
-
-            <!-- STEP 2: FLEXIBLE DEPARTURE TIME SELECTOR -->
-            <div class="step-label">
-                <span class="num">2</span> <span>Gezinize Başlamak İstediğiniz Saat (Esnek Gezi Zamanı):</span>
-            </div>
-            <div class="options-grid" id="grid-start-time">
-                <div class="option-pill" onclick="selectStartTimeOption('10:00')">
-                    <div class="title">☕ 10:00 (Sabah Kahvaltılı)</div>
-                    <div class="desc">Erken kalkanlar & kahvaltı keyfi</div>
-                </div>
-                <div class="option-pill active" onclick="selectStartTimeOption('11:30')">
-                    <div class="title">🍳 11:30 (Öğleye Doğru)</div>
-                    <div class="desc">Rahat uyanıp yola çıkanlar</div>
-                </div>
-                <div class="option-pill" onclick="selectStartTimeOption('14:00')">
-                    <div class="title">☀️ 14:00 (Öğleden Sonra)</div>
-                    <div class="desc">Öğle yemeği sonrası gezi</div>
-                </div>
-                <div class="option-pill" onclick="selectStartTimeOption('17:30')">
-                    <div class="title">🌆 17:30 (Akşamüstü & Gün Batımı)</div>
-                    <div class="desc">Gün batımı, akşam yemeği & barlar</div>
+                <div class="input-hotel-container">
+                    <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="🔎 Veya otelinizin, Airbnb evinizin adını serbestçe yazın (Örn: Tomtom Suites, Ada Karaköy)..." autocomplete="off">
+                    <div id="hotel-suggestions" class="suggestions-dropdown"></div>
                 </div>
             </div>
 
-            <!-- STEP 3: TRAVEL CONCEPT / PURPOSE -->
-            <div class="step-label">
-                <span class="num">3</span> <span>Seyahat Amacınız & Tarzınız Nedir? (Konsept):</span>
-            </div>
-            <div class="options-grid" id="grid-concept">
-                <div class="option-pill active" onclick="selectConceptOption('historical')">
-                    <div class="title">🏛️ Tarih, Kültür & Şehir Klasikleri</div>
-                    <div class="desc">Ayasofya, Sultanahmet, Galata & Çarşılar</div>
+            <!-- STEP 2: START TIME (REVEALED AFTER STEP 1) -->
+            <div class="step-container" id="step-container-2" style="display: none;">
+                <div class="step-label">
+                    <span class="num">2</span> <span>Gezinize Başlamak İstediğiniz Saat (Esnek Gezi Zamanı):</span>
                 </div>
-                <div class="option-pill" onclick="selectConceptOption('nature')">
-                    <div class="title">🌲 Doğa Gezisi, Orman Koşusu & Yürüyüş 🏃</div>
-                    <div class="desc">Moda Sahil, Belgrad Ormanı & Park Yürüyüşleri</div>
-                </div>
-                <div class="option-pill" onclick="selectConceptOption('photo')">
-                    <div class="title">📸 Renkli Mahalleler & Çift Yürüyüşleri 👫</div>
-                    <div class="desc">Fener, Balat, Galata Taş Sokaklar & Moda Sahil</div>
-                </div>
-                <div class="option-pill" onclick="selectConceptOption('nightlife')">
-                    <div class="title">🎷 Gece Hayatı & Akşam Barları 🍻</div>
-                    <div class="desc">Asmalımescit, Cihangir & Kadife Sokak Barları</div>
-                </div>
-            </div>
-
-            <!-- STEP 4: DURATION (TIME AVAILABLE) -->
-            <div class="step-label">
-                <span class="num">4</span> <span>Zamanınız Kaç Gün / Saat?</span>
-            </div>
-            <div class="options-grid" id="grid-time">
-                <div class="option-pill active" onclick="selectDurationOption('half')">
-                    <div class="title">⏱️ Yarım Gün / Kısa Mola (3-4 Saat)</div>
-                    <div class="desc">Hızlı ve süzme yakın çevre turu</div>
-                </div>
-                <div class="option-pill" onclick="selectDurationOption('1day')">
-                    <div class="title">🗓️ 1 Tam Gün (6-8 Saat Kapsamlı)</div>
-                    <div class="desc">Dolu dolu tüm gün seyahat kulvarı</div>
-                </div>
-                <div class="option-pill" onclick="selectDurationOption('2days')">
-                    <div class="title">🗺️ 2-3 Günlük Seyahat Rehberi</div>
-                    <div class="desc">Gün gün bölünmüş İstanbul turu</div>
+                <div class="options-grid" id="grid-start-time">
+                    <div class="option-pill" onclick="selectStartTimeOption('10:00')">
+                        <div class="title">☕ 10:00 (Sabah Kahvaltılı)</div>
+                        <div class="desc">Erken kalkanlar & kahvaltı keyfi</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartTimeOption('11:30')">
+                        <div class="title">🍳 11:30 (Öğleye Doğru)</div>
+                        <div class="desc">Rahat uyanıp yola çıkanlar</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartTimeOption('14:00')">
+                        <div class="title">☀️ 14:00 (Öğleden Sonra)</div>
+                        <div class="desc">Öğle yemeği sonrası gezi</div>
+                    </div>
+                    <div class="option-pill" onclick="selectStartTimeOption('17:30')">
+                        <div class="title">🌆 17:30 (Akşamüstü & Gün Batımı)</div>
+                        <div class="desc">Gün batımı, akşam yemeği & barlar</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- STEP 5: TARGET REGION / DESTINATION (DYNAMICALLY FILTERED) -->
-            <div class="step-label">
-                <span class="num">5</span> <span>Gezmek İstediniz Hedef Bölge & Yön (Mantıklı Seçenekler):</span>
-            </div>
-            <div class="options-grid" id="grid-region">
-                <!-- Dynamically populated by updateRegionOptions() -->
-            </div>
-
-            <!-- DYNAMIC SUMMARY PREVIEW CARD & TABLE (WHAT'S INCLUDED) -->
-            <div class="summary-preview-card" id="summary-preview-card">
-                <h4 style="margin:0 0 6px; color:#0f172a; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
-                    <i class="ph-bold ph-clipboard-text" style="color:#d97706;"></i> 📋 Seçilen Rota Detay Özeti (Neler Dahil?)
-                </h4>
-                <table class="summary-table">
-                    <tr>
-                        <td class="label">📍 Başlangıç Noktası:</td>
-                        <td class="val" id="summary-val-start">📍 Taksim Meydanı</td>
-                    </tr>
-                    <tr>
-                        <td class="label">⏰ Başlangıç Saati:</td>
-                        <td class="val" id="summary-val-start-time">11:30 (Öğleye Doğru)</td>
-                    </tr>
-                    <tr>
-                        <td class="label">🎯 Gezi Konsepti:</td>
-                        <td class="val" id="summary-val-concept">🏛️ Tarih, Kültür & Şehir Klasikleri</td>
-                    </tr>
-                    <tr>
-                        <td class="label">⏱️ Tahmini Süre:</td>
-                        <td class="val" id="summary-val-time">Yarım Gün (3-4 Saat)</td>
-                    </tr>
-                    <tr>
-                        <td class="label">🗺️ Gezilecek Bölge:</td>
-                        <td class="val" id="summary-val-region">🏛️ Galata - Pera - İstiklal Hattı</td>
-                    </tr>
-                    <tr>
-                        <td class="label">☕ Lezzet Durağı:</td>
-                        <td class="val"><img src="logo.png" style="height:20px; vertical-align:middle; border-radius:4px; margin-right:4px;" alt="Fırınna Logo"><strong>Fırınna Cafe & Restaurant</strong> (Sınırsız Çay & Pizza Molası)</td>
-                    </tr>
-                </table>
+            <!-- STEP 3: CONCEPT (REVEALED AFTER STEP 2) -->
+            <div class="step-container" id="step-container-3" style="display: none;">
+                <div class="step-label">
+                    <span class="num">3</span> <span>Seyahat Amacınız & Tarzınız Nedir? (Konsept):</span>
+                </div>
+                <div class="options-grid" id="grid-concept">
+                    <div class="option-pill" onclick="selectConceptOption('historical')">
+                        <div class="title">🏛️ Tarih, Kültür & Şehir Klasikleri</div>
+                        <div class="desc">Ayasofya, Sultanahmet, Galata & Çarşılar</div>
+                    </div>
+                    <div class="option-pill" onclick="selectConceptOption('nature')">
+                        <div class="title">🌲 Doğa Gezisi, Orman Koşusu & Yürüyüş 🏃</div>
+                        <div class="desc">Moda Sahil, Belgrad Ormanı & Park Yürüyüşleri</div>
+                    </div>
+                    <div class="option-pill" onclick="selectConceptOption('photo')">
+                        <div class="title">📸 Renkli Mahalleler & Çift Yürüyüşleri 👫</div>
+                        <div class="desc">Fener, Balat, Galata Taş Sokaklar & Moda Sahil</div>
+                    </div>
+                    <div class="option-pill" onclick="selectConceptOption('nightlife')">
+                        <div class="title">🎷 Gece Hayatı & Akşam Barları 🍻</div>
+                        <div class="desc">Asmalımescit, Cihangir & Kadife Sokak Barları</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="btn-group-wizard">
-                <button class="btn-generate" onclick="generateSmartItinerary()">
-                    <i class="ph-bold ph-sparkle"></i> <span>Kişiselleştirilmiş Rotamı Oluştur</span>
-                </button>
-                <button class="btn-surprise" onclick="generateSurpriseItinerary()">
-                    <i class="ph-bold ph-dice-five"></i> <span>🎲 Sürpriz Rota!</span>
-                </button>
+            <!-- STEP 4: DURATION (REVEALED AFTER STEP 3) -->
+            <div class="step-container" id="step-container-4" style="display: none;">
+                <div class="step-label">
+                    <span class="num">4</span> <span>Zamanınız Kaç Gün / Saat?</span>
+                </div>
+                <div class="options-grid" id="grid-time">
+                    <div class="option-pill" onclick="selectDurationOption('half')">
+                        <div class="title">⏱️ Yarım Gün / Kısa Mola (3-4 Saat)</div>
+                        <div class="desc">Hızlı ve süzme yakın çevre turu</div>
+                    </div>
+                    <div class="option-pill" onclick="selectDurationOption('1day')">
+                        <div class="title">🗓️ 1 Tam Gün (6-8 Saat Kapsamlı)</div>
+                        <div class="desc">Dolu dolu tüm gün seyahat kulvarı</div>
+                    </div>
+                    <div class="option-pill" onclick="selectDurationOption('2days')">
+                        <div class="title">🗺️ 2-3 Günlük Seyahat Rehberi</div>
+                        <div class="desc">Gün gün bölünmüş İstanbul turu</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 5: REGION (REVEALED AFTER STEP 4) -->
+            <div class="step-container" id="step-container-5" style="display: none;">
+                <div class="step-label">
+                    <span class="num">5</span> <span>Gezmek İstediniz Hedef Bölge & Yön:</span>
+                </div>
+                <div class="options-grid" id="grid-region">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- SUMMARY PREVIEW & SUBMIT BUTTON (REVEALED AFTER STEP 5 OR ALL SELECTED) -->
+            <div class="step-container" id="step-container-final" style="display: none;">
+                <div class="summary-preview-card" id="summary-preview-card">
+                    <h4 style="margin:0 0 6px; color:#0f172a; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
+                        <i class="ph-bold ph-clipboard-text" style="color:#d97706;"></i> 📋 Seçilen Rota Detay Özeti (Neler Dahil?)
+                    </h4>
+                    <table class="summary-table">
+                        <tr>
+                            <td class="label">📍 Başlangıç Noktası:</td>
+                            <td class="val" id="summary-val-start">📍 Taksim Meydanı</td>
+                        </tr>
+                        <tr>
+                            <td class="label">⏰ Başlangıç Saati:</td>
+                            <td class="val" id="summary-val-start-time">11:30</td>
+                        </tr>
+                        <tr>
+                            <td class="label">🎯 Gezi Konsepti:</td>
+                            <td class="val" id="summary-val-concept">🏛️ Tarih, Kültür & Şehir Klasikleri</td>
+                        </tr>
+                        <tr>
+                            <td class="label">⏱️ Tahmini Süre:</td>
+                            <td class="val" id="summary-val-time">Yarım Gün (3-4 Saat)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">🗺️ Gezilecek Bölge:</td>
+                            <td class="val" id="summary-val-region">🏛️ Galata - Pera - İstiklal Hattı</td>
+                        </tr>
+                        <tr>
+                            <td class="label">☕ Lezzet Durağı:</td>
+                            <td class="val"><img src="logo.png" style="height:20px; vertical-align:middle; border-radius:4px; margin-right:4px;" alt="Fırınna Logo"><strong>Fırınna Cafe & Restaurant</strong> (Sınırsız Çay & Pizza Molası)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="btn-group-wizard">
+                    <button class="btn-generate" onclick="generateSmartItinerary()">
+                        <i class="ph-bold ph-sparkle"></i> <span>Kişiselleştirilmiş Rotamı Oluştur</span>
+                    </button>
+                </div>
             </div>
         </main>
 
-        <!-- GENERATED RESULT -->
+        <!-- GENERATED RESULT CONTAINER -->
         <section class="itinerary-container" id="itinerary-result">
             
             <div class="result-banner">
@@ -1154,7 +1158,6 @@
         <!-- PRACTICAL TRAVEL GUIDE, SHOPPING & FAQ SECTION -->
         <section class="practical-guide-section">
             
-            <!-- NE NEREDEN ALINIR SECTION -->
             <h2 class="section-header-title">
                 <i class="ph-bold ph-shopping-bag" style="color:#d97706;"></i> 🛍️ Ne Nereden Alınır? (Orijinal Hediyelik & Alışveriş Rehberi)
             </h2>
@@ -1270,11 +1273,11 @@
     </div>
 
     <script>
-        let selectedStart = 'taksim';
-        let selectedStartTime = '11:30';
-        let selectedConcept = 'historical';
-        let selectedTime = 'half';
-        let selectedRegion = 'galata_pera';
+        let selectedStart = '';
+        let selectedStartTime = '';
+        let selectedConcept = '';
+        let selectedTime = '';
+        let selectedRegion = '';
 
         let systemWorkHours = '11:00 - 19:15';
         let systemPhone = '905456301214';
@@ -1342,7 +1345,7 @@
                     div.onclick = function() {
                         hotelInput.value = matchText;
                         suggestionsBox.style.display = 'none';
-                        generateSmartItinerary();
+                        selectStartOption('taksim'); // Trigger step 2
                     };
                     suggestionsBox.appendChild(div);
                 });
@@ -1374,12 +1377,22 @@
                 }).catch(e => {});
         }
 
+        // PROGRESSIVE STEP REVEAL LOGIC
+        function revealStep(stepNum) {
+            const stepEl = document.getElementById(`step-container-${stepNum}`);
+            if (stepEl && stepEl.style.display === 'none') {
+                stepEl.style.display = 'block';
+                stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
         // STEP 1: START LOCATION SELECTION
         function selectStartOption(startVal) {
             selectedStart = startVal;
             document.querySelectorAll('#grid-start .option-pill').forEach(p => p.classList.remove('active'));
             event.currentTarget.classList.add('active');
-            updateRegionOptions();
+            
+            revealStep(2);
             updateSummaryPreview();
         }
 
@@ -1388,6 +1401,8 @@
             selectedStartTime = startTimeVal;
             document.querySelectorAll('#grid-start-time .option-pill').forEach(p => p.classList.remove('active'));
             event.currentTarget.classList.add('active');
+            
+            revealStep(3);
             updateSummaryPreview();
         }
 
@@ -1396,6 +1411,8 @@
             selectedConcept = conceptVal;
             document.querySelectorAll('#grid-concept .option-pill').forEach(p => p.classList.remove('active'));
             event.currentTarget.classList.add('active');
+            
+            revealStep(4);
             updateRegionOptions();
             updateSummaryPreview();
         }
@@ -1405,6 +1422,8 @@
             selectedTime = timeVal;
             document.querySelectorAll('#grid-time .option-pill').forEach(p => p.classList.remove('active'));
             event.currentTarget.classList.add('active');
+            
+            revealStep(5);
             updateRegionOptions();
             updateSummaryPreview();
         }
@@ -1414,6 +1433,8 @@
             selectedRegion = regionKey;
             document.querySelectorAll('#grid-region .option-pill').forEach(p => p.classList.remove('active'));
             event.currentTarget.classList.add('active');
+            
+            revealStep('final');
             updateSummaryPreview();
         }
 
@@ -1424,7 +1445,6 @@
 
             let regionOptions = [];
 
-            // ANADOLU START (KADIKÖY / MODA)
             if (selectedStart === 'kadikoy' || selectedStart === 'moda') {
                 if (selectedTime === 'half') {
                     regionOptions = [
@@ -1439,9 +1459,7 @@
                         { key: 'belgrad_forest', title: '🌳 Belgrad Ormanı & Neşet Suyu (Avrupa Doğa)', desc: '6 km kauçuk koşu ve yürüyüş kulvarı' }
                     ];
                 }
-            } 
-            // AVRUPA START (TAKSİM, GALATA, EMİNÖNÜ, SULTANAHMET, KAPALIÇARŞI, NİŞANTAŞI)
-            else {
+            } else {
                 if (selectedConcept === 'nature') {
                     if (selectedTime === 'half') {
                         regionOptions = [
@@ -1465,7 +1483,6 @@
                 }
             }
 
-            // Render region pills
             selectedRegion = regionOptions[0].key;
             regionOptions.forEach((reg, idx) => {
                 const div = document.createElement('div');
@@ -1512,9 +1529,9 @@
         }
 
         function updateSummaryPreview() {
-            let startName = getStartLabelName(selectedStart);
+            let startName = getStartLabelName(selectedStart || 'taksim');
             let conceptTxt = "🏛️ Tarih, Kültür & Şehir Klasikleri";
-            let regionTxt = getRegionLabelName(selectedRegion);
+            let regionTxt = getRegionLabelName(selectedRegion || 'galata_pera');
             let stopsTxt = "Taksim Meydanı ➔ İstiklal ➔ Kamondo Merdivenleri ➔ Fırınna Cafe";
 
             if (selectedStart === 'galata') stopsTxt = "Fırınna Cafe ➔ Galata Kulesi ➔ Kamondo Merdivenleri ➔ Karaköy";
@@ -1530,14 +1547,13 @@
             else if (selectedTime === '2days') timeTxt = "2-3 Günlük Seyahat Rehberi";
 
             document.getElementById('summary-val-start').innerText = startName;
-            document.getElementById('summary-val-start-time').innerText = selectedStartTime;
+            document.getElementById('summary-val-start-time').innerText = selectedStartTime || '11:30';
             document.getElementById('summary-val-concept').innerText = conceptTxt;
             document.getElementById('summary-val-time').innerText = timeTxt;
             document.getElementById('summary-val-region').innerText = regionTxt;
             document.getElementById('summary-val-stops').innerText = stopsTxt;
         }
 
-        // COMPREHENSIVE MULTI-DURATION POIS DATABASE
         const POIS_DATABASE = {
             half: [
                 { offsetMin: 0, title: '📍 Başlangıç Merkeziniz & Çevre Keşfi', category: 'photo', desc: 'Seçtiğiniz lokasyondan yürüyüş ve gezi başlangıcı.', mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul' },
@@ -1574,47 +1590,32 @@
             ]
         };
 
-        // INITIALIZATION ON PAGE LOAD
-        document.addEventListener('DOMContentLoaded', function() {
-            updateRegionOptions();
-            updateSummaryPreview();
-        });
-
         function generateSmartItinerary() {
             renderItinerary(false);
         }
 
+        // SURPRISE ROUTE REVEALS ALL STEPS INSTANTLY AND RENDERS
         function generateSurpriseItinerary() {
+            const starts = ['taksim', 'galata', 'eminonu', 'sultanahmet', 'kadikoy', 'moda'];
+            const startTimes = ['10:00', '11:30', '14:00', '17:30'];
             const concepts = ['historical', 'nature', 'photo', 'nightlife'];
+            const times = ['half', '1day', '2days'];
+
+            selectedStart = starts[Math.floor(Math.random() * starts.length)];
+            selectedStartTime = startTimes[Math.floor(Math.random() * startTimes.length)];
             selectedConcept = concepts[Math.floor(Math.random() * concepts.length)];
-            
-            document.querySelectorAll('#grid-concept .option-pill').forEach((p, idx) => {
-                p.classList.remove('active');
-                if ((selectedConcept === 'historical' && idx === 0) ||
-                    (selectedConcept === 'nature' && idx === 1) ||
-                    (selectedConcept === 'photo' && idx === 2) ||
-                    (selectedConcept === 'nightlife' && idx === 3)) {
-                    p.classList.add('active');
-                }
-            });
+            selectedTime = times[Math.floor(Math.random() * times.length)];
+
+            // Reveal all steps
+            for (let i = 2; i <= 5; i++) {
+                const el = document.getElementById(`step-container-${i}`);
+                if (el) el.style.display = 'block';
+            }
+            document.getElementById('step-container-final').style.display = 'block';
 
             updateRegionOptions();
             updateSummaryPreview();
             renderItinerary(true);
-        }
-
-        function formatTimeOffset(startStr, offsetMinutes) {
-            const parts = startStr.split(':');
-            let startH = parseInt(parts[0], 10);
-            let startM = parseInt(parts[1], 10);
-
-            let totalM = startH * 60 + startM + (offsetMinutes % 1440);
-            let finalH = Math.floor(totalM / 60) % 24;
-            let finalM = totalM % 60;
-
-            const strH = finalH < 10 ? '0' + finalH : finalH;
-            const strM = finalM < 10 ? '0' + finalM : finalM;
-            return `${strH}:${strM}`;
         }
 
         function renderItinerary(isSurprise) {
@@ -1631,18 +1632,20 @@
                 });
             }
 
-            let rawPOIs = POIS_DATABASE[selectedTime] || POIS_DATABASE['half'];
+            let rawPOIs = POIS_DATABASE[selectedTime || 'half'] || POIS_DATABASE['half'];
 
             let finalPOIs = [];
-            const startLabelName = hotelNameInput || getStartLabelName(selectedStart);
+            const startLabelName = hotelNameInput || getStartLabelName(selectedStart || 'taksim');
             const mapOriginQuery = hotelNameInput ? encodeURIComponent(`${hotelNameInput}, İstanbul`) : encodeURIComponent(startLabelName);
 
+            const startTimeVal = selectedStartTime || '11:30';
+
             finalPOIs.push({
-                time: selectedStartTime,
+                time: startTimeVal,
                 hotelStart: true,
                 title: `🏡 Başlangıç Merkeziniz: ${startLabelName}`,
                 category: 'hotel',
-                desc: `Rotanız tam saat ${selectedStartTime}’da "${startLabelName}" merkezinden başlayıp navigasyonla adım adım ilerliyor.`,
+                desc: `Rotanız tam saat ${startTimeVal}’da "${startLabelName}" merkezinden başlayıp navigasyonla adım adım ilerliyor.`,
                 tip: '📍 Merkezinizden başlayarak doğrudan harita navigasyonunu başlatabilirsiniz.',
                 mapQuery: mapOriginQuery
             });
@@ -1659,7 +1662,7 @@
                     return;
                 }
 
-                const calculatedTime = formatTimeOffset(selectedStartTime, poi.offsetMin || 0);
+                const calculatedTime = formatTimeOffset(startTimeVal, poi.offsetMin || 0);
                 
                 let dynamicTitle = poi.title;
                 if (poi.featured) {
@@ -1680,7 +1683,7 @@
                 });
             });
 
-            const startText = isSurprise ? `🎲 SÜRPRİZ ROTA! "${startLabelName}" merkezinden saat ${selectedStartTime}’da başlayan` : `"${startLabelName}" merkezinden saat ${selectedStartTime}’da başlayan`;
+            const startText = isSurprise ? `🎲 SÜRPRİZ ROTA! "${startLabelName}" merkezinden saat ${startTimeVal}’da başlayan` : `"${startLabelName}" merkezinden saat ${startTimeVal}’da başlayan`;
             document.getElementById('result-start-desc').innerText = `${startText} nokta atışı gezi rotanız ve Fırınna Cafe sınırsız çay ikramlı lezzet molanız hazır.`;
 
             const randomCode = Math.floor(1000 + Math.random() * 9000);
@@ -1710,10 +1713,10 @@
             else if (selectedConcept === 'nightlife') conceptTextReadable = "🎷 Gece Hayatı & Barlar 🍻";
 
             document.getElementById('pass-val-start').innerText = startLabelName;
-            document.getElementById('pass-val-start-time').innerText = selectedStartTime;
+            document.getElementById('pass-val-start-time').innerText = startTimeVal;
             document.getElementById('pass-val-concept').innerText = conceptTextReadable;
             document.getElementById('pass-val-time').innerText = timeTextReadable;
-            document.getElementById('pass-val-region').innerText = getRegionLabelName(selectedRegion);
+            document.getElementById('pass-val-region').innerText = getRegionLabelName(selectedRegion || 'galata_pera');
 
             const passWaypointsContainer = document.getElementById('pass-waypoints-container');
             passWaypointsContainer.innerHTML = '';
