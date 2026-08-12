@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="Mobil uyumlu akıllı İstanbul gezi rehberi; 1-Tıkla hızlı VIP çay bileti, gerçek çizili harita rotaları, 4 günlük hava durumu ve Fırınna Cafe VIP ikram kartı.">
-    <meta name="keywords" content="İstanbul gezi rehberi, dükkan içi hızlı çay kuponu, canlı harita rotası, Balat gezilecek yerler, Beşiktaş gezilecek yerler, Fırınna cafe">
+    <meta name="description" content="Mobil uyumlu akıllı İstanbul rehberi; konsepte göre değişen detaylı şehir rotaları (Neden gitmeli, ne yapılmalı, ne yenmeli), Balat, Beşiktaş, Galata turları ve Fırınna Cafe VIP çay biletiniz.">
+    <meta name="keywords" content="İstanbul gezi rehberi, Beşiktaş gece hayatı rotası, Balat Eminönü birleşik hızlı gezi, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
     <meta property="og:title" content="İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe">
-    <meta property="og:description" content="1-Tıkla hızlı VIP Çay Biletini ve çizili harita rotanı oluştur!">
+    <meta property="og:description" content="1-Tıkla konseptinize özel çizili harita rotanızı ve VIP Çay Biletinizi oluşturun!">
     <meta property="og:image" content="https://firinna.com/logo.png">
     <meta property="og:url" content="https://firinna.com/gezi">
     <meta property="og:type" content="website">
@@ -312,7 +312,7 @@
             padding: 14px 16px;
             border-radius: 12px;
             border: 1.5px solid #cbd5e1;
-            font-size: 16px; /* 16px prevents iOS Auto-Zoom */
+            font-size: 16px;
             font-family: inherit;
             box-sizing: border-box;
         }
@@ -402,7 +402,7 @@
             touch-action: manipulation;
         }
 
-        /* ITINERARY RESULT TIMELINE */
+        /* ITINERARY RESULT TIMELINE STYLING */
         .itinerary-container {
             max-width: 960px;
             margin: 0 auto 3rem;
@@ -425,17 +425,6 @@
             padding: 4px 10px;
             border-radius: 20px;
             font-size: 0.78rem;
-        }
-
-        .day-header-badge {
-            background: #0f172a;
-            color: #fbbf24;
-            font-size: 1rem;
-            font-weight: 800;
-            padding: 8px 14px;
-            border-radius: 10px;
-            margin: 1.5rem 0 0.8rem;
-            border-left: 4px solid #f59e0b;
         }
 
         .embedded-map-card {
@@ -465,11 +454,12 @@
 
         .timeline-item {
             position: relative;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.4rem;
             background: white;
-            border-radius: 12px;
-            padding: 1rem 1.2rem;
+            border-radius: 14px;
+            padding: 1.2rem;
             border: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
 
         .timeline-item.featured {
@@ -507,7 +497,7 @@
             padding: 2px 8px;
             border-radius: 8px;
             display: inline-block;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .timeline-item.featured .time-badge {
@@ -516,17 +506,39 @@
         }
 
         .timeline-title {
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 800;
             color: #0f172a;
-            margin: 0 0 4px;
+            margin: 0 0 8px;
         }
 
-        .timeline-desc {
-            font-size: 0.88rem;
-            color: #475569;
+        /* DEEP GUIDE CARDS STRUCTURAL LAYOUT */
+        .guide-details-box {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+
+        .guide-row {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .guide-row strong {
+            color: #0f172a;
+            display: block;
+            margin-bottom: 2px;
+            font-size: 0.82rem;
+        }
+
+        .guide-row p {
             margin: 0;
-            line-height: 1.5;
+            color: #475569;
+            line-height: 1.45;
         }
 
         .actions-bar {
@@ -637,40 +649,6 @@
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 8px;
         }
-
-        .info-cards-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 14px;
-            margin-bottom: 2rem;
-        }
-
-        .info-card {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.2rem;
-        }
-
-        .faq-accordion {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .faq-question {
-            padding: 1rem 1.2rem;
-            font-weight: 700;
-            font-size: 0.92rem;
-            color: #0f172a;
-        }
-
-        .faq-answer {
-            padding: 0 1.2rem 1rem;
-            font-size: 0.88rem;
-            color: #475569;
-        }
     </style>
 </head>
 <body>
@@ -697,9 +675,9 @@
             <!-- HEADER TITLE -->
             <div style="text-align: center; margin-bottom: 1.2rem;">
                 <h1 style="font-family:'Playfair Display', serif; font-size:1.65rem; color:#0f172a; margin:0 0 4px; display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <i class="ph-bold ph-compass" style="color:#d97706;"></i> İstanbul Akıllı Gezi Rehberi
+                    <i class="ph-bold ph-compass" style="color:#d97706;"></i> Akıllı İstanbul Rehberi & Rota Planlayıcı
                 </h1>
-                <p style="margin:0; font-size:0.86rem; color:#64748b;">Canlı çizili harita rotanızı seçin, Fırınna Cafe VIP çay biletinizi anında alın.</p>
+                <p style="margin:0; font-size:0.86rem; color:#64748b;">Nokta atışı konsept turları, detaylı gezgin rehberi ve Fırınna VIP Çay Biletiniz.</p>
             </div>
 
             <!-- IN-STORE CUSTOMER LIFEHACK BANNER (1-CLICK INSTANT VIP TEA PASS) -->
@@ -713,7 +691,7 @@
                 </button>
             </div>
 
-            <!-- LIVE ISTANBUL WEATHER WIDGET (CURRENT + NEXT 3 DAYS) -->
+            <!-- LIVE ISTANBUL WEATHER WIDGET -->
             <div class="weather-forecast-widget">
                 <div class="weather-widget-header">
                     <div style="font-weight:800; font-size:0.88rem; color:#fbbf24; display:flex; align-items:center; gap:6px;">
@@ -723,7 +701,6 @@
                     <span id="weather-tip-badge" style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:10px; color:#cbd5e1;">Açık</span>
                 </div>
                 <div class="weather-days-grid" id="weather-days-grid">
-                    <!-- Populated by Open-Meteo JS -->
                     <div class="weather-day-card today">
                         <div class="weather-day-title">Bugün</div>
                         <div class="weather-day-icon">☀️</div>
@@ -747,9 +724,9 @@
                 </div>
             </div>
 
-            <!-- PERFECT 5-STEP TRAVEL LOGIC FLOW -->
+            <!-- 5-STEP TRAVEL FLOW -->
 
-            <!-- STEP 1: DURATION & TIME BUDGET -->
+            <!-- STEP 1: DURATION -->
             <div class="step-container" id="step-container-1">
                 <div class="step-label">
                     <span class="num">1</span> <span>Gezi İçin Ne Kadar Vaktiniz Var? (Zaman Kısıtı):</span>
@@ -757,7 +734,7 @@
                 <div class="options-grid" id="grid-time">
                     <div class="option-pill" onclick="selectDurationOption('half')">
                         <div class="title">⏱️ Yarım Gün (3-4 Saat)</div>
-                        <div class="desc">Tek bölge süzme tur</div>
+                        <div class="desc">Nokta atışı çevre veya birleşik tur</div>
                     </div>
                     <div class="option-pill" onclick="selectDurationOption('1day')">
                         <div class="title">🗓️ 1 Tam Gün (6-8 Saat)</div>
@@ -770,42 +747,42 @@
                 </div>
             </div>
 
-            <!-- STEP 2: TARGET REGION / DESTINATION -->
+            <!-- STEP 2: REGION -->
             <div class="step-container" id="step-container-2" style="display: none;">
                 <div class="step-label">
-                    <span class="num">2</span> <span>Gezmek İstediğiniz Bölge & Yön:</span>
+                    <span class="num">2</span> <span>Gezmek İstediğiniz Bölge & Yön (Zengin Seçenekler):</span>
                 </div>
                 <div class="options-grid" id="grid-region">
                     <!-- Dynamically populated -->
                 </div>
             </div>
 
-            <!-- STEP 3: CONCEPT / TRAVEL STYLE -->
+            <!-- STEP 3: CONCEPT -->
             <div class="step-container" id="step-container-3" style="display: none;">
                 <div class="step-label">
-                    <span class="num">3</span> <span>Seyahat Amacınız & Tarzınız:</span>
+                    <span class="num">3</span> <span>Seyahat Amacınız & Tarzınız (Gezinizi Şekillendirir):</span>
                 </div>
                 <div class="options-grid" id="grid-concept">
                     <div class="option-pill" onclick="selectConceptOption('historical')">
-                        <div class="title">🏛️ Tarih & Kültür</div>
-                        <div class="desc">Müzeler & saraylar</div>
-                    </div>
-                    <div class="option-pill" onclick="selectConceptOption('nature')">
-                        <div class="title">🌲 Doğa & Yürüyüş 🏃</div>
-                        <div class="desc">Parklar & ormanlar</div>
-                    </div>
-                    <div class="option-pill" onclick="selectConceptOption('photo')">
-                        <div class="title">📸 Renkli Sokaklar 👫</div>
-                        <div class="desc">Fotoğrafik kafeler</div>
+                        <div class="title">🏛️ Tarih, Kültür & Saraylar</div>
+                        <div class="desc">Müzeler, camiler & tarihi yapılar</div>
                     </div>
                     <div class="option-pill" onclick="selectConceptOption('nightlife')">
-                        <div class="title">🎷 Gece Barları 🍻</div>
-                        <div class="desc">Canlı müzik & eğlence</div>
+                        <div class="title">🎷 Gece Hayatı & Akşam Barları 🍻</div>
+                        <div class="desc">Publar, kokteyl barları & canlı müzik</div>
+                    </div>
+                    <div class="option-pill" onclick="selectConceptOption('photo')">
+                        <div class="title">📸 Renkli Sokaklar & Çift Yürüyüşleri 👫</div>
+                        <div class="desc">Fotoğraf noktaları & retro kafeler</div>
+                    </div>
+                    <div class="option-pill" onclick="selectConceptOption('nature')">
+                        <div class="title">🌲 Doğa Gezisi & Park Yürüyüşleri 🏃</div>
+                        <div class="desc">Asırlık parklar & sahil çimleri</div>
                     </div>
                 </div>
             </div>
 
-            <!-- STEP 4: STARTING POINT & HOTEL -->
+            <!-- STEP 4: STARTING POINT -->
             <div class="step-container" id="step-container-4" style="display: none;">
                 <div class="step-label">
                     <span class="num">4</span> <span>Başlangıç Noktanız / Oteliniz:</span>
@@ -837,7 +814,7 @@
                     </div>
                     <div class="option-pill" onclick="selectStartOption('kadikoy')">
                         <div class="title">📍 Kadıköy İskele</div>
-                        <div class="desc">Rıhtım</div>
+                        <div class="desc">Rıhtım & Barlar Sokağı</div>
                     </div>
                     <div class="option-pill" onclick="selectStartOption('moda')">
                         <div class="title">📍 Moda Sahil</div>
@@ -849,12 +826,12 @@
                     <label style="font-weight:700; font-size:0.82rem; color:#78350f; display:block; margin-bottom:4px;">
                         🏨 Otel / Airbnb Adı (Opsiyonel):
                     </label>
-                    <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="Örn: Tomtom Suites, Pera Palace..." autocomplete="off">
+                    <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="Örn: Tomtom Suites, W Hotel Akaretler..." autocomplete="off">
                     <div id="hotel-suggestions" class="suggestions-dropdown"></div>
                 </div>
             </div>
 
-            <!-- STEP 5: DEPARTURE TIME -->
+            <!-- STEP 5: TIME -->
             <div class="step-container" id="step-container-5" style="display: none;">
                 <div class="step-label">
                     <span class="num">5</span> <span>Gezinize Başlama Saati:</span>
@@ -879,7 +856,7 @@
                 </div>
             </div>
 
-            <!-- SUMMARY PREVIEW & SUBMIT BUTTON -->
+            <!-- SUMMARY PREVIEW -->
             <div class="step-container" id="step-container-final" style="display: none;">
                 <div class="summary-preview-card" id="summary-preview-card">
                     <h4 style="margin:0 0 6px; color:#0f172a; font-size:0.9rem; display:flex; align-items:center; gap:6px;">
@@ -887,10 +864,10 @@
                     </h4>
                     <table class="summary-table">
                         <tr><td class="label">⏱️ Süre:</td><td class="val" id="summary-val-time">Yarım Gün (3-4 Saat)</td></tr>
-                        <tr><td class="label">🗺️ Bölge:</td><td class="val" id="summary-val-region">📸 Balat & Fener Sokakları</td></tr>
-                        <tr><td class="label">🎯 Konsept:</td><td class="val" id="summary-val-concept">📸 Renkli Mahalleler</td></tr>
-                        <tr><td class="label">📍 Başlangıç:</td><td class="val" id="summary-val-start">📍 Galata / Fırınna Cafe</td></tr>
-                        <tr><td class="label">⏰ Saat:</td><td class="val" id="summary-val-start-time">11:30</td></tr>
+                        <tr><td class="label">🗺️ Bölge:</td><td class="val" id="summary-val-region">Beşiktaş & Akaretler</td></tr>
+                        <tr><td class="label">🎯 Konsept:</td><td class="val" id="summary-val-concept">🎷 Gece Hayatı & Barlar</td></tr>
+                        <tr><td class="label">📍 Başlangıç:</td><td class="val" id="summary-val-start">📍 Beşiktaş İskele</td></tr>
+                        <tr><td class="label">⏰ Saat:</td><td class="val" id="summary-val-start-time">17:30</td></tr>
                         <tr><td class="label">☕ İkram:</td><td class="val"><strong>Fırınna Cafe</strong> (Sınırsız Çay Hediyeli)</td></tr>
                     </table>
                 </div>
@@ -918,7 +895,7 @@
                 </div>
             </div>
 
-            <!-- EMBEDDED REAL GOOGLE MAP ROUTE LINE (saddr -> daddr REAL ROUTE LINE!) -->
+            <!-- EMBEDDED REAL GOOGLE MAP ROUTE LINE -->
             <div class="embedded-map-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                     <strong style="color:#0f172a; font-size:0.92rem; display:flex; align-items:center; gap:6px;">
@@ -928,7 +905,6 @@
                         <i class="ph-bold ph-google-logo"></i> Haritada Aç
                     </a>
                 </div>
-                <!-- Embedded Google Maps Route Iframe drawing true origin -> destination polyline -->
                 <iframe id="live-map-iframe" src="" width="100%" height="300" style="border:0; border-radius:10px;" allowfullscreen="" loading="lazy"></iframe>
             </div>
 
@@ -956,7 +932,7 @@
                 </a>
             </div>
 
-            <!-- HIGH END DEDICATED DIGITAL VIP TRAVEL PASS VOUCHER CARD (FOR BEAUTIFUL PNG OUTPUT) -->
+            <!-- VIP TRAVEL PASS CARD -->
             <div class="vip-travel-pass-card" id="printable-vip-voucher">
                 <div class="pass-header">
                     <div class="pass-brand" style="display:flex; align-items:center; gap:8px;">
@@ -971,10 +947,10 @@
 
                 <div class="pass-grid">
                     <div class="pass-info-box">
-                        <div>📍 <strong>Başlangıç:</strong> <span id="pass-val-start">Galata / Fırınna Cafe</span></div>
-                        <div>⏰ <strong>Saat:</strong> <span id="pass-val-start-time">11:30</span></div>
-                        <div>🎯 <strong>Konsept:</strong> <span id="pass-val-concept">Tarih & Şehir Klasikleri</span></div>
-                        <div>🗺️ <strong>Bölge:</strong> <span id="pass-val-region">Balat & Fener Sokakları</span></div>
+                        <div>📍 <strong>Başlangıç:</strong> <span id="pass-val-start">Beşiktaş</span></div>
+                        <div>⏰ <strong>Saat:</strong> <span id="pass-val-start-time">17:30</span></div>
+                        <div>🎯 <strong>Konsept:</strong> <span id="pass-val-concept">Gece Hayatı & Barlar</span></div>
+                        <div>🗺️ <strong>Bölge:</strong> <span id="pass-val-region">Beşiktaş & Akaretler</span></div>
                     </div>
                     <div class="pass-perk-box">
                         <div style="font-size:1.8rem; margin-bottom:2px;">🍵</div>
@@ -996,7 +972,7 @@
             </div>
         </section>
 
-        <!-- PRACTICAL TRAVEL GUIDE & FAQ SECTION -->
+        <!-- PRACTICAL GUIDE -->
         <section class="practical-guide-section">
             <h2 class="section-header-title">
                 <i class="ph-bold ph-shopping-bag" style="color:#d97706;"></i> 🛍️ Orijinal Hediyelik & Alışveriş Rehberi
@@ -1024,10 +1000,10 @@
 
     <script>
         let selectedTime = 'half';
-        let selectedRegion = 'galata_pera';
-        let selectedConcept = 'historical';
-        let selectedStart = 'galata';
-        let selectedStartTime = '11:30';
+        let selectedRegion = 'besiktas_akaretler';
+        let selectedConcept = 'nightlife';
+        let selectedStart = 'besiktas';
+        let selectedStartTime = '17:30';
 
         let systemWorkHours = '11:00 - 19:15';
         let systemPhone = '905456301214';
@@ -1040,12 +1016,11 @@
             "Balat Meydanı & Kiremit Sokak",
             "Eminönü Meydanı & İskele",
             "Sultanahmet / Ayasofya Meydanı",
-            "Kapalıçarşı Nuruosmaniye Kapısı",
-            "Kadıköy İskele / Rıhtım",
+            "Kadıköy İskele / Barlar Sokağı",
             "Moda Sahil / Çay Bahçesi"
         ];
 
-        // FETCH LIVE ISTANBUL WEATHER FROM OPEN-METEO API
+        // FETCH LIVE WEATHER
         if (window.fetch) {
             fetch('https://api.open-meteo.com/v1/forecast?latitude=41.0082&longitude=28.9784&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=Europe%2FIstanbul')
                 .then(r => r.json())
@@ -1056,52 +1031,28 @@
                             gridEl.innerHTML = '';
                             const daysNames = ['Bugün', 'Yarın', '2. Gün', '3. Gün'];
                             const daysData = data.daily;
-
                             for (let i = 0; i < 4; i++) {
                                 const maxTemp = Math.round(daysData.temperature_2m_max[i]);
                                 const minTemp = Math.round(daysData.temperature_2m_min[i]);
-                                const code = daysData.weathercode[i];
-
-                                let icon = '☀️';
-                                if (code >= 1 && code <= 3) icon = '⛅';
-                                else if (code >= 51 && code <= 67) icon = '🌧️';
-
                                 const dayCard = document.createElement('div');
                                 dayCard.className = `weather-day-card ${i === 0 ? 'today' : ''}`;
                                 dayCard.innerHTML = `
                                     <div class="weather-day-title">${daysNames[i]}</div>
-                                    <div class="weather-day-icon">${icon}</div>
+                                    <div class="weather-day-icon">☀️</div>
                                     <div class="weather-day-temp">${maxTemp}° / ${minTemp}°</div>
                                 `;
                                 gridEl.appendChild(dayCard);
                             }
                         }
-
-                        if (data.current_weather) {
-                            const currentTemp = Math.round(data.current_weather.temperature);
-                            liveWeatherText = `☀️ İstanbul ${currentTemp}°C`;
-                            const weatherEl = document.getElementById('weather-display');
-                            if (weatherEl) weatherEl.innerText = liveWeatherText;
-                        }
                     }
                 }).catch(e => {});
         }
 
-        // DYNAMICALLY FETCH WORKING HOURS
-        if (window.fetch) {
-            fetch('/api/web/settings')
-                .then(r => r.json())
-                .then(data => {
-                    if (data && data.work_hours) systemWorkHours = data.work_hours;
-                    if (data && data.phone) systemPhone = data.phone;
-                }).catch(e => {});
-        }
-
-        // IN-STORE CUSTOMER LIFEHACK: 1-CLICK INSTANT VIP TEA PASS!
         function quickInStoreLifehack() {
             selectedStart = 'galata';
             selectedTime = 'half';
             selectedRegion = 'galata_pera';
+            selectedConcept = 'historical';
             
             const hotelEl = document.getElementById('hotel-name-input');
             if (hotelEl) hotelEl.value = 'Galata Kumbaracı Yokuşu (Fırınna Cafe Masa Müşterisi)';
@@ -1160,6 +1111,7 @@
             generateSmartItinerary();
         }
 
+        // EXPAND REGION OPTIONS & ADD EXPRESS BALAT + EMİNÖNÜ COMBO!
         function updateRegionOptions() {
             const gridRegion = document.getElementById('grid-region');
             gridRegion.innerHTML = '';
@@ -1167,16 +1119,17 @@
 
             if (selectedTime === 'half') {
                 regionOptions = [
-                    { key: 'galata_pera', title: '🏛️ Galata & Pera Çevre Turu', desc: 'Galata Kulesi, Kamondo & Fırınna Cafe' },
-                    { key: 'balat_fener', title: '📸 Balat Renkli Tarihi Evler', desc: 'Merdivenli Yokuş, Kırmızı Mektep' },
-                    { key: 'besiktas_akaretler', title: '🏛️ Beşiktaş & Akaretler Sıraevler', desc: 'Dolmabahçe & Akaretler' },
-                    { key: 'eminonu_historic', title: '🕌 Eminönü & Mısır Çarşısı', desc: 'Mısır Çarşısı & Galata Köprüsü' },
-                    { key: 'sultanahmet_classic', title: '🕌 Sultanahmet & Yerebatan', desc: 'Ayasofya & Yerebatan Sarnıcı' },
-                    { key: 'moda_caddebostan', title: '🌊 Moda Sahil Kordonu', desc: 'Moda çay bahçesi & çimler' }
+                    { key: 'express_balat_eminonu', title: '⚡ Hızlı Gezi: Balat & Eminönü Birleşik Tur', desc: 'Sıkışık vakitte renkli Balat evleri + Mısır Çarşısı' },
+                    { key: 'besiktas_akaretler', title: '🏛️ Beşiktaş, Akaretler & Ihlamur Kasrı', desc: 'Dolmabahçe, Akaretler sıraevler & Çarşı içi' },
+                    { key: 'balat_fener', title: '📸 Balat & Fener Renkli Tarihi Sokaklar', desc: 'Merdivenli Yokuş, Kırmızı Mektep & Demir Kilise' },
+                    { key: 'galata_pera', title: '🏛️ Galata - Pera - İstiklal Sanat Hattı', desc: 'Galata Kulesi, Kamondo & Fırınna Cafe' },
+                    { key: 'eminonu_historic', title: '🕌 Eminönü, Mısır Çarşısı & Galata Köprüsü', desc: 'Baharat kokuları & Haliç yürüyüşü' },
+                    { key: 'sultanahmet_classic', title: '🕌 Tarihi Yarımada: Ayasofya & Yerebatan', desc: 'Bizans su sarayı & Ayasofya meydanı' },
+                    { key: 'moda_caddebostan', title: '🌊 Moda Sahili & Kadıköy Kordonu', desc: 'Deniz manzaralı çimler & Moda çay bahçesi' }
                 ];
             } else if (selectedTime === '1day') {
                 regionOptions = [
-                    { key: 'sultanahmet_galata_combo', title: '👑 Sultanahmet + Galata Birleşik Tur', desc: 'Ayasofya ➔ Mısır Çarşısı ➔ Galata Köprüsü ➔ Fırınna' },
+                    { key: 'sultanahmet_galata_combo', title: '👑 Tarihi Yarımada + Galata Birleşik Tur', desc: 'Ayasofya ➔ Mısır Çarşısı ➔ Galata Köprüsü ➔ Fırınna' },
                     { key: 'bosphorus_besiktas_combo', title: '⛵ Beşiktaş + Ortaköy + Bebek Boğaz Turu', desc: 'Dolmabahçe Sarayı ➔ Akaretler ➔ Bebek' },
                     { key: 'galata_moda_combo', title: '🌉 İki Yakalı Vapur Birleşimi', desc: 'Fırınna Cafe ➔ Vapurla Moda Sahili' }
                 ];
@@ -1207,11 +1160,12 @@
                 kadikoy: '📍 Kadıköy İskele',
                 moda: '📍 Moda Sahil'
             };
-            return map[startKey] || '📍 Galata / Fırınna Cafe';
+            return map[startKey] || '📍 Beşiktaş İskele';
         }
 
         function getRegionLabelName(regionKey) {
             const map = {
+                express_balat_eminonu: '⚡ Hızlı Gezi: Balat & Eminönü Birleşik Tur',
                 balat_fener: '📸 Balat & Fener Sokakları',
                 besiktas_akaretler: '🏛️ Beşiktaş & Akaretler Sıraevler',
                 bosphorus_besiktas_combo: '⛵ Beşiktaş + Ortaköy Boğaz Turu',
@@ -1223,17 +1177,17 @@
                 sultanahmet_classic: '🕌 Sultanahmet & Yerebatan Sarnıcı',
                 moda_caddebostan: '🌊 Moda Sahili & Çimler'
             };
-            return map[regionKey] || '🏛️ Galata & Pera Çevre Turu';
+            return map[regionKey] || '🏛️ Beşiktaş & Akaretler Sıraevler';
         }
 
         function updateSummaryPreview() {
-            let startName = getStartLabelName(selectedStart || 'galata');
+            let startName = getStartLabelName(selectedStart || 'besiktas');
             let conceptTxt = "🏛️ Tarih & Kültür";
             if (selectedConcept === 'nature') conceptTxt = "🌲 Doğa & Yürüyüş 🏃";
             else if (selectedConcept === 'photo') conceptTxt = "📸 Renkli Sokaklar 👫";
             else if (selectedConcept === 'nightlife') conceptTxt = "🎷 Gece Barları 🍻";
 
-            let regionTxt = getRegionLabelName(selectedRegion || 'galata_pera');
+            let regionTxt = getRegionLabelName(selectedRegion || 'besiktas_akaretler');
 
             let timeTxt = "Yarım Gün (3-4 Saat)";
             if (selectedTime === '1day') timeTxt = "1 Tam Gün (6-8 Saat)";
@@ -1243,7 +1197,7 @@
             if (elStart) elStart.innerText = startName;
 
             const elTimeStart = document.getElementById('summary-val-start-time');
-            if (elTimeStart) elTimeStart.innerText = selectedStartTime || '11:30';
+            if (elTimeStart) elTimeStart.innerText = selectedStartTime || '17:30';
 
             const elConcept = document.getElementById('summary-val-concept');
             if (elConcept) elConcept.innerText = conceptTxt;
@@ -1255,57 +1209,144 @@
             if (elRegion) elRegion.innerText = regionTxt;
         }
 
-        // COMPREHENSIVE DYNAMIC REGION-SPECIFIC POIS DATABASE
-        const REGION_POIS_DATABASE = {
-            balat_fener: [
-                { offsetMin: 0, title: '📍 1. DURAK: Haliç Sahili Balat Meydanı Girişi', category: 'photo', desc: 'Haliç kıyısından tarihi renkli semtin merkezine giriş.', mapQuery: 'Balat+Meydani+Fatih+Istanbul' },
-                { offsetMin: 40, title: '📸 2. DURAK: Kiremit Sokak & Merdivenli Yokuş Renkli Evler', category: 'photo', desc: 'İstanbul’un en çok fotoğraflanan tarihi ahşap cumbalı evleri.', mapQuery: 'Kiremit+Caddesi+Balat+Istanbul' },
-                { offsetMin: 100, title: '🏛️ 3. DURAK: Fener Rum Patrikhanesi & Kırmızı Mektep (Lise)', category: 'museums', desc: 'Görkemli tuğla mimarili Kırmızı Mektep.', mapQuery: 'Fener+Rum+Ortodoks+Patrikhanesi+Istanbul' },
-                { offsetMin: 155, title: '⛪ 4. DURAK: Sveti Stefan Dökme Demir Bulgar Kilisesi', category: 'worship', desc: 'Dünyanın dökme demirden inşa edilmiş tek kilisesi.', mapQuery: 'Sveti+Stefan+Kilisesi+Balat+Istanbul' },
-                { offsetMin: 220, featured: true, title: 'FIRINNA CAFE & RESTAURANT — Galata Köprüsü Geçişi & Fırınna Mola 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da fırından pizza ve sınırsız Türk çayı!', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' }
-            ],
+        // DEEP DYNAMIC POIS DATABASE BY REGION & BY CONCEPT!
+        const DYNAMIC_CONCEPT_POIS = {
+            // BEŞİKTAŞ REGION
+            besiktas_akaretler: {
+                nightlife: [
+                    {
+                        offsetMin: 0,
+                        title: '📍 1. DURAK: Beşiktaş Çarşısı Köyiçi Pub’lar Sokağı & Kazan Pub',
+                        category: 'nightlife',
+                        whyVisit: 'İstanbul’un en canlı mahalle pub kültürü, barlar sokağı ve samimi mahalle atmosferi.',
+                        mustDo: 'Beşiktaş Çarşısı içindeki tarihi Kazan Pub veya Köyiçi publarında soğuk fıçı bira söyleyin ve maç/akşam coşkusuna katılın.',
+                        mustEat: 'Kazan Pub patates tabağı, sıcak sosis ve fıçı bira.',
+                        mapQuery: 'Kazan+Pub+Besiktas+Istanbul'
+                    },
+                    {
+                        offsetMin: 60,
+                        title: '🍸 2. DURAK: Tarihi Akaretler Craft Kokteyl & Lounge Barları',
+                        category: 'nightlife',
+                        whyVisit: 'Neoklasik sıra evlerin altında İstanbul’un en şık craft kokteyl mekanları ve DJ performans alanları.',
+                        mustDo: 'Akaretler caddesindeki özel tasarım kokteyl barlarında imza kokteylleri tadın ve ışıklandırılmış tarihi sıra evler önünde fotoğraf çekilin.',
+                        mustEat: 'İmza neoklasik kokteyller ve yanında artisan şarküteri tabağı.',
+                        mapQuery: 'Akaretler+Besiktas+Istanbul'
+                    },
+                    {
+                        offsetMin: 120,
+                        title: '🎷 3. DURAK: Beşiktaş Cihangir & Asmalımescit Barlarına Geçiş', category: 'nightlife',
+                        whyVisit: 'Geceyi Galata/Beyoğlu’nun canlı müzik mekanlarında tamamlamak için stratejik bağlantı.',
+                        mustDo: 'Taksi veya dolmuşla 8 dakikada Galata Kumbaracı veya Asmalımescit’e geçerek canlı caz/rock mekanlarına adımı atın.',
+                        mustEat: 'Gece yarısı sokak lezzeti ıslak hamburger.',
+                        mapQuery: 'Asmalimescit+Beyoglu+Istanbul'
+                    },
+                    {
+                        offsetMin: 180,
+                        featured: true,
+                        title: 'FIRINNA CAFE & RESTAURANT — Gece Öncesi Çay, Pizza & Enerji Molası 🍵',
+                        category: 'gourmet',
+                        whyVisit: 'Kumbaracı Yokuşu No:41A’da fırından taze çıkan İtalyan pizza ve sınırsız Türk çayı ile geceye mükemmel enerji depolayın.',
+                        mustDo: 'VIP bilet kodunuzu garsona göstererek sınırsız çay ikramınızı alın.',
+                        mustEat: 'Bakır sahanda sucuklu menemen, taş fırın pizza ve demlik çay.',
+                        closedNoteDynamic: true,
+                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                    }
+                ],
+                historical: [
+                    {
+                        offsetMin: 0,
+                        title: '🏰 1. DURAK: Tarihi Dolmabahçe Sarayı & Resim Müzesi',
+                        category: 'museums',
+                        whyVisit: 'Osmanlı İmparatorluğu’nun son görkemli sarayı, Kristal Merdivenler ve Boğaz kapısı.',
+                        mustDo: 'Muayede Salonu dev avizesini görün ve deniz kıyısındaki saray kapısında fotoğraf çekilin.',
+                        mustEat: 'Saray kafesinde Boğaz manzaralı Türk kahvesi.',
+                        mapQuery: 'Dolmabahce+Sarayi+Besiktas+Istanbul'
+                    },
+                    {
+                        offsetMin: 70,
+                        title: '🏛️ 2. DURAK: Tarihi Akaretler Sıraevler & Şairler Parkı',
+                        category: 'museums',
+                        whyVisit: '1875 yapımı mimar Sarkis Balyan imzalı neoklasik sıra evler ve tarihi şairler büstleri.',
+                        mustDo: 'Sıra evlerin mimari detaylarını inceleyin ve Şairler Parkı’nda mola verin.',
+                        mustEat: 'Akaretler artisan fırınlarından kruvasan.',
+                        mapQuery: 'Akaretler+Besiktas+Istanbul'
+                    },
+                    {
+                        offsetMin: 130,
+                        title: '🌿 3. DURAK: Ihlamur Kasrı Sultan Bahçeleri & Asırlık Çınarlar',
+                        category: 'museums',
+                        whyVisit: 'Sultan Abdülmecid’in dinlenme kasrı, manolya bahçeleri ve huzurlu doğal havuz.',
+                        mustDo: 'Kasrın oymalı mermer cephesini fotoğraflayın.',
+                        mustEat: 'Tarihi kasır bahçesinde çay.',
+                        mapQuery: 'Ihlamur+Kasri+Besiktas+Istanbul'
+                    },
+                    {
+                        offsetMin: 190,
+                        featured: true,
+                        title: 'FIRINNA CAFE & RESTAURANT — Galata Mola Durağı & Sınırsız Çay 🍵',
+                        category: 'gourmet',
+                        whyVisit: 'Kumbaracı Yokuşu No:41A’da taş fırın İtalyan pizza ve çay keyfi.',
+                        mustDo: 'Bakır sahanda menemen ve çıtır bazlama tost deneyin.',
+                        mustEat: 'Bakır menemen & taze demlik çay.',
+                        closedNoteDynamic: true,
+                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                    }
+                ]
+            },
 
-            besiktas_akaretler: [
-                { offsetMin: 0, title: '📍 1. DURAK: Beşiktaş İskele Meydanı', category: 'photo', desc: 'Boğaz kıyısındaki hareketli Beşiktaş meydanı.', mapQuery: 'Besiktas+Meydani+Istanbul' },
-                { offsetMin: 45, title: '🏰 2. DURAK: Tarihi Dolmabahçe Sarayı & Saat Kulesi', category: 'museums', desc: 'Osmanlı’nın son sarayı ve neoklasik saat kulesi.', mapQuery: 'Dolmabahce+Sarayi+Besiktas+Istanbul' },
-                { offsetMin: 110, title: '🏛️ 3. DURAK: Tarihi Akaretler Sıraevler & Şairler Parkı', category: 'photo', desc: '1875 yapımı neoklasik sıra evler.', mapQuery: 'Akaretler+Besiktas+Istanbul' },
-                { offsetMin: 180, featured: true, title: 'FIRINNA CAFE & RESTAURANT — Galata Mola Durağı & Sınırsız Çay 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da İtalyan pizza ve demlik çay!', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' }
-            ],
-
-            bosphorus_besiktas_combo: [
-                { offsetMin: 0, title: '📍 1. DURAK: Dolmabahçe Sarayı & Akaretler Sıraevler', category: 'museums', desc: 'Saray mimarisi ve Akaretler yürüyüşü.', mapQuery: 'Dolmabahce+Sarayi+Besiktas+Istanbul' },
-                { offsetMin: 60, title: '🕌 2. DURAK: Ortaköy Meydanı & Büyük Mecidiye Cami', category: 'worship', desc: 'Boğaz Köprüsü altındaki ikonik cami.', mapQuery: 'Ortakoy+Meydani+Besiktas+Istanbul' },
-                { offsetMin: 130, title: '🌊 3. DURAK: Bebek Sahil Kordonu', category: 'photo', desc: 'Tarihi yalılar ve Bebek Parkı.', mapQuery: 'Bebek+Parki+Besiktas+Istanbul' },
-                { offsetMin: 210, featured: true, title: 'FIRINNA CAFE & RESTAURANT — Galata Fırınna Lezzet Molası 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da pizza ve sınırsız Türk çayı.', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' }
-            ],
-
-            sultanahmet_galata_combo: [
-                { offsetMin: 0, title: '📍 1. DURAK: Sultanahmet Meydanı & Dikilitaş', category: 'photo', desc: 'Ayasofya ve Sultanahmet Meydanı tarihi açılışı.', mapQuery: 'Sultanahmet+Meydani+Istanbul' },
-                { offsetMin: 50, title: '🕌 2. DURAK: Ayasofya-i Kebir & Yerebatan Sarnıcı', category: 'museums', desc: '1500 yıllık mabet ve 336 sütunlu su sarayı.', mapQuery: 'Basilica+Cistern+Sultanahmet+Istanbul' },
-                { offsetMin: 120, title: '🛍️ 3. DURAK: Eminönü Mısır Çarşısı', category: 'shopping', desc: 'Baharat kokuları ve Mısır Çarşısı.', mapQuery: 'Misir+Carsisi+Eminonu+Istanbul' },
-                { offsetMin: 175, title: '🌉 4. DURAK: Tarihi Galata Köprüsü Yürüyüşü', category: 'photo', desc: 'Haliç manzarası eşliğinde Galata Köprüsü geçişi.', mapQuery: 'Galata+Bridge+Istanbul' },
-                { offsetMin: 220, featured: true, title: 'FIRINNA CAFE & RESTAURANT — Gurme Yemeği & Sınırsız Çay 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da bakır sahanda menemen, taş fırın pizza ve demlik çay!', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' }
-            ],
-
-            galata_pera: [
-                { offsetMin: 0, title: '📍 1. DURAK: Taksim Meydanı & İstiklal Caddesi Başlangıç', category: 'photo', desc: 'Nostaljik tramvay hattı boyunca tarihi binalar yürüyüşü.', mapQuery: 'Taksim+Meydani+Beyoglu+Istanbul' },
-                { offsetMin: 45, title: '🏛️ 2. DURAK: Tarihi Çiçek Pasajı, Pera & St. Antuan Kilisesi', category: 'museums', desc: '19. yüzyıl Neo-Gotik ve Barok mimari geçitler.', mapQuery: 'St+Antuan+Kilisesi+Beyoglu+Istanbul' },
-                { offsetMin: 105, title: '🗼 3. DURAK: Galata Kulesi & Kamondo Merdivenleri', category: 'museums', desc: 'Ceneviz surları ve Galata simgesi taş sokakları.', mapQuery: 'Galata+Kulesi+Beyoglu+Istanbul' },
-                { offsetMin: 165, featured: true, title: 'FIRINNA CAFE & RESTAURANT — Lezzet Molası & Sınırsız Çay 🍵', category: 'gourmet', desc: 'Kumbaracı Yokuşu No:41A’da bakır sahanda menemen, İtalyan pizza ve çay.', closedNoteDynamic: true, mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul' }
-            ]
+            // EXPRESS BALAT & EMİNÖNÜ COMBO (3-4 HOURS QUICK MULTI-DISTRICT TOUR)
+            express_balat_eminonu: {
+                historical: [
+                    {
+                        offsetMin: 0,
+                        title: '📸 1. DURAK: Balat Kiremit Sokak Renkli Ahşap Evler',
+                        category: 'photo',
+                        whyVisit: 'İstanbul’un en renkli tarihi ahşap cumbalı konakları.',
+                        mustDo: 'Kiremit Sokak yokuşunda renkli evler önünde fotoğraf çekilin.',
+                        mustEat: 'Balat tarihi fırınından galeta ve çay.',
+                        mapQuery: 'Kiremit+Caddesi+Balat+Istanbul'
+                    },
+                    {
+                        offsetMin: 50,
+                        title: '🏛️ 2. DURAK: Fener Rum Patrikhanesi & Kırmızı Mektep (Fener Lisesi)',
+                        category: 'museums',
+                        whyVisit: 'Görkemli tuğla mimarili 1881 yapımı Kırmızı Mektep.',
+                        mustDo: 'Patrihane avlusunu ve Kırmızı Mektep heybetli kulesini fotoğraflayın.',
+                        mustEat: 'Fener sahilinde taze sıkma portakal suyu.',
+                        mapQuery: 'Fener+Rum+Ortodoks+Patrikhanesi+Istanbul'
+                    },
+                    {
+                        offsetMin: 100,
+                        title: '🛍️ 3. DURAK: Eminönü Mısır Çarşısı & Tahmis Sokak Kahve Kokusu',
+                        category: 'shopping',
+                        whyVisit: 'Haliç kıyısındaki 360 yıllık baharat ve taze kahve merkezi.',
+                        mustDo: 'Kurukahveci Mehmet Efendi önündeki taze kahve kuyruğuna girin.',
+                        mustEat: 'Çifte kavrulmuş Antep fıstıklı Türk lokumu ve Türk kahvesi.',
+                        mapQuery: 'Misir+Carsisi+Eminonu+Istanbul'
+                    },
+                    {
+                        offsetMin: 150,
+                        title: '🌉 4. DURAK: Galata Köprüsü Yürüyüşü & Olta Balıkçıları',
+                        category: 'photo',
+                        whyVisit: 'Haliç ve Boğaz’ın birleştiği nefes kesici manzara.',
+                        mustDo: 'Galata Köprüsü üstünden tarihi yarımada siluetini izleyin.',
+                        mustEat: 'Taze simit & çay.',
+                        mapQuery: 'Galata+Bridge+Istanbul'
+                    },
+                    {
+                        offsetMin: 195,
+                        featured: true,
+                        title: 'FIRINNA CAFE & RESTAURANT — Galata VIP Lezzet Molası 🍵',
+                        category: 'gourmet',
+                        whyVisit: 'Hızlı tur sonrası Kumbaracı Yokuşu No:41A’da menemen, pizza ve sınırsız Türk çayı.',
+                        mustDo: 'VIP bilet kodu ile sınırsız çayınızı yudumlayın.',
+                        mustEat: 'İtalyan pizza & bakır sahanda menemen.',
+                        closedNoteDynamic: true,
+                        mapQuery: 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul'
+                    }
+                ]
+            }
         };
-
-        function formatTimeOffset(startStr, offsetMinutes) {
-            const parts = startStr.split(':');
-            let startH = parseInt(parts[0], 10);
-            let startM = parseInt(parts[1], 10);
-            let totalM = startH * 60 + startM + (offsetMinutes % 1440);
-            let finalH = Math.floor(totalM / 60) % 24;
-            let finalM = totalM % 60;
-            const strH = finalH < 10 ? '0' + finalH : finalH;
-            const strM = finalM < 10 ? '0' + finalM : finalM;
-            return `${strH}:${strM}`;
-        }
 
         function generateSmartItinerary() {
             renderItinerary();
@@ -1319,27 +1360,35 @@
             listEl.innerHTML = '';
 
             if (typeof confetti === 'function') {
-                confetti({
-                    particleCount: 110,
-                    spread: 90,
-                    origin: { y: 0.6 }
-                });
+                confetti({ particleCount: 110, spread: 90, origin: { y: 0.6 } });
             }
 
-            let targetRegionKey = selectedRegion || 'galata_pera';
-            let rawPOIs = REGION_POIS_DATABASE[targetRegionKey] || REGION_POIS_DATABASE['galata_pera'];
+            let targetRegionKey = selectedRegion || 'besiktas_akaretler';
+            let targetConceptKey = selectedConcept || 'historical';
+
+            // FETCH EXACT POI ARRAY ACCORDING TO BOTH REGION AND CONCEPT!
+            let rawPOIs = null;
+            if (DYNAMIC_CONCEPT_POIS[targetRegionKey] && DYNAMIC_CONCEPT_POIS[targetRegionKey][targetConceptKey]) {
+                rawPOIs = DYNAMIC_CONCEPT_POIS[targetRegionKey][targetConceptKey];
+            } else if (DYNAMIC_CONCEPT_POIS[targetRegionKey] && DYNAMIC_CONCEPT_POIS[targetRegionKey]['historical']) {
+                rawPOIs = DYNAMIC_CONCEPT_POIS[targetRegionKey]['historical'];
+            } else {
+                rawPOIs = DYNAMIC_CONCEPT_POIS['express_balat_eminonu']['historical'];
+            }
 
             let finalPOIs = [];
-            const startLabelName = getStartLabelName(selectedStart || 'galata');
-            const startTimeVal = selectedStartTime || '11:30';
+            const startLabelName = getStartLabelName(selectedStart || 'besiktas');
+            const startTimeVal = selectedStartTime || '17:30';
 
             if (hotelNameInput) {
                 finalPOIs.push({
                     time: startTimeVal,
                     hotelStart: true,
                     title: `🏨 Oteliniz / Konumunuz: ${hotelNameInput}`,
-                    category: 'hotel',
-                    desc: `Güne (${hotelNameInput}) noktasından başlayarak Fırınna Cafe'ye veya geziye adım atıyorsunuz.`,
+                    desc: `Güne (${hotelNameInput}) noktasından başlayarak geziye adım atıyorsunuz.`,
+                    whyVisit: 'Konaklama noktanızdan en hızlı ulaşım hattı.',
+                    mustDo: 'Harita navigasyonunu başlatın.',
+                    mustEat: 'Enerji veren taze meyve suyu.',
                     mapQuery: encodeURIComponent(`${hotelNameInput}, İstanbul`)
                 });
             } else {
@@ -1347,8 +1396,10 @@
                     time: startTimeVal,
                     hotelStart: true,
                     title: `📍 Başlangıç Noktanız: ${startLabelName}`,
-                    category: 'hotel',
                     desc: `Rotanız saat ${startTimeVal}’da "${startLabelName}" merkezinden başlıyor.`,
+                    whyVisit: 'Şehrin en kolay ulaşılabilir bağlantı noktası.',
+                    mustDo: 'Buluşma noktasından seçilen bölgeye doğru ilerleyin.',
+                    mustEat: 'Taze demlik çay.',
                     mapQuery: encodeURIComponent(startLabelName)
                 });
             }
@@ -1359,37 +1410,16 @@
             const currentTotalMin = currentHour * 60 + currentMin;
             const isFirinnaOpenNow = currentTotalMin >= 660 && currentTotalMin <= 1155;
 
-            let timeOffsetAccumulator = hotelNameInput ? 30 : 0;
+            let timeOffsetAccumulator = hotelNameInput ? 20 : 0;
 
             rawPOIs.forEach(poi => {
-                if (poi.dayTitle) {
-                    finalPOIs.push(poi);
-                    return;
-                }
-
                 const calculatedTime = formatTimeOffset(startTimeVal, (poi.offsetMin || 0) + timeOffsetAccumulator);
-                let dynamicTitle = poi.title;
-                if (poi.featured) {
-                    const hourInt = parseInt(calculatedTime.split(':')[0], 10);
-                    if (hourInt >= 9 && hourInt < 12) {
-                        dynamicTitle = '🍳 FIRINNA CAFE & RESTAURANT — Menemen & Kahvaltı Molası 🍵';
-                    } else if (hourInt >= 12 && hourInt < 16) {
-                        dynamicTitle = '🍕 FIRINNA CAFE & RESTAURANT — Taş Fırın İtalyan Pizza & Öğle Yemeği 🍵';
-                    } else {
-                        dynamicTitle = '☕ FIRINNA CAFE & RESTAURANT — İkindi Kahvesi & Tatlı Molası 🍵';
-                    }
-                }
-
-                finalPOIs.push({
-                    ...poi,
-                    time: calculatedTime,
-                    title: dynamicTitle
-                });
+                finalPOIs.push({ ...poi, time: calculatedTime });
             });
 
             const regionReadableName = getRegionLabelName(targetRegionKey);
             const descEl = document.getElementById('result-start-desc');
-            if (descEl) descEl.innerText = `"${startLabelName}" noktasından saat ${startTimeVal}’da başlayan "${regionReadableName}" gezi rotanız ve Fırınna Cafe VIP çay biletiniz hazır.`;
+            if (descEl) descEl.innerText = `"${startLabelName}" noktasından saat ${startTimeVal}’da başlayan "${regionReadableName}" rehberiniz ve Fırınna Cafe VIP çay biletiniz hazır.`;
 
             const randomCode = Math.floor(1000 + Math.random() * 9000);
             const fullTicketCode = `#FIRINNA-TEA-${randomCode}`;
@@ -1410,15 +1440,10 @@
             const btnYandexMain = document.getElementById('btn-yandex-launch-main');
             if (btnYandexMain) btnYandexMain.href = yandexUrl;
 
-            // FIX EMBEDDED MAP ROUTE LINE: GOOGLE MAPS DIRECT ROUTE LINE (saddr -> daddr)
-            const originQuery = waypointsQueries[0] || 'Galata+Kulesi+Beyoglu+Istanbul';
+            const originQuery = waypointsQueries[0] || 'Besiktas+Meydani+Istanbul';
             const destQuery = waypointsQueries[waypointsQueries.length - 1] || 'Firinna+Cafe+Restaurant+Kumbaraci+Yokusu+No+41A+Beyoglu+Istanbul';
             const iframeEl = document.getElementById('live-map-iframe');
             if (iframeEl) iframeEl.src = `https://maps.google.com/maps?saddr=${originQuery}&daddr=${destQuery}&output=embed`;
-
-            let timeTextReadable = "Yarım Gün (3-4 Saat)";
-            if (selectedTime === '1day') timeTextReadable = "1 Tam Gün (6-8 Saat)";
-            else if (selectedTime === '2days') timeTextReadable = "2-3 Günlük Rehber";
 
             let conceptTextReadable = "🏛️ Tarih & Kültür";
             if (selectedConcept === 'nature') conceptTextReadable = "🌲 Doğa & Yürüyüş 🏃";
@@ -1434,33 +1459,23 @@
             const passConcept = document.getElementById('pass-val-concept');
             if (passConcept) passConcept.innerText = conceptTextReadable;
 
-            const passTime = document.getElementById('pass-val-time');
-            if (passTime) passTime.innerText = timeTextReadable;
-
             const passRegion = document.getElementById('pass-val-region');
             if (passRegion) passRegion.innerText = regionReadableName;
 
             const passWaypointsContainer = document.getElementById('pass-waypoints-container');
             if (passWaypointsContainer) passWaypointsContainer.innerHTML = '';
 
+            // RENDER RICH INSIDER TRAVEL GUIDE CARDS
             finalPOIs.forEach(item => {
-                if (item.dayTitle) {
-                    const dayHeaderDiv = document.createElement('div');
-                    dayHeaderDiv.className = 'day-header-badge';
-                    dayHeaderDiv.innerText = item.dayTitle;
-                    listEl.appendChild(dayHeaderDiv);
-                    return;
-                }
-
                 const itemDiv = document.createElement('div');
                 itemDiv.className = `timeline-item ${item.featured ? 'featured' : ''} ${item.hotelStart ? 'hotel-start-item' : ''}`;
                 
                 let closedTagHtml = '';
                 if (item.closedNoteDynamic) {
                     if (isFirinnaOpenNow) {
-                        closedTagHtml = `<div style="margin-top:4px; font-size:0.78rem; font-weight:700; color:#065f46; background:#ecfdf5; border:1px solid #a7f3d0; padding:3px 8px; border-radius:6px; display:inline-block;">🟢 DÜKKAN ŞU AN AÇIK — Sınırsız Çay İkramınız Hazır!</div>`;
+                        closedTagHtml = `<div style="margin-top:6px; font-size:0.78rem; font-weight:700; color:#065f46; background:#ecfdf5; border:1px solid #a7f3d0; padding:3px 8px; border-radius:6px; display:inline-block;">🟢 DÜKKAN ŞU AN AÇIK — Sınırsız Çay İkramınız Hazır!</div>`;
                     } else {
-                        closedTagHtml = `<div style="margin-top:4px; font-size:0.78rem; font-weight:700; color:#b91c1c; background:#fef2f2; border:1px solid #fca5a5; padding:3px 8px; border-radius:6px; display:inline-block;">🔴 FIRINNA KAPALI (Mesai: ${systemWorkHours}) — <a href="https://wa.me/${systemPhone}?text=Merhaba,%20Fırınna'dan%20rezervasyon%20yaptırmak%20istiyorum." target="_blank" style="color:#dc2626;">WhatsApp Rezervasyon</a></div>`;
+                        closedTagHtml = `<div style="margin-top:6px; font-size:0.78rem; font-weight:700; color:#b91c1c; background:#fef2f2; border:1px solid #fca5a5; padding:3px 8px; border-radius:6px; display:inline-block;">🔴 FIRINNA KAPALI (Mesai: ${systemWorkHours}) — <a href="https://wa.me/${systemPhone}?text=Merhaba,%20Fırınna'dan%20rezervasyon%20yaptırmak%20istiyorum." target="_blank" style="color:#dc2626;">WhatsApp Rezervasyon</a></div>`;
                     }
                 }
 
@@ -1468,12 +1483,33 @@
                     <div class="timeline-dot"></div>
                     <span class="time-badge">${item.time}</span>
                     <h4 class="timeline-title">${item.featured ? '<img src="logo.png" style="height:20px; vertical-align:middle; border-radius:4px; margin-right:4px;" alt="Fırınna Logo">' : ''}${item.title}</h4>
-                    <p class="timeline-desc">${item.desc}</p>
+                    
+                    <div class="guide-details-box">
+                        ${item.whyVisit ? `
+                            <div class="guide-row">
+                                <strong>📌 Neden Gitmeli? (Özellikleri):</strong>
+                                <p>${item.whyVisit}</p>
+                            </div>
+                        ` : ''}
+                        ${item.mustDo ? `
+                            <div class="guide-row" style="background:#fffdf5; border-color:#fde68a;">
+                                <strong style="color:#b45309;">👀 Neler Görülmeli / Yapılmalı?</strong>
+                                <p style="color:#78350f;">${item.mustDo}</p>
+                            </div>
+                        ` : ''}
+                        ${item.mustEat ? `
+                            <div class="guide-row" style="background:#f0fdf4; border-color:#bbf7d0;">
+                                <strong style="color:#166534;">🍽️ Ne Yenmeli / İçilmeli?</strong>
+                                <p style="color:#14532d;">${item.mustEat}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+
                     ${closedTagHtml}
                     ${item.featured ? `
-                        <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
-                            <a href="menu.html" style="background:#0f172a; color:#fff; font-size:0.78rem; font-weight:700; padding:5px 10px; border-radius:6px; text-decoration:none;">📄 Menü</a>
-                            <a href="https://maps.google.com/?q=Firinna+Cafe+Restaurant+Galata" target="_blank" style="background:#d97706; color:#fff; font-size:0.78rem; font-weight:700; padding:5px 10px; border-radius:6px; text-decoration:none;">📍 Yol Tarifi</a>
+                        <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="menu.html" style="background:#0f172a; color:#fff; font-size:0.78rem; font-weight:700; padding:6px 12px; border-radius6px; text-decoration:none;">📄 Fırınna Menüsü</a>
+                            <a href="https://maps.google.com/?q=Firinna+Cafe+Restaurant+Galata" target="_blank" style="background:#d97706; color:#fff; font-size:0.78rem; font-weight:700; padding:6px 12px; border-radius:6px; text-decoration:none;">📍 Yol Tarifi</a>
                         </div>
                     ` : ''}
                 `;
@@ -1499,20 +1535,6 @@
 
             container.style.display = 'block';
             container.scrollIntoView({ behavior: 'smooth' });
-
-            if (window.fetch) {
-                fetch('/api/web/track-visit', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        event: 'action',
-                        item: `Gezi Rehberi Rota (${startLabelName} - ${regionReadableName})`,
-                        selectedRegion: selectedConcept,
-                        selectedTime: selectedTime,
-                        startPoint: selectedStart
-                    })
-                }).catch(e => {});
-            }
         }
 
         function downloadItineraryAsImage() {
