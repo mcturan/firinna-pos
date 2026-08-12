@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe</title>
-    <meta name="description" content="Kral Yolu Efsane Rota, Ne Nereden Alınır alışveriş rehberi (Halı/Kilim VIP İndirim), Doğa Yürüyüşü, İstanbulkart ve sınırsız çay ikramı.">
-    <meta name="keywords" content="İstanbul ne nereden alınır, Anka Carpets halı kilim indirim kodu, İstanbul Kral Yolu rotası, Belgrad Ormanı koşu parkuru, Fırınna cafe">
+    <meta name="description" content="Kral Yolu Efsane Rota, Karaköy Güllüoğlu Baklava, Anka Carpets Halı/Kilim rehberi, Otel navigasyonu, Gece Hayatı ve Sınırsız Çay İkramı.">
+    <meta name="keywords" content="İstanbul gezi rehberi, Karaköy Güllüoğlu baklava, Anka Carpets halı kilim indirim kodu, İstanbul gece hayatı barlar, Fırınna cafe">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph -->
     <meta property="og:title" content="İstanbul Gezi Rehberi & Akıllı Rota Planlayıcı | Fırınna Cafe">
-    <meta property="og:description" content="Kaldığınız konumu ve rotayı seçin; Efsane Kral Yolu, Ne Nereden Alınır rehberi ve Fırınna Sınırsız Çay ikram kartınızı anında alın!">
+    <meta property="og:description" content="Kaldığınız oteli ve ilgi alanlarınızı seçin; rotanızı, Karaköy Güllüoğlu baklava molanızı ve Fırınna Sınırsız Çay ikram kartınızı anında alın!">
     <meta property="og:image" content="https://firinna.com/galata_cafe_bg_new.jpg">
     <meta property="og:url" content="https://firinna.com/gezi">
     <meta property="og:type" content="website">
@@ -26,18 +26,18 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "İstanbul'da otantik hediyelikler (Lokum, Kahve, Halı/Kilim) nereden alınır?",
+          "name": "İstanbul'da meşhur baklava nereden yenir?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Taze kahve ve dökme bakır cezve Mısır Çarşısı Tahmis Sokak'tan; lokum Kapalıçarşı bedestenlerinden; tarihi Türk halısı ve ipek kilim ise Anka Carpets'ten (#ANKA-FIRINNA-VIP kodu ile %15 İndirimli) satın alınabilir."
+            "text": "İstanbul'da tarihi orijinal baklava Karaköy Rıhtım Caddesi üzerindeki Karaköy Güllüoğlu mağazasından yenir."
           }
         },
         {
           "@type": "Question",
-          "name": "İstanbul'da gezilmesi şart olan Olmazsa Olmaz 'Kral Yolu' rotası nedir?",
+          "name": "İstanbul'da otantik hediyelikler (Lokum, Kahve, Halı/Kilim) nereden alınır?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Kapalıçarşı Nuruosmaniye Kapısı'ndan başlayıp Sultanahmet, Mısır Çarşısı, tarihi Galata Köprüsü yürüyüşü, Karaköy, Kamondo Merdivenleri, Fırınna Cafe & Restaurant lezzet molası, Tarihi Tünel Füniküleri, Şişhane ve İstiklal Caddesi üzerinden Taksim Meydanı'na uzanan efsanevi İstanbul rotasıdır."
+            "text": "Taze kahve ve dökme bakır cezve Mısır Çarşısı Tahmis Sokak'tan; lokum Kapalıçarşı bedestenlerinden; tarihi Türk halısı ve ipek kilim ise Anka Carpets'ten (#ANKA-FIRINNA-VIP kodu ile %15 İndirimli) satın alınabilir."
           }
         },
         {
@@ -386,6 +386,11 @@
             box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);
         }
 
+        .timeline-item.hotel-start-item {
+            background: #eff6ff;
+            border: 2px solid #2563eb;
+        }
+
         .timeline-dot {
             position: absolute;
             left: -2.32rem;
@@ -681,7 +686,7 @@
         
         <!-- STEP 1: ACCOMMODATION / STARTING POINT -->
         <div class="step-label">
-            <span class="num">1</span> <span>Kaldığınız Yer / Başlangıç Konumunuz:</span>
+            <span class="num">1</span> <span>Kaldığınız Yer / Otelinizin Konumu:</span>
         </div>
         <div class="options-grid" id="grid-start">
             <div class="option-pill active" onclick="selectSingleOption('grid-start', this, 'beyoglu')">
@@ -701,7 +706,7 @@
                 <div class="desc">Anadolu yakasından başlangıç</div>
             </div>
         </div>
-        <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="Otelinizin adını yazabilirsiniz (Örn: Rixos Pera, Galata Port Hotel)...">
+        <input type="text" id="hotel-name-input" class="input-hotel-box" placeholder="Otelinizin veya kaldığınız yerin adını yazın (Örn: Rixos Pera, Galata Port Hotel, CVK Park Bosphorus)...">
 
         <!-- STEP 2: REGION & PRESET ROUTES -->
         <div class="step-label">
@@ -755,7 +760,7 @@
 
         <!-- STEP 4: INTERESTS -->
         <div class="step-label">
-            <span class="num">4</span> <span>İlgi Alanlarınız:</span>
+            <span class="num">4</span> <span>İlgi Alanlarınız (Tam Filtreleme):</span>
         </div>
         <div class="options-grid" id="grid-interests">
             <div class="option-pill active" onclick="toggleMultiOption(this, 'museums')">
@@ -836,7 +841,7 @@
                     <p style="margin:0 0 12px; font-size:0.88rem; color:#cbd5e1;">Bu gezi rotasıyla gelen misafirlerimize ve tüm arkadaş grubunuza <strong>Fırınna Cafe & Restaurant</strong>'ta yemek siparişinizle birlikte <strong>SINIRSIZ DEMLİ TÜRK ÇAYI İKRAMIMIZDIR!</strong> Kodu gösterin yeterlidir.</p>
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
                         <a href="menu" style="background:#f59e0b; color:#0f172a; font-size:0.84rem; font-weight:800; padding:6px 16px; border-radius:8px; text-decoration:none;">📄 Menüyü İncele</a>
-                        <a href="https://maps.google.com/?q=Firinna+Cafe+Restaurant+Galata" target="_blank" style="background:rgba(255,255,255,0.15); color:#fff; font-size:0.84rem; font-weight:700; padding:6px 16px; border-radius:8px; text-decoration:none; border:1px solid rgba(255,255,255,0.2);">📍 Bize Yol Tarifi Al</a>
+                        <a href="https://maps.google.com/?q=Firinna+Cafe+Restaurant+Galata" target="_blank" style="background:rgba(255,255,255,0.15); color:#fff; font-size:0.84rem; font-weight:700; padding:6px 14px; border-radius:8px; text-decoration:none; border:1px solid rgba(255,255,255,0.2);">📍 Bize Yol Tarifi Al</a>
                     </div>
                 </div>
             </div>
@@ -853,7 +858,11 @@
 
         <div class="info-card" style="margin-bottom: 2.5rem; background: #fffdf5; border: 1.5px solid #f59e0b;">
             <p style="margin-bottom:1rem; font-size:0.92rem; color:#78350f; font-weight:600;">İstanbul'dan dönmeden önce almanız gereken en otantik ürünler ve güvenilir adresler:</p>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:14px;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
+                <div style="background:#fff; padding:14px; border-radius:12px; border:1px solid #fef3c7;">
+                    <strong style="color:#0f172a; font-size:0.95rem; display:block; margin-bottom:4px;">🥮 Meşhur Karaköy Baklavası:</strong>
+                    <p style="margin:0; font-size:0.85rem; color:#475569;"><strong>Karaköy Güllüoğlu</strong> (Karaköy Rıhtım Caddesi — 1871'den beri meşhur fıstıklı ve cevizli Karaköy Baklavası).</p>
+                </div>
                 <div style="background:#fff; padding:14px; border-radius:12px; border:1px solid #fef3c7;">
                     <strong style="color:#0f172a; font-size:0.95rem; display:block; margin-bottom:4px;">☕ Taze Kurukahve & Bakır Cezve:</strong>
                     <p style="margin:0; font-size:0.85rem; color:#475569;">Tarihi Mısır Çarşısı Tahmis Sokak (Özellikle Kurukahveci Mehmet Efendi ve el yapımı dövme bakır cezveler).</p>
@@ -865,10 +874,6 @@
                 <div style="background:#fff; padding:14px; border-radius:12px; border:2px solid #d97706; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.12);">
                     <strong style="color:#b45309; font-size:0.95rem; display:block; margin-bottom:4px;">🛋️ Tarihi Türk Halısı & İpek Kilim:</strong>
                     <p style="margin:0 0 6px; font-size:0.85rem; color:#475569;"><strong>Anka Carpets</strong> (Fırınna Misafirlerine Özel VIP Kod: <span style="background:#f59e0b; color:#0f172a; font-weight:800; padding:2px 8px; border-radius:6px;">#ANKA-FIRINNA-VIP</span> ile <strong>%15 İndirim</strong> ve Ücretsiz Uluslararası Kargo Desteği!).</p>
-                </div>
-                <div style="background:#fff; padding:14px; border-radius:12px; border:1px solid #fef3c7;">
-                    <strong style="color:#0f172a; font-size:0.95rem; display:block; margin-bottom:4px;">🍕 Pizza, Menemen & Demli Çay:</strong>
-                    <p style="margin:0; font-size:0.85rem; color:#475569;"><strong>Fırınna Cafe & Restaurant</strong> (Galata Kumbaracı Yokuşu No:41A — Yemekle birlikte tüm grubunuza Sınırsız Çay!).</p>
                 </div>
             </div>
         </div>
@@ -905,7 +910,7 @@
                 <p>
                     • <strong>Yürüyüş Ayakkabısı:</strong> Galata taş sokakları için rahat spor ayakkabı şarttır.<br>
                     • <strong>Müze Sıraları:</strong> Topkapı Sarayı ve Yerebatan Sarnıcı için biletleri online alın.<br>
-                    • <strong>Genel Yemek Durakları:</strong> Sultanahmet'te meşhur köfte, Eminönü sahilinde balık-ekmek, Galata'da Fırınna Cafe'de İtalyan Pizza & Sınırsız Çay keyfi!
+                    • <strong>Genel Yemek Durakları:</strong> Sultanahmet'te meşhur köfte, Karaköy'de Güllüoğlu Baklava, Galata'da Fırınna Cafe'de İtalyan Pizza & Sınırsız Çay keyfi!
                 </p>
             </div>
         </div>
@@ -916,6 +921,16 @@
         </h3>
 
         <div class="faq-accordion">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>🥮 İstanbul'da meşhur baklava nerede yenir?</span>
+                    <i class="ph-bold ph-caret-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Karaköy Rıhtım Caddesi üzerindeki <strong>Karaköy Güllüoğlu</strong> mağazasından 1871'den beri taze fıstıklı ve cevizli geleneksel baklava yiyebilirsiniz.
+                </div>
+            </div>
+
             <div class="faq-item">
                 <div class="faq-question">
                     <span>🛍️ Otantik Türk Halısı ve Kilim nereden alınır, indirim kodu nedir?</span>
@@ -943,16 +958,6 @@
                 </div>
                 <div class="faq-answer">
                     Fırınna Cafe & Restaurant sistem kayıtlarına göre haftanın 7 günü <strong id="faq-hours-text">11:00 - 19:15</strong> saatleri arasında hizmet vermektedir. Çalışma saatleri haricindeki grup organizasyonları ve masa rezervasyonu için WhatsApp hattımızdan iletişime geçebilirsiniz.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>☕ Galata Fırınna Cafe'de Sınırsız Çay ikramından nasıl faydalanabilirim?</span>
-                    <i class="ph-bold ph-caret-down"></i>
-                </div>
-                <div class="faq-answer">
-                    Kumbaracı Yokuşu No:41A adresindeki <strong>Fırınna Cafe & Restaurant</strong>'a geldiğinizde gezi rehberi ekranındaki dijital VIP kupon kodunu kasadaki arkadaşımıza göstermeniz yeterlidir. Yemek siparişi veren tüm masaya taze demli çay sınırsız olarak ikram edilmektedir.
                 </div>
             </div>
         </div>
@@ -1163,7 +1168,7 @@
                     time: '12:00',
                     title: '🪜 Kamondo Merdivenleri & Bankalar Caddesi 👫',
                     category: 'photo',
-                    desc: '1850’li yılların art nouveau tarzı tarihi dalgalı merdivenlerinde çift yürüyüşü ve fotoğraf molası.',
+                    desc: '1850’li yılların art nouveau tarzı tarihi dalgalı merdivenlerde çift yürüyüşü ve fotoğraf molası.',
                     tip: '📸 Tuyo: Aşağıdan yukarıya doğru çekim açısı en popüler karedir.',
                     closedNote: '📌 Açık kamusal alandır.',
                     mapQuery: 'Kamondo+Merdivenleri+Karakoy+Istanbul'
@@ -1390,41 +1395,82 @@
                 });
             }
 
-            let poiList = POI_DATABASE[selectedRegion] || POI_DATABASE['kral_yolu'];
-
+            // 1. COLLECT CANDIDATE POIs
+            let candidateList = [];
             if (selectedRegion === 'all_city') {
-                poiList = [
-                    ...POI_DATABASE['kral_yolu'].slice(0, 3),
-                    ...POI_DATABASE['galata'].slice(2, 4),
-                    ...POI_DATABASE['nature'].slice(0, 2),
-                    ...POI_DATABASE['moda'].slice(1, 3)
-                ];
+                Object.keys(POI_DATABASE).forEach(r => candidateList.push(...POI_DATABASE[r]));
+            } else {
+                candidateList = [...(POI_DATABASE[selectedRegion] || POI_DATABASE['kral_yolu'])];
             }
 
-            let filtered = [...poiList];
+            // 2. STRICT CATEGORY FILTERING BY SELECTED INTERESTS
+            let interestMatched = candidateList.filter(item => {
+                return item.featured || selectedInterests.includes(item.category);
+            });
 
-            if (selectedTime === 'half') {
-                filtered = filtered.slice(0, 5);
+            // If selected region doesn't have enough POIs matching user's exact interests (e.g. nightlife in historical peninsula), pool from other regions!
+            if (interestMatched.length < 3) {
+                Object.keys(POI_DATABASE).forEach(r => {
+                    POI_DATABASE[r].forEach(item => {
+                        if (selectedInterests.includes(item.category) && !interestMatched.some(e => e.title === item.title)) {
+                            interestMatched.push(item);
+                        }
+                    });
+                });
             }
 
-            const startText = hotelNameInput ? `"${hotelNameInput}" konumunuzdan başlayan` : `Seçtiğiniz başlangıç noktasından`;
-            document.getElementById('result-start-desc').innerText = `${startText} kişiselleştirilmiş rota ve Fırınna Cafe sınırsız çay ikramlı lezzet molanız hazır.`;
+            // DEDUPLICATE
+            const uniquePOIs = [];
+            const seenTitles = new Set();
+            interestMatched.forEach(item => {
+                if (!seenTitles.has(item.title)) {
+                    seenTitles.add(item.title);
+                    uniquePOIs.push(item);
+                }
+            });
+
+            // 3. HOTEL / STARTING POINT INTEGRATION IN TIMELINE & GOOGLE MAPS
+            let finalPOIs = [];
+            if (hotelNameInput) {
+                finalPOIs.push({
+                    time: '08:30',
+                    hotelStart: true,
+                    title: `🏨 Konaklama Noktanız: ${hotelNameInput}`,
+                    category: 'hotel',
+                    desc: `Rotanız doğrudan "${hotelNameInput}" konumunuzdan başlayıp Google Haritalar navigasyonuyla adım adım ilerliyor.`,
+                    tip: '📍 Otelinizden başlayarak navigasyonu başlatabilirsiniz.',
+                    mapQuery: encodeURIComponent(hotelNameInput)
+                });
+            }
+
+            finalPOIs.push(...uniquePOIs);
+
+            // 4. APPLY DURATION FILTER
+            if (selectedTime === 'half' && finalPOIs.length > 5) {
+                finalPOIs = finalPOIs.slice(0, 5);
+            } else if (selectedTime === '1day' && finalPOIs.length > 8) {
+                finalPOIs = finalPOIs.slice(0, 8);
+            }
+
+            const startText = hotelNameInput ? `"${hotelNameInput}" otelinizden başlayan` : `Seçtiğiniz başlangıç noktasından`;
+            document.getElementById('result-start-desc').innerText = `${startText} kişiselleştirilmiş tam filtreli rota ve Fırınna Cafe sınırsız çay ikramlı lezzet molanız hazır.`;
 
             const randomCode = Math.floor(1000 + Math.random() * 9000);
             document.getElementById('ticket-code').innerText = `#FIRINNA-TEA-${randomCode}`;
 
-            const waypoints = filtered.map(p => p.mapQuery).join('/');
+            // BUILD ACCURATE GOOGLE MAPS DIRECTIONS LINK (INCLUDING HOTEL START)
+            const waypoints = finalPOIs.map(p => p.mapQuery).join('/');
             const gmapsUrl = `https://www.google.com/maps/dir/${waypoints}`;
 
             document.getElementById('btn-gmaps-link').href = gmapsUrl;
             document.getElementById('btn-gmaps-launch-main').href = gmapsUrl;
 
-            const waText = encodeURIComponent(`🗺️ Akıllı İstanbul Gezi Rotam Hazır!\n\n${filtered.map(f => `${f.time} - ${f.title}`).join('\n')}\n\n📍 Haritada Aç: ${gmapsUrl}`);
+            const waText = encodeURIComponent(`🗺️ Akıllı İstanbul Gezi Rotam Hazır!\n\n${finalPOIs.map(f => `${f.time} - ${f.title}`).join('\n')}\n\n📍 Haritada Aç: ${gmapsUrl}`);
             document.getElementById('btn-whatsapp-share').href = `https://api.whatsapp.com/send?text=${waText}`;
 
-            filtered.forEach(item => {
+            finalPOIs.forEach(item => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = `timeline-item ${item.featured ? 'featured' : ''}`;
+                itemDiv.className = `timeline-item ${item.featured ? 'featured' : ''} ${item.hotelStart ? 'hotel-start-item' : ''}`;
                 
                 let closedTagHtml = '';
                 if (item.closedNoteDynamic) {
