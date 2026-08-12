@@ -79,6 +79,7 @@ def menu_web_page():
     return send_from_directory('web', 'menu.html')
 
 @app.route('/gezi')
+@app.route('/gezi/')
 @app.route('/gezi.html')
 def gezi_web_page():
     return send_from_directory('web', 'gezi.html')
