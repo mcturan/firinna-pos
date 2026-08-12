@@ -1,4 +1,5 @@
 import socket
+import textwrap
 from datetime import datetime
 import database as db
 
