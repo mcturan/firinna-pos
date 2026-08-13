@@ -2,15 +2,14 @@ function initAdmin() {
     if (!sessionStorage.getItem('firinna_token')) {
         if (document.getElementById('loginOverlay')) document.getElementById('loginOverlay').style.display = 'flex';
         if (document.getElementById('adminMain')) document.getElementById('adminMain').style.display = 'none';
-        return; // Bekle ki adam giriş yapsın
+    } else {
+        if (document.getElementById('loginOverlay')) document.getElementById('loginOverlay').style.display = 'none';
+        if (document.getElementById('adminMain')) document.getElementById('adminMain').style.display = 'flex';
+        fetchSettings();
+        fetchAnalytics();
+        loadWebCategories();
+        loadWebProducts();
     }
-
-    if (document.getElementById('loginOverlay')) document.getElementById('loginOverlay').style.display = 'none';
-    if (document.getElementById('adminMain')) document.getElementById('adminMain').style.display = 'flex';
-    fetchSettings();
-    fetchAnalytics();
-    loadWebCategories();
-    loadWebProducts();
 
     if (document.getElementById('settingsForm')) {
         document.getElementById('settingsForm').addEventListener('submit', saveSettings);

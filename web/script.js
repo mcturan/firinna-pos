@@ -230,6 +230,31 @@ const i18n = {
         menu_back: "Ana Sayfa",
         menu_intro: "Tüm menü seçeneklerimiz için mağazamızı ziyaret edebilir veya personelimizden detaylı bilgi alabilirsiniz. Aşağıda en sevilen imza lezzetlerimizi inceleyebilirsiniz.",
         menu_download: "Fiyatlı Menüyü İndir (PDF)",
+        title_social: "Sosyal Sorumluluk",
+        social_intro: "Fırınna Cafe olarak kazancımızı ve sizden gelen tüm bahşişleri doğrudan toplumsal faydaya dönüştürüyoruz.",
+        social_student_title: "Beyoğlu Öğrenci'Ye Projesi",
+        social_student_desc: "Beyoğlu Belediyesi'nin Öğrenci'Ye projesinin gururlu bir destekçisiyiz. Üniversite öğrencilerimize ücretsiz yemek desteği sağlıyoruz.",
+        social_animal_title: "Sokak Canları Dostu",
+        social_animal_desc: "Sokağımızdaki patili dostlarımızın mama, su ve veteriner giderlerini karşılıyoruz. İşletmemiz tamamen hayvan dostudur (Pet-Friendly).",
+
+        search_placeholder: "🔍 Menüde lezzet ara... (örn: Menemen, Pizza)",
+        filter_all: "✨ Tüm Menü",
+        filter_halal: "☪️ %100 Helal",
+        filter_veggie: "🌿 Vejetaryen",
+        filter_glutenfree: "🌾 Glutensiz / Fit",
+        filter_signature: "⭐ İmza Lezzetler",
+        badge_stone_oven: "🍕 Taş Fırın",
+        title_pizza_napo: "Napoliten Pizza",
+        badge_famous: "🍳 Meşhur",
+        title_menemen_cakal: "Çakallı Menemeni",
+        badge_traditional: "☕ Geleneksel",
+        title_coffee: "Közde Türk Kahvesi",
+        whatsapp_manager: "WhatsApp Yöneticisi",
+        btn_send_msg2: "Mesaj Gönder",
+
+        filter_dairyfree: "🚫 Süt / Kazein İçermez",
+
+
         cat_food: "Fırından Sıcak Sıcak",
         cat_drinks: "İçecekler & Tatlılar",
         item_pizza: "Taş Fırın Pizza",
@@ -492,6 +517,31 @@ const i18n = {
         menu_back: "Inicio",
         menu_intro: "Puede visitar nuestro local o consultar con nuestro personal para conocer todas las opciones del menú. A continuación puede revisar nuestros sabores especiales más populares.",
         menu_download: "Descargar Menú con Precios (PDF)",
+        title_social: "Responsabilidad Social",
+        social_intro: "En Firinna Cafe, convertimos nuestras ganancias y todas las propinas que nos deja directamente en beneficio social.",
+        social_student_title: "Proyecto Beyoglu Para Estudiantes",
+        social_student_desc: "Somos un orgulloso patrocinador del proyecto 'Öğrenci'Ye' de la municipalidad de Beyoglu. Brindamos comidas gratuitas a estudiantes universitarios.",
+        social_animal_title: "Amigo de los Animales Callejeros",
+        social_animal_desc: "Cubrimos los gastos de comida, agua y veterinario de nuestros amigos peludos en la calle. Nuestra cafetería admite mascotas.",
+
+        search_placeholder: "🔍 Buscar en menú... (ej: Menemen, Pizza)",
+        filter_all: "✨ Todo el Menú",
+        filter_halal: "☪️ 100% Halal",
+        filter_veggie: "🌿 Vegetariano",
+        filter_glutenfree: "🌾 Sin Gluten / Fit",
+        filter_signature: "⭐ Sabores Especiales",
+        badge_stone_oven: "🍕 Horno de Piedra",
+        title_pizza_napo: "Pizza Napolitana",
+        badge_famous: "🍳 Famoso",
+        title_menemen_cakal: "Menemen Çakallı",
+        badge_traditional: "☕ Tradicional",
+        title_coffee: "Café Turco",
+        whatsapp_manager: "Gerente WhatsApp",
+        btn_send_msg2: "Enviar Mensaje",
+
+        filter_dairyfree: "🚫 Sin Lácteos / Caseína",
+
+
         cat_food: "Caliente del Horno",
         cat_drinks: "Bebidas y Postres",
         item_pizza: "Pizza al Horno de Piedra",
@@ -623,6 +673,31 @@ const i18n = {
         menu_back: "Главная",
         menu_intro: "Вы можете посетить наше кафе или получить подробную информацию у нашего персонала обо всех вариантах меню. Ниже вы можете ознакомиться с нашими самыми любимыми фирменными блюдами.",
         menu_download: "Скачать меню с ценами (PDF)",
+        title_social: "Социальная ответственность",
+        social_intro: "В кафе Firinna мы превращаем наши доходы и все ваши чаевые в социальную пользу.",
+        social_student_title: "Проект Beyoglu для студентов",
+        social_student_desc: "Мы являемся гордым сторонником проекта «Öğrenci'Ye» муниципалитета Бейоглу. Мы предоставляем бесплатное питание студентам.",
+        social_animal_title: "Забота о бездомных животных",
+        social_animal_desc: "Мы оплачиваем еду, воду и ветеринарные услуги для наших пушистых друзей на улице. Наше кафе дружелюбно к животным.",
+
+        search_placeholder: "🔍 Поиск в меню... (напр. Менемен, Пицца)",
+        filter_all: "✨ Все меню",
+        filter_halal: "☪️ 100% Халяль",
+        filter_veggie: "🌿 Вегетарианское",
+        filter_glutenfree: "🌾 Без глютена / Фит",
+        filter_signature: "⭐ Фирменные блюда",
+        badge_stone_oven: "🍕 Каменная печь",
+        title_pizza_napo: "Неаполитанская пицца",
+        badge_famous: "🍳 Знаменитый",
+        title_menemen_cakal: "Менемен Чакаллы",
+        badge_traditional: "☕ Традиционный",
+        title_coffee: "Турецкий кофе",
+        whatsapp_manager: "Менеджер WhatsApp",
+        btn_send_msg2: "Отправить сообщение",
+
+        filter_dairyfree: "🚫 Без молока / казеина",
+
+
         cat_food: "Горячее из печи",
         cat_drinks: "Напитки и десерты",
         item_pizza: "Пицца на камне",
@@ -754,6 +829,31 @@ const i18n = {
         menu_back: "الصفحة الرئيسية",
         menu_intro: "يمكنك زيارة متجرنا أو الحصول على معلومات مفصلة من موظفينا لجميع خيارات القائمة. يمكنك أدناه مراجعة نكهاتنا المميزة المحبوبة.",
         menu_download: "تنزيل القائمة بالأسعار (PDF)",
+        title_social: "المسؤولية الاجتماعية",
+        social_intro: "في مقهى فيرنا، نحول أرباحنا وجميع البقشيش الذي تتركه إلى فائدة اجتماعية مباشرة.",
+        social_student_title: "مشروع بيوغلو للطلاب",
+        social_student_desc: "نحن داعمون فخورون لمشروع 'Öğrenci'Ye' التابع لبلدية بيوغلو. نقدم وجبات مجانية لطلاب الجامعات.",
+        social_animal_title: "أصدقاء حيوانات الشوارع",
+        social_animal_desc: "نغطي تكاليف الطعام والماء والخدمات البيطرية لأصدقائنا ذوي الفراء في الشارع. مقهانا يرحب بالحيوانات الأليفة.",
+
+        search_placeholder: "🔍 ابحث في القائمة... (مثل: منمن، بيتزا)",
+        filter_all: "✨ كل القائمة",
+        filter_halal: "☪️ حلال ١٠٠٪",
+        filter_veggie: "🌿 نباتي",
+        filter_glutenfree: "🌾 خالي من الغلوتين / صحي",
+        filter_signature: "⭐ نكهاتنا المميزة",
+        badge_stone_oven: "🍕 فرن حجري",
+        title_pizza_napo: "بيتزا نابولي",
+        badge_famous: "🍳 مشهور",
+        title_menemen_cakal: "مينيمين جاكالي",
+        badge_traditional: "☕ تقليدي",
+        title_coffee: "قهوة تركية",
+        whatsapp_manager: "مدير الواتساب",
+        btn_send_msg2: "إرسال رسالة",
+
+        filter_dairyfree: "🚫 خالي من منتجات الألبان / الكازين",
+
+
         cat_food: "ساخن من الفرن",
         cat_drinks: "المشروبات والحلويات",
         item_pizza: "بيتزا مخبوزة على الحجر",
@@ -885,6 +985,31 @@ const i18n = {
         menu_back: "主页",
         menu_intro: "您可以光临我们的商店或从我们的员工那里获取有关所有菜单选项的详细信息。在下面，您可以查看我们最受欢迎的招牌美味。",
         menu_download: "下载带价格的菜单 (PDF)",
+        title_social: "社会责任",
+        social_intro: "在 Firinna Cafe，我们将我们的收入和您留下的所有小费直接转化为社会福利。",
+        social_student_title: "贝伊奥卢学生项目",
+        social_student_desc: "我们是贝伊奥卢市政府“Öğrenci'Ye”项目的自豪支持者。我们为大学生提供免费餐点。",
+        social_animal_title: "关爱流浪动物",
+        social_animal_desc: "我们负责街头流浪动物的食物、水和兽医费用。我们的咖啡馆完全允许携带宠物。",
+
+        search_placeholder: "🔍 搜索菜单...（例如：Menemen，披萨）",
+        filter_all: "✨ 所有菜单",
+        filter_halal: "☪️ 100% 清真",
+        filter_veggie: "🌿 素食",
+        filter_glutenfree: "🌾 无麸质 / 健康",
+        filter_signature: "⭐ 招牌美味",
+        badge_stone_oven: "🍕 石窑",
+        title_pizza_napo: "那不勒斯披萨",
+        badge_famous: "🍳 著名",
+        title_menemen_cakal: "恰卡利煎蛋",
+        badge_traditional: "☕ 传统",
+        title_coffee: "土耳其咖啡",
+        whatsapp_manager: "WhatsApp 经理",
+        btn_send_msg2: "发送消息",
+
+        filter_dairyfree: "🚫 不含乳制品 / 酪蛋白",
+
+
         cat_food: "新鲜出炉",
         cat_drinks: "饮料与甜点",
         item_pizza: "石烤披萨",
@@ -1134,6 +1259,13 @@ function changeLang(lang) {
         const key = el.getAttribute('data-i18n');
         if (i18n[lang] && i18n[lang][key]) {
             el.innerHTML = i18n[lang][key].replace(/\n/g, "<br>");
+        }
+    });
+    const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+    placeholders.forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (i18n[lang] && i18n[lang][key]) {
+            el.placeholder = i18n[lang][key];
         }
     });
 
@@ -1531,6 +1663,9 @@ function filterMenuInteractive() {
             matchesDiet = text.includes('vejetaryen') || text.includes('peynir') || text.includes('sebze') || text.includes('omlet') || text.includes('tatlı') || text.includes('çikolata');
         } else if (activeDietaryFilter === 'glutenfree') {
             matchesDiet = text.includes('glutensiz') || text.includes('fit') || text.includes('salata') || text.includes('yumurta') || text.includes('kahve') || text.includes('çay');
+        } else if (activeDietaryFilter === 'dairyfree') {
+            const hasDairy = text.includes('peynir') || text.includes('kaşar') || text.includes('süt') || text.includes('tereyağ') || text.includes('krema') || text.includes('yoğurt') || text.includes('mozzarella') || text.includes('dairy');
+            matchesDiet = !hasDairy;
         } else if (activeDietaryFilter === 'signature') {
             matchesDiet = text.includes('imza') || item.innerHTML.includes('ph-star') || text.includes('çakallı') || text.includes('pizza') || text.includes('tost');
         }

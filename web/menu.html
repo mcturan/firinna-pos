@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fırınna Menü | %100 Helal Kahvaltı, Meşhur Çakallı Menemen & Taş Fırın İtalyan Pizza</title>
-    <meta name="description" content="Fırınna Cafe & Restaurant dijital menüsü. Galata Kumbaracı Yokuşu'nda %100 Helal serpme Türk kahvaltısı, Çakallı menemen, sahanda omlet, bazlama tost, taş fırın İtalyan Napoliten pizza çeşitleri, Türk kahvesi ve tatlı fiyatları.">
-    <meta name="keywords" content="Fırınna menü, Fırınna fiyatlar, Helal kahvaltı menü, Çakallı menemen fiyatı, sahanda yumurta, omlet, bazlama tost, İtalyan pizza menü, Napoliten pizza, taş fırın pizza, Türk kahvesi, harman çay, uygun fiyatlı kahvaltı Galata">
+    <meta name="description" content="Fırınna Cafe'nin bütçe dostu, en uygun fiyatlı menüsü. %100 Helal geleneksel Türk kahvaltısı, Çakallı menemen, vegan ve vejetaryen seçenekler, hakiki İtalyan Napoliten pizza çeşitleri. Otantik tarihi atmosferde lezzet şöleni.">
+    <meta name="keywords" content="Fırınna menü fiyatları, en uygun fiyatlı cafe, helal menü, vejetaryen menü, vegan seçenekler, napoliten pizza fiyatları, en iyi türk menemeni mekanı, otantik tarihi cafe menüsü">
     <meta name="robots" content="index, follow">
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css?v=22.0">
@@ -131,15 +131,16 @@
                 <!-- Live Search Box -->
                 <div style="position: relative; margin-bottom: 12px;">
                     <i class="ph-bold ph-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1rem;"></i>
-                    <input type="text" id="menu-search-input" onkeyup="filterMenuInteractive()" placeholder="🔍 Menüde lezzet ara... (örn: Menemen, Pizza, Kahve)" style="width: 100%; padding: 12px 14px 12px 42px; border-radius: 30px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.95rem; font-family: inherit; transition: border-color 0.2s ease, box-shadow 0.2s ease;">
+                    <input type="text" id="menu-search-input" data-i18n-placeholder="search_placeholder" onkeyup="filterMenuInteractive()" placeholder="🔍 Menüde lezzet ara... (örn: Menemen, Pizza, Kahve)" style="width: 100%; padding: 12px 14px 12px 42px; border-radius: 30px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.95rem; font-family: inherit; transition: border-color 0.2s ease, box-shadow 0.2s ease;">
                 </div>
                 <!-- Dietary Filter Chips (Scrollable) -->
                 <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -ms-overflow-style: none;">
-                    <button class="diet-chip active" onclick="setDietaryFilter('all', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: none; background: #2563eb; color: #fff; font-weight: 700; font-size: 0.82rem; cursor: pointer;">✨ Tüm Menü</button>
-                    <button class="diet-chip" onclick="setDietaryFilter('halal', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;">☪️ %100 Helal</button>
-                    <button class="diet-chip" onclick="setDietaryFilter('veggie', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;">🌿 Vejetaryen</button>
-                    <button class="diet-chip" onclick="setDietaryFilter('glutenfree', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;">🌾 Glutensiz / Fit</button>
-                    <button class="diet-chip" onclick="setDietaryFilter('signature', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;">⭐ İmza Lezzetler</button>
+                    <button class="diet-chip active" onclick="setDietaryFilter('all', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: none; background: #2563eb; color: #fff; font-weight: 700; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_all">✨ Tüm Menü</button>
+                    <button class="diet-chip" onclick="setDietaryFilter('halal', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_halal">☪️ %100 Helal</button>
+                    <button class="diet-chip" onclick="setDietaryFilter('veggie', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_veggie">🌿 Vejetaryen</button>
+                    <button class="diet-chip" onclick="setDietaryFilter('glutenfree', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_glutenfree">🌾 Glutensiz / Fit</button>
+                    <button class="diet-chip" onclick="setDietaryFilter('dairyfree', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_dairyfree">🚫 Süt İçermez</button>
+                    <button class="diet-chip" onclick="setDietaryFilter('signature', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_signature">⭐ İmza Lezzetler</button>
                 </div>
             </div>
 
@@ -229,6 +230,10 @@
                 }
 
                 container.innerHTML = html;
+
+                // Dinamik render sonrası data-i18n elementlerini (örn. filtre butonları) çevir
+                const curLang = window.currentLang || localStorage.getItem('firinna_lang') || 'tr';
+                if (window.changeLang) window.changeLang(curLang);
 
                 // Auto Scroll to target product if query param exists
                 const urlParams = new URLSearchParams(window.location.search);
