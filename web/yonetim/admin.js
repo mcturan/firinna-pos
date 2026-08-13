@@ -1,4 +1,10 @@
 function initAdmin() {
+    if (!sessionStorage.getItem('firinna_token')) {
+        if (document.getElementById('loginOverlay')) document.getElementById('loginOverlay').style.display = 'flex';
+        if (document.getElementById('adminMain')) document.getElementById('adminMain').style.display = 'none';
+        return; // Bekle ki adam giriş yapsın
+    }
+
     if (document.getElementById('loginOverlay')) document.getElementById('loginOverlay').style.display = 'none';
     if (document.getElementById('adminMain')) document.getElementById('adminMain').style.display = 'flex';
     fetchSettings();
@@ -63,16 +69,42 @@ setInterval(() => {
     fetchAnalytics();
 }, 5000);
 
-function checkLogin() {
+const originalFetch = window.fetch;
+window.fetch = async function() {
+    let [resource, config] = arguments;
+    if (typeof resource === 'string' && resource.startsWith('/api/') && sessionStorage.getItem('firinna_token')) {
+        config = config || {};
+        config.headers = config.headers || {};
+        config.headers['X-Admin-Token'] = sessionStorage.getItem('firinna_token');
+    }
+    return await originalFetch(resource, config);
+};
+
+async function checkLogin() {
     const user = document.getElementById('admin_user').value;
     const pass = document.getElementById('admin_pass').value;
-    if(user === 'admin' && pass === 'FirinnaPos2026!') {
-        sessionStorage.setItem('firinna_admin', 'true');
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('adminMain').style.display = 'flex';
-        fetchSettings();
-        fetchAnalytics();
-    } else {
+    if (user !== 'admin') {
+        document.getElementById('loginError').style.display = 'block';
+        return;
+    }
+    try {
+        const res = await originalFetch('/api/web/admin-login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ password: pass })
+        });
+        const data = await res.json();
+        if (data.success) {
+            sessionStorage.setItem('firinna_admin', 'true');
+            sessionStorage.setItem('firinna_token', data.token);
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('adminMain').style.display = 'flex';
+            fetchSettings();
+            fetchAnalytics();
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
+    } catch (e) {
         document.getElementById('loginError').style.display = 'block';
     }
 }
@@ -473,9 +505,13 @@ async function confirmResetAnalytics() {
     }
 
     try {
+        const adminPass = sessionStorage.getItem('firinna_pass') || 'FirinnaPos2026!';
         const res = await fetch('/api/web/reset-analytics', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic ' + btoa('admin:' + adminPass)
+            },
             body: JSON.stringify({
                 scope: scope,
                 startDate: startDate,

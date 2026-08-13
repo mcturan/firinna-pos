@@ -2590,6 +2590,9 @@ def upload_menu():
     if file.filename == '':
         return jsonify({"success": False, "error": "Dosya seçilmedi"})
     
+    from werkzeug.utils import secure_filename
+    lang = secure_filename(lang)
+    if not lang: lang = "tr"
     filename = f"firinna_menu_{lang}.pdf"
     filepath = os.path.join('/opt/firinna-pos/web', filename)
     file.save(filepath)
@@ -2881,6 +2884,9 @@ def upload_gallery_photo():
     if file.filename == '':
         return jsonify({"success": False, "error": "Dosya seçilmedi"})
         
+    from werkzeug.utils import secure_filename
+    slot = secure_filename(slot)
+    if not slot: slot = "default"
     filename = f"gallery_{slot}.jpg"
     filepath = os.path.join('/opt/firinna-pos/web', filename)
     file.save(filepath)
@@ -2908,8 +2914,26 @@ def get_ip_location(ip):
     IP_GEO_CACHE[ip] = "🌐 Bilinmeyen Konum"
     return IP_GEO_CACHE[ip]
 
+import time
+RATE_LIMIT_STORE = {}
+
+def check_rate_limit(ip, endpoint, max_requests, window_seconds):
+    now = time.time()
+    key = f"{ip}_{endpoint}"
+    if key not in RATE_LIMIT_STORE:
+        RATE_LIMIT_STORE[key] = []
+    RATE_LIMIT_STORE[key] = [t for t in RATE_LIMIT_STORE[key] if now - t < window_seconds]
+    if len(RATE_LIMIT_STORE[key]) >= max_requests:
+        return False
+    RATE_LIMIT_STORE[key].append(now)
+    return True
+
 @app.route('/api/web/track-visit', methods=['POST'])
 def track_visit():
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
+    if not check_rate_limit(ip, 'track', max_requests=20, window_seconds=60):
+        return jsonify({"success": False, "error": "Rate limit exceeded"}), 429
+        
     analytics_file = '/opt/firinna-pos/web_analytics.json'
     try:
         if os.path.exists(analytics_file):
@@ -3138,6 +3162,9 @@ def api_web_tables_status():
 
 @app.route('/api/web/contact', methods=['POST'])
 def api_web_contact():
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
+    if not check_rate_limit(ip, 'contact', max_requests=3, window_seconds=60):
+        return jsonify({'success': False, 'error': 'Çok fazla istek gönderdiniz, lütfen bekleyin.'}), 429
     try:
         data = request.json
         msg = f"📩 <b>Web'den Yeni Mesaj</b>\n\n👤 İsim: {data.get('name')}\n📞 Telefon: {data.get('phone')}\n💬 Mesaj: {data.get('message')}"
@@ -3148,6 +3175,9 @@ def api_web_contact():
 
 @app.route('/api/web/reservation', methods=['POST'])
 def api_web_reservation():
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
+    if not check_rate_limit(ip, 'contact', max_requests=3, window_seconds=60):
+        return jsonify({'success': False, 'error': 'Çok fazla istek gönderdiniz, lütfen bekleyin.'}), 429
     try:
         data = request.json
         msg = f"📅 <b>Web'den Masa Rezervasyonu Talebi</b>\n\n👤 İsim: {data.get('name')}\n📞 Telefon: {data.get('phone')}\n🗓 Tarih: {data.get('date')} - {data.get('time')}\n👥 Kişi: {data.get('guests')}\n📝 Not: {data.get('note', '-')}"
