@@ -3113,8 +3113,14 @@ def get_analytics():
     analytics_file = '/opt/firinna-pos/web_analytics.json'
     if os.path.exists(analytics_file):
         with open(analytics_file, 'r') as f:
-            return jsonify(json.load(f))
-    return jsonify({"today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0})
+            response = jsonify(json.load(f))
+    else:
+        response = jsonify({"today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0})
+        
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
 
 @app.route('/api/web/tables-status', methods=['GET'])
 def api_web_tables_status():
