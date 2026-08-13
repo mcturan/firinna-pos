@@ -1,0 +1,295 @@
+[
+  {
+    "id": 1,
+    "name": "Menemen",
+    "icon": "ph-cooking-pot",
+    "color": "#ef4444",
+    "products": [
+      {
+        "id": "m1",
+        "price": 220,
+        "description": "Özel ezilmiş domatesler ve eriyen peynirle hazırlanan ikonik Türk kahvaltısı. (Çakallı usulü)",
+        "tags": [
+          "halal",
+          "vegetarian"
+        ],
+        "title": "Sade Menemen",
+        "image_url": "food_menemen_sahanda.jpg"
+      },
+      {
+        "id": "m2",
+        "price": 260,
+        "description": "Ekstra bol kaşar peynirli ikonik Türk menemeni.",
+        "tags": [
+          "halal",
+          "vegetarian"
+        ],
+        "title": "Kaşarlı Menemen",
+        "image_url": "food_menemen_sahanda.jpg"
+      },
+      {
+        "id": "m3",
+        "price": 320,
+        "description": "Geleneksel menemen tabanının üzerine; özel marine edilmiş yaprak Et Döner, Tavuk Döner veya Sucuk.",
+        "tags": [
+          "halal"
+        ],
+        "title": "Etli / Sucuklu / Tavuklu Menemen",
+        "image_url": "food_menemen_sahanda.jpg"
+      },
+      {
+        "id": "m4",
+        "price": 380,
+        "description": "Seçtiğiniz iki farklı proteinin sıcak menemenle efsanevi buluşması.",
+        "tags": [
+          "halal"
+        ],
+        "title": "Karışık Şölen Menemen",
+        "image_url": "food_menemen_sahanda.jpg"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Omlet",
+    "icon": "ph-egg",
+    "color": "#f59e0b",
+    "products": [
+      {
+        "id": "o1",
+        "price": 200,
+        "description": "Köy tereyağında pişmiş nefis sahanda omlet",
+        "tags": [
+          "halal",
+          "vegetarian"
+        ],
+        "title": "Sade Sahanda Omlet",
+        "image_url": "food_placeholder.jpg"
+      },
+      {
+        "id": "o2",
+        "price": 240,
+        "description": "Eriyen bol kaşar peyniri dolgulu omlet",
+        "tags": [
+          "halal",
+          "vegetarian"
+        ],
+        "title": "Kaşarlı Omlet",
+        "image_url": "food_placeholder.jpg"
+      },
+      {
+        "id": "o3",
+        "price": 300,
+        "description": "Tercihinize göre protein eklentili doyurucu omlet",
+        "tags": [
+          "halal"
+        ],
+        "title": "Etli / Sucuklu / Tavuklu Omlet",
+        "image_url": "food_placeholder.jpg"
+      },
+      {
+        "id": "o4",
+        "price": 360,
+        "description": "Et, sucuk, tavuk ve kaşarlı dev omlet",
+        "tags": [
+          "halal"
+        ],
+        "title": "Karışık Şölen Omlet",
+        "image_url": "food_placeholder.jpg"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Bazlama",
+    "icon": "ph-hamburger",
+    "color": "#d97706",
+    "products": [
+      {
+        "id": "b1",
+        "price": 200,
+        "description": "Köy bazlaması arasına kaşar peyniriyle hazırlanan çıtır lezzet",
+        "tags": [
+          "halal",
+          "vegetarian"
+        ],
+        "title": "Sade Bazlama Tost",
+        "image_url": "food_placeholder.jpg"
+      },
+      {
+        "id": "b2",
+        "price": 300,
+        "description": "Kaşar peynirine ek olarak tercih ettiğiniz proteinle zenginleştirilmiş tost",
+        "tags": [
+          "halal"
+        ],
+        "title": "Etli / Sucuklu / Tavuklu Bazlama",
+        "image_url": "food_placeholder.jpg"
+      },
+      {
+        "id": "b3",
+        "price": 360,
+        "description": "İstediğiniz iki protein seçeneği ve bol kaşar",
+        "tags": [
+          "halal"
+        ],
+        "title": "İki Seçenekli Bazlama",
+        "image_url": "food_placeholder.jpg"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Pizza",
+    "icon": "ph-pizza",
+    "color": "#dc2626",
+    "products": [
+      {
+        "id": "p1",
+        "price": 390,
+        "description": "Taş fırında pişen gerçek Napoli usulü, özel karışım pizza sosumuz ve taze mozzarella harikası.",
+        "tags": [
+          "halal",
+          "vegetarian"
+        ],
+        "title": "Pizza Margarita",
+        "image_url": "food_pizza.jpg"
+      },
+      {
+        "id": "p2",
+        "price": 490,
+        "description": "Margarita tabanı üzerine dilediğiniz özel lezzet: Özel marine Et Döner, Tavuk Döner veya Sucuk.",
+        "tags": [
+          "halal"
+        ],
+        "title": "Pizza (Etli / Sucuklu / Tavuklu)",
+        "image_url": "food_pizza.jpg"
+      },
+      {
+        "id": "p3",
+        "price": 550,
+        "description": "Et, sucuk, tavuk ve bol mozzarella ile fırınlanmış efsane pizza",
+        "tags": [
+          "halal"
+        ],
+        "title": "Full Karışık Pizza",
+        "image_url": "food_pizza.jpg"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Sıcak içecekler",
+    "icon": "ph-coffee",
+    "color": "#78350f",
+    "products": [
+      {
+        "id": "s1",
+        "price": 50,
+        "description": "Özenle seçilmiş çay yapraklarının bergamotla tatlandırılıp, kuru gül yapraklarıyla harmanlanmış özel hali.",
+        "tags": [
+          "vegan"
+        ],
+        "title": "Özel Karışım Çay",
+        "image_url": "food_placeholder.jpg"
+      },
+      {
+        "id": "s2",
+        "price": 150,
+        "description": "Ağır ağır pişen, bol köpüklü, yanında lokum ile servis edilen geleneksel Türk Kahvesi.",
+        "tags": [
+          "vegan"
+        ],
+        "title": "Türk Kahvesi",
+        "image_url": "food_kahve.jpg"
+      },
+      {
+        "id": "s3",
+        "price": 180,
+        "description": "Taze çekilmiş çekirdeklerden sert kahve",
+        "tags": [
+          "vegan"
+        ],
+        "title": "Kahve Americano",
+        "image_url": "food_placeholder.jpg"
+      },
+      {
+        "id": "s4",
+        "price": 180,
+        "description": "Bol sütlü espresso",
+        "tags": [
+          "vegetarian"
+        ],
+        "title": "Kahve Latte",
+        "image_url": "food_placeholder.jpg"
+      },
+      {
+        "id": "s5",
+        "price": 180,
+        "description": "Süt köpüklü İtalyan klasiği",
+        "tags": [
+          "vegetarian"
+        ],
+        "title": "Kahve Cappucino",
+        "image_url": "food_placeholder.jpg"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Soğuk içecekler",
+    "icon": "ph-drop",
+    "color": "#0ea5e9",
+    "products": [
+      {
+        "id": "c1",
+        "price": 20,
+        "description": "Serinletici su",
+        "tags": [
+          "vegan"
+        ],
+        "title": "Su",
+        "image_url": "food_placeholder.jpg"
+      },
+      {
+        "id": "c2",
+        "price": 80,
+        "description": "Doğal mineralli su",
+        "tags": [
+          "vegan"
+        ],
+        "title": "Madensuyu",
+        "image_url": "food_placeholder.jpg"
+      },
+      {
+        "id": "c3",
+        "price": 180,
+        "description": "Buz gibi limonata temeli üzerinde; tarçın, hibiscus ve İran safranının eşsiz birleşimiyle hazırlanan özel iksir.",
+        "tags": [
+          "vegan"
+        ],
+        "title": "Hibiscuslu Safranlı Limonata",
+        "image_url": "food_placeholder.jpg"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Tatlı",
+    "icon": "ph-cake",
+    "color": "#ec4899",
+    "products": [
+      {
+        "id": "t1",
+        "price": 290,
+        "description": "Fırından yeni çıkmış sıcak çikolatalı kekin üzerine meşhur Maraş dondurması, çikolata sosu ve hindistan cevizi dokunuşu.",
+        "tags": [
+          "halal",
+          "vegetarian"
+        ],
+        "title": "Dondurmalı Sıcak Çikolatalı Kek",
+        "image_url": "food_placeholder.jpg"
+      }
+    ]
+  }
+]

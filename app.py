@@ -80,6 +80,12 @@ def web_home():
 
 @app.route('/menu')
 @app.route('/menu.html')
+@app.route('/yeni_menu.json')
+def yeni_menu_json():
+    return send_from_directory('web', 'yeni_menu.json')
+
+@app.route('/menu')
+@app.route('/menu.html')
 def menu_web_page():
     return send_from_directory('web', 'menu.html')
 

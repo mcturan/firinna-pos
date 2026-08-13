@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fırınna Menü | %100 Helal Kahvaltı, Meşhur Çakallı Menemen & Taş Fırın İtalyan Pizza</title>
     <meta name="description" content="Fırınna Cafe'nin bütçe dostu, en uygun fiyatlı menüsü. %100 Helal geleneksel Türk kahvaltısı, Çakallı menemen, vegan ve vejetaryen seçenekler, hakiki İtalyan Napoliten pizza çeşitleri. Otantik tarihi atmosferde lezzet şöleni.">
-    <meta name="keywords" content="Fırınna menü fiyatları, en uygun fiyatlı cafe, helal menü, vejetaryen menü, vegan seçenekler, napoliten pizza fiyatları, en iyi türk menemeni mekanı, otantik tarihi cafe menüsü">
+    <meta name="keywords" content="Fırınna menü fiyatları, en uygun fiyatlı cafe, helal menü, vejetaryen menü, vegan seçenekler, napoliten pizza fiyatları, en iyi türk menemeni mekanı, otantik tarihi cafe menüsü, lgbtq+ friendly cafe Istanbul, gay friendly cafe Galata, safe space cafe Beyoglu, halal food menu, halal certified cafe, muslim friendly restaurant menu">
     <meta name="robots" content="index, follow">
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css?v=22.0">
@@ -174,39 +174,24 @@
             if (!container) return;
 
             try {
-                const [catRes, prodRes] = await Promise.all([
-                    fetch('/api/web/categories'),
-                    fetch('/api/web/products')
-                ]);
-                const categories = await catRes.json();
-                const products = await prodRes.json();
-
-                const activeProducts = products.filter(p => p.is_active !== false);
-
-                const catMap = {};
-                categories.forEach(c => catMap[c.name] = []);
-                
-                activeProducts.forEach(p => {
-                    const catName = p.category || 'Diğer';
-                    if (!catMap[catName]) catMap[catName] = [];
-                    catMap[catName].push(p);
-                });
+                const res = await fetch('yeni_menu.json');
+                const groupedMenu = await res.json();
 
                 let html = '';
-                for (const [catName, prodList] of Object.entries(catMap)) {
-                    if (prodList.length === 0) continue;
+                for (const cat of groupedMenu) {
+                    if (!cat.products || cat.products.length === 0) continue;
 
                     html += `
-                        <h2 class="menu-category-title" style="margin-top:32px;"><i class="ph-fill ph-fork-knife" style="color:#d97706;"></i> ${catName}</h2>
+                        <h2 class="menu-category-title" style="margin-top:32px;"><i class="ph-fill ${cat.icon}" style="color:${cat.color};"></i> ${cat.name}</h2>
                         <div class="menu-grid">
                     `;
 
-                    prodList.forEach(p => {
+                    cat.products.forEach(p => {
                         const rawImg = p.image_url || '';
                         const img = (typeof rawImg === 'string' && rawImg.length > 0) ? rawImg : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80';
                         const tagsHtml = (p.tags || []).map(t => {
                             const info = MENU_TAG_MAP[t] || { label: t, bg: '#f1f5f9', color: '#475569' };
-                            return `<span class="diet-badge" style="background:${info.bg}; color:${info.color}; font-weight:700;">${info.label}</span>`;
+                            return `<span class="diet-badge" style="background:${info.bg}; color:${info.color}; font-weight:700;" data-i18n="tag_${t}">${info.label}</span>`;
                         }).join(' ');
 
                         const sigBadge = p.is_signature ? `<i class="ph-fill ph-star" style="color:#f59e0b; font-size:1.1rem;" title="⭐ İmza Lezzet"></i>` : '';
@@ -216,10 +201,10 @@
                                 <img src="${img}" alt="${p.title}" class="menu-img">
                                 <div class="menu-content">
                                     <div class="menu-title">
-                                        <span>${p.title} ${sigBadge}</span>
-                                        <span style="font-size:1rem; font-weight:800; color:#d97706;">${p.price || ''}</span>
+                                        <span><span data-i18n="p_${p.id}">${p.title}</span> ${sigBadge}</span>
+                                        <span style="font-size:1rem; font-weight:800; color:#d97706; display:none;">${p.price || ''}</span>
                                     </div>
-                                    <p class="menu-desc">${p.description || ''}</p>
+                                    <p class="menu-desc" data-i18n="desc_${p.id}">${p.description || ''}</p>
                                     <div class="dietary-badges">${tagsHtml}</div>
                                 </div>
                             </div>
@@ -231,46 +216,17 @@
 
                 container.innerHTML = html;
 
-                // Dinamik render sonrası data-i18n elementlerini (örn. filtre butonları) çevir
+                // Dinamik render sonrası data-i18n elementlerini çevir
                 const curLang = window.currentLang || localStorage.getItem('firinna_lang') || 'tr';
                 if (window.changeLang) window.changeLang(curLang);
 
-                // Auto Scroll to target product if query param exists
-                const urlParams = new URLSearchParams(window.location.search);
-                const targetId = urlParams.get('product');
-                if (targetId) {
-                    setTimeout(() => {
-                        const targetElem = document.getElementById(`prod_${targetId}`);
-                        if (targetElem) {
-                            targetElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            targetElem.style.border = '2px solid #f59e0b';
-                            targetElem.style.boxShadow = '0 0 0 6px rgba(245, 158, 11, 0.35), 0 8px 25px rgba(0,0,0,0.15)';
-                            targetElem.style.transform = 'scale(1.03)';
-                        }
-                    }, 300);
-                }
             } catch(e) {
-                console.error("Error loading dynamic menu:", e);
+                console.error("Menü yüklenemedi:", e);
+                container.innerHTML = '<p style="color:red;">Menü yüklenirken bir hata oluştu.</p>';
             }
         }
 
-        // Override changeLang specifically for menu.html to update the PDF link
-        const originalChangeLang = window.changeLang;
-        window.changeLang = function(lang) {
-            if (typeof originalChangeLang === 'function') originalChangeLang(lang);
-            const pdfLink = document.getElementById('pdf-download-link');
-            if (pdfLink) {
-                pdfLink.href = `menu_${lang}.pdf`;
-            }
-        };
-
-        document.addEventListener("DOMContentLoaded", () => {
-            renderDynamicMenuPage();
-            const pdfLink = document.getElementById('pdf-download-link');
-            if (pdfLink && window.currentLang) {
-                pdfLink.href = `menu_${window.currentLang}.pdf`;
-            }
-        });
-    </script>
+        renderDynamicMenuPage();
+        </script>
 </body>
 </html>

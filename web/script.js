@@ -386,6 +386,52 @@ const i18n = {
         menu_back: "Home",
         menu_intro: "You can visit our store or get detailed information from our staff for all menu options. Below you can review our most loved signature tastes.",
         menu_download: "Download Priced Menu (PDF)",
+        desc_t1: "Hot chocolate cake fresh from the oven topped with famous Maraş ice cream, chocolate sauce, and a touch of coconut.",
+        p_t1: "Hot Chocolate Cake with Ice Cream",
+        desc_c3: "A refreshing special potion prepared with the unique combination of cinnamon, hibiscus, and Iranian saffron on an ice-cold lemonade base.",
+        p_c3: "Hibiscus Saffron Lemonade",
+        desc_c2: "Natural mineral water.",
+        p_c2: "Mineral Water",
+        desc_c1: "Refreshing water.",
+        p_c1: "Water",
+        desc_s5: "Italian classic with milk foam.",
+        p_s5: "Cappuccino",
+        desc_s4: "Espresso with plenty of milk.",
+        p_s4: "Latte",
+        desc_s3: "Strong coffee from freshly ground beans.",
+        p_s3: "Americano",
+        desc_s2: "Traditional Turkish Coffee, slow-cooked, very frothy, served with Turkish delight.",
+        p_s2: "Turkish Coffee",
+        desc_s1: "A special blend of carefully selected tea leaves flavored with bergamot and softened with dry rose petals.",
+        p_s1: "Special Blend Tea",
+        desc_p3: "Magnificent festival pizza baked with beef döner, chicken döner, sausage, and plenty of mozzarella.",
+        p_p3: "Full Mixed Feast Pizza",
+        desc_p2: "Your special flavor on a Margherita base: Special marinated Beef Döner, Chicken Döner, or Sausage.",
+        p_p2: "Protein Pizza",
+        desc_p1: "Real Neapolitan style dough baked in a stone oven, our special mix pizza sauce and fresh mozzarella.",
+        p_p1: "Pizza Margherita",
+        desc_b3: "A hearty and quick classic! Hot meeting of your two chosen proteins in crispy bazlama bread.",
+        p_b3: "Mixed Bazlama Toast",
+        desc_b2: "Toast enriched with your chosen protein along with melting cheese.",
+        p_b2: "Protein Bazlama",
+        desc_b1: "Traditional Turkish Village Bread toast, crispy on the outside, filled with melting cheese.",
+        p_b1: "Plain Bazlama Toast",
+        desc_o4: "A giant portion omelette made just for you with two flavors of your choice.",
+        p_o4: "Mixed Feast Omelette",
+        desc_o3: "Filling omelette with your choice of Beef Döner, Chicken Döner, or Traditional Sausage.",
+        p_o3: "Special Protein Omelette",
+        desc_o2: "Omelette filled with melting cheese.",
+        p_o2: "Omelette with Cheese",
+        desc_o1: "Soft classic omelette cooked carefully in a pan.",
+        p_o1: "Plain Pan Omelette",
+        desc_m4: "The legendary meeting of your two chosen proteins with hot menemen.",
+        p_m4: "Mixed Feast Menemen",
+        desc_m3: "Traditional menemen base topped with your choice of specially marinated sliced Beef Döner, Chicken Döner, or Sausage.",
+        p_m3: "Menemen with Beef / Sausage / Chicken",
+        desc_m2: "Iconic Turkish menemen with extra cheese.",
+        p_m2: "Menemen with Cheese",
+        desc_m1: "Iconic Turkish breakfast prepared with crushed tomatoes and melting cheese. (Çakallı style)",
+        p_m1: "Plain Menemen",
         cat_food: "Hot from the Oven",
         cat_drinks: "Beverages & Desserts",
         item_pizza: "Stone-baked Pizza",
@@ -1470,7 +1516,7 @@ let dynamicWebProducts = [];
 
 async function fetchWebProducts() {
     try {
-        const res = await fetch('/api/web/products');
+        const res = await fetch('yeni_menu.json');
         dynamicWebProducts = await res.json();
         renderDynamicSignatureGallery();
     } catch(e) {
@@ -1495,29 +1541,43 @@ function goToMenuProduct(prodId) {
 }
 
 function renderDynamicSignatureGallery() {
-    const signatureGrid = document.getElementById('signature-gallery-grid');
-    if (!signatureGrid) return;
+    const gallery = document.getElementById('signature-gallery');
+    if (!gallery || !dynamicWebProducts) return;
 
-    const signatureProducts = dynamicWebProducts.filter(p => p.is_signature && p.is_active !== false);
-    if (!signatureProducts || signatureProducts.length === 0) return;
+    let allProducts = [];
+    if (Array.isArray(dynamicWebProducts)) {
+        if (dynamicWebProducts.length > 0 && dynamicWebProducts[0].products) {
+            // Grouped format
+            dynamicWebProducts.forEach(cat => {
+                if (cat.products) allProducts.push(...cat.products);
+            });
+        } else {
+            allProducts = dynamicWebProducts;
+        }
+    }
 
-    signatureGrid.innerHTML = signatureProducts.map(p => {
-        const img = p.image_url.startsWith('http') || p.image_url.startsWith('drink_') || p.image_url.startsWith('prod_') || p.image_url.startsWith('food_') ? p.image_url : p.image_url;
+    const signatures = allProducts.filter(p => p.is_signature || p.title.toLowerCase().includes('menemen') || p.title.toLowerCase().includes('pizza'));
+    // Select top 6
+    const topSigs = signatures.slice(0, 6);
 
-        return `
-            <div class="gallery-item-wrapper" style="position: relative; overflow: hidden; border-radius: 12px; height: 220px; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.1); transition:all 0.3s ease;" onclick="goToMenuProduct('${p.id}')" title="${p.title} - Menüde İncele">
-                <img src="${img}" alt="${p.title}" class="gallery-img" style="width:100%; height:100%; object-fit:cover; object-position:center; transition:transform 0.3s ease;">
-                <span style="position:absolute; top:8px; right:8px; background:#f59e0b; color:#fff; font-size:0.75rem; font-weight:800; padding:3px 8px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.2);">⭐ İmza Lezzet</span>
-                <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(15,23,42,0.92), transparent); padding:20px 10px 8px; color:#fff;">
-                    <div style="font-size:0.92rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title}</div>
-                    <div style="font-size:0.72rem; color:#fde68a; font-weight:600; display:flex; align-items:center; gap:4px; margin-top:2px;">
-                        <span>Menüde Gör</span> <i class="ph-bold ph-arrow-right"></i>
-                    </div>
+    let html = '';
+    topSigs.forEach(p => {
+        const rawImg = p.image_url || p.image || '';
+        const img = (typeof rawImg === 'string' && rawImg.length > 0) ? rawImg : 'food_placeholder.jpg';
+        
+        html += `
+            <div class="gallery-item" onclick="window.location.href='menu.html?product=${p.id}'" style="cursor:pointer;">
+                <img src="${img}" alt="${p.title}" loading="lazy">
+                <div class="gallery-overlay">
+                    <span class="gallery-title" data-i18n="p_${p.id}">${p.title}</span>
                 </div>
             </div>
         `;
-    }).join('');
+    });
+
+    gallery.innerHTML = html;
 }
+
 
 function openLightbox(src, captionKeyOrText, descText, tagsStr = '') {
     const modal = document.getElementById('lightboxModal');
