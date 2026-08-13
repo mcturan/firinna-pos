@@ -382,7 +382,7 @@ class ThermalPrinter:
                     draw.text((x, y), txt, font=font, fill=0)
                 y += line_h
 
-            return self._pil_to_escpos(img)
+            return self._pil_to_escpos(img, target_width=IMG_WIDTH)
         except Exception as e:
             print(f"Metin görsel render hatası: {e}")
             return None

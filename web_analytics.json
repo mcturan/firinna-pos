@@ -30,6 +30,24 @@
     },
     "recent_visitors": [
         {
+            "id": "log_1786635989231",
+            "time": "13 Ağustos 18:46",
+            "iso_date": "2026-08-13",
+            "raw_time": "2026-08-13 18:46:29",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (7745s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%43",
+            "time_spent": "7745 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
             "id": "log_1786634197214",
             "time": "13 Ağustos 18:16",
             "iso_date": "2026-08-13",
