@@ -496,11 +496,12 @@ class ThermalPrinter:
 
         # QR Kod
         if qr_url:
-            qr_bytes = self._image_to_escpos(qr_url, target_width=200)
+            qr_bytes = self._image_to_escpos(qr_url, target_width=300)
             if qr_bytes:
                 data += CENTER
                 data += qr_bytes
             if qr_label:
+                data += b'\n'
                 data += CENTER
                 data += tr(qr_label).encode('ascii', errors='replace') + b'\n'
 
