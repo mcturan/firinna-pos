@@ -3045,6 +3045,7 @@ def track_visit():
         elif event == 'action': action_name = "💬 WhatsApp / İletişim"
         elif event == 'map': action_name = "🗺️ Harita / Navigasyon Niyeti"
         elif event == 'duration_update': action_name = f"⏱️ Sitede Kalma ({time_spent_sec}s)"
+        elif event == 'pageview': action_name = "👁️ Sayfa Görüntüleme"
         elif event == 'item':
             item_name = data.get('item', 'Özel Lezzet')
             action_name = f"🍽️ Ürün İnceleme ({item_name})"
