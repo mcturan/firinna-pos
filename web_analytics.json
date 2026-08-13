@@ -30,6 +30,24 @@
     },
     "recent_visitors": [
         {
+            "id": "log_1786634197214",
+            "time": "13 Ağustos 18:16",
+            "iso_date": "2026-08-13",
+            "raw_time": "2026-08-13 18:16:37",
+            "ip": "187.40.231.202",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (9s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "9 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
             "id": "log_1786628562510",
             "time": "13 Ağustos 16:42",
             "iso_date": "2026-08-13",

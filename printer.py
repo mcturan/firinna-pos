@@ -302,7 +302,8 @@ class ThermalPrinter:
             import unicodedata
 
             FONT_PATH  = '/usr/share/fonts/truetype/freefont/FreeSerif.ttf'
-            IMG_WIDTH  = 376   # 384'ten biraz dar, kenar boşluğu
+            paper_width = db.get_setting('paper_width', '80')
+            IMG_WIDTH  = 560 if str(paper_width) == '80' else 376
             PADDING    = 4
             LINE_GAP   = 6
 
