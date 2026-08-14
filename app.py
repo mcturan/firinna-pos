@@ -2603,20 +2603,52 @@ def upload_menu():
     return jsonify({"success": True, "filename": filename})
 
 import secrets
-VALID_ADMIN_TOKENS = set()
+import time as _time
+from werkzeug.security import generate_password_hash, check_password_hash
+
+# Token -> expiry timestamp (24 saat)
+VALID_ADMIN_TOKENS = {}
+TOKEN_EXPIRY_SECONDS = 86400  # 24 saat
+
+def _cleanup_expired_tokens():
+    now = _time.time()
+    expired = [t for t, exp in VALID_ADMIN_TOKENS.items() if now > exp]
+    for t in expired:
+        VALID_ADMIN_TOKENS.pop(t, None)
+
+DEFAULT_PASSWORD_HASH = generate_password_hash('FirinnaPos2026!')
+
+def _get_password_hash():
+    """Settings dosyasından hashlenmiş şifreyi al veya varsayılanı döndür."""
+    if os.path.exists(SETTINGS_FILE):
+        with open(SETTINGS_FILE, 'r') as f:
+            settings = json.load(f)
+            stored = settings.get('admin_password_hash', '')
+            if stored:
+                return stored
+            # Eski düz metin şifre varsa, hashle ve güncelle (migration)
+            old_plain = settings.get('admin_password', '')
+            if old_plain:
+                hashed = generate_password_hash(old_plain)
+                settings['admin_password_hash'] = hashed
+                del settings['admin_password']
+                with open(SETTINGS_FILE, 'w') as fw:
+                    json.dump(settings, fw, indent=4, ensure_ascii=False)
+                return hashed
+    return DEFAULT_PASSWORD_HASH
 
 def verify_admin_auth():
+    _cleanup_expired_tokens()
     token = request.headers.get('X-Admin-Token') or request.headers.get('Authorization', '').replace('Bearer ', '').strip()
     if token and token in VALID_ADMIN_TOKENS:
-        return True
+        if _time.time() <= VALID_ADMIN_TOKENS[token]:
+            return True
+        else:
+            VALID_ADMIN_TOKENS.pop(token, None)
     auth = request.authorization
     if auth and auth.password:
-        current_pass = "FirinnaPos2026!"
-        if os.path.exists(SETTINGS_FILE):
-            with open(SETTINGS_FILE, 'r') as f:
-                settings = json.load(f)
-                current_pass = settings.get('admin_password', "FirinnaPos2026!")
-        if auth.password == current_pass:
+        pw_hash = _get_password_hash()
+        if check_password_hash(pw_hash, auth.password):
             return True
     return False
 
@@ -2624,37 +2656,37 @@ def verify_admin_auth():
 def admin_login():
     data = request.json or {}
     password = data.get('password', '')
-    current_pass = "FirinnaPos2026!"
-    if os.path.exists(SETTINGS_FILE):
-        with open(SETTINGS_FILE, 'r') as f:
-            settings = json.load(f)
-            current_pass = settings.get('admin_password', "FirinnaPos2026!")
-    if password == current_pass:
-        token = secrets.token_hex(24)
-        VALID_ADMIN_TOKENS.add(token)
+    pw_hash = _get_password_hash()
+    if check_password_hash(pw_hash, password):
+        _cleanup_expired_tokens()
+        token = secrets.token_hex(32)
+        VALID_ADMIN_TOKENS[token] = _time.time() + TOKEN_EXPIRY_SECONDS
         return jsonify({"success": True, "token": token})
     return jsonify({"success": False, "error": "Hatalı şifre!"})
 
 @app.route('/api/web/change-password', methods=['POST'])
 def change_password():
+    if not verify_admin_auth():
+        return jsonify({"success": False, "error": "Yetkisiz erişim!"}), 401
     data = request.json or {}
     old_pass = data.get('old_password', '')
     new_pass = data.get('new_password', '')
     if not new_pass or len(new_pass) < 6:
         return jsonify({"success": False, "error": "Yeni şifre en az 6 karakter olmalıdır."})
     
+    pw_hash = _get_password_hash()
+    if not check_password_hash(pw_hash, old_pass):
+        return jsonify({"success": False, "error": "Mevcut şifreniz hatalı!"})
+        
     settings = {}
     if os.path.exists(SETTINGS_FILE):
         with open(SETTINGS_FILE, 'r') as f:
             settings = json.load(f)
     
-    current_pass = settings.get('admin_password', "FirinnaPos2026!")
-    if old_pass != current_pass:
-        return jsonify({"success": False, "error": "Mevcut şifreniz hatalı!"})
-        
-    settings['admin_password'] = new_pass
+    settings['admin_password_hash'] = generate_password_hash(new_pass)
+    settings.pop('admin_password', None)  # Eski düz metin şifreyi sil
     with open(SETTINGS_FILE, 'w') as f:
-        json.dump(settings, f, indent=4)
+        json.dump(settings, f, indent=4, ensure_ascii=False)
     return jsonify({"success": True, "message": "Şifreniz başarıyla değiştirildi."})
 
 @app.route('/api/web/reset-analytics', methods=['POST'])
@@ -3223,4 +3255,4 @@ if __name__ == '__main__':
     except Exception as e:
         print("Auto WebP Error:", e)
         
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
