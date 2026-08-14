@@ -2960,7 +2960,11 @@ function renderPublicScheduleTable(statusData) {
         }
         
         const translatedDayName = dayMap[d] || d;
-        const timeStr = (cfg.active !== false) ? `${cfg.open || '08:30'} - ${cfg.close || '23:00'}` : `<span style="color:#dc2626; font-weight:700;">🔴 ${statMap.closed}</span>`;
+        let timeStr = (cfg.active !== false) ? `${cfg.open || '08:30'} - ${cfg.close || '23:00'}` : `<span style="color:#dc2626; font-weight:700;">🔴 ${statMap.closed}</span>`;
+        
+        if (isToday && statusData.is_exceptional_open && cfg.active !== false) {
+            timeStr = `<span style="text-decoration:line-through; color:#94a3b8; font-size:0.85em; margin-right:6px;">${timeStr}</span><span style="background:#059669; color:white; font-size:0.75rem; padding:2px 6px; border-radius:6px; font-weight:700;">Müşteri Var</span>`;
+        }
         
         tr.innerHTML = `
             <td style="padding:8px 6px; color:${dayColor}; white-space:nowrap; width:50%;">${dot}<span>${translatedDayName}</span></td>

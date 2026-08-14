@@ -2641,15 +2641,22 @@ def get_store_status():
                 is_open = False
                 badge = f"🔴 ŞU AN KAPALI (Açılış: {open_str})"
 
+    is_exceptional_open = False
+    if is_open and (current_hm < open_str or current_hm > close_str):
+        is_exceptional_open = True
+    elif not is_open and (open_str <= current_hm <= close_str):
+        is_exceptional_closed = True # just in case we need it later
+        
     res = jsonify({
         "status": "success",
         "store_name": "Fırınna Cafe & Restaurant",
         "is_open": is_open,
+        "is_exceptional_open": is_exceptional_open,
         "status_text": "Açık" if is_open else "Kapalı",
         "status_badge": badge,
         "current_day": current_day_tr,
         "current_time": current_hm,
-        "today_hours": f"{today_cfg.get('open', '08:30')} - {today_cfg.get('close', '23:00')}",
+        "today_hours": f"{open_str} - {close_str}",
         "hours": daily_hours,
         "address": "Şahkulu Mah. Kumbaracı Yokuşu Sok. No:41A, Beyoğlu, İstanbul",
         "phone": "+905456301214",
