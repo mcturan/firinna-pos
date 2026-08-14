@@ -13,7 +13,7 @@
           "halal",
           "vegetarian"
         ],
-        "title": "Sade Menemen",
+        "title": "Geleneksel Menemen",
         "image_url": "food_menemen_sahanda.jpg"
       },
       {
@@ -61,10 +61,11 @@
         "description": "Köy tereyağında pişmiş nefis sahanda omlet",
         "tags": [
           "halal",
-          "vegetarian"
+          "vegetarian",
+          "dairy"
         ],
-        "title": "Sade Sahanda Omlet",
-        "image_url": "food_placeholder.jpg"
+        "title": "Geleneksel Sahanda Omlet",
+        "image_url": "omlet_geleneksel.jpg"
       },
       {
         "id": "o2",
@@ -72,30 +73,33 @@
         "description": "Eriyen bol kaşar peyniri dolgulu omlet",
         "tags": [
           "halal",
-          "vegetarian"
+          "vegetarian",
+          "dairy"
         ],
         "title": "Kaşarlı Omlet",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "omlet_geleneksel.jpg"
       },
       {
         "id": "o3",
         "price": 300,
         "description": "Tercihinize göre protein eklentili doyurucu omlet",
         "tags": [
-          "halal"
+          "halal",
+          "dairy"
         ],
         "title": "Etli / Sucuklu / Tavuklu Omlet",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "omlet_sucuklu.jpg"
       },
       {
         "id": "o4",
         "price": 360,
         "description": "Et, sucuk, tavuk ve kaşarlı dev omlet",
         "tags": [
-          "halal"
+          "halal",
+          "dairy"
         ],
         "title": "Karışık Şölen Omlet",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "omlet_sucuklu.jpg"
       }
     ]
   },
@@ -111,30 +115,36 @@
         "description": "Köy bazlaması arasına kaşar peyniriyle hazırlanan çıtır lezzet",
         "tags": [
           "halal",
-          "vegetarian"
+          "vegetarian",
+          "dairy",
+          "gluten"
         ],
-        "title": "Sade Bazlama Tost",
-        "image_url": "food_placeholder.jpg"
+        "title": "Geleneksel Bazlama Tost",
+        "image_url": "food_bazlama_tost.jpg"
       },
       {
         "id": "b2",
         "price": 300,
         "description": "Kaşar peynirine ek olarak tercih ettiğiniz proteinle zenginleştirilmiş tost",
         "tags": [
-          "halal"
+          "halal",
+          "dairy",
+          "gluten"
         ],
         "title": "Etli / Sucuklu / Tavuklu Bazlama",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "food_bazlama_tost.jpg"
       },
       {
         "id": "b3",
         "price": 360,
         "description": "İstediğiniz iki protein seçeneği ve bol kaşar",
         "tags": [
-          "halal"
+          "halal",
+          "dairy",
+          "gluten"
         ],
         "title": "İki Seçenekli Bazlama",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "food_bazlama_tost.jpg"
       }
     ]
   },
@@ -150,30 +160,36 @@
         "description": "Taş fırında pişen gerçek Napoli usulü, özel karışım pizza sosumuz ve taze mozzarella harikası.",
         "tags": [
           "halal",
-          "vegetarian"
+          "vegetarian",
+          "dairy",
+          "gluten"
         ],
         "title": "Pizza Margarita",
-        "image_url": "food_pizza.jpg"
+        "image_url": "pizza_napoliten.jpg"
       },
       {
         "id": "p2",
         "price": 490,
         "description": "Margarita tabanı üzerine dilediğiniz özel lezzet: Özel marine Et Döner, Tavuk Döner veya Sucuk.",
         "tags": [
-          "halal"
+          "halal",
+          "dairy",
+          "gluten"
         ],
         "title": "Pizza (Etli / Sucuklu / Tavuklu)",
-        "image_url": "food_pizza.jpg"
+        "image_url": "pizza_napoliten.jpg"
       },
       {
         "id": "p3",
         "price": 550,
         "description": "Et, sucuk, tavuk ve bol mozzarella ile fırınlanmış efsane pizza",
         "tags": [
-          "halal"
+          "halal",
+          "dairy",
+          "gluten"
         ],
         "title": "Full Karışık Pizza",
-        "image_url": "food_pizza.jpg"
+        "image_url": "pizza_napoliten.jpg"
       }
     ]
   },
@@ -191,7 +207,7 @@
           "vegan"
         ],
         "title": "Özel Karışım Çay",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "drink_cay.png"
       },
       {
         "id": "s2",
@@ -201,7 +217,7 @@
           "vegan"
         ],
         "title": "Türk Kahvesi",
-        "image_url": "food_kahve.jpg"
+        "image_url": "drink_kahve.png"
       },
       {
         "id": "s3",
@@ -211,27 +227,29 @@
           "vegan"
         ],
         "title": "Kahve Americano",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "drink_kahve.png"
       },
       {
         "id": "s4",
         "price": 180,
         "description": "Bol sütlü espresso",
         "tags": [
-          "vegetarian"
+          "vegetarian",
+          "dairy"
         ],
         "title": "Kahve Latte",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "drink_kahve.png"
       },
       {
         "id": "s5",
         "price": 180,
         "description": "Süt köpüklü İtalyan klasiği",
         "tags": [
-          "vegetarian"
+          "vegetarian",
+          "dairy"
         ],
         "title": "Kahve Cappucino",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "drink_kahve.png"
       }
     ]
   },
@@ -249,7 +267,7 @@
           "vegan"
         ],
         "title": "Su",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "food_madensuyu.jpg"
       },
       {
         "id": "c2",
@@ -259,17 +277,18 @@
           "vegan"
         ],
         "title": "Madensuyu",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "food_madensuyu.jpg"
       },
       {
         "id": "c3",
         "price": 180,
         "description": "Buz gibi limonata temeli üzerinde; tarçın, hibiscus ve İran safranının eşsiz birleşimiyle hazırlanan özel iksir.",
         "tags": [
-          "vegan"
+          "vegan",
+          "gluten_free"
         ],
         "title": "Hibiscuslu Safranlı Limonata",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "drink_limonata.png"
       }
     ]
   },
@@ -285,10 +304,12 @@
         "description": "Fırından yeni çıkmış sıcak çikolatalı kekin üzerine meşhur Maraş dondurması, çikolata sosu ve hindistan cevizi dokunuşu.",
         "tags": [
           "halal",
-          "vegetarian"
+          "vegetarian",
+          "dairy",
+          "gluten"
         ],
         "title": "Dondurmalı Sıcak Çikolatalı Kek",
-        "image_url": "food_placeholder.jpg"
+        "image_url": "cikolatali_kek.jpg"
       }
     ]
   }
