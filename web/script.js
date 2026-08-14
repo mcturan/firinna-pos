@@ -2904,7 +2904,7 @@ function goToMenuProduct(prodId) {
 }
 
 function renderDynamicSignatureGallery() {
-    const gallery = document.getElementById('signature-gallery');
+    const gallery = document.getElementById('signature-gallery-grid');
     if (!gallery || !dynamicWebProducts) return;
 
     let allProducts = [];
