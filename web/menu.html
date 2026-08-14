@@ -126,23 +126,7 @@
                 </a>
             </div>
 
-            <!-- Yapışkan Arama & Diyet Filtre Hapları (Sticky Search Bar & Dietary Chips) -->
-            <div id="sticky-filter-bar" style="position: sticky; top: 10px; z-index: 100; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 14px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; margin-bottom: 24px;">
-                <!-- Live Search Box -->
-                <div style="position: relative; margin-bottom: 12px;">
-                    <i class="ph-bold ph-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1rem;"></i>
-                    <input type="text" id="menu-search-input" data-i18n-placeholder="search_placeholder" onkeyup="filterMenuInteractive()" placeholder="🔍 Menüde lezzet ara... (örn: Menemen, Pizza, Kahve)" style="width: 100%; padding: 12px 14px 12px 42px; border-radius: 30px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.95rem; font-family: inherit; transition: border-color 0.2s ease, box-shadow 0.2s ease;">
-                </div>
-                <!-- Dietary Filter Chips (Scrollable) -->
-                <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -ms-overflow-style: none;">
-                    <button class="diet-chip active" onclick="setDietaryFilter('all', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: none; background: #2563eb; color: #fff; font-weight: 700; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_all">✨ Tüm Menü</button>
-                    <button class="diet-chip" onclick="setDietaryFilter('halal', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_halal">☪️ %100 Helal</button>
-                    <button class="diet-chip" onclick="setDietaryFilter('veggie', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_veggie">🌿 Vejetaryen</button>
-                    <button class="diet-chip" onclick="setDietaryFilter('glutenfree', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_glutenfree">🌾 Glutensiz / Fit</button>
-                    <button class="diet-chip" onclick="setDietaryFilter('dairyfree', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_dairyfree">🚫 Süt İçermez</button>
-                    <button class="diet-chip" onclick="setDietaryFilter('signature', this)" style="white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-weight: 600; font-size: 0.82rem; cursor: pointer;" data-i18n="filter_signature">⭐ İmza Lezzetler</button>
-                </div>
-            </div>
+            
 
             <div id="dynamic-full-menu">
                 <div style="text-align:center; padding:40px 0; color:#94a3b8;">Menü yükleniyor...</div>
@@ -205,7 +189,7 @@
                                         <span style="font-size:1rem; font-weight:800; color:#d97706; display:none;">${p.price || ''}</span>
                                     </div>
                                     <p class="menu-desc" data-i18n="desc_${p.id}">${p.description || ''}</p>
-                                    <div class="dietary-badges">${tagsHtml}</div>
+                                    
                                 </div>
                             </div>
                         `;
