@@ -2502,7 +2502,7 @@ function changeLang(lang) {
     }
     
     document.querySelectorAll('.lang-selector button').forEach(btn => {
-        if(btn.innerText.toLowerCase() === lang) {
+        if(btn.getAttribute('data-lang') === lang) {
             btn.classList.add('active');
         } else {
             btn.classList.remove('active');
