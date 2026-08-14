@@ -95,14 +95,19 @@
         <img src="banner.jpg" alt="Galata Istanbul" class="banner-img">
         <div class="banner-overlay"></div>
         
-        <div class="lang-selector">
-            <button onclick="changeLang('tr')">TR</button>
-            <button onclick="changeLang('en')">EN</button>
-            <button onclick="changeLang('es')">ES</button>
-            <button onclick="changeLang('ar')">AR</button>
-            <button onclick="changeLang('ru')">RU</button>
-            <button onclick="changeLang('zh')">ZH</button>
-        </div>
+        <div class="lang-selector" style="overflow-x: auto; white-space: nowrap; display: flex; gap: 8px;">
+            <button onclick="changeLang('tr')" class="active">🇹🇷 TR</button>
+            <button onclick="changeLang('en')">🇬🇧 EN</button>
+            <button onclick="changeLang('de')">🇩🇪 DE</button>
+            <button onclick="changeLang('fr')">🇫🇷 FR</button>
+            <button onclick="changeLang('it')">🇮🇹 IT</button>
+            <button onclick="changeLang('es')">🇪🇸 ES</button>
+            <button onclick="changeLang('ru')">🇷🇺 RU</button>
+            <button onclick="changeLang('uk')">🇺🇦 UK</button>
+            <button onclick="changeLang('ar')">🇸🇦 AR</button>
+            <button onclick="changeLang('fa')">🇮🇷 FA</button>
+            <button onclick="changeLang('zh')">🇨🇳 ZH</button>
+</div>
 
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; text-align: center; width: 100%;">
             <h1 style="color: #fff; font-size: 2.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5);" data-i18n="menu_header_title">İmza Lezzetlerimiz</h1>
