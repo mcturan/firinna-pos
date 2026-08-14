@@ -165,7 +165,7 @@
           "gluten"
         ],
         "title": "Pizza Margarita",
-        "image_url": "pizza_napoliten.jpg"
+        "image_url": "pizza_napoliten_v2.jpg"
       },
       {
         "id": "p2",
@@ -177,7 +177,7 @@
           "gluten"
         ],
         "title": "Pizza (Etli / Sucuklu / Tavuklu)",
-        "image_url": "pizza_napoliten.jpg"
+        "image_url": "pizza_napoliten_v2.jpg"
       },
       {
         "id": "p3",
@@ -189,7 +189,7 @@
           "gluten"
         ],
         "title": "Full Karışık Pizza",
-        "image_url": "pizza_napoliten.jpg"
+        "image_url": "pizza_napoliten_v2.jpg"
       }
     ]
   },
@@ -227,7 +227,7 @@
           "vegan"
         ],
         "title": "Kahve Americano",
-        "image_url": "drink_kahve.png"
+        "image_url": "kahve_uzun_bardak.jpg"
       },
       {
         "id": "s4",
@@ -238,7 +238,7 @@
           "dairy"
         ],
         "title": "Kahve Latte",
-        "image_url": "drink_kahve.png"
+        "image_url": "kahve_uzun_bardak.jpg"
       },
       {
         "id": "s5",
@@ -249,7 +249,7 @@
           "dairy"
         ],
         "title": "Kahve Cappucino",
-        "image_url": "drink_kahve.png"
+        "image_url": "kahve_uzun_bardak.jpg"
       }
     ]
   },
@@ -259,16 +259,6 @@
     "icon": "ph-drop",
     "color": "#0ea5e9",
     "products": [
-      {
-        "id": "c1",
-        "price": 20,
-        "description": "Serinletici su",
-        "tags": [
-          "vegan"
-        ],
-        "title": "Su",
-        "image_url": "food_madensuyu.jpg"
-      },
       {
         "id": "c2",
         "price": 80,
