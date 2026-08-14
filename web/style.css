@@ -554,6 +554,7 @@ img, iframe, video, object, embed, table {
     }
 
     .map-buttons {
+        display: flex !important;
         flex-direction: column !important;
         gap: 8px !important;
     }

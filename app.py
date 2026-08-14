@@ -78,8 +78,6 @@ def index():
 def web_home():
     return send_from_directory('web', 'index.html')
 
-@app.route('/menu')
-@app.route('/menu.html')
 @app.route('/yeni_menu.json')
 def yeni_menu_json():
     return send_from_directory('web', 'yeni_menu.json')

@@ -2921,7 +2921,7 @@ function changeLang(lang) {
         }
     });
 
-    if (lang === 'ar') {
+    if (lang === 'ar' || lang === 'fa') {
         document.body.style.direction = 'rtl';
     } else {
         document.body.style.direction = 'ltr';
@@ -3177,7 +3177,7 @@ function renderDynamicSignatureGallery() {
     let html = '';
     topSigs.forEach(p => {
         const rawImg = p.image_url || p.image || '';
-        const img = (typeof rawImg === 'string' && rawImg.length > 0) ? rawImg : 'food_placeholder.jpg';
+        const img = (typeof rawImg === 'string' && rawImg.length > 0) ? rawImg : 'pizza_napoliten_v2.webp';
         
         html += `
             <div class="gallery-item" onclick="window.location.href='menu.html?product=${p.id}'" style="cursor:pointer;">
