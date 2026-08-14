@@ -790,6 +790,19 @@ def api_send_daily_close_telegram():
         f"{top_lines}{open_warn}{tomorrow_alert}"
     )
     ok = telegram_notify.send_message(msg)
+    
+    # Gün sonu yapıldığında web durumunu otomatik (auto) moda al
+    try:
+        if os.path.exists(SETTINGS_FILE):
+            with open(SETTINGS_FILE, 'r') as f:
+                settings = json.load(f)
+            if settings.get('manual_status') != 'auto':
+                settings['manual_status'] = 'auto'
+                with open(SETTINGS_FILE, 'w') as f:
+                    json.dump(settings, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print("Web status reset error on day close:", e)
+
     return jsonify({'success': ok, 'message': msg if not ok else ''})
 
 @app.route('/kitchen')
@@ -799,6 +812,26 @@ def kitchen_page():
 @app.route('/notes')
 def notes_page():
     return render_template('notes.html')
+
+@app.route('/api/pos/store-status', methods=['GET', 'POST'])
+def api_pos_store_status():
+    settings = {}
+    if os.path.exists(SETTINGS_FILE):
+        try:
+            with open(SETTINGS_FILE, 'r') as f:
+                settings = json.load(f)
+        except: pass
+    if request.method == 'GET':
+        return jsonify({"manual_status": settings.get("manual_status", "auto")})
+    
+    data = request.json
+    new_status = data.get('manual_status', 'auto')
+    settings['manual_status'] = new_status
+    try:
+        with open(SETTINGS_FILE, 'w') as f:
+            json.dump(settings, f, indent=4, ensure_ascii=False)
+    except: pass
+    return jsonify({"success": True, "manual_status": new_status})
 
 @app.route('/api/kitchen/orders', methods=['GET'])
 def api_kitchen_orders():
@@ -2113,10 +2146,23 @@ def start_telegram_auto_send():
                         try:
                             import telegram_notify
                             telegram_notify.send_message(text)
+                            
+                            # Gün sonu telegram'ı otomatik gönderildiğinde web durumunu da auto'ya al
+                            try:
+                                if os.path.exists(SETTINGS_FILE):
+                                    with open(SETTINGS_FILE, 'r') as f:
+                                        s_data = json.load(f)
+                                    if s_data.get('manual_status') != 'auto':
+                                        s_data['manual_status'] = 'auto'
+                                        with open(SETTINGS_FILE, 'w') as f:
+                                            json.dump(s_data, f, indent=4, ensure_ascii=False)
+                            except Exception as ex:
+                                print(f"Auto status reset error: {ex}")
+
                         except Exception as te:
                             print(f"Telegram auto-send hatasi: {te}")
                         last_sent = today
-                        _time.sleep(70)
+                        _time.sleep(60) # Sadece 1 dakika uyut (60 saniye), böylece o dakika içinde bir daha göndermez
                         continue
             except Exception as e:
                 import traceback

@@ -34,6 +34,15 @@
     </div>
 
     <div class="nav-links">
+        <!-- Web Status Toggle -->
+        <div style="display:flex; align-items:center; gap:0.3rem; margin-right: 0.5rem; background: rgba(0,0,0,0.05); padding: 0.2rem 0.5rem; border-radius: 8px;">
+            <span style="font-size:0.75rem; font-weight:700; color:#4a5568;" class="nav-status-label">Web:</span>
+            <select id="webStatusSelect" onchange="updateWebStatus(this.value)" style="padding:0.2rem; border-radius:4px; border:1px solid #cbd5e1; font-size:0.75rem; font-weight:600; cursor:pointer; background:white; outline:none; color:#334155;">
+                <option value="auto">⏱️ Otomatik</option>
+                <option value="open">🟢 Hep Açık</option>
+                <option value="closed">🔴 Hep Kapalı</option>
+            </select>
+        </div>
         <a href="/" {% if request.path == '/' %}class="active"{% endif %}>Siparişler</a>
         <a href="/kitchen" {% if request.path == '/kitchen' %}class="active"{% endif %}>Mutfak</a>
         <a href="/notes" {% if request.path == '/notes' %}class="active"{% endif %}>📋 Notlar</a>
@@ -78,6 +87,41 @@
         </div>
     </div>
 </nav>
+
+<script>
+    // Web Status Toggle logic
+    document.addEventListener('DOMContentLoaded', async () => {
+        const select = document.getElementById('webStatusSelect');
+        if (!select) return;
+        try {
+            const r = await fetch('/api/pos/store-status');
+            const data = await r.json();
+            if (data.manual_status) {
+                select.value = data.manual_status;
+            }
+        } catch(e) { console.error('Status fetch error', e); }
+    });
+
+    async function updateWebStatus(val) {
+        try {
+            const r = await fetch('/api/pos/store-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ manual_status: val })
+            });
+            const data = await r.json();
+            if(data.success) {
+                console.log('Web durumu güncellendi:', data.manual_status);
+                // Optionally show a toast if available
+                if(typeof showToast === 'function') {
+                    showToast('Web durumu güncellendi: ' + val, 'success', 2000);
+                }
+            }
+        } catch(e) {
+            console.error('Status update error', e);
+        }
+    }
+</script>
 
 <div class="alert-panel" id="alertPanel">
     <div class="alert-panel-header">
