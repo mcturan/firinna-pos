@@ -171,7 +171,7 @@
                     if (!cat.products || cat.products.length === 0) continue;
 
                     html += `
-                        <h2 class="menu-category-title" style="margin-top:32px;"><i class="ph-fill ${cat.icon}" style="color:${cat.color};"></i> ${cat.name}</h2>
+                        <h2 class="menu-category-title" style="margin-top:32px;"><i class="ph-fill ${cat.icon}" style="color:${cat.color};"></i> <span data-i18n="cat_${cat.id}">${cat.name}</span></h2>
                         <div class="menu-grid">
                     `;
 
