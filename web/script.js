@@ -2812,9 +2812,9 @@ function fetchTableStatus() {
 function changeTour(type) {
     const iframe = document.getElementById('tour-iframe');
     if (type === 'interior') {
-        iframe.src = "https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https://pannellum.org/images/alma.jpg&autoLoad=true";
+        iframe.src = "https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https://pannellum.org/images/alma.webp&autoLoad=true";
     } else {
-        iframe.src = "https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https://pannellum.org/images/cerro-toco-0.jpg&autoLoad=true";
+        iframe.src = "https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https://pannellum.org/images/cerro-toco-0.webp&autoLoad=true";
     }
 }
 
@@ -2926,7 +2926,7 @@ function renderDynamicSignatureGallery() {
     let html = '';
     topSigs.forEach(p => {
         const rawImg = p.image_url || p.image || '';
-        const img = (typeof rawImg === 'string' && rawImg.length > 0) ? rawImg : 'food_placeholder.jpg';
+        const img = (typeof rawImg === 'string' && rawImg.length > 0) ? rawImg : 'food_placeholder.webp';
         
         html += `
             <div class="gallery-item" onclick="window.location.href='menu.html?product=${p.id}'" style="cursor:pointer;">
@@ -3154,7 +3154,7 @@ function initOpenFreeMap3D() {
             map.on('load', function() {
                 map.resize();
                 
-                // Add 3D Extruded Buildings (Matching restoranim.net 222.png)
+                // Add 3D Extruded Buildings (Matching restoranim.net 222.webp)
                 try {
                     var layers = map.getStyle().layers;
                     var labelLayerId;

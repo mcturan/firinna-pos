@@ -14,7 +14,7 @@
           "vegetarian"
         ],
         "title": "Geleneksel Menemen",
-        "image_url": "food_menemen_sahanda.jpg"
+        "image_url": "food_menemen_sahanda.webp"
       },
       {
         "id": "m2",
@@ -25,7 +25,7 @@
           "vegetarian"
         ],
         "title": "Kaşarlı Menemen",
-        "image_url": "food_menemen_sahanda.jpg"
+        "image_url": "food_menemen_sahanda.webp"
       },
       {
         "id": "m3",
@@ -35,7 +35,7 @@
           "halal"
         ],
         "title": "Etli / Sucuklu / Tavuklu Menemen",
-        "image_url": "food_menemen_sahanda.jpg"
+        "image_url": "food_menemen_sahanda.webp"
       },
       {
         "id": "m4",
@@ -45,7 +45,7 @@
           "halal"
         ],
         "title": "Karışık Şölen Menemen",
-        "image_url": "food_menemen_sahanda.jpg"
+        "image_url": "food_menemen_sahanda.webp"
       }
     ]
   },
@@ -65,7 +65,7 @@
           "dairy"
         ],
         "title": "Geleneksel Sahanda Omlet",
-        "image_url": "omlet_geleneksel.jpg"
+        "image_url": "omlet_geleneksel.webp"
       },
       {
         "id": "o2",
@@ -77,7 +77,7 @@
           "dairy"
         ],
         "title": "Kaşarlı Omlet",
-        "image_url": "omlet_geleneksel.jpg"
+        "image_url": "omlet_geleneksel.webp"
       },
       {
         "id": "o3",
@@ -88,7 +88,7 @@
           "dairy"
         ],
         "title": "Etli / Sucuklu / Tavuklu Omlet",
-        "image_url": "omlet_sucuklu.jpg"
+        "image_url": "omlet_sucuklu.webp"
       },
       {
         "id": "o4",
@@ -99,7 +99,7 @@
           "dairy"
         ],
         "title": "Karışık Şölen Omlet",
-        "image_url": "omlet_sucuklu.jpg"
+        "image_url": "omlet_sucuklu.webp"
       }
     ]
   },
@@ -120,7 +120,7 @@
           "gluten"
         ],
         "title": "Geleneksel Bazlama Tost",
-        "image_url": "food_bazlama_tost.jpg"
+        "image_url": "food_bazlama_tost.webp"
       },
       {
         "id": "b2",
@@ -132,7 +132,7 @@
           "gluten"
         ],
         "title": "Etli / Sucuklu / Tavuklu Bazlama",
-        "image_url": "food_bazlama_tost.jpg"
+        "image_url": "food_bazlama_tost.webp"
       },
       {
         "id": "b3",
@@ -144,7 +144,7 @@
           "gluten"
         ],
         "title": "İki Seçenekli Bazlama",
-        "image_url": "food_bazlama_tost.jpg"
+        "image_url": "food_bazlama_tost.webp"
       }
     ]
   },
@@ -165,7 +165,7 @@
           "gluten"
         ],
         "title": "Pizza Margarita",
-        "image_url": "pizza_napoliten_v2.jpg"
+        "image_url": "pizza_napoliten_v2.webp"
       },
       {
         "id": "p2",
@@ -177,7 +177,7 @@
           "gluten"
         ],
         "title": "Pizza (Etli / Sucuklu / Tavuklu)",
-        "image_url": "pizza_napoliten_v2.jpg"
+        "image_url": "pizza_napoliten_v2.webp"
       },
       {
         "id": "p3",
@@ -189,7 +189,7 @@
           "gluten"
         ],
         "title": "Full Karışık Pizza",
-        "image_url": "pizza_napoliten_v2.jpg"
+        "image_url": "pizza_napoliten_v2.webp"
       }
     ]
   },
@@ -207,7 +207,7 @@
           "vegan"
         ],
         "title": "Özel Karışım Çay",
-        "image_url": "drink_cay.png"
+        "image_url": "drink_cay.webp"
       },
       {
         "id": "s2",
@@ -217,7 +217,7 @@
           "vegan"
         ],
         "title": "Türk Kahvesi",
-        "image_url": "drink_kahve.png"
+        "image_url": "drink_kahve.webp"
       },
       {
         "id": "s3",
@@ -227,7 +227,7 @@
           "vegan"
         ],
         "title": "Kahve Americano",
-        "image_url": "kahve_uzun_bardak.jpg"
+        "image_url": "kahve_uzun_bardak.webp"
       },
       {
         "id": "s4",
@@ -238,7 +238,7 @@
           "dairy"
         ],
         "title": "Kahve Latte",
-        "image_url": "kahve_uzun_bardak.jpg"
+        "image_url": "kahve_uzun_bardak.webp"
       },
       {
         "id": "s5",
@@ -249,7 +249,7 @@
           "dairy"
         ],
         "title": "Kahve Cappucino",
-        "image_url": "kahve_uzun_bardak.jpg"
+        "image_url": "kahve_uzun_bardak.webp"
       }
     ]
   },
@@ -267,7 +267,7 @@
           "vegan"
         ],
         "title": "Madensuyu",
-        "image_url": "food_madensuyu.jpg"
+        "image_url": "food_madensuyu.webp"
       },
       {
         "id": "c3",
@@ -278,7 +278,7 @@
           "gluten_free"
         ],
         "title": "Hibiscuslu Safranlı Limonata",
-        "image_url": "drink_limonata.png"
+        "image_url": "drink_limonata.webp"
       }
     ]
   },
@@ -299,7 +299,7 @@
           "gluten"
         ],
         "title": "Dondurmalı Sıcak Çikolatalı Kek",
-        "image_url": "cikolatali_kek.jpg"
+        "image_url": "cikolatali_kek.webp"
       }
     ]
   }
