@@ -357,7 +357,7 @@ const i18n = {
         amenity_tea: "☕ Özel Harman Gül Çayı",
         google_review_desc: "Google üzerindeki tüm gerçek misafir yorumlarını ve puanlamaları doğrudan inceleyin.",
         yandex_review_desc: "Yandex Haritalar üzerindeki konum ve değerlendirme kayıtlarını görün.",
-        badge_satisfaction: "Müşteri Memnuniyeti"
+        badge_satisfaction: "Müşteri Memnuniyeti",
     },
     en: {
         category: "Cafe & Restaurant",
@@ -1338,7 +1338,7 @@ const i18n = {
         amenity_tea: "☕ 特制玫瑰花茶",
         google_review_desc: "直接在 Google 上查看所有真实客人评价和评分。",
         yandex_review_desc: "在 Yandex 地图上查看位置和评价记录。",
-        badge_satisfaction: "顾客满意度"
+        badge_satisfaction: "顾客满意度",
         cat_1: "Menemen",
         p_m1: "Geleneksel Menemen",
         desc_m1: "Özel ezilmiş domatesler ve eriyen peynirle hazırlanan ikonik Türk kahvaltısı. (Çakallı usulü)",
