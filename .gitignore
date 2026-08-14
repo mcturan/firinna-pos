@@ -47,3 +47,4 @@ ROADMAP.md
 .claude/worktrees/
 dev_notes/.claude/worktrees/
 pos_data.db
+.git_credentials.json
