@@ -194,7 +194,9 @@
                                         <span style="font-size:1rem; font-weight:800; color:#d97706; display:none;">${p.price || ''}</span>
                                     </div>
                                     <p class="menu-desc" data-i18n="desc_${p.id}">${p.description || ''}</p>
-                                    
+                                    <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px;">
+                                        ${tagsHtml}
+                                    </div>
                                 </div>
                             </div>
                         `;
