@@ -2919,9 +2919,13 @@ function renderDynamicSignatureGallery() {
         }
     }
 
-    const signatures = allProducts.filter(p => p.is_signature || p.title.toLowerCase().includes('menemen') || p.title.toLowerCase().includes('pizza'));
-    // Select top 6
-    const topSigs = signatures.slice(0, 6);
+    const targetIds = ['m1', 'o1', 'p1', 'b1', 's1', 'c3', 't1', 's2'];
+    const topSigs = [];
+    
+    targetIds.forEach(id => {
+        const prod = allProducts.find(p => p.id === id);
+        if (prod) topSigs.push(prod);
+    });
 
     let html = '';
     topSigs.forEach(p => {
