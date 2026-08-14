@@ -1,17 +1,17 @@
 {
-    "today": 8,
-    "month": 120,
-    "total": 120,
+    "today": 11,
+    "month": 123,
+    "total": 123,
     "menu": 3,
     "actions": 27,
     "last_date": "2026-08-14",
     "devices": {
-        "💻 Masaüstü": 79,
-        "📱 Mobil": 41
+        "💻 Masaüstü": 80,
+        "📱 Mobil": 43
     },
     "browsers": {
-        "Google Chrome": 107,
-        "Apple Safari": 5,
+        "Google Chrome": 109,
+        "Apple Safari": 6,
         "Microsoft Edge": 7,
         "Diğer Tarayıcı": 1
     },
@@ -26,10 +26,82 @@
         "Direkt Giriş": 24,
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 3,
-        "🌐 Diğer Web Sitesi": 21,
-        "🔗 Doğrudan (Direct)": 19
+        "🌐 Diğer Web Sitesi": 22,
+        "🔗 Doğrudan (Direct)": 21
     },
     "recent_visitors": [
+        {
+            "id": "log_1786695082749",
+            "time": "14 Ağustos 11:11",
+            "iso_date": "2026-08-14",
+            "raw_time": "2026-08-14 11:11:22",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ ES"
+        },
+        {
+            "id": "log_1786692183841",
+            "time": "14 Ağustos 10:23",
+            "iso_date": "2026-08-14",
+            "raw_time": "2026-08-14 10:23:03",
+            "ip": "54.242.144.178",
+            "country": "📍 Ashburn / United States",
+            "location": "📍 Ashburn / United States",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Apple iOS)",
+            "browser": "Apple Safari",
+            "action": "⏱️ Sitede Kalma (3s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "3 sn",
+            "lang_compare": "EN ➔ EN"
+        },
+        {
+            "id": "log_1786692181041",
+            "time": "14 Ağustos 10:23",
+            "iso_date": "2026-08-14",
+            "raw_time": "2026-08-14 10:23:01",
+            "ip": "54.242.144.178",
+            "country": "📍 Ashburn / United States",
+            "location": "📍 Ashburn / United States",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Apple iOS)",
+            "browser": "Apple Safari",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
+        {
+            "id": "log_1786683528329",
+            "time": "14 Ağustos 07:58",
+            "iso_date": "2026-08-14",
+            "raw_time": "2026-08-14 07:58:48",
+            "ip": "66.249.74.168",
+            "country": "📍 Mountain View / United States",
+            "location": "📍 Mountain View / United States",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
         {
             "id": "log_1786683228043",
             "time": "14 Ağustos 07:53",
@@ -4690,47 +4762,49 @@
             "type": "🔄 Tekrar Gelen Misafir"
         }
     ],
-    "repeat_visitors": 97,
-    "new_visitors": 23,
+    "repeat_visitors": 98,
+    "new_visitors": 25,
     "os": {
-        "Linux": 71,
+        "Linux": 72,
         "Windows PC": 6,
-        "Apple iOS": 5,
-        "Android OS": 36,
+        "Apple iOS": 6,
+        "Android OS": 37,
         "Diğer Sistem": 2
     },
     "peak_hours": {
         "14:00 - 17:00 (İkindi Kahve/Tatlı)": 35,
         "17:00 - 20:00 (Akşam Yemeği)": 45,
         "20:00 - 23:00 (Gece Keyfi)": 26,
-        "23:00 - 08:00 (Gece / Erken)": 14
+        "23:00 - 08:00 (Gece / Erken)": 15,
+        "08:00 - 11:00 (Sabah Kahvaltı)": 1,
+        "11:00 - 14:00 (Öğle Brunch)": 1
     },
     "map_clicks": 1,
     "locations": {
         "📍 İstanbul / Türkiye (Yerel)": 2,
-        "📍 Kartal / Türkiye": 18,
+        "📍 Kartal / Türkiye": 19,
         "📍 Prineville / United States": 1,
         "📍 Kansas City / United States": 1,
         "📍 Istanbul / Türkiye": 4,
         "📍 Şişli / Turkey": 12,
-        "📍 Ashburn / United States": 1,
-        "📍 Mountain View / United States": 5
+        "📍 Ashburn / United States": 2,
+        "📍 Mountain View / United States": 6
     },
     "traffic_sources": {
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 3,
-        "🌐 Diğer Web Sitesi": 21,
-        "🔗 Doğrudan (Direct)": 19
+        "🌐 Diğer Web Sitesi": 22,
+        "🔗 Doğrudan (Direct)": 21
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 43
+        "🌐 Dışarıdan İnceleyen": 46
     },
     "lang_comparisons": {
         "TR ➔ TR": 17,
-        "EN ➔ TR": 12,
+        "EN ➔ TR": 14,
         "EN ➔ EN": 7,
-        "TR ➔ ES": 6,
+        "TR ➔ ES": 7,
         "TR ➔ RU": 2
     }
 }
