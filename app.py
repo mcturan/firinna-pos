@@ -3218,8 +3218,11 @@ if __name__ == '__main__':
         start_telegram_auto_send()
     except:
         pass
+        
+    try:
+        import auto_webp
+        auto_webp.convert_to_webp('/opt/firinna-pos/web')
+    except Exception as e:
+        print("Auto WebP Error:", e)
+        
     app.run(host='0.0.0.0', port=5000, debug=True)
-
-
-import auto_webp
-auto_webp.convert_to_webp('/opt/firinna-pos/web')
