@@ -279,6 +279,27 @@
         ],
         "title": "Hibiscuslu Safranlı Limonata",
         "image_url": "drink_limonata.webp"
+      },
+      {
+        "id": "c4",
+        "price": 200,
+        "description": "Buzlu espresso ve suyun ferahlatıcı buluşması, yanında spesiyal kakaolu kurabiye ikramıyla.",
+        "tags": [
+          "vegan"
+        ],
+        "title": "Buzlu Americano",
+        "image_url": "ice_americano.webp"
+      },
+      {
+        "id": "c5",
+        "price": 220,
+        "description": "Buzlu taze süt ve espressonun serinletici uyumu, yanında spesiyal kakaolu kurabiye ikramıyla.",
+        "tags": [
+          "vegetarian",
+          "dairy"
+        ],
+        "title": "Buzlu Latte",
+        "image_url": "ice_latte.webp"
       }
     ]
   },

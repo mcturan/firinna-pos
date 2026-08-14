@@ -358,6 +358,10 @@ const i18n = {
         google_review_desc: "Google üzerindeki tüm gerçek misafir yorumlarını ve puanlamaları doğrudan inceleyin.",
         yandex_review_desc: "Yandex Haritalar üzerindeki konum ve değerlendirme kayıtlarını görün.",
         badge_satisfaction: "Müşteri Memnuniyeti",
+        p_c4: "Buzlu Americano",
+        desc_c4: "Buzlu espresso ve suyun ferahlatıcı buluşması, yanında spesiyal kakaolu kurabiye ikramıyla.",
+        p_c5: "Buzlu Latte",
+        desc_c5: "Buzlu taze süt ve espressonun serinletici uyumu, yanında spesiyal kakaolu kurabiye ikramıyla.",
     },
     en: {
         category: "Cafe & Restaurant",
@@ -556,6 +560,10 @@ const i18n = {
         whatsapp_manager: "WhatsApp Manager",
         btn_send_msg2: "Send Message",
         filter_dairyfree: "🚫 Dairy-Free",
+        p_c4: "Iced Americano",
+        desc_c4: "Refreshing combination of iced espresso and water, served with a special cocoa cookie.",
+        p_c5: "Iced Latte",
+        desc_c5: "Cooling harmony of fresh iced milk and espresso, served with a special cocoa cookie.",
     },
     es: {
         category: "Cafetería y Restaurante",
@@ -765,6 +773,10 @@ const i18n = {
         desc_tea: "Elaborada con una mezcla premium de té turco y de Ceilán, bergamota y capullos de rosa secos.",
         desc_lemonade: "Limonada fresca casera helada con hibisco, canela, anís estrellado y auténtico azafrán persa.",
         desc_cake: "Suave por dentro, mucho cacao y cubierto con salsa de chocolate caliente, un sabor indispensable.",
+        p_c4: "americano helado",
+        desc_c4: "Refrescante combinación de espresso helado y agua, servida con una galleta de cacao especial.",
+        p_c5: "Latte helado",
+        desc_c5: "Armonía refrescante de leche fresca helada y espresso, servida con una galleta de cacao especial.",
     },
     ru: {
         category: "Кафе и Ресторан",
@@ -974,6 +986,10 @@ const i18n = {
         desc_tea: "Сварен из премиальной смеси турецкого и цейлонского чая, бергамота и сушеных бутонов роз.",
         desc_lemonade: "Ледяной домашний свежий лимонад, наполненный гибискусом, корицей, звездчатым анисом и настоящим персидским шафраном.",
         desc_cake: "Мягкий внутри, много какао и покрыт горячим шоколадным соусом, незаменимый вкус.",
+        p_c4: "Ледяной американо",
+        desc_c4: "Освежающее сочетание ледяного эспрессо и воды, подается со специальным печеньем какао.",
+        p_c5: "Ледяной латте",
+        desc_c5: "Охлаждающая гармония свежего замороженного молока и эспрессо, подаваемого со специальным печеньем какао.",
     },
     ar: {
         category: "مقهى ومطعم",
@@ -1183,6 +1199,10 @@ const i18n = {
         desc_tea: "مخمر بمزيج فاخر من الشاي التركي والسيلاني والبرغموت وبراعم الورد المجففة.",
         desc_lemonade: "عصير ليمون طازج منزلي الصنع مثلج ومملوء بالكركديه والقرفة واليانسون والزعفران الفارسي الأصيل.",
         desc_cake: "طرية من الداخل، كثيرة الكاكاو، ومغطاة بصوص الشوكولاتة الساخنة، طعم لا غنى عنه.",
+        p_c4: "أمريكانو مثلج",
+        desc_c4: "مزيج منعش من الإسبريسو المثلج والماء، يقدم مع كوكيز الكاكاو الخاصة.",
+        p_c5: "لاتيه مثلج",
+        desc_c5: "مزيج من الحليب المثلج الطازج والإسبريسو، يقدم مع كوكيز الكاكاو الخاصة.",
     },
     zh: {
         category: "咖啡厅与餐厅",
@@ -1396,6 +1416,10 @@ const i18n = {
         tag_halal: "清真",
         tag_dairy: "乳制品",
         tag_vegetarian: "素食",
+        p_c4: "冰美式咖啡",
+        desc_c4: "冰镇浓缩咖啡和水的清爽组合，搭配特殊的可可饼干。",
+        p_c5: "冰拿铁",
+        desc_c5: "新鲜冰牛奶和浓缩咖啡的清凉和谐，搭配特殊的可可饼干。",
     },
     uk: {
         category: "Кафе та ресторан",
@@ -1607,6 +1631,10 @@ const i18n = {
         tag_halal: "халяль",
         tag_dairy: "Молочний продукт",
         tag_vegetarian: "Вегетаріанська",
+        p_c4: "Американо з льодом",
+        desc_c4: "Освіжаюче поєднання холодного еспресо та води, подається з особливим какао-печивом.",
+        p_c5: "Холодний латте",
+        desc_c5: "Охолоджуюча гармонія свіжого молока з льодом і еспресо, подається з особливим какао-печивом.",
     },
     de: {
         category: "Café & Restaurant",
@@ -1818,6 +1846,10 @@ const i18n = {
         tag_halal: "Halal",
         tag_dairy: "Milchprodukt",
         tag_vegetarian: "Vegetarier",
+        p_c4: "Eisgekühlter Americano",
+        desc_c4: "Erfrischende Kombination aus Eisespresso und Wasser, serviert mit einem speziellen Kakaokeks.",
+        p_c5: "Geeiste Latte",
+        desc_c5: "Kühlende Harmonie aus frischer Eismilch und Espresso, serviert mit einem speziellen Kakaokeks.",
     },
     fr: {
         category: "Café et restaurant",
@@ -2029,6 +2061,10 @@ const i18n = {
         tag_halal: "halal",
         tag_dairy: "Produit laitier",
         tag_vegetarian: "Végétarien",
+        p_c4: "Américain glacé",
+        desc_c4: "Combinaison rafraîchissante d'espresso glacé et d'eau, servie avec un biscuit spécial au cacao.",
+        p_c5: "Latté glacé",
+        desc_c5: "Harmonie rafraîchissante de lait frais glacé et d'espresso, servie avec un biscuit spécial au cacao.",
     },
     fa: {
         category: "کافه و رستوران",
@@ -2240,6 +2276,10 @@ const i18n = {
         tag_halal: "حلال",
         tag_dairy: "محصولات لبنی",
         tag_vegetarian: "گیاهخواری",
+        p_c4: "آمریکانو یخی",
+        desc_c4: "ترکیبی با طراوت از اسپرسو سرد و آب، همراه با کوکی مخصوص کاکائویی سرو می شود.",
+        p_c5: "آیس لاته",
+        desc_c5: "هارمونی خنک کننده شیر یخی تازه و اسپرسو، همراه با کوکی مخصوص کاکائویی سرو می شود.",
     },
     it: {
         category: "Caffetteria e ristorante",
@@ -2451,6 +2491,10 @@ const i18n = {
         tag_halal: "halal",
         tag_dairy: "Prodotto lattiero-caseario",
         tag_vegetarian: "Vegetariano",
+        p_c4: "Americano ghiacciato",
+        desc_c4: "Combinazione rinfrescante di caffè espresso ghiacciato e acqua, servita con uno speciale biscotto al cacao.",
+        p_c5: "Latte ghiacciato",
+        desc_c5: "Raffinata armonia di latte fresco ghiacciato ed espresso, servita con uno speciale biscotto al cacao.",
     }
 };
 
@@ -2919,7 +2963,7 @@ function renderDynamicSignatureGallery() {
         }
     }
 
-    const targetIds = ['m1', 'o1', 'p1', 'b1', 's1', 'c3', 't1', 's2'];
+    const targetIds = ['m1', 'o1', 'p1', 'b1', 's1', 'c3', 't1', 's2', 's3', 's5', 'c4', 'c5'];
     const topSigs = [];
     
     targetIds.forEach(id => {
