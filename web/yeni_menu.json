@@ -11,7 +11,8 @@
         "description": "Özel ezilmiş domatesler ve eriyen peynirle hazırlanan ikonik Türk kahvaltısı. (Çakallı usulü)",
         "tags": [
           "halal",
-          "vegetarian"
+          "vegetarian",
+          "dairy"
         ],
         "title": "Geleneksel Menemen",
         "image_url": "food_menemen_sahanda.webp"
@@ -22,7 +23,8 @@
         "description": "Ekstra bol kaşar peynirli ikonik Türk menemeni.",
         "tags": [
           "halal",
-          "vegetarian"
+          "vegetarian",
+          "dairy"
         ],
         "title": "Kaşarlı Menemen",
         "image_url": "food_menemen_sahanda.webp"
@@ -32,7 +34,8 @@
         "price": 320,
         "description": "Geleneksel menemen tabanının üzerine; özel marine edilmiş yaprak Et Döner, Tavuk Döner veya Sucuk.",
         "tags": [
-          "halal"
+          "halal",
+          "dairy"
         ],
         "title": "Etli / Sucuklu / Tavuklu Menemen",
         "image_url": "food_menemen_sahanda.webp"
@@ -42,7 +45,8 @@
         "price": 380,
         "description": "Seçtiğiniz iki farklı proteinin sıcak menemenle efsanevi buluşması.",
         "tags": [
-          "halal"
+          "halal",
+          "dairy"
         ],
         "title": "Karışık Şölen Menemen",
         "image_url": "food_menemen_sahanda.webp"
@@ -116,8 +120,8 @@
         "tags": [
           "halal",
           "vegetarian",
-          "dairy",
-          "gluten"
+          "gluten",
+          "dairy"
         ],
         "title": "Geleneksel Bazlama Tost",
         "image_url": "food_bazlama_tost.webp"
@@ -128,8 +132,8 @@
         "description": "Kaşar peynirine ek olarak tercih ettiğiniz proteinle zenginleştirilmiş tost",
         "tags": [
           "halal",
-          "dairy",
-          "gluten"
+          "gluten",
+          "dairy"
         ],
         "title": "Etli / Sucuklu / Tavuklu Bazlama",
         "image_url": "food_bazlama_tost.webp"
@@ -140,8 +144,8 @@
         "description": "İstediğiniz iki protein seçeneği ve bol kaşar",
         "tags": [
           "halal",
-          "dairy",
-          "gluten"
+          "gluten",
+          "dairy"
         ],
         "title": "İki Seçenekli Bazlama",
         "image_url": "food_bazlama_tost.webp"
@@ -161,8 +165,8 @@
         "tags": [
           "halal",
           "vegetarian",
-          "dairy",
-          "gluten"
+          "gluten",
+          "dairy"
         ],
         "title": "Pizza Margarita",
         "image_url": "pizza_napoliten_v2.webp"
@@ -173,8 +177,8 @@
         "description": "Margarita tabanı üzerine dilediğiniz özel lezzet: Özel marine Et Döner, Tavuk Döner veya Sucuk.",
         "tags": [
           "halal",
-          "dairy",
-          "gluten"
+          "gluten",
+          "dairy"
         ],
         "title": "Pizza (Etli / Sucuklu / Tavuklu)",
         "image_url": "pizza_napoliten_v2.webp"
@@ -185,8 +189,8 @@
         "description": "Et, sucuk, tavuk ve bol mozzarella ile fırınlanmış efsane pizza",
         "tags": [
           "halal",
-          "dairy",
-          "gluten"
+          "gluten",
+          "dairy"
         ],
         "title": "Full Karışık Pizza",
         "image_url": "pizza_napoliten_v2.webp"
@@ -274,8 +278,8 @@
         "price": 180,
         "description": "Buz gibi limonata temeli üzerinde; tarçın, hibiscus ve İran safranının eşsiz birleşimiyle hazırlanan özel iksir.",
         "tags": [
-          "vegan",
-          "gluten_free"
+          "gluten_free",
+          "vegan"
         ],
         "title": "Hibiscuslu Safranlı Limonata",
         "image_url": "drink_limonata.webp"
@@ -316,8 +320,8 @@
         "tags": [
           "halal",
           "vegetarian",
-          "dairy",
-          "gluten"
+          "gluten",
+          "dairy"
         ],
         "title": "Dondurmalı Sıcak Çikolatalı Kek",
         "image_url": "cikolatali_kek.webp"
