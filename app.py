@@ -827,6 +827,10 @@ def api_pos_store_status():
     data = request.json
     new_status = data.get('manual_status', 'auto')
     settings['manual_status'] = new_status
+    if new_status != 'auto':
+        settings['manual_status_time'] = datetime.now().timestamp()
+    else:
+        settings.pop('manual_status_time', None)
     try:
         with open(SETTINGS_FILE, 'w') as f:
             json.dump(settings, f, indent=4, ensure_ascii=False)
@@ -2590,21 +2594,46 @@ def get_store_status():
     current_hm = now.strftime("%H:%M")
 
     today_cfg = daily_hours.get(current_day_tr, {"open": "08:30", "close": "23:00", "active": True})
+    open_str = today_cfg.get('open', '08:30')
+    close_str = today_cfg.get('close', '23:00')
+
+    # 1. Check for open tables implicitly keeping the store open
+    has_open_tables = False
+    try:
+        tables = db.get_tables()
+        for t in tables:
+            if db.get_table_order(t['id']):
+                has_open_tables = True
+                break
+    except: pass
+
+    if has_open_tables:
+        manual_status = 'open'
+    
+    # 2. Check 2-hour timeout or auto-open time crossover for manual status
+    if manual_status != 'auto' and not has_open_tables:
+        set_time = settings.get('manual_status_time', 0)
+        if set_time:
+            dt_set = datetime.fromtimestamp(set_time)
+            # Timeout (2 hours)
+            if (now.timestamp() - set_time) > 2 * 3600:
+                manual_status = 'auto'
+            # Crossover to auto open time (e.g. set closed at 07:00, but 08:30 has arrived)
+            elif dt_set.strftime("%H:%M") < open_str <= current_hm:
+                manual_status = 'auto'
 
     if manual_status == 'closed':
         is_open = False
         badge = "🔴 ŞU AN KAPALI (Geçici Olarak Kapalı)"
     elif manual_status == 'open':
         is_open = True
-        badge = f"🟢 ŞU AN AÇIK ({today_cfg.get('close', '23:00')}'e Kadar)"
+        badge = f"🟢 ŞU AN AÇIK ({close_str}'e Kadar)"
     else:
         # Automatic calculation based on current time & daily schedule
         if not today_cfg.get('active', True):
             is_open = False
             badge = "🔴 ŞU AN KAPALI (Bugün Kapalı)"
         else:
-            open_str = today_cfg.get('open', '08:30')
-            close_str = today_cfg.get('close', '23:00')
             if open_str <= current_hm <= close_str:
                 is_open = True
                 badge = f"🟢 ŞU AN AÇIK ({close_str}'e Kadar)"

@@ -19,6 +19,17 @@
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
             <div class="zone-tabs" id="zoneTabs" style="display:none; margin-bottom:0;"></div>
             <div style="margin-left:auto; display:flex; align-items:center; gap:0.5rem;">
+                <!-- Web Status Toggle -->
+                <div style="display:inline-flex; align-items:center; gap:0.4rem; padding:0.45rem 0.6rem; background:white; border:1.5px solid #cbd5e1; border-radius:10px; font-weight:700; color:#334155; font-size:0.84rem; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+                    <span style="font-size:1rem;">🌐</span>
+                    <span>Web:</span>
+                    <select id="webStatusSelect" onchange="updateWebStatus(this.value)" style="border:none; outline:none; background:transparent; font-weight:700; color:#2563eb; cursor:pointer; font-family:inherit; font-size:0.84rem;">
+                        <option value="auto">⏱️ Otomatik</option>
+                        <option value="open">🟢 Manuel Açık</option>
+                        <option value="closed">🔴 Manuel Kapalı</option>
+                    </select>
+                </div>
+
                 <button onclick="openQuickNotePrintModal()" style="display:inline-flex; align-items:center; gap:0.4rem; padding:0.45rem 0.9rem; background:white; border:1.5px solid #cbd5e1; border-radius:10px; font-weight:700; color:#334155; font-size:0.84rem; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.03); transition:all 0.2s;" onmouseover="this.style.borderColor='#94a3b8'; this.style.background='#f8fafc';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='white';">
                     <span style="font-size:1rem;">📋</span>
                     <span>Hızlı Not Fişi</span>
@@ -2372,6 +2383,44 @@ async function doMerge(targetTableId, targetTableName) {
         });
     });
 </script>
+    <script>
+        // Web Status Toggle Logic
+        document.addEventListener('DOMContentLoaded', async () => {
+            const select = document.getElementById('webStatusSelect');
+            if (!select) return;
+            try {
+                const r = await fetch('/api/pos/store-status');
+                const data = await r.json();
+                if (data.manual_status) {
+                    select.value = data.manual_status;
+                }
+            } catch(e) { console.error('Status fetch error', e); }
+        });
+
+        async function updateWebStatus(val) {
+            try {
+                const r = await fetch('/api/pos/store-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ manual_status: val })
+                });
+                const data = await r.json();
+                if(data.success) {
+                    if(typeof showToast === 'function') {
+                        showToast('Web durumu güncellendi: ' + selectOptionText(val), 'success', 2000);
+                    }
+                }
+            } catch(e) {
+                console.error('Status update error', e);
+            }
+        }
+        function selectOptionText(val) {
+            if(val==='auto') return 'Otomatik';
+            if(val==='open') return 'Manuel Açık';
+            if(val==='closed') return 'Manuel Kapalı';
+            return val;
+        }
+    </script>
 </body>
 </html>
 <script>
