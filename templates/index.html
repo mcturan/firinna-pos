@@ -143,9 +143,8 @@
                             </button>
                         </div>
                         <button class="btn" onclick="cancelOrder()" style="background:#f56565;color:white;width:100%;">🗑️ Fiş İptal</button>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin-top: 0.5rem;">
                             <button class="btn" onclick="openTransferModal()" style="background:#718096;color:white;" title="Tüm masayı taşı">↔ Masayı Taşı</button>
-                            <button class="btn" onclick="openItemSplitModal()" style="background:#718096;color:white;" title="Seçilen ürünleri yeni bir adisyona (Part 2 vb.) ayır">✂ Adisyonu Böl</button>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin-top: 0.5rem;">
                             <button class="btn" onclick="openMergeModal()" style="background:#718096;color:white;" title="Siparişleri Birleştir">⊕ Birleştir</button>
@@ -401,12 +400,7 @@
                         </button>
                     </div>
 
-                    <!-- Eşit Bölme -->
-                    <div style="display:flex;gap:.3rem;margin-bottom:0.1rem;">
-                        <button onclick="splitRemaining(2)" style="flex:1;padding:.4rem;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#475569;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .14s;">1/2</button>
-                        <button onclick="splitRemaining(3)" style="flex:1;padding:.4rem;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#475569;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .14s;">1/3</button>
-                        <button onclick="splitRemaining(4)" style="flex:1;padding:.4rem;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#475569;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .14s;">1/4</button>
-                    </div>
+
 
                     <!-- Numpad -->
                     <div class="pay-numpad">
@@ -1191,6 +1185,7 @@
         }
 
         function setNumpadTarget(t) {
+            if (numpadTarget === t) return;
             numpadTarget = t;
             document.getElementById('btnNumpadTutar').style.background = t === 'amount' ? 'var(--ink)' : 'transparent';
             document.getElementById('btnNumpadTutar').style.color      = t === 'amount' ? '#fff' : 'var(--ink-2)';
@@ -1198,7 +1193,7 @@
             document.getElementById('btnNumpadBahsis').style.color     = t === 'tip' ? '#fff' : 'var(--ink-2)';
             if (t === 'amount') {
                 const tip = parseFloat(document.getElementById('tipAmount').value)||0;
-                document.getElementById('payEntryAmount').value = (currentOrder.total + tip).toFixed(2);
+                document.getElementById('payEntryAmount').value = (getRemainingAmount() + tip).toFixed(2);
                 manualAmountOverride = false;
             } else {
                 document.getElementById('payEntryAmount').value = document.getElementById('tipAmount').value;
@@ -1219,7 +1214,7 @@
             const amt = parseFloat(amtInp.value);
             if (!amt || amt <= 0) return showToast('Geçerli tutar girin', 'warn');
             
-            payEntries.push({ amount: amt, method: payEntryType });
+            payEntries.push({ amount: amt, type: payEntryType, method: payEntryType });
             updatePayRemaining();
             
             amtInp.value = '';
@@ -1422,16 +1417,7 @@
             }
             quickExact();
         }
-        
-        function splitRemaining(parts) {
-            setNumpadTarget('amount');
-            const remaining = getRemainingAmount();
-            if (remaining > 0) {
-                const fraction = (remaining / parts).toFixed(2);
-                document.getElementById('payEntryAmount').value = fraction;
-                manualAmountOverride = true;
-            }
-        }
+
 
         function closePaymentModal() {
             document.getElementById('paymentModal').style.display = 'none';
@@ -1480,109 +1466,7 @@
             section.style.display = section.style.display === 'none' ? 'block' : 'none';
         }
 
-        async function calculateSplit(numPeople) {
-            const total = getRemainingAmount();
-            const perPerson = total / numPeople;
-            setEntryAmount(perPerson);
-            showToast(`Hesap ${numPeople} parçaya bölündü. (${fmtTL(perPerson)})`, 'success');
-        }
-        function openItemSplitModal() {
-            const list = document.getElementById('itemSplitList');
-            if (!currentOrder || !currentOrder.items) return;
-            
-            list.innerHTML = currentOrder.items.map(i =>
-                `<div style="display:flex;align-items:center;gap:.5rem;padding:.5rem;border-bottom:1px solid var(--border);">
-                    <button class="btn" style="padding:0.4rem 0.8rem; background:#ed8936; color:white; font-size:1.2rem; font-weight:bold;" onclick="changeSplitQty(this, -1)">-</button>
-                    <input type="number" class="item-split-qty" data-id="${i.id}" data-price="${i.price||0}" data-complimentary="${i.is_complimentary ? '1' : '0'}" value="0" min="0" max="${i.quantity}" oninput="recalcItemSplitTotal()" onchange="recalcItemSplitTotal()" style="width:50px;padding:.4rem;border:2px solid #ccc;border-radius:8px;text-align:center;font-size:1.1rem;font-weight:bold;" readonly>
-                    <button class="btn" style="padding:0.4rem 0.8rem; background:#48bb78; color:white; font-size:1.2rem; font-weight:bold;" onclick="changeSplitQty(this, 1)">+</button>
-                    <span style="flex:1;cursor:pointer;font-size:1.1rem;margin-left:0.5rem;" onclick="toggleItemSplitQty(this)">${i.product_name||i.name||''} (Max: ${i.quantity})</span>
-                    <span style="font-weight:600;font-size:1.1rem;">${i.is_complimentary ? 'İkram' : fmtTL(i.price||0)}</span>
-                </div>`
-            ).join('');
-            
-            recalcItemSplitTotal();
-            document.getElementById('itemSplitModal').style.display = 'flex';
-        }
 
-        function changeSplitQty(btn, delta) {
-            const container = btn.parentElement;
-            const inp = container.querySelector('.item-split-qty');
-            let val = parseInt(inp.value) || 0;
-            let max = parseInt(inp.max) || 0;
-            val += delta;
-            if (val > max) val = max;
-            if (val < 0) val = 0;
-            inp.value = val;
-            recalcItemSplitTotal();
-        }
-
-        function toggleItemSplitQty(spanEl) {
-            const container = spanEl.parentElement;
-            const inp = container.querySelector('.item-split-qty');
-            if (parseInt(inp.value) > 0) inp.value = 0;
-            else inp.value = inp.max;
-            recalcItemSplitTotal();
-        }
-
-        function recalcItemSplitTotal() {
-            let total = 0;
-            document.querySelectorAll('.item-split-qty').forEach(inp => {
-                let max = parseInt(inp.max);
-                let val = parseInt(inp.value);
-                if(isNaN(val)) val = 0;
-                if(val > max) { val = max; inp.value = max; }
-                if(val < 0) { val = 0; inp.value = 0; }
-                if (inp.dataset.complimentary !== '1') {
-                    total += parseFloat(inp.dataset.price) * val;
-                }
-            });
-            document.getElementById('itemSplitTotal').textContent = total.toFixed(2) + ' TL';
-            return total;
-        }
-
-        async function applyItemSplit() {
-            const inputs = document.querySelectorAll('.item-split-qty');
-            let itemsToMove = [];
-            inputs.forEach(inp => {
-                const qty = parseInt(inp.value)||0;
-                if (qty > 0) {
-                    itemsToMove.push({id: inp.dataset.id, quantity: qty});
-                }
-            });
-
-            if (itemsToMove.length === 0) {
-                return showToast('Aktarılacak ürün seçmediniz!', 'warn');
-            }
-
-            const btn = document.querySelector('#itemSplitModal .btn-success');
-            if (btn) { btn.disabled = true; btn.textContent = 'Bölünüyor...'; }
-
-            try {
-                const res = await fetch(`/api/orders/${currentOrder.id}/split-ticket`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({items: itemsToMove})
-                }).then(r => r.json());
-
-                if (res.success) {
-                    showToast('Adisyon başarıyla bölündü!', 'success');
-                    document.getElementById('itemSplitModal').style.display = 'none';
-                    
-                    refreshZone();
-                    if (res.source_deleted) {
-                        document.getElementById('orderModal').style.display = 'none';
-                    } else {
-                        openTable(currentTable, document.getElementById('modalTableName').textContent);
-                    }
-                } else {
-                    showToast('Hata: ' + res.error, 'error');
-                }
-            } catch (e) {
-                showToast('Hata oluştu', 'error');
-            }
-            
-            if (btn) { btn.disabled = false; btn.textContent = 'Böl ve Yeni Adisyon Aç'; }
-        }
 
         function updateOrderSummary() {
             const orderItems = document.getElementById('orderItems');
@@ -1597,57 +1481,29 @@
             }
             
             let subtotal = 0;
-            const parts = {};
-            currentOrder.items.forEach(item => {
-                const p = item.part_no || 1;
-                if (!parts[p]) parts[p] = { items: [], total: 0 };
-                parts[p].items.push(item);
+            orderItems.innerHTML = currentOrder.items.map(item => {
                 if (!item.is_complimentary) {
-                    const lineTotal = item.quantity * item.price;
-                    parts[p].total += lineTotal;
-                    subtotal += lineTotal;
+                    subtotal += item.quantity * item.price;
                 }
-            });
-            
-            const partKeys = Object.keys(parts).map(k=>parseInt(k)).sort();
-            const multiPart = partKeys.length > 1;
-            
-            orderItems.innerHTML = partKeys.map(p => {
-                const partHtml = parts[p].items.map(item => {
-                    const itemTotal = item.is_complimentary ? 0 : (item.quantity * item.price);
-                    return `
-                    <div class="order-item">
-                        <div class="order-item-info">
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <button class="btn-delete" onclick="changeQuantity(${item.id}, -1)" style="background: #ed8936; padding: 0.25rem 0.5rem;">-</button>
-                                <strong>${item.quantity}x</strong>
-                                <button class="btn-delete" onclick="changeQuantity(${item.id}, 1)" style="background: #48bb78; padding: 0.25rem 0.5rem;">+</button>
-                                <span>${item.product_name || 'Özel Ürün'} ${item.is_complimentary ? '(İKRAM)' : ''}</span>
-                            </div>
-                            ${item.kitchen_notes ? `<div style="font-size: 0.85rem; color: #718096; margin-top: 0.25rem;">📝 ${item.kitchen_notes}</div>` : ''}
+                const itemTotal = item.is_complimentary ? 0 : (item.quantity * item.price);
+                return `
+                <div class="order-item">
+                    <div class="order-item-info">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button class="btn-delete" onclick="changeQuantity(${item.id}, -1)" style="background: #ed8936; padding: 0.25rem 0.5rem;">-</button>
+                            <strong>${item.quantity}x</strong>
+                            <button class="btn-delete" onclick="changeQuantity(${item.id}, 1)" style="background: #48bb78; padding: 0.25rem 0.5rem;">+</button>
+                            <span>${item.product_name || 'Özel Ürün'} ${item.is_complimentary ? '(İKRAM)' : ''}</span>
                         </div>
-                        <div class="order-item-price">
-                            ${fmtTL(itemTotal)}
-                            <button class="btn-delete" onclick="openEditItem(${item.id}, '${item.product_name || 'Özel Ürün'}')" style="background: #667eea;">✏️</button>
-                            <button class="btn-delete" onclick="deleteItem(${item.id})">🗑️</button>
-                        </div>
+                        ${item.kitchen_notes ? `<div style="font-size: 0.85rem; color: #718096; margin-top: 0.25rem;">📝 ${item.kitchen_notes}</div>` : ''}
                     </div>
-                    `;
-                }).join('');
-                
-                if (multiPart) {
-                    return `
-                        <div style="margin-bottom: 1rem;">
-                            <div style="background:#e2e8f0; padding:0.25rem 0.5rem; font-weight:bold; font-size:0.85rem; display:flex; justify-content:space-between; margin-bottom: 0.5rem; border-radius: 4px;">
-                                <span>Adisyon Bölüm ${p}</span>
-                                <span>${fmtTL(parts[p].total)}</span>
-                            </div>
-                            ${partHtml}
-                        </div>
-                    `;
-                } else {
-                    return partHtml;
-                }
+                    <div class="order-item-price">
+                        ${fmtTL(itemTotal)}
+                        <button class="btn-delete" onclick="openEditItem(${item.id}, '${item.product_name || 'Özel Ürün'}')" style="background: #667eea;">✏️</button>
+                        <button class="btn-delete" onclick="deleteItem(${item.id})">🗑️</button>
+                    </div>
+                </div>
+                `;
             }).join('');
 
             orderSubtotal.textContent = fmtTL(subtotal);
@@ -2556,25 +2412,7 @@ async function doMerge(targetTableId, targetTableName) {
             return val;
         }
     </script>
-    <!-- Ürün Seçerek Böl Modal -->
-    <div id="itemSplitModal" class="modal-overlay">
-        <div class="modal" style="max-width:500px;">
-            <h3 style="margin-top:0;">✂️ Adisyonu Böl (Ürün Seçerek)</h3>
-            <div style="background-color: #ebf8ff; color: #2b6cb0; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem;">
-                <strong>Nasıl yapılır?</strong><br/>
-                Ayrılmasını istediğiniz ürünlerin yanındaki <b style="color:#48bb78">[+]</b> tuşuna basarak (veya doğrudan ürün adına dokunarak) seçin. Seçtiğiniz ürünler adisyonda "Ödeme 2, Ödeme 3" gibi ayrı gruplara ayrılır.
-            </div>
-            <div id="itemSplitList" style="max-height:350px;overflow-y:auto;margin-bottom:1rem;"></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:1.3rem;margin-bottom:1rem;background:#f7fafc;padding:0.75rem;border-radius:8px;border:1px solid #e2e8f0;">
-                <span>Aktarılacak Tutar:</span>
-                <span id="itemSplitTotal" style="color:#2b6cb0;">0.00 TL</span>
-            </div>
-            <div style="display:flex;gap:.75rem;">
-                <button class="btn btn-secondary" style="flex:1;font-size:1.1rem;padding:0.75rem;" onclick="document.getElementById('itemSplitModal').style.display='none'">İptal</button>
-                <button class="btn btn-success" style="flex:2;font-size:1.1rem;padding:0.75rem;background:#2b6cb0;" onclick="applyItemSplit()">Seçilenleri Yeni Bölüme Aktar</button>
-            </div>
-        </div>
-    </div>
+
 </body>
 </html>
 <script>
