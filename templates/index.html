@@ -1207,7 +1207,6 @@
                 const tip = parseFloat(document.getElementById('tipAmount').value)||0;
                 document.getElementById('payEntryAmount').value = (currentOrder.total + tip).toFixed(2);
                 manualAmountOverride = false;
-                recalcSelectedPayTotal();
             } else {
                 document.getElementById('payEntryAmount').value = document.getElementById('tipAmount').value;
                 manualAmountOverride = true;
