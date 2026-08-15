@@ -842,8 +842,6 @@
                 const tkwDur = tkwHasOrder ? calcDuration(tkw.order_started_at) : null;
                 const tkwStatusStyle = tkwHasOrder ? 'background:#fed7d7; border-color:#e53e3e;' : '';
                 
-                const extraTables = tables.filter(t => t !== m1 && t !== m2 && t !== m3 && t !== m4 && (!tkw || t.id !== tkw.id));
-
                 tablesGrid.innerHTML = `
                     <div class="blueprint-wrapper">
                         <img id="blueprintLogo" src="/static/uploads/logo.png" onerror="this.style.display='none'" alt="Logo" class="blueprint-logo">
@@ -868,28 +866,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    ${extraTables.length > 0 ? `
-                    <div style="margin-top: 2rem; padding-top: 1rem;">
-                        <h3 style="color: var(--ink-2); margin-bottom: 1rem; font-size: 1rem; text-align: center; font-weight: 600;">Ayrılmış / Ek Adisyonlar</h3>
-                        <div class="tables-grid">
-                            ${extraTables.map(table => {
-                                const hasOrder = table.has_order > 0;
-                                const status = hasOrder ? 'occupied' : 'empty';
-                                const dur = hasOrder ? calcDuration(table.order_started_at) : null;
-                                const displayName = table.name.toUpperCase().includes('MASA') ? table.name.toUpperCase() : 'MASA ' + table.name.toUpperCase();
-                                return `
-                                    <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
-                                        ${dur ? `<span class="dur-badge ${dur.cls}">${dur.text}</span>` : ''}
-                                        <div class="table-icon">🍽️</div>
-                                        <div class="table-name" style="font-size:0.9rem;">${displayName}${table.table_note ? ' 📝' : ''}</div>
-                                        ${hasOrder ? `<div class="table-total">${fmtTL(table.order_total||0)}</div>` : ''}
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                    ` : ''}
                 `;
             } else {
                 tablesGrid.style.display = 'grid'; // Enable grid layout for others
@@ -1308,12 +1284,41 @@
             document.getElementById('paymentModalTitle').textContent = 'Ödeme Al — ' + (currentOrder.table_name || '');
             const list = document.getElementById('payItemsList');
             if (currentOrder && currentOrder.items) {
-                list.innerHTML = currentOrder.items.map(i =>
-                    `<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid var(--border);">
-                        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.quantity}x ${i.product_name||i.name||''}</span>
-                        <span style="font-weight:600;flex-shrink:0;margin-left:.5rem;">${i.is_complimentary ? 'İkram' : fmtTL(i.quantity * (i.price||0))}</span>
-                    </div>`
-                ).join('');
+                const parts = {};
+                currentOrder.items.forEach(item => {
+                    const p = item.part_no || 1;
+                    if (!parts[p]) parts[p] = { items: [], total: 0 };
+                    parts[p].items.push(item);
+                    if (!item.is_complimentary) {
+                        parts[p].total += item.quantity * (item.price || 0);
+                    }
+                });
+                
+                const partKeys = Object.keys(parts).map(k=>parseInt(k)).sort();
+                const multiPart = partKeys.length > 1;
+                
+                list.innerHTML = partKeys.map(p => {
+                    const partHtml = parts[p].items.map(i =>
+                        `<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid var(--border);">
+                            <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.quantity}x ${i.product_name||i.name||''}</span>
+                            <span style="font-weight:600;flex-shrink:0;margin-left:.5rem;">${i.is_complimentary ? 'İkram' : fmtTL(i.quantity * (i.price||0))}</span>
+                        </div>`
+                    ).join('');
+                    
+                    if (multiPart) {
+                        return `
+                            <div style="margin-bottom: 0.75rem;">
+                                <div style="background:#e2e8f0; padding:0.25rem 0.5rem; font-weight:bold; font-size:0.8rem; display:flex; justify-content:space-between; margin-bottom: 0.25rem; border-radius: 4px;">
+                                    <span>Ödeme ${p}</span>
+                                    <span>${fmtTL(parts[p].total)}</span>
+                                </div>
+                                ${partHtml}
+                            </div>
+                        `;
+                    } else {
+                        return partHtml;
+                    }
+                }).join('');
             }
             document.getElementById('payTipRow').style.display = 'none';
             updatePayRemaining();
@@ -1559,32 +1564,58 @@
             }
             
             let subtotal = 0;
+            const parts = {};
             currentOrder.items.forEach(item => {
+                const p = item.part_no || 1;
+                if (!parts[p]) parts[p] = { items: [], total: 0 };
+                parts[p].items.push(item);
                 if (!item.is_complimentary) {
-                    subtotal += item.quantity * item.price;
+                    const lineTotal = item.quantity * item.price;
+                    parts[p].total += lineTotal;
+                    subtotal += lineTotal;
                 }
             });
             
-            orderItems.innerHTML = currentOrder.items.map(item => {
-                const itemTotal = item.is_complimentary ? 0 : (item.quantity * item.price);
-                return `
-                <div class="order-item">
-                    <div class="order-item-info">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <button class="btn-delete" onclick="changeQuantity(${item.id}, -1)" style="background: #ed8936; padding: 0.25rem 0.5rem;">-</button>
-                            <strong>${item.quantity}x</strong>
-                            <button class="btn-delete" onclick="changeQuantity(${item.id}, 1)" style="background: #48bb78; padding: 0.25rem 0.5rem;">+</button>
-                            <span>${item.product_name || 'Özel Ürün'} ${item.is_complimentary ? '(İKRAM)' : ''}</span>
+            const partKeys = Object.keys(parts).map(k=>parseInt(k)).sort();
+            const multiPart = partKeys.length > 1;
+            
+            orderItems.innerHTML = partKeys.map(p => {
+                const partHtml = parts[p].items.map(item => {
+                    const itemTotal = item.is_complimentary ? 0 : (item.quantity * item.price);
+                    return `
+                    <div class="order-item">
+                        <div class="order-item-info">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <button class="btn-delete" onclick="changeQuantity(${item.id}, -1)" style="background: #ed8936; padding: 0.25rem 0.5rem;">-</button>
+                                <strong>${item.quantity}x</strong>
+                                <button class="btn-delete" onclick="changeQuantity(${item.id}, 1)" style="background: #48bb78; padding: 0.25rem 0.5rem;">+</button>
+                                <span>${item.product_name || 'Özel Ürün'} ${item.is_complimentary ? '(İKRAM)' : ''}</span>
+                            </div>
+                            ${item.kitchen_notes ? `<div style="font-size: 0.85rem; color: #718096; margin-top: 0.25rem;">📝 ${item.kitchen_notes}</div>` : ''}
                         </div>
-                        ${item.kitchen_notes ? `<div style="font-size: 0.85rem; color: #718096; margin-top: 0.25rem;">📝 ${item.kitchen_notes}</div>` : ''}
+                        <div class="order-item-price">
+                            ${fmtTL(itemTotal)}
+                            <button class="btn-delete" onclick="openEditItem(${item.id}, '${item.product_name || 'Özel Ürün'}')" style="background: #667eea;">✏️</button>
+                            <button class="btn-delete" onclick="deleteItem(${item.id})">🗑️</button>
+                        </div>
                     </div>
-                    <div class="order-item-price">
-                        ${fmtTL(itemTotal)}
-                        <button class="btn-delete" onclick="openEditItem(${item.id}, '${item.product_name || 'Özel Ürün'}')" style="background: #667eea;">✏️</button>
-                        <button class="btn-delete" onclick="deleteItem(${item.id})">🗑️</button>
-                    </div>
-                </div>
-            `}).join('');
+                    `;
+                }).join('');
+                
+                if (multiPart) {
+                    return `
+                        <div style="margin-bottom: 1rem;">
+                            <div style="background:#e2e8f0; padding:0.25rem 0.5rem; font-weight:bold; font-size:0.85rem; display:flex; justify-content:space-between; margin-bottom: 0.5rem; border-radius: 4px;">
+                                <span>Adisyon Bölüm ${p}</span>
+                                <span>${fmtTL(parts[p].total)}</span>
+                            </div>
+                            ${partHtml}
+                        </div>
+                    `;
+                } else {
+                    return partHtml;
+                }
+            }).join('');
 
             orderSubtotal.textContent = fmtTL(subtotal);
             orderTotal.textContent = fmtTL(currentOrder.total);

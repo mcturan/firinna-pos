@@ -1168,47 +1168,39 @@ def api_split_ticket(order_id):
         
     try:
         conn = db.get_db()
-        order = conn.execute("SELECT table_id FROM orders WHERE id=?", (order_id,)).fetchone()
-        if not order:
-            conn.close()
-            return jsonify({'success': False, 'error': 'Sipariş bulunamadı'}), 404
-            
-        tbl = conn.execute("SELECT * FROM tables WHERE id=?", (order['table_id'],)).fetchone()
+        # Find max part_no for this order
+        max_part = conn.execute("SELECT MAX(part_no) FROM order_items WHERE order_id=?", (order_id,)).fetchone()[0]
+        if not max_part:
+            max_part = 1
+        new_part = max_part + 1
         
-        base_name = tbl['name']
-        if " - Part " in base_name:
-            base_name = base_name.split(" - Part ")[0]
+        for item in items_to_move:
+            item_id = item['id']
+            qty_to_move = item['qty']
             
-        existing = conn.execute("SELECT name FROM tables WHERE name LIKE ?", (f"{base_name} - Part %",)).fetchall()
-        
-        next_num = 2
-        for ex in existing:
-            try:
-                num = int(ex['name'].split(" - Part ")[-1])
-                if num >= next_num:
-                    next_num = num + 1
-            except:
-                pass
-                
-        new_name = f"{base_name} - Part {next_num}"
-        
-        # If this is the first split, maybe rename original table to Part 1? 
-        # Actually it's better to just leave it as is or rename it.
-        # We will rename the original if it doesn't have "Part" in it.
-        if " - Part " not in tbl['name']:
-            conn.execute("UPDATE tables SET name = ? WHERE id = ?", (f"{base_name} - Part 1", tbl['id']))
+            orig = conn.execute("SELECT * FROM order_items WHERE id=? AND order_id=?", (item_id, order_id)).fetchone()
+            if not orig:
+                continue
             
-        conn.execute('INSERT INTO tables (name, zone_id) VALUES (?, ?)', (new_name, tbl['zone_id']))
-        new_table_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+            if qty_to_move >= orig['quantity']:
+                conn.execute("UPDATE order_items SET part_no=? WHERE id=?", (new_part, item_id))
+            else:
+                conn.execute("UPDATE order_items SET quantity = quantity - ? WHERE id=?", (qty_to_move, item_id))
+                conn.execute('''
+                    INSERT INTO order_items 
+                    (order_id, product_id, product_name, price, quantity, kitchen_notes, is_complimentary, part_no)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    order_id, orig['product_id'], orig['product_name'], orig['price'], 
+                    qty_to_move, orig['kitchen_notes'], orig['is_complimentary'], new_part
+                ))
+        
         conn.commit()
         conn.close()
         
-        target_order_id, source_deleted = db.transfer_order_items(order_id, new_table_id, items_to_move)
-        
         return jsonify({
             'success': True,
-            'target_order_id': target_order_id,
-            'source_deleted': source_deleted
+            'source_deleted': False
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400

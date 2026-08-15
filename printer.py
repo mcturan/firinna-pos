@@ -90,22 +90,55 @@ class ThermalPrinter:
         data += "==========================================\n".encode('ascii', errors='replace')
         
         # Ürünler
+        # Ürünleri part_no'ya göre grupla
+        parts = {}
         for item in order_data.get('items', []):
-            name = item.get('product_name', 'Urun')
-            qty = item.get('quantity', 1)
-            price = item.get('price', 0)
-            total = qty * price
-            
-            if item.get('is_complimentary'):
-                data += tr(f"{qty}x {name}").encode('ascii', errors='replace')
-                data += " (IKRAM)\n".encode('ascii', errors='replace')
-            else:
-                line = f"{qty}x {name}"
-                price_str = f"{total:.2f} TL"
-                LINE_WIDTH = 42
-                spaces = LINE_WIDTH - len(line) - len(price_str)
-                if spaces < 1: spaces = 1
-                data += tr(f"{line}{' ' * spaces}{price_str}\n").encode('ascii', errors='replace')
+            p = item.get('part_no', 1)
+            if p not in parts:
+                parts[p] = {'items': [], 'total': 0}
+            parts[p]['items'].append(item)
+            if not item.get('is_complimentary'):
+                parts[p]['total'] += item.get('quantity', 1) * item.get('price', 0)
+        
+        LINE_WIDTH = 42
+        
+        if len(parts) > 1:
+            for p in sorted(parts.keys()):
+                data += tr(f"--- Odeme {p} ---\n").encode('ascii', errors='replace')
+                for item in parts[p]['items']:
+                    name = item.get('product_name', 'Urun')
+                    qty = item.get('quantity', 1)
+                    price = item.get('price', 0)
+                    total = qty * price
+                    if item.get('is_complimentary'):
+                        data += tr(f"{qty}x {name} (IKRAM)\n").encode('ascii', errors='replace')
+                    else:
+                        line = f"{qty}x {name}"
+                        price_str = f"{total:.2f} TL"
+                        spaces = LINE_WIDTH - len(line) - len(price_str)
+                        if spaces < 1: spaces = 1
+                        data += tr(f"{line}{' ' * spaces}{price_str}\n").encode('ascii', errors='replace')
+                total_str = f"Odeme {p} Toplam: {parts[p]['total']:.2f} TL"
+                spaces_for_total = LINE_WIDTH - len(total_str)
+                if spaces_for_total < 1: spaces_for_total = 1
+                data += tr(f"{' ' * spaces_for_total}{total_str}\n").encode('ascii', errors='replace')
+                data += b'\n'
+        else:
+            for item in order_data.get('items', []):
+                name = item.get('product_name', 'Urun')
+                qty = item.get('quantity', 1)
+                price = item.get('price', 0)
+                total = qty * price
+                
+                if item.get('is_complimentary'):
+                    data += tr(f"{qty}x {name}").encode('ascii', errors='replace')
+                    data += " (IKRAM)\n".encode('ascii', errors='replace')
+                else:
+                    line = f"{qty}x {name}"
+                    price_str = f"{total:.2f} TL"
+                    spaces = LINE_WIDTH - len(line) - len(price_str)
+                    if spaces < 1: spaces = 1
+                    data += tr(f"{line}{' ' * spaces}{price_str}\n").encode('ascii', errors='replace')
             
         data += "==========================================\n".encode('ascii', errors='replace')
         
