@@ -1356,11 +1356,21 @@
         }
 
         async function doItemSplitPayment(itemsToPay, method) {
+            const amtInp = document.getElementById('payEntryAmount');
+            const amt = parseFloat(amtInp.value) || 0;
+            const tip = parseFloat(document.getElementById('tipAmount').value) || 0;
+            
             try {
                 const res = await fetch(`/api/orders/${currentOrder.id}/pay-items`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ items: itemsToPay, method: method })
+                    body: JSON.stringify({ 
+                        items: itemsToPay,
+                        payment_cash: method === 'cash' ? amt : 0,
+                        payment_card: method === 'card' ? amt : 0,
+                        tip_amount: tip,
+                        tip_method: tipMethod
+                    })
                 });
                 const data = await res.json();
                 if (data.success) {

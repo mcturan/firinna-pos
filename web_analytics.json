@@ -1,16 +1,16 @@
 {
-    "today": 1,
-    "month": 206,
-    "total": 206,
+    "today": 3,
+    "month": 208,
+    "total": 208,
     "menu": 3,
     "actions": 27,
     "last_date": "2026-08-15",
     "devices": {
-        "💻 Masaüstü": 147,
+        "💻 Masaüstü": 149,
         "📱 Mobil": 59
     },
     "browsers": {
-        "Google Chrome": 182,
+        "Google Chrome": 184,
         "Apple Safari": 8,
         "Microsoft Edge": 15,
         "Diğer Tarayıcı": 1
@@ -27,9 +27,63 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 4,
         "🌐 Diğer Web Sitesi": 87,
-        "🔗 Doğrudan (Direct)": 38
+        "🔗 Doğrudan (Direct)": 40
     },
     "recent_visitors": [
+        {
+            "id": "log_1786785809631",
+            "time": "15 Ağustos 12:23",
+            "iso_date": "2026-08-15",
+            "raw_time": "2026-08-15 12:23:29",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (10s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%50",
+            "time_spent": "10 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1786785799907",
+            "time": "15 Ağustos 12:23",
+            "iso_date": "2026-08-15",
+            "raw_time": "2026-08-15 12:23:19",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1786785795743",
+            "time": "15 Ağustos 12:23",
+            "iso_date": "2026-08-15",
+            "raw_time": "2026-08-15 12:23:15",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%9",
+            "time_spent": "1 sn",
+            "lang_compare": "TR ➔ TR"
+        },
         {
             "id": "log_1786743199571",
             "time": "15 Ağustos 00:33",
@@ -7696,10 +7750,10 @@
             "type": "🔄 Tekrar Gelen Misafir"
         }
     ],
-    "repeat_visitors": 172,
+    "repeat_visitors": 174,
     "new_visitors": 34,
     "os": {
-        "Linux": 136,
+        "Linux": 138,
         "Windows PC": 7,
         "Apple iOS": 8,
         "Android OS": 51,
@@ -7712,12 +7766,12 @@
         "20:00 - 23:00 (Gece Keyfi)": 54,
         "23:00 - 08:00 (Gece / Erken)": 17,
         "08:00 - 11:00 (Sabah Kahvaltı)": 1,
-        "11:00 - 14:00 (Öğle Brunch)": 17
+        "11:00 - 14:00 (Öğle Brunch)": 19
     },
     "map_clicks": 1,
     "locations": {
         "📍 İstanbul / Türkiye (Yerel)": 2,
-        "📍 Kartal / Türkiye": 90,
+        "📍 Kartal / Türkiye": 92,
         "📍 Prineville / United States": 1,
         "📍 Kansas City / United States": 1,
         "📍 Istanbul / Türkiye": 6,
@@ -7733,14 +7787,14 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 4,
         "🌐 Diğer Web Sitesi": 87,
-        "🔗 Doğrudan (Direct)": 38
+        "🔗 Doğrudan (Direct)": 40
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 129
+        "🌐 Dışarıdan İnceleyen": 131
     },
     "lang_comparisons": {
-        "TR ➔ TR": 59,
+        "TR ➔ TR": 61,
         "EN ➔ TR": 23,
         "EN ➔ EN": 10,
         "TR ➔ ES": 8,
