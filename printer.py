@@ -132,10 +132,21 @@ class ThermalPrinter:
         data += "==========================================\n".encode('ascii', errors='replace')
         
         # Ödeme bilgisi
-        if order_data.get('payment_cash', 0) > 0:
-            data += rjust_row('Nakit:', f"{order_data['payment_cash']:.2f} TL")
-        if order_data.get('payment_card', 0) > 0:
-            data += rjust_row('Kart:', f"{order_data['payment_card']:.2f} TL")
+        conn = db.get_db()
+        txs = conn.execute('SELECT * FROM transactions WHERE related_order_id = ? AND category = "satis" ORDER BY id ASC', (order_data['id'],)).fetchall()
+        conn.close()
+
+        if txs and len(txs) > 0:
+            for t in txs:
+                desc = t['description'] if t['description'] and t['description'].startswith('Ödeme') else ('Nakit:' if t['payment_method']=='cash' else 'Kart:')
+                if not desc.endswith(':'): desc += ':'
+                data += rjust_row(desc, f"{t['amount']:.2f} TL")
+        else:
+            if order_data.get('payment_cash', 0) > 0:
+                data += rjust_row('Nakit:', f"{order_data['payment_cash']:.2f} TL")
+            if order_data.get('payment_card', 0) > 0:
+                data += rjust_row('Kart:', f"{order_data['payment_card']:.2f} TL")
+                
         if order_data.get('tip_amount', 0) > 0:
             data += rjust_row('Bahsis:', f"{order_data['tip_amount']:.2f} TL")
         

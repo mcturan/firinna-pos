@@ -1098,13 +1098,22 @@ def api_set_discount(order_id):
 @app.route('/api/orders/<int:order_id>/close-with-payment', methods=['POST'])
 def api_close_with_payment(order_id):
     data = request.json
+    pay_entries = data.get('pay_entries')
+    if pay_entries:
+        payment_cash = sum(e['amount'] for e in pay_entries if e['method'] == 'cash')
+        payment_card = sum(e['amount'] for e in pay_entries if e['method'] == 'card')
+    else:
+        payment_cash = data.get('payment_cash', 0)
+        payment_card = data.get('payment_card', 0)
+
     db.close_order_with_payment(
         order_id,
-        data.get('payment_cash', 0),
-        data.get('payment_card', 0),
+        payment_cash,
+        payment_card,
         data.get('tip_amount', 0),
         data.get('tip_method', 'cash'),
-        data.get('closed_at')
+        data.get('closed_at'),
+        pay_entries=pay_entries
     )
     db.deduct_stock_for_order(order_id)
     telegram_notify.check_low_stock_after_order(order_id)

@@ -422,15 +422,17 @@
 
                     <!-- Hesabı böl -->
                     <div>
-                        <button class="btn btn-secondary" style="width:100%;font-size:.82rem;" onclick="toggleSplitSection()">Hesabı Böl</button>
+                        <button class="btn btn-secondary" style="width:100%;font-size:.82rem;" onclick="toggleSplitSection()">Hesabı Böl / Kısmi Ödeme Hesapla</button>
                         <div id="splitSection" style="display:none;margin-top:.5rem;padding:.75rem;background:var(--bg);border-radius:var(--r-sm);border:1px solid var(--border);">
-                            <div style="display:flex;gap:.4rem;align-items:center;">
-                                <label style="font-size:.82rem;white-space:nowrap;">Kişi sayısı:</label>
-                                <input type="number" id="numPeople" value="2" min="2"
-                                    style="flex:1;padding:.45rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.88rem;font-family:inherit;">
-                                <button class="btn btn-secondary" onclick="calculateSplit()">Hesapla</button>
+                            <div style="font-size:.75rem;color:var(--ink-3);margin-bottom:.4rem;">Kalan tutarı eşit böl:</div>
+                            <div style="display:flex;gap:.4rem;align-items:center;margin-bottom:.75rem;">
+                                <button class="btn btn-secondary" style="flex:1;padding:.4rem;font-size:.85rem;" onclick="calculateSplit(2)">1/2</button>
+                                <button class="btn btn-secondary" style="flex:1;padding:.4rem;font-size:.85rem;" onclick="calculateSplit(3)">1/3</button>
+                                <button class="btn btn-secondary" style="flex:1;padding:.4rem;font-size:.85rem;" onclick="calculateSplit(4)">1/4</button>
+                                <button class="btn btn-secondary" style="flex:1;padding:.4rem;font-size:.85rem;" onclick="calculateSplit(5)">1/5</button>
                             </div>
-                            <div id="splitResult" style="margin-top:.5rem;font-weight:700;text-align:center;font-size:.95rem;"></div>
+                            <div style="font-size:.75rem;color:var(--ink-3);margin-bottom:.4rem;">Veya ürün seçerek hesapla:</div>
+                            <button class="btn btn-secondary" style="width:100%;font-size:.85rem;" onclick="openItemSplitModal()">Ürün Seçerek Böl</button>
                         </div>
                     </div>
 
@@ -1225,22 +1227,11 @@
             const amt = parseFloat(amtInp.value);
             if (!amt || amt <= 0) return showToast('Geçerli tutar girin', 'warn');
             
-            let isItemSplit = false;
-            let itemsToPay = [];
-            document.querySelectorAll('.pay-item-qty').forEach(inp => {
-                let max = parseInt(inp.max);
-                let val = parseInt(inp.value) || 0;
-                if (val !== max) isItemSplit = true;
-                if (val > 0) itemsToPay.push({ id: parseInt(inp.dataset.id), qty: val });
-            });
-
-            if (isItemSplit && !manualAmountOverride && numpadTarget === 'amount') {
-                doItemSplitPayment(itemsToPay, payEntryType);
-                return;
-            }
-
             payEntries.push({ amount: amt, method: payEntryType });
             updatePayRemaining();
+            
+            amtInp.value = '';
+            manualAmountOverride = false;
         }
 
         function removePayEntry(idx) {
@@ -1310,10 +1301,9 @@
             const list = document.getElementById('payItemsList');
             if (currentOrder && currentOrder.items) {
                 list.innerHTML = currentOrder.items.map(i =>
-                    `<div style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid var(--border);">
-                        <input type="number" class="pay-item-qty" data-id="${i.id}" data-price="${i.price||0}" data-complimentary="${i.is_complimentary ? '1' : '0'}" value="${i.quantity}" min="0" max="${i.quantity}" oninput="recalcSelectedPayTotal()" onchange="recalcSelectedPayTotal()" style="width:40px;padding:.2rem;border:1px solid #ccc;border-radius:4px;text-align:center;">
-                        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;" onclick="toggleItemPayQty(this)">x ${i.product_name||i.name||''}</span>
-                        <span style="font-weight:600;flex-shrink:0;">${i.is_complimentary ? 'İkram' : fmtTL(i.price||0)}</span>
+                    `<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid var(--border);">
+                        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.quantity}x ${i.product_name||i.name||''}</span>
+                        <span style="font-weight:600;flex-shrink:0;margin-left:.5rem;">${i.is_complimentary ? 'İkram' : fmtTL(i.quantity * (i.price||0))}</span>
                     </div>`
                 ).join('');
             }
@@ -1322,68 +1312,7 @@
             document.getElementById('paymentModal').style.display = 'block';
         }
 
-        function recalcSelectedPayTotal() {
-            if (manualAmountOverride) return;
-            let selectedTotal = 0;
-            document.querySelectorAll('.pay-item-qty').forEach(inp => {
-                let max = parseInt(inp.max);
-                let val = parseInt(inp.value);
-                if (isNaN(val)) val = 0;
-                if (val > max) { val = max; inp.value = max; }
-                if (val < 0) { val = 0; inp.value = 0; }
-                if (inp.dataset.complimentary !== '1') {
-                    selectedTotal += parseFloat(inp.dataset.price) * val;
-                }
-            });
-            const amtInp = document.getElementById('payEntryAmount');
-            if (amtInp) {
-                if (selectedTotal > 0) {
-                    amtInp.value = selectedTotal.toFixed(2);
-                } else {
-                    amtInp.value = '';
-                }
-            }
-        }
 
-        function toggleItemPayQty(spanEl) {
-            const inp = spanEl.previousElementSibling;
-            if (parseInt(inp.value) > 0) {
-                inp.value = 0;
-            } else {
-                inp.value = inp.max;
-            }
-            recalcSelectedPayTotal();
-        }
-
-        async function doItemSplitPayment(itemsToPay, method) {
-            const amtInp = document.getElementById('payEntryAmount');
-            const amt = parseFloat(amtInp.value) || 0;
-            const tip = parseFloat(document.getElementById('tipAmount').value) || 0;
-            
-            try {
-                const res = await fetch(`/api/orders/${currentOrder.id}/pay-items`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        items: itemsToPay,
-                        payment_cash: method === 'cash' ? amt : 0,
-                        payment_card: method === 'card' ? amt : 0,
-                        tip_amount: tip,
-                        tip_method: tipMethod
-                    })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    showToast('Seçili ürünler ödendi!', 'success');
-                    closePaymentModal();
-                    refreshZone();
-                } else {
-                    showToast('Ödeme hatası: ' + data.error, 'error');
-                }
-            } catch(e) {
-                showToast('Hata oluştu', 'error');
-            }
-        }
 
         function updateTipDisplay() {
             const tip   = parseFloat(document.getElementById('tipAmount').value) || 0;
@@ -1502,8 +1431,7 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    payment_cash: totalCash,
-                    payment_card: totalCard,
+                    pay_entries: payEntries,
                     tip_amount: tip,
                     tip_method: tipMethod,
                     closed_at: getCustomDatetime()
@@ -1520,16 +1448,61 @@
             section.style.display = section.style.display === 'none' ? 'block' : 'none';
         }
 
-        async function calculateSplit() {
-            const numPeople = parseInt(document.getElementById('numPeople').value);
-            const response = await fetch(`/api/orders/${currentOrder.id}/split`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({num_people: numPeople})
-            }).then(r => r.json());
+        async function calculateSplit(numPeople) {
+            const total = getRemainingAmount();
+            const perPerson = total / numPeople;
+            setEntryAmount(perPerson);
+            showToast(`Hesap ${numPeople} parçaya bölündü. (${fmtTL(perPerson)})`, 'success');
+        }
+
+        function openItemSplitModal() {
+            const list = document.getElementById('itemSplitList');
+            if (!currentOrder || !currentOrder.items) return;
             
-            document.getElementById('splitResult').innerHTML =
-                `Kişi başı: ${fmtTL(response.per_person)} <button class="btn btn-secondary" onclick="setEntryAmount(${response.per_person})" style="padding:.2rem .4rem;font-size:.7rem;margin-left:.5rem;border-radius:4px;display:inline-block;width:auto;height:auto;line-height:1;">Tutara Aktar</button>`;
+            list.innerHTML = currentOrder.items.map(i =>
+                `<div style="display:flex;align-items:center;gap:.5rem;padding:.5rem;border-bottom:1px solid var(--border);">
+                    <input type="number" class="item-split-qty" data-price="${i.price||0}" data-complimentary="${i.is_complimentary ? '1' : '0'}" value="0" min="0" max="${i.quantity}" oninput="recalcItemSplitTotal()" onchange="recalcItemSplitTotal()" style="width:50px;padding:.3rem;border:1px solid #ccc;border-radius:4px;text-align:center;">
+                    <span style="flex:1;cursor:pointer;" onclick="toggleItemSplitQty(this)">x ${i.product_name||i.name||''} (${i.quantity} adet)</span>
+                    <span style="font-weight:600;">${i.is_complimentary ? 'İkram' : fmtTL(i.price||0)}</span>
+                </div>`
+            ).join('');
+            
+            document.getElementById('itemSplitTotal').textContent = '0.00 TL';
+            document.getElementById('itemSplitModal').style.display = 'flex';
+        }
+
+        function toggleItemSplitQty(spanEl) {
+            const inp = spanEl.previousElementSibling;
+            if (parseInt(inp.value) > 0) inp.value = 0;
+            else inp.value = inp.max;
+            recalcItemSplitTotal();
+        }
+
+        function recalcItemSplitTotal() {
+            let total = 0;
+            document.querySelectorAll('.item-split-qty').forEach(inp => {
+                let max = parseInt(inp.max);
+                let val = parseInt(inp.value);
+                if(isNaN(val)) val = 0;
+                if(val > max) { val = max; inp.value = max; }
+                if(val < 0) { val = 0; inp.value = 0; }
+                if (inp.dataset.complimentary !== '1') {
+                    total += parseFloat(inp.dataset.price) * val;
+                }
+            });
+            document.getElementById('itemSplitTotal').textContent = total.toFixed(2) + ' TL';
+            return total;
+        }
+
+        function applyItemSplit() {
+            const total = recalcItemSplitTotal();
+            if (total > 0) {
+                setEntryAmount(total);
+                document.getElementById('itemSplitModal').style.display = 'none';
+                showToast(`Seçilen ürünlerin toplamı (${total.toFixed(2)} TL) ödeme ekranına aktarıldı.`, 'success');
+            } else {
+                showToast('Lütfen en az bir ürün seçin', 'warn');
+            }
         }
 
         function updateOrderSummary() {
@@ -2478,6 +2451,22 @@ async function doMerge(targetTableId, targetTableName) {
             return val;
         }
     </script>
+    <!-- Ürün Seçerek Böl Modal -->
+    <div id="itemSplitModal" class="modal-overlay">
+        <div class="modal" style="max-width:400px;">
+            <h3 style="margin-top:0;">Ürün Seçerek Böl</h3>
+            <p style="font-size:.85rem;color:var(--ink-2);margin-bottom:1rem;">Ödenecek ürünleri seçin, toplam tutar ödeme ekranına yansıtılacaktır.</p>
+            <div id="itemSplitList" style="max-height:300px;overflow-y:auto;margin-bottom:1rem;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:1.2rem;margin-bottom:1rem;">
+                <span>Toplam:</span>
+                <span id="itemSplitTotal">0.00 TL</span>
+            </div>
+            <div style="display:flex;gap:.5rem;">
+                <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('itemSplitModal').style.display='none'">İptal</button>
+                <button class="btn" style="flex:1;" onclick="applyItemSplit()">Tutara Aktar</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 <script>

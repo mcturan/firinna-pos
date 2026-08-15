@@ -712,7 +712,7 @@ def set_order_discount(order_id, discount_type, discount_value, discount_reason=
     conn.commit()
     conn.close()
 
-def close_order_with_payment(order_id, payment_cash=0, payment_card=0, tip_amount=0, tip_method='cash', closed_at=None):
+def close_order_with_payment(order_id, payment_cash=0, payment_card=0, tip_amount=0, tip_method='cash', closed_at=None, pay_entries=None):
     """Sipariş kapat ve ödeme kaydet (#5, #10)"""
     conn = get_db()
     if not closed_at:
@@ -727,7 +727,7 @@ def close_order_with_payment(order_id, payment_cash=0, payment_card=0, tip_amoun
             tip_method = ?
         WHERE id = ?
     ''', (closed_at, payment_cash, payment_card, tip_amount, tip_method, order_id))
-    record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amount, tip_method, closed_at)
+    record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amount, tip_method, closed_at, pay_entries=pay_entries)
     check_and_delete_temp_table(conn, order_id)
     conn.commit()
     conn.close()
@@ -1350,19 +1350,32 @@ def migrate_orders_to_transactions():
         print(f"migrate_orders_to_transactions atlandı: {e}")
         return 0
 
-def record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amount, tip_method, closed_at):
-    """Sipariş kapanışında otomatik transaction kaydı"""
+def record_order_transaction(conn, order_id, payment_cash, payment_card, tip_amount, tip_method, closed_at, pay_entries=None):
+    """Sipariş kapandığında kasaya / işlemlere kaydet"""
     date = closed_at[:10] if closed_at else datetime.now().strftime('%Y-%m-%d')
-    if payment_cash and payment_cash > 0:
-        conn.execute('''INSERT INTO transactions
-            (date, type, amount, category, payment_method, description, related_order_id, created_at)
-            VALUES (?, 'in', ?, 'satis', 'cash', 'Sipariş #' || ?, ?, ?)''',
-            (date, payment_cash, order_id, order_id, closed_at))
-    if payment_card and payment_card > 0:
-        conn.execute('''INSERT INTO transactions
-            (date, type, amount, category, payment_method, description, related_order_id, created_at)
-            VALUES (?, 'in', ?, 'satis', 'card', 'Sipariş #' || ?, ?, ?)''',
-            (date, payment_card, order_id, order_id, closed_at))
+    
+    if pay_entries and len(pay_entries) > 0:
+        for i, entry in enumerate(pay_entries):
+            method = entry.get('method', 'cash')
+            amount = entry.get('amount', 0)
+            desc = f"Ödeme {i+1} (Sipariş #{order_id})" if len(pay_entries) > 1 else f"Sipariş #{order_id}"
+            if amount > 0:
+                conn.execute('''INSERT INTO transactions 
+                    (date, type, amount, category, payment_method, description, related_order_id, created_at)
+                    VALUES (?, 'in', ?, 'satis', ?, ?, ?, ?)''',
+                    (date, amount, method, desc, order_id, closed_at))
+    else:
+        if payment_cash > 0:
+            conn.execute('''INSERT INTO transactions 
+                (date, type, amount, category, payment_method, description, related_order_id, created_at)
+                VALUES (?, 'in', ?, 'satis', 'cash', 'Sipariş #' || ?, ?, ?)''',
+                (date, payment_cash, order_id, order_id, closed_at))
+        if payment_card > 0:
+            conn.execute('''INSERT INTO transactions 
+                (date, type, amount, category, payment_method, description, related_order_id, created_at)
+                VALUES (?, 'in', ?, 'satis', 'card', 'Sipariş #' || ?, ?, ?)''',
+                (date, payment_card, order_id, order_id, closed_at))
+                
     if tip_amount and tip_amount > 0:
         conn.execute('''INSERT INTO transactions
             (date, type, amount, category, payment_method, description, related_order_id, created_at)
