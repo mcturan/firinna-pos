@@ -145,11 +145,10 @@
                         <button class="btn" onclick="cancelOrder()" style="background:#f56565;color:white;width:100%;">🗑️ Fiş İptal</button>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
                             <button class="btn" onclick="openTransferModal()" style="background:#718096;color:white;" title="Tüm masayı taşı">↔ Masayı Taşı</button>
-                            <button class="btn" onclick="openItemTransferModal()" style="background:#718096;color:white;" title="Seçilen ürünleri taşı">↔ Ürün Aktar</button>
+                            <button class="btn" onclick="openItemSplitModal()" style="background:#718096;color:white;" title="Seçilen ürünleri yeni bir adisyona (Part 2 vb.) ayır">✂ Adisyonu Böl</button>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin-top: 0.5rem;">
                             <button class="btn" onclick="openMergeModal()" style="background:#718096;color:white;" title="Siparişleri Birleştir">⊕ Birleştir</button>
-                            <button class="btn" onclick="promptSplitTable()" style="background:#718096;color:white;" title="Alt masa oluşturarak masayı böl">✂ Masayı Böl</button>
                         </div>
 
                         </div>
@@ -418,22 +417,6 @@
                         <button class="pay-numpad-btn pay-numpad-del" onclick="numpadDel()">⌫</button>
                         <button class="pay-numpad-btn pay-numpad-zero" onclick="numpadPress('0')">0</button>
                         <button class="pay-numpad-btn" onclick="numpadPress('.')">.</button>
-                    </div>
-
-                    <!-- Hesabı böl -->
-                    <div>
-                        <button class="btn btn-secondary" style="width:100%;font-size:.82rem;" onclick="toggleSplitSection()">Hesabı Böl / Kısmi Ödeme Hesapla</button>
-                        <div id="splitSection" style="display:none;margin-top:.5rem;padding:.75rem;background:var(--bg);border-radius:var(--r-sm);border:1px solid var(--border);">
-                            <div style="font-size:.75rem;color:var(--ink-3);margin-bottom:.4rem;">Kalan tutarı eşit böl:</div>
-                            <div style="display:flex;gap:.4rem;align-items:center;margin-bottom:.75rem;">
-                                <button class="btn btn-secondary" style="flex:1;padding:.4rem;font-size:.85rem;" onclick="calculateSplit(2)">1/2</button>
-                                <button class="btn btn-secondary" style="flex:1;padding:.4rem;font-size:.85rem;" onclick="calculateSplit(3)">1/3</button>
-                                <button class="btn btn-secondary" style="flex:1;padding:.4rem;font-size:.85rem;" onclick="calculateSplit(4)">1/4</button>
-                                <button class="btn btn-secondary" style="flex:1;padding:.4rem;font-size:.85rem;" onclick="calculateSplit(5)">1/5</button>
-                            </div>
-                            <div style="font-size:.75rem;color:var(--ink-3);margin-bottom:.4rem;">Veya ürün seçerek hesapla:</div>
-                            <button class="btn btn-secondary" style="width:100%;font-size:.85rem;" onclick="openItemSplitModal()">Ürün Seçerek Böl</button>
-                        </div>
                     </div>
 
                     <!-- Bahşiş (hidden, JS tarafından yönetilir) -->
