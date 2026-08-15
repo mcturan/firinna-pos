@@ -342,7 +342,7 @@ def get_table_order(table_id):
     order_dict = dict(order)
     items = conn.execute('''
         SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.price, 
-               oi.is_complimentary, oi.kitchen_notes, oi.created_at,
+               oi.is_complimentary, oi.kitchen_notes, oi.created_at, oi.part_no,
                COALESCE(oi.product_name, p.name) as product_name
         FROM order_items oi
         LEFT JOIN products p ON oi.product_id = p.id
