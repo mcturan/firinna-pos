@@ -69,9 +69,15 @@ def api_version():
         'db_size_kb':  round(db_size / 1024, 1)
     })
 
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    response = make_response(render_template('index.html'))
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 
 @app.route('/web')
 @app.route('/web/')
