@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, make_response
 import database as db
 import telegram_notify
 from printer import ThermalPrinter
