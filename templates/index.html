@@ -1195,27 +1195,20 @@
             document.getElementById('btnCard').style.color     = type === 'card' ? 'white' : '#3b82f6';
         }
 
-        function setNumpadTarget(target) {
-            numpadTarget = target;
-            const btnTutar  = document.getElementById('btnNumpadTutar');
-            const btnBahsis = document.getElementById('btnNumpadBahsis');
-            const tamBtn    = document.getElementById('numpadTamBtn');
-            if (target === 'amount') {
-                btnTutar.style.background  = 'var(--ink)';
-                btnTutar.style.color       = '#fff';
-                btnBahsis.style.background = 'transparent';
-                btnBahsis.style.color      = 'var(--ink-2)';
-                if (tamBtn) tamBtn.textContent = 'Tam';
-                updatePayRemaining();
+        function setNumpadTarget(t) {
+            numpadTarget = t;
+            document.getElementById('btnNumpadTutar').style.background = t === 'amount' ? 'var(--ink)' : 'transparent';
+            document.getElementById('btnNumpadTutar').style.color      = t === 'amount' ? '#fff' : 'var(--ink-2)';
+            document.getElementById('btnNumpadBahsis').style.background= t === 'tip' ? 'var(--ink)' : 'transparent';
+            document.getElementById('btnNumpadBahsis').style.color     = t === 'tip' ? '#fff' : 'var(--ink-2)';
+            if (t === 'amount') {
+                const tip = parseFloat(document.getElementById('tipAmount').value)||0;
+                document.getElementById('payEntryAmount').value = (currentOrder.total + tip).toFixed(2);
+                manualAmountOverride = false;
+                recalcSelectedPayTotal();
             } else {
-                btnBahsis.style.background = '#f97316';
-                btnBahsis.style.color      = '#fff';
-                btnTutar.style.background  = 'transparent';
-                btnTutar.style.color       = 'var(--ink-2)';
-                if (tamBtn) tamBtn.textContent = 'Sıfırla';
-                const tip = parseFloat(document.getElementById('tipAmount').value) || 0;
-                document.getElementById('payEntryAmount').value = tip > 0 ? tip.toFixed(2) : '';
-                document.getElementById('payEntryAmount').placeholder = 'Bahşiş';
+                document.getElementById('payEntryAmount').value = document.getElementById('tipAmount').value;
+                manualAmountOverride = true;
             }
         }
 
@@ -1228,28 +1221,25 @@
         }
 
         function addPayEntry() {
-            if (numpadTarget === 'tip') {
-                setNumpadTarget('amount');
+            const amtInp = document.getElementById('payEntryAmount');
+            const amt = parseFloat(amtInp.value);
+            if (!amt || amt <= 0) return showToast('Geçerli tutar girin', 'warn');
+            
+            let isItemSplit = false;
+            let itemsToPay = [];
+            document.querySelectorAll('.pay-item-qty').forEach(inp => {
+                let max = parseInt(inp.max);
+                let val = parseInt(inp.value) || 0;
+                if (val !== max) isItemSplit = true;
+                if (val > 0) itemsToPay.push({ id: parseInt(inp.dataset.id), qty: val });
+            });
+
+            if (isItemSplit && !manualAmountOverride && numpadTarget === 'amount') {
+                doItemSplitPayment(itemsToPay, payEntryType);
                 return;
             }
-            const amtInput = document.getElementById('payEntryAmount');
-            const amt = parseFloat(amtInput.value);
-            if (!amt || amt <= 0) { return; }
-            const remaining = getRemainingAmount();
 
-            if (remaining > 0.01 && amt > remaining + 0.01) {
-                const excess = parseFloat((amt - remaining).toFixed(2));
-                payEntries.push({ type: payEntryType, amount: remaining });
-                const currentTip = parseFloat(document.getElementById('tipAmount').value) || 0;
-                document.getElementById('tipAmount').value = (currentTip + excess).toFixed(2);
-                updateTipDisplay();
-                showToast(`${fmtTL(excess)} bahşiş eklendi`, 'success');
-            } else {
-                const actual = Math.min(amt, remaining > 0 ? remaining : amt);
-                payEntries.push({ type: payEntryType, amount: actual });
-            }
-            amtInput.value = '';
-            renderPayEntries();
+            payEntries.push({ amount: amt, method: payEntryType });
             updatePayRemaining();
         }
 
@@ -1295,6 +1285,7 @@
 
         function setEntryAmount(val) {
             document.getElementById('payEntryAmount').value = val.toFixed(2);
+            manualAmountOverride = true;
             updatePayRemaining();
         }
 
@@ -1303,6 +1294,7 @@
             payEntryType = 'cash';
             numpadTarget = 'amount';
             tipMethod = 'cash';
+            manualAmountOverride = false;
             setEntryType('cash');
             setNumpadTarget('amount');
             setTipMethod('cash');
@@ -1316,17 +1308,71 @@
             document.getElementById('payGrandTotal').textContent = total;
             document.getElementById('paymentModalTitle').textContent = 'Ödeme Al — ' + (currentOrder.table_name || '');
             const list = document.getElementById('payItemsList');
-            if (list && currentOrder.items) {
+            if (currentOrder && currentOrder.items) {
                 list.innerHTML = currentOrder.items.map(i =>
-                    `<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid var(--border);">
-                        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.quantity}x ${i.product_name||i.name||''}</span>
-                        <span style="font-weight:600;flex-shrink:0;margin-left:.5rem;">${i.is_complimentary ? 'İkram' : fmtTL(i.quantity * (i.price||0))}</span>
+                    `<div style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;padding:.3rem 0;border-bottom:1px solid var(--border);">
+                        <input type="number" class="pay-item-qty" data-id="${i.id}" data-price="${i.price||0}" data-complimentary="${i.is_complimentary ? '1' : '0'}" value="${i.quantity}" min="0" max="${i.quantity}" oninput="recalcSelectedPayTotal()" onchange="recalcSelectedPayTotal()" style="width:40px;padding:.2rem;border:1px solid #ccc;border-radius:4px;text-align:center;">
+                        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;" onclick="toggleItemPayQty(this)">x ${i.product_name||i.name||''}</span>
+                        <span style="font-weight:600;flex-shrink:0;">${i.is_complimentary ? 'İkram' : fmtTL(i.price||0)}</span>
                     </div>`
                 ).join('');
             }
             document.getElementById('payTipRow').style.display = 'none';
             updatePayRemaining();
             document.getElementById('paymentModal').style.display = 'block';
+        }
+
+        function recalcSelectedPayTotal() {
+            if (manualAmountOverride) return;
+            let selectedTotal = 0;
+            document.querySelectorAll('.pay-item-qty').forEach(inp => {
+                let max = parseInt(inp.max);
+                let val = parseInt(inp.value);
+                if (isNaN(val)) val = 0;
+                if (val > max) { val = max; inp.value = max; }
+                if (val < 0) { val = 0; inp.value = 0; }
+                if (inp.dataset.complimentary !== '1') {
+                    selectedTotal += parseFloat(inp.dataset.price) * val;
+                }
+            });
+            const amtInp = document.getElementById('payEntryAmount');
+            if (amtInp) {
+                if (selectedTotal > 0) {
+                    amtInp.value = selectedTotal.toFixed(2);
+                } else {
+                    amtInp.value = '';
+                }
+            }
+        }
+
+        function toggleItemPayQty(spanEl) {
+            const inp = spanEl.previousElementSibling;
+            if (parseInt(inp.value) > 0) {
+                inp.value = 0;
+            } else {
+                inp.value = inp.max;
+            }
+            recalcSelectedPayTotal();
+        }
+
+        async function doItemSplitPayment(itemsToPay, method) {
+            try {
+                const res = await fetch(`/api/orders/${currentOrder.id}/pay-items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: itemsToPay, method: method })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Seçili ürünler ödendi!', 'success');
+                    closePaymentModal();
+                    refreshZone();
+                } else {
+                    showToast('Ödeme hatası: ' + data.error, 'error');
+                }
+            } catch(e) {
+                showToast('Hata oluştu', 'error');
+            }
         }
 
         function updateTipDisplay() {
@@ -1378,6 +1424,7 @@
                 updateTipDisplay();
                 return;
             }
+            manualAmountOverride = true;
             const inp = document.getElementById('payEntryAmount');
             if (!inp) return;
             if (val === '.' && inp.value.includes('.')) return;

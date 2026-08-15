@@ -127,6 +127,66 @@ def api_kasa_summary():
     date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
     return jsonify(db.get_kasa_summary(date))
 
+@app.route('/api/orders/<int:order_id>/pay-items', methods=['POST'])
+def api_pay_order_items(order_id):
+    data = request.json
+    items_to_pay = data.get('items', [])
+    method = data.get('method', 'cash')
+    
+    conn = db.get_db()
+    order = conn.execute('SELECT * FROM orders WHERE id = ?', (order_id,)).fetchone()
+    if not order: 
+        conn.close()
+        return jsonify({'success': False, 'error': 'Order not found'})
+    
+    table_id = order['table_id']
+    c = conn.cursor()
+    c.execute('INSERT INTO orders (table_id) VALUES (?)', (table_id,))
+    new_order_id = c.lastrowid
+    
+    pay_total = 0
+    for pay_req in items_to_pay:
+        oi_id = pay_req['id']
+        pay_qty = pay_req.get('qty', 0)
+        if pay_qty <= 0: continue
+        
+        item = conn.execute('SELECT * FROM order_items WHERE id=?', (oi_id,)).fetchone()
+        if not item: continue
+        
+        actual_pay_qty = min(pay_qty, item['quantity'])
+        item_total = actual_pay_qty * item['price']
+        
+        if not item['is_complimentary']:
+            pay_total += item_total
+            
+        c.execute('''
+            INSERT INTO order_items (order_id, product_id, product_name, quantity, price, kitchen_notes, is_complimentary)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (new_order_id, item['product_id'], item['product_name'], actual_pay_qty, item['price'], item['kitchen_notes'], item['is_complimentary']))
+        
+        new_qty = item['quantity'] - actual_pay_qty
+        if new_qty > 0:
+            c.execute('UPDATE order_items SET quantity=? WHERE id=?', (new_qty, oi_id))
+        else:
+            c.execute('DELETE FROM order_items WHERE id=?', (oi_id,))
+
+    conn.commit()
+    db.update_order_total(conn, order_id)
+    db.update_order_total(conn, new_order_id)
+    
+    rem = conn.execute('SELECT id FROM order_items WHERE order_id=?', (order_id,)).fetchone()
+    if not rem:
+        c.execute("UPDATE orders SET status='closed', closed_at=CURRENT_TIMESTAMP WHERE id=?", (order_id,))
+    
+    conn.commit()
+    conn.close()
+    
+    db.close_order_with_payment(new_order_id, 
+                                payment_cash=pay_total if method=='cash' else 0,
+                                payment_card=pay_total if method=='card' else 0)
+
+    return jsonify({'success': True})
+
 @app.route('/api/kasa/data', methods=['GET'])
 def api_kasa_data():
     from datetime import timedelta
