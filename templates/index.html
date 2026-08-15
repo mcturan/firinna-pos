@@ -813,21 +813,23 @@
             // Blueprint layout for main zone (Cafe)
             if (zoneId == 1 || tables.some(t => t.name === '1' || t.name.toLowerCase().includes('masa'))) {
                 tablesGrid.style.display = 'block'; // Disable grid layout
-                let m1 = tables.find(t => t.name === '1' || t.name === 'Masa 1');
-                let m2 = tables.find(t => t.name === '2' || t.name === 'Masa 2');
-                let m3 = tables.find(t => t.name === '3' || t.name === 'Masa 3');
-                let m4 = tables.find(t => t.name === '4' || t.name === 'Masa 4');
+                const isMatch = (t, base) => t.name === base || t.name === 'Masa ' + base || t.name.startsWith(base + ' - Part') || t.name.startsWith('Masa ' + base + ' - Part');
+                let m1 = tables.find(t => isMatch(t, '1'));
+                let m2 = tables.find(t => isMatch(t, '2'));
+                let m3 = tables.find(t => isMatch(t, '3'));
+                let m4 = tables.find(t => isMatch(t, '4'));
                 
                 const renderTable = (t, extraCls) => {
                     if(!t) return `<div class="blueprint-table ${extraCls}" style="opacity:0.5;cursor:default;"><div>Boş Masa</div></div>`;
                     const hasOrder = t.has_order > 0;
                     const status = hasOrder ? 'occupied' : 'empty';
                     const dur = hasOrder ? calcDuration(t.order_started_at) : null;
+                    const displayName = t.name.toUpperCase().includes('MASA') ? t.name.toUpperCase() : 'MASA ' + t.name.toUpperCase();
                     return `
                         <div class="blueprint-table ${status} ${extraCls}" onclick="openTable(${t.id}, '${t.name}')">
                             ${dur ? `<span class="dur-badge ${dur.cls}">${dur.text}</span>` : ''}
                             <div class="table-icon">🍽️</div>
-                            <div class="table-name">MASA-${t.name.replace(/[^0-9]/g, '')}${t.table_note ? ' 📝' : ''}</div>
+                            <div class="table-name" style="font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${displayName}${t.table_note ? ' 📝' : ''}</div>
                             ${hasOrder ? `<div class="table-total">${fmtTL(t.order_total||0)}</div>` : ''}
                         </div>
                     `;
@@ -839,6 +841,8 @@
                 const tkwHasOrder = tkw && tkw.has_order > 0;
                 const tkwDur = tkwHasOrder ? calcDuration(tkw.order_started_at) : null;
                 const tkwStatusStyle = tkwHasOrder ? 'background:#fed7d7; border-color:#e53e3e;' : '';
+                
+                const extraTables = tables.filter(t => t !== m1 && t !== m2 && t !== m3 && t !== m4 && (!tkw || t.id !== tkw.id));
 
                 tablesGrid.innerHTML = `
                     <div class="blueprint-wrapper">
@@ -864,6 +868,28 @@
                             </div>
                         </div>
                     </div>
+                    
+                    ${extraTables.length > 0 ? `
+                    <div style="margin-top: 2rem; padding-top: 1rem;">
+                        <h3 style="color: var(--ink-2); margin-bottom: 1rem; font-size: 1rem; text-align: center; font-weight: 600;">Ayrılmış / Ek Adisyonlar</h3>
+                        <div class="tables-grid">
+                            ${extraTables.map(table => {
+                                const hasOrder = table.has_order > 0;
+                                const status = hasOrder ? 'occupied' : 'empty';
+                                const dur = hasOrder ? calcDuration(table.order_started_at) : null;
+                                const displayName = table.name.toUpperCase().includes('MASA') ? table.name.toUpperCase() : 'MASA ' + table.name.toUpperCase();
+                                return `
+                                    <div class="table-card ${status}" onclick="openTable(${table.id}, '${table.name}')">
+                                        ${dur ? `<span class="dur-badge ${dur.cls}">${dur.text}</span>` : ''}
+                                        <div class="table-icon">🍽️</div>
+                                        <div class="table-name" style="font-size:0.9rem;">${displayName}${table.table_note ? ' 📝' : ''}</div>
+                                        ${hasOrder ? `<div class="table-total">${fmtTL(table.order_total||0)}</div>` : ''}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
                 `;
             } else {
                 tablesGrid.style.display = 'grid'; // Enable grid layout for others
