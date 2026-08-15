@@ -1443,13 +1443,13 @@
             
             list.innerHTML = currentOrder.items.map(i =>
                 `<div style="display:flex;align-items:center;gap:.5rem;padding:.5rem;border-bottom:1px solid var(--border);">
-                    <input type="number" class="item-split-qty" data-price="${i.price||0}" data-complimentary="${i.is_complimentary ? '1' : '0'}" value="0" min="0" max="${i.quantity}" oninput="recalcItemSplitTotal()" onchange="recalcItemSplitTotal()" style="width:50px;padding:.3rem;border:1px solid #ccc;border-radius:4px;text-align:center;">
+                    <input type="number" class="item-split-qty" data-id="${i.id}" data-price="${i.price||0}" data-complimentary="${i.is_complimentary ? '1' : '0'}" value="0" min="0" max="${i.quantity}" oninput="recalcItemSplitTotal()" onchange="recalcItemSplitTotal()" style="width:50px;padding:.3rem;border:1px solid #ccc;border-radius:4px;text-align:center;">
                     <span style="flex:1;cursor:pointer;" onclick="toggleItemSplitQty(this)">x ${i.product_name||i.name||''} (${i.quantity} adet)</span>
                     <span style="font-weight:600;">${i.is_complimentary ? 'İkram' : fmtTL(i.price||0)}</span>
                 </div>`
             ).join('');
             
-            document.getElementById('itemSplitTotal').textContent = '0.00 TL';
+            recalcItemSplitTotal();
             document.getElementById('itemSplitModal').style.display = 'flex';
         }
 
@@ -1476,15 +1476,48 @@
             return total;
         }
 
-        function applyItemSplit() {
-            const total = recalcItemSplitTotal();
-            if (total > 0) {
-                setEntryAmount(total);
-                document.getElementById('itemSplitModal').style.display = 'none';
-                showToast(`Seçilen ürünlerin toplamı (${total.toFixed(2)} TL) ödeme ekranına aktarıldı.`, 'success');
-            } else {
-                showToast('Lütfen en az bir ürün seçin', 'warn');
+        async function applyItemSplit() {
+            const inputs = document.querySelectorAll('.item-split-qty');
+            let itemsToMove = [];
+            inputs.forEach(inp => {
+                const qty = parseInt(inp.value)||0;
+                if (qty > 0) {
+                    itemsToMove.push({id: inp.dataset.id, quantity: qty});
+                }
+            });
+
+            if (itemsToMove.length === 0) {
+                return showToast('Aktarılacak ürün seçmediniz!', 'warn');
             }
+
+            const btn = document.querySelector('#itemSplitModal .btn-success');
+            if (btn) { btn.disabled = true; btn.textContent = 'Bölünüyor...'; }
+
+            try {
+                const res = await fetch(`/api/orders/${currentOrder.id}/split-ticket`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({items: itemsToMove})
+                }).then(r => r.json());
+
+                if (res.success) {
+                    showToast('Adisyon başarıyla bölündü!', 'success');
+                    document.getElementById('itemSplitModal').style.display = 'none';
+                    
+                    refreshZone();
+                    if (res.source_deleted) {
+                        document.getElementById('orderModal').style.display = 'none';
+                    } else {
+                        openTable(currentTable, document.getElementById('modalTableName').textContent);
+                    }
+                } else {
+                    showToast('Hata: ' + res.error, 'error');
+                }
+            } catch (e) {
+                showToast('Hata oluştu', 'error');
+            }
+            
+            if (btn) { btn.disabled = false; btn.textContent = 'Böl ve Yeni Adisyon Aç'; }
         }
 
         function updateOrderSummary() {
