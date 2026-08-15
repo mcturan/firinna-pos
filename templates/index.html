@@ -401,6 +401,13 @@
                         </button>
                     </div>
 
+                    <!-- Eşit Bölme -->
+                    <div style="display:flex;gap:.3rem;margin-bottom:0.1rem;">
+                        <button onclick="splitRemaining(2)" style="flex:1;padding:.4rem;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#475569;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .14s;">1/2</button>
+                        <button onclick="splitRemaining(3)" style="flex:1;padding:.4rem;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#475569;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .14s;">1/3</button>
+                        <button onclick="splitRemaining(4)" style="flex:1;padding:.4rem;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#475569;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .14s;">1/4</button>
+                    </div>
+
                     <!-- Numpad -->
                     <div class="pay-numpad">
                         <button class="pay-numpad-btn" onclick="numpadPress('1')">1</button>
@@ -1168,9 +1175,10 @@
             el.focus();
         }
         function quickExact() {
+            const inp = document.getElementById('payEntryAmount');
             const rem = getRemainingAmount();
-            if (rem > 0) {
-                document.getElementById('payEntryAmount').value = rem.toFixed(2);
+            if (rem > 0 && (!inp.value || inp.value === '0' || !manualAmountOverride)) {
+                inp.value = rem.toFixed(2);
             }
         }
 
@@ -1414,6 +1422,17 @@
             }
             quickExact();
         }
+        
+        function splitRemaining(parts) {
+            setNumpadTarget('amount');
+            const remaining = getRemainingAmount();
+            if (remaining > 0) {
+                const fraction = (remaining / parts).toFixed(2);
+                document.getElementById('payEntryAmount').value = fraction;
+                manualAmountOverride = true;
+            }
+        }
+
         function closePaymentModal() {
             document.getElementById('paymentModal').style.display = 'none';
         }
@@ -1467,16 +1486,17 @@
             setEntryAmount(perPerson);
             showToast(`Hesap ${numPeople} parçaya bölündü. (${fmtTL(perPerson)})`, 'success');
         }
-
         function openItemSplitModal() {
             const list = document.getElementById('itemSplitList');
             if (!currentOrder || !currentOrder.items) return;
             
             list.innerHTML = currentOrder.items.map(i =>
                 `<div style="display:flex;align-items:center;gap:.5rem;padding:.5rem;border-bottom:1px solid var(--border);">
-                    <input type="number" class="item-split-qty" data-id="${i.id}" data-price="${i.price||0}" data-complimentary="${i.is_complimentary ? '1' : '0'}" value="0" min="0" max="${i.quantity}" oninput="recalcItemSplitTotal()" onchange="recalcItemSplitTotal()" style="width:50px;padding:.3rem;border:1px solid #ccc;border-radius:4px;text-align:center;">
-                    <span style="flex:1;cursor:pointer;" onclick="toggleItemSplitQty(this)">x ${i.product_name||i.name||''} (${i.quantity} adet)</span>
-                    <span style="font-weight:600;">${i.is_complimentary ? 'İkram' : fmtTL(i.price||0)}</span>
+                    <button class="btn" style="padding:0.4rem 0.8rem; background:#ed8936; color:white; font-size:1.2rem; font-weight:bold;" onclick="changeSplitQty(this, -1)">-</button>
+                    <input type="number" class="item-split-qty" data-id="${i.id}" data-price="${i.price||0}" data-complimentary="${i.is_complimentary ? '1' : '0'}" value="0" min="0" max="${i.quantity}" oninput="recalcItemSplitTotal()" onchange="recalcItemSplitTotal()" style="width:50px;padding:.4rem;border:2px solid #ccc;border-radius:8px;text-align:center;font-size:1.1rem;font-weight:bold;" readonly>
+                    <button class="btn" style="padding:0.4rem 0.8rem; background:#48bb78; color:white; font-size:1.2rem; font-weight:bold;" onclick="changeSplitQty(this, 1)">+</button>
+                    <span style="flex:1;cursor:pointer;font-size:1.1rem;margin-left:0.5rem;" onclick="toggleItemSplitQty(this)">${i.product_name||i.name||''} (Max: ${i.quantity})</span>
+                    <span style="font-weight:600;font-size:1.1rem;">${i.is_complimentary ? 'İkram' : fmtTL(i.price||0)}</span>
                 </div>`
             ).join('');
             
@@ -1484,8 +1504,21 @@
             document.getElementById('itemSplitModal').style.display = 'flex';
         }
 
+        function changeSplitQty(btn, delta) {
+            const container = btn.parentElement;
+            const inp = container.querySelector('.item-split-qty');
+            let val = parseInt(inp.value) || 0;
+            let max = parseInt(inp.max) || 0;
+            val += delta;
+            if (val > max) val = max;
+            if (val < 0) val = 0;
+            inp.value = val;
+            recalcItemSplitTotal();
+        }
+
         function toggleItemSplitQty(spanEl) {
-            const inp = spanEl.previousElementSibling;
+            const container = spanEl.parentElement;
+            const inp = container.querySelector('.item-split-qty');
             if (parseInt(inp.value) > 0) inp.value = 0;
             else inp.value = inp.max;
             recalcItemSplitTotal();
@@ -2525,17 +2558,20 @@ async function doMerge(targetTableId, targetTableName) {
     </script>
     <!-- Ürün Seçerek Böl Modal -->
     <div id="itemSplitModal" class="modal-overlay">
-        <div class="modal" style="max-width:400px;">
-            <h3 style="margin-top:0;">Ürün Seçerek Böl</h3>
-            <p style="font-size:.85rem;color:var(--ink-2);margin-bottom:1rem;">Ödenecek ürünleri seçin, toplam tutar ödeme ekranına yansıtılacaktır.</p>
-            <div id="itemSplitList" style="max-height:300px;overflow-y:auto;margin-bottom:1rem;"></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:1.2rem;margin-bottom:1rem;">
-                <span>Toplam:</span>
-                <span id="itemSplitTotal">0.00 TL</span>
+        <div class="modal" style="max-width:500px;">
+            <h3 style="margin-top:0;">✂️ Adisyonu Böl (Ürün Seçerek)</h3>
+            <div style="background-color: #ebf8ff; color: #2b6cb0; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem;">
+                <strong>Nasıl yapılır?</strong><br/>
+                Ayrılmasını istediğiniz ürünlerin yanındaki <b style="color:#48bb78">[+]</b> tuşuna basarak (veya doğrudan ürün adına dokunarak) seçin. Seçtiğiniz ürünler adisyonda "Ödeme 2, Ödeme 3" gibi ayrı gruplara ayrılır.
             </div>
-            <div style="display:flex;gap:.5rem;">
-                <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('itemSplitModal').style.display='none'">İptal</button>
-                <button class="btn" style="flex:1;" onclick="applyItemSplit()">Tutara Aktar</button>
+            <div id="itemSplitList" style="max-height:350px;overflow-y:auto;margin-bottom:1rem;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:1.3rem;margin-bottom:1rem;background:#f7fafc;padding:0.75rem;border-radius:8px;border:1px solid #e2e8f0;">
+                <span>Aktarılacak Tutar:</span>
+                <span id="itemSplitTotal" style="color:#2b6cb0;">0.00 TL</span>
+            </div>
+            <div style="display:flex;gap:.75rem;">
+                <button class="btn btn-secondary" style="flex:1;font-size:1.1rem;padding:0.75rem;" onclick="document.getElementById('itemSplitModal').style.display='none'">İptal</button>
+                <button class="btn btn-success" style="flex:2;font-size:1.1rem;padding:0.75rem;background:#2b6cb0;" onclick="applyItemSplit()">Seçilenleri Yeni Bölüme Aktar</button>
             </div>
         </div>
     </div>
