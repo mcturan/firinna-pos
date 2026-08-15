@@ -1176,7 +1176,7 @@ def api_split_ticket(order_id):
         
         for item in items_to_move:
             item_id = item['id']
-            qty_to_move = item['qty']
+            qty_to_move = item.get('quantity', item.get('qty', 1))
             
             orig = conn.execute("SELECT * FROM order_items WHERE id=? AND order_id=?", (item_id, order_id)).fetchone()
             if not orig:
