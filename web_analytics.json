@@ -1,19 +1,19 @@
 {
-    "today": 14,
-    "month": 219,
-    "total": 219,
+    "today": 1,
+    "month": 220,
+    "total": 220,
     "menu": 3,
     "actions": 27,
-    "last_date": "2026-08-15",
+    "last_date": "2026-08-16",
     "devices": {
-        "💻 Masaüstü": 156,
+        "💻 Masaüstü": 157,
         "📱 Mobil": 63
     },
     "browsers": {
         "Google Chrome": 193,
         "Apple Safari": 8,
         "Microsoft Edge": 17,
-        "Diğer Tarayıcı": 1
+        "Diğer Tarayıcı": 2
     },
     "countries": {
         "🇹🇷 Türkiye": 58,
@@ -27,9 +27,45 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 88,
-        "🔗 Doğrudan (Direct)": 49
+        "🔗 Doğrudan (Direct)": 50
     },
     "recent_visitors": [
+        {
+            "id": "log_1786853908414",
+            "time": "16 Ağustos 07:18",
+            "iso_date": "2026-08-16",
+            "raw_time": "2026-08-16 07:18:28",
+            "ip": "202.8.43.201",
+            "country": "📍 Sterling / United States",
+            "location": "📍 Sterling / United States",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Diğer Sistem)",
+            "browser": "Diğer Tarayıcı",
+            "action": "⏱️ Sitede Kalma (3s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "3 sn",
+            "lang_compare": "EN ➔ EN"
+        },
+        {
+            "id": "log_1786853905414",
+            "time": "16 Ağustos 07:18",
+            "iso_date": "2026-08-16",
+            "raw_time": "2026-08-16 07:18:25",
+            "ip": "202.8.43.201",
+            "country": "📍 Sterling / United States",
+            "location": "📍 Sterling / United States",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Diğer Sistem)",
+            "browser": "Diğer Tarayıcı",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
         {
             "id": "log_1786818693168",
             "time": "15 Ağustos 21:31",
@@ -8345,20 +8381,20 @@
         }
     ],
     "repeat_visitors": 184,
-    "new_visitors": 35,
+    "new_visitors": 36,
     "os": {
         "Linux": 144,
         "Windows PC": 8,
         "Apple iOS": 8,
         "Android OS": 55,
-        "Diğer Sistem": 3,
+        "Diğer Sistem": 4,
         "Apple macOS": 1
     },
     "peak_hours": {
         "14:00 - 17:00 (İkindi Kahve/Tatlı)": 52,
         "17:00 - 20:00 (Akşam Yemeği)": 70,
         "20:00 - 23:00 (Gece Keyfi)": 56,
-        "23:00 - 08:00 (Gece / Erken)": 17,
+        "23:00 - 08:00 (Gece / Erken)": 18,
         "08:00 - 11:00 (Sabah Kahvaltı)": 1,
         "11:00 - 14:00 (Öğle Brunch)": 23
     },
@@ -8376,21 +8412,22 @@
         "📍 San Jose / United States": 1,
         "📍 Pryor / United States": 4,
         "📍 Minkler / United States": 1,
-        "📍 Baku / Azerbaijan": 1
+        "📍 Baku / Azerbaijan": 1,
+        "📍 Sterling / United States": 1
     },
     "traffic_sources": {
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 88,
-        "🔗 Doğrudan (Direct)": 49
+        "🔗 Doğrudan (Direct)": 50
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 142
+        "🌐 Dışarıdan İnceleyen": 143
     },
     "lang_comparisons": {
         "TR ➔ TR": 71,
-        "EN ➔ TR": 23,
+        "EN ➔ TR": 24,
         "EN ➔ EN": 11,
         "TR ➔ ES": 8,
         "TR ➔ RU": 3,
