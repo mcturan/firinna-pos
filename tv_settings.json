@@ -1,0 +1,18 @@
+{
+    "logo_url": "",
+    "layout": "default",
+    "video_playlist": "",
+    "local_videos": [],
+    "local_audio": [],
+    "media_source": "youtube",
+    "audio_priority": "video",
+    "promo_text": "",
+    "qr_code": "",
+    "qr_text": "",
+    "widgets": {
+        "weather": true,
+        "clock": true
+    },
+    "messages": [],
+    "last_ping": "2026-08-17T16:31:05.509766"
+}

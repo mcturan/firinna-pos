@@ -25,13 +25,19 @@
     {% include '_navbar.html' %}
     <div class="container" style="max-width: 900px;">
         <h1>📺 Dijital Tabela Yönetimi</h1>
-        <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
-            <strong>Oynatıcı Ekranı:</strong> <a href="/tv-player" target="_blank" style="font-weight:bold;color:#2d6a4f;text-decoration:underline;">Sistemin IP'si:5000/tv-player</a> 
-            <span id="pingStatus" style="margin-left:1rem;font-size:0.9rem;font-weight:bold;color:red;">🔴 Çevrimdışı (Son görülme: Yok)</span>
+        <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div>
+                <strong>Oynatıcı Ekranı:</strong> <a href="/tv-player" target="_blank" style="font-weight:bold;color:#2d6a4f;text-decoration:underline;">Sistemin IP'si:5000/tv-player</a> 
+                <span id="pingStatus" style="margin-left:1rem;font-size:0.9rem;font-weight:bold;color:red;">🔴 Çevrimdışı (Son görülme: Yok)</span>
+            </div>
+            <a href="/static/Firinna-TV.apk" class="btn-save" style="width:auto; margin-top:0; padding:0.5rem 1rem; background:#38a169; text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;" download>
+                📱 Android Uygulamasını İndir (APK)
+            </a>
         </div>
         
         <div class="tv-tabs">
             <button class="tv-tab active" onclick="switchTab('genel')">Genel & Logo</button>
+            <button class="tv-tab" onclick="switchTab('layout_ayarlari')">Yerleşim (Layout)</button>
             <button class="tv-tab" onclick="switchTab('medya')">Video & Müzik (PC / YouTube)</button>
             <button class="tv-tab" onclick="switchTab('mesajlar')">Kayan Yazılar</button>
             <button class="tv-tab" onclick="switchTab('qr')">QR & Araçlar</button>
@@ -44,11 +50,68 @@
                 <input type="text" id="logo_url" placeholder="/static/uploads/logo.png veya http://...">
             </div>
             <div class="form-group">
-                <label>Ekran Düzeni (Layout)</label>
+                <label>Varsayılan Ekran Düzeni (Layout)</label>
                 <select id="layout">
+                    <option value="modern_grid">Modern Tabela (Saat, Ürünler, Mesajlar, Video)</option>
                     <option value="default">Tam Ekran Video + Alt Kayan Yazı</option>
                     <option value="sidebar">Sol Video + Sağ Bilgi Paneli</option>
                 </select>
+            </div>
+        </div>
+
+        <div id="layout_ayarlari" class="tv-pane card">
+            <h3 style="margin-top:0;">Yerleşim (Layout) Özelleştirme</h3>
+            <p style="font-size:0.85rem; color:#718096; margin-bottom:1rem;">Bu bölüm "Modern Tabela" düzeni seçildiğinde geçerlidir.</p>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; background:#f7fafc; padding:15px; border:2px dashed #cbd5e1; border-radius:8px;">
+                <!-- Üst Kısım -->
+                <div style="background:white; padding:10px; border:1px solid #e2e8f0; border-radius:6px;">
+                    <label style="font-size:0.8rem; font-weight:bold; color:#4a5568;">Üst Sol Bölge</label>
+                    <select id="layout_top_left" style="width:100%; font-size:0.8rem; padding:4px;">
+                        <option value="clock_weather">Saat + Hava Durumu</option>
+                        <option value="empty">Boş</option>
+                    </select>
+                </div>
+                <div style="background:white; padding:10px; border:1px solid #e2e8f0; border-radius:6px; text-align:center;">
+                    <label style="font-size:0.8rem; font-weight:bold; color:#4a5568;">Üst Orta Bölge</label>
+                    <select id="layout_top_center" style="width:100%; font-size:0.8rem; padding:4px;">
+                        <option value="logo">Fırınna Logosu</option>
+                        <option value="empty">Boş</option>
+                    </select>
+                </div>
+                <div style="background:white; padding:10px; border:1px solid #e2e8f0; border-radius:6px;">
+                    <label style="font-size:0.8rem; font-weight:bold; color:#4a5568;">Üst Sağ Bölge</label>
+                    <select id="layout_top_right" style="width:100%; font-size:0.8rem; padding:4px;">
+                        <option value="ticker">Firinna.com + Kayan Yazı</option>
+                        <option value="empty">Boş</option>
+                    </select>
+                </div>
+
+                <!-- Alt Kısım -->
+                <div style="grid-column: 1; display:flex; flex-direction:column; gap:10px;">
+                    <div style="background:white; padding:10px; border:1px solid #e2e8f0; border-radius:6px; flex:1;">
+                        <label style="font-size:0.8rem; font-weight:bold; color:#4a5568;">Sol Üst Kutu (Menü)</label>
+                        <select id="layout_left_top" style="width:100%; font-size:0.8rem; padding:4px;">
+                            <option value="products">Web Menü Ürünleri Döngüsü</option>
+                            <option value="empty">Boş</option>
+                        </select>
+                    </div>
+                    <div style="background:white; padding:10px; border:1px solid #e2e8f0; border-radius:6px; flex:1;">
+                        <label style="font-size:0.8rem; font-weight:bold; color:#4a5568;">Sol Alt Kutu (Mesajlar)</label>
+                        <select id="layout_left_bottom" style="width:100%; font-size:0.8rem; padding:4px;">
+                            <option value="messages">Kayıtlı Mesajlar (Fade in/out)</option>
+                            <option value="empty">Boş</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="grid-column: 2 / span 2; background:white; padding:10px; border:1px solid #e2e8f0; border-radius:6px; min-height: 150px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                    <label style="font-size:0.8rem; font-weight:bold; color:#4a5568; margin-bottom:10px;">Ana Ekran (Video Alanı)</label>
+                    <select id="layout_main_video" style="width:80%; font-size:0.8rem; padding:4px;">
+                        <option value="video">Medya (YouTube / Kayıtlı Video)</option>
+                        <option value="empty">Boş</option>
+                    </select>
+                </div>
             </div>
         </div>
 

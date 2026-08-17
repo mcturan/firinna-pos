@@ -3363,6 +3363,15 @@ def api_tv_ping():
     save_tv_settings(current)
     return jsonify({"success": True})
 
+@app.route('/api/tv/products', methods=['GET'])
+def get_tv_products():
+    try:
+        with open('/opt/firinna-pos/web_products.json', 'r', encoding='utf-8') as f:
+            products = json.load(f)
+        return jsonify(products)
+    except Exception as e:
+        return jsonify([])
+
 @app.route('/api/tv/media', methods=['GET'])
 def api_get_tv_media():
     videos = os.listdir(os.path.join(TV_MEDIA_FOLDER, 'videos'))

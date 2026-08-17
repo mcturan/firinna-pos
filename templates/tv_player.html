@@ -4,61 +4,136 @@
     <meta charset="UTF-8">
     <title>Dijital Tabela</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         
-        #video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        @keyframes meshAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(-45deg, #fdfbfb, #ebedee, #f3e7e9, #e3eeff);
+            background-size: 400% 400%;
+            animation: meshAnimation 12s ease infinite;
+            color: #1A1A1A;
+        }
+
+        /* Legacy Layout (Default & Sidebar) */
+        body.layout-default #video-container, body.layout-sidebar #video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background:#000; }
+        body.layout-sidebar #video-container { width: 75%; }
+        
+        /* Modern Grid Layout */
+        #modern-layout { display: none; width: 100vw; height: 100vh; padding: 1.5vw; box-sizing: border-box; grid-template-columns: 3fr 4fr 3fr; grid-template-rows: 12vh 1fr; gap: 1.5vw; }
+        body.layout-modern_grid #modern-layout { display: grid; }
+        body.layout-modern_grid #legacy-overlay { display: none; }
+        body.layout-modern_grid #sidebar { display: none; }
+        body.layout-modern_grid #video-container { position: relative; width: 100%; height: 100%; border-radius: 1vw; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); background: #000; }
+        
+        .grid-box { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 1vw; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(255,255,255,0.5); }
+        
+        /* Modern Grid Areas */
+        #ml-top-left { grid-column: 1; grid-row: 1; font-size: 2.5vw; font-weight: 800; color: #2d6a4f; justify-content: flex-start; padding-left: 2vw;}
+        #ml-top-center { grid-column: 2; grid-row: 1; }
+        #ml-top-right { grid-column: 3; grid-row: 1; flex-direction: column; align-items: flex-end; padding-right: 2vw; text-align: right; }
+        
+        #ml-main-left { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 1.5vw; background: transparent; box-shadow: none; border: none; backdrop-filter: none; }
+        
+        #ml-left-top { flex: 2; background: rgba(255, 255, 255, 0.9); border-radius: 1vw; box-shadow: 0 8px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        #ml-left-bottom { flex: 1; background: #2d6a4f; color: white; border-radius: 1vw; box-shadow: 0 8px 20px rgba(0,0,0,0.1); padding: 2vw; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 2vw; font-weight: 700; position: relative; }
+        
+        #ml-main-video { grid-column: 2 / span 2; grid-row: 2; position: relative; }
+        
+        /* Product Carousel */
+        .product-slide { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 1s ease; }
+        .product-slide.active { opacity: 1; }
+        .prod-img { width: 100%; height: 50%; object-fit: cover; }
+        .prod-info { padding: 1.5vw; flex: 1; display: flex; flex-direction: column; }
+        .prod-title { font-size: 2vw; font-weight: 800; margin-bottom: 0.5vw; color: #1a202c; }
+        .prod-desc { font-size: 1.2vw; color: #4a5568; margin-bottom: 1vw; flex: 1; }
+        .prod-tags { display: flex; gap: 0.5vw; flex-wrap: wrap; }
+        .prod-tag { font-size: 0.8vw; background: #edf2f7; padding: 0.3vw 0.8vw; border-radius: 1vw; font-weight: 600; color: #2d3748; text-transform: uppercase; }
+        .prod-price { font-size: 2.2vw; font-weight: 800; color: #e53e3e; text-align: right; margin-top: auto; }
+
+        /* Messages Fade */
+        .msg-slide { position: absolute; inset: 2vw; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; }
+        .msg-slide.active { opacity: 1; }
+        
+        /* Ticker Top Right */
+        .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2d6a4f; margin-bottom: 0.2vw; }
+        .tr-ticker { font-size: 1.2vw; font-weight: 600; color: #4a5568; }
+
+        /* Record Animation */
+        #record-player { position: absolute; top: 2vw; right: 2vw; width: 6vw; height: 6vw; background: url('/static/img/record.png') no-repeat center/cover; border-radius: 50%; z-index: 10; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .spinning { animation: spin 4s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Legacy Overlays */
         #ytplayer, #local-video { width: 100%; height: 100%; border: none; }
         #local-video { object-fit: cover; }
-        
-        #overlay-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
-        
+        #legacy-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
         .logo { position: absolute; top: 40px; right: 40px; max-width: 250px; max-height: 120px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
-        
-        /* Ticker (Kayan Yazı) */
         .ticker-wrap { position: absolute; bottom: 0; width: 100%; height: 70px; background: rgba(0, 0, 0, 0.75); display: flex; align-items: center; overflow: hidden; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); border-top: 3px solid #2d6a4f; pointer-events: auto; }
         .ticker-title { background: #2d6a4f; color: white; padding: 0 30px; height: 100%; display: flex; align-items: center; font-weight: 800; font-size: 1.5rem; z-index: 2; white-space: nowrap; text-transform: uppercase; letter-spacing: 2px; }
         .ticker-content { white-space: nowrap; font-size: 2.2rem; color: #fff; font-weight: 600; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); animation: ticker 25s linear infinite; padding-left: 100%; display: inline-block; }
-        
-        @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
-
-        /* Widgets Container */
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         .widgets { position: absolute; bottom: 90px; right: 40px; display: flex; flex-direction: column; gap: 20px; align-items: flex-end; }
-        
-        /* QR Code */
         .qr-box { background: rgba(255,255,255,0.9); padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .qr-box img { width: 120px; height: 120px; display: block; margin: 0 auto;}
         .qr-text { color: #000; font-weight: 800; font-size: 1.1rem; margin-top: 10px; }
-        
-        /* Clock Widget */
         .clock-widget { background: rgba(0,0,0,0.6); padding: 15px 30px; border-radius: 12px; color: white; font-size: 3rem; font-weight: 700; backdrop-filter: blur(5px); border: 2px solid rgba(255,255,255,0.2); text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
-
-        /* Sidebar Layout */
-        body.layout-sidebar #video-container { width: 75%; }
+        
         body.layout-sidebar .sidebar { position: absolute; top: 0; right: 0; width: 25%; height: calc(100% - 70px); background: #1a202c; z-index: 5; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; box-sizing: border-box; border-left: 2px solid #2d3748; }
         body.layout-sidebar .widgets { position: static; margin-top: auto; align-items: center; }
         body.layout-sidebar .logo { position: static; max-width: 80%; margin-bottom: 40px; filter: none; }
-        
         .sidebar { display: none; }
         body.layout-sidebar .sidebar { display: flex; }
     </style>
 </head>
-<body>
-    <div id="video-container">
-        <div id="ytplayer" style="display:none;"></div>
-        <video id="local-video" style="display:none;" autoplay muted playsinline></video>
-    </div>
-    
-    <audio id="local-audio" style="display:none;"></audio>
+<body class="layout-modern_grid">
 
+    <!-- MODERN GRID LAYOUT -->
+    <div id="modern-layout">
+        <!-- Top Row -->
+        <div class="grid-box" id="ml-top-left">
+            <span id="ml-clock">00:00</span>
+            <span id="ml-weather" style="margin-left:1vw; font-size:1.8vw;">☀️ 24°C</span>
+        </div>
+        <div class="grid-box" id="ml-top-center">
+            <img id="ml-logo" src="" style="max-height:80%; max-width:80%; display:none;">
+        </div>
+        <div class="grid-box" id="ml-top-right">
+            <div class="tr-domain">firinna.com</div>
+            <div class="tr-ticker" id="ml-ticker-short">Hoş Geldiniz</div>
+        </div>
+
+        <!-- Main Content Row -->
+        <div id="ml-main-left">
+            <div id="ml-left-top">
+                <div id="product-carousel" style="width:100%; height:100%; position:relative;"></div>
+            </div>
+            <div id="ml-left-bottom">
+                <div id="message-carousel" style="width:100%; height:100%; position:relative;"></div>
+            </div>
+        </div>
+
+        <div id="ml-main-video">
+            <div id="video-container">
+                <div id="ytplayer" style="display:none;"></div>
+                <video id="local-video" style="display:none;" autoplay muted playsinline></video>
+            </div>
+            <div id="record-player"></div>
+        </div>
+    </div>
+
+    <!-- LEGACY LAYOUT ELEMENTS -->
     <div class="sidebar" id="sidebar">
         <img id="logo-sidebar" class="logo" src="" style="display:none;">
         <div class="widgets" id="widgets-sidebar"></div>
     </div>
-
-    <div id="overlay-layer">
+    <div id="legacy-overlay">
         <img id="logo-overlay" class="logo" src="" style="display:none;">
         <div class="widgets" id="widgets-overlay"></div>
         <div class="ticker-wrap">
@@ -66,6 +141,8 @@
             <div class="ticker-content" id="ticker-text">Yükleniyor...</div>
         </div>
     </div>
+
+    <audio id="local-audio" style="display:none;"></audio>
 
     <!-- YouTube API Script -->
     <script>
@@ -78,7 +155,6 @@
         var currentVideoId = "";
         var currentAudioPriority = "video";
         var currentMediaSource = "";
-        
         var ytReady = false;
         var isPlayerInitialized = false;
         
@@ -87,12 +163,11 @@
         var currentLocalVideoIndex = 0;
         var currentLocalAudioIndex = 0;
 
-        function onYouTubeIframeAPIReady() {
-            ytReady = true;
-        }
+        function onYouTubeIframeAPIReady() { ytReady = true; }
 
         const vidEl = document.getElementById('local-video');
         const audEl = document.getElementById('local-audio');
+        const recordPlayer = document.getElementById('record-player');
 
         vidEl.onended = () => {
             if(localVideoList.length > 0) {
@@ -109,6 +184,9 @@
                 audEl.play().catch(e=>{});
             }
         };
+
+        audEl.onplay = () => { recordPlayer.style.display = 'block'; recordPlayer.classList.add('spinning'); };
+        audEl.onpause = () => { recordPlayer.style.display = 'none'; recordPlayer.classList.remove('spinning'); };
 
         function switchSource(sourceType) {
             currentMediaSource = sourceType;
@@ -129,11 +207,9 @@
             currentVideoId = videoId;
             currentAudioPriority = priority;
             let playerVars = { 'autoplay': 1, 'controls': 0, 'rel': 0, 'showinfo': 0, 'loop': 1, 'mute': (priority === 'music' ? 1 : 0) };
-            if(videoId.startsWith('PL')) {
-                playerVars['listType'] = 'playlist'; playerVars['list'] = videoId;
-            } else {
-                playerVars['playlist'] = videoId;
-            }
+            if(videoId.startsWith('PL')) { playerVars['listType'] = 'playlist'; playerVars['list'] = videoId; }
+            else { playerVars['playlist'] = videoId; }
+            
             player = new YT.Player('ytplayer', {
                 height: '100%', width: '100%',
                 videoId: videoId.startsWith('PL') ? '' : videoId,
@@ -157,13 +233,38 @@
         let lastSettingsStr = "";
         let currentMessages = [];
         let basePromoText = "";
+        let webProducts = [];
+        
+        let pIndex = 0;
+        let mIndex = 0;
 
         function updateClock() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'});
             document.querySelectorAll('.clock-text').forEach(el => el.textContent = timeStr);
+            document.getElementById('ml-clock').textContent = timeStr;
         }
         setInterval(updateClock, 1000);
+
+        function rotateContent() {
+            if(webProducts.length > 0) {
+                const slides = document.querySelectorAll('.product-slide');
+                if(slides.length > 0) {
+                    slides.forEach(s => s.classList.remove('active'));
+                    slides[pIndex].classList.add('active');
+                    pIndex = (pIndex + 1) % slides.length;
+                }
+            }
+            if(currentMessages.length > 0) {
+                const slides = document.querySelectorAll('.msg-slide');
+                if(slides.length > 0) {
+                    slides.forEach(s => s.classList.remove('active'));
+                    slides[mIndex].classList.add('active');
+                    mIndex = (mIndex + 1) % slides.length;
+                }
+            }
+        }
+        setInterval(rotateContent, 10000);
 
         function updateTickerText() {
             let finalText = basePromoText;
@@ -182,13 +283,41 @@
                 }
             });
             if(!finalText) finalText = "Hoş Geldiniz...";
+            
             const tickerEl = document.getElementById('ticker-text');
             if (tickerEl.textContent !== finalText) {
                 tickerEl.textContent = finalText;
                 tickerEl.style.animation = 'none'; tickerEl.offsetHeight; tickerEl.style.animation = null; 
             }
+            
+            let shortText = currentMessages.length > 0 ? currentMessages[Math.floor(Math.random()*currentMessages.length)].text : finalText;
+            document.getElementById('ml-ticker-short').textContent = shortText.substring(0, 50) + (shortText.length > 50 ? '...' : '');
         }
-        setInterval(updateTickerText, 60000); 
+        setInterval(updateTickerText, 20000); 
+
+        async function fetchProducts() {
+            try {
+                const res = await fetch('/api/tv/products');
+                webProducts = await res.json();
+                
+                let html = "";
+                webProducts.forEach((p, idx) => {
+                    let tagsHtml = (p.tags||[]).map(t => `<span class="prod-tag">${t}</span>`).join('');
+                    html += `
+                        <div class="product-slide ${idx===0?'active':''}">
+                            <img src="/${p.image_url}" class="prod-img" onerror="this.src='/static/img/placeholder.webp';">
+                            <div class="prod-info">
+                                <div class="prod-title">${p.title}</div>
+                                <div class="prod-desc">${p.description}</div>
+                                <div class="prod-tags" style="margin-top:auto;">${tagsHtml}</div>
+                                <div class="prod-price">${p.price}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById('product-carousel').innerHTML = html;
+            } catch(e) {}
+        }
 
         async function fetchSettings() {
             try {
@@ -200,50 +329,43 @@
                     lastSettingsStr = dataStr;
                     applySettings(data);
                 }
-            } catch (e) {
-                console.log("Bağlantı hatası", e);
-            }
+            } catch (e) { console.log(e); }
         }
 
         function applySettings(data) {
-            // Layout & Logo
-            if(data.layout === 'sidebar') {
-                document.body.classList.add('layout-sidebar');
-                document.getElementById('logo-overlay').style.display = 'none';
-                if(data.logo_url) {
-                    document.getElementById('logo-sidebar').src = data.logo_url;
-                    document.getElementById('logo-sidebar').style.display = 'block';
-                } else document.getElementById('logo-sidebar').style.display = 'none';
-            } else {
-                document.body.classList.remove('layout-sidebar');
-                document.getElementById('logo-sidebar').style.display = 'none';
-                if(data.logo_url) {
-                    document.getElementById('logo-overlay').src = data.logo_url;
-                    document.getElementById('logo-overlay').style.display = 'block';
-                } else document.getElementById('logo-overlay').style.display = 'none';
+            const layout = data.layout || 'modern_grid';
+            document.body.className = `layout-${layout}`;
+            
+            if(data.logo_url) {
+                document.getElementById('ml-logo').src = data.logo_url;
+                document.getElementById('ml-logo').style.display = 'block';
+                document.getElementById('logo-overlay').src = data.logo_url;
+                document.getElementById('logo-sidebar').src = data.logo_url;
             }
 
             basePromoText = data.promo_text || "";
             currentMessages = data.messages || [];
             updateTickerText();
+            
+            if(currentMessages.length > 0) {
+                let mHtml = "";
+                currentMessages.forEach((m, idx) => {
+                    mHtml += `<div class="msg-slide ${idx===0?'active':''}">${m.text}</div>`;
+                });
+                document.getElementById('message-carousel').innerHTML = mHtml;
+            }
 
-            // Widgets
             let widgetsHtml = "";
             if (data.widgets && data.widgets.clock) widgetsHtml += `<div class="clock-widget clock-text">00:00</div>`;
             if (data.qr_code) {
                 let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data.qr_code)}`;
                 widgetsHtml += `<div class="qr-box"><img src="${qrUrl}" alt="QR"><div class="qr-text">${data.qr_text || 'Okutun'}</div></div>`;
             }
-            if(data.layout === 'sidebar') {
-                document.getElementById('widgets-sidebar').innerHTML = widgetsHtml;
-                document.getElementById('widgets-overlay').innerHTML = '';
-            } else {
-                document.getElementById('widgets-overlay').innerHTML = widgetsHtml;
-                document.getElementById('widgets-sidebar').innerHTML = '';
-            }
+            document.getElementById('widgets-sidebar').innerHTML = layout==='sidebar' ? widgetsHtml : '';
+            document.getElementById('widgets-overlay').innerHTML = layout==='default' ? widgetsHtml : '';
+            
             updateClock();
 
-            // Media Handle
             const mediaSource = data.media_source || 'youtube';
             switchSource(mediaSource);
             currentAudioPriority = data.audio_priority || 'video';
@@ -272,11 +394,8 @@
                     vidEl.muted = false;
                     audEl.pause();
                 }
-                
                 if (localVideoList.length === 0) vidEl.pause();
-
             } else {
-                // Youtube
                 if (data.video_playlist && data.video_playlist !== currentVideoId) {
                     if(isPlayerInitialized && player && player.loadPlaylist) {
                         if(data.video_playlist.startsWith('PL')) player.loadPlaylist({list: data.video_playlist, listType: 'playlist'});
@@ -294,10 +413,10 @@
             }
         }
 
+        fetchProducts();
         setInterval(fetchSettings, 5000); 
         setTimeout(fetchSettings, 1000); 
 
-        // Auto-play unblocker on user click (for browsers that block autoplay)
         document.body.addEventListener('click', () => {
             if(currentMediaSource === 'local') {
                 if(localVideoList.length > 0) vidEl.play().catch(e=>{});
