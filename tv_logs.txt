@@ -4,18 +4,12 @@ Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna
 App is up to date.
 Settings fetched successfully.
 Video already exists: 1.mp4
-[JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 131
-[JS] [applySettings] AndroidTV exists. using Native. -- From line 513
-[JS] Playing local video: /static/tv_media/videos/1.mp4 -- From line 256
-[JS] Calling AndroidTV.playNativeVideo... -- From line 258
-[NATIVE] setVideoBounds called: left=325.7066650390625, top=15.433333396911621, w=687.9800415039062, h=374.2266845703125, density=2.34375
-[NATIVE] Trying to play: /storage/emulated/0/Android/data/com.firinna.tv/files/Movies/1.mp4
-[NATIVE] File exists! Starting playback.
-[NATIVE] MediaPlayer PREPARED!
-[JS] [applySettings] AndroidTV exists. using Native. -- From line 513
-[JS] Playing local video: /static/tv_media/videos/1.mp4 -- From line 256
-[JS] Calling AndroidTV.playNativeVideo... -- From line 258
-[NATIVE] setVideoBounds called: left=325.7066650390625, top=15.433333396911621, w=687.9800415039062, h=374.2266845703125, density=2.34375
+[JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 140
+[JS] SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON -- From line 442
+[JS] [applySettings] AndroidTV exists. using Native. -- From line 508
+[JS] Playing local video: /static/tv_media/videos/1.mp4 -- From line 251
+[JS] Calling AndroidTV.playNativeVideo... -- From line 253
+[NATIVE] setVideoBounds called: left=325.7066650390625, top=86.16000366210938, w=687.9800415039062, h=316.1266784667969, density=2.34375
 [NATIVE] Trying to play: /storage/emulated/0/Android/data/com.firinna.tv/files/Movies/1.mp4
 [NATIVE] File exists! Starting playback.
 [NATIVE] MediaPlayer PREPARED!

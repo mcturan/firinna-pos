@@ -12,7 +12,7 @@
     },
     {
         "id": "prod_s1",
-        "title": "Premium Turkish Tea",
+        "title": "Premium Turkish Tea with bergamot and rose",
         "category": "Hot Drinks",
         "description": "Finest black tea leaves from the Black Sea region, traditionally brewed for a rich and deep flavor.",
         "price": "40 TL",
@@ -34,7 +34,7 @@
     },
     {
         "id": "prod_dr1",
-        "title": "Signature Homemade Lemonade",
+        "title": "Hibiscus Lemonade",
         "category": "Cold Drinks",
         "description": "Ice-cold freshly squeezed lemons, delicately blended with fresh mint and Iranian saffron.",
         "price": "150 TL",

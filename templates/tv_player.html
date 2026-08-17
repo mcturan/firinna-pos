@@ -47,7 +47,7 @@
         
         #ml-main-video { grid-column: 2; grid-row: 2; position: relative; border-radius: 1vw; overflow: hidden; background: transparent; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         
-        #ml-ticker-box { grid-column: 1 / 3; grid-row: 3; background: #2d6a4f; color: white; border-radius: 1vw; display: flex; align-items: center; overflow: hidden; white-space: nowrap; padding: 0 1vw; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        #ml-ticker-box { grid-column: 1 / 3; grid-row: 3; background: #1a202c; color: white; border-radius: 1vw; display: flex; align-items: center; overflow: hidden; white-space: nowrap; padding: 0 1vw; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
         .ticker-text { font-size: 2.2vw; font-weight: 700; display: inline-block; animation: marquee 20s linear infinite; padding-left: 100%; text-transform: uppercase; letter-spacing: 2px; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         
@@ -106,28 +106,31 @@
         <!-- TOP ROW: Logo (left) & Support (right) -->
         <div id="ml-logo-box" class="grid-box">
             <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
-            <div class="tr-domain">www.firinna.com</div>
         </div>
         
         <div id="ml-support-box" class="grid-box">
             <!-- Layer 1: Support -->
-            <div id="ml-support-layer" style="display:flex; justify-content: space-between; align-items:center; transition: opacity 1s ease; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
-                <div style="font-size:1.5vw; font-weight:800; color:#2d6a4f; text-transform:uppercase;">Support Us & Review Us</div>
-                <div style="display:flex; gap:2vw; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
-                        <span style="color:#4285F4; font-weight:800; font-size:1.5vw;">G</span><span style="color:#EA4335; font-weight:800; font-size:1.5vw;">o</span><span style="color:#FBBC05; font-weight:800; font-size:1.5vw;">o</span><span style="color:#4285F4; font-weight:800; font-size:1.5vw;">g</span><span style="color:#34A853; font-weight:800; font-size:1.5vw;">l</span><span style="color:#EA4335; font-weight:800; font-size:1.5vw;">e</span> <span style="font-weight:700; color:#4a5568; font-size:1.5vw;">Maps</span>
+            <div id="ml-layer-0" style="display:flex; justify-content: space-between; align-items:center; transition: opacity 1s ease; position:absolute; left:3vw; right:3vw; top:0; bottom:0;">
+                <div style="font-size:1.8vw; font-weight:800; color:#2d6a4f; letter-spacing:1px;">BİZİ DEĞERLENDİRİN</div>
+                <div style="display:flex; gap:3vw; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:0.8vw; padding: 0.5vw 1.5vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0; font-size:1.5vw; font-weight:800;">
+                        <span style="color:#4285F4;">G</span><span style="color:#EA4335;">o</span><span style="color:#FBBC05;">o</span><span style="color:#4285F4;">g</span><span style="color:#34A853;">l</span><span style="color:#EA4335;">e</span> <span style="color:#4a5568;">Maps</span>
                     </div>
-                    <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
-                        <span style="color:#fc3f1d; font-weight:800; font-size:1.5vw;">Yandex</span> <span style="font-weight:700; color:#4a5568; font-size:1.5vw;">Maps</span>
+                    <div style="display:flex; align-items:center; gap:0.8vw; padding: 0.5vw 1.5vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0; font-size:1.5vw; font-weight:800;">
+                        <span style="color:#fc3f1d;">Yandex</span> <span style="color:#4a5568;">Maps</span>
                     </div>
                 </div>
             </div>
             <!-- Layer 2: Weather & Clock -->
-            <div id="ml-weather-layer" style="display:flex; justify-content: space-between; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
-                <span id="ml-clock" style="font-size:2.5vw; font-weight:800;">00:00</span>
-                <div id="ml-weather" style="font-size:1.5vw; font-weight:700; color:#4a5568; display:flex; gap: 3vw;">
+            <div id="ml-layer-1" style="display:flex; justify-content: space-between; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; left:3vw; right:3vw; top:0; bottom:0; pointer-events:none;">
+                <span id="ml-clock" style="font-size:3vw; font-weight:800; color:#1a202c; letter-spacing:2px;">00:00</span>
+                <div id="ml-weather" style="font-size:1.6vw; font-weight:700; color:#4a5568; display:flex; gap: 2vw;">
                     <span>Loading...</span>
                 </div>
+            </div>
+            <!-- Layer 3: Website -->
+            <div id="ml-layer-2" style="display:flex; justify-content: center; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; left:3vw; right:3vw; top:0; bottom:0; pointer-events:none;">
+                <span style="font-size:2.8vw; font-weight:800; color:#2d6a4f; letter-spacing:2px;">www.firinna.com</span>
             </div>
         </div>
 
@@ -367,15 +370,17 @@
         }
         setInterval(rotateProducts, 7000); // 7 seconds for products
         
-        let supportToggle = false;
+        let supportIndex = 0;
         function rotateSupport() {
-            supportToggle = !supportToggle;
-            document.getElementById('ml-support-layer').style.opacity = supportToggle ? '0' : '1';
-            document.getElementById('ml-support-layer').style.pointerEvents = supportToggle ? 'none' : 'auto';
-            document.getElementById('ml-weather-layer').style.opacity = supportToggle ? '1' : '0';
-            document.getElementById('ml-weather-layer').style.pointerEvents = supportToggle ? 'auto' : 'none';
+            supportIndex = (supportIndex + 1) % 3;
+            document.getElementById('ml-layer-0').style.opacity = supportIndex === 0 ? '1' : '0';
+            document.getElementById('ml-layer-0').style.pointerEvents = supportIndex === 0 ? 'auto' : 'none';
+            document.getElementById('ml-layer-1').style.opacity = supportIndex === 1 ? '1' : '0';
+            document.getElementById('ml-layer-1').style.pointerEvents = supportIndex === 1 ? 'auto' : 'none';
+            document.getElementById('ml-layer-2').style.opacity = supportIndex === 2 ? '1' : '0';
+            document.getElementById('ml-layer-2').style.pointerEvents = supportIndex === 2 ? 'auto' : 'none';
         }
-        setInterval(rotateSupport, 5000); // 5 seconds for support/weather
+        setInterval(rotateSupport, 8000); // 8 seconds for support/weather/domain
 
         function updateTickerText() {
             let finalText = basePromoText;
