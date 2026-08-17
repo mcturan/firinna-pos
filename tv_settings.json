@@ -1,5 +1,5 @@
 {
-    "logo_url": "",
+    "logo_url": "/static/uploads/logo.png",
     "layout": "modern_grid",
     "video_playlist": "https://www.youtube.com/watch?v=27bsX5a9qO4",
     "local_videos": [],
@@ -14,5 +14,5 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-17T17:42:32.761096"
+    "last_ping": "2026-08-17T17:50:57.903566"
 }

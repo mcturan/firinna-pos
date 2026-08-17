@@ -26,7 +26,7 @@
         body.layout-sidebar #video-container { width: 75%; }
         
         /* Modern Grid Layout */
-        #modern-layout { display: none; width: 100vw; height: 100vh; padding: 1.5vw; box-sizing: border-box; grid-template-columns: 3fr 4fr 3fr; grid-template-rows: 12vh 1fr; gap: 1.5vw; }
+        #modern-layout { display: none; width: 100vw; height: 100vh; padding: 1.5vw; padding-bottom: 0; box-sizing: border-box; grid-template-columns: 3fr 4fr 3fr; grid-template-rows: 12vh 1fr 6vh; gap: 1.5vw; }
         body.layout-modern_grid #modern-layout { display: grid; }
         body.layout-modern_grid #legacy-overlay { display: none; }
         body.layout-modern_grid #sidebar { display: none; }
@@ -62,8 +62,13 @@
         .msg-slide.active { opacity: 1; }
         
         /* Ticker Top Right */
-        .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2d6a4f; margin-bottom: 0.2vw; }
-        .tr-ticker { font-size: 1.2vw; font-weight: 600; color: #4a5568; }
+        .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2d6a4f; margin-bottom: 0.5vw; text-transform: uppercase; }
+        .tr-flags { display: flex; gap: 0.8vw; justify-content: flex-end; }
+        .tr-flags img { height: 1.8vw; border-radius: 0.2vw; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        /* Modern Bottom Ticker */
+        #ml-bottom-ticker { grid-column: 1 / span 3; grid-row: 3; background: #2d6a4f; border-radius: 1vw 1vw 0 0; color: white; display: flex; align-items: center; overflow: hidden; font-size: 1.8vw; font-weight: 600; text-transform: uppercase; white-space: nowrap; }
+        .ml-ticker-anim { display: inline-block; padding-left: 100%; animation: ticker 25s linear infinite; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
 
         /* Record Animation */
         #record-player { position: absolute; top: 2vw; right: 2vw; width: 6vw; height: 6vw; background: url('/static/img/record.png') no-repeat center/cover; border-radius: 50%; z-index: 10; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
@@ -106,9 +111,14 @@
         <div class="grid-box" id="ml-top-center">
             <img id="ml-logo" src="" style="max-height:80%; max-width:80%; display:none;">
         </div>
-        <div class="grid-box" id="ml-top-right">
-            <div class="tr-domain">firinna.com</div>
-            <div class="tr-ticker" id="ml-ticker-short">Hoş Geldiniz</div>
+        <div class="grid-box" id="ml-top-right" style="justify-content:center;">
+            <div class="tr-domain">FIRINNA MENU: www.firinna.com</div>
+            <div class="tr-flags">
+                <img src="https://flagcdn.com/w40/tr.png" alt="TR">
+                <img src="https://flagcdn.com/w40/gb.png" alt="EN">
+                <img src="https://flagcdn.com/w40/sa.png" alt="AR">
+                <img src="https://flagcdn.com/w40/ru.png" alt="RU">
+            </div>
         </div>
 
         <!-- Main Content Row -->
@@ -127,6 +137,10 @@
                 <video id="local-video" style="display:none;" autoplay muted playsinline></video>
             </div>
             <div id="record-player"></div>
+        </div>
+
+        <div id="ml-bottom-ticker">
+            <div class="ml-ticker-anim" id="ml-ticker-text">Yükleniyor...</div>
         </div>
     </div>
 
@@ -320,14 +334,19 @@
             });
             if(!finalText) finalText = "Hoş Geldiniz...";
             
+            // Legacy ticker
             const tickerEl = document.getElementById('ticker-text');
             if (tickerEl.textContent !== finalText) {
                 tickerEl.textContent = finalText;
                 tickerEl.style.animation = 'none'; tickerEl.offsetHeight; tickerEl.style.animation = null; 
             }
             
-            let shortText = currentMessages.length > 0 ? currentMessages[Math.floor(Math.random()*currentMessages.length)].text : finalText;
-            document.getElementById('ml-ticker-short').textContent = shortText.substring(0, 50) + (shortText.length > 50 ? '...' : '');
+            // Modern grid ticker
+            const mlTicker = document.getElementById('ml-ticker-text');
+            if (mlTicker.textContent !== finalText) {
+                mlTicker.textContent = finalText;
+                mlTicker.style.animation = 'none'; mlTicker.offsetHeight; mlTicker.style.animation = null;
+            }
         }
         setInterval(updateTickerText, 20000); 
 
@@ -464,6 +483,9 @@
             if(currentMediaSource === 'local') {
                 if(localVideoList.length > 0) vidEl.play().catch(e=>{});
                 if(currentAudioPriority === 'music' && localAudioList.length > 0) audEl.play().catch(e=>{});
+            } else if (currentMediaSource === 'youtube') {
+                if(player && player.playVideo) player.playVideo();
+                if (currentAudioPriority === 'video' && player && player.unMute) player.unMute();
             }
         });
     </script>
