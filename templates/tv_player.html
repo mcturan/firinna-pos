@@ -221,7 +221,7 @@
         
         function playLocalVideo(vIndex) {
             if(localVideoList.length === 0) return;
-            const srcUrl = "/static/tv_media/videos/" + localVideoList[vIndex];
+            let srcUrl = localVideoList[vIndex]; if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             vidEl.src = srcUrl;
             vidEl.play().catch(e => {
                 console.log("Local video play blocked:", e);
