@@ -53,7 +53,9 @@ def add_no_cache_headers(response):
 def api_mobile_version():
     return jsonify({
         'version': APP_VERSION,
-        'apk_url': '/download_apk'
+        'apk_url': '/download_apk',
+        'tv_version': '1.0.1',
+        'tv_apk_url': '/static/Firinna-TV.apk'
     })
 
 @app.route('/download_apk')
