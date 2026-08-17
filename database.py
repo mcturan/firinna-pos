@@ -108,6 +108,11 @@ def init_db():
         created_at TEXT DEFAULT (datetime('now','localtime'))
     )''')
 
+    c.execute('CREATE INDEX IF NOT EXISTS idx_orders_table_status ON orders(table_id, status)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_stock_movements_item ON stock_movements(stock_item_id)')
+
     conn.commit()
     conn.close()
 

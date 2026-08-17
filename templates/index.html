@@ -106,7 +106,7 @@
                     <div class="products-grid" id="productsGrid"></div>
                 </div>
 
-                <div class="order-summary" style="min-width: 450px;">
+                <div class="order-summary" style="min-width: 0;">
                     <h3>Sipariş Özeti</h3>
                     <div class="order-items" id="orderItems"></div>
                     
@@ -185,7 +185,7 @@
                     <div class="products-grid" id="pastProductsGrid"></div>
                 </div>
 
-                <div class="order-summary" style="min-width: 450px;">
+                <div class="order-summary" style="min-width: 0;">
                     <h3>Sipariş Sepeti</h3>
                     <div class="order-items" id="pastOrderItems"></div>
                     
@@ -1461,10 +1461,7 @@
             document.getElementById('orderModal').style.display   = 'none';
             refreshZone();
         }
-        function toggleSplitSection() {
-            const section = document.getElementById('splitSection');
-            section.style.display = section.style.display === 'none' ? 'block' : 'none';
-        }
+
 
 
 
@@ -2458,7 +2455,7 @@ async function openItemTransferModal() {
         itemsList.innerHTML = currentOrder.items.map(i => `
             <div style="display:flex; gap:.5rem; align-items:center; font-size:.85rem; padding:.3rem 0; border-bottom:1px solid var(--border);">
                 <input type="checkbox" class="transfer-item-check" data-item-id="${i.id}" data-max-qty="${i.quantity}">
-                <input type="number" class="transfer-item-qty" value="${i.quantity}" min="1" max="${i.quantity}" data-item-id="${i.id}" style="width:45px; padding:2px; border:1px solid var(--border); border-radius:4px; text-align:center;" oninput="validatePayQty(this)">
+                <input type="number" class="transfer-item-qty" value="${i.quantity}" min="1" max="${i.quantity}" data-item-id="${i.id}" style="width:45px; padding:2px; border:1px solid var(--border); border-radius:4px; text-align:center;" oninput="if(parseInt(this.value)>parseInt(this.max))this.value=this.max;if(parseInt(this.value)<1)this.value=1;">
                 <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-left:.25rem;">x ${i.product_name||i.name||''}</span>
                 <span style="font-weight:600; color:var(--ink-2);">${i.is_complimentary ? 'İkram' : fmtTL(i.quantity * (i.price||0))}</span>
             </div>

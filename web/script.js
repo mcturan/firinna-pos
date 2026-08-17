@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Yıl Güncelleme
     const yearSpan = document.getElementById('year');
     if (yearSpan) {
-        yearSpan.textContent = '2025';
+        yearSpan.textContent = new Date().getFullYear();
     }
 
     // Kartlar için giriş animasyonu

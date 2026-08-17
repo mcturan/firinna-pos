@@ -9,8 +9,17 @@ import threading
 import time
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["5000 per hour", "100 per minute"],
+    storage_uri="memory://"
+)
 
 APP_VERSION = "1.5.5"
 APP_BUILD   = "2026-08-10"
@@ -319,9 +328,6 @@ def api_delete_recipe(rid):
 def expenses_page():
     return render_template('expenses.html')
 
-@app.route('/reports')
-def reports_page():
-    return render_template('reports.html')
 
 # API: Kategoriler
 @app.route('/api/categories', methods=['GET', 'POST'])
@@ -1131,79 +1137,6 @@ def api_split_order(order_id):
     per_person = db.split_order_equal(order_id, data['num_people'])
     return jsonify({'per_person': per_person})
 
-@app.route('/api/orders/<int:order_id>/pay-items', methods=['POST'])
-def api_pay_order_items(order_id):
-    data = request.json or {}
-    items_to_pay = data.get('items', [])
-    payment_cash = data.get('payment_cash', 0)
-    payment_card = data.get('payment_card', 0)
-    tip_amount = data.get('tip_amount', 0)
-    tip_method = data.get('tip_method', 'cash')
-    
-    if not items_to_pay:
-        return jsonify({'success': False, 'error': 'Ödenecek ürün seçilmedi.'}), 400
-        
-    try:
-        new_order_id, original_closed = db.pay_order_items(
-            order_id, items_to_pay, payment_cash, payment_card, tip_amount, tip_method
-        )
-        db.deduct_stock_for_order(new_order_id)
-        telegram_notify.check_low_stock_after_order(new_order_id)
-        
-        return jsonify({
-            'success': True,
-            'new_order_id': new_order_id,
-            'original_closed': original_closed
-        })
-    except ValueError as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
-
-
-@app.route('/api/orders/<int:order_id>/split-ticket', methods=['POST'])
-def api_split_ticket(order_id):
-    data = request.json or {}
-    items_to_move = data.get('items', [])
-    if not items_to_move:
-        return jsonify({'success': False, 'error': 'Aktarılacak ürün seçilmedi.'}), 400
-        
-    try:
-        conn = db.get_db()
-        # Find max part_no for this order
-        max_part = conn.execute("SELECT MAX(part_no) FROM order_items WHERE order_id=?", (order_id,)).fetchone()[0]
-        if not max_part:
-            max_part = 1
-        new_part = max_part + 1
-        
-        for item in items_to_move:
-            item_id = item['id']
-            qty_to_move = item.get('quantity', item.get('qty', 1))
-            
-            orig = conn.execute("SELECT * FROM order_items WHERE id=? AND order_id=?", (item_id, order_id)).fetchone()
-            if not orig:
-                continue
-            
-            if qty_to_move >= orig['quantity']:
-                conn.execute("UPDATE order_items SET part_no=? WHERE id=?", (new_part, item_id))
-            else:
-                conn.execute("UPDATE order_items SET quantity = quantity - ? WHERE id=?", (qty_to_move, item_id))
-                conn.execute('''
-                    INSERT INTO order_items 
-                    (order_id, product_id, product_name, price, quantity, kitchen_notes, is_complimentary, part_no)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    order_id, orig['product_id'], orig['product_name'], orig['price'], 
-                    qty_to_move, orig['kitchen_notes'], orig['is_complimentary'], new_part
-                ))
-        
-        conn.commit()
-        conn.close()
-        
-        return jsonify({
-            'success': True,
-            'source_deleted': False
-        })
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
 
 
 @app.route('/api/orders/<int:order_id>/transfer-items', methods=['POST'])
@@ -3367,6 +3300,17 @@ def api_web_reservation():
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/<path:filename>')
+def serve_web_static(filename):
+    """Serve static files from web directory (for port 5000 access)"""
+    import os
+    web_path = os.path.join(os.path.dirname(__file__), 'web', filename)
+    if os.path.isfile(web_path):
+        return send_from_directory('web', filename)
+    # Fall through to other routes / 404
+    from flask import abort
+    abort(404)
 
 if __name__ == '__main__':
     db.init_db()
