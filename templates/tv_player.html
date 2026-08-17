@@ -213,7 +213,11 @@
             currentMediaSource = sourceType;
             if(sourceType === 'local') {
                 document.getElementById('ytplayer').style.display = 'none';
-                document.getElementById('local-video').style.display = 'block';
+                if (!window.AndroidTV) {
+                    document.getElementById('local-video').style.display = 'block';
+                } else {
+                    document.getElementById('local-video').style.display = 'none';
+                }
                 if(player && player.pauseVideo) player.pauseVideo();
             } else {
                 document.getElementById('local-video').style.display = 'none';
