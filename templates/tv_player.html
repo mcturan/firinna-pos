@@ -35,8 +35,12 @@
         /* Left Sidebar (Column 1) */
         #ml-sidebar { grid-column: 1; display: flex; flex-direction: column; gap: 1.5vw; }
         
-        #ml-logo-box { padding: 1.5vw; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; }
-        #ml-logo { max-width: 90%; max-height: 12vh; object-fit: contain; }
+        #ml-logo-box { padding: 2vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; gap: 1vw; }
+        #ml-logo { max-width: 95%; max-height: 18vh; object-fit: contain; }
+        
+        .tr-domain { font-size: 1.1vw; font-weight: 800; color: #2d6a4f; text-align: center; }
+        .tr-flags { display: flex; gap: 0.8vw; justify-content: center; margin-top: 0.5vw; }
+        .tr-flags img { height: 1.5vw; border-radius: 0.2vw; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         #ml-weather-box { padding: 1vw 1.5vw; display: flex; justify-content: space-between; align-items: center; background: #2d6a4f; color: white; border-radius: 1vw; }
         #ml-clock { font-size: 2.5vw; font-weight: 800; }
@@ -48,12 +52,6 @@
         /* Main Video (Column 2) */
         #ml-main-video { grid-column: 2; position: relative; border-radius: 1vw; overflow: hidden; background: #000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         #video-container { width: 100%; height: 100%; position: absolute; inset: 0; }
-        
-        /* Floating Domain/Flags on Video */
-        #ml-floating-top-right { position: absolute; top: 1.5vw; right: 1.5vw; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); padding: 0.8vw 1.2vw; border-radius: 0.8vw; border: 1px solid rgba(255,255,255,0.2); z-index: 10; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5vw; }
-        .tr-domain { font-size: 1vw; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-        .tr-flags { display: flex; gap: 0.5vw; justify-content: flex-end; }
-        .tr-flags img { height: 1.2vw; border-radius: 0.2vw; }
 
         /* Product Carousel */
         .product-slide { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 1s ease; }
@@ -104,14 +102,23 @@
         
         <!-- Left Sidebar -->
         <div id="ml-sidebar">
-            <div id="ml-logo-box" class="grid-box">
+            <div id="ml-logo-box" class="grid-box" style="flex-direction:column;">
                 <img id="ml-logo" src="" style="display:none;">
+                <div style="margin-top:0.5vw;">
+                    <div class="tr-domain">fırınna menü: www.firinna.com</div>
+                    <div class="tr-flags">
+                        <img src="https://flagcdn.com/w40/tr.png" alt="TR">
+                        <img src="https://flagcdn.com/w40/gb.png" alt="EN">
+                        <img src="https://flagcdn.com/w40/sa.png" alt="AR">
+                        <img src="https://flagcdn.com/w40/ru.png" alt="RU">
+                    </div>
+                </div>
             </div>
             
             <div id="ml-weather-box" class="grid-box">
                 <span id="ml-clock">00:00</span>
                 <div id="ml-weather">
-                    <span>Yükleniyor...</span>
+                    <span>Loading...</span>
                 </div>
             </div>
             
@@ -131,16 +138,6 @@
                 <video id="local-video" style="display:none;" autoplay muted playsinline></video>
             </div>
             <div id="record-player"></div>
-            
-            <div id="ml-floating-top-right">
-                <div class="tr-domain">FIRINNA MENU: www.firinna.com</div>
-                <div class="tr-flags">
-                    <img src="https://flagcdn.com/w40/tr.png" alt="TR">
-                    <img src="https://flagcdn.com/w40/gb.png" alt="EN">
-                    <img src="https://flagcdn.com/w40/sa.png" alt="AR">
-                    <img src="https://flagcdn.com/w40/ru.png" alt="RU">
-                </div>
-            </div>
         </div>
 
     </div>
@@ -257,7 +254,7 @@
 
         function updateClock() {
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'});
+            const timeStr = now.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: false});
             document.querySelectorAll('.clock-text').forEach(el => el.textContent = timeStr);
             document.getElementById('ml-clock').textContent = timeStr;
         }
@@ -286,8 +283,8 @@
                     const tomIcon = wCodeMap[tomCode] || '🌤️';
                     
                     document.getElementById('ml-weather').innerHTML = `
-                        <span style="font-weight:700;">Bugün: ${todayIcon} ${todayMin}° / ${todayMax}°C</span>
-                        <span style="font-size:0.9vw; color:#bbf7d0;">Yarın: ${tomIcon} ${tomMax}°C</span>
+                        <span style="font-weight:700;">Today: ${todayIcon} ${todayMin}° / ${todayMax}°C</span>
+                        <span style="font-size:0.9vw; color:#bbf7d0;">Tomorrow: ${tomIcon} ${tomMax}°C</span>
                     `;
                 }
             } catch(e) {
