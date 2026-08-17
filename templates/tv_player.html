@@ -59,13 +59,12 @@
         #video-container { width: 100%; height: 100%; position: absolute; inset: 0; }
 
         /* Product Carousel */
-        .product-slide { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 1s ease; }
+        .product-slide { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 1s ease; background: #fff; border-radius: 1vw; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
         .product-slide.active { opacity: 1; z-index: 5; }
-        .prod-img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; }
-        .prod-info { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; padding: 2vw; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; color: white; height: 60%; }
-        .prod-title { font-size: 2.2vw; font-weight: 800; color: #fff; margin-bottom: 0.5vw; line-height: 1.1; }
-        .prod-desc { font-size: 1.4vw; color: #cbd5e1; margin-bottom: 0.5vw; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
-        .prod-tags { display: none; }
+        .prod-img { width: 100%; height: 85%; object-fit: cover; z-index: 1; border-radius: 1vw 1vw 0 0; }
+        .prod-info { height: 15%; padding: 0.5vw 1vw; display: flex; align-items: center; justify-content: center; background: #fff; color: #1a202c; z-index: 2; border-top: 2px solid #e2e8f0; }
+        .prod-title { font-size: 1.8vw; font-weight: 800; color: #1a202c; text-align: center; margin: 0; line-height: 1.2; text-transform: uppercase; letter-spacing: 1px; }
+        .prod-desc, .prod-tags { display: none; }
 
         /* Video Native Control Fixes for Mobile */
         video::-webkit-media-controls { display: none !important; }
@@ -114,12 +113,6 @@
             <div id="ml-logo-box">
                 <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
                 <div class="tr-domain">www.firinna.com</div>
-                <div id="ml-floating-weather" style="position:relative; top:auto; right:auto; width:100%; margin-top:0.2vw; padding:0; background:transparent; border:none; color:#1a202c; flex-direction:column; gap:0.2vw; box-shadow:none; backdrop-filter:none;">
-                    <span id="ml-clock" style="font-size:2.5vw; font-weight:800;">00:00</span>
-                    <div id="ml-weather" style="text-align:center; font-size:1.2vw; font-weight:600; color:#4a5568;">
-                        <span>Loading...</span>
-                    </div>
-                </div>
             </div>
 
             <div id="ml-left-top" class="grid-box">
@@ -140,14 +133,24 @@
                 <div id="record-player"></div>
             </div>
             
-            <div id="ml-support-box" class="grid-box" style="padding: 1vw 2vw; display: flex; justify-content: space-between; align-items: center; background: #fff; color: #1a202c; border-radius: 1vw; max-height: 8vh;">
-                <div style="font-size:1.5vw; font-weight:800; color:#2d6a4f; text-transform:uppercase;">Support Us & Review Us</div>
-                <div style="display:flex; gap:2vw; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
-                        <span style="color:#4285F4; font-weight:800; font-size:1.5vw;">G</span><span style="color:#EA4335; font-weight:800; font-size:1.5vw;">o</span><span style="color:#FBBC05; font-weight:800; font-size:1.5vw;">o</span><span style="color:#4285F4; font-weight:800; font-size:1.5vw;">g</span><span style="color:#34A853; font-weight:800; font-size:1.5vw;">l</span><span style="color:#EA4335; font-weight:800; font-size:1.5vw;">e</span> <span style="font-weight:700; color:#4a5568; font-size:1.5vw;">Maps</span>
+            <div id="ml-support-box" class="grid-box" style="padding: 0 2vw; display: flex; justify-content: space-between; align-items: center; background: #fff; color: #1a202c; border-radius: 1vw; min-height: 8vh; position: relative; overflow: hidden;">
+                <!-- Layer 1: Support -->
+                <div id="ml-support-layer" style="display:flex; justify-content: space-between; width: 100%; align-items:center; transition: opacity 1s ease; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
+                    <div style="font-size:1.5vw; font-weight:800; color:#2d6a4f; text-transform:uppercase;">Support Us & Review Us</div>
+                    <div style="display:flex; gap:2vw; align-items:center;">
+                        <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
+                            <span style="color:#4285F4; font-weight:800; font-size:1.5vw;">G</span><span style="color:#EA4335; font-weight:800; font-size:1.5vw;">o</span><span style="color:#FBBC05; font-weight:800; font-size:1.5vw;">o</span><span style="color:#4285F4; font-weight:800; font-size:1.5vw;">g</span><span style="color:#34A853; font-weight:800; font-size:1.5vw;">l</span><span style="color:#EA4335; font-weight:800; font-size:1.5vw;">e</span> <span style="font-weight:700; color:#4a5568; font-size:1.5vw;">Maps</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
+                            <span style="color:#fc3f1d; font-weight:800; font-size:1.5vw;">Yandex</span> <span style="font-weight:700; color:#4a5568; font-size:1.5vw;">Maps</span>
+                        </div>
                     </div>
-                    <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
-                        <span style="color:#fc3f1d; font-weight:800; font-size:1.5vw;">Yandex</span> <span style="font-weight:700; color:#4a5568; font-size:1.5vw;">Maps</span>
+                </div>
+                <!-- Layer 2: Weather & Clock -->
+                <div id="ml-weather-layer" style="display:flex; justify-content: space-between; width: 100%; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
+                    <span id="ml-clock" style="font-size:2.5vw; font-weight:800;">00:00</span>
+                    <div id="ml-weather" style="font-size:1.5vw; font-weight:700; color:#4a5568; display:flex; gap: 3vw;">
+                        <span>Loading...</span>
                     </div>
                 </div>
             </div>
@@ -349,6 +352,7 @@
         fetchWeather();
         setInterval(fetchWeather, 3600000);
 
+        let supportToggle = false;
         function rotateContent() {
             if(webProducts.length > 0) {
                 const slides = document.querySelectorAll('.product-slide');
@@ -366,8 +370,14 @@
                     mIndex = (mIndex + 1) % slides.length;
                 }
             }
+            
+            supportToggle = !supportToggle;
+            document.getElementById('ml-support-layer').style.opacity = supportToggle ? '0' : '1';
+            document.getElementById('ml-support-layer').style.pointerEvents = supportToggle ? 'none' : 'auto';
+            document.getElementById('ml-weather-layer').style.opacity = supportToggle ? '1' : '0';
+            document.getElementById('ml-weather-layer').style.pointerEvents = supportToggle ? 'auto' : 'none';
         }
-        setInterval(rotateContent, 10000);
+        setInterval(rotateContent, 4000);
 
         function updateTickerText() {
             let finalText = basePromoText;

@@ -4,17 +4,10 @@ Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna
 App is up to date.
 Settings fetched successfully.
 Video already exists: 1.mp4
-[JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 132
-[JS] [applySettings] AndroidTV exists. using Native. -- From line 501
-[JS] Playing local video: /static/tv_media/videos/1.mp4 -- From line 254
-[JS] Calling AndroidTV.playNativeVideo... -- From line 256
-[NATIVE] setVideoBounds called: left=325.7066650390625, top=15.433333396911621, w=687.9800415039062, h=358.8999938964844, density=2.34375
-[NATIVE] Trying to play: /storage/emulated/0/Android/data/com.firinna.tv/files/Movies/1.mp4
-[NATIVE] File exists! Starting playback.
-[NATIVE] MediaPlayer PREPARED!
-[JS] [applySettings] AndroidTV exists. using Native. -- From line 501
-[JS] Playing local video: /static/tv_media/videos/1.mp4 -- From line 254
-[JS] Calling AndroidTV.playNativeVideo... -- From line 256
+[JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 138
+[JS] [applySettings] AndroidTV exists. using Native. -- From line 500
+[JS] Playing local video: /static/tv_media/videos/1.mp4 -- From line 253
+[JS] Calling AndroidTV.playNativeVideo... -- From line 255
 [NATIVE] setVideoBounds called: left=325.7066650390625, top=15.433333396911621, w=687.9800415039062, h=358.8999938964844, density=2.34375
 [NATIVE] Trying to play: /storage/emulated/0/Android/data/com.firinna.tv/files/Movies/1.mp4
 [NATIVE] File exists! Starting playback.
