@@ -5,7 +5,7 @@
         "category": "Hot Drinks",
         "description": "Slow-brewed traditional Turkish coffee made from specially roasted and freshly ground Arabica beans, served with authentic Turkish delight.",
         "price": "120 TL",
-        "image_url": "https://images.unsplash.com/photo-1579992357154-faf4bde95b3d?auto=format&fit=crop&w=800&q=80",
+        "image_url": "https://firinna.com/drink_kahve.webp",
         "is_signature": true,
         "tags": [],
         "is_active": true
@@ -16,7 +16,7 @@
         "category": "Hot Drinks",
         "description": "Finest black tea leaves from the Black Sea region, traditionally brewed for a rich and deep flavor.",
         "price": "40 TL",
-        "image_url": "https://images.unsplash.com/photo-1576092762791-dd9e2220abd4?auto=format&fit=crop&w=800&q=80",
+        "image_url": "https://firinna.com/drink_cay.webp",
         "is_signature": true,
         "tags": [],
         "is_active": true
@@ -27,7 +27,7 @@
         "category": "Desserts",
         "description": "Rich and moist chocolate cake served warm with premium melted chocolate sauce and powdered sugar.",
         "price": "150 TL",
-        "image_url": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80",
+        "image_url": "https://firinna.com/cikolatali_kek.webp",
         "is_signature": true,
         "tags": [],
         "is_active": true
@@ -38,7 +38,7 @@
         "category": "Cold Drinks",
         "description": "Ice-cold freshly squeezed lemons, delicately blended with fresh mint and Iranian saffron.",
         "price": "150 TL",
-        "image_url": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=80",
+        "image_url": "https://firinna.com/drink_limonata.webp",
         "is_signature": true,
         "tags": [],
         "is_active": true
