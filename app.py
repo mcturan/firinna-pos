@@ -3312,40 +3312,7 @@ def serve_web_static(filename):
     from flask import abort
     abort(404)
 
-if __name__ == '__main__':
-    db.init_db()
-    try: db.init_muhasebe_tables()
-    except: pass
-    try: db.migrate_product_stock_link()
-    except: pass
-    try: db.migrate_orders_to_transactions()
-    except: pass
-    try: db.init_telegram_contacts()
-    except: pass
-    # Auto-pull başlat (local config'e göre)
-    try:
-        start_auto_pull_smart()
-    except:
-        pass
-    # Auto-push başlat
-    start_auto_push()
-    # Telegram günlük otomatik gönderim
-    try:
-        db.migrate_is_available()
-    except:
-        pass
-    try:
-        start_telegram_auto_send()
-    except:
-        pass
-        
-    try:
-        import auto_webp
-        auto_webp.convert_to_webp('/opt/firinna-pos/web')
-    except Exception as e:
-        print("Auto WebP Error:", e)
-        
-    
+
 import os
 import json
 from datetime import datetime
@@ -3427,5 +3394,40 @@ def tv_admin():
 @app.route('/tv-player')
 def tv_player():
     return render_template('tv_player.html')
+
+if __name__ == '__main__':
+    db.init_db()
+    try: db.init_muhasebe_tables()
+    except: pass
+    try: db.migrate_product_stock_link()
+    except: pass
+    try: db.migrate_orders_to_transactions()
+    except: pass
+    try: db.init_telegram_contacts()
+    except: pass
+    # Auto-pull başlat (local config'e göre)
+    try:
+        start_auto_pull_smart()
+    except:
+        pass
+    # Auto-push başlat
+    start_auto_push()
+    # Telegram günlük otomatik gönderim
+    try:
+        db.migrate_is_available()
+    except:
+        pass
+    try:
+        start_telegram_auto_send()
+    except:
+        pass
+        
+    try:
+        import auto_webp
+        auto_webp.convert_to_webp('/opt/firinna-pos/web')
+    except Exception as e:
+        print("Auto WebP Error:", e)
+        
+    
 
     app.run(host='0.0.0.0', port=5000, debug=False)
