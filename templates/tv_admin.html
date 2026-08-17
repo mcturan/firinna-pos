@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dijital Tabela Yönetimi</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .tv-tabs { display:flex; gap:.5rem; border-bottom:2px solid #e2e8f0; margin-bottom:1.5rem; flex-wrap: wrap; }
+        .tv-tab { padding:.75rem 1.2rem; border:none; background:none; font-size:.9rem; font-weight:600; color:#718096; cursor:pointer; border-bottom:3px solid transparent; }
+        .tv-tab.active { color:#2d6a4f; border-bottom-color:#2d6a4f; }
+        .tv-pane { display:none; }
+        .tv-pane.active { display:block; }
+        .form-group { margin-bottom:1.25rem; }
+        .form-group label { display:block; margin-bottom:.5rem; font-weight:600; color:#4a5568; }
+        .form-group input[type="text"], .form-group select, .form-group textarea, .form-group input[type="file"] { width:100%; padding:.65rem; border:2px solid #e2e8f0; border-radius:8px; font-family:inherit;}
+        .form-group input[type="time"] { padding:.65rem; border:2px solid #e2e8f0; border-radius:8px; }
+        .btn-save { background:#2d6a4f; color:white; border:none; padding:.75rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem; margin-top: 1rem; width:100%;}
+        .btn-save:hover { background:#1b4332; }
+        .card { background:white; padding:1.5rem; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.05); margin-bottom:1.5rem; }
+        .flex-row { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;}
+        .media-list { max-height: 150px; overflow-y: auto; background: #f7fafc; padding: 1rem; border-radius: 8px; font-size: 0.85rem; border: 1px solid #e2e8f0;}
+    </style>
+</head>
+<body>
+    {% include '_navbar.html' %}
+    <div class="container" style="max-width: 900px;">
+        <h1>📺 Dijital Tabela Yönetimi</h1>
+        <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
+            <strong>Oynatıcı Ekranı:</strong> <a href="/tv-player" target="_blank" style="font-weight:bold;color:#2d6a4f;text-decoration:underline;">Sistemin IP'si:5000/tv-player</a> 
+            <span id="pingStatus" style="margin-left:1rem;font-size:0.9rem;font-weight:bold;color:red;">🔴 Çevrimdışı (Son görülme: Yok)</span>
+        </div>
+        
+        <div class="tv-tabs">
+            <button class="tv-tab active" onclick="switchTab('genel')">Genel & Logo</button>
+            <button class="tv-tab" onclick="switchTab('medya')">Video & Müzik (PC / YouTube)</button>
+            <button class="tv-tab" onclick="switchTab('mesajlar')">Kayan Yazılar</button>
+            <button class="tv-tab" onclick="switchTab('qr')">QR & Araçlar</button>
+        </div>
+
+        <div id="genel" class="tv-pane active card">
+            <h3 style="margin-top:0;">Genel Ayarlar ve Logo</h3>
+            <div class="form-group">
+                <label>Logo URL (PNG tavsiye edilir)</label>
+                <input type="text" id="logo_url" placeholder="/static/uploads/logo.png veya http://...">
+            </div>
+            <div class="form-group">
+                <label>Ekran Düzeni (Layout)</label>
+                <select id="layout">
+                    <option value="default">Tam Ekran Video + Alt Kayan Yazı</option>
+                    <option value="sidebar">Sol Video + Sağ Bilgi Paneli</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="medya" class="tv-pane card">
+            <h3 style="margin-top:0;">Video ve Müzik Kaynağı</h3>
+            <div class="form-group">
+                <label>Kaynak Seçimi</label>
+                <select id="media_source" onchange="toggleSource()">
+                    <option value="youtube">İnternetten (YouTube)</option>
+                    <option value="local">Bu PC'den (Kendi Videolarım & Müziklerim)</option>
+                </select>
+            </div>
+
+            <div id="source_youtube">
+                <div class="form-group">
+                    <label>YouTube Video veya Playlist ID</label>
+                    <input type="text" id="video_playlist" placeholder="Örn: PLa12345... veya videoId">
+                    <small style="color:#718096">YouTube linkindeki 'list=' veya 'v=' sonrasındaki kısımdır.</small>
+                </div>
+            </div>
+
+            <div id="source_local" style="display:none;">
+                <div style="display:flex; gap:1rem;">
+                    <div class="form-group" style="flex:1">
+                        <label>Bilgisayardan Video Yükle (.mp4)</label>
+                        <input type="file" id="upload_video" accept="video/mp4,video/webm">
+                        <button onclick="uploadMedia('video')" style="margin-top:5px; padding:5px 10px;">Yükle</button>
+                    </div>
+                    <div class="form-group" style="flex:1">
+                        <label>Bilgisayardan Müzik Yükle (.mp3)</label>
+                        <input type="file" id="upload_audio" accept="audio/mpeg,audio/wav">
+                        <button onclick="uploadMedia('audio')" style="margin-top:5px; padding:5px 10px;">Yükle</button>
+                    </div>
+                </div>
+                <div style="display:flex; gap:1rem;">
+                    <div style="flex:1">
+                        <strong>Yüklü Videolar (Sırayla Çalar):</strong>
+                        <div id="local_videos_list" class="media-list">Yok</div>
+                    </div>
+                    <div style="flex:1">
+                        <strong>Yüklü Müzikler (Sırayla Çalar):</strong>
+                        <div id="local_audio_list" class="media-list">Yok</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label>Ses Önceliği (Videoların sesi çıksın mı?)</label>
+                <select id="audio_priority">
+                    <option value="video">Videoların Sesi Çıksın</option>
+                    <option value="music">Videolar Sessiz Olsun (Sadece Müzik Çalsın)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="mesajlar" class="tv-pane card">
+            <h3 style="margin-top:0;">Kayan Yazılar & Ürün Tanıtımları</h3>
+            <div class="form-group">
+                <label>Sürekli Akan Yazı (Ekranın en altından geçer)</label>
+                <textarea id="promo_text" rows="3" placeholder="Bugüne özel fırından yeni çıkan simitlerimizi denediniz mi?"></textarea>
+            </div>
+            <hr style="margin:2rem 0; border:1px solid #e2e8f0;">
+            <h3 style="margin-top:0;">Zamanlanmış Mesajlar</h3>
+            <p style="font-size:0.85rem; color:#718096; margin-bottom:1rem;">Sadece belirttiğiniz saatler arasında kayan yazıda gösterilecek mesajlar.</p>
+            <div id="messages_container"></div>
+            <button onclick="addMessage()" style="margin-top:1rem;padding:.5rem 1rem; background:#edf2f7; border:none; border-radius:6px; cursor:pointer; font-weight:600;">+ Yeni Mesaj Ekle</button>
+        </div>
+
+        <div id="qr" class="tv-pane card">
+            <h3 style="margin-top:0;">QR Kod ve Hava Durumu</h3>
+            <div class="form-group">
+                <label>QR Kod Yönlendirme Linki</label>
+                <input type="text" id="qr_code" placeholder="https://firinna.com/menu">
+            </div>
+            <div class="form-group">
+                <label>QR Kod Altı Yazısı</label>
+                <input type="text" id="qr_text" placeholder="Menü için okutun">
+            </div>
+            <div class="form-group" style="display:flex; gap:1.5rem; margin-top:2rem;">
+                <label style="display:flex; align-items:center; gap:.5rem;"><input type="checkbox" id="w_weather"> Hava Durumu Göster</label>
+                <label style="display:flex; align-items:center; gap:.5rem;"><input type="checkbox" id="w_clock"> Dijital Saat Göster</label>
+            </div>
+        </div>
+
+        <button class="btn-save" onclick="saveSettings()">💾 Ayarları Kaydet ve Ekrana Gönder</button>
+    </div>
+
+    <script>
+        let localVideos = [];
+        let localAudio = [];
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tv-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tv-pane').forEach(p => p.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function toggleSource() {
+            const v = document.getElementById('media_source').value;
+            if(v === 'youtube') {
+                document.getElementById('source_youtube').style.display = 'block';
+                document.getElementById('source_local').style.display = 'none';
+            } else {
+                document.getElementById('source_youtube').style.display = 'none';
+                document.getElementById('source_local').style.display = 'block';
+                fetchLocalMedia();
+            }
+        }
+
+        async function fetchLocalMedia() {
+            const res = await fetch('/api/tv/media');
+            const data = await res.json();
+            localVideos = data.videos;
+            localAudio = data.audio;
+            document.getElementById('local_videos_list').innerHTML = localVideos.map(v => v.split('/').pop()).join('<br>') || 'Yok';
+            document.getElementById('local_audio_list').innerHTML = localAudio.map(a => a.split('/').pop()).join('<br>') || 'Yok';
+        }
+
+        async function uploadMedia(type) {
+            const input = document.getElementById('upload_' + type);
+            if(!input.files[0]) return alert("Lütfen dosya seçin");
+            const fd = new FormData();
+            fd.append('file', input.files[0]);
+            fd.append('type', type);
+            const btn = event.target;
+            btn.textContent = "Yükleniyor...";
+            try {
+                await fetch('/api/tv/media/upload', { method: 'POST', body: fd });
+                alert("Başarıyla yüklendi!");
+                input.value = "";
+                fetchLocalMedia();
+            } catch(e) {
+                alert("Yükleme başarısız oldu.");
+            }
+            btn.textContent = "Yükle";
+        }
+
+        function addMessage(text='', start='', end='') {
+            const container = document.getElementById('messages_container');
+            const id = Date.now() + Math.random().toString().substr(2, 5);
+            const html = `
+                <div class="flex-row message-row" id="msg-${id}" style="margin-bottom:1rem; align-items:end; background:#f7fafc; padding:1rem; border-radius:8px;">
+                    <div style="flex:1; min-width:200px;"><label style="font-size:0.8rem">Mesaj İçeriği</label><input type="text" class="m-text" value="${text}"></div>
+                    <div><label style="font-size:0.8rem">Başlangıç</label><input type="time" class="m-start" value="${start}"></div>
+                    <div><label style="font-size:0.8rem">Bitiş</label><input type="time" class="m-end" value="${end}"></div>
+                    <button onclick="document.getElementById('msg-${id}').remove()" style="padding:.65rem; background:#fee2e2; color:#9b2c2c; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">Sil</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        async function loadSettings() {
+            try {
+                const res = await fetch('/api/tv/settings');
+                const data = await res.json();
+                
+                document.getElementById('logo_url').value = data.logo_url || '';
+                document.getElementById('layout').value = data.layout || 'default';
+                document.getElementById('media_source').value = data.media_source || 'youtube';
+                document.getElementById('video_playlist').value = data.video_playlist || '';
+                document.getElementById('audio_priority').value = data.audio_priority || 'video';
+                document.getElementById('promo_text').value = data.promo_text || '';
+                
+                document.getElementById('qr_code').value = data.qr_code || '';
+                document.getElementById('qr_text').value = data.qr_text || '';
+                document.getElementById('w_weather').checked = data.widgets?.weather;
+                document.getElementById('w_clock').checked = data.widgets?.clock;
+
+                document.getElementById('messages_container').innerHTML = '';
+                (data.messages || []).forEach(m => addMessage(m.text, m.start_time, m.end_time));
+
+                toggleSource();
+
+                if (data.last_ping) {
+                    const diff = (new Date() - new Date(data.last_ping)) / 1000;
+                    const pStatus = document.getElementById('pingStatus');
+                    if (diff < 40) {
+                        pStatus.textContent = '🟢 Çevrimiçi (Ekran Açık)';
+                        pStatus.style.color = '#047857';
+                    } else {
+                        pStatus.textContent = `🔴 Çevrimdışı (Son görülme: ${Math.floor(diff/60)} dk önce)`;
+                        pStatus.style.color = '#dc2626';
+                    }
+                }
+            } catch(e) {
+                console.error("Ayar yükleme hatası", e);
+            }
+        }
+
+        async function saveSettings() {
+            const messages = Array.from(document.querySelectorAll('.message-row')).map(row => ({
+                text: row.querySelector('.m-text').value,
+                start_time: row.querySelector('.m-start').value,
+                end_time: row.querySelector('.m-end').value
+            })).filter(m => m.text.trim() !== '');
+
+            const data = {
+                logo_url: document.getElementById('logo_url').value,
+                layout: document.getElementById('layout').value,
+                media_source: document.getElementById('media_source').value,
+                video_playlist: document.getElementById('video_playlist').value,
+                local_videos: localVideos,
+                local_audio: localAudio,
+                audio_priority: document.getElementById('audio_priority').value,
+                promo_text: document.getElementById('promo_text').value,
+                qr_code: document.getElementById('qr_code').value,
+                qr_text: document.getElementById('qr_text').value,
+                widgets: {
+                    weather: document.getElementById('w_weather').checked,
+                    clock: document.getElementById('w_clock').checked
+                },
+                messages: messages
+            };
+
+            const btn = document.querySelector('.btn-save');
+            btn.textContent = "⏳ Kaydediliyor...";
+            try {
+                await fetch('/api/tv/settings', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                alert('Ayarlar kaydedildi! TV ekranı otomatik güncellenecek.');
+            } catch(e) {
+                alert("Hata oluştu.");
+            }
+            btn.textContent = "💾 Ayarları Kaydet ve Ekrana Gönder";
+        }
+
+        loadSettings();
+    </script>
+</body>
+</html>

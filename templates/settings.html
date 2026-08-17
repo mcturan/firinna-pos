@@ -53,7 +53,10 @@
     {% include '_navbar.html' %}
 
     <div class="container">
-        <h1 style="margin-bottom:1.25rem;">⚙️ Ayarlar</h1>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
+            <h1 style="margin:0;">⚙️ Ayarlar</h1>
+            <a href="/tv-admin" style="background:#2d6a4f; color:white; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:bold; font-size:1.1rem; box-shadow:0 4px 6px rgba(0,0,0,0.1);">📺 Dijital Tabela Ayarlarına Git →</a>
+        </div>
 
         <!-- Sekme Nav -->
         <div style="display:flex;gap:0;border-bottom:2px solid #e2e8f0;margin-bottom:1.5rem;overflow-x:auto;">
@@ -63,6 +66,7 @@
             <button class="settings-tab" onclick="switchTab('not',this)">📝 Not</button>
             <button class="settings-tab" onclick="switchTab('telegram',this)">📲 Telegram</button>
             <button class="settings-tab" onclick="switchTab('foto',this)">📸 Fotoğraf</button>
+            <button class="settings-tab" onclick="window.location.href='/tv-admin'" style="color:#2d6a4f; font-weight:bold;">📺 Dijital Tabela</button>
         </div>
 
         <!-- İşletme Bilgileri -->
@@ -143,8 +147,8 @@
                     <img id="qr-preview-img" src="" alt="QR" style="display:none;width:110px;height:110px;object-fit:contain;">
                 </div>
                 <div style="width:100%;">
-                    <label style="font-size:.85rem;color:#4a5568;font-weight:600;">QR Başlık / Davet Metni (Her Satır Birebir 1 Satır Basılır)</label>
-                    <textarea id="qr-label" rows="4" placeholder="⭐ THANK YOU FOR VISITING FIRINNA ⭐&#10;Support us with a Google Review!&#10;Your feedback means the world to us.&#10;📸 Instagram: @firinnagalata" style="width:100%; min-width:400px; padding:.75rem; border:2px solid #cbd5e1; border-radius:8px; font-size:0.95rem; margin-top:.3rem; font-family:'Courier New', monospace; box-sizing:border-box; line-height:1.5; white-space:pre; overflow-x:auto;"></textarea>
+                    <label style="font-size:.85rem;color:#4a5568;font-weight:600;">QR Altı Yazı</label>
+                    <input type="text" id="qr-label" placeholder="Bizi Google Haritalarda bulun" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;margin-top:.3rem;">
                 </div>
                 <input type="file" id="qr-file-input" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewQrFile(event)">
                 <div class="save-row" style="width:100%;">
@@ -298,31 +302,6 @@
                 statusEl.textContent = '❌ Bağlantı hatası';
             }
             btn.disabled = false; btn.textContent = '📨 Test Mesajı Gönder';
-        }
-
-        async function sendInstantReport() {
-            const btn = event.target;
-            const oldText = btn.textContent;
-            btn.disabled = true; btn.textContent = '📊 Gönderiliyor...';
-            const statusEl = document.getElementById('tg-status');
-            statusEl.style.display = 'none';
-            try {
-                const res = await fetch('/api/settings/telegram/instant_report', {method:'POST'});
-                const d = await res.json();
-                statusEl.style.display = 'block';
-                if (d.success) {
-                    statusEl.style.background = '#d1fae5'; statusEl.style.color = '#065f46';
-                    statusEl.textContent = '✅ Anlık durum raporu başarıyla gönderildi!';
-                } else {
-                    statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
-                    statusEl.textContent = '❌ ' + (d.error || 'Gönderim başarısız');
-                }
-            } catch(e) {
-                statusEl.style.display = 'block';
-                statusEl.style.background = '#fee2e2'; statusEl.style.color = '#991b1b';
-                statusEl.textContent = '❌ Bağlantı hatası';
-            }
-            btn.disabled = false; btn.textContent = oldText;
         }
 
         // --- getUpdates ---
@@ -736,13 +715,13 @@
                 WiFi QR, Google Haritalar, Instagram vb. — not fişinin altında basılır.
             </p>
             <div class="logo-area">
-                <div id="note-qr-preview-box" style="width:200px;height:200px;border:2px dashed #cbd5e1;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f8fafc;">
+                <div id="note-qr-preview-box" style="width:120px;height:120px;border:2px dashed #cbd5e1;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f8fafc;">
                     <span id="note-qr-placeholder" style="color:#94a3b8;font-size:.8rem;text-align:center;">QR yüklenmemiş</span>
-                    <img id="note-qr-img" src="" alt="QR" style="display:none;width:190px;height:190px;object-fit:contain;">
+                    <img id="note-qr-img" src="" alt="QR" style="display:none;width:110px;height:110px;object-fit:contain;">
                 </div>
-                <div style="width:100%; margin-top: 1.25rem;">
-                    <label style="font-size:.85rem;color:#4a5568;font-weight:600;">QR Başlık Metni (Enter ile Çoklu Satır Yazabilirsiniz)</label>
-                    <textarea id="note-qr-label" rows="3" placeholder="WiFi: Firinna_Guest&#10;Şifre: firinna2026" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:0.95rem;margin-top:.3rem;font-family:inherit;box-sizing:border-box;"></textarea>
+                <div style="width:100%;">
+                    <label style="font-size:.85rem;color:#4a5568;font-weight:600;">QR Altı Yazı</label>
+                    <input type="text" id="note-qr-label" placeholder="WiFi: Firinna_Guest" style="width:100%;padding:.6rem;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;margin-top:.3rem;">
                 </div>
                 <input type="file" id="note-qr-file-input" accept="image/*" style="display:none;" onchange="noteQrFileSelected(event)">
                 <div class="save-row" style="width:100%;">
@@ -818,7 +797,6 @@
                 <div class="save-row">
                     <button class="btn btn-primary" onclick="saveTelegram()">💾 Kaydet</button>
                     <button class="btn btn-secondary" onclick="testTelegram()">📨 Test Mesajı Gönder</button>
-                    <button class="btn btn-secondary" onclick="sendInstantReport()">📊 Anlık Rapor Gönder</button>
                 </div>
             </div>
             <div id="tg-status" style="margin-top:1rem;padding:.75rem;border-radius:8px;display:none;font-size:.9rem;font-weight:600;"></div>

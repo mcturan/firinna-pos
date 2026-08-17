@@ -1,16 +1,16 @@
 {
-    "today": 4,
-    "month": 230,
-    "total": 230,
-    "menu": 4,
+    "today": 6,
+    "month": 232,
+    "total": 232,
+    "menu": 5,
     "actions": 27,
     "last_date": "2026-08-17",
     "devices": {
         "💻 Masaüstü": 165,
-        "📱 Mobil": 65
+        "📱 Mobil": 67
     },
     "browsers": {
-        "Google Chrome": 199,
+        "Google Chrome": 201,
         "Apple Safari": 12,
         "Microsoft Edge": 17,
         "Diğer Tarayıcı": 2
@@ -26,10 +26,118 @@
         "Direkt Giriş": 24,
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
-        "🌐 Diğer Web Sitesi": 90,
-        "🔗 Doğrudan (Direct)": 58
+        "🌐 Diğer Web Sitesi": 91,
+        "🔗 Doğrudan (Direct)": 59
     },
     "recent_visitors": [
+        {
+            "id": "log_1786973299857",
+            "time": "17 Ağustos 16:28",
+            "iso_date": "2026-08-17",
+            "raw_time": "2026-08-17 16:28:19",
+            "ip": "46.154.40.126",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (21s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%20",
+            "time_spent": "21 sn",
+            "lang_compare": "EN ➔ UK"
+        },
+        {
+            "id": "log_1786973285747",
+            "time": "17 Ağustos 16:28",
+            "iso_date": "2026-08-17",
+            "raw_time": "2026-08-17 16:28:05",
+            "ip": "46.154.40.126",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (7s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%4",
+            "time_spent": "7 sn",
+            "lang_compare": "EN ➔ UK"
+        },
+        {
+            "id": "log_1786973285630",
+            "time": "17 Ağustos 16:28",
+            "iso_date": "2026-08-17",
+            "raw_time": "2026-08-17 16:28:05",
+            "ip": "46.154.40.126",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "📄 PDF Menü İndirme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%4",
+            "time_spent": "7 sn",
+            "lang_compare": "EN ➔ UK"
+        },
+        {
+            "id": "log_1786973279033",
+            "time": "17 Ağustos 16:27",
+            "iso_date": "2026-08-17",
+            "raw_time": "2026-08-17 16:27:59",
+            "ip": "46.154.40.126",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ UK"
+        },
+        {
+            "id": "log_1786973278665",
+            "time": "17 Ağustos 16:27",
+            "iso_date": "2026-08-17",
+            "raw_time": "2026-08-17 16:27:58",
+            "ip": "46.154.40.126",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (14s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%3",
+            "time_spent": "14 sn",
+            "lang_compare": "EN ➔ UK"
+        },
+        {
+            "id": "log_1786973265515",
+            "time": "17 Ağustos 16:27",
+            "iso_date": "2026-08-17",
+            "raw_time": "2026-08-17 16:27:45",
+            "ip": "46.154.40.126",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "1 sn",
+            "lang_compare": "EN ➔ EN"
+        },
         {
             "id": "log_1786967368309",
             "time": "17 Ağustos 14:49",
@@ -8704,18 +8812,18 @@
             "type": "🔄 Tekrar Gelen Misafir"
         }
     ],
-    "repeat_visitors": 190,
+    "repeat_visitors": 192,
     "new_visitors": 40,
     "os": {
         "Linux": 146,
         "Windows PC": 10,
         "Apple iOS": 8,
-        "Android OS": 57,
+        "Android OS": 59,
         "Diğer Sistem": 4,
         "Apple macOS": 5
     },
     "peak_hours": {
-        "14:00 - 17:00 (İkindi Kahve/Tatlı)": 54,
+        "14:00 - 17:00 (İkindi Kahve/Tatlı)": 56,
         "17:00 - 20:00 (Akşam Yemeği)": 70,
         "20:00 - 23:00 (Gece Keyfi)": 56,
         "23:00 - 08:00 (Gece / Erken)": 23,
@@ -8728,7 +8836,7 @@
         "📍 Kartal / Türkiye": 102,
         "📍 Prineville / United States": 1,
         "📍 Kansas City / United States": 1,
-        "📍 Istanbul / Türkiye": 8,
+        "📍 Istanbul / Türkiye": 10,
         "📍 Şişli / Turkey": 15,
         "📍 Ashburn / United States": 2,
         "📍 Mountain View / United States": 7,
@@ -8745,17 +8853,17 @@
     "traffic_sources": {
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
-        "🌐 Diğer Web Sitesi": 90,
-        "🔗 Doğrudan (Direct)": 58
+        "🌐 Diğer Web Sitesi": 91,
+        "🔗 Doğrudan (Direct)": 59
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 153
+        "🌐 Dışarıdan İnceleyen": 155
     },
     "lang_comparisons": {
         "TR ➔ TR": 75,
         "EN ➔ TR": 27,
-        "EN ➔ EN": 14,
+        "EN ➔ EN": 15,
         "TR ➔ ES": 8,
         "TR ➔ RU": 3,
         "TR ➔ ZH": 2,
@@ -8766,6 +8874,7 @@
         "TR ➔ FR": 2,
         "TR ➔ FA": 3,
         "TR ➔ IT": 3,
-        "TR ➔ HI": 2
+        "TR ➔ HI": 2,
+        "EN ➔ UK": 1
     }
 }

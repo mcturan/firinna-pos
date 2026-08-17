@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dijital Tabela</title>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        #video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        #ytplayer, #local-video { width: 100%; height: 100%; border: none; }
+        #local-video { object-fit: cover; }
+        
+        #overlay-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        
+        .logo { position: absolute; top: 40px; right: 40px; max-width: 250px; max-height: 120px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+        
+        /* Ticker (Kayan Yazı) */
+        .ticker-wrap { position: absolute; bottom: 0; width: 100%; height: 70px; background: rgba(0, 0, 0, 0.75); display: flex; align-items: center; overflow: hidden; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); border-top: 3px solid #2d6a4f; pointer-events: auto; }
+        .ticker-title { background: #2d6a4f; color: white; padding: 0 30px; height: 100%; display: flex; align-items: center; font-weight: 800; font-size: 1.5rem; z-index: 2; white-space: nowrap; text-transform: uppercase; letter-spacing: 2px; }
+        .ticker-content { white-space: nowrap; font-size: 2.2rem; color: #fff; font-weight: 600; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); animation: ticker 25s linear infinite; padding-left: 100%; display: inline-block; }
+        
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Widgets Container */
+        .widgets { position: absolute; bottom: 90px; right: 40px; display: flex; flex-direction: column; gap: 20px; align-items: flex-end; }
+        
+        /* QR Code */
+        .qr-box { background: rgba(255,255,255,0.9); padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .qr-box img { width: 120px; height: 120px; display: block; margin: 0 auto;}
+        .qr-text { color: #000; font-weight: 800; font-size: 1.1rem; margin-top: 10px; }
+        
+        /* Clock Widget */
+        .clock-widget { background: rgba(0,0,0,0.6); padding: 15px 30px; border-radius: 12px; color: white; font-size: 3rem; font-weight: 700; backdrop-filter: blur(5px); border: 2px solid rgba(255,255,255,0.2); text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+
+        /* Sidebar Layout */
+        body.layout-sidebar #video-container { width: 75%; }
+        body.layout-sidebar .sidebar { position: absolute; top: 0; right: 0; width: 25%; height: calc(100% - 70px); background: #1a202c; z-index: 5; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; box-sizing: border-box; border-left: 2px solid #2d3748; }
+        body.layout-sidebar .widgets { position: static; margin-top: auto; align-items: center; }
+        body.layout-sidebar .logo { position: static; max-width: 80%; margin-bottom: 40px; filter: none; }
+        
+        .sidebar { display: none; }
+        body.layout-sidebar .sidebar { display: flex; }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <div id="ytplayer" style="display:none;"></div>
+        <video id="local-video" style="display:none;" autoplay muted playsinline></video>
+    </div>
+    
+    <audio id="local-audio" style="display:none;"></audio>
+
+    <div class="sidebar" id="sidebar">
+        <img id="logo-sidebar" class="logo" src="" style="display:none;">
+        <div class="widgets" id="widgets-sidebar"></div>
+    </div>
+
+    <div id="overlay-layer">
+        <img id="logo-overlay" class="logo" src="" style="display:none;">
+        <div class="widgets" id="widgets-overlay"></div>
+        <div class="ticker-wrap">
+            <div class="ticker-title">DUYURU</div>
+            <div class="ticker-content" id="ticker-text">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- YouTube API Script -->
+    <script>
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var currentVideoId = "";
+        var currentAudioPriority = "video";
+        var currentMediaSource = "";
+        
+        var ytReady = false;
+        var isPlayerInitialized = false;
+        
+        var localVideoList = [];
+        var localAudioList = [];
+        var currentLocalVideoIndex = 0;
+        var currentLocalAudioIndex = 0;
+
+        function onYouTubeIframeAPIReady() {
+            ytReady = true;
+        }
+
+        const vidEl = document.getElementById('local-video');
+        const audEl = document.getElementById('local-audio');
+
+        vidEl.onended = () => {
+            if(localVideoList.length > 0) {
+                currentLocalVideoIndex = (currentLocalVideoIndex + 1) % localVideoList.length;
+                vidEl.src = localVideoList[currentLocalVideoIndex];
+                vidEl.play().catch(e=>{});
+            }
+        };
+
+        audEl.onended = () => {
+            if(localAudioList.length > 0) {
+                currentLocalAudioIndex = (currentLocalAudioIndex + 1) % localAudioList.length;
+                audEl.src = localAudioList[currentLocalAudioIndex];
+                audEl.play().catch(e=>{});
+            }
+        };
+
+        function switchSource(sourceType) {
+            currentMediaSource = sourceType;
+            if(sourceType === 'local') {
+                document.getElementById('ytplayer').style.display = 'none';
+                document.getElementById('local-video').style.display = 'block';
+                if(player && player.pauseVideo) player.pauseVideo();
+            } else {
+                document.getElementById('ytplayer').style.display = 'block';
+                document.getElementById('local-video').style.display = 'none';
+                vidEl.pause();
+                audEl.pause();
+                if(player && player.playVideo) player.playVideo();
+            }
+        }
+
+        function initYTPlayer(videoId, priority) {
+            currentVideoId = videoId;
+            currentAudioPriority = priority;
+            let playerVars = { 'autoplay': 1, 'controls': 0, 'rel': 0, 'showinfo': 0, 'loop': 1, 'mute': (priority === 'music' ? 1 : 0) };
+            if(videoId.startsWith('PL')) {
+                playerVars['listType'] = 'playlist'; playerVars['list'] = videoId;
+            } else {
+                playerVars['playlist'] = videoId;
+            }
+            player = new YT.Player('ytplayer', {
+                height: '100%', width: '100%',
+                videoId: videoId.startsWith('PL') ? '' : videoId,
+                playerVars: playerVars,
+                events: {
+                    'onReady': (e) => {
+                        if(currentMediaSource === 'youtube') {
+                            e.target.playVideo();
+                            if(currentAudioPriority === 'music') e.target.mute();
+                            else e.target.unMute();
+                        }
+                    },
+                    'onStateChange': (e) => { if (e.data === YT.PlayerState.ENDED) player.playVideo(); }
+                }
+            });
+        }
+    </script>
+
+    <!-- Main App Logic -->
+    <script>
+        let lastSettingsStr = "";
+        let currentMessages = [];
+        let basePromoText = "";
+
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'});
+            document.querySelectorAll('.clock-text').forEach(el => el.textContent = timeStr);
+        }
+        setInterval(updateClock, 1000);
+
+        function updateTickerText() {
+            let finalText = basePromoText;
+            const now = new Date();
+            const currentMin = now.getHours() * 60 + now.getMinutes();
+            currentMessages.forEach(msg => {
+                if(msg.start_time && msg.end_time) {
+                    const [sh, sm] = msg.start_time.split(':');
+                    const [eh, em] = msg.end_time.split(':');
+                    const startMin = parseInt(sh)*60 + parseInt(sm);
+                    const endMin = parseInt(eh)*60 + parseInt(em);
+                    if(currentMin >= startMin && currentMin <= endMin) {
+                        if(finalText) finalText += "  •  ";
+                        finalText += msg.text;
+                    }
+                }
+            });
+            if(!finalText) finalText = "Hoş Geldiniz...";
+            const tickerEl = document.getElementById('ticker-text');
+            if (tickerEl.textContent !== finalText) {
+                tickerEl.textContent = finalText;
+                tickerEl.style.animation = 'none'; tickerEl.offsetHeight; tickerEl.style.animation = null; 
+            }
+        }
+        setInterval(updateTickerText, 60000); 
+
+        async function fetchSettings() {
+            try {
+                fetch('/api/tv/ping', {method: 'POST'}).catch(e=>{});
+                const res = await fetch('/api/tv/settings');
+                const data = await res.json();
+                const dataStr = JSON.stringify(data);
+                if (dataStr !== lastSettingsStr) {
+                    lastSettingsStr = dataStr;
+                    applySettings(data);
+                }
+            } catch (e) {
+                console.log("Bağlantı hatası", e);
+            }
+        }
+
+        function applySettings(data) {
+            // Layout & Logo
+            if(data.layout === 'sidebar') {
+                document.body.classList.add('layout-sidebar');
+                document.getElementById('logo-overlay').style.display = 'none';
+                if(data.logo_url) {
+                    document.getElementById('logo-sidebar').src = data.logo_url;
+                    document.getElementById('logo-sidebar').style.display = 'block';
+                } else document.getElementById('logo-sidebar').style.display = 'none';
+            } else {
+                document.body.classList.remove('layout-sidebar');
+                document.getElementById('logo-sidebar').style.display = 'none';
+                if(data.logo_url) {
+                    document.getElementById('logo-overlay').src = data.logo_url;
+                    document.getElementById('logo-overlay').style.display = 'block';
+                } else document.getElementById('logo-overlay').style.display = 'none';
+            }
+
+            basePromoText = data.promo_text || "";
+            currentMessages = data.messages || [];
+            updateTickerText();
+
+            // Widgets
+            let widgetsHtml = "";
+            if (data.widgets && data.widgets.clock) widgetsHtml += `<div class="clock-widget clock-text">00:00</div>`;
+            if (data.qr_code) {
+                let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data.qr_code)}`;
+                widgetsHtml += `<div class="qr-box"><img src="${qrUrl}" alt="QR"><div class="qr-text">${data.qr_text || 'Okutun'}</div></div>`;
+            }
+            if(data.layout === 'sidebar') {
+                document.getElementById('widgets-sidebar').innerHTML = widgetsHtml;
+                document.getElementById('widgets-overlay').innerHTML = '';
+            } else {
+                document.getElementById('widgets-overlay').innerHTML = widgetsHtml;
+                document.getElementById('widgets-sidebar').innerHTML = '';
+            }
+            updateClock();
+
+            // Media Handle
+            const mediaSource = data.media_source || 'youtube';
+            switchSource(mediaSource);
+            currentAudioPriority = data.audio_priority || 'video';
+
+            if(mediaSource === 'local') {
+                const oldVidList = JSON.stringify(localVideoList);
+                const oldAudList = JSON.stringify(localAudioList);
+                
+                localVideoList = data.local_videos || [];
+                localAudioList = data.local_audio || [];
+
+                if (JSON.stringify(localVideoList) !== oldVidList && localVideoList.length > 0) {
+                    currentLocalVideoIndex = 0;
+                    vidEl.src = localVideoList[0];
+                    vidEl.play().catch(e=>{});
+                }
+                
+                if(currentAudioPriority === 'music' && localAudioList.length > 0) {
+                    vidEl.muted = true;
+                    if (JSON.stringify(localAudioList) !== oldAudList) {
+                        currentLocalAudioIndex = 0;
+                        audEl.src = localAudioList[0];
+                    }
+                    audEl.play().catch(e=>{});
+                } else {
+                    vidEl.muted = false;
+                    audEl.pause();
+                }
+                
+                if (localVideoList.length === 0) vidEl.pause();
+
+            } else {
+                // Youtube
+                if (data.video_playlist && data.video_playlist !== currentVideoId) {
+                    if(isPlayerInitialized && player && player.loadPlaylist) {
+                        if(data.video_playlist.startsWith('PL')) player.loadPlaylist({list: data.video_playlist, listType: 'playlist'});
+                        else player.loadVideoById(data.video_playlist);
+                        currentVideoId = data.video_playlist;
+                    } else if (!isPlayerInitialized && ytReady && window.YT && window.YT.Player) {
+                        initYTPlayer(data.video_playlist, data.audio_priority);
+                        isPlayerInitialized = true;
+                    }
+                }
+                if (isPlayerInitialized && player && player.mute) {
+                    if (data.audio_priority === 'music') player.mute();
+                    else player.unMute();
+                }
+            }
+        }
+
+        setInterval(fetchSettings, 5000); 
+        setTimeout(fetchSettings, 1000); 
+
+        // Auto-play unblocker on user click (for browsers that block autoplay)
+        document.body.addEventListener('click', () => {
+            if(currentMediaSource === 'local') {
+                if(localVideoList.length > 0) vidEl.play().catch(e=>{});
+                if(currentAudioPriority === 'music' && localAudioList.length > 0) audEl.play().catch(e=>{});
+            }
+        });
+    </script>
+</body>
+</html>
