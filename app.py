@@ -54,13 +54,23 @@ def api_mobile_version():
     return jsonify({
         'version': APP_VERSION,
         'apk_url': '/download_apk',
-        'tv_version': '1.1.2',
-        'tv_apk_url': '/static/Firinna-TV-1.1.2.apk'
+        'tv_version': '1.1.3',
+        'tv_apk_url': '/static/Firinna-TV-1.1.3.apk'
     })
 
 @app.route('/download_apk')
 def download_apk():
     return send_from_directory('mobile_app', 'Firinna-Garson.apk', as_attachment=True)
+
+@app.route('/api/tv/upload_logs', methods=['POST'])
+def upload_logs():
+    try:
+        logs = request.form.get('logs', '')
+        with open('/opt/firinna-pos/tv_logs.txt', 'w') as f:
+            f.write(logs)
+        return jsonify({"status": "success"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/api/version')
 def api_version():
