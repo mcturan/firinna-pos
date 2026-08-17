@@ -480,7 +480,11 @@
                 }
             } else if (currentMediaSource === 'local') {
                 document.getElementById('ytplayer').style.display = 'none';
-                vidEl.style.display = 'block';
+                if (!window.AndroidTV) {
+                    vidEl.style.display = 'block';
+                } else {
+                    vidEl.style.display = 'none';
+                }
                 localVideoList = data.local_videos || [];
                 if (localVideoList.length > 0) playLocalVideo(0);
             }
