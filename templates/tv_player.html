@@ -38,7 +38,7 @@
         #ml-logo-box { padding: 1.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; gap: 1vw; }
         #ml-logo { max-width: 100%; max-height: 22vh; object-fit: contain; }
         
-        .tr-domain { font-size: 1.8vw; font-weight: 800; color: #2d6a4f; text-align: center; }
+        .tr-domain { font-size: 2.5vw; font-weight: 800; color: #2d6a4f; text-align: center; }
         
         /* Weather Floating Box */
         #ml-floating-weather { position: absolute; top: 1.5vw; right: 1.5vw; padding: 0.8vw 1.2vw; display: flex; justify-content: space-between; align-items: center; gap: 1.5vw; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 1vw; z-index: 10; }
@@ -57,10 +57,9 @@
         .product-slide { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 1s ease; }
         .product-slide.active { opacity: 1; z-index: 5; }
         .prod-img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; }
-        .prod-info { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; padding: 2vw; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; color: white; height: 50%; }
-        .prod-title { font-size: 2vw; font-weight: 800; color: #fff; margin-bottom: 0.5vw; line-height: 1.1; }
-        .prod-desc { font-size: 1.2vw; color: #cbd5e1; margin-bottom: 0.5vw; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-        .prod-price { font-size: 2.2vw; font-weight: 900; color: #4ade80; text-align: right; margin-top: auto; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .prod-info { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; padding: 2vw; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; color: white; height: 60%; }
+        .prod-title { font-size: 2.2vw; font-weight: 800; color: #fff; margin-bottom: 0.5vw; line-height: 1.1; }
+        .prod-desc { font-size: 1.4vw; color: #cbd5e1; margin-bottom: 0.5vw; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
         .prod-tags { display: none; }
 
         /* Video Native Control Fixes for Mobile */
@@ -125,7 +124,7 @@
         <div id="ml-right-col">
             <!-- Main Video -->
             <div id="ml-main-video">
-                <div id="ytplayer" style="display:none;"></div>
+                <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
                 <video id="local-video" style="display:none;" autoplay muted playsinline webkit-playsinline loop></video>
                 <div id="record-player"></div>
                 
@@ -217,36 +216,51 @@
                 document.getElementById('local-video').style.display = 'block';
                 if(player && player.pauseVideo) player.pauseVideo();
             } else {
-                document.getElementById('ytplayer').style.display = 'block';
-                document.getElementById('local-video').style.display = 'none';
-                vidEl.pause();
-                audEl.pause();
-                if(player && player.playVideo) player.playVideo();
-            }
+        const ytIframe = document.getElementById('ytplayer');
+        const audEl = new Audio();
+        
+        function playLocalVideo(vIndex) {
+            if(localVideoList.length === 0) return;
+            const srcUrl = "/static/tv_media/videos/" + localVideoList[vIndex];
+            vidEl.src = srcUrl;
+            vidEl.play().catch(e => {
+                console.log("Local video play blocked:", e);
+            });
+            vidEl.onended = () => {
+                currentVidIndex = (vIndex + 1) % localVideoList.length;
+                playLocalVideo(currentVidIndex);
+            };
         }
 
-        function initOrUpdatePlayer(videoId, priority) {
-            if (!isPlayerInitialized) {
-                currentAudioPriority = priority;
-                let playerVars = { 'autoplay': 1, 'controls': 0, 'rel': 0, 'showinfo': 0, 'loop': 1, 'mute': 1 };
-                if(videoId.startsWith('PL')) { playerVars['listType'] = 'playlist'; playerVars['list'] = videoId; }
-                else { playerVars['playlist'] = videoId; }
-            
-            player = new YT.Player('ytplayer', {
-                height: '100%', width: '100%',
-                videoId: videoId.startsWith('PL') ? '' : videoId,
-                playerVars: playerVars,
-                    events: {
-                        'onReady': (e) => {
-                            if(currentMediaSource === 'youtube') {
-                                e.target.mute(); // FORCE MUTE
-                                setTimeout(() => { e.target.playVideo(); }, 500);
-                            }
-                        },
-                        'onStateChange': (e) => { if (e.data === YT.PlayerState.ENDED) player.playVideo(); }
-                }
+        function playLocalAudio(aIndex) {
+            if(localAudioList.length === 0) return;
+            const srcUrl = "/static/tv_media/audio/" + localAudioList[aIndex];
+            audEl.src = srcUrl;
+            audEl.play().catch(e => {
+                console.log("Local audio play blocked:", e);
             });
-            isPlayerInitialized = true;
+            audEl.onended = () => {
+                currentAudIndex = (aIndex + 1) % localAudioList.length;
+                playLocalAudio(currentAudIndex);
+            };
+        }
+
+        let isYtInit = false;
+        function initOrUpdatePlayer(videoId, priority) {
+            if (!isYtInit) {
+                let vId = videoId;
+                if(vId.includes('v=')) vId = vId.split('v=')[1].split('&')[0];
+                else if(vId.includes('youtu.be/')) vId = vId.split('youtu.be/')[1].split('?')[0];
+                
+                let embedUrl = `https://www.youtube.com/embed/${vId}?autoplay=1&mute=1&loop=1&playlist=${vId}&controls=0&rel=0&showinfo=0&modestbranding=1`;
+                if(vId.startsWith('PL') || videoId.includes('list=')) {
+                    let pId = vId;
+                    if(videoId.includes('list=')) pId = videoId.split('list=')[1].split('&')[0];
+                    embedUrl = `https://www.youtube.com/embed/videoseries?list=${pId}&autoplay=1&mute=1&loop=1&controls=0&rel=0&showinfo=0&modestbranding=1`;
+                }
+                
+                ytIframe.src = embedUrl;
+                isYtInit = true;
             }
         }
     </script>
@@ -278,7 +292,6 @@
 
         async function fetchWeather() {
             try {
-                // İstanbul koordinatları (varsayılan)
                 const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=41.0082&longitude=28.9784&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=2");
                 const data = await res.json();
                 if(data && data.daily) {
@@ -301,7 +314,7 @@
             }
         }
         fetchWeather();
-        setInterval(fetchWeather, 3600000); // Saat başı yenile
+        setInterval(fetchWeather, 3600000);
 
         function rotateContent() {
             if(webProducts.length > 0) {
@@ -341,7 +354,6 @@
             });
             if(!finalText) finalText = "";
             
-            // Legacy ticker
             const tickerEl = document.getElementById('ticker-text');
             if (tickerEl.textContent !== finalText) {
                 tickerEl.textContent = finalText;
@@ -368,7 +380,6 @@
                                 <div class="prod-title">${p.title}</div>
                                 <div class="prod-desc">${p.description}</div>
                                 <div class="prod-tags" style="margin-top:auto;">${tagsHtml}</div>
-                                <div class="prod-price">${p.price}</div>
                             </div>
                         </div>
                     `;
@@ -436,50 +447,20 @@
             
             updateClock();
 
-            const mediaSource = data.media_source || 'youtube';
-            switchSource(mediaSource);
+            currentMediaSource = data.media_source || 'youtube';
             currentAudioPriority = data.audio_priority || 'video';
 
-            if(mediaSource === 'local') {
-                const oldVidList = JSON.stringify(localVideoList);
-                const oldAudList = JSON.stringify(localAudioList);
-                
+            if (currentMediaSource === 'youtube') {
+                document.getElementById('local-video').style.display = 'none';
+                document.getElementById('ytplayer').style.display = 'block';
+                if (data.video_playlist) {
+                    initOrUpdatePlayer(data.video_playlist, data.audio_priority);
+                }
+            } else if (currentMediaSource === 'local') {
+                document.getElementById('ytplayer').style.display = 'none';
+                vidEl.style.display = 'block';
                 localVideoList = data.local_videos || [];
-                localAudioList = data.local_audio || [];
-
-                if (JSON.stringify(localVideoList) !== oldVidList && localVideoList.length > 0) {
-                    currentLocalVideoIndex = 0;
-                    vidEl.src = localVideoList[0];
-                    vidEl.play().catch(e=>{});
-                }
-                
-                if(currentAudioPriority === 'music' && localAudioList.length > 0) {
-                    vidEl.muted = true;
-                    if (JSON.stringify(localAudioList) !== oldAudList) {
-                        currentLocalAudioIndex = 0;
-                        audEl.src = localAudioList[0];
-                    }
-                    audEl.play().catch(e=>{});
-                } else {
-                    vidEl.muted = false;
-                    audEl.pause();
-                }
-                if (localVideoList.length === 0) vidEl.pause();
-            } else {
-                if (data.video_playlist && data.video_playlist !== currentVideoId) {
-                    if(isPlayerInitialized && player && player.loadPlaylist) {
-                        if(data.video_playlist.startsWith('PL')) player.loadPlaylist({list: data.video_playlist, listType: 'playlist'});
-                        else player.loadVideoById(data.video_playlist);
-                        currentVideoId = data.video_playlist;
-                    } else if (!isPlayerInitialized && ytReady && window.YT && window.YT.Player) {
-                        initYTPlayer(data.video_playlist, data.audio_priority);
-                        isPlayerInitialized = true;
-                    }
-                }
-                if (isPlayerInitialized && player && typeof player.mute === 'function') {
-                    // Mobile and TV Browsers often require muting to autoplay. 
-                    // We enforce mute during startup for reliability.
-                }
+                if (localVideoList.length > 0) playLocalVideo(0);
             }
         }
 
