@@ -54,8 +54,8 @@ def api_mobile_version():
     return jsonify({
         'version': APP_VERSION,
         'apk_url': '/download_apk',
-        'tv_version': '1.0.4',
-        'tv_apk_url': '/static/Firinna-TV-1.0.4.apk'
+        'tv_version': '1.0.5',
+        'tv_apk_url': '/static/Firinna-TV-1.0.5.apk'
     })
 
 @app.route('/download_apk')
