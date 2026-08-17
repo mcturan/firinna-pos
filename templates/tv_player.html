@@ -260,7 +260,7 @@
             } else {
                 console.log("Setting HTML5 src...");
                 let srcUrl = localVideoList[vIndex]; if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
-                vidEl.src = srcUrl;
+                vidEl.setAttribute('src', srcUrl);
                 vidEl.play().catch(e => { console.log("Local video play blocked:", e); });
                 vidEl.onended = () => { window.playNextNativeVideo(); };
             }
@@ -502,8 +502,12 @@
                     vidEl.style.display = 'none';
                     document.documentElement.classList.add('native-video-active');
                 }
-                localVideoList = data.local_videos || [];
-                if (localVideoList.length > 0) playLocalVideo(0);
+                let newLocalVideos = data.local_videos || [];
+                let oldSrc = vidEl.getAttribute('src');
+                localVideoList = newLocalVideos;
+                if (localVideoList.length > 0 && (!oldSrc || !localVideoList.includes(oldSrc))) {
+                    playLocalVideo(0);
+                }
             }
         }
 
