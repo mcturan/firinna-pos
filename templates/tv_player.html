@@ -41,7 +41,7 @@
         #ml-sidebar { grid-column: 1; display: flex; flex-direction: column; gap: 1.5vw; }
         
         #ml-logo-box { padding: 1vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; gap: 0.5vw; }
-        #ml-logo { max-width: 90%; max-height: 15vh; object-fit: contain; }
+        #ml-logo { max-width: 90%; max-height: 20vh; object-fit: contain; }
         
         .tr-domain { font-size: 1.8vw; font-weight: 800; color: #2d6a4f; text-align: center; }
         
@@ -63,7 +63,7 @@
         .product-slide.active { opacity: 1; z-index: 5; }
         .prod-img { width: 100%; height: 85%; object-fit: cover; z-index: 1; border-radius: 1vw 1vw 0 0; }
         .prod-info { height: 15%; padding: 0.5vw 1vw; display: flex; align-items: center; justify-content: center; background: #fff; color: #1a202c; z-index: 2; border-top: 2px solid #e2e8f0; }
-        .prod-title { font-size: 1.8vw; font-weight: 800; color: #1a202c; text-align: center; margin: 0; line-height: 1.2; text-transform: uppercase; letter-spacing: 1px; }
+        .prod-title { font-size: 1.8vw; font-weight: 800; color: #1a202c; text-align: center; margin: 0; line-height: 1.2; letter-spacing: 0.5px; }
         .prod-desc, .prod-tags { display: none; }
 
         /* Video Native Control Fixes for Mobile */
@@ -135,7 +135,7 @@
             
             <div id="ml-support-box" class="grid-box" style="padding: 0 2vw; display: flex; justify-content: space-between; align-items: center; background: #fff; color: #1a202c; border-radius: 1vw; min-height: 8vh; position: relative; overflow: hidden;">
                 <!-- Layer 1: Support -->
-                <div id="ml-support-layer" style="display:flex; justify-content: space-between; width: 100%; align-items:center; transition: opacity 1s ease; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
+                <div id="ml-support-layer" style="display:flex; justify-content: space-between; align-items:center; transition: opacity 1s ease; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
                     <div style="font-size:1.5vw; font-weight:800; color:#2d6a4f; text-transform:uppercase;">Support Us & Review Us</div>
                     <div style="display:flex; gap:2vw; align-items:center;">
                         <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
@@ -147,7 +147,7 @@
                     </div>
                 </div>
                 <!-- Layer 2: Weather & Clock -->
-                <div id="ml-weather-layer" style="display:flex; justify-content: space-between; width: 100%; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
+                <div id="ml-weather-layer" style="display:flex; justify-content: space-between; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
                     <span id="ml-clock" style="font-size:2.5vw; font-weight:800;">00:00</span>
                     <div id="ml-weather" style="font-size:1.5vw; font-weight:700; color:#4a5568; display:flex; gap: 3vw;">
                         <span>Loading...</span>
@@ -341,8 +341,8 @@
                     const tomIcon = wCodeMap[tomCode] || '🌤️';
                     
                     document.getElementById('ml-weather').innerHTML = `
-                        <span style="font-weight:700;">Today: ${todayIcon} ${todayMin}° / ${todayMax}°C</span>
-                        <span style="font-size:0.9vw; color:#bbf7d0;">Tomorrow: ${tomIcon} ${tomMax}°C</span>
+                        <span style="font-weight:700;">Bugün: ${todayIcon} ${todayMin}°/${todayMax}°C</span>
+                        <span style="font-size:1.2vw; color:#718096; border-left: 2px solid #cbd5e1; padding-left: 1vw;">Yarın: ${tomIcon} ${tomMax}°C</span>
                     `;
                 }
             } catch(e) {
@@ -352,8 +352,7 @@
         fetchWeather();
         setInterval(fetchWeather, 3600000);
 
-        let supportToggle = false;
-        function rotateContent() {
+        function rotateProducts() {
             if(webProducts.length > 0) {
                 const slides = document.querySelectorAll('.product-slide');
                 if(slides.length > 0) {
@@ -370,14 +369,18 @@
                     mIndex = (mIndex + 1) % slides.length;
                 }
             }
-            
+        }
+        setInterval(rotateProducts, 10000); // 10 seconds for products
+        
+        let supportToggle = false;
+        function rotateSupport() {
             supportToggle = !supportToggle;
             document.getElementById('ml-support-layer').style.opacity = supportToggle ? '0' : '1';
             document.getElementById('ml-support-layer').style.pointerEvents = supportToggle ? 'none' : 'auto';
             document.getElementById('ml-weather-layer').style.opacity = supportToggle ? '1' : '0';
             document.getElementById('ml-weather-layer').style.pointerEvents = supportToggle ? 'auto' : 'none';
         }
-        setInterval(rotateContent, 4000);
+        setInterval(rotateSupport, 5000); // 5 seconds for support/weather
 
         function updateTickerText() {
             let finalText = basePromoText;
