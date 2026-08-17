@@ -38,9 +38,7 @@
         #ml-logo-box { padding: 1.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; gap: 1vw; }
         #ml-logo { max-width: 100%; max-height: 22vh; object-fit: contain; }
         
-        .tr-domain { font-size: 1.6vw; font-weight: 800; color: #2d6a4f; text-align: center; }
-        .tr-flags { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5vw; width: 100%; justify-items: center; margin-top: 1vw; padding: 0 1vw; }
-        .tr-flags img { width: 100%; max-height: 1.8vw; object-fit: contain; border-radius: 0.2vw; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .tr-domain { font-size: 1.8vw; font-weight: 800; color: #2d6a4f; text-align: center; }
         
         /* Weather Floating Box */
         #ml-floating-weather { position: absolute; top: 1.5vw; right: 1.5vw; padding: 0.8vw 1.2vw; display: flex; justify-content: space-between; align-items: center; gap: 1.5vw; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 1vw; z-index: 10; }
@@ -57,14 +55,13 @@
 
         /* Product Carousel */
         .product-slide { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 1s ease; }
-        .product-slide.active { opacity: 1; }
-        .prod-img { width: 100%; height: 50%; object-fit: cover; }
-        .prod-info { flex: 1; padding: 1.5vw; display: flex; flex-direction: column; justify-content: center; }
-        .prod-title { font-size: 1.8vw; font-weight: 800; color: #1a202c; margin-bottom: 0.5vw; line-height: 1.1; }
-        .prod-desc { font-size: 1.1vw; color: #4a5568; margin-bottom: 1vw; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
-        .prod-price { font-size: 2vw; font-weight: 800; color: #2d6a4f; text-align: right; margin-top: auto; }
-        .prod-tags { display: flex; flex-wrap: wrap; gap: 0.5vw; }
-        .prod-tag { font-size: 0.8vw; padding: 0.3vw 0.8vw; background: #e2e8f0; color: #4a5568; border-radius: 2vw; font-weight: 600; }
+        .product-slide.active { opacity: 1; z-index: 5; }
+        .prod-img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; }
+        .prod-info { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2; padding: 2vw; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; color: white; height: 50%; }
+        .prod-title { font-size: 2vw; font-weight: 800; color: #fff; margin-bottom: 0.5vw; line-height: 1.1; }
+        .prod-desc { font-size: 1.2vw; color: #cbd5e1; margin-bottom: 0.5vw; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+        .prod-price { font-size: 2.2vw; font-weight: 900; color: #4ade80; text-align: right; margin-top: auto; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .prod-tags { display: none; }
 
         /* Video Native Control Fixes for Mobile */
         video::-webkit-media-controls { display: none !important; }
@@ -110,27 +107,10 @@
         
         <!-- Left Sidebar -->
         <div id="ml-sidebar">
-            <div id="ml-logo-box" class="grid-box" style="flex-direction:column;">
-                <img id="ml-logo" src="" style="display:none;">
-                <div style="margin-top:0.5vw;">
-                    <div class="tr-domain">www.firinna.com</div>
-                    <div class="tr-flags">
-                        <img src="https://flagcdn.com/w40/tr.png" alt="TR">
-                        <img src="https://flagcdn.com/w40/gb.png" alt="EN">
-                        <img src="https://flagcdn.com/w40/sa.png" alt="AR">
-                        <img src="https://flagcdn.com/w40/ru.png" alt="RU">
-                        <img src="https://flagcdn.com/w40/de.png" alt="DE">
-                        <img src="https://flagcdn.com/w40/fr.png" alt="FR">
-                        <img src="https://flagcdn.com/w40/it.png" alt="IT">
-                        <img src="https://flagcdn.com/w40/es.png" alt="ES">
-                        <img src="https://flagcdn.com/w40/nl.png" alt="NL">
-                        <img src="https://flagcdn.com/w40/pt.png" alt="PT">
-                        <img src="https://flagcdn.com/w40/ae.png" alt="AE">
-                        <img src="https://flagcdn.com/w40/ir.png" alt="IR">
-                    </div>
-                </div>
+            <div id="ml-logo-box">
+                <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
+                <div class="tr-domain">www.firinna.com</div>
             </div>
-            
 
             <div id="ml-left-top" class="grid-box">
                 <div id="product-carousel" style="width:100%; height:100%; position:relative;"></div>
@@ -245,28 +225,29 @@
             }
         }
 
-        function initYTPlayer(videoId, priority) {
-            currentVideoId = videoId;
-            currentAudioPriority = priority;
-            let playerVars = { 'autoplay': 1, 'controls': 0, 'rel': 0, 'showinfo': 0, 'loop': 1, 'mute': (priority === 'music' ? 1 : 0) };
-            if(videoId.startsWith('PL')) { playerVars['listType'] = 'playlist'; playerVars['list'] = videoId; }
-            else { playerVars['playlist'] = videoId; }
+        function initOrUpdatePlayer(videoId, priority) {
+            if (!isPlayerInitialized) {
+                currentAudioPriority = priority;
+                let playerVars = { 'autoplay': 1, 'controls': 0, 'rel': 0, 'showinfo': 0, 'loop': 1, 'mute': 1 };
+                if(videoId.startsWith('PL')) { playerVars['listType'] = 'playlist'; playerVars['list'] = videoId; }
+                else { playerVars['playlist'] = videoId; }
             
             player = new YT.Player('ytplayer', {
                 height: '100%', width: '100%',
                 videoId: videoId.startsWith('PL') ? '' : videoId,
                 playerVars: playerVars,
-                events: {
-                    'onReady': (e) => {
-                        if(currentMediaSource === 'youtube') {
-                            if (currentAudioPriority === 'music') e.target.mute();
-                            else e.target.unMute();
-                            setTimeout(() => { e.target.playVideo(); }, 500);
-                        }
-                    },
-                    'onStateChange': (e) => { if (e.data === YT.PlayerState.ENDED) player.playVideo(); }
+                    events: {
+                        'onReady': (e) => {
+                            if(currentMediaSource === 'youtube') {
+                                e.target.mute(); // FORCE MUTE
+                                setTimeout(() => { e.target.playVideo(); }, 500);
+                            }
+                        },
+                        'onStateChange': (e) => { if (e.data === YT.PlayerState.ENDED) player.playVideo(); }
                 }
             });
+            isPlayerInitialized = true;
+            }
         }
     </script>
 
@@ -495,9 +476,9 @@
                         isPlayerInitialized = true;
                     }
                 }
-                if (isPlayerInitialized && player && player.mute) {
-                    if (data.audio_priority === 'music') player.mute();
-                    else player.unMute();
+                if (isPlayerInitialized && player && typeof player.mute === 'function') {
+                    // Mobile and TV Browsers often require muting to autoplay. 
+                    // We enforce mute during startup for reliability.
                 }
             }
         }

@@ -1,12 +1,10 @@
 {
     "logo_url": "/static/uploads/logo.png",
     "layout": "modern_grid",
-    "video_playlist": "https://www.youtube.com/watch?v=27bsX5a9qO4",
-    "local_videos": [
-        "custom_video.mp4"
-    ],
+    "video_playlist": "https://www.youtube.com/watch?v=kgmFrnm2aLk",
+    "local_videos": [],
     "local_audio": [],
-    "media_source": "local",
+    "media_source": "youtube",
     "audio_priority": "video",
     "promo_text": "",
     "qr_code": "",
@@ -16,5 +14,5 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-17T19:07:07.131396"
+    "last_ping": "2026-08-17T18:30:12.136228"
 }
