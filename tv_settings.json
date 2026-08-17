@@ -1,10 +1,12 @@
 {
     "logo_url": "/static/uploads/logo.png",
     "layout": "modern_grid",
-    "video_playlist": "https://www.youtube.com/watch?v=kgmFrnm2aLk",
-    "local_videos": [],
+    "video_playlist": "",
+    "local_videos": [
+        "oceans.mp4"
+    ],
     "local_audio": [],
-    "media_source": "youtube",
+    "media_source": "local",
     "audio_priority": "video",
     "promo_text": "",
     "qr_code": "",
@@ -14,5 +16,5 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-17T19:29:37.146717"
+    "last_ping": "2026-08-17T19:35:25.674870"
 }
