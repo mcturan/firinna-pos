@@ -54,7 +54,7 @@ def api_mobile_version():
     return jsonify({
         'version': APP_VERSION,
         'apk_url': '/download_apk',
-        'tv_version': '1.0.1',
+        'tv_version': '1.0.0',
         'tv_apk_url': '/static/Firinna-TV.apk'
     })
 
@@ -3330,7 +3330,7 @@ def get_tv_settings():
             return json.load(f)
     return {
         "logo_url": "",
-        "layout": "default",
+        "layout": "modern_grid",
         "video_playlist": "",
         "local_videos": [],
         "local_audio": [],

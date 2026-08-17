@@ -1,6 +1,6 @@
 {
     "logo_url": "",
-    "layout": "default",
+    "layout": "modern_grid",
     "video_playlist": "",
     "local_videos": [],
     "local_audio": [],
@@ -14,5 +14,5 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-17T17:21:45.878532"
+    "last_ping": "2026-08-17T17:29:08.573032"
 }
