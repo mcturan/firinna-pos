@@ -25,51 +25,51 @@
         body.layout-default #video-container, body.layout-sidebar #video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background:#000; }
         body.layout-sidebar #video-container { width: 75%; }
         
-        /* Modern Grid Layout */
-        #modern-layout { display: none; width: 100vw; height: 100vh; padding: 1.5vw; padding-bottom: 0; box-sizing: border-box; grid-template-columns: 3fr 4fr 3fr; grid-template-rows: 12vh 1fr 6vh; gap: 1.5vw; }
+        /* Modern Layout Redesign */
+        #modern-layout { display: none; width: 100vw; height: 100vh; padding: 1.5vw; box-sizing: border-box; gap: 1.5vw; grid-template-columns: 3fr 7fr; grid-template-rows: 1fr; }
         body.layout-modern_grid #modern-layout { display: grid; }
-        body.layout-modern_grid #legacy-overlay { display: none; }
-        body.layout-modern_grid #sidebar { display: none; }
-        body.layout-modern_grid #video-container { position: relative; width: 100%; height: 100%; border-radius: 1vw; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); background: #000; }
+        body.layout-modern_grid #legacy-overlay, body.layout-modern_grid #sidebar { display: none; }
         
-        .grid-box { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 1vw; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(255,255,255,0.5); }
+        .grid-box { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 1vw; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 2px solid rgba(255,255,255,0.5); }
         
-        /* Modern Grid Areas */
-        #ml-top-left { grid-column: 1; grid-row: 1; font-size: 2.5vw; font-weight: 800; color: #2d6a4f; justify-content: flex-start; padding-left: 2vw;}
-        #ml-top-center { grid-column: 2; grid-row: 1; }
-        #ml-top-right { grid-column: 3; grid-row: 1; flex-direction: column; align-items: flex-end; padding-right: 2vw; text-align: right; }
+        /* Left Sidebar (Column 1) */
+        #ml-sidebar { grid-column: 1; display: flex; flex-direction: column; gap: 1.5vw; }
         
-        #ml-main-left { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 1.5vw; background: transparent; box-shadow: none; border: none; backdrop-filter: none; }
+        #ml-logo-box { padding: 1.5vw; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; }
+        #ml-logo { max-width: 90%; max-height: 12vh; object-fit: contain; }
         
-        #ml-left-top { flex: 2; background: rgba(255, 255, 255, 0.9); border-radius: 1vw; box-shadow: 0 8px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        #ml-left-bottom { flex: 1; background: #2d6a4f; color: white; border-radius: 1vw; box-shadow: 0 8px 20px rgba(0,0,0,0.1); padding: 2vw; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 2vw; font-weight: 700; position: relative; }
+        #ml-weather-box { padding: 1vw 1.5vw; display: flex; justify-content: space-between; align-items: center; background: #2d6a4f; color: white; border-radius: 1vw; }
+        #ml-clock { font-size: 2.5vw; font-weight: 800; }
+        #ml-weather { font-size: 1vw; line-height: 1.2; text-align: right; }
         
-        #ml-main-video { grid-column: 2 / span 2; grid-row: 2; position: relative; }
+        #ml-left-top { flex: 2; background: rgba(255, 255, 255, 0.95); border-radius: 1vw; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        #ml-left-bottom { flex: 1; background: #f8fafc; border-radius: 1vw; padding: 1.5vw; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 1.8vw; font-weight: 700; position: relative; border: 2px solid #e2e8f0; color: #2d3748; }
         
+        /* Main Video (Column 2) */
+        #ml-main-video { grid-column: 2; position: relative; border-radius: 1vw; overflow: hidden; background: #000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        #video-container { width: 100%; height: 100%; position: absolute; inset: 0; }
+        
+        /* Floating Domain/Flags on Video */
+        #ml-floating-top-right { position: absolute; top: 1.5vw; right: 1.5vw; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); padding: 0.8vw 1.2vw; border-radius: 0.8vw; border: 1px solid rgba(255,255,255,0.2); z-index: 10; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5vw; }
+        .tr-domain { font-size: 1vw; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .tr-flags { display: flex; gap: 0.5vw; justify-content: flex-end; }
+        .tr-flags img { height: 1.2vw; border-radius: 0.2vw; }
+
         /* Product Carousel */
         .product-slide { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 1s ease; }
         .product-slide.active { opacity: 1; }
         .prod-img { width: 100%; height: 50%; object-fit: cover; }
         .prod-info { padding: 1.5vw; flex: 1; display: flex; flex-direction: column; }
-        .prod-title { font-size: 2vw; font-weight: 800; margin-bottom: 0.5vw; color: #1a202c; }
-        .prod-desc { font-size: 1.2vw; color: #4a5568; margin-bottom: 1vw; flex: 1; }
+        .prod-title { font-size: 1.8vw; font-weight: 800; margin-bottom: 0.5vw; color: #1a202c; }
+        .prod-desc { font-size: 1vw; color: #4a5568; margin-bottom: 1vw; flex: 1; }
         .prod-tags { display: flex; gap: 0.5vw; flex-wrap: wrap; }
-        .prod-tag { font-size: 0.8vw; background: #edf2f7; padding: 0.3vw 0.8vw; border-radius: 1vw; font-weight: 600; color: #2d3748; text-transform: uppercase; }
-        .prod-price { font-size: 2.2vw; font-weight: 800; color: #e53e3e; text-align: right; margin-top: auto; }
+        .prod-tag { font-size: 0.7vw; background: #edf2f7; padding: 0.3vw 0.8vw; border-radius: 1vw; font-weight: 600; color: #2d3748; text-transform: uppercase; }
+        .prod-price { font-size: 2vw; font-weight: 800; color: #e53e3e; text-align: right; margin-top: auto; }
 
         /* Messages Fade */
-        .msg-slide { position: absolute; inset: 2vw; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; }
+        .msg-slide { position: absolute; inset: 1.5vw; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.5s ease; }
         .msg-slide.active { opacity: 1; }
         
-        /* Ticker Top Right */
-        .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2d6a4f; margin-bottom: 0.5vw; text-transform: uppercase; }
-        .tr-flags { display: flex; gap: 0.8vw; justify-content: flex-end; }
-        .tr-flags img { height: 1.8vw; border-radius: 0.2vw; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
-        /* Modern Bottom Ticker */
-        #ml-bottom-ticker { grid-column: 1 / span 3; grid-row: 3; background: #2d6a4f; border-radius: 1vw 1vw 0 0; color: white; display: flex; align-items: center; overflow: hidden; font-size: 1.8vw; font-weight: 600; text-transform: uppercase; white-space: nowrap; }
-        .ml-ticker-anim { display: inline-block; padding-left: 100%; animation: ticker 25s linear infinite; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
-
         /* Record Animation */
         #record-player { position: absolute; top: 2vw; right: 2vw; width: 6vw; height: 6vw; background: url('/static/img/record.png') no-repeat center/cover; border-radius: 50%; z-index: 10; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .spinning { animation: spin 4s linear infinite; }
@@ -101,47 +101,48 @@
 
     <!-- MODERN GRID LAYOUT -->
     <div id="modern-layout">
-        <!-- Top Row -->
-        <div class="grid-box" id="ml-top-left">
-            <span id="ml-clock">00:00</span>
-            <div id="ml-weather" style="margin-left:1.5vw; font-size:1.2vw; display:flex; flex-direction:column; line-height:1.2;">
-                <span>Yükleniyor...</span>
+        
+        <!-- Left Sidebar -->
+        <div id="ml-sidebar">
+            <div id="ml-logo-box" class="grid-box">
+                <img id="ml-logo" src="" style="display:none;">
             </div>
-        </div>
-        <div class="grid-box" id="ml-top-center">
-            <img id="ml-logo" src="" style="max-height:80%; max-width:80%; display:none;">
-        </div>
-        <div class="grid-box" id="ml-top-right" style="justify-content:center;">
-            <div class="tr-domain">FIRINNA MENU: www.firinna.com</div>
-            <div class="tr-flags">
-                <img src="https://flagcdn.com/w40/tr.png" alt="TR">
-                <img src="https://flagcdn.com/w40/gb.png" alt="EN">
-                <img src="https://flagcdn.com/w40/sa.png" alt="AR">
-                <img src="https://flagcdn.com/w40/ru.png" alt="RU">
+            
+            <div id="ml-weather-box" class="grid-box">
+                <span id="ml-clock">00:00</span>
+                <div id="ml-weather">
+                    <span>Yükleniyor...</span>
+                </div>
             </div>
-        </div>
-
-        <!-- Main Content Row -->
-        <div id="ml-main-left">
-            <div id="ml-left-top">
+            
+            <div id="ml-left-top" class="grid-box">
                 <div id="product-carousel" style="width:100%; height:100%; position:relative;"></div>
             </div>
-            <div id="ml-left-bottom">
+            
+            <div id="ml-left-bottom" class="grid-box">
                 <div id="message-carousel" style="width:100%; height:100%; position:relative;"></div>
             </div>
         </div>
 
+        <!-- Main Video -->
         <div id="ml-main-video">
             <div id="video-container">
                 <div id="ytplayer" style="display:none;"></div>
                 <video id="local-video" style="display:none;" autoplay muted playsinline></video>
             </div>
             <div id="record-player"></div>
+            
+            <div id="ml-floating-top-right">
+                <div class="tr-domain">FIRINNA MENU: www.firinna.com</div>
+                <div class="tr-flags">
+                    <img src="https://flagcdn.com/w40/tr.png" alt="TR">
+                    <img src="https://flagcdn.com/w40/gb.png" alt="EN">
+                    <img src="https://flagcdn.com/w40/sa.png" alt="AR">
+                    <img src="https://flagcdn.com/w40/ru.png" alt="RU">
+                </div>
+            </div>
         </div>
 
-        <div id="ml-bottom-ticker">
-            <div class="ml-ticker-anim" id="ml-ticker-text">Yükleniyor...</div>
-        </div>
     </div>
 
     <!-- LEGACY LAYOUT ELEMENTS -->
@@ -286,7 +287,7 @@
                     
                     document.getElementById('ml-weather').innerHTML = `
                         <span style="font-weight:700;">Bugün: ${todayIcon} ${todayMin}° / ${todayMax}°C</span>
-                        <span style="font-size:1vw; color:#4a5568;">Yarın: ${tomIcon} ${tomMax}°C</span>
+                        <span style="font-size:0.9vw; color:#bbf7d0;">Yarın: ${tomIcon} ${tomMax}°C</span>
                     `;
                 }
             } catch(e) {
@@ -332,7 +333,7 @@
                     }
                 }
             });
-            if(!finalText) finalText = "Hoş Geldiniz...";
+            if(!finalText) finalText = "";
             
             // Legacy ticker
             const tickerEl = document.getElementById('ticker-text');
@@ -340,13 +341,7 @@
                 tickerEl.textContent = finalText;
                 tickerEl.style.animation = 'none'; tickerEl.offsetHeight; tickerEl.style.animation = null; 
             }
-            
-            // Modern grid ticker
-            const mlTicker = document.getElementById('ml-ticker-text');
-            if (mlTicker.textContent !== finalText) {
-                mlTicker.textContent = finalText;
-                mlTicker.style.animation = 'none'; mlTicker.offsetHeight; mlTicker.style.animation = null;
-            }
+
         }
         setInterval(updateTickerText, 20000); 
 
