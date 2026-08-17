@@ -215,13 +215,16 @@
         audEl.onpause = () => { recordPlayer.style.display = 'none'; recordPlayer.classList.remove('spinning'); };
 
         function switchSource(sourceType) {
+            console.log("Switching source to: " + sourceType + ", AndroidTV exists: " + (!!window.AndroidTV));
             currentMediaSource = sourceType;
             if(sourceType === 'local') {
                 document.getElementById('ytplayer').style.display = 'none';
                 if (!window.AndroidTV) {
+                    console.log("AndroidTV is missing! Using HTML5 video.");
                     document.getElementById('local-video').style.display = 'block';
                     document.documentElement.classList.remove('native-video-active');
                 } else {
+                    console.log("AndroidTV is present! Using Native video.");
                     document.getElementById('local-video').style.display = 'none';
                     document.documentElement.classList.add('native-video-active');
                 }
@@ -248,13 +251,14 @@
         function playLocalVideo(vIndex) {
             if(localVideoList.length === 0) return;
             let fileName = localVideoList[vIndex];
-            if (fileName.includes("/")) fileName = fileName.split("/").pop();
-            
+            console.log("Playing local video: " + fileName);
             if (window.AndroidTV) {
+                console.log("Calling AndroidTV.playNativeVideo...");
                 let rect = document.getElementById('ml-main-video').getBoundingClientRect();
                 window.AndroidTV.setVideoBounds(rect.left, rect.top, rect.width, rect.height);
                 window.AndroidTV.playNativeVideo(fileName);
             } else {
+                console.log("Setting HTML5 src...");
                 let srcUrl = localVideoList[vIndex]; if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
                 vidEl.src = srcUrl;
                 vidEl.play().catch(e => { console.log("Local video play blocked:", e); });
@@ -490,9 +494,11 @@
             } else if (currentMediaSource === 'local') {
                 document.getElementById('ytplayer').style.display = 'none';
                 if (!window.AndroidTV) {
+                    console.log("[applySettings] AndroidTV missing. using HTML5");
                     vidEl.style.display = 'block';
                     document.documentElement.classList.remove('native-video-active');
                 } else {
+                    console.log("[applySettings] AndroidTV exists. using Native.");
                     vidEl.style.display = 'none';
                     document.documentElement.classList.add('native-video-active');
                 }
