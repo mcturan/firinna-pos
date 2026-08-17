@@ -20,6 +20,11 @@
             animation: meshAnimation 12s ease infinite;
             color: #1A1A1A;
         }
+        
+        html.native-video-active, html.native-video-active body {
+            background: transparent !important;
+            animation: none !important;
+        }
 
         /* Legacy Layout (Default & Sidebar) */
         body.layout-default #video-container, body.layout-sidebar #video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background:#000; }
@@ -215,11 +220,14 @@
                 document.getElementById('ytplayer').style.display = 'none';
                 if (!window.AndroidTV) {
                     document.getElementById('local-video').style.display = 'block';
+                    document.documentElement.classList.remove('native-video-active');
                 } else {
                     document.getElementById('local-video').style.display = 'none';
+                    document.documentElement.classList.add('native-video-active');
                 }
                 if(player && player.pauseVideo) player.pauseVideo();
             } else {
+                document.documentElement.classList.remove('native-video-active');
                 document.getElementById('local-video').style.display = 'none';
                 if (window.AndroidTV) window.AndroidTV.stopNativeVideo();
                 document.getElementById('ytplayer').style.display = 'block';
@@ -473,6 +481,7 @@
             currentAudioPriority = data.audio_priority || 'video';
 
             if (currentMediaSource === 'youtube') {
+                document.documentElement.classList.remove('native-video-active');
                 document.getElementById('local-video').style.display = 'none';
                 document.getElementById('ytplayer').style.display = 'block';
                 if (data.video_playlist) {
@@ -482,8 +491,10 @@
                 document.getElementById('ytplayer').style.display = 'none';
                 if (!window.AndroidTV) {
                     vidEl.style.display = 'block';
+                    document.documentElement.classList.remove('native-video-active');
                 } else {
                     vidEl.style.display = 'none';
+                    document.documentElement.classList.add('native-video-active');
                 }
                 localVideoList = data.local_videos || [];
                 if (localVideoList.length > 0) playLocalVideo(0);
