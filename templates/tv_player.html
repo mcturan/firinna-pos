@@ -35,16 +35,17 @@
         /* Left Sidebar (Column 1) */
         #ml-sidebar { grid-column: 1; display: flex; flex-direction: column; gap: 1.5vw; }
         
-        #ml-logo-box { padding: 2vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; gap: 1vw; }
-        #ml-logo { max-width: 95%; max-height: 18vh; object-fit: contain; }
+        #ml-logo-box { padding: 1.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; gap: 0.5vw; }
+        #ml-logo { max-width: 95%; max-height: 15vh; object-fit: contain; }
         
         .tr-domain { font-size: 1.2vw; font-weight: 800; color: #2d6a4f; text-align: center; }
-        .tr-flags { display: flex; gap: 0.8vw; justify-content: center; margin-top: 0.5vw; flex-wrap: wrap; max-width: 80%; margin-left: auto; margin-right: auto; }
-        .tr-flags img { height: 1.5vw; border-radius: 0.2vw; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .tr-flags { display: flex; gap: 0.6vw; justify-content: center; margin-top: 0.5vw; flex-wrap: wrap; max-width: 90%; margin-left: auto; margin-right: auto; }
+        .tr-flags img { height: 1.2vw; border-radius: 0.2vw; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
-        #ml-weather-box { padding: 1vw 1.5vw; display: flex; justify-content: space-between; align-items: center; background: #2d6a4f; color: white; border-radius: 1vw; }
-        #ml-clock { font-size: 2.5vw; font-weight: 800; }
-        #ml-weather { font-size: 1vw; line-height: 1.2; text-align: right; }
+        /* Weather Floating Box */
+        #ml-floating-weather { position: absolute; top: 1.5vw; right: 1.5vw; padding: 0.8vw 1.2vw; display: flex; justify-content: space-between; align-items: center; gap: 1.5vw; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 1vw; z-index: 10; }
+        #ml-clock { font-size: 2vw; font-weight: 800; }
+        #ml-weather { text-align: right; font-size: 1.2vw; display: flex; flex-direction: column; }
         
         #ml-left-top { flex: 2; background: rgba(255, 255, 255, 0.95); border-radius: 1vw; display: flex; flex-direction: column; overflow: hidden; position: relative; }
         #ml-left-bottom { flex: 1; background: #f8fafc; border-radius: 1vw; padding: 1.5vw; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 1.8vw; font-weight: 700; position: relative; border: 2px solid #e2e8f0; color: #2d3748; }
@@ -113,17 +114,17 @@
                         <img src="https://flagcdn.com/w40/ru.png" alt="RU">
                         <img src="https://flagcdn.com/w40/de.png" alt="DE">
                         <img src="https://flagcdn.com/w40/fr.png" alt="FR">
+                        <img src="https://flagcdn.com/w40/it.png" alt="IT">
+                        <img src="https://flagcdn.com/w40/es.png" alt="ES">
+                        <img src="https://flagcdn.com/w40/nl.png" alt="NL">
+                        <img src="https://flagcdn.com/w40/pt.png" alt="PT">
+                        <img src="https://flagcdn.com/w40/ae.png" alt="AE">
+                        <img src="https://flagcdn.com/w40/ir.png" alt="IR">
                     </div>
                 </div>
             </div>
             
-            <div id="ml-weather-box" class="grid-box">
-                <span id="ml-clock">00:00</span>
-                <div id="ml-weather">
-                    <span>Loading...</span>
-                </div>
-            </div>
-            
+
             <div id="ml-left-top" class="grid-box">
                 <div id="product-carousel" style="width:100%; height:100%; position:relative;"></div>
             </div>
@@ -148,6 +149,13 @@
                 <video id="local-video" style="display:none;" autoplay muted playsinline></video>
             </div>
             <div id="record-player"></div>
+            
+            <div id="ml-floating-weather">
+                <span id="ml-clock">00:00</span>
+                <div id="ml-weather">
+                    <span>Loading...</span>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -360,9 +368,11 @@
                 let html = "";
                 webProducts.forEach((p, idx) => {
                     let tagsHtml = (p.tags||[]).map(t => `<span class="prod-tag">${t}</span>`).join('');
+                    let imgUrl = (p.image_url && p.image_url.trim() !== "") ? p.image_url : null;
+                    let imgSrc = imgUrl ? (imgUrl.startsWith('http') ? imgUrl : '/' + imgUrl) : '';
                     html += `
                         <div class="product-slide ${idx===0?'active':''}">
-                            <img src="${p.image_url.startsWith('http') ? p.image_url : '/' + p.image_url}" class="prod-img" onerror="this.onerror=null; this.style.display='none';">
+                            ${imgSrc ? `<img src="${imgSrc}" class="prod-img" onerror="this.onerror=null; this.style.display='none';">` : ''}
                             <div class="prod-info">
                                 <div class="prod-title">${p.title}</div>
                                 <div class="prod-desc">${p.description}</div>
