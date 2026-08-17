@@ -3409,6 +3409,13 @@ def tv_admin():
 def tv_player():
     return render_template('tv_player.html')
 
+
+@app.after_request
+def add_cache_headers(response):
+    if '/static/tv_media/' in request.path:
+        response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+    return response
+
 if __name__ == '__main__':
     db.init_db()
     try: db.init_muhasebe_tables()

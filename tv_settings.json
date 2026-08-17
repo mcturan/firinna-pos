@@ -3,7 +3,9 @@
     "layout": "modern_grid",
     "video_playlist": "",
     "local_videos": [
-        "oceans.mp4"
+        "/static/tv_media/videos/custom_video.mp4",
+        "/static/tv_media/videos/oceans.mp4",
+        "/static/tv_media/videos/1.mp4"
     ],
     "local_audio": [],
     "media_source": "local",
@@ -16,5 +18,5 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-17T19:35:25.674870"
+    "last_ping": "2026-08-17T20:10:25.515135"
 }
