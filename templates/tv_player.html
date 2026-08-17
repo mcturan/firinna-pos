@@ -31,39 +31,34 @@
         body.layout-sidebar #video-container { width: 75%; }
         
         /* Modern Layout Redesign */
-        #modern-layout { display: none; width: 100vw; height: 100vh; padding: 1.5vw; box-sizing: border-box; gap: 1.5vw; grid-template-columns: 3fr 7fr; grid-template-rows: 1fr; }
+        #modern-layout { display: none; width: 100vw; height: 100vh; padding: 1.5vw; box-sizing: border-box; gap: 1.5vw; grid-template-columns: 3fr 7fr; grid-template-rows: 12vh 1fr 6vh; }
         body.layout-modern_grid #modern-layout { display: grid; }
         body.layout-modern_grid #legacy-overlay, body.layout-modern_grid #sidebar { display: none; }
         
         .grid-box { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 1vw; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 2px solid rgba(255,255,255,0.5); }
         
-        /* Left Sidebar (Column 1) */
-        #ml-sidebar { grid-column: 1; display: flex; flex-direction: column; gap: 1.5vw; }
+        #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; gap: 0.2vw; }
+        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; }
+        .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2d6a4f; text-align: center; }
         
-        #ml-logo-box { padding: 1vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; gap: 0.5vw; }
-        #ml-logo { max-width: 90%; max-height: 20vh; object-fit: contain; }
-        
-        .tr-domain { font-size: 1.8vw; font-weight: 800; color: #2d6a4f; text-align: center; }
-        
-        /* Weather Floating Box */
-        #ml-floating-weather { position: absolute; top: 1.5vw; right: 1.5vw; padding: 0.8vw 1.2vw; display: flex; justify-content: space-between; align-items: center; gap: 1.5vw; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 1vw; z-index: 10; }
-        #ml-clock { font-size: 2vw; font-weight: 800; }
-        #ml-weather { text-align: right; font-size: 1.2vw; display: flex; flex-direction: column; }
-        
-        #ml-left-top { flex: 2; background: rgba(255, 255, 255, 0.95); border-radius: 1vw; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        #ml-left-bottom { flex: 1; background: #f8fafc; border-radius: 1vw; padding: 1.5vw; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 1.8vw; font-weight: 700; position: relative; border: 2px solid #e2e8f0; color: #2d3748; }
+        #ml-support-box { grid-column: 2; grid-row: 1; padding: 0 2vw; display: flex; justify-content: space-between; align-items: center; background: #fff; color: #1a202c; border-radius: 1vw; position: relative; overflow: hidden; }
 
-        /* Right Column (Column 2) */
-        #ml-right-col { grid-column: 2; display: flex; flex-direction: column; gap: 1.5vw; height: 100%; }
-        #ml-main-video { flex: 1; position: relative; border-radius: 1vw; overflow: hidden; background: transparent; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        #ml-left-top { grid-column: 1; grid-row: 2; background: rgba(255, 255, 255, 0.95); border-radius: 1vw; display: flex; flex-direction: column; overflow: hidden; position: relative; border: 2px solid #e2e8f0; }
+        
+        #ml-main-video { grid-column: 2; grid-row: 2; position: relative; border-radius: 1vw; overflow: hidden; background: transparent; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        
+        #ml-ticker-box { grid-column: 1 / 3; grid-row: 3; background: #2d6a4f; color: white; border-radius: 1vw; display: flex; align-items: center; overflow: hidden; white-space: nowrap; padding: 0 1vw; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .ticker-text { font-size: 2.2vw; font-weight: 700; display: inline-block; animation: marquee 20s linear infinite; padding-left: 100%; text-transform: uppercase; letter-spacing: 2px; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        
         #video-container { width: 100%; height: 100%; position: absolute; inset: 0; }
 
         /* Product Carousel */
         .product-slide { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 1s ease; background: #fff; border-radius: 1vw; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
         .product-slide.active { opacity: 1; z-index: 5; }
         .prod-img { width: 100%; height: 85%; object-fit: cover; z-index: 1; border-radius: 1vw 1vw 0 0; }
-        .prod-info { height: 15%; padding: 0.5vw 1vw; display: flex; align-items: center; justify-content: center; background: #fff; color: #1a202c; z-index: 2; border-top: 2px solid #e2e8f0; }
-        .prod-title { font-size: 1.8vw; font-weight: 800; color: #1a202c; text-align: center; margin: 0; line-height: 1.2; letter-spacing: 0.5px; }
+        .prod-info { height: 15%; padding: 0.5vw 1vw; display: flex; align-items: center; justify-content: center; background: #fff; color: #1a202c; z-index: 2; border-top: 2px solid #e2e8f0; overflow: hidden; box-sizing: border-box; }
+        .prod-title { font-size: 1.5vw; font-weight: 800; color: #1a202c; text-align: center; margin: 0; line-height: 1.2; letter-spacing: 0.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
         .prod-desc, .prod-tags { display: none; }
 
         /* Video Native Control Fixes for Mobile */
@@ -108,53 +103,53 @@
     <!-- MODERN GRID LAYOUT -->
     <div id="modern-layout">
         
-        <!-- Left Sidebar -->
-        <div id="ml-sidebar">
-            <div id="ml-logo-box">
-                <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
-                <div class="tr-domain">www.firinna.com</div>
-            </div>
-
-            <div id="ml-left-top" class="grid-box">
-                <div id="product-carousel" style="width:100%; height:100%; position:relative;"></div>
-            </div>
-            
-            <div id="ml-left-bottom" class="grid-box" style="display: none;">
-                <div id="message-carousel" style="width:100%; height:100%; position:relative;"></div>
-            </div>
+        <!-- TOP ROW: Logo (left) & Support (right) -->
+        <div id="ml-logo-box" class="grid-box">
+            <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
+            <div class="tr-domain">www.firinna.com</div>
         </div>
-
-        <!-- Right Column -->
-        <div id="ml-right-col">
-            <!-- Main Video -->
-            <div id="ml-main-video">
-                <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
-                <video id="local-video" style="display:none;" autoplay muted playsinline webkit-playsinline loop></video>
-                <div id="record-player"></div>
-            </div>
-            
-            <div id="ml-support-box" class="grid-box" style="padding: 0 2vw; display: flex; justify-content: space-between; align-items: center; background: #fff; color: #1a202c; border-radius: 1vw; min-height: 8vh; position: relative; overflow: hidden;">
-                <!-- Layer 1: Support -->
-                <div id="ml-support-layer" style="display:flex; justify-content: space-between; align-items:center; transition: opacity 1s ease; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
-                    <div style="font-size:1.5vw; font-weight:800; color:#2d6a4f; text-transform:uppercase;">Support Us & Review Us</div>
-                    <div style="display:flex; gap:2vw; align-items:center;">
-                        <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
-                            <span style="color:#4285F4; font-weight:800; font-size:1.5vw;">G</span><span style="color:#EA4335; font-weight:800; font-size:1.5vw;">o</span><span style="color:#FBBC05; font-weight:800; font-size:1.5vw;">o</span><span style="color:#4285F4; font-weight:800; font-size:1.5vw;">g</span><span style="color:#34A853; font-weight:800; font-size:1.5vw;">l</span><span style="color:#EA4335; font-weight:800; font-size:1.5vw;">e</span> <span style="font-weight:700; color:#4a5568; font-size:1.5vw;">Maps</span>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
-                            <span style="color:#fc3f1d; font-weight:800; font-size:1.5vw;">Yandex</span> <span style="font-weight:700; color:#4a5568; font-size:1.5vw;">Maps</span>
-                        </div>
+        
+        <div id="ml-support-box" class="grid-box">
+            <!-- Layer 1: Support -->
+            <div id="ml-support-layer" style="display:flex; justify-content: space-between; align-items:center; transition: opacity 1s ease; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
+                <div style="font-size:1.5vw; font-weight:800; color:#2d6a4f; text-transform:uppercase;">Support Us & Review Us</div>
+                <div style="display:flex; gap:2vw; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
+                        <span style="color:#4285F4; font-weight:800; font-size:1.5vw;">G</span><span style="color:#EA4335; font-weight:800; font-size:1.5vw;">o</span><span style="color:#FBBC05; font-weight:800; font-size:1.5vw;">o</span><span style="color:#4285F4; font-weight:800; font-size:1.5vw;">g</span><span style="color:#34A853; font-weight:800; font-size:1.5vw;">l</span><span style="color:#EA4335; font-weight:800; font-size:1.5vw;">e</span> <span style="font-weight:700; color:#4a5568; font-size:1.5vw;">Maps</span>
                     </div>
-                </div>
-                <!-- Layer 2: Weather & Clock -->
-                <div id="ml-weather-layer" style="display:flex; justify-content: space-between; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
-                    <span id="ml-clock" style="font-size:2.5vw; font-weight:800;">00:00</span>
-                    <div id="ml-weather" style="font-size:1.5vw; font-weight:700; color:#4a5568; display:flex; gap: 3vw;">
-                        <span>Loading...</span>
+                    <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.5vw 1vw; background:#f8fafc; border-radius: 0.5vw; border: 1px solid #e2e8f0;">
+                        <span style="color:#fc3f1d; font-weight:800; font-size:1.5vw;">Yandex</span> <span style="font-weight:700; color:#4a5568; font-size:1.5vw;">Maps</span>
                     </div>
                 </div>
             </div>
+            <!-- Layer 2: Weather & Clock -->
+            <div id="ml-weather-layer" style="display:flex; justify-content: space-between; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; left:2vw; right:2vw; top:0; bottom:0;">
+                <span id="ml-clock" style="font-size:2.5vw; font-weight:800;">00:00</span>
+                <div id="ml-weather" style="font-size:1.5vw; font-weight:700; color:#4a5568; display:flex; gap: 3vw;">
+                    <span>Loading...</span>
+                </div>
+            </div>
         </div>
+
+        <!-- MIDDLE ROW: Products (left) & Video (right) -->
+        <div id="ml-left-top" class="grid-box">
+            <div id="product-carousel" style="width:100%; height:100%; position:relative;"></div>
+        </div>
+        
+        <div id="ml-main-video" class="grid-box">
+            <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            <video id="local-video" style="display:none;" autoplay muted playsinline webkit-playsinline loop></video>
+            <div id="record-player"></div>
+        </div>
+
+        <!-- BOTTOM ROW: Ticker -->
+        <div id="ml-ticker-box" class="grid-box">
+            <div class="ticker-text">
+                Fırınna'ya Hoş Geldiniz! En taze ürünlerimizle hizmetinizdeyiz. Özel siparişleriniz için kasadan bilgi alabilirsiniz...
+            </div>
+        </div>
+        
+    </div>
 
     <!-- LEGACY LAYOUT ELEMENTS -->
     <div class="sidebar" id="sidebar">
@@ -370,7 +365,7 @@
                 }
             }
         }
-        setInterval(rotateProducts, 10000); // 10 seconds for products
+        setInterval(rotateProducts, 7000); // 7 seconds for products
         
         let supportToggle = false;
         function rotateSupport() {
