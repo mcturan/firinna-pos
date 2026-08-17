@@ -1,33 +1,33 @@
 [
     {
-        "id": "prod_m1",
-        "title": "Geleneksel Çakallı Menemeni",
-        "category": "Kahvaltılıklar",
-        "description": "Sadece yumurta sarısıyla hazırlanan, bol kaşar peyniri ve özel tereyağı ile pişen meşhur Çakallı menemeni.",
-        "price": "250 TL",
-        "image_url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
-        "is_signature": true,
-        "tags": [],
-        "is_active": true
-    },
-    {
-        "id": "prod_p2",
-        "title": "Taş Fırın Pizza Margarita",
-        "category": "Taş Fırın Pizza",
-        "description": "Geleneksel Napoliten domates sosu, taze mozzarella ve fesleğen dokunuşuyla taş fırında pişen lezzet.",
-        "price": "380 TL",
-        "image_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=800&q=80",
-        "is_signature": true,
-        "tags": [],
-        "is_active": true
-    },
-    {
         "id": "prod_s2",
         "title": "Traditional Turkish Coffee",
         "category": "Hot Drinks",
-        "description": "Slow-brewed traditional Turkish coffee made from specially roasted and freshly ground Arabica beans.",
+        "description": "Slow-brewed traditional Turkish coffee made from specially roasted and freshly ground Arabica beans, served with authentic Turkish delight.",
         "price": "120 TL",
         "image_url": "https://images.unsplash.com/photo-1579992357154-faf4bde95b3d?auto=format&fit=crop&w=800&q=80",
+        "is_signature": true,
+        "tags": [],
+        "is_active": true
+    },
+    {
+        "id": "prod_s1",
+        "title": "Premium Turkish Tea",
+        "category": "Hot Drinks",
+        "description": "Finest black tea leaves from the Black Sea region, traditionally brewed for a rich and deep flavor.",
+        "price": "40 TL",
+        "image_url": "https://images.unsplash.com/photo-1576092762791-dd9e2220abd4?auto=format&fit=crop&w=800&q=80",
+        "is_signature": true,
+        "tags": [],
+        "is_active": true
+    },
+    {
+        "id": "prod_t1",
+        "title": "Warm Chocolate Cake",
+        "category": "Desserts",
+        "description": "Rich and moist chocolate cake served warm with premium melted chocolate sauce and powdered sugar.",
+        "price": "150 TL",
+        "image_url": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80",
         "is_signature": true,
         "tags": [],
         "is_active": true
