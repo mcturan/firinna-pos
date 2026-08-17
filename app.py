@@ -55,7 +55,7 @@ def api_mobile_version():
         'version': APP_VERSION,
         'apk_url': '/download_apk',
         'tv_version': '1.0.3',
-        'tv_apk_url': '/static/Firinna-TV.apk'
+        'tv_apk_url': '/static/Firinna-TV-1.0.3.apk'
     })
 
 @app.route('/download_apk')
