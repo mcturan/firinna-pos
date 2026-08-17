@@ -3345,4 +3345,87 @@ if __name__ == '__main__':
     except Exception as e:
         print("Auto WebP Error:", e)
         
+    
+import os
+import json
+from datetime import datetime
+
+TV_SETTINGS_FILE = os.path.join(os.path.dirname(__file__), 'tv_settings.json')
+TV_MEDIA_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'tv_media')
+os.makedirs(os.path.join(TV_MEDIA_FOLDER, 'videos'), exist_ok=True)
+os.makedirs(os.path.join(TV_MEDIA_FOLDER, 'audio'), exist_ok=True)
+
+def get_tv_settings():
+    if os.path.exists(TV_SETTINGS_FILE):
+        with open(TV_SETTINGS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {
+        "logo_url": "",
+        "layout": "default",
+        "video_playlist": "",
+        "local_videos": [],
+        "local_audio": [],
+        "media_source": "youtube",
+        "audio_priority": "video",
+        "promo_text": "",
+        "qr_code": "",
+        "qr_text": "",
+        "widgets": {"weather": False, "clock": False},
+        "messages": [],
+        "last_ping": None
+    }
+
+def save_tv_settings(data):
+    with open(TV_SETTINGS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+@app.route('/api/tv/settings', methods=['GET', 'POST'])
+def api_tv_settings():
+    if request.method == 'POST':
+        data = request.json
+        current = get_tv_settings()
+        current.update(data)
+        save_tv_settings(current)
+        return jsonify({"success": True})
+    return jsonify(get_tv_settings())
+
+@app.route('/api/tv/ping', methods=['POST'])
+def api_tv_ping():
+    current = get_tv_settings()
+    current['last_ping'] = datetime.now().isoformat()
+    save_tv_settings(current)
+    return jsonify({"success": True})
+
+@app.route('/api/tv/media', methods=['GET'])
+def api_get_tv_media():
+    videos = os.listdir(os.path.join(TV_MEDIA_FOLDER, 'videos'))
+    audio = os.listdir(os.path.join(TV_MEDIA_FOLDER, 'audio'))
+    return jsonify({
+        "videos": ["/static/tv_media/videos/" + v for v in videos if v.endswith(('.mp4', '.webm', '.ogg'))],
+        "audio": ["/static/tv_media/audio/" + a for a in audio if a.endswith(('.mp3', '.wav', '.ogg'))]
+    })
+
+@app.route('/api/tv/media/upload', methods=['POST'])
+def api_upload_tv_media():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    from werkzeug.utils import secure_filename
+    file = request.files['file']
+    type_ = request.form.get('type', 'video')
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    if file:
+        filename = secure_filename(file.filename)
+        folder = 'videos' if type_ == 'video' else 'audio'
+        file.save(os.path.join(TV_MEDIA_FOLDER, folder, filename))
+        return jsonify({"success": True})
+
+@app.route('/tv-admin')
+def tv_admin():
+    return render_template('tv_admin.html')
+
+@app.route('/tv-player')
+def tv_player():
+    return render_template('tv_player.html')
+
     app.run(host='0.0.0.0', port=5000, debug=False)
