@@ -3,8 +3,6 @@
     "layout": "modern_grid",
     "video_playlist": "",
     "local_videos": [
-        "/static/tv_media/videos/custom_video.mp4",
-        "/static/tv_media/videos/oceans.mp4",
         "/static/tv_media/videos/1.mp4"
     ],
     "local_audio": [],
