@@ -99,7 +99,9 @@
         <!-- Top Row -->
         <div class="grid-box" id="ml-top-left">
             <span id="ml-clock">00:00</span>
-            <span id="ml-weather" style="margin-left:1vw; font-size:1.8vw;">☀️ 24°C</span>
+            <div id="ml-weather" style="margin-left:1.5vw; font-size:1.2vw; display:flex; flex-direction:column; line-height:1.2;">
+                <span>Yükleniyor...</span>
+            </div>
         </div>
         <div class="grid-box" id="ml-top-center">
             <img id="ml-logo" src="" style="max-height:80%; max-width:80%; display:none;">
@@ -246,6 +248,40 @@
         }
         setInterval(updateClock, 1000);
 
+        const wCodeMap = {
+            0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 
+            45: '🌫️', 48: '🌫️', 51: '🌦️', 53: '🌦️', 55: '🌧️', 
+            61: '🌧️', 63: '🌧️', 65: '🌧️', 71: '🌨️', 73: '🌨️', 75: '❄️', 
+            80: '🌧️', 81: '⛈️', 82: '⛈️', 95: '🌩️', 96: '⛈️', 99: '⛈️'
+        };
+
+        async function fetchWeather() {
+            try {
+                // İstanbul koordinatları (varsayılan)
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=41.0082&longitude=28.9784&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=2");
+                const data = await res.json();
+                if(data && data.daily) {
+                    const todayCode = data.daily.weathercode[0];
+                    const todayMax = Math.round(data.daily.temperature_2m_max[0]);
+                    const todayMin = Math.round(data.daily.temperature_2m_min[0]);
+                    const tomCode = data.daily.weathercode[1];
+                    const tomMax = Math.round(data.daily.temperature_2m_max[1]);
+                    
+                    const todayIcon = wCodeMap[todayCode] || '🌤️';
+                    const tomIcon = wCodeMap[tomCode] || '🌤️';
+                    
+                    document.getElementById('ml-weather').innerHTML = `
+                        <span style="font-weight:700;">Bugün: ${todayIcon} ${todayMin}° / ${todayMax}°C</span>
+                        <span style="font-size:1vw; color:#4a5568;">Yarın: ${tomIcon} ${tomMax}°C</span>
+                    `;
+                }
+            } catch(e) {
+                console.error("Hava durumu çekilemedi", e);
+            }
+        }
+        fetchWeather();
+        setInterval(fetchWeather, 3600000); // Saat başı yenile
+
         function rotateContent() {
             if(webProducts.length > 0) {
                 const slides = document.querySelectorAll('.product-slide');
@@ -350,7 +386,14 @@
             if(currentMessages.length > 0) {
                 let mHtml = "";
                 currentMessages.forEach((m, idx) => {
-                    mHtml += `<div class="msg-slide ${idx===0?'active':''}">${m.text}</div>`;
+                    if (m.image) {
+                        mHtml += `<div class="msg-slide ${idx===0?'active':''}" style="flex-direction:row; gap:1.5vw;">
+                                    <img src="${m.image}" style="max-height:80%; max-width:40%; border-radius:0.5vw; object-fit:cover;" onerror="this.style.display='none'">
+                                    <div>${m.text}</div>
+                                  </div>`;
+                    } else {
+                        mHtml += `<div class="msg-slide ${idx===0?'active':''}">${m.text}</div>`;
+                    }
                 });
                 document.getElementById('message-carousel').innerHTML = mHtml;
             }

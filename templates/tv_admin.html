@@ -254,8 +254,9 @@
             const container = document.getElementById('messages_container');
             const id = Date.now() + Math.random().toString().substr(2, 5);
             const html = `
-                <div class="flex-row message-row" id="msg-${id}" style="margin-bottom:1rem; align-items:end; background:#f7fafc; padding:1rem; border-radius:8px;">
-                    <div style="flex:1; min-width:200px;"><label style="font-size:0.8rem">Mesaj İçeriği</label><input type="text" class="m-text" value="${text}"></div>
+                <div class="flex-row message-row" id="msg-${id}" style="margin-bottom:1rem; align-items:end; background:#f7fafc; padding:1rem; border-radius:8px; flex-wrap:wrap;">
+                    <div style="flex:2; min-width:200px;"><label style="font-size:0.8rem">Mesaj İçeriği</label><input type="text" class="m-text" value="${text}"></div>
+                    <div style="flex:1; min-width:150px;"><label style="font-size:0.8rem">Görsel URL (İsteğe bağlı)</label><input type="text" class="m-image" placeholder="/static/uploads/... veya https://..." value=""></div>
                     <div><label style="font-size:0.8rem">Başlangıç</label><input type="time" class="m-start" value="${start}"></div>
                     <div><label style="font-size:0.8rem">Bitiş</label><input type="time" class="m-end" value="${end}"></div>
                     <button onclick="document.getElementById('msg-${id}').remove()" style="padding:.65rem; background:#fee2e2; color:#9b2c2c; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">Sil</button>
@@ -282,7 +283,12 @@
                 document.getElementById('w_clock').checked = data.widgets?.clock;
 
                 document.getElementById('messages_container').innerHTML = '';
-                (data.messages || []).forEach(m => addMessage(m.text, m.start_time, m.end_time));
+                (data.messages || []).forEach(m => {
+                    addMessage(m.text, m.start_time, m.end_time);
+                    const rows = document.querySelectorAll('.message-row');
+                    const lastRow = rows[rows.length-1];
+                    lastRow.querySelector('.m-image').value = m.image || '';
+                });
 
                 toggleSource();
 
@@ -305,6 +311,7 @@
         async function saveSettings() {
             const messages = Array.from(document.querySelectorAll('.message-row')).map(row => ({
                 text: row.querySelector('.m-text').value,
+                image: row.querySelector('.m-image').value,
                 start_time: row.querySelector('.m-start').value,
                 end_time: row.querySelector('.m-end').value
             })).filter(m => m.text.trim() !== '');

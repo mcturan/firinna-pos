@@ -3327,9 +3327,12 @@ os.makedirs(os.path.join(TV_MEDIA_FOLDER, 'audio'), exist_ok=True)
 def get_tv_settings():
     if os.path.exists(TV_SETTINGS_FILE):
         with open(TV_SETTINGS_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            data = json.load(f)
+            if not data.get('logo_url'):
+                data['logo_url'] = db.get_setting('logo_url', '')
+            return data
     return {
-        "logo_url": "",
+        "logo_url": db.get_setting('logo_url', ''),
         "layout": "modern_grid",
         "video_playlist": "",
         "local_videos": [],
