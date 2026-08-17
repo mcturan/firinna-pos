@@ -38,8 +38,8 @@
         #ml-logo-box { padding: 2vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); border-radius: 1vw; gap: 1vw; }
         #ml-logo { max-width: 95%; max-height: 18vh; object-fit: contain; }
         
-        .tr-domain { font-size: 1.1vw; font-weight: 800; color: #2d6a4f; text-align: center; }
-        .tr-flags { display: flex; gap: 0.8vw; justify-content: center; margin-top: 0.5vw; }
+        .tr-domain { font-size: 1.2vw; font-weight: 800; color: #2d6a4f; text-align: center; }
+        .tr-flags { display: flex; gap: 0.8vw; justify-content: center; margin-top: 0.5vw; flex-wrap: wrap; max-width: 80%; margin-left: auto; margin-right: auto; }
         .tr-flags img { height: 1.5vw; border-radius: 0.2vw; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         #ml-weather-box { padding: 1vw 1.5vw; display: flex; justify-content: space-between; align-items: center; background: #2d6a4f; color: white; border-radius: 1vw; }
@@ -105,12 +105,14 @@
             <div id="ml-logo-box" class="grid-box" style="flex-direction:column;">
                 <img id="ml-logo" src="" style="display:none;">
                 <div style="margin-top:0.5vw;">
-                    <div class="tr-domain">fırınna menü: www.firinna.com</div>
+                    <div class="tr-domain">www.firinna.com</div>
                     <div class="tr-flags">
                         <img src="https://flagcdn.com/w40/tr.png" alt="TR">
                         <img src="https://flagcdn.com/w40/gb.png" alt="EN">
                         <img src="https://flagcdn.com/w40/sa.png" alt="AR">
                         <img src="https://flagcdn.com/w40/ru.png" alt="RU">
+                        <img src="https://flagcdn.com/w40/de.png" alt="DE">
+                        <img src="https://flagcdn.com/w40/fr.png" alt="FR">
                     </div>
                 </div>
             </div>
@@ -128,6 +130,14 @@
             
             <div id="ml-left-bottom" class="grid-box">
                 <div id="message-carousel" style="width:100%; height:100%; position:relative;"></div>
+            </div>
+            
+            <div id="ml-support-box" class="grid-box" style="padding: 1vw; flex-direction:column; background: #fff; color: #1a202c;">
+                <div style="font-size:0.9vw; font-weight:700; color:#4a5568; margin-bottom:0.5vw;">Support Us on</div>
+                <div style="display:flex; gap:1.5vw; justify-content:center;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Google_Maps_icon.svg" style="height:2.5vw;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Yandex_Maps_icon.svg" style="height:2.5vw;">
+                </div>
             </div>
         </div>
 
@@ -231,9 +241,9 @@
                 events: {
                     'onReady': (e) => {
                         if(currentMediaSource === 'youtube') {
-                            e.target.playVideo();
-                            if(currentAudioPriority === 'music') e.target.mute();
+                            if (currentAudioPriority === 'music') e.target.mute();
                             else e.target.unMute();
+                            setTimeout(() => { e.target.playVideo(); }, 500);
                         }
                     },
                     'onStateChange': (e) => { if (e.data === YT.PlayerState.ENDED) player.playVideo(); }
@@ -352,7 +362,7 @@
                     let tagsHtml = (p.tags||[]).map(t => `<span class="prod-tag">${t}</span>`).join('');
                     html += `
                         <div class="product-slide ${idx===0?'active':''}">
-                            <img src="/${p.image_url}" class="prod-img" onerror="this.src='/static/img/placeholder.webp';">
+                            <img src="${p.image_url.startsWith('http') ? p.image_url : '/' + p.image_url}" class="prod-img" onerror="this.onerror=null; this.style.display='none';">
                             <div class="prod-info">
                                 <div class="prod-title">${p.title}</div>
                                 <div class="prod-desc">${p.description}</div>
