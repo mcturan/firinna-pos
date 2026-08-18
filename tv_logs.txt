@@ -1,5 +1,5 @@
-[2026-08-18 18:26:45]
-Gece 03:00 otomatik yeniden başlatma: 513 dk sonra
+[2026-08-18 18:30:12]
+Gece 03:00 otomatik yeniden başlatma: 509 dk sonra
 Boot sequence started.
 Connected to LAN: http://192.168.1.10:5000
 Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
@@ -7,7 +7,3 @@ App is up to date.
 Settings fetched successfully.
 Video already exists: 2.mp4
 Video already exists: 1.mp4
-[JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 254
-[JS] Setting HTML5 src for: /static/tv_media/videos/2.mp4 -- From line 396
-
-[AUTO LOG DUMP AFTER 10s]
