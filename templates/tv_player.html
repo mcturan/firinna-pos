@@ -58,8 +58,9 @@
             contain: content;
         }
         
-        #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #FFFFFF; border-radius: 1vw; gap: 0.2vw; border: 1.5px solid #E2E8F0; }
-        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; }
+        #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0.5vw; display: flex; align-items: center; justify-content: center; background: #FFFFFF; border-radius: 1vw; position: relative; overflow: hidden; border: 1.5px solid #E2E8F0; }
+        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; position: absolute; opacity: 1; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
+        #ml-logo-domain { position: absolute; font-size: 1.6vw; font-weight: 800; color: #2D6A4F; text-align: center; letter-spacing: 1px; opacity: 0; transform: scale(0.92); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
         .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2D6A4F; text-align: center; }
         
         #ml-support-box { 
@@ -257,9 +258,10 @@
     <!-- MODERN GRID LAYOUT -->
     <div id="modern-layout">
         
-        <!-- TOP ROW: Logo (left) & Info/Clock + Flag (right) -->
+        <!-- TOP ROW: Logo & Domain (left) | Clock & Weather + Flag (right) -->
         <div id="ml-logo-box" class="grid-box">
             <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
+            <div id="ml-logo-domain">www.firinna.com</div>
         </div>
         
         <div id="ml-support-box" class="grid-box">
@@ -281,10 +283,6 @@
                     <div id="ml-weather" style="font-size:1.7vw; font-weight:700; color:#1A202C; display:flex; justify-content:space-around; width:100%; align-items:center;">
                         <span>Loading Weather...</span>
                     </div>
-                </div>
-                <!-- Layer 2: Website Domain -->
-                <div id="ml-layer-2" style="display:flex; justify-content: center; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; inset:0; pointer-events:none;">
-                    <span style="font-size:2vw; font-weight:800; color:#2D6A4F; letter-spacing:2px;">www.firinna.com</span>
                 </div>
             </div>
             <!-- Waving Turkish Flag at Far-Right of the Top Bar -->
@@ -602,8 +600,8 @@
         
         let supportIndex = 0;
         function rotateSupport() {
-            supportIndex = (supportIndex + 1) % 3;
-            for(let i = 0; i < 3; i++) {
+            supportIndex = (supportIndex + 1) % 2; // 2 layers: Clock & Weather
+            for(let i = 0; i < 2; i++) {
                 const el = document.getElementById('ml-layer-' + i);
                 if(el) {
                     el.style.opacity = (supportIndex === i) ? '1' : '0';
@@ -611,7 +609,31 @@
                 }
             }
         }
-        setInterval(rotateSupport, 8000); // 8 seconds for each top layer
+        setInterval(rotateSupport, 8000); // 8 seconds per layer
+
+        // Logo / Domain Transition in Sol-Üst: Shows www.firinna.com for 5 seconds every 30 seconds
+        function triggerLogoDomainCycle() {
+            const logoEl = document.getElementById('ml-logo');
+            const domainEl = document.getElementById('ml-logo-domain');
+            if (!logoEl || !domainEl) return;
+
+            // 1. Show domain text, fade out logo
+            logoEl.style.opacity = '0';
+            logoEl.style.transform = 'scale(0.88)';
+            domainEl.style.opacity = '1';
+            domainEl.style.transform = 'scale(1)';
+
+            // 2. Return back to logo after 5 seconds
+            setTimeout(() => {
+                domainEl.style.opacity = '0';
+                domainEl.style.transform = 'scale(0.92)';
+                logoEl.style.opacity = '1';
+                logoEl.style.transform = 'scale(1)';
+            }, 5000);
+        }
+        // First domain reveal at 5 seconds after load, then every 30 seconds
+        setTimeout(triggerLogoDomainCycle, 5000);
+        setInterval(triggerLogoDomainCycle, 30000);
 
         function triggerWatermarkCycle() {
             const container = document.getElementById('ml-watermark-container');
