@@ -59,8 +59,8 @@
         }
         
         #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0.5vw; display: flex; align-items: center; justify-content: center; background: #FFFFFF; border-radius: 1vw; position: relative; overflow: hidden; border: 1.5px solid #E2E8F0; }
-        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; position: absolute; transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
-        #ml-flag { max-width: 92%; max-height: 8.5vh; object-fit: contain; position: absolute; opacity: 0; transform: scale(0.92); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; border-radius: 0.4vw; }
+        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; position: absolute; opacity: 1; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; z-index: 2; pointer-events: none; }
+        #ml-flag { max-width: 92%; max-height: 8.5vh; object-fit: contain; position: absolute; opacity: 0; transform: scale(0.92); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; z-index: 3; border-radius: 0.4vw; pointer-events: none; }
         .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2D6A4F; text-align: center; }
         
         #ml-support-box { grid-column: 2; grid-row: 1; padding: 0 2vw; display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; color: #1A202C; border-radius: 1vw; position: relative; overflow: hidden; border: 1.5px solid #E2E8F0; }
@@ -585,8 +585,8 @@
                 logoEl.style.transform = 'scale(1)';
             }, 5000);
         }
-        // First wave after 15s, then every 30s
-        setTimeout(triggerFlagCycle, 15000);
+        // First wave appears quickly at 4 seconds after page load, then repeats every 30 seconds
+        setTimeout(triggerFlagCycle, 4000);
         setInterval(triggerFlagCycle, 30000);
 
         function triggerWatermarkCycle() {
