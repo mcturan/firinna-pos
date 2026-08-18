@@ -58,32 +58,44 @@
             contain: content;
         }
         
-        #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #FFFFFF; border-radius: 1vw; gap: 0.2vw; border: 1.5px solid #E2E8F0; }
-        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; }
-        .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2D6A4F; text-align: center; }
-        
-        #ml-video-flag {
-            position: absolute;
-            top: 1.2vw;
-            right: 1.2vw;
-            width: 4.8vw;
-            height: 3.2vw;
-            border-radius: 0.5vw;
+        #ml-logo-box { 
+            grid-column: 1; 
+            grid-row: 1; 
+            padding: 0 1vw; 
+            display: flex; 
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: center; 
+            background: #FFFFFF; 
+            border-radius: 1vw; 
+            gap: 0.8vw; 
+            border: 1.5px solid #E2E8F0; 
+        }
+        #ml-logo-flag {
+            width: 3.8vw;
+            height: 2.6vw;
+            border-radius: 0.35vw;
             overflow: hidden;
-            z-index: 25;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 0 1.5px rgba(255, 255, 255, 0.4);
-            pointer-events: none;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+            border: 1px solid #E2E8F0;
             background: #E30A17;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        #ml-video-flag img {
+        #ml-logo-flag img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
         }
+        #ml-logo { 
+            max-width: 65%; 
+            max-height: 7.5vh; 
+            object-fit: contain; 
+        }
+        .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2D6A4F; text-align: center; }
         
         #ml-support-box { grid-column: 2; grid-row: 1; padding: 0 2vw; display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; color: #1A202C; border-radius: 1vw; position: relative; overflow: hidden; border: 1.5px solid #E2E8F0; }
 
@@ -236,8 +248,11 @@
     <!-- MODERN GRID LAYOUT -->
     <div id="modern-layout">
         
-        <!-- TOP ROW: Logo (left) & Info/Clock (right) -->
+        <!-- TOP ROW: Flag + Logo (left) & Info/Clock (right) -->
         <div id="ml-logo-box" class="grid-box">
+            <div id="ml-logo-flag">
+                <img src="/static/img/bayrak.gif" alt="Türk Bayrağı">
+            </div>
             <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
         </div>
         
@@ -275,10 +290,6 @@
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
             <video id="local-video" style="display:none;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
-            <!-- Turkish Flag Overlay at Top-Right of Video -->
-            <div id="ml-video-flag">
-                <img src="/static/img/bayrak.gif" alt="Türk Bayrağı">
-            </div>
             <!-- Watermark -->
             <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 1.5vw 3vw; border-radius: 1.5vw; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
                 <img id="ml-watermark" src="/static/uploads/logo.png" style="width:28vw; display:block; margin: 0 auto;">
