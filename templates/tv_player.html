@@ -58,11 +58,32 @@
             contain: content;
         }
         
-        #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0; display: flex; align-items: center; justify-content: center; background: #0B0F19; border-radius: 1vw; position: relative; overflow: hidden; border: 1.5px solid #E2E8F0; }
-        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; position: absolute; opacity: 1; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; z-index: 2; pointer-events: none; }
-        #ml-flag { width: 100%; height: 100%; object-fit: contain; position: absolute; inset: 0; opacity: 0; transform: scale(1.85); transition: opacity 0.8s ease, transform 5s cubic-bezier(0.1, 0.9, 0.2, 1); will-change: opacity, transform; z-index: 3; pointer-events: none; }
-        #ml-flag.active-flag { opacity: 1; transform: scale(0.92); }
+        #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #FFFFFF; border-radius: 1vw; gap: 0.2vw; border: 1.5px solid #E2E8F0; }
+        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; }
         .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2D6A4F; text-align: center; }
+        
+        #ml-video-flag {
+            position: absolute;
+            top: 1.2vw;
+            right: 1.2vw;
+            width: 4.8vw;
+            height: 3.2vw;
+            border-radius: 0.5vw;
+            overflow: hidden;
+            z-index: 25;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 0 1.5px rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+            background: #E30A17;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #ml-video-flag img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
         
         #ml-support-box { grid-column: 2; grid-row: 1; padding: 0 2vw; display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; color: #1A202C; border-radius: 1vw; position: relative; overflow: hidden; border: 1.5px solid #E2E8F0; }
 
@@ -215,10 +236,9 @@
     <!-- MODERN GRID LAYOUT -->
     <div id="modern-layout">
         
-        <!-- TOP ROW: Logo / Turkish Flag (left) & Info/Clock (right) -->
+        <!-- TOP ROW: Logo (left) & Info/Clock (right) -->
         <div id="ml-logo-box" class="grid-box">
             <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
-            <img id="ml-flag" src="/static/img/turkey_flag.gif" alt="Türk Bayrağı">
         </div>
         
         <div id="ml-support-box" class="grid-box">
@@ -255,6 +275,10 @@
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
             <video id="local-video" style="display:none;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
+            <!-- Turkish Flag Overlay at Top-Right of Video -->
+            <div id="ml-video-flag">
+                <img src="/static/img/bayrak.gif" alt="Türk Bayrağı">
+            </div>
             <!-- Watermark -->
             <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 1.5vw 3vw; border-radius: 1.5vw; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
                 <img id="ml-watermark" src="/static/uploads/logo.png" style="width:28vw; display:block; margin: 0 auto;">
@@ -565,36 +589,6 @@
             }
         }
         setInterval(rotateSupport, 8000); // 8 seconds for each top layer
-
-        // Turkish Flag Animation: Shows for 5 seconds every 1 minute (60s) with dramatic Zoom-Out reveal
-        function triggerFlagCycle() {
-            const logoEl = document.getElementById('ml-logo');
-            const flagEl = document.getElementById('ml-flag');
-            if (!logoEl || !flagEl) return;
-
-            // Reset zoom-in state before triggering
-            flagEl.classList.remove('active-flag');
-            flagEl.style.transition = 'none';
-            flagEl.style.transform = 'scale(1.9)';
-            flagEl.offsetHeight; // trigger reflow
-
-            // 1. Show waving flag with dramatic zoom out pull-back
-            logoEl.style.opacity = '0';
-            logoEl.style.transform = 'scale(0.9)';
-            
-            flagEl.style.transition = 'opacity 0.8s ease, transform 5s cubic-bezier(0.1, 0.9, 0.2, 1)';
-            flagEl.classList.add('active-flag');
-
-            // 2. Return back to logo after 5 seconds
-            setTimeout(() => {
-                flagEl.classList.remove('active-flag');
-                logoEl.style.opacity = '1';
-                logoEl.style.transform = 'scale(1)';
-            }, 5000);
-        }
-        // First wave appears quickly at 4 seconds after page load, then repeats every 60 seconds (1 minute)
-        setTimeout(triggerFlagCycle, 4000);
-        setInterval(triggerFlagCycle, 60000);
 
         function triggerWatermarkCycle() {
             const container = document.getElementById('ml-watermark-container');
