@@ -58,8 +58,9 @@
             contain: content;
         }
         
-        #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0.5vw; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #FFFFFF; border-radius: 1vw; gap: 0.2vw; border: 1.5px solid #E2E8F0; }
-        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; }
+        #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0.5vw; display: flex; align-items: center; justify-content: center; background: #FFFFFF; border-radius: 1vw; position: relative; overflow: hidden; border: 1.5px solid #E2E8F0; }
+        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; position: absolute; transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
+        #ml-flag { max-width: 92%; max-height: 8.5vh; object-fit: contain; position: absolute; opacity: 0; transform: scale(0.92); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; border-radius: 0.4vw; }
         .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2D6A4F; text-align: center; }
         
         #ml-support-box { grid-column: 2; grid-row: 1; padding: 0 2vw; display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; color: #1A202C; border-radius: 1vw; position: relative; overflow: hidden; border: 1.5px solid #E2E8F0; }
@@ -213,9 +214,10 @@
     <!-- MODERN GRID LAYOUT -->
     <div id="modern-layout">
         
-        <!-- TOP ROW: Logo (left) & Info/Clock (right) -->
+        <!-- TOP ROW: Logo / Turkish Flag (left) & Info/Clock (right) -->
         <div id="ml-logo-box" class="grid-box">
             <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
+            <img id="ml-flag" src="/static/img/turkey_flag.gif" alt="Türk Bayrağı">
         </div>
         
         <div id="ml-support-box" class="grid-box">
@@ -562,6 +564,30 @@
             }
         }
         setInterval(rotateSupport, 8000); // 8 seconds for each top layer
+
+        // Turkish Flag Animation: Shows for 5 seconds every 30 seconds
+        function triggerFlagCycle() {
+            const logoEl = document.getElementById('ml-logo');
+            const flagEl = document.getElementById('ml-flag');
+            if (!logoEl || !flagEl) return;
+
+            // 1. Show waving flag, fade out logo
+            logoEl.style.opacity = '0';
+            logoEl.style.transform = 'scale(0.9)';
+            flagEl.style.opacity = '1';
+            flagEl.style.transform = 'scale(1)';
+
+            // 2. Return back to logo after 5 seconds
+            setTimeout(() => {
+                flagEl.style.opacity = '0';
+                flagEl.style.transform = 'scale(0.92)';
+                logoEl.style.opacity = '1';
+                logoEl.style.transform = 'scale(1)';
+            }, 5000);
+        }
+        // First wave after 15s, then every 30s
+        setTimeout(triggerFlagCycle, 15000);
+        setInterval(triggerFlagCycle, 30000);
 
         function triggerWatermarkCycle() {
             const container = document.getElementById('ml-watermark-container');
