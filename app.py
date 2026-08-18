@@ -8,7 +8,8 @@ import subprocess
 import threading
 import time
 from datetime import datetime
-from werkzeug.utils import secure_filename
+import urllib.request
+import xml.etree.ElementTree as ET
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
@@ -54,20 +55,66 @@ def api_mobile_version():
     return jsonify({
         'version': APP_VERSION,
         'apk_url': '/download_apk',
-        'tv_version': '1.1.19',
-        'tv_apk_url': '/static/Firinna-TV-1.1.19.apk'
+        'tv_version': '1.1.32',
+        'tv_apk_url': '/static/Firinna-TV-1.1.32.apk'
     })
 
 @app.route('/download_apk')
 def download_apk():
     return send_from_directory('mobile_app', 'Firinna-Garson.apk', as_attachment=True)
 
+@app.route('/static/Firinna-TV-<path:filename>.apk')
+@app.route('/download_tv_apk')
+def download_tv_apk(filename=None):
+    # Always serve TV APK with 200 OK (ignore Range header) so older clients (v1.1.30) don't get 416
+    apk_path = '/opt/firinna-pos/static/Firinna-TV-1.1.32.apk'
+    if not os.path.exists(apk_path):
+        return jsonify({"error": "APK not found"}), 404
+    with open(apk_path, 'rb') as f:
+        data = f.read()
+    response = app.response_class(
+        response=data,
+        status=200,
+        mimetype='application/vnd.android.package-archive'
+    )
+    response.headers['Content-Disposition'] = 'attachment; filename="Firinna-TV-1.1.32.apk"'
+    response.headers['Content-Length'] = str(len(data))
+    response.headers['Accept-Ranges'] = 'none'
+    return response
+
 @app.route('/api/tv/upload_logs', methods=['POST'])
 def upload_logs():
     try:
-        logs = request.form.get('logs', '')
-        with open('/opt/firinna-pos/tv_logs.txt', 'w') as f:
-            f.write(logs)
+        # Support both form and multipart/json uploads
+        logs = request.form.get('logs', '') or (request.json or {}).get('logs', '')
+        now = datetime.now()
+        timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+        today_str = now.strftime('%Y-%m-%d')
+        
+        # 1. Write latest logs to server
+        with open('/opt/firinna-pos/tv_logs.txt', 'w', encoding='utf-8') as f:
+            f.write(f"[{timestamp}]\n{logs}")
+        
+        # 2. Store in 7-day rolling daily directory
+        logs_dir = '/opt/firinna-pos/tv_logs'
+        os.makedirs(logs_dir, exist_ok=True)
+        daily_file = os.path.join(logs_dir, f"tv_log_{today_str}.txt")
+        with open(daily_file, 'a', encoding='utf-8') as f:
+            f.write(f"\n{'='*60}\n[SESSION: {timestamp}]\n{logs}\n")
+        
+        # Purge files older than 7 days
+        from datetime import timedelta
+        cutoff = now - timedelta(days=7)
+        for fname in os.listdir(logs_dir):
+            if fname.startswith("tv_log_") and fname.endswith(".txt"):
+                try:
+                    fdate_str = fname.replace("tv_log_", "").replace(".txt", "")
+                    fdate = datetime.strptime(fdate_str, '%Y-%m-%d')
+                    if fdate < cutoff:
+                        os.remove(os.path.join(logs_dir, fname))
+                except:
+                    pass
+
         return jsonify({"status": "success"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -3349,6 +3396,8 @@ def get_tv_settings():
         "local_audio": [],
         "media_source": "youtube",
         "audio_priority": "video",
+        "ticker_text_enabled": True,
+        "ticker_currency_enabled": True,
         "promo_text": "",
         "qr_code": "",
         "qr_text": "",
@@ -3377,6 +3426,68 @@ def api_tv_ping():
     current['last_ping'] = datetime.now().isoformat()
     save_tv_settings(current)
     return jsonify({"success": True})
+
+@app.route('/api/tv/rates', methods=['GET'])
+def api_tv_rates():
+    rates_data = {
+        'usd_try': None,
+        'eur_try': None,
+        'eur_usd': None,
+        'btc_usdt': None,
+        'eth_usdt': None
+    }
+    # 1. Fetch TCMB rates (Official Central Bank of Turkey)
+    try:
+        req = urllib.request.Request('https://www.tcmb.gov.tr/kurlar/today.xml', headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            xml_data = resp.read()
+        import xml.etree.ElementTree as ET
+        root = ET.fromstring(xml_data)
+        for cur in root.findall('Currency'):
+            code = cur.get('CurrencyCode')
+            if code == 'USD':
+                buying = cur.find('ForexBuying')
+                if buying is not None and buying.text:
+                    rates_data['usd_try'] = round(float(buying.text), 2)
+            elif code == 'EUR':
+                buying = cur.find('ForexBuying')
+                if buying is not None and buying.text:
+                    rates_data['eur_try'] = round(float(buying.text), 2)
+        if rates_data.get('usd_try') and rates_data.get('eur_try'):
+            rates_data['eur_usd'] = round(rates_data['eur_try'] / rates_data['usd_try'], 4)
+    except Exception as e:
+        print(f"[TV RATES] TCMB fetch error: {e}")
+
+    # Fallback for Forex if TCMB fails
+    if not rates_data.get('usd_try'):
+        try:
+            req = urllib.request.Request('https://open.er-api.com/v6/latest/USD', headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+            if data and 'rates' in data:
+                usd_try = data['rates'].get('TRY', 0)
+                usd_eur = data['rates'].get('EUR', 0)
+                if usd_try and usd_eur:
+                    rates_data['usd_try'] = round(float(usd_try), 2)
+                    rates_data['eur_try'] = round(float(usd_try / usd_eur), 2)
+                    rates_data['eur_usd'] = round(float(1 / usd_eur), 4)
+        except Exception as e:
+            print(f"[TV RATES] Er-api fallback error: {e}")
+
+    # 2. Fetch Crypto (BTC/USDT, ETH/USDT) from Binance API
+    try:
+        req = urllib.request.Request('https://api.binance.com/api/v3/ticker/price?symbols=["BTCUSDT","ETHUSDT"]', headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            crypto_data = json.loads(resp.read().decode('utf-8'))
+        for item in crypto_data:
+            if item.get('symbol') == 'BTCUSDT':
+                rates_data['btc_usdt'] = round(float(item['price']), 2)
+            elif item.get('symbol') == 'ETHUSDT':
+                rates_data['eth_usdt'] = round(float(item['price']), 2)
+    except Exception as e:
+        print(f"[TV RATES] Binance crypto fetch error: {e}")
+
+    return jsonify(rates_data)
 
 @app.route('/api/tv/products', methods=['GET'])
 def get_tv_products():
@@ -3410,6 +3521,21 @@ def api_upload_tv_media():
         folder = 'videos' if type_ == 'video' else 'audio'
         file.save(os.path.join(TV_MEDIA_FOLDER, folder, filename))
         return jsonify({"success": True})
+
+@app.route('/api/tv/media/delete', methods=['POST'])
+def api_delete_tv_media():
+    data = request.json
+    filename = data.get('filename')
+    type_ = data.get('type', 'video')
+    if filename:
+        from werkzeug.utils import secure_filename
+        filename = secure_filename(filename)
+        folder = 'videos' if type_ == 'video' else 'audio'
+        filepath = os.path.join(TV_MEDIA_FOLDER, folder, filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            return jsonify({"success": True})
+    return jsonify({"success": False, "error": "File not found"}), 404
 
 @app.route('/tv-admin')
 def tv_admin():

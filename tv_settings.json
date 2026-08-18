@@ -3,11 +3,12 @@
     "layout": "modern_grid",
     "video_playlist": "",
     "local_videos": [
+        "/static/tv_media/videos/2.mp4",
         "/static/tv_media/videos/1.mp4"
     ],
     "local_audio": [],
     "media_source": "local",
-    "audio_priority": "video",
+    "audio_priority": "music",
     "promo_text": "",
     "qr_code": "",
     "qr_text": "",
@@ -16,5 +17,8 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-18T01:15:18.193775"
+    "last_ping": "2026-08-18T16:54:06.638855",
+    "ticker_enabled": true,
+    "ticker_text_enabled": true,
+    "ticker_currency_enabled": true
 }

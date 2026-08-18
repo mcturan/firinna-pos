@@ -48,3 +48,9 @@ ROADMAP.md
 dev_notes/.claude/worktrees/
 pos_data.db
 .git_credentials.json
+static/tv_media/videos/*
+static/tv_media/audio/*
+!static/tv_media/videos/.gitkeep
+!static/tv_media/audio/.gitkeep
+tv_logs/
+*.apk

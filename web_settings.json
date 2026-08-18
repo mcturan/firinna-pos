@@ -1,5 +1,6 @@
 {
     "address": "Şahkulu Mah. Kumbaracı Yokuşu, No:41A\nBeyoğlu, İstanbul",
+    "admin_password_hash": "scrypt:32768:8:1$twATRM9fXA4gO8hv$96a4533a75c0f60857e133317e65402f6deb9a7b1c329da64dd7d1cdbaca048b2831699109dab121234207eaeef6cd2e9f7dd8f01a0bba7bbadbedad6adb67ca",
     "baidu": "https://map.baidu.com/",
     "closed_until": "",
     "daily_hours": {
@@ -16,7 +17,7 @@
         "Çarşamba": {
             "open": "11:00",
             "close": "19:15",
-            "active": true
+            "active": false
         },
         "Perşembe": {
             "open": "11:00",
@@ -46,6 +47,5 @@
     "phone": "905456301214",
     "tripadvisor_review_url": "",
     "work_hours": "11:00 - 19:15",
-    "yandex_review_url": "https://yandex.com.tr/maps/org/firinna/37863615675/reviews/?add-review=true",
-    "admin_password_hash": "scrypt:32768:8:1$twATRM9fXA4gO8hv$96a4533a75c0f60857e133317e65402f6deb9a7b1c329da64dd7d1cdbaca048b2831699109dab121234207eaeef6cd2e9f7dd8f01a0bba7bbadbedad6adb67ca"
+    "yandex_review_url": "https://yandex.com.tr/maps/org/firinna/37863615675/reviews/?add-review=true"
 }

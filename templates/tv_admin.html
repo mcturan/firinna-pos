@@ -30,8 +30,8 @@
                 <strong>Oynatıcı Ekranı:</strong> <a href="/tv-player" target="_blank" style="font-weight:bold;color:#2d6a4f;text-decoration:underline;">Sistemin IP'si:5000/tv-player</a> 
                 <span id="pingStatus" style="margin-left:1rem;font-size:0.9rem;font-weight:bold;color:red;">🔴 Çevrimdışı (Son görülme: Yok)</span>
             </div>
-            <a href="/static/Firinna-TV-1.1.19.apk?v=7" class="btn-save" style="width:auto; margin-top:0; padding:0.5rem 1rem; background:#38a169; text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;" download="Firinna-TV-1.1.19.apk">
-                <i class="fas fa-download"></i> TV APK İndir (v1.1.19)
+            <a href="/static/Firinna-TV-1.1.32.apk?v=12" class="btn-save" style="width:auto; margin-top:0; padding:0.5rem 1rem; background:#38a169; text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;" download="Firinna-TV-1.1.32.apk">
+                <i class="fas fa-download"></i> TV APK İndir (v1.1.32)
             </a>
         </div>
         
@@ -169,6 +169,17 @@
 
         <div id="mesajlar" class="tv-pane card">
             <h3 style="margin-top:0;">Kayan Yazılar & Ürün Tanıtımları</h3>
+            <div class="form-group" style="background:#f8fafc; padding:16px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:1.5rem; display:flex; flex-direction:column; gap:12px;">
+                <label style="display:flex; align-items:center; gap:0.75rem; font-size:0.95rem; font-weight:bold; color:#1a202c; cursor:pointer; margin-bottom:0;">
+                    <input type="checkbox" id="ticker_text_enabled" style="width:1.2rem; height:1.2rem; cursor:pointer;" checked>
+                    📢 Duyuru & Mesaj Kayan Yazısını Göster
+                </label>
+                <label style="display:flex; align-items:center; gap:0.75rem; font-size:0.95rem; font-weight:bold; color:#1a202c; cursor:pointer; margin-bottom:0;">
+                    <input type="checkbox" id="ticker_currency_enabled" style="width:1.2rem; height:1.2rem; cursor:pointer;" checked>
+                    💱 Canlı Döviz & Kripto Kurlarını Göster (TCMB USD/TL, EUR/TL, EUR/USD, BTC/USDT, ETH/USDT)
+                </label>
+                <small style="color:#718096; margin-top:2px;">* Her ikisi de kapatılırsa alt bant gizlenir ve sayfa/video alanı otomatik olarak ekranın en altına genişler.</small>
+            </div>
             <div class="form-group">
                 <label>Sürekli Akan Yazı (Ekranın en altından geçer)</label>
                 <textarea id="promo_text" rows="3" placeholder="Bugüne özel fırından yeni çıkan simitlerimizi denediniz mi?"></textarea>
@@ -222,13 +233,75 @@
             }
         }
 
+        let serverVideosList = [];
+
         async function fetchLocalMedia() {
             const res = await fetch('/api/tv/media');
             const data = await res.json();
-            localVideos = data.videos;
+            serverVideosList = data.videos;
             localAudio = data.audio;
-            document.getElementById('local_videos_list').innerHTML = localVideos.map(v => v.split('/').pop()).join('<br>') || 'Yok';
             document.getElementById('local_audio_list').innerHTML = localAudio.map(a => a.split('/').pop()).join('<br>') || 'Yok';
+            renderVideoList();
+        }
+
+        function renderVideoList() {
+            // Keep existing localVideos order, filter out ones not on server
+            localVideos = localVideos.filter(v => serverVideosList.includes(v));
+            // Find disabled ones (on server but not in localVideos)
+            const disabledVideos = serverVideosList.filter(v => !localVideos.includes(v));
+            
+            const allVideos = [...localVideos, ...disabledVideos];
+            
+            let html = '';
+            if (allVideos.length === 0) html = 'Yok';
+            allVideos.forEach((v, index) => {
+                const isEnabled = localVideos.includes(v);
+                const filename = v.split('/').pop();
+                html += `<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; background:#f7fafc; padding:0.5rem; border-radius:4px; border:1px solid #e2e8f0;">
+                    <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="toggleVideo('${v}', this.checked)" title="Aktif/Pasif">
+                    <span style="flex:1; font-weight:${isEnabled ? 'bold' : 'normal'}; color:${isEnabled ? '#2d3748' : '#a0aec0'}">${filename}</span>
+                    <button onclick="moveVideo('${v}', -1)" style="padding:2px 5px;" title="Yukarı">⬆️</button>
+                    <button onclick="moveVideo('${v}', 1)" style="padding:2px 5px;" title="Aşağı">⬇️</button>
+                    <button onclick="deleteVideo('${v}')" style="padding:2px 5px; color:red;" title="Sil">🗑️</button>
+                </div>`;
+            });
+            document.getElementById('local_videos_list').innerHTML = html;
+        }
+
+        function toggleVideo(url, checked) {
+            if (checked) {
+                if (!localVideos.includes(url)) localVideos.push(url);
+            } else {
+                localVideos = localVideos.filter(v => v !== url);
+            }
+            renderVideoList();
+        }
+
+        function moveVideo(url, dir) {
+            const index = localVideos.indexOf(url);
+            if (index === -1) return; // disabled videos cannot be moved
+            const newIndex = index + dir;
+            if (newIndex < 0 || newIndex >= localVideos.length) return;
+            const temp = localVideos[index];
+            localVideos[index] = localVideos[newIndex];
+            localVideos[newIndex] = temp;
+            renderVideoList();
+        }
+
+        async function deleteVideo(url) {
+            if(!confirm("Bu videoyu tamamen silmek istediğinize emin misiniz?")) return;
+            const filename = url.split('/').pop();
+            try {
+                await fetch('/api/tv/media/delete', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({filename: filename, type: 'video'})
+                });
+                localVideos = localVideos.filter(v => v !== url);
+                fetchLocalMedia();
+            } catch(e) {
+                alert("Silinemedi!");
+            }
         }
 
         async function uploadMedia(type) {
@@ -243,6 +316,12 @@
                 await fetch('/api/tv/media/upload', { method: 'POST', body: fd });
                 alert("Başarıyla yüklendi!");
                 input.value = "";
+                
+                // Add new video to enabled list automatically
+                if (type === 'video') {
+                    const newUrl = '/static/tv_media/videos/' + input.files[0].name;
+                    if (!localVideos.includes(newUrl)) localVideos.push(newUrl);
+                }
                 fetchLocalMedia();
             } catch(e) {
                 alert("Yükleme başarısız oldu.");
@@ -275,6 +354,8 @@
                 document.getElementById('media_source').value = data.media_source || 'youtube';
                 document.getElementById('video_playlist').value = data.video_playlist || '';
                 document.getElementById('audio_priority').value = data.audio_priority || 'video';
+                document.getElementById('ticker_text_enabled').checked = (data.ticker_text_enabled !== false);
+                document.getElementById('ticker_currency_enabled').checked = (data.ticker_currency_enabled !== false);
                 document.getElementById('promo_text').value = data.promo_text || '';
                 
                 document.getElementById('qr_code').value = data.qr_code || '';
@@ -324,6 +405,8 @@
                 local_videos: localVideos,
                 local_audio: localAudio,
                 audio_priority: document.getElementById('audio_priority').value,
+                ticker_text_enabled: document.getElementById('ticker_text_enabled').checked,
+                ticker_currency_enabled: document.getElementById('ticker_currency_enabled').checked,
                 promo_text: document.getElementById('promo_text').value,
                 qr_code: document.getElementById('qr_code').value,
                 qr_text: document.getElementById('qr_text').value,
