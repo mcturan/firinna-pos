@@ -429,14 +429,15 @@
         
         window.playNextNativeVideo = function() {
             if (localVideoList.length > 0) {
-                currentVidIndex = (currentVidIndex + 1) % localVideoList.length;
-                playLocalVideo(currentVidIndex);
+                currentLocalVideoIndex = (currentLocalVideoIndex + 1) % localVideoList.length;
+                playLocalVideo(currentLocalVideoIndex);
             }
         };
 
         function playLocalVideo(vIndex) {
             if(!localVideoList || localVideoList.length === 0) return;
-            let srcUrl = localVideoList[vIndex]; 
+            currentLocalVideoIndex = vIndex % localVideoList.length;
+            let srcUrl = localVideoList[currentLocalVideoIndex]; 
             if(!srcUrl) return;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             console.log("Setting HTML5 src for: " + srcUrl);
@@ -458,18 +459,22 @@
                 });
             }
             vidEl.onended = () => { window.playNextNativeVideo(); };
+            vidEl.onerror = () => { setTimeout(window.playNextNativeVideo, 2000); };
         }
 
         function playLocalAudio(aIndex) {
             if(localAudioList.length === 0) return;
-            const srcUrl = "/static/tv_media/audio/" + localAudioList[aIndex];
+            currentLocalAudioIndex = aIndex % localAudioList.length;
+            const srcUrl = "/static/tv_media/audio/" + localAudioList[currentLocalAudioIndex];
             audEl.src = srcUrl;
             audEl.play().catch(e => {
                 console.log("Local audio play blocked:", e);
             });
             audEl.onended = () => {
-                currentAudIndex = (aIndex + 1) % localAudioList.length;
-                playLocalAudio(currentAudIndex);
+                playLocalAudio(currentLocalAudioIndex + 1);
+            };
+            audEl.onerror = () => {
+                setTimeout(() => playLocalAudio(currentLocalAudioIndex + 1), 2000);
             };
         }
 
@@ -896,6 +901,13 @@
         fetchProducts();
         setInterval(fetchSettings, 5000); 
         setTimeout(fetchSettings, 1000); 
+
+        // Auto-Reload / Restart every 5 hours (5 * 60 * 60 * 1000 ms) to keep memory clean and auto-fetch updates
+        const AUTO_RELOAD_MS = 5 * 60 * 60 * 1000;
+        setTimeout(() => {
+            console.log("[AUTO-RELOAD] 5 hours reached, reloading TV player application...");
+            window.location.reload(true);
+        }, AUTO_RELOAD_MS); 
 
         document.body.addEventListener('click', () => {
             if(currentMediaSource === 'local') {
