@@ -1,16 +1,16 @@
 {
-    "today": 3,
-    "month": 237,
-    "total": 237,
+    "today": 2,
+    "month": 239,
+    "total": 239,
     "menu": 5,
     "actions": 27,
-    "last_date": "2026-08-18",
+    "last_date": "2026-08-19",
     "devices": {
-        "💻 Masaüstü": 166,
+        "💻 Masaüstü": 168,
         "📱 Mobil": 71
     },
     "browsers": {
-        "Google Chrome": 205,
+        "Google Chrome": 207,
         "Apple Safari": 13,
         "Microsoft Edge": 17,
         "Diğer Tarayıcı": 2
@@ -27,9 +27,63 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 91,
-        "🔗 Doğrudan (Direct)": 64
+        "🔗 Doğrudan (Direct)": 66
     },
     "recent_visitors": [
+        {
+            "id": "log_1787127359245",
+            "time": "19 Ağustos 11:15",
+            "iso_date": "2026-08-19",
+            "raw_time": "2026-08-19 11:15:59",
+            "ip": "91.98.178.153",
+            "country": "📍 Falkenstein / Germany",
+            "location": "📍 Falkenstein / Germany",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Windows PC)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
+        {
+            "id": "log_1787127355528",
+            "time": "19 Ağustos 11:15",
+            "iso_date": "2026-08-19",
+            "raw_time": "2026-08-19 11:15:55",
+            "ip": "91.98.178.153",
+            "country": "📍 Falkenstein / Germany",
+            "location": "📍 Falkenstein / Germany",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Windows PC)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (1s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "1 sn",
+            "lang_compare": "EN ➔ EN"
+        },
+        {
+            "id": "log_1787127354707",
+            "time": "19 Ağustos 11:15",
+            "iso_date": "2026-08-19",
+            "raw_time": "2026-08-19 11:15:54",
+            "ip": "91.98.178.153",
+            "country": "📍 Falkenstein / Germany",
+            "location": "📍 Falkenstein / Germany",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Windows PC)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
         {
             "id": "log_1787073741813",
             "time": "18 Ağustos 20:22",
@@ -9371,10 +9425,10 @@
         }
     ],
     "repeat_visitors": 194,
-    "new_visitors": 43,
+    "new_visitors": 45,
     "os": {
         "Linux": 147,
-        "Windows PC": 10,
+        "Windows PC": 12,
         "Apple iOS": 9,
         "Android OS": 62,
         "Diğer Sistem": 4,
@@ -9386,7 +9440,7 @@
         "20:00 - 23:00 (Gece Keyfi)": 58,
         "23:00 - 08:00 (Gece / Erken)": 23,
         "08:00 - 11:00 (Sabah Kahvaltı)": 1,
-        "11:00 - 14:00 (Öğle Brunch)": 26
+        "11:00 - 14:00 (Öğle Brunch)": 28
     },
     "map_clicks": 1,
     "locations": {
@@ -9407,21 +9461,22 @@
         "📍 Kütahya / Türkiye": 2,
         "📍 Silver Spring / United States": 2,
         "📍 Berkeley / United States": 2,
-        "📍 Almaty / Kazakhstan": 1
+        "📍 Almaty / Kazakhstan": 1,
+        "📍 Falkenstein / Germany": 2
     },
     "traffic_sources": {
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 91,
-        "🔗 Doğrudan (Direct)": 64
+        "🔗 Doğrudan (Direct)": 66
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 160
+        "🌐 Dışarıdan İnceleyen": 162
     },
     "lang_comparisons": {
         "TR ➔ TR": 77,
-        "EN ➔ TR": 29,
+        "EN ➔ TR": 31,
         "EN ➔ EN": 15,
         "TR ➔ ES": 8,
         "TR ➔ RU": 3,
