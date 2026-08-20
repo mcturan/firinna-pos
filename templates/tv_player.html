@@ -396,26 +396,26 @@
             <video id="local-video" style="display:none;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
             <!-- High-Definition Graphic Watermark Container -->
-            <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), top 1s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; width: 56vw; aspect-ratio: 1200 / 720; max-height: 80%; border-radius: 1.8vw; box-shadow: 0 24px 70px rgba(0,0,0,0.7), 0 0 0 2px rgba(255,255,255,0.85); box-sizing: border-box; overflow: hidden; background: transparent;">
+            <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; width: 48vw; aspect-ratio: 1000 / 520; max-height: 75%; border-radius: 1.5vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
                 
                 <!-- Card 0: Brand & Web -->
-                <div id="wm-card-logo" class="wm-card" style="padding:0; background:transparent;">
-                    <img src="/static/img/watermarks/card_0_logo.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
+                <div id="wm-card-logo" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
+                    <img src="/static/img/watermarks/card_0_logo.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));">
                 </div>
 
                 <!-- Card 1: Social Media -->
-                <div id="wm-card-social" class="wm-card" style="padding:0; background:transparent;">
-                    <img src="/static/img/watermarks/card_1_social.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
+                <div id="wm-card-social" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
+                    <img src="/static/img/watermarks/card_1_social.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));">
                 </div>
 
                 <!-- Card 2: Support University Students -->
-                <div id="wm-card-students" class="wm-card" style="padding:0; background:transparent;">
-                    <img src="/static/img/watermarks/card_2_students.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
+                <div id="wm-card-students" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
+                    <img src="/static/img/watermarks/card_2_students.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));">
                 </div>
 
                 <!-- Card 3: Stray Animals Support -->
-                <div id="wm-card-animals" class="wm-card" style="padding:0; background:transparent;">
-                    <img src="/static/img/watermarks/card_3_animals.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
+                <div id="wm-card-animals" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
+                    <img src="/static/img/watermarks/card_3_animals.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));">
                 </div>
 
             </div>
@@ -804,18 +804,18 @@
             const cardEl = document.getElementById(targetCardId);
             if (cardEl) cardEl.classList.add('active');
 
-            // 1. Show watermark container with smooth lift & fade-in
+            // 1. Show watermark container centered with smooth subtle zoom/fade
             container.style.opacity = '1';
-            container.style.top = '40%';
+            container.style.transform = 'translate(-50%, -50%) scale(1)';
 
             // 2. Hide after configured duration (default: 10s)
             const durationMs = (wmSettings.duration_sec || 10) * 1000;
             setTimeout(() => {
                 container.style.opacity = '0';
+                container.style.transform = 'translate(-50%, -50%) scale(0.96)';
                 setTimeout(() => {
-                    container.style.top = '50%';
                     document.querySelectorAll('.wm-card').forEach(c => c.classList.remove('active'));
-                }, 1200);
+                }, 1000);
             }, durationMs);
         }
 
