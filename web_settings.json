@@ -17,7 +17,7 @@
         "Çarşamba": {
             "open": "11:00",
             "close": "19:15",
-            "active": false
+            "active": true
         },
         "Perşembe": {
             "open": "11:00",

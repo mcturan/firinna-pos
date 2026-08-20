@@ -1,16 +1,16 @@
 {
-    "today": 1,
-    "month": 245,
-    "total": 245,
+    "today": 3,
+    "month": 247,
+    "total": 247,
     "menu": 6,
     "actions": 27,
     "last_date": "2026-08-21",
     "devices": {
-        "💻 Masaüstü": 171,
+        "💻 Masaüstü": 173,
         "📱 Mobil": 74
     },
     "browsers": {
-        "Google Chrome": 208,
+        "Google Chrome": 210,
         "Apple Safari": 16,
         "Microsoft Edge": 17,
         "Diğer Tarayıcı": 4
@@ -27,9 +27,81 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 93,
-        "🔗 Doğrudan (Direct)": 70
+        "🔗 Doğrudan (Direct)": 72
     },
     "recent_visitors": [
+        {
+            "id": "log_1787266439548",
+            "time": "21 Ağustos 01:53",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 01:53:59",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (27s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%96",
+            "time_spent": "27 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787266412865",
+            "time": "21 Ağustos 01:53",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 01:53:32",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787266391537",
+            "time": "21 Ağustos 01:53",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 01:53:11",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (45s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%99",
+            "time_spent": "45 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787266347065",
+            "time": "21 Ağustos 01:52",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 01:52:27",
+            "ip": "84.17.86.208",
+            "country": "📍 Kartal / Türkiye",
+            "location": "📍 Kartal / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ TR"
+        },
         {
             "id": "log_1787259805597",
             "time": "21 Ağustos 00:03",
@@ -9640,10 +9712,10 @@
             "type": "🔄 Tekrar Gelen Misafir"
         }
     ],
-    "repeat_visitors": 196,
+    "repeat_visitors": 198,
     "new_visitors": 49,
     "os": {
-        "Linux": 147,
+        "Linux": 149,
         "Windows PC": 13,
         "Apple iOS": 12,
         "Android OS": 62,
@@ -9654,14 +9726,14 @@
         "14:00 - 17:00 (İkindi Kahve/Tatlı)": 60,
         "17:00 - 20:00 (Akşam Yemeği)": 72,
         "20:00 - 23:00 (Gece Keyfi)": 58,
-        "23:00 - 08:00 (Gece / Erken)": 24,
+        "23:00 - 08:00 (Gece / Erken)": 26,
         "08:00 - 11:00 (Sabah Kahvaltı)": 1,
         "11:00 - 14:00 (Öğle Brunch)": 30
     },
     "map_clicks": 1,
     "locations": {
         "📍 İstanbul / Türkiye (Yerel)": 2,
-        "📍 Kartal / Türkiye": 104,
+        "📍 Kartal / Türkiye": 106,
         "📍 Prineville / United States": 1,
         "📍 Kansas City / United States": 1,
         "📍 Istanbul / Türkiye": 13,
@@ -9686,14 +9758,14 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 93,
-        "🔗 Doğrudan (Direct)": 70
+        "🔗 Doğrudan (Direct)": 72
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 168
+        "🌐 Dışarıdan İnceleyen": 170
     },
     "lang_comparisons": {
-        "TR ➔ TR": 79,
+        "TR ➔ TR": 81,
         "EN ➔ TR": 34,
         "EN ➔ EN": 16,
         "TR ➔ ES": 8,
