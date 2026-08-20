@@ -3500,7 +3500,7 @@ def api_tv_rss():
     if not rss_url:
         return jsonify({"titles": [], "enabled": False})
     
-    # Cache for 2 minutes (120 seconds) to avoid spamming the RSS provider
+    # Cache for 2 minutes (120 seconds)
     now = time.time()
     if _rss_cache["url"] == rss_url and (now - _rss_cache["time"] < 120) and _rss_cache["titles"]:
         return jsonify({"titles": _rss_cache["titles"], "enabled": True})
@@ -3508,23 +3508,34 @@ def api_tv_rss():
     try:
         req = urllib.request.Request(rss_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
         with urllib.request.urlopen(req, timeout=6) as resp:
-            xml_content = resp.read()
-        import xml.etree.ElementTree as ET
-        root = ET.fromstring(xml_content)
+            content = resp.read()
+            
         titles = []
-        # Support RSS 2.0 (<item><title>) and Atom (<entry><title>)
-        for item in root.findall('.//item')[:15]:
-            t = item.find('title')
-            if t is not None and t.text:
-                titles.append(t.text.strip())
-        if not titles:
-            for item in root.findall('.//{http://www.w3.org/2005/Atom}entry')[:15]:
-                t = item.find('{http://www.w3.org/2005/Atom}title')
+        # Check if response is HTML widget (like feed.informer.com)
+        if b'<html' in content.lower() or b'<!doctype' in content.lower() or rss_url.endswith('.html'):
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(content.decode('utf-8', errors='ignore'), 'html.parser')
+            for a in soup.find_all('a'):
+                txt = a.get_text().strip()
+                if txt and len(txt) > 20 and not txt.startswith(('Feed Informer', 'Widgets', 'Privacy', 'Terms')):
+                    if txt not in titles:
+                        titles.append(txt)
+        else:
+            import xml.etree.ElementTree as ET
+            root = ET.fromstring(content)
+            # Support RSS 2.0 (<item><title>) and Atom (<entry><title>)
+            for item in root.findall('.//item')[:20]:
+                t = item.find('title')
                 if t is not None and t.text:
                     titles.append(t.text.strip())
+            if not titles:
+                for item in root.findall('.//{http://www.w3.org/2005/Atom}entry')[:20]:
+                    t = item.find('{http://www.w3.org/2005/Atom}title')
+                    if t is not None and t.text:
+                        titles.append(t.text.strip())
                     
-        _rss_cache = {"url": rss_url, "time": now, "titles": titles}
-        return jsonify({"titles": titles, "enabled": True})
+        _rss_cache = {"url": rss_url, "time": now, "titles": titles[:25]}
+        return jsonify({"titles": titles[:25], "enabled": True})
     except Exception as e:
         print(f"[RSS ERROR] Failed to fetch RSS from {rss_url}: {e}")
         return jsonify({"titles": _rss_cache.get("titles", []), "enabled": True, "error": str(e)})

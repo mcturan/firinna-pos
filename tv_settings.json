@@ -16,7 +16,7 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-21T00:31:55.386641",
+    "last_ping": "2026-08-21T00:56:36.593033",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
@@ -27,5 +27,7 @@
         "social_enabled": true,
         "students_enabled": true,
         "animals_enabled": true
-    }
+    },
+    "ticker_rss_enabled": true,
+    "rss_url": "http://feed.informer.com/widgets/LXPXCGW6AL.html"
 }

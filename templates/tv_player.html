@@ -29,78 +29,97 @@
         body.layout-sidebar #video-container { width: 75%; }
         
         /* Modern Layout Redesign - Dark Background with Light Cards */
-        #modern-layout { 
-            display: none; 
-            width: 100vw; 
-            height: 100vh; 
-            padding: 2.5vh 3.5vw 2.5vh 3.5vw; 
-            box-sizing: border-box; 
-            gap: 1.5vw; 
-            grid-template-columns: 3fr 7fr; 
-            grid-template-rows: 9.5vh 1fr 5.8vh; 
-            contain: strict;
+        #modern-layout {
+            display: none;
+            position: absolute;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            padding: 1.2vh 1.2vw;
+            box-sizing: border-box;
+            grid-template-columns: 28vw 1fr;
+            grid-template-rows: 10vh 1fr 7.5vh;
+            gap: 1.2vh 1.2vw;
             background: #0B0F19;
-        }
-        #modern-layout.no-ticker {
-            grid-template-rows: 9.5vh 1fr !important;
-        }
-        #modern-layout.no-ticker #ml-ticker-box {
-            display: none !important;
+            overflow: hidden;
         }
         body.layout-modern_grid #modern-layout { display: grid; }
         body.layout-modern_grid #legacy-overlay, body.layout-modern_grid #sidebar { display: none; }
         
         .grid-box { 
-            background: #FFFFFF; 
-            border-radius: 1vw; 
-            border: 1.5px solid #E2E8F0; 
+            background: #121826; 
+            border-radius: 0.8vw; 
+            border: 1.5px solid #253046; 
             overflow: hidden; 
             contain: content;
         }
         
-        #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0.5vw; display: flex; align-items: center; justify-content: center; background: #FFFFFF; border-radius: 1vw; position: relative; overflow: hidden; border: 1.5px solid #E2E8F0; }
-        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; position: absolute; opacity: 1; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
-        #ml-logo-domain { position: absolute; font-size: 1.6vw; font-weight: 800; color: #2D6A4F; text-align: center; letter-spacing: 1px; opacity: 0; transform: scale(0.92); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
-        .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2D6A4F; text-align: center; }
-        
-        #ml-support-box { 
-            grid-column: 2; 
+        /* Top Left: Logo & www.firinna.com */
+        #ml-logo-box { 
+            grid-column: 1; 
             grid-row: 1; 
-            padding: 0 1.5vw 0 1.5vw; 
+            padding: 0.4vw; 
             display: flex; 
-            justify-content: space-between; 
             align-items: center; 
+            justify-content: center; 
             background: #FFFFFF; 
-            color: #1A202C; 
-            border-radius: 1vw; 
+            border-radius: 0.8vw; 
             position: relative; 
             overflow: hidden; 
             border: 1.5px solid #E2E8F0; 
         }
-        .support-layers-container {
-            position: absolute;
-            left: 1.5vw;
-            right: 7vw;
-            top: 0;
-            bottom: 0;
+        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; position: absolute; opacity: 1; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
+        #ml-logo-domain { position: absolute; font-size: 1.6vw; font-weight: 800; color: #2D6A4F; text-align: center; letter-spacing: 1px; opacity: 0; transform: scale(0.92); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
+        
+        /* Top Middle & Right Container (Split grid inside grid-column 2) */
+        #ml-top-right-wrapper {
+            grid-column: 2;
+            grid-row: 1;
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 1.2vw;
+            height: 100%;
         }
+
+        /* Top Center: Clock, Date & Weather */
+        #ml-center-box {
+            background: #121826;
+            border-radius: 0.8vw;
+            border: 1.5px solid #253046;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.2vw;
+            padding: 0 1.2vw;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top Right: Review Us & Flag */
+        #ml-review-box {
+            background: #121826;
+            border-radius: 0.8vw;
+            border: 1.5px solid #253046;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.2vw;
+            position: relative;
+            overflow: hidden;
+        }
+
         #ml-support-flag {
-            position: absolute;
-            right: 1.2vw;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4.6vw;
-            height: 3.1vw;
-            border-radius: 0.4vw;
+            width: 4.2vw;
+            height: 2.8vw;
+            border-radius: 0.35vw;
             overflow: hidden;
             flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
             border: 1px solid #E2E8F0;
             background: #E30A17;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10;
         }
         #ml-support-flag img {
             width: 100%;
@@ -109,35 +128,37 @@
             display: block;
         }
 
-        #ml-left-top { grid-column: 1; grid-row: 2; background: #FFFFFF; border-radius: 1vw; display: flex; flex-direction: column; overflow: hidden; position: relative; border: 1.5px solid #E2E8F0; }
+        #ml-left-top { grid-column: 1; grid-row: 2; background: #FFFFFF; border-radius: 0.8vw; display: flex; flex-direction: column; overflow: hidden; position: relative; border: 1.5px solid #E2E8F0; }
         
-        #ml-main-video { grid-column: 2; grid-row: 2; position: relative; border-radius: 1vw; overflow: hidden; background: #000000; }
+        #ml-main-video { grid-column: 2; grid-row: 2; position: relative; border-radius: 0.8vw; overflow: hidden; background: #000000; border: 1.5px solid #253046; }
         
+        /* Bottom Row: RSS & Ticker Marquee Strip */
         #ml-ticker-box { 
             grid-column: 1 / 3; 
             grid-row: 3; 
-            background: #1A202C; 
+            background: #121826; 
             color: #FFFFFF; 
-            border-radius: 1vw; 
+            border-radius: 0.8vw; 
             position: relative; 
             overflow: hidden; 
-            border: 1px solid rgba(255,255,255,0.1); 
-        }
-        .bot-slide {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
+            border: 1.5px solid #253046; 
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 2vw;
-            opacity: 0;
-            transform: translate3d(0, 100%, 0);
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease;
-            will-change: transform, opacity;
-            padding: 0 2vw;
-            box-sizing: border-box;
+        }
+        .rss-marquee-content {
+            white-space: nowrap;
+            display: inline-block;
+            animation: marquee 35s linear infinite;
+            padding-left: 100%;
+            font-size: 1.45vw;
+            font-weight: 600;
+            color: #F8FAFC;
+            letter-spacing: 0.4px;
+            will-change: transform;
+        }
+        @keyframes marquee { 
+            0% { transform: translate3d(0, 0, 0); } 
+            100% { transform: translate3d(-100%, 0, 0); } 
         }
         .bot-slide.active {
             opacity: 1;
@@ -353,36 +374,48 @@
     <!-- MODERN GRID LAYOUT -->
     <div id="modern-layout">
         
-        <!-- TOP ROW: Logo & Domain (left) | Clock & Weather + Flag (right) -->
+        <!-- TOP ROW: 3 Distinct Modern Glass Boxes -->
+        <!-- Box 1: Logo & Domain (Left) -->
         <div id="ml-logo-box" class="grid-box">
             <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
             <div id="ml-logo-domain">www.firinna.com</div>
         </div>
         
-        <div id="ml-support-box" class="grid-box">
-            <div class="support-layers-container">
-                <!-- Layer 0: Red Clock with Seconds & European Date in English (Default Active) -->
-                <div id="ml-layer-0" style="display:flex; justify-content: center; align-items:center; gap: 1.5vw; transition: opacity 1s ease; opacity: 1; position:absolute; inset:0;">
-                    <div style="display:flex; align-items:center; gap:0.5vw;">
-                        <span style="font-size:1.5vw; color:#EF4444;">🕒</span>
-                        <span id="ml-clock" style="font-size:2vw; font-weight:800; color:#EF4444; letter-spacing:1px; font-family:'Plus Jakarta Sans', monospace;">00:00:00</span>
-                    </div>
-                    <span style="font-size:1.5vw; font-weight:300; color:#CBD5E1;">|</span>
-                    <div style="display:flex; align-items:center; gap:0.5vw;">
-                        <span style="font-size:1.5vw; color:#718096;">📅</span>
-                        <span id="ml-date" style="font-size:1.8vw; font-weight:700; color:#2D6A4F; letter-spacing:0.5px;">18.08.2026, Tuesday</span>
-                    </div>
+        <!-- Box 2 & 3 Wrapper -->
+        <div id="ml-top-right-wrapper">
+            <!-- Box 2: Center Clock, Date & Weather -->
+            <div id="ml-center-box" class="grid-box">
+                <div style="display:flex; align-items:center; gap:0.5vw;">
+                    <span style="font-size:1.4vw; color:#EF4444;">🕒</span>
+                    <span id="ml-clock" style="font-size:1.8vw; font-weight:800; color:#EF4444; letter-spacing:1px; font-family:'Plus Jakarta Sans', monospace;">00:00:00</span>
                 </div>
-                <!-- Layer 1: 3-Day Weather Forecast for Beyoglu -->
-                <div id="ml-layer-1" style="display:flex; justify-content: space-around; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; inset:0; pointer-events:none;">
-                    <div id="ml-weather" style="font-size:1.7vw; font-weight:700; color:#1A202C; display:flex; justify-content:space-around; width:100%; align-items:center;">
-                        <span>Loading Weather...</span>
-                    </div>
+                <span style="font-size:1.3vw; font-weight:300; color:#4B5563;">|</span>
+                <div style="display:flex; align-items:center; gap:0.5vw;">
+                    <span style="font-size:1.3vw; color:#94A3B8;">📅</span>
+                    <span id="ml-date" style="font-size:1.4vw; font-weight:700; color:#34D399; letter-spacing:0.5px;">--.--.----</span>
+                </div>
+                <span style="font-size:1.3vw; font-weight:300; color:#4B5563;">|</span>
+                <div id="ml-weather" style="font-size:1.4vw; font-weight:700; color:#F8FAFC; display:flex; align-items:center; gap:0.5vw;">
+                    <span>☀️ ISTANBUL 26°C</span>
                 </div>
             </div>
-            <!-- Waving Turkish Flag at Far-Right of the Top Bar -->
-            <div id="ml-support-flag">
-                <img src="/static/img/bayrak.gif" alt="Türk Bayrağı">
+
+            <!-- Box 3: Right Review Us on Maps & Flag -->
+            <div id="ml-review-box" class="grid-box">
+                <div style="font-size:1.2vw; font-weight:800; color:#34D399; letter-spacing:0.6px; display:flex; align-items:center; gap:0.4vw;">
+                    <span>⭐</span> REVIEW US:
+                </div>
+                <div style="display:flex; gap:0.6vw; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:0.4vw; padding: 0.2vw 0.7vw; background:#FFFFFF; border-radius: 0.35vw; font-size:1.15vw; font-weight:700; color:#1A202C; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        <span style="color:#4285F4;">G</span><span style="color:#EA4335;">o</span><span style="color:#FBBC05;">o</span><span style="color:#4285F4;">g</span><span style="color:#34A853;">l</span><span style="color:#EA4335;">e</span> <span style="color:#4A5568;">Maps</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.4vw; padding: 0.2vw 0.7vw; background:#FFFFFF; border-radius: 0.35vw; font-size:1.15vw; font-weight:700; color:#1A202C; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        <span style="color:#FC3F1D;">Yandex</span> <span style="color:#4A5568;">Maps</span>
+                    </div>
+                </div>
+                <div id="ml-support-flag">
+                    <img src="/static/img/bayrak.gif" alt="Türk Bayrağı">
+                </div>
             </div>
         </div>
 
@@ -421,41 +454,10 @@
             </div>
         </div>
 
-        <!-- BOTTOM ROW: Sliding Bar -->
+        <!-- BOTTOM ROW: Seamless Continuous News & Markets Marquee Strip -->
         <div id="ml-ticker-box" class="grid-box">
-            <!-- Slide 0: Support Us with Google Maps and Yandex Maps logos -->
-            <div id="ml-bot-support" class="bot-slide active">
-                <span style="font-size:1.6vw; font-weight:800; color:#34D399; letter-spacing:0.8px; display:flex; align-items:center; gap:0.5vw;">
-                    <span>⭐</span> SUPPORT FIRINNA BY A REVIEW ON:
-                </span>
-                <div style="display:flex; gap:1.2vw; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.25vw 1.1vw; background:#FFFFFF; border-radius: 0.4vw; font-size:1.55vw; font-weight:700; color:#1A202C; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                        <span style="color:#4285F4;">G</span><span style="color:#EA4335;">o</span><span style="color:#FBBC05;">o</span><span style="color:#4285F4;">g</span><span style="color:#34A853;">l</span><span style="color:#EA4335;">e</span> <span style="color:#4A5568;">Maps</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.25vw 1.1vw; background:#FFFFFF; border-radius: 0.4vw; font-size:1.55vw; font-weight:700; color:#1A202C; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                        <span style="color:#FC3F1D;">Yandex</span> <span style="color:#4A5568;">Maps</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Slide 1: Live Currencies & Crypto -->
-            <div id="ml-bot-currency" class="bot-slide">
-                <div id="ml-currency-content" style="font-size:1.6vw; font-weight:700; color:#F8FAFC; display:flex; align-items:center; gap:1.4vw; letter-spacing:0.5px; white-space:nowrap;">
-                    <span>💵 USD: -- ₺</span>
-                    <span style="color:#64748B;">•</span>
-                    <span>💶 EUR: -- ₺</span>
-                    <span style="color:#64748B;">•</span>
-                    <span style="color:#38BDF8;">EUR/USD: --</span>
-                    <span style="color:#64748B;">•</span>
-                    <span style="color:#F59E0B;">₿ BTC: -- $</span>
-                    <span style="color:#64748B;">•</span>
-                    <span style="color:#818CF8;">Ξ ETH: -- $</span>
-                </div>
-            </div>
-            <!-- Slide 2: Promo / Announcements (if any) -->
-            <div id="ml-bot-promo" class="bot-slide" style="display:none;">
-                <div id="ml-promo-content" style="font-size:1.7vw; font-weight:700; color:#F8FAFC; letter-spacing:0.5px; display:flex; align-items:center; gap:0.8vw;">
-                    <span>📢</span> <span id="ml-promo-text"></span>
-                </div>
+            <div id="ml-continuous-marquee" class="rss-marquee-content">
+                <span>FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE</span>
             </div>
         </div>
         
@@ -889,27 +891,33 @@
         fetchCurrencies();
         setInterval(fetchCurrencies, 300000); // 5 mins
 
-        let botSlideIndex = 0;
-        function rotateBottomSlides() {
-            const slides = Array.from(document.querySelectorAll('#ml-ticker-box .bot-slide')).filter(el => el.style.display !== 'none');
-            if (slides.length <= 1) return;
+        let liveRssTitles = [];
+        let isTickerRssEnabled = true;
 
-            const currentSlide = slides[botSlideIndex % slides.length];
-            botSlideIndex = (botSlideIndex + 1) % slides.length;
-            const nextSlide = slides[botSlideIndex];
-
-            slides.forEach(s => {
-                if (s !== currentSlide && s !== nextSlide) {
-                    s.className = 'bot-slide';
+        async function fetchRssFeed() {
+            try {
+                const res = await fetch('/api/tv/rss');
+                const data = await res.json();
+                if (data && data.titles && data.titles.length > 0) {
+                    liveRssTitles = data.titles;
+                } else {
+                    liveRssTitles = [];
                 }
-            });
-
-            currentSlide.className = 'bot-slide exit';
-            nextSlide.className = 'bot-slide active';
+                updateUnifiedMarquee();
+            } catch(e) {
+                console.error("RSS fetch error:", e);
+            }
         }
-        setInterval(rotateBottomSlides, 7000); // Rotates every 7 seconds with vertical sweep!
+        fetchRssFeed();
+        setInterval(fetchRssFeed, 180000); // Check RSS every 3 mins
 
-        function updateTickerText() {
+        function updateUnifiedMarquee() {
+            const marqueeEl = document.getElementById('ml-continuous-marquee');
+            if (!marqueeEl) return;
+
+            let items = [];
+
+            // 1. Promo / Announcement Messages
             let messageText = basePromoText;
             const now = new Date();
             const currentMin = now.getHours() * 60 + now.getMinutes();
@@ -925,31 +933,34 @@
                     }
                 }
             });
-
-            const promoSlide = document.getElementById('ml-bot-promo');
-            const promoTextEl = document.getElementById('ml-promo-text');
-            if (isTickerTextEnabled && messageText && messageText.trim() !== "") {
-                if (promoSlide) promoSlide.style.display = 'flex';
-                if (promoTextEl) promoTextEl.textContent = messageText.trim();
-            } else {
-                if (promoSlide) promoSlide.style.display = 'none';
+            if (isTickerTextEnabled && messageText && messageText.trim() !== '') {
+                items.push(`<span style="color:#FBBF24; font-weight:700;">📢 ${messageText.trim()}</span>`);
             }
 
-            const currSlide = document.getElementById('ml-bot-currency');
-            if (currSlide) {
-                currSlide.style.display = isTickerCurrencyEnabled ? 'flex' : 'none';
+            // 2. RSS Live Headlines (clean text stream, no breaking news prefix)
+            if (isTickerRssEnabled && liveRssTitles.length > 0) {
+                const rssHtml = liveRssTitles.map(t => `<span style="color:#F8FAFC; font-weight:600;">${t}</span>`).join('<span style="color:#64748B; margin: 0 1.2vw;">•</span>');
+                items.push(rssHtml);
             }
 
-            const legacyTickerEl = document.getElementById('ticker-text');
-            if (legacyTickerEl) {
-                let parts = [];
-                if (isTickerTextEnabled && messageText) parts.push(messageText);
-                parts.push("⭐ SUPPORT FIRINNA BY A REVIEW ON: Google Maps • Yandex Maps ⭐");
-                if (isTickerCurrencyEnabled && liveCurrencyText) parts.push(liveCurrencyText);
-                legacyTickerEl.textContent = parts.join("  •  ");
+            // 3. Live Exchange & Crypto Rates
+            if (isTickerCurrencyEnabled && liveCurrencyText) {
+                items.push(`<span style="color:#34D399; font-weight:700;">${liveCurrencyText}</span>`);
             }
+
+            // 4. Fallback Brand Text
+            if (items.length === 0) {
+                items.push('<span style="color:#F8FAFC;">FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE • ISTANBUL</span>');
+            }
+
+            const combinedHtml = items.join('<span style="color:#475569; margin: 0 1.5vw;">|</span>');
+            marqueeEl.innerHTML = combinedHtml + '<span style="color:#475569; margin: 0 1.5vw;">|</span>' + combinedHtml;
         }
-        setInterval(updateTickerText, 15000); 
+
+        function updateTickerText() {
+            updateUnifiedMarquee();
+        }
+        setInterval(updateUnifiedMarquee, 15000); 
 
         async function fetchProducts() {
             try {
@@ -1004,6 +1015,7 @@
 
             isTickerTextEnabled = (data.ticker_text_enabled !== false);
             isTickerCurrencyEnabled = (data.ticker_currency_enabled !== false);
+            isTickerRssEnabled = (data.ticker_rss_enabled !== false);
             basePromoText = data.promo_text || "";
             currentMessages = data.messages || [];
             updateTickerText();
