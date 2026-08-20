@@ -1,5 +1,5 @@
-[2026-08-21 02:12:23]
-Gece 03:00 otomatik yeniden başlatma: 47 dk sonra
+[2026-08-21 02:20:04]
+Gece 03:00 otomatik yeniden başlatma: 40 dk sonra
 Boot sequence started.
 LAN failed, trying WAN: http://84.17.86.208:5000
 Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
