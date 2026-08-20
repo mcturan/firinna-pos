@@ -16,7 +16,7 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-21T02:16:38.789117",
+    "last_ping": "2026-08-21T02:20:34.719209",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
@@ -39,5 +39,8 @@
     "rss_goodnews_enabled": true,
     "rss_bbc_tech_enabled": true,
     "rss_aa_kultur_enabled": false,
-    "rss_refresh_mins": 60
+    "rss_refresh_mins": 60,
+    "rss_ist_kultur_enabled": true,
+    "rss_ist_life_enabled": true,
+    "rss_tr_gurme_enabled": false
 }

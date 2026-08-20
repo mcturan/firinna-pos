@@ -3492,11 +3492,10 @@ def api_tv_rates():
 _rss_cache = {"key": "", "time": 0, "titles": []}
 
 PRESET_FEEDS = {
-    "timeout": ("TimeOut & Vogue (Coffee, Food & Culture - EN)", "https://news.google.com/rss/search?q=coffee+bakery+lifestyle+culture&hl=en-US&gl=US&ceid=US:en"),
-    "goodnews": ("Good News Network (Positive World Stories - EN)", "https://www.goodnewsnetwork.org/feed/"),
-    "bbc_tech": ("BBC Innovation & Tech (EN)", "https://feeds.bbci.co.uk/news/technology/rss.xml"),
-    "euronews": ("Euronews Culture & Travel (EN)", "https://www.euronews.com/rss?level=theme&name=culture"),
-    "aa_kultur": ("Anadolu Ajansı (Kültür & Sanat - TR)", "https://www.aa.com.tr/tr/rss/default?cat=kultur-sanat")
+    "ist_kultur": ("İstanbul Kültür, Sanat & Etkinlikler (TR)", "https://news.google.com/rss/search?q=istanbul+konser+sergi+tiyatro+festival+kultur+sanat&hl=tr&gl=TR&ceid=TR:tr"),
+    "ist_life": ("Istanbul Culture, Coffee & Events (EN)", "https://news.google.com/rss/search?q=Istanbul+events+exhibition+culture+food+coffee+travel&hl=en-US&gl=US&ceid=US:en"),
+    "goodnews": ("Good News & Positive Stories (EN)", "https://www.goodnewsnetwork.org/feed/"),
+    "tr_gurme": ("Türkiye Lezzet & Gurme Rehberi (TR)", "https://news.google.com/rss/search?q=turkiye+gurme+lezzet+restoran+kahve+trendleri&hl=tr&gl=TR&ceid=TR:tr")
 }
 
 # Unwanted disaster / crime / war words to maintain pleasant bakery ambience
@@ -3505,7 +3504,7 @@ NEGATIVE_KEYWORDS = [
     'hostage', 'military', 'soldier', 'murder', 'gunman', 'shooting', 'missile',
     'sanctions', 'suicide', 'tragedy', 'casualty', 'disaster', 'crash', 'arrest',
     'savaş', 'ölü', 'ölüm', 'saldırı', 'bomba', 'patlama', 'cinayet', 'çatışma',
-    'kaza', 'facia', 'ceset', 'gözaltı', 'tutuklama', 'rehin'
+    'kaza', 'facia', 'ceset', 'gözaltı', 'tutuklama', 'rehin', 'yaralı', 'operasyon'
 ]
 
 @app.route('/api/tv/rss', methods=['GET'])
@@ -3518,16 +3517,14 @@ def api_tv_rss():
     enabled_sources = []
     
     # Presets
-    if settings.get('rss_timeout_enabled', True):
-        enabled_sources.append(('TimeOut', PRESET_FEEDS['timeout'][1]))
+    if settings.get('rss_ist_kultur_enabled', True):
+        enabled_sources.append(('IstKultur', PRESET_FEEDS['ist_kultur'][1]))
+    if settings.get('rss_ist_life_enabled', True):
+        enabled_sources.append(('IstLife', PRESET_FEEDS['ist_life'][1]))
     if settings.get('rss_goodnews_enabled', True):
         enabled_sources.append(('GoodNews', PRESET_FEEDS['goodnews'][1]))
-    if settings.get('rss_bbc_tech_enabled', True):
-        enabled_sources.append(('BBCTech', PRESET_FEEDS['bbc_tech'][1]))
-    if settings.get('rss_euronews_enabled', False):
-        enabled_sources.append(('EuroNews', PRESET_FEEDS['euronews'][1]))
-    if settings.get('rss_aa_kultur_enabled', False):
-        enabled_sources.append(('AAKultur', PRESET_FEEDS['aa_kultur'][1]))
+    if settings.get('rss_tr_gurme_enabled', False):
+        enabled_sources.append(('TRGurme', PRESET_FEEDS['tr_gurme'][1]))
         
     custom_url = settings.get('rss_url', '').strip()
     if custom_url and settings.get('rss_custom_enabled', False):
