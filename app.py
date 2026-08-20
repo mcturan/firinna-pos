@@ -3492,11 +3492,21 @@ def api_tv_rates():
 _rss_cache = {"key": "", "time": 0, "titles": []}
 
 PRESET_FEEDS = {
-    "bbc": ("BBC News (World - EN)", "http://feeds.bbci.co.uk/news/world/rss.xml"),
-    "aljazeera": ("Al Jazeera (World - EN)", "https://www.aljazeera.com/xml/rss/all.xml"),
-    "aa": ("Anadolu Ajansı (Gündem - TR)", "https://www.aa.com.tr/tr/rss/default?cat=guncel"),
-    "trt": ("TRT Haber (Manşet - TR)", "https://www.trthaber.com/manset_articles.rss")
+    "timeout": ("TimeOut & Vogue (Coffee, Food & Culture - EN)", "https://news.google.com/rss/search?q=coffee+bakery+lifestyle+culture&hl=en-US&gl=US&ceid=US:en"),
+    "goodnews": ("Good News Network (Positive World Stories - EN)", "https://www.goodnewsnetwork.org/feed/"),
+    "bbc_tech": ("BBC Innovation & Tech (EN)", "https://feeds.bbci.co.uk/news/technology/rss.xml"),
+    "euronews": ("Euronews Culture & Travel (EN)", "https://www.euronews.com/rss?level=theme&name=culture"),
+    "aa_kultur": ("Anadolu Ajansı (Kültür & Sanat - TR)", "https://www.aa.com.tr/tr/rss/default?cat=kultur-sanat")
 }
+
+# Unwanted disaster / crime / war words to maintain pleasant bakery ambience
+NEGATIVE_KEYWORDS = [
+    'war', 'killed', 'killing', 'dead', 'death', 'strike', 'attack', 'bomb', 'blast',
+    'hostage', 'military', 'soldier', 'murder', 'gunman', 'shooting', 'missile',
+    'sanctions', 'suicide', 'tragedy', 'casualty', 'disaster', 'crash', 'arrest',
+    'savaş', 'ölü', 'ölüm', 'saldırı', 'bomba', 'patlama', 'cinayet', 'çatışma',
+    'kaza', 'facia', 'ceset', 'gözaltı', 'tutuklama', 'rehin'
+]
 
 @app.route('/api/tv/rss', methods=['GET'])
 def api_tv_rss():
@@ -3508,17 +3518,19 @@ def api_tv_rss():
     enabled_sources = []
     
     # Presets
-    if settings.get('rss_bbc_enabled', True):
-        enabled_sources.append(('BBC', PRESET_FEEDS['bbc'][1]))
-    if settings.get('rss_aljazeera_enabled', True):
-        enabled_sources.append(('AlJazeera', PRESET_FEEDS['aljazeera'][1]))
-    if settings.get('rss_aa_enabled', False):
-        enabled_sources.append(('AA', PRESET_FEEDS['aa'][1]))
-    if settings.get('rss_trt_enabled', False):
-        enabled_sources.append(('TRT', PRESET_FEEDS['trt'][1]))
+    if settings.get('rss_timeout_enabled', True):
+        enabled_sources.append(('TimeOut', PRESET_FEEDS['timeout'][1]))
+    if settings.get('rss_goodnews_enabled', True):
+        enabled_sources.append(('GoodNews', PRESET_FEEDS['goodnews'][1]))
+    if settings.get('rss_bbc_tech_enabled', True):
+        enabled_sources.append(('BBCTech', PRESET_FEEDS['bbc_tech'][1]))
+    if settings.get('rss_euronews_enabled', False):
+        enabled_sources.append(('EuroNews', PRESET_FEEDS['euronews'][1]))
+    if settings.get('rss_aa_kultur_enabled', False):
+        enabled_sources.append(('AAKultur', PRESET_FEEDS['aa_kultur'][1]))
         
     custom_url = settings.get('rss_url', '').strip()
-    if custom_url and settings.get('rss_custom_enabled', True):
+    if custom_url and settings.get('rss_custom_enabled', False):
         enabled_sources.append(('Custom', custom_url))
         
     if not enabled_sources:
@@ -3542,24 +3554,29 @@ def api_tv_rss():
                 for a in soup.find_all('a'):
                     txt = a.get_text().strip()
                     if txt and len(txt) > 20 and not txt.startswith(('Feed Informer', 'Widgets', 'Privacy', 'Terms')):
-                        if txt not in all_titles:
-                            all_titles.append(txt)
+                        # Filter out negative / tragedy / war keywords
+                        if not any(bad in txt.lower() for bad in NEGATIVE_KEYWORDS):
+                            if txt not in all_titles:
+                                all_titles.append(txt)
             else:
                 import xml.etree.ElementTree as ET
                 root = ET.fromstring(content)
-                for item in root.findall('.//item')[:10]:
+                for item in root.findall('.//item')[:12]:
                     t = item.find('title')
                     if t is not None and t.text:
                         clean_t = t.text.strip()
-                        if clean_t not in all_titles:
-                            all_titles.append(clean_t)
+                        # Filter out negative / tragedy / war keywords
+                        if not any(bad in clean_t.lower() for bad in NEGATIVE_KEYWORDS):
+                            if clean_t not in all_titles:
+                                all_titles.append(clean_t)
                 if len(all_titles) < 5:
-                    for item in root.findall('.//{http://www.w3.org/2005/Atom}entry')[:10]:
+                    for item in root.findall('.//{http://www.w3.org/2005/Atom}entry')[:12]:
                         t = item.find('{http://www.w3.org/2005/Atom}title')
                         if t is not None and t.text:
                             clean_t = t.text.strip()
-                            if clean_t not in all_titles:
-                                all_titles.append(clean_t)
+                            if not any(bad in clean_t.lower() for bad in NEGATIVE_KEYWORDS):
+                                if clean_t not in all_titles:
+                                    all_titles.append(clean_t)
         except Exception as e:
             print(f"[RSS ERROR] Failed to fetch {label} ({feed_url}): {e}")
             

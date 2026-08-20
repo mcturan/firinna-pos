@@ -16,7 +16,7 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-21T02:09:23.747270",
+    "last_ping": "2026-08-21T02:16:38.789117",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
@@ -34,5 +34,10 @@
     "rss_aljazeera_enabled": true,
     "rss_aa_enabled": false,
     "rss_trt_enabled": false,
-    "rss_custom_enabled": true
+    "rss_custom_enabled": false,
+    "rss_timeout_enabled": true,
+    "rss_goodnews_enabled": true,
+    "rss_bbc_tech_enabled": true,
+    "rss_aa_kultur_enabled": false,
+    "rss_refresh_mins": 60
 }
