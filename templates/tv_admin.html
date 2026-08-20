@@ -39,6 +39,7 @@
             <button class="tv-tab active" onclick="switchTab('genel')">Genel & Logo</button>
             <button class="tv-tab" onclick="switchTab('layout_ayarlari')">Yerleşim (Layout)</button>
             <button class="tv-tab" onclick="switchTab('medya')">Video & Müzik (PC / YouTube)</button>
+            <button class="tv-tab" onclick="switchTab('filigran')">🎨 Filigran Döngüsü</button>
             <button class="tv-tab" onclick="switchTab('mesajlar')">Kayan Yazılar</button>
             <button class="tv-tab" onclick="switchTab('qr')">QR & Araçlar</button>
         </div>
@@ -164,6 +165,89 @@
                     <option value="video">Videoların Sesi Çıksın</option>
                     <option value="music">Videolar Sessiz Olsun (Sadece Müzik Çalsın)</option>
                 </select>
+            </div>
+        <div id="filigran" class="tv-pane card">
+            <h3 style="margin-top:0;">🎨 Filigran Döngüsü & Özel Kartlar</h3>
+            <p style="font-size:0.88rem; color:#718096; margin-bottom:1.5rem;">
+                Videonun üzerinde periyodik olarak beliren kurumsal filigran ve sosyal sorumluluk tanıtım kartları.
+            </p>
+
+            <div class="form-group" style="background:#f8fafc; padding:16px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:1.5rem; display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                <div>
+                    <label style="font-weight:bold; color:#1a202c; display:block; margin-bottom:6px;">⏱️ Döngü Aralığı (Saniyede bir)</label>
+                    <input type="number" id="wm_interval_sec" value="90" min="10" max="600" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
+                    <small style="color:#718096;">Varsayılan: 90 saniye</small>
+                </div>
+                <div>
+                    <label style="font-weight:bold; color:#1a202c; display:block; margin-bottom:6px;">⏳ Ekranda Kalma Süresi (Saniye)</label>
+                    <input type="number" id="wm_duration_sec" value="10" min="3" max="60" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
+                    <small style="color:#718096;">Varsayılan: 10 saniye</small>
+                </div>
+            </div>
+
+            <h4 style="margin-bottom:0.8rem; color:#2d3748;">Filigran Kartları Sıralaması ve Aç/Kapa</h4>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+                
+                <!-- Kart 0: Varsayılan Logo & Domain -->
+                <div style="border:1.5px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <span style="font-size:1.8rem;">🏷️</span>
+                        <div>
+                            <strong style="font-size:1rem; color:#1a202c; display:block;">1. Fırınna Logo & Web Sitesi Filigranı</strong>
+                            <span style="font-size:0.85rem; color:#718096;">Klasik büyük logo ve www.firinna.com açılış filigranı</span>
+                        </div>
+                    </div>
+                    <label class="switch" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:bold; color:#2d6a4f;">
+                        <input type="checkbox" id="wm_logo_enabled" checked style="width:1.3rem; height:1.3rem; cursor:pointer;">
+                        <span>Aktif</span>
+                    </label>
+                </div>
+
+                <!-- Kart 1: Sosyal Medya -->
+                <div style="border:1.5px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <span style="font-size:1.8rem;">📱</span>
+                        <div>
+                            <strong style="font-size:1rem; color:#1a202c; display:block;">2. Follow Us on Social Media & Share Your Day</strong>
+                            <span style="font-size:0.85rem; color:#718096;">Instagram & TikTok: <b>@firinnacafe</b> • Google Maps • Yandex Maps</span>
+                        </div>
+                    </div>
+                    <label class="switch" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:bold; color:#2d6a4f;">
+                        <input type="checkbox" id="wm_social_enabled" checked style="width:1.3rem; height:1.3rem; cursor:pointer;">
+                        <span>Aktif</span>
+                    </label>
+                </div>
+
+                <!-- Kart 2: Üniversite Öğrencilerine Destek -->
+                <div style="border:1.5px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <span style="font-size:1.8rem;">🎓</span>
+                        <div>
+                            <strong style="font-size:1rem; color:#1a202c; display:block;">3. Fırınna is Supporting University Students</strong>
+                            <span style="font-size:0.85rem; color:#718096;">"Beyoğlu Öğrenciye" projesi görseli + Sosyal medyada destek çağrısı</span>
+                        </div>
+                    </div>
+                    <label class="switch" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:bold; color:#2d6a4f;">
+                        <input type="checkbox" id="wm_students_enabled" checked style="width:1.3rem; height:1.3rem; cursor:pointer;">
+                        <span>Aktif</span>
+                    </label>
+                </div>
+
+                <!-- Kart 3: Sokak Hayvanlarına Sahip Çıkma -->
+                <div style="border:1.5px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <span style="font-size:1.8rem;">🐾</span>
+                        <div>
+                            <strong style="font-size:1rem; color:#1a202c; display:block;">4. Fırınna Cares for Stray Animals</strong>
+                            <span style="font-size:0.85rem; color:#718096;">"Fırınna cares for stray animals & paws — Help us by supporting us on social media!"</span>
+                        </div>
+                    </div>
+                    <label class="switch" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:bold; color:#2d6a4f;">
+                        <input type="checkbox" id="wm_animals_enabled" checked style="width:1.3rem; height:1.3rem; cursor:pointer;">
+                        <span>Aktif</span>
+                    </label>
+                </div>
+
             </div>
         </div>
 
@@ -363,6 +447,15 @@
                 document.getElementById('w_weather').checked = data.widgets?.weather;
                 document.getElementById('w_clock').checked = data.widgets?.clock;
 
+                // Filigran Döngüsü Ayarları
+                const wm = data.watermark_cycle || {};
+                document.getElementById('wm_interval_sec').value = wm.interval_sec || 90;
+                document.getElementById('wm_duration_sec').value = wm.duration_sec || 10;
+                document.getElementById('wm_logo_enabled').checked = (wm.logo_enabled !== false);
+                document.getElementById('wm_social_enabled').checked = (wm.social_enabled !== false);
+                document.getElementById('wm_students_enabled').checked = (wm.students_enabled !== false);
+                document.getElementById('wm_animals_enabled').checked = (wm.animals_enabled !== false);
+
                 document.getElementById('messages_container').innerHTML = '';
                 (data.messages || []).forEach(m => {
                     addMessage(m.text, m.start_time, m.end_time);
@@ -413,6 +506,14 @@
                 widgets: {
                     weather: document.getElementById('w_weather').checked,
                     clock: document.getElementById('w_clock').checked
+                },
+                watermark_cycle: {
+                    interval_sec: parseInt(document.getElementById('wm_interval_sec').value) || 90,
+                    duration_sec: parseInt(document.getElementById('wm_duration_sec').value) || 10,
+                    logo_enabled: document.getElementById('wm_logo_enabled').checked,
+                    social_enabled: document.getElementById('wm_social_enabled').checked,
+                    students_enabled: document.getElementById('wm_students_enabled').checked,
+                    animals_enabled: document.getElementById('wm_animals_enabled').checked
                 },
                 messages: messages
             };

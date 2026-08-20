@@ -17,8 +17,16 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-20T19:36:42.900150",
+    "last_ping": "2026-08-20T22:28:42.824839",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
-    "ticker_currency_enabled": true
+    "ticker_currency_enabled": true,
+    "watermark_cycle": {
+        "interval_sec": 90,
+        "duration_sec": 10,
+        "logo_enabled": true,
+        "social_enabled": true,
+        "students_enabled": true,
+        "animals_enabled": true
+    }
 }
