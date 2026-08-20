@@ -1,16 +1,16 @@
 {
-    "today": 5,
-    "month": 244,
-    "total": 244,
+    "today": 1,
+    "month": 245,
+    "total": 245,
     "menu": 6,
     "actions": 27,
-    "last_date": "2026-08-20",
+    "last_date": "2026-08-21",
     "devices": {
-        "💻 Masaüstü": 170,
+        "💻 Masaüstü": 171,
         "📱 Mobil": 74
     },
     "browsers": {
-        "Google Chrome": 207,
+        "Google Chrome": 208,
         "Apple Safari": 16,
         "Microsoft Edge": 17,
         "Diğer Tarayıcı": 4
@@ -26,10 +26,28 @@
         "Direkt Giriş": 24,
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
-        "🌐 Diğer Web Sitesi": 92,
+        "🌐 Diğer Web Sitesi": 93,
         "🔗 Doğrudan (Direct)": 70
     },
     "recent_visitors": [
+        {
+            "id": "log_1787259805597",
+            "time": "21 Ağustos 00:03",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 00:03:25",
+            "ip": "205.169.39.0",
+            "country": "📍 Santa Clara / United States",
+            "location": "📍 Santa Clara / United States",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Windows PC)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
         {
             "id": "log_1787233450925",
             "time": "20 Ağustos 16:44",
@@ -9623,10 +9641,10 @@
         }
     ],
     "repeat_visitors": 196,
-    "new_visitors": 48,
+    "new_visitors": 49,
     "os": {
         "Linux": 147,
-        "Windows PC": 12,
+        "Windows PC": 13,
         "Apple iOS": 12,
         "Android OS": 62,
         "Diğer Sistem": 6,
@@ -9636,7 +9654,7 @@
         "14:00 - 17:00 (İkindi Kahve/Tatlı)": 60,
         "17:00 - 20:00 (Akşam Yemeği)": 72,
         "20:00 - 23:00 (Gece Keyfi)": 58,
-        "23:00 - 08:00 (Gece / Erken)": 23,
+        "23:00 - 08:00 (Gece / Erken)": 24,
         "08:00 - 11:00 (Sabah Kahvaltı)": 1,
         "11:00 - 14:00 (Öğle Brunch)": 30
     },
@@ -9661,21 +9679,22 @@
         "📍 Berkeley / United States": 2,
         "📍 Almaty / Kazakhstan": 1,
         "📍 Falkenstein / Germany": 2,
-        "📍 Cedar Knolls / United States": 2
+        "📍 Cedar Knolls / United States": 2,
+        "📍 Santa Clara / United States": 1
     },
     "traffic_sources": {
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
-        "🌐 Diğer Web Sitesi": 92,
+        "🌐 Diğer Web Sitesi": 93,
         "🔗 Doğrudan (Direct)": 70
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 167
+        "🌐 Dışarıdan İnceleyen": 168
     },
     "lang_comparisons": {
         "TR ➔ TR": 79,
-        "EN ➔ TR": 33,
+        "EN ➔ TR": 34,
         "EN ➔ EN": 16,
         "TR ➔ ES": 8,
         "TR ➔ RU": 3,

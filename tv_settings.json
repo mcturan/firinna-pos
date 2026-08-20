@@ -2,10 +2,7 @@
     "logo_url": "/static/uploads/logo.png",
     "layout": "modern_grid",
     "video_playlist": "",
-    "local_videos": [
-        "/static/tv_media/videos/2.mp4",
-        "/static/tv_media/videos/1.mp4"
-    ],
+    "local_videos": [],
     "local_audio": [],
     "media_source": "local",
     "audio_priority": "music",
@@ -17,12 +14,12 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-20T23:59:55.335990",
+    "last_ping": "2026-08-21T00:04:51.483550",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
     "watermark_cycle": {
-        "interval_sec": 90,
+        "interval_sec": 20,
         "duration_sec": 10,
         "logo_enabled": true,
         "social_enabled": true,
