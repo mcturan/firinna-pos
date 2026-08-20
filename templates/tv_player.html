@@ -790,19 +790,18 @@
                     const d0Icon = wCodeMap[data.daily.weathercode[0]] || '🌤️';
 
                     document.getElementById('ml-weather').innerHTML = `
-                        <div style="display:flex; align-items:center; gap:0.4vw;">
-                            <span style="color:#DC2626; font-weight:800; font-size:1.3vw;">Now:</span>
-                            <span style="font-size:1.4vw;">${currentIcon}</span>
-                            <span style="color:#0F172A; font-weight:800; font-size:1.4vw;">${currentTemp !== null ? currentTemp : d0Max}°C</span>
+                        <div style="display:flex; align-items:center; gap:0.35vw;">
+                            <span style="color:#DC2626; font-weight:800; font-size:1.25vw;">Now:</span>
+                            <span style="font-size:1.3vw;">${currentIcon}</span>
+                            <span style="color:#0F172A; font-weight:800; font-size:1.35vw;">${currentTemp !== null ? currentTemp : d0Max}°C</span>
                         </div>
                         <span style="color:#CBD5E1; font-weight:300; margin:0 0.8vw;">|</span>
-                        <div style="display:flex; align-items:center; gap:0.4vw;">
+                        <div style="display:flex; align-items:center; gap:0.35vw;">
                             <span style="font-size:1.25vw;">💧</span>
-                            <span style="color:#0284C7; font-weight:800; font-size:1.25vw;">Humidity:</span>
-                            <span style="color:#0F172A; font-weight:800; font-size:1.3vw;">%${humidity !== null ? humidity : '--'}</span>
+                            <span style="color:#0284C7; font-weight:800; font-size:1.3vw;">%${humidity !== null ? humidity : '--'}</span>
                         </div>
                         <span style="color:#CBD5E1; font-weight:300; margin:0 0.8vw;">|</span>
-                        <div style="display:flex; align-items:center; gap:0.4vw;">
+                        <div style="display:flex; align-items:center; gap:0.35vw;">
                             <span style="color:#2D6A4F; font-weight:800; font-size:1.25vw;">Today:</span>
                             <span style="font-size:1.3vw;">${d0Icon}</span>
                             <span style="color:#0F172A; font-weight:800; font-size:1.3vw;">${d0Max}° / ${d0Min}°C</span>

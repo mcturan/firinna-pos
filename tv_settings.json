@@ -16,7 +16,7 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-21T02:20:34.719209",
+    "last_ping": "2026-08-21T02:24:33.877477",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
@@ -42,5 +42,9 @@
     "rss_refresh_mins": 60,
     "rss_ist_kultur_enabled": true,
     "rss_ist_life_enabled": true,
-    "rss_tr_gurme_enabled": false
+    "rss_tr_gurme_enabled": false,
+    "rss_aa_life_en_enabled": true,
+    "rss_ds_arts_en_enabled": true,
+    "rss_turkey_exp_en_enabled": true,
+    "rss_goodnews_en_enabled": true
 }

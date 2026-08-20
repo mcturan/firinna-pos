@@ -3492,10 +3492,10 @@ def api_tv_rates():
 _rss_cache = {"key": "", "time": 0, "titles": []}
 
 PRESET_FEEDS = {
-    "ist_kultur": ("İstanbul Kültür, Sanat & Etkinlikler (TR)", "https://news.google.com/rss/search?q=istanbul+konser+sergi+tiyatro+festival+kultur+sanat&hl=tr&gl=TR&ceid=TR:tr"),
-    "ist_life": ("Istanbul Culture, Coffee & Events (EN)", "https://news.google.com/rss/search?q=Istanbul+events+exhibition+culture+food+coffee+travel&hl=en-US&gl=US&ceid=US:en"),
-    "goodnews": ("Good News & Positive Stories (EN)", "https://www.goodnewsnetwork.org/feed/"),
-    "tr_gurme": ("Türkiye Lezzet & Gurme Rehberi (TR)", "https://news.google.com/rss/search?q=turkiye+gurme+lezzet+restoran+kahve+trendleri&hl=tr&gl=TR&ceid=TR:tr")
+    "aa_life_en": ("Anadolu Agency (Life, Culture & Heritage - EN)", "https://www.aa.com.tr/en/rss/default?cat=life"),
+    "ds_arts_en": ("Daily Sabah (Culture, Arts & Lifestyle - EN)", "https://www.dailysabah.com/rssFeed/arts"),
+    "turkey_exp_en": ("Explore Türkiye (Travel, Tourism & Events - EN)", "https://news.google.com/rss/search?q=turkey+istanbul+culture+OR+tourism+OR+heritage+OR+gastronomy&hl=en-US&gl=US&ceid=US:en"),
+    "goodnews_en": ("Good News Network (Positive World Stories - EN)", "https://www.goodnewsnetwork.org/feed/")
 }
 
 # Unwanted disaster / crime / war words to maintain pleasant bakery ambience
@@ -3503,6 +3503,7 @@ NEGATIVE_KEYWORDS = [
     'war', 'killed', 'killing', 'dead', 'death', 'strike', 'attack', 'bomb', 'blast',
     'hostage', 'military', 'soldier', 'murder', 'gunman', 'shooting', 'missile',
     'sanctions', 'suicide', 'tragedy', 'casualty', 'disaster', 'crash', 'arrest',
+    'gaza', 'israel', 'syria', 'iran', 'palestinian', 'court', 'jail', 'prison',
     'savaş', 'ölü', 'ölüm', 'saldırı', 'bomba', 'patlama', 'cinayet', 'çatışma',
     'kaza', 'facia', 'ceset', 'gözaltı', 'tutuklama', 'rehin', 'yaralı', 'operasyon'
 ]
@@ -3516,15 +3517,15 @@ def api_tv_rss():
     # Enabled sources
     enabled_sources = []
     
-    # Presets
-    if settings.get('rss_ist_kultur_enabled', True):
-        enabled_sources.append(('IstKultur', PRESET_FEEDS['ist_kultur'][1]))
-    if settings.get('rss_ist_life_enabled', True):
-        enabled_sources.append(('IstLife', PRESET_FEEDS['ist_life'][1]))
-    if settings.get('rss_goodnews_enabled', True):
-        enabled_sources.append(('GoodNews', PRESET_FEEDS['goodnews'][1]))
-    if settings.get('rss_tr_gurme_enabled', False):
-        enabled_sources.append(('TRGurme', PRESET_FEEDS['tr_gurme'][1]))
+    # Presets (100% English Turkey culture & positive developments)
+    if settings.get('rss_aa_life_en_enabled', True):
+        enabled_sources.append(('AALife', PRESET_FEEDS['aa_life_en'][1]))
+    if settings.get('rss_ds_arts_en_enabled', True):
+        enabled_sources.append(('DSArts', PRESET_FEEDS['ds_arts_en'][1]))
+    if settings.get('rss_turkey_exp_en_enabled', True):
+        enabled_sources.append(('TurkeyExp', PRESET_FEEDS['turkey_exp_en'][1]))
+    if settings.get('rss_goodnews_en_enabled', True):
+        enabled_sources.append(('GoodNews', PRESET_FEEDS['goodnews_en'][1]))
         
     custom_url = settings.get('rss_url', '').strip()
     if custom_url and settings.get('rss_custom_enabled', False):

@@ -272,24 +272,24 @@
             </div>
 
             <div class="form-group" style="background:#f0fdf4; padding:16px; border-radius:8px; border:1px solid #bbf7d0; margin-bottom:1.5rem;">
-                <label style="font-weight:bold; color:#166534; display:block; margin-bottom:10px; font-size:1.05rem;">📰 Canlı Haber Kaynakları (İstanbul & Türkiye Kültür / Yaşam)</label>
+                <label style="font-weight:bold; color:#166534; display:block; margin-bottom:10px; font-size:1.05rem;">📰 Canlı Haber Kaynakları (Türkiye & İstanbul Kültür / Yaşam - İngilizce)</label>
                 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
                     <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
-                        <input type="checkbox" id="rss_ist_kultur_enabled" checked style="width:1.15rem; height:1.15rem;">
-                        <span>🎨 İstanbul Kültür, Sanat & Etkinlikler (TR)</span>
+                        <input type="checkbox" id="rss_aa_life_en_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>🏛️ Anadolu Agency (Life & Culture - EN)</span>
                     </label>
                     <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
-                        <input type="checkbox" id="rss_ist_life_enabled" checked style="width:1.15rem; height:1.15rem;">
-                        <span>☕ Istanbul Culture, Coffee & Travel (EN)</span>
+                        <input type="checkbox" id="rss_ds_arts_en_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>🎨 Daily Sabah (Arts & Lifestyle - EN)</span>
                     </label>
                     <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
-                        <input type="checkbox" id="rss_goodnews_enabled" checked style="width:1.15rem; height:1.15rem;">
-                        <span>🌱 Good News & Positive Stories (EN)</span>
+                        <input type="checkbox" id="rss_turkey_exp_en_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>☕ Explore Türkiye & Istanbul (Culture & Travel - EN)</span>
                     </label>
                     <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
-                        <input type="checkbox" id="rss_tr_gurme_enabled" style="width:1.15rem; height:1.15rem;">
-                        <span>🥐 Türkiye Lezzet & Gurme Rehberi (TR)</span>
+                        <input type="checkbox" id="rss_goodnews_en_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>🌱 Good News Network (Positive Stories - EN)</span>
                     </label>
                 </div>
 
@@ -495,10 +495,10 @@
                 document.getElementById('ticker_text_enabled').checked = (data.ticker_text_enabled !== false);
                 document.getElementById('ticker_currency_enabled').checked = (data.ticker_currency_enabled !== false);
                 document.getElementById('ticker_rss_enabled').checked = (data.ticker_rss_enabled !== false);
-                document.getElementById('rss_ist_kultur_enabled').checked = (data.rss_ist_kultur_enabled !== false);
-                document.getElementById('rss_ist_life_enabled').checked = (data.rss_ist_life_enabled !== false);
-                document.getElementById('rss_goodnews_enabled').checked = (data.rss_goodnews_enabled !== false);
-                document.getElementById('rss_tr_gurme_enabled').checked = !!data.rss_tr_gurme_enabled;
+                document.getElementById('rss_aa_life_en_enabled').checked = (data.rss_aa_life_en_enabled !== false);
+                document.getElementById('rss_ds_arts_en_enabled').checked = (data.rss_ds_arts_en_enabled !== false);
+                document.getElementById('rss_turkey_exp_en_enabled').checked = (data.rss_turkey_exp_en_enabled !== false);
+                document.getElementById('rss_goodnews_en_enabled').checked = (data.rss_goodnews_en_enabled !== false);
                 document.getElementById('rss_custom_enabled').checked = !!data.rss_custom_enabled;
                 document.getElementById('rss_refresh_mins').value = data.rss_refresh_mins || 60;
                 document.getElementById('rss_url').value = data.rss_url || '';
@@ -563,10 +563,10 @@
                 ticker_text_enabled: document.getElementById('ticker_text_enabled').checked,
                 ticker_currency_enabled: document.getElementById('ticker_currency_enabled').checked,
                 ticker_rss_enabled: document.getElementById('ticker_rss_enabled').checked,
-                rss_ist_kultur_enabled: document.getElementById('rss_ist_kultur_enabled').checked,
-                rss_ist_life_enabled: document.getElementById('rss_ist_life_enabled').checked,
-                rss_goodnews_enabled: document.getElementById('rss_goodnews_enabled').checked,
-                rss_tr_gurme_enabled: document.getElementById('rss_tr_gurme_enabled').checked,
+                rss_aa_life_en_enabled: document.getElementById('rss_aa_life_en_enabled').checked,
+                rss_ds_arts_en_enabled: document.getElementById('rss_ds_arts_en_enabled').checked,
+                rss_turkey_exp_en_enabled: document.getElementById('rss_turkey_exp_en_enabled').checked,
+                rss_goodnews_en_enabled: document.getElementById('rss_goodnews_en_enabled').checked,
                 rss_custom_enabled: document.getElementById('rss_custom_enabled').checked,
                 rss_refresh_mins: parseInt(document.getElementById('rss_refresh_mins').value) || 60,
                 rss_url: document.getElementById('rss_url').value,
