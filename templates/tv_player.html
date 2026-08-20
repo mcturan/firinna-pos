@@ -203,24 +203,19 @@
             align-items: center;
             position: relative;
             overflow: hidden;
-            padding: 0 1vw;
+            padding: 0;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .rss-marquee-content {
+            display: inline-flex;
+            align-items: center;
             white-space: nowrap;
-            display: inline-block;
-            animation: marquee 45s linear infinite;
-            padding-left: 100%;
-            font-size: 1.35vw;
+            font-size: 1.3vw;
             font-weight: 700;
             color: #0F172A;
             letter-spacing: 0.2px;
             will-change: transform;
-        }
-        @keyframes marquee { 
-            0% { transform: translate3d(0, 0, 0); } 
-            100% { transform: translate3d(-100%, 0, 0); } 
         }
         .bot-slide.active {
             opacity: 1;
@@ -451,18 +446,18 @@
                 <div id="ml-center-layer-0" class="top-layer active">
                     <div style="display:flex; align-items:center; gap:0.6vw;">
                         <span style="font-size:1.5vw; color:#DC2626;">🕒</span>
-                        <span id="ml-clock" style="font-size:2vw; font-weight:800; color:#DC2626; letter-spacing:1px; font-family:'Plus Jakarta Sans', monospace;">00:00:00</span>
+                        <span id="ml-clock" style="font-size:2.1vw; font-weight:800; color:#DC2626; letter-spacing:1px; font-family:'Plus Jakarta Sans', monospace;">00:00:00</span>
                     </div>
-                    <span style="font-size:1.4vw; font-weight:300; color:#94A3B8; margin: 0 0.8vw;">|</span>
+                    <span style="font-size:1.4vw; font-weight:300; color:#CBD5E1; margin: 0 1vw;">|</span>
                     <div style="display:flex; align-items:center; gap:0.5vw;">
                         <span style="font-size:1.4vw; color:#2D6A4F;">📅</span>
-                        <span id="ml-date" style="font-size:1.6vw; font-weight:700; color:#2D6A4F; letter-spacing:0.5px;">--.--.----</span>
+                        <span id="ml-date" style="font-size:1.7vw; font-weight:700; color:#2D6A4F; letter-spacing:0.5px;">--.--.----</span>
                     </div>
                 </div>
 
                 <!-- Layer 1: Weather Forecast for Beyoglu -->
                 <div id="ml-center-layer-1" class="top-layer">
-                    <div id="ml-weather" style="font-size:1.6vw; font-weight:700; color:#1E293B; display:flex; justify-content:space-around; width:100%; align-items:center;">
+                    <div id="ml-weather" style="font-size:1.4vw; font-weight:700; color:#1E293B; display:flex; justify-content:space-around; width:100%; align-items:center;">
                         <span>☀️ Istanbul 26°C</span>
                     </div>
                 </div>
@@ -492,7 +487,7 @@
 
                     <!-- Layer 1: Support Us (Google Maps & Yandex Maps) -->
                     <div id="ml-review-layer-1" class="top-layer" style="justify-content:flex-start; gap:0.6vw;">
-                        <span style="font-size:1.1vw; font-weight:800; color:#2D6A4F; letter-spacing:0.4px;">⭐ RATE US:</span>
+                        <span style="font-size:1.1vw; font-weight:800; color:#2D6A4F; letter-spacing:0.4px;">⭐ SUPPORT:</span>
                         <!-- Google Maps Official Logo Pill -->
                         <div class="social-pill">
                             <svg viewBox="0 0 24 24">
@@ -761,13 +756,12 @@
             const day = String(now.getDate()).padStart(2, '0');
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const year = now.getFullYear();
-            const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
             
             document.querySelectorAll('.clock-text').forEach(el => el.textContent = timeStr);
             const clockEl = document.getElementById('ml-clock');
             if (clockEl) clockEl.textContent = timeStr;
             const dateEl = document.getElementById('ml-date');
-            if (dateEl) dateEl.textContent = `${day}.${month}.${year}, ${dayName}`;
+            if (dateEl) dateEl.textContent = `${day}.${month}.${year}`;
         }
         setInterval(updateClock, 1000);
         updateClock();
@@ -1056,6 +1050,7 @@
 
         let liveRssTitles = [];
         let isTickerRssEnabled = true;
+        let rssIntervalId = null;
 
         async function fetchRssFeed() {
             try {
@@ -1072,7 +1067,32 @@
             }
         }
         fetchRssFeed();
-        setInterval(fetchRssFeed, 120000); // Check RSS every 2 mins
+
+        function startRssScheduler(mins) {
+            if (rssIntervalId) clearInterval(rssIntervalId);
+            const intervalMs = (mins || 60) * 60 * 1000;
+            rssIntervalId = setInterval(fetchRssFeed, intervalMs);
+        }
+        startRssScheduler(60);
+
+        let marqueeOffset = 0;
+        let marqueeSpeed = 1.1; // Balanced comfortable reading speed (pixels per frame)
+        let marqueeAnimId = null;
+
+        function animateMarquee() {
+            const marqueeEl = document.getElementById('ml-continuous-marquee');
+            if (marqueeEl && marqueeEl.firstElementChild) {
+                const singleWidth = marqueeEl.firstElementChild.offsetWidth;
+                if (singleWidth > 0) {
+                    marqueeOffset += marqueeSpeed;
+                    if (marqueeOffset >= singleWidth) {
+                        marqueeOffset -= singleWidth;
+                    }
+                    marqueeEl.style.transform = `translate3d(-${marqueeOffset}px, 0, 0)`;
+                }
+            }
+            marqueeAnimId = requestAnimationFrame(animateMarquee);
+        }
 
         function updateUnifiedMarquee() {
             const marqueeEl = document.getElementById('ml-continuous-marquee');
@@ -1111,8 +1131,12 @@
                 items.push('<span style="color:#0F172A; font-weight:700;">FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE • GALATA / BEYOĞLU</span>');
             }
 
-            const combinedHtml = items.join('<span style="color:#CBD5E1; margin: 0 1.5vw;">|</span>');
-            marqueeEl.innerHTML = combinedHtml + '<span style="color:#CBD5E1; margin: 0 1.5vw;">|</span>' + combinedHtml;
+            const singleHtml = `<div class="rss-single-strip" style="display:inline-flex; align-items:center; flex-shrink:0; padding-right:2vw;">${items.join('<span style="color:#CBD5E1; margin: 0 1.5vw;">|</span>')}</div>`;
+            marqueeEl.innerHTML = singleHtml + singleHtml + singleHtml;
+            
+            if (!marqueeAnimId) {
+                marqueeAnimId = requestAnimationFrame(animateMarquee);
+            }
         }
 
         function updateTickerText() {
@@ -1174,6 +1198,9 @@
             isTickerTextEnabled = (data.ticker_text_enabled !== false);
             isTickerCurrencyEnabled = (data.ticker_currency_enabled !== false);
             isTickerRssEnabled = (data.ticker_rss_enabled !== false);
+            if (data.rss_refresh_mins) {
+                startRssScheduler(data.rss_refresh_mins);
+            }
             basePromoText = data.promo_text || "";
             currentMessages = data.messages || [];
             updateTickerText();

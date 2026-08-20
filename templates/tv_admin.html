@@ -299,7 +299,17 @@
                     <input type="checkbox" id="rss_custom_enabled" checked style="width:1.15rem; height:1.15rem;">
                     <span>🔗 Özel RSS / HTML Widget Kaynağı:</span>
                 </label>
-                <input type="text" id="rss_url" placeholder="Örn: http://feed.informer.com/widgets/LXPXCGW6AL.html" style="width:100%; padding:10px; border-radius:6px; border:1px solid #86efac; font-size:0.95rem;">
+                <input type="text" id="rss_url" placeholder="Örn: http://feed.informer.com/widgets/LXPXCGW6AL.html" style="width:100%; padding:10px; border-radius:6px; border:1px solid #86efac; font-size:0.95rem; margin-bottom:10px;">
+                
+                <div style="margin-top:10px; display:flex; align-items:center; gap:12px;">
+                    <label style="font-weight:600; color:#14532d; font-size:0.95rem; margin-bottom:0;">⏱️ Haberleri Yenileme Sıklığı:</label>
+                    <select id="rss_refresh_mins" style="padding:6px 12px; border-radius:6px; border:1px solid #86efac; font-size:0.95rem; font-weight:bold; color:#14532d; background:#ffffff;">
+                        <option value="15">15 Dakikada Bir</option>
+                        <option value="30">30 Dakikada Bir</option>
+                        <option value="45">45 Dakikada Bir</option>
+                        <option value="60" selected>1 Saatte Bir (En Fazla)</option>
+                    </select>
+                </div>
                 <small style="color:#15803d; display:block; margin-top:4px;">Seçtiğiniz tüm kaynaklardan canlı başlıklar otomatik olarak toplanıp ekranda akıcı şekilde döndürülür.</small>
             </div>
 
@@ -490,6 +500,7 @@
                 document.getElementById('rss_aa_enabled').checked = !!data.rss_aa_enabled;
                 document.getElementById('rss_trt_enabled').checked = !!data.rss_trt_enabled;
                 document.getElementById('rss_custom_enabled').checked = (data.rss_custom_enabled !== false);
+                document.getElementById('rss_refresh_mins').value = data.rss_refresh_mins || 60;
                 document.getElementById('rss_url').value = data.rss_url || '';
                 document.getElementById('promo_text').value = data.promo_text || '';
                 
@@ -557,6 +568,7 @@
                 rss_aa_enabled: document.getElementById('rss_aa_enabled').checked,
                 rss_trt_enabled: document.getElementById('rss_trt_enabled').checked,
                 rss_custom_enabled: document.getElementById('rss_custom_enabled').checked,
+                rss_refresh_mins: parseInt(document.getElementById('rss_refresh_mins').value) || 60,
                 rss_url: document.getElementById('rss_url').value,
                 promo_text: document.getElementById('promo_text').value,
                 qr_code: document.getElementById('qr_code').value,
