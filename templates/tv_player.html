@@ -778,10 +778,12 @@
         async function fetchWeather() {
             try {
                 // Beyoğlu, Istanbul coordinates (41.0370, 28.9773)
-                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=41.0370&longitude=28.9773&current=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe%2FIstanbul&forecast_days=3");
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=41.0370&longitude=28.9773&current=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe%2FIstanbul&forecast_days=2");
                 const data = await res.json();
-                if(data && data.daily && data.daily.time && data.daily.time.length >= 3) {
+                if(data && data.daily && data.daily.time && data.daily.time.length >= 2) {
                     const currentTemp = data.current ? Math.round(data.current.temperature_2m) : null;
+                    const currentIcon = data.current ? (wCodeMap[data.current.weathercode] || '🌤️') : '🌤️';
+
                     const d0Max = Math.round(data.daily.temperature_2m_max[0]);
                     const d0Min = Math.round(data.daily.temperature_2m_min[0]);
                     const d0Icon = wCodeMap[data.daily.weathercode[0]] || '🌤️';
@@ -790,30 +792,27 @@
                     const d1Min = Math.round(data.daily.temperature_2m_min[1]);
                     const d1Icon = wCodeMap[data.daily.weathercode[1]] || '🌤️';
 
-                    const d2Date = new Date(data.daily.time[2]);
-                    const d2DayName = englishDays[d2Date.getDay()] || 'Next Day';
-                    const d2Max = Math.round(data.daily.temperature_2m_max[2]);
-                    const d2Min = Math.round(data.daily.temperature_2m_min[2]);
-                    const d2Icon = wCodeMap[data.daily.weathercode[2]] || '🌤️';
-                    
-                    const todayStr = currentTemp !== null ? `${d0Icon} ${currentTemp}°C` : `${d0Icon} ${d0Max}°C`;
+                    const nowPart = currentTemp !== null ? `
+                        <div style="display:flex; align-items:center; gap:0.4vw;">
+                            <span style="color:#DC2626; font-weight:800; font-size:1.2vw;">Now:</span>
+                            <span style="font-size:1.25vw;">${currentIcon}</span>
+                            <span style="color:#0F172A; font-weight:800; font-size:1.3vw;">${currentTemp}°C</span>
+                        </div>
+                        <span style="color:#CBD5E1; font-weight:300; margin:0 0.6vw;">|</span>
+                    ` : '';
 
                     document.getElementById('ml-weather').innerHTML = `
+                        ${nowPart}
                         <div style="display:flex; align-items:center; gap:0.4vw;">
-                            <span style="color:#2D6A4F; font-weight:800; font-size:1.15vw;">Today:</span>
-                            <span style="color:#0F172A; font-weight:700; font-size:1.15vw;">${todayStr}</span>
+                            <span style="color:#2D6A4F; font-weight:800; font-size:1.2vw;">Today:</span>
+                            <span style="font-size:1.25vw;">${d0Icon}</span>
+                            <span style="color:#0F172A; font-weight:700; font-size:1.2vw;">${d0Max}° / ${d0Min}°C</span>
                         </div>
-                        <span style="color:#CBD5E1; font-weight:300; margin:0 0.4vw;">•</span>
+                        <span style="color:#CBD5E1; font-weight:300; margin:0 0.6vw;">|</span>
                         <div style="display:flex; align-items:center; gap:0.4vw;">
-                            <span style="color:#2D6A4F; font-weight:800; font-size:1.15vw;">Tomorrow:</span>
-                            <span style="font-size:1.15vw;">${d1Icon}</span>
-                            <span style="color:#0F172A; font-weight:700; font-size:1.15vw;">${d1Max}°C</span>
-                        </div>
-                        <span style="color:#CBD5E1; font-weight:300; margin:0 0.4vw;">•</span>
-                        <div style="display:flex; align-items:center; gap:0.4vw;">
-                            <span style="color:#2D6A4F; font-weight:800; font-size:1.15vw;">${d2DayName}:</span>
-                            <span style="font-size:1.15vw;">${d2Icon}</span>
-                            <span style="color:#0F172A; font-weight:700; font-size:1.15vw;">${d2Max}°C</span>
+                            <span style="color:#2D6A4F; font-weight:800; font-size:1.2vw;">Tomorrow:</span>
+                            <span style="font-size:1.25vw;">${d1Icon}</span>
+                            <span style="color:#0F172A; font-weight:700; font-size:1.2vw;">${d1Max}° / ${d1Min}°C</span>
                         </div>
                     `;
                 }
