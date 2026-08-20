@@ -264,10 +264,21 @@
                     <input type="checkbox" id="ticker_currency_enabled" style="width:1.2rem; height:1.2rem; cursor:pointer;" checked>
                     💱 Canlı Döviz & Kripto Kurlarını Göster (TCMB USD/TL, EUR/TL, EUR/USD, BTC/USDT, ETH/USDT)
                 </label>
-                <small style="color:#718096; margin-top:2px;">* Her ikisi de kapatılırsa alt bant gizlenir ve sayfa/video alanı otomatik olarak ekranın en altına genişler.</small>
+                <label style="display:flex; align-items:center; gap:0.75rem; font-size:0.95rem; font-weight:bold; color:#1a202c; cursor:pointer; margin-bottom:0;">
+                    <input type="checkbox" id="ticker_rss_enabled" style="width:1.2rem; height:1.2rem; cursor:pointer;" checked>
+                    📰 Canlı RSS Haber Akışını Göster
+                </label>
+                <small style="color:#718096; margin-top:2px;">* Her üçü de kapatılırsa alt bant gizlenir ve sayfa/video alanı otomatik olarak ekranın en altına genişler.</small>
             </div>
+
+            <div class="form-group" style="background:#f0fdf4; padding:16px; border-radius:8px; border:1px solid #bbf7d0; margin-bottom:1.5rem;">
+                <label style="font-weight:bold; color:#166534; display:block; margin-bottom:6px;">📰 Canlı Haber Kaynağı (RSS URL)</label>
+                <input type="text" id="rss_url" placeholder="Örn: https://www.trthaber.com/gundem_articles.rss veya https://feeds.bbci.co.uk/turkce/rss.xml" style="width:100%; padding:10px; border-radius:6px; border:1px solid #86efac; font-size:0.95rem;">
+                <small style="color:#15803d; display:block; margin-top:4px;">İstediğiniz haber ajansı veya gazetenin RSS / XML linkini buraya yapıştırabilirsiniz. Otomatik olarak canlı başlıklar çekilir.</small>
+            </div>
+
             <div class="form-group">
-                <label>Sürekli Akan Yazı (Ekranın en altından geçer)</label>
+                <label>Sürekli Akan Özel Yazı / Duyuru (Ekranın altından geçer)</label>
                 <textarea id="promo_text" rows="3" placeholder="Bugüne özel fırından yeni çıkan simitlerimizi denediniz mi?"></textarea>
             </div>
             <hr style="margin:2rem 0; border:1px solid #e2e8f0;">
@@ -447,6 +458,8 @@
                 document.getElementById('audio_priority').value = data.audio_priority || 'video';
                 document.getElementById('ticker_text_enabled').checked = (data.ticker_text_enabled !== false);
                 document.getElementById('ticker_currency_enabled').checked = (data.ticker_currency_enabled !== false);
+                document.getElementById('ticker_rss_enabled').checked = (data.ticker_rss_enabled !== false);
+                document.getElementById('rss_url').value = data.rss_url || '';
                 document.getElementById('promo_text').value = data.promo_text || '';
                 
                 document.getElementById('qr_code').value = data.qr_code || '';
@@ -507,6 +520,8 @@
                 audio_priority: document.getElementById('audio_priority').value,
                 ticker_text_enabled: document.getElementById('ticker_text_enabled').checked,
                 ticker_currency_enabled: document.getElementById('ticker_currency_enabled').checked,
+                ticker_rss_enabled: document.getElementById('ticker_rss_enabled').checked,
+                rss_url: document.getElementById('rss_url').value,
                 promo_text: document.getElementById('promo_text').value,
                 qr_code: document.getElementById('qr_code').value,
                 qr_text: document.getElementById('qr_text').value,

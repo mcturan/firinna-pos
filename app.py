@@ -3489,6 +3489,46 @@ def api_tv_rates():
 
     return jsonify(rates_data)
 
+_rss_cache = {"url": "", "time": 0, "titles": []}
+
+@app.route('/api/tv/rss', methods=['GET'])
+def api_tv_rss():
+    global _rss_cache
+    import time
+    settings = get_tv_settings()
+    rss_url = settings.get('rss_url', '').strip()
+    if not rss_url:
+        return jsonify({"titles": [], "enabled": False})
+    
+    # Cache for 2 minutes (120 seconds) to avoid spamming the RSS provider
+    now = time.time()
+    if _rss_cache["url"] == rss_url and (now - _rss_cache["time"] < 120) and _rss_cache["titles"]:
+        return jsonify({"titles": _rss_cache["titles"], "enabled": True})
+        
+    try:
+        req = urllib.request.Request(rss_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            xml_content = resp.read()
+        import xml.etree.ElementTree as ET
+        root = ET.fromstring(xml_content)
+        titles = []
+        # Support RSS 2.0 (<item><title>) and Atom (<entry><title>)
+        for item in root.findall('.//item')[:15]:
+            t = item.find('title')
+            if t is not None and t.text:
+                titles.append(t.text.strip())
+        if not titles:
+            for item in root.findall('.//{http://www.w3.org/2005/Atom}entry')[:15]:
+                t = item.find('{http://www.w3.org/2005/Atom}title')
+                if t is not None and t.text:
+                    titles.append(t.text.strip())
+                    
+        _rss_cache = {"url": rss_url, "time": now, "titles": titles}
+        return jsonify({"titles": titles, "enabled": True})
+    except Exception as e:
+        print(f"[RSS ERROR] Failed to fetch RSS from {rss_url}: {e}")
+        return jsonify({"titles": _rss_cache.get("titles", []), "enabled": True, "error": str(e)})
+
 @app.route('/api/tv/products', methods=['GET'])
 def get_tv_products():
     try:
