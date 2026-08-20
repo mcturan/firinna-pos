@@ -3489,56 +3489,85 @@ def api_tv_rates():
 
     return jsonify(rates_data)
 
-_rss_cache = {"url": "", "time": 0, "titles": []}
+_rss_cache = {"key": "", "time": 0, "titles": []}
+
+PRESET_FEEDS = {
+    "bbc": ("BBC News (World - EN)", "http://feeds.bbci.co.uk/news/world/rss.xml"),
+    "aljazeera": ("Al Jazeera (World - EN)", "https://www.aljazeera.com/xml/rss/all.xml"),
+    "aa": ("Anadolu Ajansı (Gündem - TR)", "https://www.aa.com.tr/tr/rss/default?cat=guncel"),
+    "trt": ("TRT Haber (Manşet - TR)", "https://www.trthaber.com/manset_articles.rss")
+}
 
 @app.route('/api/tv/rss', methods=['GET'])
 def api_tv_rss():
     global _rss_cache
     import time
     settings = get_tv_settings()
-    rss_url = settings.get('rss_url', '').strip()
-    if not rss_url:
-        return jsonify({"titles": [], "enabled": False})
     
-    # Cache for 2 minutes (120 seconds)
+    # Enabled sources
+    enabled_sources = []
+    
+    # Presets
+    if settings.get('rss_bbc_enabled', True):
+        enabled_sources.append(('BBC', PRESET_FEEDS['bbc'][1]))
+    if settings.get('rss_aljazeera_enabled', True):
+        enabled_sources.append(('AlJazeera', PRESET_FEEDS['aljazeera'][1]))
+    if settings.get('rss_aa_enabled', False):
+        enabled_sources.append(('AA', PRESET_FEEDS['aa'][1]))
+    if settings.get('rss_trt_enabled', False):
+        enabled_sources.append(('TRT', PRESET_FEEDS['trt'][1]))
+        
+    custom_url = settings.get('rss_url', '').strip()
+    if custom_url and settings.get('rss_custom_enabled', True):
+        enabled_sources.append(('Custom', custom_url))
+        
+    if not enabled_sources:
+        return jsonify({"titles": [], "enabled": False})
+        
+    cache_key = "_".join([s[0] for s in enabled_sources]) + "_" + custom_url
     now = time.time()
-    if _rss_cache["url"] == rss_url and (now - _rss_cache["time"] < 120) and _rss_cache["titles"]:
+    if _rss_cache["key"] == cache_key and (now - _rss_cache["time"] < 120) and _rss_cache["titles"]:
         return jsonify({"titles": _rss_cache["titles"], "enabled": True})
         
-    try:
-        req = urllib.request.Request(rss_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
-        with urllib.request.urlopen(req, timeout=6) as resp:
-            content = resp.read()
-            
-        titles = []
-        # Check if response is HTML widget (like feed.informer.com)
-        if b'<html' in content.lower() or b'<!doctype' in content.lower() or rss_url.endswith('.html'):
-            from bs4 import BeautifulSoup
-            soup = BeautifulSoup(content.decode('utf-8', errors='ignore'), 'html.parser')
-            for a in soup.find_all('a'):
-                txt = a.get_text().strip()
-                if txt and len(txt) > 20 and not txt.startswith(('Feed Informer', 'Widgets', 'Privacy', 'Terms')):
-                    if txt not in titles:
-                        titles.append(txt)
-        else:
-            import xml.etree.ElementTree as ET
-            root = ET.fromstring(content)
-            # Support RSS 2.0 (<item><title>) and Atom (<entry><title>)
-            for item in root.findall('.//item')[:20]:
-                t = item.find('title')
-                if t is not None and t.text:
-                    titles.append(t.text.strip())
-            if not titles:
-                for item in root.findall('.//{http://www.w3.org/2005/Atom}entry')[:20]:
-                    t = item.find('{http://www.w3.org/2005/Atom}title')
+    all_titles = []
+    for label, feed_url in enabled_sources:
+        try:
+            req = urllib.request.Request(feed_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                content = resp.read()
+                
+            if b'<html' in content.lower() or b'<!doctype' in content.lower() or feed_url.endswith('.html'):
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(content.decode('utf-8', errors='ignore'), 'html.parser')
+                for a in soup.find_all('a'):
+                    txt = a.get_text().strip()
+                    if txt and len(txt) > 20 and not txt.startswith(('Feed Informer', 'Widgets', 'Privacy', 'Terms')):
+                        if txt not in all_titles:
+                            all_titles.append(txt)
+            else:
+                import xml.etree.ElementTree as ET
+                root = ET.fromstring(content)
+                for item in root.findall('.//item')[:10]:
+                    t = item.find('title')
                     if t is not None and t.text:
-                        titles.append(t.text.strip())
-                    
-        _rss_cache = {"url": rss_url, "time": now, "titles": titles[:25]}
-        return jsonify({"titles": titles[:25], "enabled": True})
-    except Exception as e:
-        print(f"[RSS ERROR] Failed to fetch RSS from {rss_url}: {e}")
-        return jsonify({"titles": _rss_cache.get("titles", []), "enabled": True, "error": str(e)})
+                        clean_t = t.text.strip()
+                        if clean_t not in all_titles:
+                            all_titles.append(clean_t)
+                if len(all_titles) < 5:
+                    for item in root.findall('.//{http://www.w3.org/2005/Atom}entry')[:10]:
+                        t = item.find('{http://www.w3.org/2005/Atom}title')
+                        if t is not None and t.text:
+                            clean_t = t.text.strip()
+                            if clean_t not in all_titles:
+                                all_titles.append(clean_t)
+        except Exception as e:
+            print(f"[RSS ERROR] Failed to fetch {label} ({feed_url}): {e}")
+            
+    if all_titles:
+        _rss_cache = {"key": cache_key, "time": now, "titles": all_titles[:35]}
+        return jsonify({"titles": all_titles[:35], "enabled": True})
+    else:
+        return jsonify({"titles": _rss_cache.get("titles", []), "enabled": True})
 
 @app.route('/api/tv/products', methods=['GET'])
 def get_tv_products():

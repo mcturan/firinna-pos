@@ -16,7 +16,7 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-21T01:29:57.074990",
+    "last_ping": "2026-08-21T01:40:49.789370",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
@@ -29,5 +29,10 @@
         "animals_enabled": true
     },
     "ticker_rss_enabled": true,
-    "rss_url": "http://feed.informer.com/widgets/LXPXCGW6AL.html"
+    "rss_url": "http://feed.informer.com/widgets/LXPXCGW6AL.html",
+    "rss_bbc_enabled": true,
+    "rss_aljazeera_enabled": true,
+    "rss_aa_enabled": false,
+    "rss_trt_enabled": false,
+    "rss_custom_enabled": true
 }

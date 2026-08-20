@@ -272,9 +272,35 @@
             </div>
 
             <div class="form-group" style="background:#f0fdf4; padding:16px; border-radius:8px; border:1px solid #bbf7d0; margin-bottom:1.5rem;">
-                <label style="font-weight:bold; color:#166534; display:block; margin-bottom:6px;">📰 Canlı Haber Kaynağı (RSS URL)</label>
-                <input type="text" id="rss_url" placeholder="Örn: https://www.trthaber.com/gundem_articles.rss veya https://feeds.bbci.co.uk/turkce/rss.xml" style="width:100%; padding:10px; border-radius:6px; border:1px solid #86efac; font-size:0.95rem;">
-                <small style="color:#15803d; display:block; margin-top:4px;">İstediğiniz haber ajansı veya gazetenin RSS / XML linkini buraya yapıştırabilirsiniz. Otomatik olarak canlı başlıklar çekilir.</small>
+                <label style="font-weight:bold; color:#166534; display:block; margin-bottom:10px; font-size:1.05rem;">📰 Canlı Haber Kaynakları (RSS)</label>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
+                        <input type="checkbox" id="rss_bbc_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>🌍 BBC World News (İngilizce)</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
+                        <input type="checkbox" id="rss_aljazeera_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>🌐 Al Jazeera English (İngilizce)</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
+                        <input type="checkbox" id="rss_aa_enabled" style="width:1.15rem; height:1.15rem;">
+                        <span>🇹🇷 Anadolu Ajansı (Gündem - TR)</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
+                        <input type="checkbox" id="rss_trt_enabled" style="width:1.15rem; height:1.15rem;">
+                        <span>🇹🇷 TRT Haber (Manşet - TR)</span>
+                    </label>
+                </div>
+
+                <hr style="border:0; border-top:1px solid #bbf7d0; margin:10px 0;">
+
+                <label style="display:flex; align-items:center; gap:8px; font-weight:bold; color:#166534; cursor:pointer; margin-bottom:6px;">
+                    <input type="checkbox" id="rss_custom_enabled" checked style="width:1.15rem; height:1.15rem;">
+                    <span>🔗 Özel RSS / HTML Widget Kaynağı:</span>
+                </label>
+                <input type="text" id="rss_url" placeholder="Örn: http://feed.informer.com/widgets/LXPXCGW6AL.html" style="width:100%; padding:10px; border-radius:6px; border:1px solid #86efac; font-size:0.95rem;">
+                <small style="color:#15803d; display:block; margin-top:4px;">Seçtiğiniz tüm kaynaklardan canlı başlıklar otomatik olarak toplanıp ekranda akıcı şekilde döndürülür.</small>
             </div>
 
             <div class="form-group">
@@ -459,6 +485,11 @@
                 document.getElementById('ticker_text_enabled').checked = (data.ticker_text_enabled !== false);
                 document.getElementById('ticker_currency_enabled').checked = (data.ticker_currency_enabled !== false);
                 document.getElementById('ticker_rss_enabled').checked = (data.ticker_rss_enabled !== false);
+                document.getElementById('rss_bbc_enabled').checked = (data.rss_bbc_enabled !== false);
+                document.getElementById('rss_aljazeera_enabled').checked = (data.rss_aljazeera_enabled !== false);
+                document.getElementById('rss_aa_enabled').checked = !!data.rss_aa_enabled;
+                document.getElementById('rss_trt_enabled').checked = !!data.rss_trt_enabled;
+                document.getElementById('rss_custom_enabled').checked = (data.rss_custom_enabled !== false);
                 document.getElementById('rss_url').value = data.rss_url || '';
                 document.getElementById('promo_text').value = data.promo_text || '';
                 
@@ -521,6 +552,11 @@
                 ticker_text_enabled: document.getElementById('ticker_text_enabled').checked,
                 ticker_currency_enabled: document.getElementById('ticker_currency_enabled').checked,
                 ticker_rss_enabled: document.getElementById('ticker_rss_enabled').checked,
+                rss_bbc_enabled: document.getElementById('rss_bbc_enabled').checked,
+                rss_aljazeera_enabled: document.getElementById('rss_aljazeera_enabled').checked,
+                rss_aa_enabled: document.getElementById('rss_aa_enabled').checked,
+                rss_trt_enabled: document.getElementById('rss_trt_enabled').checked,
+                rss_custom_enabled: document.getElementById('rss_custom_enabled').checked,
                 rss_url: document.getElementById('rss_url').value,
                 promo_text: document.getElementById('promo_text').value,
                 qr_code: document.getElementById('qr_code').value,
