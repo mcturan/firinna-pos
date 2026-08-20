@@ -36,12 +36,12 @@
         </div>
         
         <div class="tv-tabs">
-            <button class="tv-tab active" onclick="switchTab('genel')">Genel & Logo</button>
-            <button class="tv-tab" onclick="switchTab('layout_ayarlari')">Yerleşim (Layout)</button>
-            <button class="tv-tab" onclick="switchTab('medya')">Video & Müzik (PC / YouTube)</button>
-            <button class="tv-tab" onclick="switchTab('filigran')">🎨 Filigran Döngüsü</button>
-            <button class="tv-tab" onclick="switchTab('mesajlar')">Kayan Yazılar</button>
-            <button class="tv-tab" onclick="switchTab('qr')">QR & Araçlar</button>
+            <button class="tv-tab active" onclick="switchTab('genel', this)">Genel & Logo</button>
+            <button class="tv-tab" onclick="switchTab('layout_ayarlari', this)">Yerleşim (Layout)</button>
+            <button class="tv-tab" onclick="switchTab('medya', this)">Video & Müzik (PC / YouTube)</button>
+            <button class="tv-tab" onclick="switchTab('filigran', this)">🎨 Filigran Döngüsü</button>
+            <button class="tv-tab" onclick="switchTab('mesajlar', this)">Kayan Yazılar</button>
+            <button class="tv-tab" onclick="switchTab('qr', this)">QR & Araçlar</button>
         </div>
 
         <div id="genel" class="tv-pane active card">
@@ -166,6 +166,8 @@
                     <option value="music">Videolar Sessiz Olsun (Sadece Müzik Çalsın)</option>
                 </select>
             </div>
+        </div>
+
         <div id="filigran" class="tv-pane card">
             <h3 style="margin-top:0;">🎨 Filigran Döngüsü & Özel Kartlar</h3>
             <p style="font-size:0.88rem; color:#718096; margin-bottom:1.5rem;">
@@ -298,11 +300,16 @@
         let localVideos = [];
         let localAudio = [];
 
-        function switchTab(tabId) {
+        function switchTab(tabId, btn) {
             document.querySelectorAll('.tv-tab').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tv-pane').forEach(p => p.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
+            if (btn) {
+                btn.classList.add('active');
+            } else if (window.event && window.event.target) {
+                window.event.target.classList.add('active');
+            }
+            const pane = document.getElementById(tabId);
+            if (pane) pane.classList.add('active');
         }
 
         function toggleSource() {
