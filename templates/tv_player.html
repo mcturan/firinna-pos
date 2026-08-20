@@ -81,25 +81,24 @@
             height: 100%;
         }
 
-        /* Top Center: Clock, Date & Weather */
+        /* Top Center: Rotating Clock/Date and Weather Forecast (Crisp Pure White) */
         #ml-center-box {
-            background: #121826;
+            background: #FFFFFF;
             border-radius: 0.8vw;
-            border: 1.5px solid #253046;
+            border: 1.5px solid #E2E8F0;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1.2vw;
             padding: 0 1.2vw;
             position: relative;
             overflow: hidden;
         }
 
-        /* Top Right: Review Us & Flag */
+        /* Top Right: Rotating Social Media & Review Us on Maps + Flag (Crisp Pure White) */
         #ml-review-box {
-            background: #121826;
+            background: #FFFFFF;
             border-radius: 0.8vw;
-            border: 1.5px solid #253046;
+            border: 1.5px solid #E2E8F0;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -108,18 +107,36 @@
             overflow: hidden;
         }
 
+        .top-layer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 1vw;
+            opacity: 0;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            pointer-events: none;
+            box-sizing: border-box;
+        }
+        .top-layer.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         #ml-support-flag {
-            width: 4.2vw;
-            height: 2.8vw;
+            width: 3.8vw;
+            height: 2.6vw;
             border-radius: 0.35vw;
             overflow: hidden;
             flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
             border: 1px solid #E2E8F0;
             background: #E30A17;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 10;
         }
         #ml-support-flag img {
             width: 100%;
@@ -130,30 +147,50 @@
 
         #ml-left-top { grid-column: 1; grid-row: 2; background: #FFFFFF; border-radius: 0.8vw; display: flex; flex-direction: column; overflow: hidden; position: relative; border: 1.5px solid #E2E8F0; }
         
-        #ml-main-video { grid-column: 2; grid-row: 2; position: relative; border-radius: 0.8vw; overflow: hidden; background: #000000; border: 1.5px solid #253046; }
+        #ml-main-video { grid-column: 2; grid-row: 2; position: relative; border-radius: 0.8vw; overflow: hidden; background: #000000; border: 1.5px solid #E2E8F0; }
         
-        /* Bottom Row: RSS & Ticker Marquee Strip */
-        #ml-ticker-box { 
-            grid-column: 1 / 3; 
-            grid-row: 3; 
-            background: #121826; 
-            color: #FFFFFF; 
-            border-radius: 0.8vw; 
-            position: relative; 
-            overflow: hidden; 
-            border: 1.5px solid #253046; 
+        /* BOTTOM ROW: Split Grid (Left: Currency/Crypto | Right: Wide RSS News Feed) */
+        #ml-bottom-row {
+            grid-column: 1 / 3;
+            grid-row: 3;
+            display: grid;
+            grid-template-columns: 28vw 1fr;
+            gap: 1.2vw;
+            height: 100%;
+        }
+
+        #ml-currency-box {
+            background: #FFFFFF;
+            border-radius: 0.8vw;
+            border: 1.5px solid #E2E8F0;
             display: flex;
             align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 0 0.8vw;
         }
+
+        #ml-rss-box {
+            background: #FFFFFF;
+            border-radius: 0.8vw;
+            border: 1.5px solid #E2E8F0;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 0 1vw;
+        }
+
         .rss-marquee-content {
             white-space: nowrap;
             display: inline-block;
             animation: marquee 35s linear infinite;
             padding-left: 100%;
-            font-size: 1.45vw;
+            font-size: 1.4vw;
             font-weight: 600;
-            color: #F8FAFC;
-            letter-spacing: 0.4px;
+            color: #1E293B;
+            letter-spacing: 0.3px;
             will-change: transform;
         }
         @keyframes marquee { 
@@ -383,36 +420,57 @@
         
         <!-- Box 2 & 3 Wrapper -->
         <div id="ml-top-right-wrapper">
-            <!-- Box 2: Center Clock, Date & Weather -->
+            <!-- Box 2: Center (Layer 0: Digital Clock & Date | Layer 1: Weather Forecast) -->
             <div id="ml-center-box" class="grid-box">
-                <div style="display:flex; align-items:center; gap:0.5vw;">
-                    <span style="font-size:1.4vw; color:#EF4444;">🕒</span>
-                    <span id="ml-clock" style="font-size:1.8vw; font-weight:800; color:#EF4444; letter-spacing:1px; font-family:'Plus Jakarta Sans', monospace;">00:00:00</span>
+                <!-- Layer 0: Clock & Date -->
+                <div id="ml-center-layer-0" class="top-layer active">
+                    <div style="display:flex; align-items:center; gap:0.6vw;">
+                        <span style="font-size:1.5vw; color:#DC2626;">🕒</span>
+                        <span id="ml-clock" style="font-size:2vw; font-weight:800; color:#DC2626; letter-spacing:1px; font-family:'Plus Jakarta Sans', monospace;">00:00:00</span>
+                    </div>
+                    <span style="font-size:1.4vw; font-weight:300; color:#94A3B8; margin: 0 0.8vw;">|</span>
+                    <div style="display:flex; align-items:center; gap:0.5vw;">
+                        <span style="font-size:1.4vw; color:#2D6A4F;">📅</span>
+                        <span id="ml-date" style="font-size:1.6vw; font-weight:700; color:#2D6A4F; letter-spacing:0.5px;">--.--.----</span>
+                    </div>
                 </div>
-                <span style="font-size:1.3vw; font-weight:300; color:#4B5563;">|</span>
-                <div style="display:flex; align-items:center; gap:0.5vw;">
-                    <span style="font-size:1.3vw; color:#94A3B8;">📅</span>
-                    <span id="ml-date" style="font-size:1.4vw; font-weight:700; color:#34D399; letter-spacing:0.5px;">--.--.----</span>
-                </div>
-                <span style="font-size:1.3vw; font-weight:300; color:#4B5563;">|</span>
-                <div id="ml-weather" style="font-size:1.4vw; font-weight:700; color:#F8FAFC; display:flex; align-items:center; gap:0.5vw;">
-                    <span>☀️ ISTANBUL 26°C</span>
+
+                <!-- Layer 1: Weather Forecast for Beyoglu -->
+                <div id="ml-center-layer-1" class="top-layer">
+                    <div id="ml-weather" style="font-size:1.6vw; font-weight:700; color:#1E293B; display:flex; justify-content:space-around; width:100%; align-items:center;">
+                        <span>☀️ Istanbul 26°C</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Box 3: Right Review Us on Maps & Flag -->
+            <!-- Box 3: Right (Layer 0: Follow/Share Instagram & TikTok | Layer 1: Support Us Maps) + Turkish Flag -->
             <div id="ml-review-box" class="grid-box">
-                <div style="font-size:1.2vw; font-weight:800; color:#34D399; letter-spacing:0.6px; display:flex; align-items:center; gap:0.4vw;">
-                    <span>⭐</span> REVIEW US:
-                </div>
-                <div style="display:flex; gap:0.6vw; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:0.4vw; padding: 0.2vw 0.7vw; background:#FFFFFF; border-radius: 0.35vw; font-size:1.15vw; font-weight:700; color:#1A202C; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                        <span style="color:#4285F4;">G</span><span style="color:#EA4335;">o</span><span style="color:#FBBC05;">o</span><span style="color:#4285F4;">g</span><span style="color:#34A853;">l</span><span style="color:#EA4335;">e</span> <span style="color:#4A5568;">Maps</span>
+                <div style="position:relative; width:calc(100% - 4.5vw); height:100%;">
+                    <!-- Layer 0: Follow / Share (Instagram & TikTok) -->
+                    <div id="ml-review-layer-0" class="top-layer active" style="justify-content:flex-start; gap:0.8vw;">
+                        <span style="font-size:1.2vw; font-weight:800; color:#2D6A4F; letter-spacing:0.4px;">📸 FOLLOW:</span>
+                        <div class="social-pill">
+                            <span style="color:#E1306C;">Instagram</span>
+                            <span style="color:#4A5568; font-size:1.1vw;">@firinnacafe</span>
+                        </div>
+                        <div class="social-pill">
+                            <span style="color:#000000;">TikTok</span>
+                            <span style="color:#4A5568; font-size:1.1vw;">@firinnacafe</span>
+                        </div>
                     </div>
-                    <div style="display:flex; align-items:center; gap:0.4vw; padding: 0.2vw 0.7vw; background:#FFFFFF; border-radius: 0.35vw; font-size:1.15vw; font-weight:700; color:#1A202C; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                        <span style="color:#FC3F1D;">Yandex</span> <span style="color:#4A5568;">Maps</span>
+
+                    <!-- Layer 1: Support Us (Google Maps & Yandex Maps) -->
+                    <div id="ml-review-layer-1" class="top-layer" style="justify-content:flex-start; gap:0.8vw;">
+                        <span style="font-size:1.2vw; font-weight:800; color:#2D6A4F; letter-spacing:0.4px;">⭐ RATE US:</span>
+                        <div class="social-pill">
+                            <span style="color:#4285F4;">Google</span> <span style="color:#4A5568;">Maps</span>
+                        </div>
+                        <div class="social-pill">
+                            <span style="color:#FC3F1D;">Yandex</span> <span style="color:#4A5568;">Maps</span>
+                        </div>
                     </div>
                 </div>
+
                 <div id="ml-support-flag">
                     <img src="/static/img/bayrak.gif" alt="Türk Bayrağı">
                 </div>
@@ -433,31 +491,50 @@
                 
                 <!-- Card 0: Brand & Web -->
                 <div id="wm-card-logo" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_0_logo.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));">
+                    <img src="/static/img/watermarks/card_0_logo.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.18));">
                 </div>
 
                 <!-- Card 1: Social Media -->
                 <div id="wm-card-social" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_1_social.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));">
+                    <img src="/static/img/watermarks/card_1_social.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.18));">
                 </div>
 
                 <!-- Card 2: Support University Students -->
                 <div id="wm-card-students" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_2_students.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));">
+                    <img src="/static/img/watermarks/card_2_students.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.18));">
                 </div>
 
                 <!-- Card 3: Stray Animals Support -->
                 <div id="wm-card-animals" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_3_animals.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));">
+                    <img src="/static/img/watermarks/card_3_animals.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.18));">
                 </div>
 
             </div>
         </div>
 
-        <!-- BOTTOM ROW: Seamless Continuous News & Markets Marquee Strip -->
-        <div id="ml-ticker-box" class="grid-box">
-            <div id="ml-continuous-marquee" class="rss-marquee-content">
-                <span>FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE</span>
+        <!-- BOTTOM ROW: Split Grid (Left: Currencies/Crypto | Right: Wide Live RSS Feed) -->
+        <div id="ml-bottom-row">
+            <!-- Left: Currencies & Crypto Box (TCMB + Crypto) -->
+            <div id="ml-currency-box" class="grid-box">
+                <!-- Slide 0: Forex (USD/TRY, EUR/TRY, EUR/USD) -->
+                <div id="ml-curr-slide-0" class="top-layer active" style="font-size:1.15vw; font-weight:700; color:#1E293B; gap:0.6vw;">
+                    <span style="color:#059669;">💵 USD: <b id="val-usd" style="color:#0F172A;">-- ₺</b></span>
+                    <span style="color:#94A3B8;">•</span>
+                    <span style="color:#2563EB;">💶 EUR: <b id="val-eur" style="color:#0F172A;">-- ₺</b></span>
+                </div>
+                <!-- Slide 1: Crypto (BTC/USDT, ETH/USDT) -->
+                <div id="ml-curr-slide-1" class="top-layer" style="font-size:1.15vw; font-weight:700; color:#1E293B; gap:0.6vw;">
+                    <span style="color:#D97706;">₿ BTC: <b id="val-btc" style="color:#0F172A;">-- $</b></span>
+                    <span style="color:#94A3B8;">•</span>
+                    <span style="color:#7C3AED;">Ξ ETH: <b id="val-eth" style="color:#0F172A;">-- $</b></span>
+                </div>
+            </div>
+
+            <!-- Right: Wide Continuous RSS News Stream -->
+            <div id="ml-rss-box" class="grid-box">
+                <div id="ml-continuous-marquee" class="rss-marquee-content">
+                    <span>Loading Live World News...</span>
+                </div>
             </div>
         </div>
         
@@ -855,6 +932,57 @@
         let isTickerTextEnabled = true;
         let isTickerCurrencyEnabled = true;
 
+        // Top-Middle Rotation (Layer 0: Clock & Date | Layer 1: Weather)
+        let topCenterIndex = 0;
+        function rotateTopCenter() {
+            const l0 = document.getElementById('ml-center-layer-0');
+            const l1 = document.getElementById('ml-center-layer-1');
+            if (!l0 || !l1) return;
+            topCenterIndex = (topCenterIndex + 1) % 2;
+            if (topCenterIndex === 0) {
+                l1.classList.remove('active');
+                l0.classList.add('active');
+            } else {
+                l0.classList.remove('active');
+                l1.classList.add('active');
+            }
+        }
+        setInterval(rotateTopCenter, 8000); // Rotates every 8 seconds
+
+        // Top-Right Rotation (Layer 0: Follow Instagram & TikTok | Layer 1: Rate Us Google & Yandex Maps)
+        let topRightIndex = 0;
+        function rotateTopRight() {
+            const r0 = document.getElementById('ml-review-layer-0');
+            const r1 = document.getElementById('ml-review-layer-1');
+            if (!r0 || !r1) return;
+            topRightIndex = (topRightIndex + 1) % 2;
+            if (topRightIndex === 0) {
+                r1.classList.remove('active');
+                r0.classList.add('active');
+            } else {
+                r0.classList.remove('active');
+                r1.classList.add('active');
+            }
+        }
+        setInterval(rotateTopRight, 7000); // Rotates every 7 seconds
+
+        // Bottom-Left Currency & Crypto Rotation (Slide 0: Forex | Slide 1: Crypto)
+        let currSlideIndex = 0;
+        function rotateCurrencies() {
+            const c0 = document.getElementById('ml-curr-slide-0');
+            const c1 = document.getElementById('ml-curr-slide-1');
+            if (!c0 || !c1) return;
+            currSlideIndex = (currSlideIndex + 1) % 2;
+            if (currSlideIndex === 0) {
+                c1.classList.remove('active');
+                c0.classList.add('active');
+            } else {
+                c0.classList.remove('active');
+                c1.classList.add('active');
+            }
+        }
+        setInterval(rotateCurrencies, 5000); // Rotates every 5 seconds
+
         async function fetchCurrencies() {
             try {
                 const res = await fetch("/api/tv/rates");
@@ -866,23 +994,17 @@
                     const btcUsdt = data.btc_usdt ? Number(data.btc_usdt).toLocaleString('en-US') : '--';
                     const ethUsdt = data.eth_usdt ? Number(data.eth_usdt).toLocaleString('en-US') : '--';
 
-                    const currEl = document.getElementById('ml-currency-content');
-                    if (currEl) {
-                        currEl.innerHTML = `
-                            <span style="display:flex; align-items:center; gap:0.4vw; color:#34D399; font-weight:800;">💵 USD: <span style="color:#FFFFFF;">${usdBuy} ₺</span></span>
-                            <span style="color:#64748B; font-weight:300;">•</span>
-                            <span style="display:flex; align-items:center; gap:0.4vw; color:#38BDF8; font-weight:800;">💶 EUR: <span style="color:#FFFFFF;">${eurBuy} ₺</span></span>
-                            <span style="color:#64748B; font-weight:300;">•</span>
-                            <span style="display:flex; align-items:center; gap:0.4vw; color:#FBBF24; font-weight:800;">📊 EUR/USD: <span style="color:#FFFFFF;">${eurUsd}</span></span>
-                            <span style="color:#64748B; font-weight:300;">•</span>
-                            <span style="display:flex; align-items:center; gap:0.4vw; color:#F59E0B; font-weight:800;">₿ BTC: <span style="color:#FFFFFF;">$${btcUsdt}</span></span>
-                            <span style="color:#64748B; font-weight:300;">•</span>
-                            <span style="display:flex; align-items:center; gap:0.4vw; color:#818CF8; font-weight:800;">Ξ ETH: <span style="color:#FFFFFF;">$${ethUsdt}</span></span>
-                        `;
-                    }
+                    const valUsd = document.getElementById('val-usd');
+                    const valEur = document.getElementById('val-eur');
+                    const valBtc = document.getElementById('val-btc');
+                    const valEth = document.getElementById('val-eth');
+
+                    if (valUsd) valUsd.textContent = `${usdBuy} ₺`;
+                    if (valEur) valEur.textContent = `${eurBuy} ₺`;
+                    if (valBtc) valBtc.textContent = `$${btcUsdt}`;
+                    if (valEth) valEth.textContent = `$${ethUsdt}`;
 
                     liveCurrencyText = `USD: ${usdBuy} ₺  •  EUR: ${eurBuy} ₺  •  EUR/USD: ${eurUsd}  •  BTC: $${btcUsdt}  •  ETH: $${ethUsdt}`;
-                    updateTickerText();
                 }
             } catch(e) {
                 console.error("Currency fetch error:", e);
@@ -909,7 +1031,7 @@
             }
         }
         fetchRssFeed();
-        setInterval(fetchRssFeed, 180000); // Check RSS every 3 mins
+        setInterval(fetchRssFeed, 120000); // Check RSS every 2 mins
 
         function updateUnifiedMarquee() {
             const marqueeEl = document.getElementById('ml-continuous-marquee');
@@ -934,27 +1056,22 @@
                 }
             });
             if (isTickerTextEnabled && messageText && messageText.trim() !== '') {
-                items.push(`<span style="color:#FBBF24; font-weight:700;">📢 ${messageText.trim()}</span>`);
+                items.push(`<span style="color:#D97706; font-weight:800;">📢 ${messageText.trim()}</span>`);
             }
 
-            // 2. RSS Live Headlines (clean text stream, no breaking news prefix)
+            // 2. RSS Live Headlines (Clean high-contrast dark text on white)
             if (isTickerRssEnabled && liveRssTitles.length > 0) {
-                const rssHtml = liveRssTitles.map(t => `<span style="color:#F8FAFC; font-weight:600;">${t}</span>`).join('<span style="color:#64748B; margin: 0 1.2vw;">•</span>');
+                const rssHtml = liveRssTitles.map(t => `<span style="color:#0F172A; font-weight:700;">${t}</span>`).join('<span style="color:#94A3B8; margin: 0 1.2vw;">•</span>');
                 items.push(rssHtml);
             }
 
-            // 3. Live Exchange & Crypto Rates
-            if (isTickerCurrencyEnabled && liveCurrencyText) {
-                items.push(`<span style="color:#34D399; font-weight:700;">${liveCurrencyText}</span>`);
-            }
-
-            // 4. Fallback Brand Text
+            // 3. Fallback Brand Text
             if (items.length === 0) {
-                items.push('<span style="color:#F8FAFC;">FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE • ISTANBUL</span>');
+                items.push('<span style="color:#0F172A; font-weight:700;">FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE • GALATA / BEYOĞLU</span>');
             }
 
-            const combinedHtml = items.join('<span style="color:#475569; margin: 0 1.5vw;">|</span>');
-            marqueeEl.innerHTML = combinedHtml + '<span style="color:#475569; margin: 0 1.5vw;">|</span>' + combinedHtml;
+            const combinedHtml = items.join('<span style="color:#CBD5E1; margin: 0 1.5vw;">|</span>');
+            marqueeEl.innerHTML = combinedHtml + '<span style="color:#CBD5E1; margin: 0 1.5vw;">|</span>' + combinedHtml;
         }
 
         function updateTickerText() {
