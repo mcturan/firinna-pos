@@ -230,7 +230,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 1.4vw 2vw;
+            padding: 1.6vw 2.2vw;
             box-sizing: border-box;
             opacity: 0;
             transform: scale(0.95);
@@ -255,26 +255,26 @@
             gap: 0.5vw;
             background: #2D6A4F;
             color: #FFFFFF;
-            padding: 0.35vw 1.2vw;
+            padding: 0.4vw 1.3vw;
             border-radius: 2vw;
-            font-size: 1.15vw;
+            font-size: 1.2vw;
             font-weight: 800;
             letter-spacing: 1px;
             text-transform: uppercase;
-            margin-bottom: 0.6vw;
-            box-shadow: 0 4px 12px rgba(45,106,79,0.35);
+            margin-bottom: 0.8vw;
+            box-shadow: 0 4px 14px rgba(45,106,79,0.35);
         }
         .wm-title {
-            font-size: 1.85vw;
+            font-size: 2.1vw;
             font-weight: 800;
             color: #1A202C;
             text-align: center;
             line-height: 1.25;
-            margin: 0 0 0.5vw 0;
+            margin: 0 0 0.6vw 0;
             letter-spacing: 0.3px;
         }
         .wm-desc {
-            font-size: 1.25vw;
+            font-size: 1.35vw;
             font-weight: 600;
             color: #4A5568;
             text-align: center;
@@ -286,9 +286,9 @@
             align-items: center;
             justify-content: space-between;
             width: 100%;
-            padding-top: 0.8vw;
+            padding-top: 1vw;
             border-top: 1.5px solid #E2E8F0;
-            margin-top: 0.4vw;
+            margin-top: 0.6vw;
         }
         .wm-footer-brand {
             display: flex;
@@ -296,11 +296,11 @@
             gap: 0.8vw;
         }
         .wm-footer-brand img {
-            height: 3.2vh;
+            height: 4vh;
             object-fit: contain;
         }
         .wm-footer-brand span {
-            font-size: 1.25vw;
+            font-size: 1.35vw;
             font-weight: 800;
             color: #2D6A4F;
             letter-spacing: 1px;
@@ -308,20 +308,20 @@
         .wm-social-pills {
             display: flex;
             align-items: center;
-            gap: 0.6vw;
+            gap: 0.7vw;
         }
         .wm-pill {
             display: inline-flex;
             align-items: center;
-            gap: 0.35vw;
-            padding: 0.22vw 0.65vw;
+            gap: 0.4vw;
+            padding: 0.3vw 0.8vw;
             background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 0.4vw;
-            font-size: 1.05vw;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 0.5vw;
+            font-size: 1.15vw;
             font-weight: 700;
             color: #1A202C;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
         }
 
         /* Legacy Overlays */
@@ -394,22 +394,22 @@
             <video id="local-video" style="display:none;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
             <!-- Dynamic Multi-Card Watermark Container -->
-            <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), top 1.2s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; width: 48vw; height: 25vh; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); border-radius: 1.5vw; box-shadow: 0 18px 50px rgba(0,0,0,0.6), 0 0 0 1.5px rgba(255,255,255,0.7); box-sizing: border-box; overflow: hidden;">
+            <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), top 1.2s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; width: 56vw; height: 38vh; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(14px); border-radius: 1.8vw; box-shadow: 0 20px 60px rgba(0,0,0,0.65), 0 0 0 2px rgba(255,255,255,0.8); box-sizing: border-box; overflow: hidden;">
                 
                 <!-- Card 0: Main Logo & Domain -->
                 <div id="wm-card-logo" class="wm-card">
                     <div class="wm-content">
-                        <img id="ml-watermark" src="/static/uploads/logo.png" style="width:22vw; max-height:10vh; object-fit:contain; display:block; margin: 0 auto;">
-                        <div id="ml-watermark-text" style="color: #2D6A4F; font-size: 1.8vw; font-weight: 800; margin-top: 0.4vw; font-family: sans-serif; letter-spacing: 2px;">www.firinna.com</div>
+                        <img id="ml-watermark" src="/static/uploads/logo.png" style="width:26vw; max-height:16vh; object-fit:contain; display:block; margin: 0 auto;">
+                        <div id="ml-watermark-text" style="color: #2D6A4F; font-size: 2.2vw; font-weight: 800; margin-top: 1vw; font-family: sans-serif; letter-spacing: 2px;">www.firinna.com</div>
                     </div>
                     <div class="wm-footer">
                         <div class="wm-footer-brand">
-                            <span style="font-size:1.1vw; font-weight:700; color:#4A5568;">⭐ Support us on social media & maps</span>
+                            <span style="font-size:1.25vw; font-weight:700; color:#4A5568;">⭐ Follow us on social media & review us on maps!</span>
                         </div>
                         <div class="wm-social-pills">
-                            <div class="wm-pill"><span style="color:#E1306C; font-size:1.2vw;">📷</span> <span>@firinnacafe</span></div>
-                            <div class="wm-pill"><span style="color:#000000; font-size:1.2vw;">🎵</span> <span>TikTok</span></div>
-                            <div class="wm-pill"><span style="color:#4285F4; font-size:1.2vw;">📍</span> <span>Maps</span></div>
+                            <div class="wm-pill"><span style="color:#E1306C; font-size:1.3vw;">📷</span> <span>@firinnacafe</span></div>
+                            <div class="wm-pill"><span style="color:#000000; font-size:1.3vw;">🎵</span> <span>TikTok</span></div>
+                            <div class="wm-pill"><span style="color:#4285F4; font-size:1.3vw;">📍</span> <span>Maps</span></div>
                         </div>
                     </div>
                 </div>
@@ -417,9 +417,12 @@
                 <!-- Card 1: Social Media (Instagram & TikTok @firinnacafe + Maps) -->
                 <div id="wm-card-social" class="wm-card">
                     <div class="wm-content">
+                        <div style="display:flex; align-items:center; gap:0.8vw; margin-bottom:0.5vw;">
+                            <span style="font-size:3.2vw;">✨📸✨</span>
+                        </div>
                         <div class="wm-badge">📸 Social Community</div>
                         <div class="wm-title">Follow Us on Social Media & Share Your Day!</div>
-                        <div class="wm-desc">Tag <b style="color:#2D6A4F;">@firinnacafe</b> in your stories & posts to get featured!</div>
+                        <div class="wm-desc" style="font-size:1.45vw; max-width:85%;">Capture your favorite bakery moments, tag <b style="color:#2D6A4F; font-weight:800;">@firinnacafe</b> and share your story with us!</div>
                     </div>
                     <div class="wm-footer">
                         <div class="wm-footer-brand">
@@ -427,24 +430,25 @@
                             <span>www.firinna.com</span>
                         </div>
                         <div class="wm-social-pills">
-                            <div class="wm-pill"><span style="color:#E1306C; font-size:1.2vw;">📷</span> <span>@firinnacafe</span></div>
-                            <div class="wm-pill"><span style="color:#000000; font-size:1.2vw;">🎵</span> <span>TikTok</span></div>
-                            <div class="wm-pill"><span style="color:#4285F4; font-size:1.2vw;">📍</span> <span>Google / Yandex</span></div>
+                            <div class="wm-pill"><span style="color:#E1306C; font-size:1.3vw;">📷</span> <span>@firinnacafe</span></div>
+                            <div class="wm-pill"><span style="color:#000000; font-size:1.3vw;">🎵</span> <span>TikTok</span></div>
+                            <div class="wm-pill"><span style="color:#4285F4; font-size:1.3vw;">📍</span> <span>Google / Yandex</span></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Card 2: Support University Students (Beyoğlu Öğrenciye) -->
+                <!-- Card 2: Support University Students (Beyoğlu Öğrenciye + Graduation Cap & Students) -->
                 <div id="wm-card-students" class="wm-card">
                     <div class="wm-content">
-                        <div style="display:flex; align-items:center; gap:1.2vw; width:100%; justify-content:center; margin-bottom:0.4vw;">
-                            <img src="/static/img/ogrenciye_logo.webp" style="height:6vh; object-fit:contain; border-radius:0.4vw;" alt="Öğrenciye Destek">
-                            <div style="text-align:left;">
-                                <div class="wm-badge" style="background:#D97706; margin-bottom:0.2vw;">🎓 Social Responsibility</div>
-                                <div class="wm-title" style="text-align:left; margin:0;">Fırınna Supports University Students!</div>
+                        <div style="display:flex; align-items:center; justify-content:center; gap:2vw; width:100%; margin-bottom:0.8vw;">
+                            <div style="display:flex; align-items:center; gap:0.4vw; font-size:3.2vw; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.15));">
+                                <span>🎓</span><span>👨‍🎓</span><span>👩‍🎓</span>
                             </div>
+                            <img src="/static/img/ogrenciye_logo.webp" style="height:9vh; object-fit:contain; border-radius:0.6vw; box-shadow:0 4px 12px rgba(0,0,0,0.1); border:1px solid #E2E8F0;" alt="Öğrenciye Destek">
                         </div>
-                        <div class="wm-desc">We proudly support students through "Beyoğlu Öğrenciye". Help us by following & reviewing us!</div>
+                        <div class="wm-badge" style="background:#D97706;">🎓 Social Responsibility</div>
+                        <div class="wm-title">Fırınna is Supporting University Students!</div>
+                        <div class="wm-desc" style="font-size:1.4vw; max-width:90%;">We proudly support university youth with special discounts through "Beyoğlu Öğrenciye". Show your love by following & reviewing us!</div>
                     </div>
                     <div class="wm-footer">
                         <div class="wm-footer-brand">
@@ -452,19 +456,22 @@
                             <span>www.firinna.com</span>
                         </div>
                         <div class="wm-social-pills">
-                            <div class="wm-pill"><span style="color:#E1306C; font-size:1.2vw;">📷</span> <span>@firinnacafe</span></div>
-                            <div class="wm-pill"><span style="color:#4285F4; font-size:1.2vw;">⭐</span> <span>Google Maps</span></div>
-                            <div class="wm-pill"><span style="color:#FC3F1D; font-size:1.2vw;">⭐</span> <span>Yandex Maps</span></div>
+                            <div class="wm-pill"><span style="color:#E1306C; font-size:1.3vw;">📷</span> <span>@firinnacafe</span></div>
+                            <div class="wm-pill"><span style="color:#4285F4; font-size:1.3vw;">⭐</span> <span>Google Maps</span></div>
+                            <div class="wm-pill"><span style="color:#FC3F1D; font-size:1.3vw;">⭐</span> <span>Yandex Maps</span></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Card 3: Stray Animals Support -->
+                <!-- Card 3: Stray Animals Support (Cats & Food Bowls) -->
                 <div id="wm-card-animals" class="wm-card">
                     <div class="wm-content">
+                        <div style="display:flex; align-items:center; justify-content:center; gap:0.8vw; font-size:3.2vw; margin-bottom:0.6vw; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.15));">
+                            <span>🐱</span><span>🥣</span><span>🐾</span><span>🥣</span><span>🐈</span>
+                        </div>
                         <div class="wm-badge" style="background:#059669;">🐾 Loving Our Street Friends</div>
                         <div class="wm-title">Fırınna Cares for Stray Animals & Street Paws!</div>
-                        <div class="wm-desc">We regularly feed and shelter street animals. Help us make a difference by supporting us on social media!</div>
+                        <div class="wm-desc" style="font-size:1.4vw; max-width:90%;">We actively feed and shelter local street cats & dogs every single day. Help us keep them safe & fed by supporting us online!</div>
                     </div>
                     <div class="wm-footer">
                         <div class="wm-footer-brand">
@@ -472,9 +479,9 @@
                             <span>www.firinna.com</span>
                         </div>
                         <div class="wm-social-pills">
-                            <div class="wm-pill"><span style="color:#E1306C; font-size:1.2vw;">📷</span> <span>@firinnacafe</span></div>
-                            <div class="wm-pill"><span style="color:#000000; font-size:1.2vw;">🎵</span> <span>TikTok</span></div>
-                            <div class="wm-pill"><span style="color:#4285F4; font-size:1.2vw;">📍</span> <span>Maps</span></div>
+                            <div class="wm-pill"><span style="color:#E1306C; font-size:1.3vw;">📷</span> <span>@firinnacafe</span></div>
+                            <div class="wm-pill"><span style="color:#000000; font-size:1.3vw;">🎵</span> <span>TikTok</span></div>
+                            <div class="wm-pill"><span style="color:#4285F4; font-size:1.3vw;">📍</span> <span>Maps</span></div>
                         </div>
                     </div>
                 </div>
