@@ -712,12 +712,15 @@
             vidEl.defaultMuted = true;
             vidEl.loop = true;
             vidEl.playsInline = true;
-            vidEl.setAttribute('autoplay', '');
-            vidEl.setAttribute('muted', '');
-            vidEl.setAttribute('playsinline', '');
-            vidEl.setAttribute('webkit-playsinline', '');
+            vidEl.setAttribute('autoplay', 'autoplay');
+            vidEl.setAttribute('muted', 'muted');
+            vidEl.setAttribute('playsinline', 'true');
+            vidEl.setAttribute('webkit-playsinline', 'true');
             
-            if (vidEl.src !== window.location.origin + srcUrl) {
+            const currentFullSrc = vidEl.src;
+            const targetFullSrc = window.location.origin + srcUrl;
+            
+            if (currentFullSrc !== targetFullSrc) {
                 vidEl.src = srcUrl;
                 vidEl.load();
             }
@@ -728,6 +731,7 @@
                 if (p !== undefined) {
                     p.catch((e) => {
                         console.log("Autoplay error:", e);
+                        // Retry muted on touch or scroll
                         vidEl.muted = true;
                         vidEl.play().catch(err=>{});
                     });
