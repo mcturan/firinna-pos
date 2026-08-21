@@ -712,18 +712,14 @@
             vidEl.defaultMuted = true;
             vidEl.loop = true;
             vidEl.playsInline = true;
-            vidEl.setAttribute('autoplay', 'autoplay');
-            vidEl.setAttribute('muted', 'muted');
-            vidEl.setAttribute('playsinline', 'true');
-            vidEl.setAttribute('webkit-playsinline', 'true');
+            vidEl.autoplay = true;
+            vidEl.setAttribute('autoplay', '');
+            vidEl.setAttribute('muted', '');
+            vidEl.setAttribute('playsinline', '');
+            vidEl.setAttribute('webkit-playsinline', '');
             
-            const currentFullSrc = vidEl.src;
-            const targetFullSrc = window.location.origin + srcUrl;
-            
-            if (currentFullSrc !== targetFullSrc) {
-                vidEl.src = srcUrl;
-                vidEl.load();
-            }
+            vidEl.src = srcUrl;
+            vidEl.load();
 
             const attemptPlay = () => {
                 vidEl.muted = true;
