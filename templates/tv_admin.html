@@ -694,11 +694,14 @@
                                 <b>IP:</b> ${c.ip} • <b>Ad:</b> ${c.name}
                             </div>
                             <div style="display:flex; gap:6px; margin-top:4px;">
-                                <button type="button" onclick="pushInstantUpdate('reload', '${c.client_id}')" style="flex:1; background:#dc2626; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.78rem; font-weight:bold; cursor:pointer;" title="Sadece Bu Cihazı Yeniden Başlat">
-                                    🔄 Restart
+                                <button type="button" onclick="pushInstantUpdate('reload', '${c.client_id}')" style="flex:1; background:#dc2626; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.78rem; font-weight:bold; cursor:pointer;" title="Uygulamayı Yeniden Başlat">
+                                    🔄 Uygulama
                                 </button>
                                 <button type="button" onclick="pushInstantUpdate('clear_cache', '${c.client_id}')" style="flex:1; background:#ea580c; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.78rem; font-weight:bold; cursor:pointer;" title="Önbelleği Sil ve Yeniden Başlat">
                                     🧹 Cache Sil
+                                </button>
+                                <button type="button" onclick="rebootDeviceHardware('${c.ip}')" style="flex:1; background:#475569; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.78rem; font-weight:bold; cursor:pointer;" title="Cihazı Komple Kapatıp Aç (Donanımsal Reboot)">
+                                    🔌 Cihaz Reboot
                                 </button>
                             </div>
                         </div>
@@ -725,6 +728,25 @@
                 setTimeout(fetchClients, 1000);
             } catch(e) {
                 alert("Push sinyali gönderilemedi.");
+            }
+        }
+
+        async function rebootDeviceHardware(ip) {
+            if (!confirm(`⚠️ DİKKAT: ${ip} IP adresli cihaz donanımsal olarak kapatılıp baştan açılacak (Android Reboot). Onaylıyor musunuz?`)) return;
+            try {
+                const res = await fetch('/api/tv/device/reboot', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ip: ip})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("✅ " + data.message);
+                } else {
+                    alert("❌ " + data.error);
+                }
+            } catch(e) {
+                alert("Yeniden başlatma isteği gönderilemedi.");
             }
         }
 

@@ -3497,6 +3497,41 @@ def api_tv_push():
     save_tv_settings(current)
     return jsonify({"success": True, "pushed": current['last_push']})
 
+@app.route('/api/tv/device/reboot', methods=['POST'])
+def api_tv_device_reboot():
+    data = request.json or {}
+    target_ip = data.get('ip', '').strip()
+    
+    if not target_ip or target_ip.startswith('127.') or target_ip.startswith('localhost'):
+        return jsonify({"success": False, "error": "Geçerli bir yerel cihaz IP'si bulunamadı."})
+        
+    import subprocess
+    try:
+        # Check if adb is installed
+        chk = subprocess.run(['which', 'adb'], capture_output=True, text=True)
+        if chk.returncode != 0:
+            return jsonify({
+                "success": False, 
+                "error": "Sunucuda ADB kurulu değil. Lütfen terminalde: sudo apt update && sudo apt install -y adb çalıştırın."
+            })
+            
+        # Connect to Mi Stick via TCP/IP port 5555
+        target_addr = f"{target_ip}:5555" if ':' not in target_ip else target_ip
+        conn = subprocess.run(['adb', 'connect', target_addr], capture_output=True, text=True, timeout=6)
+        
+        # Send reboot command
+        reb = subprocess.run(['adb', '-s', target_addr, 'reboot'], capture_output=True, text=True, timeout=6)
+        
+        if reb.returncode == 0:
+            return jsonify({"success": True, "message": f"Mi Stick ({target_addr}) donanımsal olarak baştan başlatılıyor..."})
+        else:
+            return jsonify({
+                "success": False, 
+                "error": f"Bağlantı kuruldu ancak yeniden başlatılamadı: {reb.stderr or reb.stdout}. (Mi Stick'te 'Ağ Üzerinden Hata Ayıklama' açık mı?)"
+            })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
 @app.route('/api/tv/rates', methods=['GET'])
 def api_tv_rates():
     rates_data = {
