@@ -575,10 +575,12 @@
             </div>
 
             <!-- Right: Wide Continuous RSS News Stream -->
-            <div id="ml-rss-box" class="grid-box">
+            <div id="ml-rss-box" class="grid-box" style="position:relative;">
                 <div id="ml-continuous-marquee" class="rss-marquee-content">
                     <span>Loading Live World News...</span>
                 </div>
+                <!-- Subtle Background Video Preload Line (Only visible as a tiny 2px line at the very bottom) -->
+                <div id="ml-video-sync-bar" style="position:absolute; bottom:0; left:0; height:2.5px; width:0%; background:linear-gradient(90deg, #10B981, #3B82F6); transition: width 0.4s ease; opacity:0.85; z-index:100; pointer-events:none;" title="Sync Status"></div>
             </div>
         </div>
         
@@ -654,17 +656,83 @@
             }
         const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/0.mp4"];
         var isPlayingFallback = false;
+        var preloadedVideoUrl = null;
+        var isPreloading = false;
+
+        // Background Preloader: Continuously downloads and buffers custom selected video in the background while fallback plays
+        function preloadTargetVideo(targetUrl) {
+            if (!targetUrl || isPreloading || targetUrl === preloadedVideoUrl) return;
+            isPreloading = true;
+            
+            const syncBar = document.getElementById('ml-video-sync-bar');
+            if (syncBar) {
+                syncBar.style.width = '15%';
+                syncBar.style.display = 'block';
+            }
+
+            console.log("[PRELOAD] Background prefetching selected video in background:", targetUrl);
+            
+            const tempVid = document.createElement('video');
+            tempVid.muted = true;
+            tempVid.preload = 'auto';
+            tempVid.src = targetUrl;
+            tempVid.load();
+
+            tempVid.onprogress = () => {
+                try {
+                    if (tempVid.buffered && tempVid.buffered.length > 0 && tempVid.duration) {
+                        const bufferedEnd = tempVid.buffered.end(tempVid.buffered.length - 1);
+                        const pct = Math.min(100, Math.round((bufferedEnd / tempVid.duration) * 100));
+                        if (syncBar) syncBar.style.width = Math.max(15, pct) + '%';
+                    }
+                } catch(e) {}
+            };
+
+            const onVideoReady = () => {
+                console.log("[PRELOAD] Target video successfully buffered and ready to play!", targetUrl);
+                preloadedVideoUrl = targetUrl;
+                isPreloading = false;
+                if (syncBar) {
+                    syncBar.style.width = '100%';
+                    setTimeout(() => { if (syncBar) syncBar.style.width = '0%'; }, 2000);
+                }
+                // If we are currently playing fallback bayrak/0.mp4, instantly switch to custom video
+                if (isPlayingFallback) {
+                    console.log("[AUTO-SWITCH] Switching from fallback loop to ready custom video!");
+                    isPlayingFallback = false;
+                    playLocalVideo(0);
+                }
+            };
+
+            tempVid.oncanplaythrough = onVideoReady;
+            tempVid.oncanplay = () => {
+                if (syncBar) syncBar.style.width = '70%';
+                onVideoReady();
+            };
+
+            tempVid.onerror = (e) => {
+                console.warn("[PRELOAD] Failed loading custom video in background:", e);
+                isPreloading = false;
+                if (syncBar) syncBar.style.width = '0%';
+            };
+        }
 
         window.playNextNativeVideo = function() {
-            const currentList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            const hasCustom = (localVideoList && localVideoList.length > 0);
+            const currentList = (!isPlayingFallback && hasCustom) ? localVideoList : CORE_FALLBACK_VIDEOS;
             currentLocalVideoIndex = (currentLocalVideoIndex + 1) % currentList.length;
             playLocalVideo(currentLocalVideoIndex);
         };
 
         function playLocalVideo(vIndex) {
-            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
-            isPlayingFallback = (!localVideoList || localVideoList.length === 0);
+            const hasCustom = (localVideoList && localVideoList.length > 0);
+            let activeList = (!isPlayingFallback && hasCustom) ? localVideoList : CORE_FALLBACK_VIDEOS;
             
+            // If custom videos exist but are not yet playing, trigger background download
+            if (hasCustom && (isPlayingFallback || preloadedVideoUrl !== localVideoList[0])) {
+                preloadTargetVideo(localVideoList[0]);
+            }
+
             currentLocalVideoIndex = vIndex % activeList.length;
             let rawVideo = activeList[currentLocalVideoIndex];
             if (!rawVideo) return;
@@ -709,7 +777,7 @@
                     vidEl.play().catch(e => {
                         console.log("Play failed, switching to core fallback:", e);
                         if (!isPlayingFallback) {
-                            localVideoList = [];
+                            isPlayingFallback = true;
                             playLocalVideo(0);
                         }
                     });
@@ -722,7 +790,7 @@
                 if (vidEl.paused || vidEl.readyState < 2) {
                     console.warn("[VIDEO WATCHDOG] Video not playing after 3s, triggering core fallback...");
                     if (!isPlayingFallback) {
-                        localVideoList = [];
+                        isPlayingFallback = true;
                         playLocalVideo(0);
                     }
                 }
@@ -737,9 +805,7 @@
             };
             vidEl.onerror = () => { 
                 console.log("Video error, falling back to core video...");
-                if (!isPlayingFallback) {
-                    localVideoList = [];
-                }
+                isPlayingFallback = true;
                 setTimeout(window.playNextNativeVideo, 1000); 
             };
         }

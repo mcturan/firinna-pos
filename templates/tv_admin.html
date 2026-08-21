@@ -306,12 +306,16 @@
             allVideos.forEach((v, index) => {
                 const isEnabled = localVideos.includes(v);
                 const filename = v.split('/').pop();
-                html += `<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; background:#f7fafc; padding:0.5rem; border-radius:4px; border:1px solid #e2e8f0;">
-                    <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="toggleVideo('${v}', this.checked)" title="Aktif/Pasif">
-                    <span style="flex:1; font-weight:${isEnabled ? 'bold' : 'normal'}; color:${isEnabled ? '#2d3748' : '#a0aec0'}">${filename}</span>
+                const isCorePermanent = (filename.toLowerCase() === 'bayrak.mp4' || filename.toLowerCase() === '0.mp4');
+                
+                html += `<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; background:${isCorePermanent ? '#f0fdf4' : '#f7fafc'}; padding:0.5rem; border-radius:4px; border:1px solid ${isCorePermanent ? '#bbf7d0' : '#e2e8f0'};">
+                    <input type="checkbox" ${isEnabled || isCorePermanent ? 'checked' : ''} ${isCorePermanent ? 'disabled' : ''} onchange="toggleVideo('${v}', this.checked)" title="${isCorePermanent ? 'Kalıcı Başlangıç Videosu (Devre Dışı Bırakılamaz)' : 'Aktif/Pasif'}">
+                    <span style="flex:1; font-weight:${isEnabled || isCorePermanent ? 'bold' : 'normal'}; color:${isCorePermanent ? '#15803d' : (isEnabled ? '#2d3748' : '#a0aec0')}">
+                        ${isCorePermanent ? '⭐ ' : ''}${filename} ${isCorePermanent ? '<small style="color:#16a34a; font-weight:normal;">(Kalıcı Açılış / Yedek)</small>' : ''}
+                    </span>
                     <button onclick="moveVideo('${v}', -1)" style="padding:2px 5px;" title="Yukarı">⬆️</button>
                     <button onclick="moveVideo('${v}', 1)" style="padding:2px 5px;" title="Aşağı">⬇️</button>
-                    <button onclick="deleteVideo('${v}')" style="padding:2px 5px; color:red;" title="Sil">🗑️</button>
+                    ${!isCorePermanent ? `<button onclick="deleteVideo('${v}')" style="padding:2px 5px; color:red;" title="Sil">🗑️</button>` : `<span style="font-size:0.8rem; color:#94a3b8; padding:0 4px;" title="Kalıcı video silinemez">🔒</span>`}
                 </div>`;
             });
             document.getElementById('local_videos_list').innerHTML = html;
