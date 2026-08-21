@@ -657,7 +657,7 @@
         }
 
         const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/0.mp4"];
-        var isPlayingFallback = true;
+        var isPlayingFallback = false;
         var preloadedVideoUrl = null;
         var isPreloading = false;
 
@@ -698,7 +698,7 @@
                     syncBar.style.width = '100%';
                     setTimeout(() => { if (syncBar) syncBar.style.width = '0%'; }, 2000);
                 }
-                // If we are currently playing fallback bayrak/0.mp4, instantly switch to custom video
+                // If we are currently playing fallback bayrak/0.mp4, switch immediately to custom video
                 if (isPlayingFallback) {
                     console.log("[AUTO-SWITCH] Switching from fallback loop to ready custom video!");
                     isPlayingFallback = false;
@@ -720,19 +720,38 @@
         }
 
         window.playNextNativeVideo = function() {
-            const hasCustom = (localVideoList && localVideoList.length > 0);
-            const currentList = (!isPlayingFallback && hasCustom) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            // Filter custom videos (excluding bayrak and 0.mp4)
+            const customVideos = (localVideoList || []).filter(v => !v.endsWith('bayrak.mp4') && !v.endsWith('0.mp4'));
+            
+            // If custom videos exist and are ready, cycle through full localVideoList
+            // If not ready or no custom videos, cycle through CORE_FALLBACK_VIDEOS
+            let currentList = CORE_FALLBACK_VIDEOS;
+            if (!isPlayingFallback && localVideoList && localVideoList.length > 0) {
+                currentList = localVideoList;
+            }
             currentLocalVideoIndex = (currentLocalVideoIndex + 1) % currentList.length;
             playLocalVideo(currentLocalVideoIndex);
         };
 
         function playLocalVideo(vIndex) {
-            const hasCustom = (localVideoList && localVideoList.length > 0);
-            let activeList = (!isPlayingFallback && hasCustom) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            // Find custom videos
+            const customVideos = (localVideoList || []).filter(v => !v.endsWith('bayrak.mp4') && !v.endsWith('0.mp4'));
             
-            // If custom videos exist but are not yet playing, trigger background download
-            if (hasCustom && (isPlayingFallback || preloadedVideoUrl !== localVideoList[0])) {
-                preloadTargetVideo(localVideoList[0]);
+            let activeList = CORE_FALLBACK_VIDEOS;
+            
+            if (customVideos.length > 0) {
+                const targetCustom = customVideos[0];
+                // Check if target custom is preloaded or playable
+                if (preloadedVideoUrl === targetCustom && !isPlayingFallback) {
+                    activeList = localVideoList;
+                } else {
+                    // Custom video is not yet loaded/ready -> play fallback and preload in background
+                    activeList = CORE_FALLBACK_VIDEOS;
+                    isPlayingFallback = true;
+                    preloadTargetVideo(targetCustom);
+                }
+            } else if (localVideoList && localVideoList.length > 0) {
+                activeList = localVideoList;
             }
 
             currentLocalVideoIndex = vIndex % activeList.length;
