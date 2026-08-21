@@ -16,7 +16,7 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-21T10:07:31.472284",
+    "last_ping": "2026-08-21T10:10:28.894846",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
@@ -26,8 +26,8 @@
         "cards": [
             {
                 "id": "wm-card-0",
-                "title": "1. Fırınna Logo & Slogan",
-                "desc": "Klasik büyük logo ve www.firinna.com filigranı",
+                "title": "1. F\u0131r\u0131nna Logo & Slogan",
+                "desc": "Klasik b\u00fcy\u00fck logo ve www.firinna.com filigran\u0131",
                 "image": "/static/img/watermarks/card_0_logo.png",
                 "enabled": true
             },
@@ -40,15 +40,15 @@
             },
             {
                 "id": "wm-card-2",
-                "title": "3. Fırınna Supports Students",
-                "desc": "Beyoğlu Öğrenciye projesi, ücretsiz yemek ve burs desteği",
+                "title": "3. F\u0131r\u0131nna Supports Students",
+                "desc": "Beyo\u011flu \u00d6\u011frenciye projesi, \u00fccretsiz yemek ve burs deste\u011fi",
                 "image": "/static/img/watermarks/card_2_students.png",
                 "enabled": true
             },
             {
                 "id": "wm-card-3",
-                "title": "4. Fırınna Cares for Stray Animals",
-                "desc": "Sokak hayvanları mama, su ve yuva desteği",
+                "title": "4. F\u0131r\u0131nna Cares for Stray Animals",
+                "desc": "Sokak hayvanlar\u0131 mama, su ve yuva deste\u011fi",
                 "image": "/static/img/watermarks/card_3_animals.png",
                 "enabled": true
             }
@@ -72,5 +72,10 @@
     "rss_aa_life_en_enabled": true,
     "rss_ds_arts_en_enabled": true,
     "rss_turkey_exp_en_enabled": true,
-    "rss_goodnews_en_enabled": true
+    "rss_goodnews_en_enabled": true,
+    "rss_turkey_archaeo_enabled": true,
+    "last_push": {
+        "action": "none",
+        "timestamp": 0
+    }
 }

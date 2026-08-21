@@ -3416,9 +3416,23 @@ def api_tv_settings():
         data = request.json
         current = get_tv_settings()
         current.update(data)
+        # Update config version timestamp so TV detects push immediately
+        current['version'] = int(datetime.now().timestamp() * 1000)
         save_tv_settings(current)
-        return jsonify({"success": True})
+        return jsonify({"success": True, "version": current['version']})
     return jsonify(get_tv_settings())
+
+@app.route('/api/tv/push', methods=['POST'])
+def api_tv_push():
+    data = request.json or {}
+    action = data.get('action', 'reload') # 'reload' or 'sync'
+    current = get_tv_settings()
+    current['last_push'] = {
+        'action': action,
+        'timestamp': int(datetime.now().timestamp() * 1000)
+    }
+    save_tv_settings(current)
+    return jsonify({"success": True, "pushed": current['last_push']})
 
 @app.route('/api/tv/ping', methods=['POST'])
 def api_tv_ping():
@@ -3492,10 +3506,11 @@ def api_tv_rates():
 _rss_cache = {"key": "", "time": 0, "titles": []}
 
 PRESET_FEEDS = {
-    "aa_life_en": ("Anadolu Agency (Life & Culture - EN)", "https://www.aa.com.tr/en/rss/default?cat=life"),
-    "ds_arts_en": ("Daily Sabah (Culture & Arts - EN)", "https://www.dailysabah.com/rssFeed/arts"),
-    "turkey_exp_en": ("Istanbul & Turkey (Live Events & Culture - EN)", "https://news.google.com/rss/search?q=when:48h+Istanbul+OR+Turkey+culture+OR+arts+OR+events+OR+tourism+OR+heritage&hl=en-US&gl=US&ceid=US:en"),
-    "goodnews_en": ("Good News Network (Positive World Stories - EN)", "https://www.goodnewsnetwork.org/feed/")
+    "turkey_archaeo": ("🏛️ Türkiye Arkeoloji, Antik Kentler & Tarih (EN)", "https://news.google.com/rss/search?q=when:7d+turkey+archaeology+OR+arkeoloji+OR+excavation+OR+heritage+OR+unesco&hl=en-US&gl=US&ceid=US:en"),
+    "ds_arts_en": ("🎨 Daily Sabah (Kültür, Sanat & Yaşam - EN)", "https://www.dailysabah.com/rssFeed/arts"),
+    "aa_life_en": ("📜 Anadolu Agency (Kültürel Miras & Yaşam - EN)", "https://www.aa.com.tr/en/rss/default?cat=life"),
+    "turkey_exp_en": ("☕ İstanbul & Türkiye Güncel Etkinlikler (EN)", "https://news.google.com/rss/search?q=when:48h+Istanbul+OR+Turkey+culture+OR+arts+OR+events+OR+tourism+OR+heritage&hl=en-US&gl=US&ceid=US:en"),
+    "goodnews_en": ("🌱 Good News Network (Pozitif Dünya Hikayeleri - EN)", "https://www.goodnewsnetwork.org/feed/")
 }
 
 # Unwanted disaster / crime / war words to maintain pleasant bakery ambience
@@ -3518,10 +3533,12 @@ def api_tv_rss():
     enabled_sources = []
     
     # Presets (100% English Turkey culture & positive developments)
-    if settings.get('rss_aa_life_en_enabled', True):
-        enabled_sources.append(('AALife', PRESET_FEEDS['aa_life_en'][1]))
+    if settings.get('rss_turkey_archaeo_enabled', True):
+        enabled_sources.append(('TurkeyArchaeo', PRESET_FEEDS['turkey_archaeo'][1]))
     if settings.get('rss_ds_arts_en_enabled', True):
         enabled_sources.append(('DSArts', PRESET_FEEDS['ds_arts_en'][1]))
+    if settings.get('rss_aa_life_en_enabled', True):
+        enabled_sources.append(('AALife', PRESET_FEEDS['aa_life_en'][1]))
     if settings.get('rss_turkey_exp_en_enabled', True):
         enabled_sources.append(('TurkeyExp', PRESET_FEEDS['turkey_exp_en'][1]))
     if settings.get('rss_goodnews_en_enabled', True):

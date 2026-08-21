@@ -1166,6 +1166,8 @@
             } catch(e) {}
         }
 
+        let lastPushTimestamp = 0;
+
         async function fetchSettings() {
             try {
                 fetch('/api/tv/ping', {method: 'POST'}).catch(e=>{});
@@ -1174,6 +1176,17 @@
                 const text = await res.text();
                 if (!text || text.trim().startsWith('<')) return;
                 const data = JSON.parse(text);
+
+                // Check for instant push signal (from admin panel)
+                if (data.last_push && data.last_push.timestamp && data.last_push.timestamp > lastPushTimestamp) {
+                    if (lastPushTimestamp > 0 && data.last_push.action === 'reload') {
+                        console.log("[PUSH] Instant reload signal received, refreshing TV player...");
+                        window.location.reload(true);
+                        return;
+                    }
+                    lastPushTimestamp = data.last_push.timestamp;
+                }
+
                 const dataStr = JSON.stringify(data);
                 if (dataStr !== lastSettingsStr) {
                     lastSettingsStr = dataStr;
