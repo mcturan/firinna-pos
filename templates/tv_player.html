@@ -706,16 +706,41 @@
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
                     vidEl.muted = true;
-                    vidEl.play().catch(e => {});
+                    vidEl.play().catch(e => {
+                        console.log("Play failed, switching to core fallback:", e);
+                        if (!isPlayingFallback) {
+                            localVideoList = [];
+                            playLocalVideo(0);
+                        }
+                    });
                 });
             }
+
+            // Watchdog: If video stays paused/stalled for >3s, fallback to core loop
+            if (window._videoLoadWatchdog) clearTimeout(window._videoLoadWatchdog);
+            window._videoLoadWatchdog = setTimeout(() => {
+                if (vidEl.paused || vidEl.readyState < 2) {
+                    console.warn("[VIDEO WATCHDOG] Video not playing after 3s, triggering core fallback...");
+                    if (!isPlayingFallback) {
+                        localVideoList = [];
+                        playLocalVideo(0);
+                    }
+                }
+            }, 3000);
+
+            vidEl.onplaying = () => {
+                if (window._videoLoadWatchdog) clearTimeout(window._videoLoadWatchdog);
+            };
 
             vidEl.onended = () => {
                 window.playNextNativeVideo();
             };
             vidEl.onerror = () => { 
                 console.log("Video error, falling back to core video...");
-                setTimeout(window.playNextNativeVideo, 1500); 
+                if (!isPlayingFallback) {
+                    localVideoList = [];
+                }
+                setTimeout(window.playNextNativeVideo, 1000); 
             };
         }
 
