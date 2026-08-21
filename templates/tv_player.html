@@ -736,8 +736,6 @@
             
             // 1. Android TV APK
             if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
-                vidEl.style.display = "none";
-                document.documentElement.classList.add('native-video-active');
                 try {
                     const videoBox = document.getElementById('ml-main-video');
                     if (videoBox && window.AndroidTV.setVideoBounds) {
@@ -750,11 +748,12 @@
                         );
                     }
                 } catch(e) {}
+                
+                // Trigger native video playback
                 window.AndroidTV.playNativeVideo(fileName);
-                return;
             }
 
-            // 2. Web & Mobile HTML5 Video Player
+            // 2. Web & Mobile & Fallback HTML5 Video Player (Always active to ensure video NEVER disappears)
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             
