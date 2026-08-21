@@ -876,7 +876,7 @@
         // Dynamic Multi-Card Watermark Carousel
         let wmSettings = {
             interval_sec: 90,
-            duration_sec: 10,
+            duration_sec: 12,
             logo_enabled: true,
             social_enabled: true,
             students_enabled: true,
@@ -884,6 +884,7 @@
         };
         let wmCardIndex = 0;
         let wmIntervalId = null;
+        let wmHideTimeoutId = null;
 
         function getActiveWatermarkCards() {
             const list = [];
@@ -904,6 +905,11 @@
             const targetCardId = activeCards[wmCardIndex % activeCards.length];
             wmCardIndex++;
 
+            if (wmHideTimeoutId) {
+                clearTimeout(wmHideTimeoutId);
+                wmHideTimeoutId = null;
+            }
+
             // Deactivate all cards first
             document.querySelectorAll('.wm-card').forEach(c => c.classList.remove('active'));
 
@@ -914,20 +920,20 @@
             container.style.opacity = '1';
             container.style.transform = 'translate(-50%, -50%) scale(1)';
 
-            // 2. Hide after configured duration (default: 10s)
-            const durationMs = (wmSettings.duration_sec || 10) * 1000;
-            setTimeout(() => {
+            // 2. Hide exactly after configured duration (e.g. 12s)
+            const durationMs = Math.max(3, parseInt(wmSettings.duration_sec) || 12) * 1000;
+            wmHideTimeoutId = setTimeout(() => {
                 container.style.opacity = '0';
                 container.style.transform = 'translate(-50%, -50%) scale(0.96)';
                 setTimeout(() => {
                     document.querySelectorAll('.wm-card').forEach(c => c.classList.remove('active'));
-                }, 1000);
+                }, 800);
             }, durationMs);
         }
 
         function startWatermarkScheduler() {
             if (wmIntervalId) clearInterval(wmIntervalId);
-            const intervalMs = (wmSettings.interval_sec || 90) * 1000;
+            const intervalMs = Math.max(10, parseInt(wmSettings.interval_sec) || 90) * 1000;
             wmIntervalId = setInterval(triggerWatermarkCycle, intervalMs);
         }
 
