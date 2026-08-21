@@ -384,7 +384,6 @@
                 const data = await res.json();
                 
                 document.getElementById('logo_url').value = data.logo_url || '';
-                document.getElementById('layout').value = data.layout || 'default';
                 document.getElementById('media_source').value = data.media_source || 'youtube';
                 document.getElementById('video_playlist').value = data.video_playlist || '';
                 localVideos = (data.local_videos && data.local_videos.length > 0) ? data.local_videos : ['/static/tv_media/videos/2.mp4'];
