@@ -673,7 +673,9 @@
             
             vidEl.style.display = "block";
             vidEl.muted = true;
+            vidEl.defaultMuted = true;
             vidEl.loop = true;
+            vidEl.playsInline = true;
             vidEl.setAttribute('autoplay', '');
             vidEl.setAttribute('muted', '');
             vidEl.setAttribute('playsinline', '');
@@ -683,21 +685,27 @@
                 vidEl.src = srcUrl;
             }
 
-            // Always trigger play without blocking
-            const playPromise = vidEl.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(err => {
-                    vidEl.muted = true;
-                    vidEl.play().catch(e => {});
-                });
-            }
+            const attemptPlay = () => {
+                vidEl.muted = true;
+                const p = vidEl.play();
+                if (p !== undefined) {
+                    p.catch(() => {
+                        vidEl.muted = true;
+                        vidEl.play().catch(e=>{});
+                    });
+                }
+            };
+
+            attemptPlay();
+            vidEl.oncanplay = attemptPlay;
+            vidEl.onloadeddata = attemptPlay;
 
             vidEl.onended = () => {
                 if (localVideoList.length > 1) {
                     window.playNextNativeVideo();
                 } else {
                     vidEl.currentTime = 0;
-                    vidEl.play().catch(e=>{});
+                    attemptPlay();
                 }
             };
             vidEl.onerror = () => { setTimeout(window.playNextNativeVideo, 2000); };
@@ -1322,15 +1330,25 @@
             window.location.reload(true);
         }, AUTO_RELOAD_MS); 
 
-        document.body.addEventListener('click', () => {
-            if(currentMediaSource === 'local') {
-                if(localVideoList.length > 0) vidEl.play().catch(e=>{});
+        const triggerUnlock = () => {
+            if(currentMediaSource === 'local' && vidEl) {
+                vidEl.muted = true;
+                vidEl.play().catch(e=>{});
                 if(currentAudioPriority === 'music' && localAudioList.length > 0) audEl.play().catch(e=>{});
-            } else if (currentMediaSource === 'youtube') {
-                if(player && player.playVideo) player.playVideo();
-                if (currentAudioPriority === 'video' && player && player.unMute) player.unMute();
+            } else if (currentMediaSource === 'youtube' && player) {
+                if(player.playVideo) player.playVideo();
+                if (currentAudioPriority === 'video' && player.unMute) player.unMute();
             }
-        });
+        };
+
+        // Automatic unlock pulses for TV WebView
+        setTimeout(triggerUnlock, 500);
+        setTimeout(triggerUnlock, 1500);
+        setTimeout(triggerUnlock, 3000);
+
+        document.body.addEventListener('click', triggerUnlock);
+        document.body.addEventListener('touchstart', triggerUnlock, {passive: true});
+        window.addEventListener('keydown', triggerUnlock); // TV Remote OK / Direction keys
     </script>
 </body>
 </html>
