@@ -1,19 +1,8 @@
-[2026-08-21 12:37:27]
-Gece 03:00 otomatik yeniden başlatma: 862 dk sonra
+[2026-08-21 12:39:18]
+Gece 03:00 otomatik yeniden başlatma: 860 dk sonra
 Boot sequence started.
 LAN failed, trying WAN: http://84.17.86.208:5000
 Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
 App is up to date.
 Settings fetched successfully.
 Video already exists: bayrak.mp4
-[JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 534
-[JS] [AndroidTV] Triggering native video player for: bayrak.mp4 -- From line 685
-[NATIVE] setVideoBounds called: left=313.0, top=57.0, w=704.0, h=347.0, density=2.34375
-[NATIVE] Trying to play: /storage/emulated/0/Android/data/com.firinna.tv/files/Movies/bayrak.mp4
-[NATIVE] File DOES NOT EXIST!
-[JS] [AndroidTV] Triggering native video player for: bayrak.mp4 -- From line 685
-[NATIVE] setVideoBounds called: left=313.0, top=57.0, w=704.0, h=347.0, density=2.34375
-[NATIVE] Trying to play: /storage/emulated/0/Android/data/com.firinna.tv/files/Movies/bayrak.mp4
-[NATIVE] File DOES NOT EXIST!
-
-[AUTO LOG DUMP AFTER 10s]
