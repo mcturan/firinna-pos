@@ -528,7 +528,7 @@
         
         <div id="ml-main-video" class="grid-box" style="background: #000000 !important; backdrop-filter: none !important;">
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
-            <video id="local-video" src="/static/tv_media/videos/1.mp4" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
+            <video id="local-video" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
             <div id="record-player"></div>
             <!-- High-Definition Graphic Watermark Container -->
             <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; width: 48vw; aspect-ratio: 1000 / 520; max-height: 75%; border-radius: 1.5vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
@@ -713,17 +713,19 @@
             vidEl.setAttribute('playsinline', '');
             vidEl.setAttribute('webkit-playsinline', '');
             
-            if (vidEl.getAttribute('src') !== srcUrl) {
+            if (vidEl.src !== window.location.origin + srcUrl) {
                 vidEl.src = srcUrl;
+                vidEl.load();
             }
 
             const attemptPlay = () => {
                 vidEl.muted = true;
                 const p = vidEl.play();
                 if (p !== undefined) {
-                    p.catch(() => {
+                    p.catch((e) => {
+                        console.log("Autoplay error:", e);
                         vidEl.muted = true;
-                        vidEl.play().catch(e=>{});
+                        vidEl.play().catch(err=>{});
                     });
                 }
             };
@@ -740,7 +742,10 @@
                     attemptPlay();
                 }
             };
-            vidEl.onerror = () => { setTimeout(window.playNextNativeVideo, 2000); };
+            vidEl.onerror = (e) => { 
+                console.error("Video error:", e);
+                setTimeout(window.playNextNativeVideo, 2000); 
+            };
         }
 
         function playLocalAudio(aIndex) {
