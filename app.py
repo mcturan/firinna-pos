@@ -3425,9 +3425,14 @@ def api_tv_settings():
 # In-memory TV clients registry: { client_id: { ip, device_type, user_agent, last_ping, name } }
 _tv_clients = {}
 
-@app.route('/api/tv/ping', methods=['POST'])
+@app.route('/api/tv/ping', methods=['GET', 'POST'])
 def api_tv_ping():
-    data = request.json or {}
+    data = {}
+    try:
+        if request.is_json:
+            data = request.get_json(silent=True) or {}
+    except Exception:
+        pass
     client_id = data.get('client_id', 'unknown')
     device_type = data.get('device_type', 'TV / Browser')
     screen_name = data.get('name', 'Ekran')
