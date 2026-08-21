@@ -2,60 +2,29 @@
     "logo_url": "/static/uploads/logo.png",
     "layout": "modern_grid",
     "video_playlist": "",
-    "local_videos": [
-        "/static/tv_media/videos/1.mp4"
-    ],
+    "local_videos": [],
     "local_audio": [],
-    "media_source": "local",
-    "audio_priority": "music",
+    "media_source": "youtube",
+    "audio_priority": "video",
     "promo_text": "",
     "qr_code": "",
     "qr_text": "",
     "widgets": {
-        "weather": true,
-        "clock": true
+        "weather": false,
+        "clock": false
     },
     "messages": [],
-    "last_ping": "2026-08-21T10:10:28.894846",
+    "last_ping": "2026-08-21T10:24:44.577740",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
     "watermark_cycle": {
         "interval_sec": 90,
-        "duration_sec": 12,
-        "cards": [
-            {
-                "id": "wm-card-0",
-                "title": "1. F\u0131r\u0131nna Logo & Slogan",
-                "desc": "Klasik b\u00fcy\u00fck logo ve www.firinna.com filigran\u0131",
-                "image": "/static/img/watermarks/card_0_logo.png",
-                "enabled": true
-            },
-            {
-                "id": "wm-card-1",
-                "title": "2. Follow Us on Social Media",
-                "desc": "Instagram, TikTok, Google Maps ve Yandex Maps rozetleri",
-                "image": "/static/img/watermarks/card_1_social.png",
-                "enabled": true
-            },
-            {
-                "id": "wm-card-2",
-                "title": "3. F\u0131r\u0131nna Supports Students",
-                "desc": "Beyo\u011flu \u00d6\u011frenciye projesi, \u00fccretsiz yemek ve burs deste\u011fi",
-                "image": "/static/img/watermarks/card_2_students.png",
-                "enabled": true
-            },
-            {
-                "id": "wm-card-3",
-                "title": "4. F\u0131r\u0131nna Cares for Stray Animals",
-                "desc": "Sokak hayvanlar\u0131 mama, su ve yuva deste\u011fi",
-                "image": "/static/img/watermarks/card_3_animals.png",
-                "enabled": true
-            }
-        ]
+        "duration_sec": 10,
+        "cards": []
     },
     "ticker_rss_enabled": true,
-    "rss_url": "http://feed.informer.com/widgets/LXPXCGW6AL.html",
+    "rss_url": "",
     "rss_bbc_enabled": true,
     "rss_aljazeera_enabled": true,
     "rss_aa_enabled": false,
@@ -77,5 +46,6 @@
     "last_push": {
         "action": "none",
         "timestamp": 0
-    }
+    },
+    "version": 1787297051931
 }
