@@ -677,30 +677,23 @@
             let srcUrl = localVideoList[currentLocalVideoIndex]; 
             if(!srcUrl) return;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
-            console.log("Setting HTML5 src for: " + srcUrl);
+            
             vidEl.style.display = "block";
-            // Browsers strictly require initial autoplay to be muted; we start muted then unmute if priority is video
             vidEl.muted = true;
+            vidEl.loop = true;
+            vidEl.autoplay = true;
             vidEl.setAttribute('playsinline', '');
             vidEl.setAttribute('webkit-playsinline', '');
             
-            if (vidEl.getAttribute('src') !== srcUrl) {
-                vidEl.setAttribute('src', srcUrl);
+            if (vidEl.src !== window.location.origin + srcUrl && vidEl.getAttribute('src') !== srcUrl) {
+                vidEl.src = srcUrl;
                 vidEl.load();
-            } else {
-                vidEl.currentTime = 0;
             }
 
             const playPromise = vidEl.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     console.log("Local video autoplay started successfully.");
-                    if (currentAudioPriority === 'video') {
-                        // Attempt to unmute after playback has begun
-                        setTimeout(() => {
-                            vidEl.muted = false;
-                        }, 300);
-                    }
                 }).catch(err => {
                     console.log("Autoplay retry muted:", err);
                     vidEl.muted = true;

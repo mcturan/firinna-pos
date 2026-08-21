@@ -437,6 +437,8 @@
                 document.getElementById('layout').value = data.layout || 'default';
                 document.getElementById('media_source').value = data.media_source || 'youtube';
                 document.getElementById('video_playlist').value = data.video_playlist || '';
+                localVideos = (data.local_videos && data.local_videos.length > 0) ? data.local_videos : ['/static/tv_media/videos/2.mp4'];
+                localAudio = data.local_audio || [];
                 document.getElementById('audio_priority').value = data.audio_priority || 'video';
                 document.getElementById('ticker_text_enabled').checked = (data.ticker_text_enabled !== false);
                 document.getElementById('ticker_currency_enabled').checked = (data.ticker_currency_enabled !== false);
