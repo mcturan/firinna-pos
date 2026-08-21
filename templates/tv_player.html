@@ -23,6 +23,10 @@
         html.native-video-active, html.native-video-active body {
             background: #0B0F19 !important;
         }
+        html.native-video-active #ml-main-video {
+            background: transparent !important;
+            background-color: transparent !important;
+        }
 
         /* Legacy Layout (Default & Sidebar) */
         body.layout-default #video-container, body.layout-sidebar #video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background:#000; }
@@ -526,7 +530,7 @@
             <div id="product-carousel" style="width:100%; height:100%; position:relative;"></div>
         </div>
         
-        <div id="ml-main-video" class="grid-box" style="background: #000000 !important; backdrop-filter: none !important;">
+        <div id="ml-main-video" class="grid-box" style="position:relative; overflow:hidden;">
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
             <video id="local-video" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
             <div id="record-player"></div>
