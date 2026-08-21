@@ -526,9 +526,9 @@
             <div id="product-carousel" style="width:100%; height:100%; position:relative;"></div>
         </div>
         
-        <div id="ml-main-video" class="grid-box" style="background: #000000 !important; backdrop-filter: none !important;">
+        <div id="ml-main-video" class="grid-box" style="background: transparent !important; backdrop-filter: none !important;">
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
-            <video id="local-video" style="display:none; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
+            <video id="local-video" style="display:none;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
             <!-- High-Definition Graphic Watermark Container -->
             <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; width: 48vw; aspect-ratio: 1000 / 520; max-height: 75%; border-radius: 1.5vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
@@ -677,23 +677,30 @@
             let srcUrl = localVideoList[currentLocalVideoIndex]; 
             if(!srcUrl) return;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
-            
+            console.log("Setting HTML5 src for: " + srcUrl);
             vidEl.style.display = "block";
+            // Browsers strictly require initial autoplay to be muted; we start muted then unmute if priority is video
             vidEl.muted = true;
-            vidEl.loop = true;
-            vidEl.autoplay = true;
             vidEl.setAttribute('playsinline', '');
             vidEl.setAttribute('webkit-playsinline', '');
             
-            if (vidEl.src !== window.location.origin + srcUrl && vidEl.getAttribute('src') !== srcUrl) {
-                vidEl.src = srcUrl;
+            if (vidEl.getAttribute('src') !== srcUrl) {
+                vidEl.setAttribute('src', srcUrl);
                 vidEl.load();
+            } else {
+                vidEl.currentTime = 0;
             }
 
             const playPromise = vidEl.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     console.log("Local video autoplay started successfully.");
+                    if (currentAudioPriority === 'video') {
+                        // Attempt to unmute after playback has begun
+                        setTimeout(() => {
+                            vidEl.muted = false;
+                        }, 300);
+                    }
                 }).catch(err => {
                     console.log("Autoplay retry muted:", err);
                     vidEl.muted = true;
@@ -877,42 +884,21 @@
         let wmSettings = {
             interval_sec: 90,
             duration_sec: 10,
-            cards: [
-                { id: 'wm-card-0', title: '1. Fırınna Logo & Slogan', image: '/static/img/watermarks/card_0_logo.png', enabled: true },
-                { id: 'wm-card-1', title: '2. Follow Us on Social Media', image: '/static/img/watermarks/card_1_social.png', enabled: true },
-                { id: 'wm-card-2', title: '3. Fırınna Supports Students', image: '/static/img/watermarks/card_2_students.png', enabled: true },
-                { id: 'wm-card-3', title: '4. Fırınna Cares for Stray Animals', image: '/static/img/watermarks/card_3_animals.png', enabled: true }
-            ]
+            logo_enabled: true,
+            social_enabled: true,
+            students_enabled: true,
+            animals_enabled: true
         };
         let wmCardIndex = 0;
         let wmIntervalId = null;
 
-        function renderDynamicWatermarkCards() {
-            const container = document.getElementById('ml-watermark-container');
-            if (!container) return;
-            
-            const cards = (wmSettings.cards && wmSettings.cards.length > 0) ? wmSettings.cards : [
-                { id: 'wm-card-0', image: '/static/img/watermarks/card_0_logo.png', enabled: true },
-                { id: 'wm-card-1', image: '/static/img/watermarks/card_1_social.png', enabled: true },
-                { id: 'wm-card-2', image: '/static/img/watermarks/card_2_students.png', enabled: true },
-                { id: 'wm-card-3', image: '/static/img/watermarks/card_3_animals.png', enabled: true }
-            ];
-
-            let html = "";
-            cards.forEach((c, idx) => {
-                const cardId = c.id || `wm-card-${idx}`;
-                html += `
-                    <div id="${cardId}" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                        <img src="${c.image}" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.18));">
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
         function getActiveWatermarkCards() {
-            if (!wmSettings.cards || wmSettings.cards.length === 0) return [];
-            return wmSettings.cards.filter(c => c.enabled !== false && c.image);
+            const list = [];
+            if (wmSettings.logo_enabled !== false) list.push('wm-card-logo');
+            if (wmSettings.social_enabled !== false) list.push('wm-card-social');
+            if (wmSettings.students_enabled !== false) list.push('wm-card-students');
+            if (wmSettings.animals_enabled !== false) list.push('wm-card-animals');
+            return list;
         }
 
         function triggerWatermarkCycle() {
@@ -922,8 +908,7 @@
             const activeCards = getActiveWatermarkCards();
             if (activeCards.length === 0) return;
 
-            const targetCard = activeCards[wmCardIndex % activeCards.length];
-            const targetCardId = targetCard.id || `wm-card-${wmCardIndex % activeCards.length}`;
+            const targetCardId = activeCards[wmCardIndex % activeCards.length];
             wmCardIndex++;
 
             // Deactivate all cards first
@@ -953,7 +938,7 @@
             wmIntervalId = setInterval(triggerWatermarkCycle, intervalMs);
         }
 
-        renderDynamicWatermarkCards();
+        // First show quickly after 15s, then follows configured interval
         setTimeout(triggerWatermarkCycle, 15000);
         startWatermarkScheduler();
 
@@ -1223,7 +1208,6 @@
             if (data.watermark_cycle) {
                 const oldInterval = wmSettings.interval_sec;
                 wmSettings = Object.assign(wmSettings, data.watermark_cycle);
-                renderDynamicWatermarkCards();
                 if (wmSettings.interval_sec !== oldInterval) {
                     startWatermarkScheduler();
                 }
