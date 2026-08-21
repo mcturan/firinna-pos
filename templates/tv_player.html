@@ -1321,27 +1321,13 @@
                 }
             } else if (currentMediaSource === 'local') {
                 document.getElementById('ytplayer').style.display = 'none';
+                vidEl.style.display = 'block';
+                document.documentElement.classList.remove('native-video-active');
                 let newLocalVideos = data.local_videos || [];
-                if (newLocalVideos.length === 0) {
-                    newLocalVideos = ["/static/tv_media/videos/1.mp4"];
-                }
-                
-                const oldVideosStr = JSON.stringify(localVideoList);
-                const newVideosStr = JSON.stringify(newLocalVideos);
+                let oldSrc = vidEl.getAttribute('src');
                 localVideoList = newLocalVideos;
-                
-                if (window.AndroidTV) {
-                    vidEl.style.display = 'none';
-                    document.documentElement.classList.add('native-video-active');
-                    if (oldVideosStr !== newVideosStr) {
-                        playLocalVideo(currentLocalVideoIndex || 0);
-                    }
-                } else {
-                    vidEl.style.display = 'block';
-                    document.documentElement.classList.remove('native-video-active');
-                    if (oldVideosStr !== newVideosStr || vidEl.paused) {
-                        playLocalVideo(0);
-                    }
+                if (localVideoList.length > 0 && (!oldSrc || !localVideoList.includes(oldSrc))) {
+                    playLocalVideo(0);
                 }
             }
         }
