@@ -55,8 +55,8 @@ def api_mobile_version():
     return jsonify({
         'version': APP_VERSION,
         'apk_url': '/download_apk',
-        'tv_version': '1.1.32',
-        'tv_apk_url': '/static/Firinna-TV-1.1.32.apk'
+        'tv_version': '1.1.33',
+        'tv_apk_url': '/static/Firinna-TV-1.1.33.apk'
     })
 
 @app.route('/download_apk')
@@ -66,8 +66,8 @@ def download_apk():
 @app.route('/static/Firinna-TV-<path:filename>.apk')
 @app.route('/download_tv_apk')
 def download_tv_apk(filename=None):
-    # Always serve TV APK with 200 OK (ignore Range header) so older clients (v1.1.30) don't get 416
-    apk_path = '/opt/firinna-pos/static/Firinna-TV-1.1.32.apk'
+    # Always serve TV APK with 200 OK (ignore Range header) so older clients don't get 416
+    apk_path = '/opt/firinna-pos/static/Firinna-TV-1.1.33.apk'
     if not os.path.exists(apk_path):
         return jsonify({"error": "APK not found"}), 404
     with open(apk_path, 'rb') as f:
@@ -77,7 +77,7 @@ def download_tv_apk(filename=None):
         status=200,
         mimetype='application/vnd.android.package-archive'
     )
-    response.headers['Content-Disposition'] = 'attachment; filename="Firinna-TV-1.1.32.apk"'
+    response.headers['Content-Disposition'] = 'attachment; filename="Firinna-TV-1.1.33.apk"'
     response.headers['Content-Length'] = str(len(data))
     response.headers['Accept-Ranges'] = 'none'
     return response
