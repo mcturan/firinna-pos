@@ -1,16 +1,16 @@
 {
-    "today": 5,
-    "month": 249,
-    "total": 249,
+    "today": 8,
+    "month": 252,
+    "total": 252,
     "menu": 6,
     "actions": 27,
     "last_date": "2026-08-21",
     "devices": {
-        "💻 Masaüstü": 173,
+        "💻 Masaüstü": 176,
         "📱 Mobil": 76
     },
     "browsers": {
-        "Google Chrome": 210,
+        "Google Chrome": 213,
         "Apple Safari": 18,
         "Microsoft Edge": 17,
         "Diğer Tarayıcı": 4
@@ -26,10 +26,100 @@
         "Direkt Giriş": 24,
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
-        "🌐 Diğer Web Sitesi": 93,
-        "🔗 Doğrudan (Direct)": 74
+        "🌐 Diğer Web Sitesi": 94,
+        "🔗 Doğrudan (Direct)": 76
     },
     "recent_visitors": [
+        {
+            "id": "log_1787304073439",
+            "time": "21 Ağustos 12:21",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 12:21:13",
+            "ip": "18.198.4.32",
+            "country": "📍 Frankfurt am Main / Germany",
+            "location": "📍 Frankfurt am Main / Germany",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (2s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "2 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787304070971",
+            "time": "21 Ağustos 12:21",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 12:21:10",
+            "ip": "18.198.4.32",
+            "country": "📍 Frankfurt am Main / Germany",
+            "location": "📍 Frankfurt am Main / Germany",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787304069990",
+            "time": "21 Ağustos 12:21",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 12:21:09",
+            "ip": "18.198.4.32",
+            "country": "📍 Frankfurt am Main / Germany",
+            "location": "📍 Frankfurt am Main / Germany",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787304069671",
+            "time": "21 Ağustos 12:21",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 12:21:09",
+            "ip": "18.198.4.32",
+            "country": "📍 Frankfurt am Main / Germany",
+            "location": "📍 Frankfurt am Main / Germany",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (2s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "2 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787304067812",
+            "time": "21 Ağustos 12:21",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 12:21:07",
+            "ip": "18.198.4.32",
+            "country": "📍 Frankfurt am Main / Germany",
+            "location": "📍 Frankfurt am Main / Germany",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ TR"
+        },
         {
             "id": "log_1787280796368",
             "time": "21 Ağustos 05:53",
@@ -9766,10 +9856,10 @@
             "type": "🔄 Tekrar Gelen Misafir"
         }
     ],
-    "repeat_visitors": 198,
-    "new_visitors": 51,
+    "repeat_visitors": 200,
+    "new_visitors": 52,
     "os": {
-        "Linux": 149,
+        "Linux": 152,
         "Windows PC": 13,
         "Apple iOS": 14,
         "Android OS": 62,
@@ -9782,7 +9872,7 @@
         "20:00 - 23:00 (Gece Keyfi)": 58,
         "23:00 - 08:00 (Gece / Erken)": 28,
         "08:00 - 11:00 (Sabah Kahvaltı)": 1,
-        "11:00 - 14:00 (Öğle Brunch)": 30
+        "11:00 - 14:00 (Öğle Brunch)": 33
     },
     "map_clicks": 1,
     "locations": {
@@ -9807,20 +9897,21 @@
         "📍 Falkenstein / Germany": 2,
         "📍 Cedar Knolls / United States": 2,
         "📍 Santa Clara / United States": 1,
-        "📍 Toronto / Canada": 2
+        "📍 Toronto / Canada": 2,
+        "📍 Frankfurt am Main / Germany": 3
     },
     "traffic_sources": {
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
-        "🌐 Diğer Web Sitesi": 93,
-        "🔗 Doğrudan (Direct)": 74
+        "🌐 Diğer Web Sitesi": 94,
+        "🔗 Doğrudan (Direct)": 76
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 172
+        "🌐 Dışarıdan İnceleyen": 175
     },
     "lang_comparisons": {
-        "TR ➔ TR": 81,
+        "TR ➔ TR": 84,
         "EN ➔ TR": 36,
         "EN ➔ EN": 16,
         "TR ➔ ES": 8,
