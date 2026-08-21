@@ -186,7 +186,7 @@ def tables_page():
 
 @app.route('/kasa')
 def kasa_page():
-    return render_template('kasa.html')
+    return redirect('/hesap')
 
 @app.route('/stok')
 def stok_page():
@@ -1736,7 +1736,7 @@ def api_hesap_overview():
 
 @app.route('/muhasebe')
 def page_muhasebe():
-    return render_template('muhasebe.html')
+    return redirect('/hesap')
 
 @app.route('/reports')
 def page_reports_redirect():
