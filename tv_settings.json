@@ -63,10 +63,10 @@
         ]
     },
     "last_push": {
-        "action": "clear_cache",
+        "action": "reload",
         "target": "tv_phius0l",
-        "timestamp": 1787303107908
+        "timestamp": 1787303728662
     },
-    "last_ping": "2026-08-21T12:14:05.045140",
+    "last_ping": "2026-08-21T12:18:04.755256",
     "version": 1787303520134
 }
