@@ -3492,9 +3492,9 @@ def api_tv_rates():
 _rss_cache = {"key": "", "time": 0, "titles": []}
 
 PRESET_FEEDS = {
-    "aa_life_en": ("Anadolu Agency (Life, Culture & Heritage - EN)", "https://www.aa.com.tr/en/rss/default?cat=life"),
-    "ds_arts_en": ("Daily Sabah (Culture, Arts & Lifestyle - EN)", "https://www.dailysabah.com/rssFeed/arts"),
-    "turkey_exp_en": ("Explore Türkiye (Travel, Tourism & Events - EN)", "https://news.google.com/rss/search?q=turkey+istanbul+culture+OR+tourism+OR+heritage+OR+gastronomy&hl=en-US&gl=US&ceid=US:en"),
+    "aa_life_en": ("Anadolu Agency (Life & Culture - EN)", "https://www.aa.com.tr/en/rss/default?cat=life"),
+    "ds_arts_en": ("Daily Sabah (Culture & Arts - EN)", "https://www.dailysabah.com/rssFeed/arts"),
+    "turkey_exp_en": ("Istanbul & Turkey (Live Events & Culture - EN)", "https://news.google.com/rss/search?q=when:48h+Istanbul+OR+Turkey+culture+OR+arts+OR+events+OR+tourism+OR+heritage&hl=en-US&gl=US&ceid=US:en"),
     "goodnews_en": ("Good News Network (Positive World Stories - EN)", "https://www.goodnewsnetwork.org/feed/")
 }
 

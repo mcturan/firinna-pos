@@ -2,7 +2,9 @@
     "logo_url": "/static/uploads/logo.png",
     "layout": "modern_grid",
     "video_playlist": "",
-    "local_videos": [],
+    "local_videos": [
+        "/static/tv_media/videos/2.mp4"
+    ],
     "local_audio": [],
     "media_source": "local",
     "audio_priority": "music",
@@ -14,7 +16,7 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-21T03:10:53.944896",
+    "last_ping": "2026-08-21T09:55:01.727995",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
