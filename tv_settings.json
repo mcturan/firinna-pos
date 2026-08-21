@@ -21,13 +21,16 @@
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
     "ticker_rss_enabled": true,
+    "ticker_effect": "marquee",
+    "ticker_speed": 4.5,
+    "ticker_slide_duration": 8,
     "rss_turkey_archaeo_enabled": true,
     "rss_ds_arts_en_enabled": true,
     "rss_aa_life_en_enabled": true,
     "rss_turkey_exp_en_enabled": true,
     "rss_goodnews_en_enabled": true,
     "rss_custom_enabled": false,
-    "rss_refresh_mins": 60,
+    "rss_refresh_mins": 15,
     "rss_url": "",
     "watermark_cycle": {
         "interval_sec": 90,
@@ -69,5 +72,5 @@
         "timestamp": 1787328925976
     },
     "last_ping": "2026-08-21T21:11:51.482861",
-    "version": 1787327722329
+    "version": 1787344427873
 }

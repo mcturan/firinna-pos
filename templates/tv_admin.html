@@ -178,6 +178,57 @@
                 <small style="color:#718096; margin-top:2px;">* Her üçü de kapatılırsa alt bant gizlenir ve sayfa/video alanı otomatik olarak ekranın en altına genişler.</small>
             </div>
 
+            <!-- Alt Bant Efekt ve Hız Ayarı -->
+            <div class="form-group" style="background:#eff6ff; padding:16px; border-radius:8px; border:1px solid #bfdbfe; margin-bottom:1.5rem;">
+                <label style="font-weight:bold; color:#1e40af; display:block; margin-bottom:12px; font-size:1.05rem;">
+                    ⚡ Alt Bant Geçiş Efekti ve Hız Ayarları
+                </label>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:10px;">
+                    <div>
+                        <label style="font-weight:600; color:#1e3a8a; font-size:0.92rem; display:block; margin-bottom:6px;">
+                            🎬 Geçiş Efekti:
+                        </label>
+                        <select id="ticker_effect" style="width:100%; padding:9px 12px; border-radius:6px; border:1.5px solid #93c5fd; font-size:0.95rem; font-weight:600; background:#ffffff; color:#1e293b;" onchange="onTickerEffectChange()">
+                            <option value="marquee">➡️ Sürekli Kayan Yazı (Yatay Akış)</option>
+                            <option value="fade">✨ Fade In / Out (Belirip Kaybolan)</option>
+                            <option value="slide_up">⬆️ Aşağıdan Yukarı Kayan (Slide Up)</option>
+                            <option value="slide_down">⬇️ Yukarıdan Aşağı Kayan (Slide Down)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="font-weight:600; color:#1e3a8a; font-size:0.92rem; display:block; margin-bottom:6px;" id="lbl_ticker_speed">
+                            🚀 Kayan Yazı Hızı:
+                        </label>
+                        <!-- Marquee Hız Seçimi -->
+                        <div id="container_marquee_speed">
+                            <select id="ticker_speed" style="width:100%; padding:9px 12px; border-radius:6px; border:1.5px solid #93c5fd; font-size:0.95rem; font-weight:600; background:#ffffff; color:#1e293b;">
+                                <option value="1.5">1 - Yavaş (1.5 px/frame)</option>
+                                <option value="2.5">2 - Normal (2.5 px/frame)</option>
+                                <option value="3.5">3 - Akıcı / Orta (3.5 px/frame)</option>
+                                <option value="4.5" selected>4 - Hızlı (4.5 px/frame - TV İçin Tavsiye)</option>
+                                <option value="6.0">5 - Çok Hızlı (6.0 px/frame)</option>
+                                <option value="8.0">6 - Ekstra Hızlı (8.0 px/frame)</option>
+                            </select>
+                        </div>
+                        <!-- Fade/Slide Süre Seçimi -->
+                        <div id="container_slide_duration" style="display:none;">
+                            <select id="ticker_slide_duration" style="width:100%; padding:9px 12px; border-radius:6px; border:1.5px solid #93c5fd; font-size:0.95rem; font-weight:600; background:#ffffff; color:#1e293b;">
+                                <option value="4">4 Saniye (Hızlı)</option>
+                                <option value="6">6 Saniye</option>
+                                <option value="8" selected>8 Saniye (Tavsiye)</option>
+                                <option value="10">10 Saniye</option>
+                                <option value="15">15 Saniye (Yavaş)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <small style="color:#1d4ed8; display:block; margin-top:4px;">
+                    💡 TV ekranınızda haberlerin ve duyuruların akış stilini ve hızını buradan belirleyebilirsiniz.
+                </small>
+            </div>
+
             <div class="form-group" style="background:#f0fdf4; padding:16px; border-radius:8px; border:1px solid #bbf7d0; margin-bottom:1.5rem;">
                 <label style="font-weight:bold; color:#166534; display:block; margin-bottom:10px; font-size:1.05rem;">📰 Canlı Haber Kaynakları (Türkiye & İstanbul Kültür, Arkeoloji & Yaşam - İngilizce)</label>
                 
@@ -397,6 +448,23 @@
             container.insertAdjacentHTML('beforeend', html);
         }
 
+        function onTickerEffectChange() {
+            const effect = document.getElementById('ticker_effect').value;
+            const marqueeBox = document.getElementById('container_marquee_speed');
+            const slideBox = document.getElementById('container_slide_duration');
+            const lblSpeed = document.getElementById('lbl_ticker_speed');
+
+            if (effect === 'marquee') {
+                marqueeBox.style.display = 'block';
+                slideBox.style.display = 'none';
+                lblSpeed.textContent = '🚀 Kayan Yazı Hızı:';
+            } else {
+                marqueeBox.style.display = 'none';
+                slideBox.style.display = 'block';
+                lblSpeed.textContent = '⏱️ Ekranda Kalma Süresi:';
+            }
+        }
+
         async function loadSettings() {
             try {
                 const res = await fetch('/api/tv/settings');
@@ -411,6 +479,11 @@
                 document.getElementById('ticker_text_enabled').checked = (data.ticker_text_enabled !== false);
                 document.getElementById('ticker_currency_enabled').checked = (data.ticker_currency_enabled !== false);
                 document.getElementById('ticker_rss_enabled').checked = (data.ticker_rss_enabled !== false);
+                document.getElementById('ticker_effect').value = data.ticker_effect || 'marquee';
+                document.getElementById('ticker_speed').value = (data.ticker_speed !== undefined) ? String(data.ticker_speed) : '4.5';
+                document.getElementById('ticker_slide_duration').value = data.ticker_slide_duration || 8;
+                onTickerEffectChange();
+
                 document.getElementById('rss_turkey_archaeo_enabled').checked = (data.rss_turkey_archaeo_enabled !== false);
                 document.getElementById('rss_ds_arts_en_enabled').checked = (data.rss_ds_arts_en_enabled !== false);
                 document.getElementById('rss_aa_life_en_enabled').checked = (data.rss_aa_life_en_enabled !== false);
@@ -626,6 +699,9 @@
                 ticker_text_enabled: document.getElementById('ticker_text_enabled').checked,
                 ticker_currency_enabled: document.getElementById('ticker_currency_enabled').checked,
                 ticker_rss_enabled: document.getElementById('ticker_rss_enabled').checked,
+                ticker_effect: document.getElementById('ticker_effect').value,
+                ticker_speed: parseFloat(document.getElementById('ticker_speed').value) || 4.5,
+                ticker_slide_duration: parseInt(document.getElementById('ticker_slide_duration').value) || 8,
                 rss_turkey_archaeo_enabled: document.getElementById('rss_turkey_archaeo_enabled').checked,
                 rss_ds_arts_en_enabled: document.getElementById('rss_ds_arts_en_enabled').checked,
                 rss_aa_life_en_enabled: document.getElementById('rss_aa_life_en_enabled').checked,

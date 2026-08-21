@@ -236,6 +236,67 @@
             transform: translate3d(0, -100%, 0);
             z-index: 1;
         }
+
+        /* Ticker Card Effects (Fade, Slide Up, Slide Down) */
+        .ticker-card {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 1.5vw;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 1.55vw;
+            font-weight: 700;
+            color: #0F172A;
+            opacity: 0;
+            pointer-events: none;
+            will-change: transform, opacity;
+            transition: all 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Effect 1: Fade */
+        .ticker-effect-fade .ticker-card.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .ticker-effect-fade .ticker-card.enter {
+            opacity: 0;
+            transform: scale(0.97);
+        }
+        .ticker-effect-fade .ticker-card.exit {
+            opacity: 0;
+            transform: scale(1.03);
+        }
+
+        /* Effect 2: Slide Up */
+        .ticker-effect-slide_up .ticker-card.active {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+        .ticker-effect-slide_up .ticker-card.enter {
+            opacity: 0;
+            transform: translate3d(0, 100%, 0);
+        }
+        .ticker-effect-slide_up .ticker-card.exit {
+            opacity: 0;
+            transform: translate3d(0, -100%, 0);
+        }
+
+        /* Effect 3: Slide Down */
+        .ticker-effect-slide_down .ticker-card.active {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+        .ticker-effect-slide_down .ticker-card.enter {
+            opacity: 0;
+            transform: translate3d(0, -100%, 0);
+        }
+        .ticker-effect-slide_down .ticker-card.exit {
+            opacity: 0;
+            transform: translate3d(0, 100%, 0);
+        }
         .ticker-text { 
             font-size: 1.8vw; 
             font-weight: 600; 
@@ -1221,11 +1282,17 @@
         }
         startRssScheduler(60);
 
+        let currentTickerEffect = 'marquee'; // 'marquee' | 'fade' | 'slide_up' | 'slide_down'
         let marqueeOffset = 0;
-        let marqueeSpeed = 1.1; // Balanced comfortable reading speed (pixels per frame)
+        let marqueeSpeed = 4.5; // Configurable (pixels per frame)
+        let tickerSlideDurationSec = 8;
+        let tickerSlideTimer = null;
+        let currentTickerCardIdx = 0;
+        let tickerCardItems = [];
         let marqueeAnimId = null;
 
         function animateMarquee() {
+            if (currentTickerEffect !== 'marquee') return;
             const marqueeEl = document.getElementById('ml-continuous-marquee');
             if (marqueeEl && marqueeEl.firstElementChild) {
                 const singleWidth = marqueeEl.firstElementChild.offsetWidth;
@@ -1241,8 +1308,12 @@
         }
 
         function updateUnifiedMarquee() {
+            const box = document.getElementById('ml-rss-box');
             const marqueeEl = document.getElementById('ml-continuous-marquee');
-            if (!marqueeEl) return;
+            if (!box || !marqueeEl) return;
+
+            // Apply active effect class on the container
+            box.className = 'grid-box ticker-effect-' + currentTickerEffect;
 
             let items = [];
 
@@ -1263,13 +1334,14 @@
                 }
             });
             if (isTickerTextEnabled && messageText && messageText.trim() !== '') {
-                items.push(`<span style="color:#D97706; font-weight:800;">📢 ${messageText.trim()}</span>`);
+                items.push(`<span style="color:#D97706; font-weight:800;">📢 DUYURU:</span> <span style="margin-left:0.5vw; color:#0F172A; font-weight:700;">${messageText.trim()}</span>`);
             }
 
             // 2. RSS Live Headlines (Clean high-contrast dark text on white)
             if (isTickerRssEnabled && liveRssTitles.length > 0) {
-                const rssHtml = liveRssTitles.map(t => `<span style="color:#0F172A; font-weight:700;">${t}</span>`).join('<span style="color:#94A3B8; margin: 0 1.2vw;">•</span>');
-                items.push(rssHtml);
+                liveRssTitles.forEach(t => {
+                    items.push(`<span style="color:#2563EB; font-weight:800;">📰 HABER:</span> <span style="margin-left:0.5vw; color:#0F172A; font-weight:700;">${t}</span>`);
+                });
             }
 
             // 3. Fallback Brand Text
@@ -1277,11 +1349,49 @@
                 items.push('<span style="color:#0F172A; font-weight:700;">FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE • GALATA / BEYOĞLU</span>');
             }
 
-            const singleHtml = `<div class="rss-single-strip" style="display:inline-flex; align-items:center; flex-shrink:0; padding-right:2vw;">${items.join('<span style="color:#CBD5E1; margin: 0 1.5vw;">|</span>')}</div>`;
-            marqueeEl.innerHTML = singleHtml + singleHtml + singleHtml;
-            
-            if (!marqueeAnimId) {
-                marqueeAnimId = requestAnimationFrame(animateMarquee);
+            tickerCardItems = items;
+
+            if (currentTickerEffect === 'marquee') {
+                if (tickerSlideTimer) { clearInterval(tickerSlideTimer); tickerSlideTimer = null; }
+                const singleHtml = `<div class="rss-single-strip" style="display:inline-flex; align-items:center; flex-shrink:0; padding-right:2.5vw;">${items.join('<span style="color:#CBD5E1; margin: 0 1.8vw;">|</span>')}</div>`;
+                marqueeEl.style.display = 'inline-flex';
+                marqueeEl.innerHTML = singleHtml + singleHtml + singleHtml;
+                
+                if (!marqueeAnimId) {
+                    marqueeAnimId = requestAnimationFrame(animateMarquee);
+                }
+            } else {
+                if (marqueeAnimId) { cancelAnimationFrame(marqueeAnimId); marqueeAnimId = null; }
+                marqueeEl.style.transform = 'none';
+                marqueeEl.style.display = 'block';
+
+                let html = '';
+                items.forEach((c, idx) => {
+                    html += `<div class="ticker-card ${idx === 0 ? 'active' : 'enter'}" id="tcard-${idx}">${c}</div>`;
+                });
+                marqueeEl.innerHTML = html;
+                currentTickerCardIdx = 0;
+
+                if (tickerSlideTimer) clearInterval(tickerSlideTimer);
+                tickerSlideTimer = setInterval(rotateTickerCard, tickerSlideDurationSec * 1000);
+            }
+        }
+
+        function rotateTickerCard() {
+            if (!tickerCardItems || tickerCardItems.length <= 1) return;
+            const oldIdx = currentTickerCardIdx;
+            currentTickerCardIdx = (currentTickerCardIdx + 1) % tickerCardItems.length;
+
+            const oldEl = document.getElementById(`tcard-${oldIdx}`);
+            const newEl = document.getElementById(`tcard-${currentTickerCardIdx}`);
+
+            if (oldEl) {
+                oldEl.className = 'ticker-card exit';
+            }
+            if (newEl) {
+                newEl.className = 'ticker-card enter';
+                void newEl.offsetWidth; // Trigger reflow for CSS animation
+                newEl.className = 'ticker-card active';
             }
         }
 
@@ -1385,6 +1495,10 @@
             isTickerTextEnabled = (data.ticker_text_enabled !== false);
             isTickerCurrencyEnabled = (data.ticker_currency_enabled !== false);
             isTickerRssEnabled = (data.ticker_rss_enabled !== false);
+            currentTickerEffect = data.ticker_effect || 'marquee';
+            marqueeSpeed = (data.ticker_speed !== undefined) ? parseFloat(data.ticker_speed) : 4.5;
+            tickerSlideDurationSec = parseInt(data.ticker_slide_duration) || 8;
+
             if (data.rss_refresh_mins) {
                 startRssScheduler(data.rss_refresh_mins);
             }
