@@ -649,13 +649,15 @@
             } else {
                 document.documentElement.classList.remove('native-video-active');
                 document.getElementById('local-video').style.display = 'none';
-                if (window.AndroidTV) window.AndroidTV.stopNativeVideo();
+                if (window.AndroidTV && window.AndroidTV.stopNativeVideo) window.AndroidTV.stopNativeVideo();
                 document.getElementById('ytplayer').style.display = 'block';
                 if(vidEl) vidEl.pause();
                 if(player && player.playVideo) player.playVideo();
             }
+        }
+
         const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/0.mp4"];
-        var isPlayingFallback = false;
+        var isPlayingFallback = true;
         var preloadedVideoUrl = null;
         var isPreloading = false;
 
