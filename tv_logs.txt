@@ -1,7 +1,19 @@
-[2026-08-21 03:01:15]
-Gece 03:00 otomatik yeniden başlatma: 1438 dk sonra
+[2026-08-21 03:03:35]
+Gece 03:00 otomatik yeniden başlatma: 1436 dk sonra
 Boot sequence started.
 LAN failed, trying WAN: http://84.17.86.208:5000
 Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
 App is up to date.
 Settings fetched successfully.
+[JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 530
+[JS] Setting HTML5 src for: /static/tv_media/videos/2.mp4 -- From line 680
+[JS] Autoplay retry muted: [object DOMException] -- From line 705
+[JS] Complete play failure: [object DOMException] -- From line 707
+[JS] Setting HTML5 src for: /static/tv_media/videos/2.mp4 -- From line 680
+[JS] Autoplay retry muted: [object DOMException] -- From line 705
+[JS] Complete play failure: [object DOMException] -- From line 707
+[JS] Setting HTML5 src for: /static/tv_media/videos/2.mp4 -- From line 680
+[JS] Autoplay retry muted: [object DOMException] -- From line 705
+[JS] Complete play failure: [object DOMException] -- From line 707
+
+[AUTO LOG DUMP AFTER 10s]
