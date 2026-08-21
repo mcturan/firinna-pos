@@ -1359,19 +1359,14 @@
                 } else {
                     vidEl.style.display = 'block';
                     document.documentElement.classList.remove('native-video-active');
-                    let targetSrc = localVideoList[0];
-                    if (!targetSrc.startsWith("/static/")) targetSrc = "/static/tv_media/videos/" + targetSrc;
-                    let currentSrcAttr = vidEl.getAttribute('src') || '';
-                    if (vidEl.paused || currentSrcAttr !== targetSrc) {
-                        playLocalVideo(0);
-                    }
+                    playLocalVideo(0);
                 }
             }
         }
 
         fetchProducts();
         setInterval(fetchSettings, 5000); 
-        setTimeout(fetchSettings, 1000); 
+        fetchSettings(); 
 
         // Auto-Reload / Restart every 5 hours (5 * 60 * 60 * 1000 ms) to keep memory clean and auto-fetch updates
         const AUTO_RELOAD_MS = 5 * 60 * 60 * 1000;
