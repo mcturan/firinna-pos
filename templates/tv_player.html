@@ -713,30 +713,16 @@
             vidEl.loop = true;
             vidEl.playsInline = true;
             vidEl.autoplay = true;
-            vidEl.setAttribute('autoplay', '');
-            vidEl.setAttribute('muted', '');
-            vidEl.setAttribute('playsinline', '');
-            vidEl.setAttribute('webkit-playsinline', '');
             
-            vidEl.src = srcUrl;
-            vidEl.load();
+            const currentSrc = vidEl.getAttribute('src');
+            if (currentSrc !== srcUrl) {
+                vidEl.setAttribute('src', srcUrl);
+                vidEl.src = srcUrl;
+            }
 
-            const attemptPlay = () => {
-                vidEl.muted = true;
-                const p = vidEl.play();
-                if (p !== undefined) {
-                    p.catch((e) => {
-                        console.log("Autoplay error:", e);
-                        // Retry muted on touch or scroll
-                        vidEl.muted = true;
-                        vidEl.play().catch(err=>{});
-                    });
-                }
-            };
-
-            attemptPlay();
-            vidEl.oncanplay = attemptPlay;
-            vidEl.onloadeddata = attemptPlay;
+            vidEl.play().catch(e => {
+                console.log("Autoplay waiting for touch:", e);
+            });
 
             vidEl.onended = () => {
                 if (localVideoList.length > 1) {
