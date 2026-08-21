@@ -1,9 +1,11 @@
-[2026-08-21 18:39:19]
-Gece 03:00 otomatik yeniden başlatma: 500 dk sonra
+[2026-08-21 18:54:35]
+Gece 03:00 otomatik yeniden başlatma: 489 dk sonra
 Boot sequence started.
 LAN failed, trying WAN: http://84.17.86.208:5000
-Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.33.apk","tv_version":"1.1.33","version":"1.5.5"}
-Downloading APK from: http://84.17.86.208:5000/static/Firinna-TV-1.1.33.apk
-Installing APK from: /data/user/0/com.firinna.tv/files/update.apk (exists: true, size: 3946208)
+Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
+App is up to date.
+Settings fetched successfully.
+Downloading video: 1.mp4
 
-[AUTO LOG DUMP AFTER 10s]
+[AUTO LOG DUMP AFTER 10s]Downloading video: 0.mp4
+Downloading video: bayrak.mp4
