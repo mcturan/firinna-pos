@@ -668,8 +668,9 @@
             
             const syncBar = document.getElementById('ml-video-sync-bar');
             if (syncBar) {
-                syncBar.style.width = '15%';
+                syncBar.style.width = '25%';
                 syncBar.style.display = 'block';
+                syncBar.style.opacity = '1';
             }
 
             console.log("[PRELOAD] Background prefetching selected video in background:", targetUrl);
@@ -685,7 +686,7 @@
                     if (tempVid.buffered && tempVid.buffered.length > 0 && tempVid.duration) {
                         const bufferedEnd = tempVid.buffered.end(tempVid.buffered.length - 1);
                         const pct = Math.min(100, Math.round((bufferedEnd / tempVid.duration) * 100));
-                        if (syncBar) syncBar.style.width = Math.max(15, pct) + '%';
+                        if (syncBar) syncBar.style.width = Math.max(25, pct) + '%';
                     }
                 } catch(e) {}
             };
@@ -708,7 +709,7 @@
 
             tempVid.oncanplaythrough = onVideoReady;
             tempVid.oncanplay = () => {
-                if (syncBar) syncBar.style.width = '70%';
+                if (syncBar) syncBar.style.width = '75%';
                 onVideoReady();
             };
 
@@ -720,40 +721,14 @@
         }
 
         window.playNextNativeVideo = function() {
-            // Filter custom videos (excluding bayrak and 0.mp4)
-            const customVideos = (localVideoList || []).filter(v => !v.endsWith('bayrak.mp4') && !v.endsWith('0.mp4'));
-            
-            // If custom videos exist and are ready, cycle through full localVideoList
-            // If not ready or no custom videos, cycle through CORE_FALLBACK_VIDEOS
-            let currentList = CORE_FALLBACK_VIDEOS;
-            if (!isPlayingFallback && localVideoList && localVideoList.length > 0) {
-                currentList = localVideoList;
-            }
+            let currentList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             currentLocalVideoIndex = (currentLocalVideoIndex + 1) % currentList.length;
             playLocalVideo(currentLocalVideoIndex);
         };
 
         function playLocalVideo(vIndex) {
-            // Find custom videos
-            const customVideos = (localVideoList || []).filter(v => !v.endsWith('bayrak.mp4') && !v.endsWith('0.mp4'));
+            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             
-            let activeList = CORE_FALLBACK_VIDEOS;
-            
-            if (customVideos.length > 0) {
-                const targetCustom = customVideos[0];
-                // Check if target custom is preloaded or playable
-                if (preloadedVideoUrl === targetCustom && !isPlayingFallback) {
-                    activeList = localVideoList;
-                } else {
-                    // Custom video is not yet loaded/ready -> play fallback and preload in background
-                    activeList = CORE_FALLBACK_VIDEOS;
-                    isPlayingFallback = true;
-                    preloadTargetVideo(targetCustom);
-                }
-            } else if (localVideoList && localVideoList.length > 0) {
-                activeList = localVideoList;
-            }
-
             currentLocalVideoIndex = vIndex % activeList.length;
             let rawVideo = activeList[currentLocalVideoIndex];
             if (!rawVideo) return;
@@ -783,6 +758,16 @@
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             
+            const syncBar = document.getElementById('ml-video-sync-bar');
+            
+            // Show subtle sync bar while loading custom video
+            if (!fileName.includes('bayrak') && !fileName.includes('0.mp4')) {
+                if (syncBar) {
+                    syncBar.style.width = '30%';
+                    syncBar.style.display = 'block';
+                }
+            }
+
             vidEl.style.display = "block";
             vidEl.muted = (currentAudioPriority === 'music');
             
@@ -793,40 +778,75 @@
 
             const playPromise = vidEl.play();
             if (playPromise !== undefined) {
-                playPromise.catch(err => {
+                playPromise.then(() => {
+                    if (syncBar) {
+                        syncBar.style.width = '100%';
+                        setTimeout(() => { if (syncBar) syncBar.style.width = '0%'; }, 1500);
+                    }
+                }).catch(err => {
                     vidEl.muted = true;
                     vidEl.play().catch(e => {
                         console.log("Play failed, switching to core fallback:", e);
-                        if (!isPlayingFallback) {
-                            isPlayingFallback = true;
-                            playLocalVideo(0);
-                        }
+                        // Fallback to bayrak.mp4 if play failed
+                        vidEl.src = "/static/tv_media/videos/bayrak.mp4";
+                        vidEl.play().catch(()=>{});
                     });
                 });
             }
 
-            // Watchdog: If video stays paused/stalled for >3s, fallback to core loop
+            vidEl.onprogress = () => {
+                try {
+                    if (vidEl.buffered && vidEl.buffered.length > 0 && vidEl.duration) {
+                        const bufferedEnd = vidEl.buffered.end(vidEl.buffered.length - 1);
+                        const pct = Math.min(100, Math.round((bufferedEnd / vidEl.duration) * 100));
+                        if (syncBar) syncBar.style.width = Math.max(30, pct) + '%';
+                    }
+                } catch(e) {}
+            };
+
+            // Watchdog: If video stays paused/stalled for >4s, fallback to core loop
             if (window._videoLoadWatchdog) clearTimeout(window._videoLoadWatchdog);
             window._videoLoadWatchdog = setTimeout(() => {
                 if (vidEl.paused || vidEl.readyState < 2) {
-                    console.warn("[VIDEO WATCHDOG] Video not playing after 3s, triggering core fallback...");
-                    if (!isPlayingFallback) {
-                        isPlayingFallback = true;
-                        playLocalVideo(0);
-                    }
+                    console.warn("[VIDEO WATCHDOG] Video not playing after 4s, playing bayrak.mp4...");
+                    vidEl.src = "/static/tv_media/videos/bayrak.mp4";
+                    vidEl.play().catch(()=>{});
                 }
-            }, 3000);
+            }, 4000);
 
             vidEl.onplaying = () => {
                 if (window._videoLoadWatchdog) clearTimeout(window._videoLoadWatchdog);
+                if (syncBar) {
+                    syncBar.style.width = '100%';
+                    setTimeout(() => { if (syncBar) syncBar.style.width = '0%'; }, 1500);
+                }
             };
+            
+            // 1. Android TV APK
+            if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
+                vidEl.style.display = "none";
+                document.documentElement.classList.add('native-video-active');
+                try {
+                    const videoBox = document.getElementById('ml-main-video');
+                    if (videoBox && window.AndroidTV.setVideoBounds) {
+                        const rect = videoBox.getBoundingClientRect();
+                        window.AndroidTV.setVideoBounds(
+                            Math.round(rect.left),
+                            Math.round(rect.top),
+                            Math.round(rect.width),
+                            Math.round(rect.height)
+                        );
+                    }
+                } catch(e) {}
+                window.AndroidTV.playNativeVideo(fileName);
+                return;
+            }
 
             vidEl.onended = () => {
                 window.playNextNativeVideo();
             };
             vidEl.onerror = () => { 
                 console.log("Video error, falling back to core video...");
-                isPlayingFallback = true;
                 setTimeout(window.playNextNativeVideo, 1000); 
             };
         }
