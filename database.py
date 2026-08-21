@@ -1088,18 +1088,38 @@ def get_report(start_date, end_date):
         LIMIT 20
     ''', (start_date, end_date)).fetchall()
 
-    # Günlük dağılım (grafik için)
+    # Günlük dağılım (grafik ve döküm tablosu için)
     daily = conn.execute('''
         SELECT
             DATE(closed_at) as day,
             COUNT(*) as order_count,
             COALESCE(SUM(total), 0) as total_sales,
-            COALESCE(SUM(tip_amount), 0) as tips
+            COALESCE(SUM(payment_cash), 0) as cash,
+            COALESCE(SUM(payment_card), 0) as card,
+            COALESCE(SUM(tip_amount), 0) as tips,
+            COALESCE(SUM(discount_value), 0) as discount
         FROM orders
         WHERE DATE(closed_at) BETWEEN ? AND ?
           AND status = 'closed'
         GROUP BY DATE(closed_at)
         ORDER BY day
+    ''', (start_date, end_date)).fetchall()
+
+    # Aylık dağılım (yıllık/tüm zamanlar döküm tablosu ve grafik için)
+    monthly = conn.execute('''
+        SELECT
+            strftime('%Y-%m', closed_at) as month,
+            COUNT(*) as order_count,
+            COALESCE(SUM(total), 0) as total_sales,
+            COALESCE(SUM(payment_cash), 0) as cash,
+            COALESCE(SUM(payment_card), 0) as card,
+            COALESCE(SUM(tip_amount), 0) as tips,
+            COALESCE(SUM(discount_value), 0) as discount
+        FROM orders
+        WHERE DATE(closed_at) BETWEEN ? AND ?
+          AND status = 'closed'
+        GROUP BY strftime('%Y-%m', closed_at)
+        ORDER BY month
     ''', (start_date, end_date)).fetchall()
 
     # Masraf (toplam)
@@ -1111,11 +1131,20 @@ def get_report(start_date, end_date):
 
     # Günlük gider dağılımı (trend grafik için)
     daily_expenses = conn.execute('''
-        SELECT DATE(created_at) as day, COALESCE(SUM(amount), 0) as total
+        SELECT DATE(created_at) as day, COALESCE(SUM(amount), 0) as total, COUNT(*) as count
         FROM expenses
         WHERE DATE(created_at) BETWEEN ? AND ?
         GROUP BY DATE(created_at)
         ORDER BY day
+    ''', (start_date, end_date)).fetchall()
+
+    # Aylık gider dağılımı
+    monthly_expenses = conn.execute('''
+        SELECT strftime('%Y-%m', created_at) as month, COALESCE(SUM(amount), 0) as total, COUNT(*) as count
+        FROM expenses
+        WHERE DATE(created_at) BETWEEN ? AND ?
+        GROUP BY strftime('%Y-%m', created_at)
+        ORDER BY month
     ''', (start_date, end_date)).fetchall()
 
     conn.close()
@@ -1152,7 +1181,9 @@ def get_report(start_date, end_date):
         'net': round(net, 2),
         'top_products': [dict(p) for p in top_products],
         'daily': [dict(d) for d in daily],
+        'monthly': [dict(m) for m in monthly],
         'daily_expenses': [dict(r) for r in daily_expenses],
+        'monthly_expenses': [dict(r) for r in monthly_expenses],
     }
 
 def get_hourly_sales(start_date, end_date):

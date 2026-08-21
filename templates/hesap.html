@@ -46,7 +46,7 @@
             padding: 1.5rem 1.75rem;
             border-radius: 0 0 20px 20px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .hero-top {
@@ -106,10 +106,10 @@
         .period-container {
             background: var(--card-bg);
             border-radius: 14px;
-            padding: 0.6rem 0.75rem;
+            padding: 0.6rem 0.85rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             border: 1px solid var(--border);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -119,17 +119,17 @@
 
         .period-group {
             display: flex;
-            gap: 0.35rem;
+            gap: 0.3rem;
             flex-wrap: wrap;
         }
 
         .period-pill {
-            padding: 0.45rem 0.9rem;
+            padding: 0.42rem 0.8rem;
             border: 1px solid transparent;
             background: transparent;
             color: var(--text-muted);
             border-radius: 8px;
-            font-size: 0.85rem;
+            font-size: 0.84rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -146,10 +146,48 @@
             box-shadow: 0 2px 6px rgba(45, 106, 79, 0.3);
         }
 
+        /* Stepper navigator */
+        .date-stepper-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--bg);
+            padding: 0.3rem 0.6rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .stepper-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.15s;
+        }
+
+        .stepper-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .stepper-label {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text);
+            padding: 0 0.4rem;
+            min-width: 130px;
+            text-align: center;
+        }
+
         .custom-range-inputs {
             display: none;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             flex-wrap: wrap;
         }
 
@@ -158,10 +196,10 @@
         }
 
         .custom-range-inputs input {
-            padding: 0.4rem 0.6rem;
+            padding: 0.35rem 0.55rem;
             border: 1.5px solid var(--border);
             border-radius: 8px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             background: var(--card-bg);
             color: var(--text);
         }
@@ -170,14 +208,14 @@
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.85rem;
+            margin-bottom: 1.25rem;
         }
 
         .kpi-card {
             background: var(--card-bg);
             border-radius: 14px;
-            padding: 1.1rem 1.2rem;
+            padding: 1rem 1.15rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             border: 1px solid var(--border);
             display: flex;
@@ -207,24 +245,24 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
 
         .kpi-label {
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.78rem;
+            font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .kpi-icon {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             opacity: 0.85;
         }
 
         .kpi-value {
-            font-size: 1.45rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--text);
             letter-spacing: -0.5px;
@@ -251,18 +289,18 @@
             display: flex;
             gap: 0.5rem;
             border-bottom: 2px solid var(--border);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             overflow-x: auto;
             scrollbar-width: thin;
         }
 
         .main-tab-btn {
-            padding: 0.75rem 1.25rem;
+            padding: 0.7rem 1.2rem;
             background: none;
             border: none;
             border-bottom: 3px solid transparent;
             margin-bottom: -2px;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
@@ -284,7 +322,7 @@
 
         .tab-panel {
             display: none;
-            animation: fadeIn 0.25s ease-in-out;
+            animation: fadeIn 0.2s ease-in-out;
         }
 
         .tab-panel.active {
@@ -300,10 +338,10 @@
         .panel-card {
             background: var(--card-bg);
             border-radius: 14px;
-            padding: 1.25rem 1.5rem;
+            padding: 1.25rem 1.4rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             border: 1px solid var(--border);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .panel-header {
@@ -317,27 +355,27 @@
 
         .panel-title {
             margin: 0;
-            font-size: 1.05rem;
+            font-size: 1.02rem;
             font-weight: 700;
             color: var(--text);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         /* Form Inputs */
         .tx-form-grid {
             display: flex;
-            gap: 0.6rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
             align-items: flex-end;
         }
 
         .tx-form-grid input, .tx-form-grid select {
-            padding: 0.5rem 0.75rem;
+            padding: 0.48rem 0.7rem;
             border: 1.5px solid var(--border);
             border-radius: 8px;
-            font-size: 0.88rem;
+            font-size: 0.86rem;
             background: var(--card-bg);
             color: var(--text);
             font-family: inherit;
@@ -356,11 +394,11 @@
         }
 
         .t-btn {
-            padding: 0.45rem 0.85rem;
+            padding: 0.42rem 0.8rem;
             border: none;
             background: var(--bg);
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -378,20 +416,50 @@
             font-weight: 700;
         }
 
+        /* View Mode Selector (Özet vs Tekil İşlemler) */
+        .view-mode-toggle {
+            display: inline-flex;
+            background: var(--bg);
+            padding: 0.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            gap: 0.2rem;
+        }
+
+        .vm-btn {
+            padding: 0.35rem 0.75rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .vm-btn.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            font-weight: 700;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
         /* Sub Kasa Tabs */
         .kasa-subtabs {
             display: flex;
             gap: 0.4rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.9rem;
+            flex-wrap: wrap;
         }
 
         .kasa-subtab-btn {
-            padding: 0.45rem 1rem;
+            padding: 0.42rem 0.9rem;
             border: 1px solid var(--border);
             background: var(--bg);
             color: var(--text-muted);
             border-radius: 8px;
-            font-size: 0.85rem;
+            font-size: 0.84rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -406,18 +474,18 @@
         /* Filter Row */
         .filter-row {
             display: flex;
-            gap: 0.6rem;
+            gap: 0.5rem;
             align-items: center;
             flex-wrap: wrap;
-            margin-bottom: 1rem;
+            margin-bottom: 0.9rem;
             background: var(--bg);
-            padding: 0.75rem 1rem;
+            padding: 0.65rem 0.85rem;
             border-radius: 10px;
             border: 1px solid var(--border);
         }
 
         .filter-row label {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 600;
             color: var(--text-muted);
             display: flex;
@@ -426,7 +494,7 @@
         }
 
         .filter-row input, .filter-row select {
-            padding: 0.35rem 0.6rem;
+            padding: 0.32rem 0.55rem;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 0.82rem;
@@ -444,13 +512,13 @@
         .custom-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.88rem;
+            font-size: 0.86rem;
             text-align: left;
         }
 
         .custom-table th {
             background: var(--bg);
-            padding: 0.75rem 0.9rem;
+            padding: 0.7rem 0.85rem;
             font-weight: 700;
             color: var(--text-muted);
             border-bottom: 2px solid var(--border);
@@ -458,7 +526,7 @@
         }
 
         .custom-table td {
-            padding: 0.7rem 0.9rem;
+            padding: 0.65rem 0.85rem;
             border-bottom: 1px solid var(--border);
             color: var(--text);
         }
@@ -467,9 +535,15 @@
             background: rgba(0,0,0,0.015);
         }
 
+        .custom-table tfoot td {
+            background: var(--bg);
+            font-weight: 800;
+            border-top: 2px solid var(--border);
+        }
+
         .badge {
             display: inline-block;
-            padding: 0.2rem 0.55rem;
+            padding: 0.18rem 0.5rem;
             border-radius: 16px;
             font-size: 0.72rem;
             font-weight: 700;
@@ -500,13 +574,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 1rem;
-            font-size: 0.85rem;
+            padding-top: 0.85rem;
+            font-size: 0.82rem;
             color: var(--text-muted);
         }
 
         .btn-page {
-            padding: 0.35rem 0.8rem;
+            padding: 0.32rem 0.75rem;
             border: 1px solid var(--border);
             background: var(--card-bg);
             color: var(--text);
@@ -524,14 +598,14 @@
         .charts-2col {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 1.5rem;
+            gap: 1.15rem;
+            margin-bottom: 1.25rem;
         }
 
         .chart-box {
             background: var(--card-bg);
             border-radius: 14px;
-            padding: 1.25rem;
+            padding: 1.2rem;
             border: 1px solid var(--border);
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
@@ -546,7 +620,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             padding: 0.2rem 0.35rem;
             border-radius: 4px;
             transition: all 0.15s;
@@ -618,11 +692,11 @@
             background: #fffbeb;
             border: 1px solid #fef3c7;
             border-left: 4px solid #f59e0b;
-            padding: 0.85rem 1rem;
+            padding: 0.75rem 1rem;
             border-radius: 8px;
-            font-size: 0.88rem;
+            font-size: 0.86rem;
             color: #92400e;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.15rem;
             display: flex;
             align-items: center;
             gap: 0.6rem;
@@ -632,6 +706,7 @@
             .hero-top { flex-direction: column; align-items: flex-start; }
             .kpi-grid { grid-template-columns: repeat(2, 1fr); }
             .charts-2col { grid-template-columns: 1fr; }
+            .period-container { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -643,10 +718,10 @@
             <div class="hero-top">
                 <div class="hero-title">
                     <h1>💼 Hesap & Finans Merkezi</h1>
-                    <p>Kasa, Ön Muhasebe, Gider Yönetimi ve Raporlama tek ekranda</p>
+                    <p>Kasa, Ön Muhasebe, Gider Yönetimi ve Dönemsel Raporlama</p>
                 </div>
                 <div class="hero-actions">
-                    <button class="hero-btn" onclick="loadOverview(true)" title="Verileri Güncelle">🔄 Yenile</button>
+                    <button class="hero-btn" onclick="loadOverview(true)" title="Verileri Yenile">🔄 Yenile</button>
                     <button class="hero-btn" onclick="exportExcelCurrentTab()" title="Excel Çıktısı Al">📥 Excel İndir</button>
                     <button class="hero-btn" onclick="printReportModal()" title="Rapor Yazdır">🖨️ Yazdır</button>
                 </div>
@@ -655,20 +730,31 @@
     </div>
 
     <div class="container">
-        <!-- Zaman Aralığı Seçici -->
+        <!-- Zaman Aralığı Seçici & Ay/Yıl Atlama Barı -->
         <div class="period-container">
             <div class="period-group">
                 <button class="period-pill active" onclick="setPeriod('daily')" id="pill-daily">Bugün</button>
                 <button class="period-pill" onclick="setPeriod('yesterday')" id="pill-yesterday">Dün</button>
                 <button class="period-pill" onclick="setPeriod('weekly')" id="pill-weekly">Bu Hafta</button>
                 <button class="period-pill" onclick="setPeriod('monthly')" id="pill-monthly">Bu Ay</button>
-                <button class="period-pill" onclick="setPeriod('custom')" id="pill-custom">🔍 Özel Aralık</button>
+                <button class="period-pill" onclick="setPeriod('yearly')" id="pill-yearly">Bu Yıl</button>
+                <button class="period-pill" onclick="setPeriod('all')" id="pill-all">Tüm Zamanlar</button>
+                <button class="period-pill" onclick="setPeriod('custom')" id="pill-custom">🔍 Özel</button>
             </div>
+
+            <!-- Dinamik İleri / Geri Ay veya Gün Atlama -->
+            <div class="date-stepper-bar" id="stepperBar">
+                <button class="stepper-btn" onclick="stepPeriod(-1)" title="Önceki">◀</button>
+                <span class="stepper-label" id="stepperLabel">Ağustos 2026</span>
+                <button class="stepper-btn" onclick="stepPeriod(1)" title="Sonraki">▶</button>
+            </div>
+
+            <!-- Özel Tarih Aralığı Girişi -->
             <div class="custom-range-inputs" id="customRangeInputs">
                 <input type="date" id="inputStart">
                 <span>—</span>
                 <input type="date" id="inputEnd">
-                <button class="btn btn-primary" style="padding:.4rem .9rem;font-size:.85rem;" onclick="loadOverview()">Uygula</button>
+                <button class="btn btn-primary" style="padding:.35rem .8rem;font-size:.82rem;" onclick="loadOverview()">Getir</button>
             </div>
         </div>
 
@@ -688,7 +774,7 @@
 
             <div class="kpi-card danger">
                 <div class="kpi-header">
-                    <span class="kpi-label">Toplam Gider / Masraf</span>
+                    <span class="kpi-label">Toplam Masraf & Gider</span>
                     <span class="kpi-icon">💸</span>
                 </div>
                 <div class="kpi-value red" id="kpiTotalExpenses">0,00 ₺</div>
@@ -732,10 +818,10 @@
         <!-- Ana Sekmeler -->
         <div class="main-tabs">
             <button class="main-tab-btn active" onclick="switchMainTab('kasa')" id="mtab-kasa">
-                <span>💰</span> Kasa & İşlem Defteri
+                <span>💰</span> Kasa & Hareket Defteri
             </button>
             <button class="main-tab-btn" onclick="switchMainTab('muhasebe')" id="mtab-muhasebe">
-                <span>📊</span> Finans & Analiz Grafikleri
+                <span>📊</span> Finans & Zaman Analizi
             </button>
             <button class="main-tab-btn" onclick="switchMainTab('urunler')" id="mtab-urunler">
                 <span>🏆</span> Ürün Satış Performansı
@@ -747,11 +833,18 @@
 
         <!-- SEKME 1: KASA & İŞLEM DEFTERİ -->
         <div class="tab-panel active" id="panel-kasa">
-            <!-- Kasa Seçimi Alt Sekmeleri -->
-            <div class="kasa-subtabs">
-                <button class="kasa-subtab-btn active" onclick="switchKasaSub('ana')" id="ksub-ana">🏛️ Ana Kasa (Tümü)</button>
-                <button class="kasa-subtab-btn" onclick="switchKasaSub('nakit')" id="ksub-nakit">💵 Nakit Kasa</button>
-                <button class="kasa-subtab-btn" onclick="switchKasaSub('kart')" id="ksub-kart">💳 Banka / POS Kasa</button>
+            <!-- Görünüm Seçici ve Kasa Alt Sekmeleri -->
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem;">
+                <div class="kasa-subtabs" style="margin:0;">
+                    <button class="kasa-subtab-btn active" onclick="switchKasaSub('ana')" id="ksub-ana">🏛️ Ana Kasa (Tümü)</button>
+                    <button class="kasa-subtab-btn" onclick="switchKasaSub('nakit')" id="ksub-nakit">💵 Nakit Kasa</button>
+                    <button class="kasa-subtab-btn" onclick="switchKasaSub('kart')" id="ksub-kart">💳 Banka / POS Kasa</button>
+                </div>
+
+                <div class="view-mode-toggle">
+                    <button class="vm-btn active" onclick="setViewMode('grouped')" id="vm-grouped">📊 Dönemsel Döküm</button>
+                    <button class="vm-btn" onclick="setViewMode('individual')" id="vm-individual">📋 Tekil İşlemler</button>
+                </div>
             </div>
 
             <!-- İşlem Ekleme Formu -->
@@ -805,10 +898,39 @@
                 </div>
             </div>
 
-            <!-- İşlem Listesi ve Filtreleme -->
-            <div class="panel-card">
+            <!-- GÖRÜNÜM 1: DÖNEMSEL DÖKÜM TABLOSU (GÜN GÜN VEYA AY AY) -->
+            <div class="panel-card" id="cardGroupedView">
                 <div class="panel-header">
-                    <h3 class="panel-title">📋 Hareket Defteri (İşlem Kayıtları)</h3>
+                    <h3 class="panel-title" id="groupedTableTitle">📅 Gün Gün Kasa & Satış Dökümü</h3>
+                    <span style="font-size:.82rem;color:var(--text-muted);" id="groupedSubtitle">Seçili dönemin günlük dağılımı</span>
+                </div>
+                <div class="data-table-container">
+                    <table class="custom-table" id="groupedTable">
+                        <thead>
+                            <tr id="groupedTableHead">
+                                <th>Tarih / Dönem</th>
+                                <th style="text-align:center;">Sipariş Adedi</th>
+                                <th style="text-align:right;">Nakit Satış</th>
+                                <th style="text-align:right;">Kart / POS</th>
+                                <th style="text-align:right;">Toplam Satış</th>
+                                <th style="text-align:right;">Bahşiş</th>
+                                <th style="text-align:right;">Giderler</th>
+                                <th style="text-align:right;">Net Bakiye</th>
+                                <th style="text-align:center;width:60px;">İncele</th>
+                            </tr>
+                        </thead>
+                        <tbody id="groupedTableBody">
+                            <tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:2rem;">Yükleniyor...</td></tr>
+                        </tbody>
+                        <tfoot id="groupedTableFoot"></tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- GÖRÜNÜM 2: TEKİL İŞLEM LİSTESİ -->
+            <div class="panel-card" id="cardIndividualView" style="display:none;">
+                <div class="panel-header">
+                    <h3 class="panel-title">📋 Tekil Kasa Hareketleri</h3>
                     <a id="btnDownloadCsv" href="#" class="btn btn-secondary" style="text-decoration:none;font-size:.82rem;" download>⬇️ Excel İndir</a>
                 </div>
 
@@ -872,10 +994,10 @@
         <!-- SEKME 2: FİNANS & ANALİZ GRAFİKLERİ -->
         <div class="tab-panel" id="panel-muhasebe">
             <div class="charts-2col">
-                <!-- Günlük Trend Grafiği -->
+                <!-- Günlük / Aylık Trend Grafiği -->
                 <div class="chart-box">
                     <div class="panel-header">
-                        <h4 class="panel-title">📈 Günlük Satış & Gider Dağılımı</h4>
+                        <h4 class="panel-title" id="trendChartTitle">📈 Gelir & Gider Trend Analizi</h4>
                     </div>
                     <div class="chart-container-rel">
                         <canvas id="chartDailyTrend"></canvas>
@@ -885,7 +1007,7 @@
                 <!-- Gider Kategori Pastası -->
                 <div class="chart-box">
                     <div class="panel-header">
-                        <h4 class="panel-title">🥧 Masraf & Gider Dağılımı</h4>
+                        <h4 class="panel-title">🥧 Masraf Dağılımı</h4>
                     </div>
                     <div class="chart-container-rel">
                         <canvas id="chartExpenses"></canvas>
@@ -893,10 +1015,10 @@
                 </div>
             </div>
 
-            <!-- Saatlik Yoğunluk Grafiği -->
-            <div class="panel-card">
+            <!-- Saatlik Yoğunluk Grafiği (Günlük ve haftalıkta gösterilir) -->
+            <div class="panel-card" id="cardHourlyChart">
                 <div class="panel-header">
-                    <h3 class="panel-title">⏱️ Saatlik Satış Dağılımı (Yoğunluk Haritası)</h3>
+                    <h3 class="panel-title">⏱️ Saatlik Satış Yoğunluğu (00:00 - 23:00)</h3>
                 </div>
                 <div class="chart-container-rel" style="height:220px;">
                     <canvas id="chartHourly"></canvas>
@@ -1030,9 +1152,11 @@
 
     <script>
         // State
-        let currentPeriod = 'daily';
+        let currentPeriod = 'monthly';
         let currentKasaSub = 'ana';
+        let currentViewMode = 'grouped'; // 'grouped' | 'individual'
         let currentTxType = 'out';
+        let currentAnchorDate = new Date(); // Referans tarihi (ay/yıl adım navigasyonu için)
         let txPage = 1, txTotal = 0, txPages = 1;
         let overviewData = null;
         let chartDailyTrendInstance = null;
@@ -1040,6 +1164,11 @@
         let chartHourlyInstance = null;
         let editingTxId = null;
         let stockItemsCache = [];
+
+        const MONTH_NAMES = [
+            'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+            'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+        ];
 
         const SUBCATS = {
             'Faturalar':   ['Elektrik','Su','Doğalgaz','İnternet','Telefon','Abonelik'],
@@ -1067,28 +1196,47 @@
 
         function getDateRange() {
             const today = localDate();
+            const d = new Date(currentAnchorDate);
+
             if (currentPeriod === 'daily') {
-                return { start: today, end: today };
+                const s = localDate(d);
+                return { start: s, end: s, label: formatDateTR(s) };
             } else if (currentPeriod === 'yesterday') {
                 const y = new Date();
                 y.setDate(y.getDate() - 1);
-                const yDate = localDate(y);
-                return { start: yDate, end: yDate };
+                const s = localDate(y);
+                return { start: s, end: s, label: 'Dün (' + formatDateTR(s) + ')' };
             } else if (currentPeriod === 'weekly') {
-                const now = new Date();
-                const diff = now.getDay() === 0 ? -6 : 1 - now.getDay();
-                const mon = new Date(now); mon.setDate(now.getDate() + diff);
-                return { start: localDate(mon), end: today };
+                const diff = d.getDay() === 0 ? -6 : 1 - d.getDay();
+                const mon = new Date(d); mon.setDate(d.getDate() + diff);
+                const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+                const s = localDate(mon);
+                const e = localDate(sun);
+                return { start: s, end: e, label: `${formatDateTR(s)} — ${formatDateTR(e)}` };
             } else if (currentPeriod === 'monthly') {
-                const now = new Date();
-                return { start: now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-01', end: today };
+                const y = d.getFullYear();
+                const m = d.getMonth();
+                const firstDay = `${y}-${String(m+1).padStart(2,'0')}-01`;
+                const lastDay = localDate(new Date(y, m + 1, 0));
+                return { start: firstDay, end: lastDay, label: `${MONTH_NAMES[m]} ${y}` };
+            } else if (currentPeriod === 'yearly') {
+                const y = d.getFullYear();
+                return { start: `${y}-01-01`, end: `${y}-12-31`, label: `${y} Yılı` };
+            } else if (currentPeriod === 'all') {
+                return { start: '2020-01-01', end: today, label: 'Tüm Zamanlar' };
             } else if (currentPeriod === 'custom') {
-                return {
-                    start: document.getElementById('inputStart').value || today,
-                    end: document.getElementById('inputEnd').value || today
-                };
+                const s = document.getElementById('inputStart').value || today;
+                const e = document.getElementById('inputEnd').value || today;
+                return { start: s, end: e, label: `${s} — ${e}` };
             }
-            return { start: today, end: today };
+            return { start: today, end: today, label: today };
+        }
+
+        function formatDateTR(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            return `${parts[2]}.${parts[1]}.${parts[0]}`;
         }
 
         function setPeriod(p) {
@@ -1098,11 +1246,44 @@
             if (pill) pill.classList.add('active');
 
             const customInputs = document.getElementById('customRangeInputs');
+            const stepperBar = document.getElementById('stepperBar');
+
             if (p === 'custom') {
                 customInputs.classList.add('show');
+                stepperBar.style.display = 'none';
             } else {
                 customInputs.classList.remove('show');
+                stepperBar.style.display = (p === 'all') ? 'none' : 'flex';
                 loadOverview();
+            }
+        }
+
+        function stepPeriod(delta) {
+            const d = new Date(currentAnchorDate);
+            if (currentPeriod === 'daily') {
+                d.setDate(d.getDate() + delta);
+            } else if (currentPeriod === 'weekly') {
+                d.setDate(d.getDate() + (delta * 7));
+            } else if (currentPeriod === 'monthly') {
+                d.setMonth(d.getMonth() + delta);
+            } else if (currentPeriod === 'yearly') {
+                d.setFullYear(d.getFullYear() + delta);
+            }
+            currentAnchorDate = d;
+            loadOverview();
+        }
+
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            document.querySelectorAll('.vm-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById('vm-' + mode);
+            if (btn) btn.classList.add('active');
+
+            document.getElementById('cardGroupedView').style.display = (mode === 'grouped') ? 'block' : 'none';
+            document.getElementById('cardIndividualView').style.display = (mode === 'individual') ? 'block' : 'none';
+
+            if (mode === 'individual') {
+                loadTxTable(1);
             }
         }
 
@@ -1129,7 +1310,10 @@
             if (fMethodWrapper) {
                 fMethodWrapper.style.display = sub === 'ana' ? 'flex' : 'none';
             }
-            loadTxTable(1);
+            renderGroupedTable();
+            if (currentViewMode === 'individual') {
+                loadTxTable(1);
+            }
         }
 
         function setTxType(t) {
@@ -1158,17 +1342,21 @@
 
         async function loadOverview(forceRefresh = false) {
             const range = getDateRange();
+            document.getElementById('stepperLabel').textContent = range.label;
             setDefaultDateTime();
 
             try {
                 const res = await fetch(`/api/hesap/overview?start=${range.start}&end=${range.end}`);
                 overviewData = await res.json();
                 renderKPIs(overviewData);
+                renderGroupedTable();
                 renderTopProducts(overviewData.top_products || []);
                 renderExpenseCategoryTable(overviewData.expense_categories || []);
                 renderDailyCloseTab(overviewData);
                 renderCharts();
-                loadTxTable(1);
+                if (currentViewMode === 'individual') {
+                    loadTxTable(1);
+                }
                 if (forceRefresh && typeof showToast === 'function') showToast('Veriler güncellendi.', 'success');
             } catch (err) {
                 console.error('Overview error:', err);
@@ -1208,6 +1396,157 @@
             }
         }
 
+        // DÖNEMSEL DÖKÜM TABLOSU (Gün Gün veya Ay Ay)
+        function renderGroupedTable() {
+            if (!overviewData) return;
+            const isMonthlyOrYearly = (currentPeriod === 'yearly' || currentPeriod === 'all');
+            const tbody = document.getElementById('groupedTableBody');
+            const tfoot = document.getElementById('groupedTableFoot');
+            const titleEl = document.getElementById('groupedTableTitle');
+            const subEl = document.getElementById('groupedSubtitle');
+
+            if (isMonthlyOrYearly) {
+                // AY AY GÖRÜNÜM
+                titleEl.innerHTML = '🗓️ Ay Ay Kasa & Satış Dökümü';
+                subEl.textContent = 'Yıllık / Tüm zamanlar döneminin aylık toplamları';
+
+                const months = overviewData.monthly || [];
+                const expMap = {};
+                (overviewData.monthly_expenses || []).forEach(e => { expMap[e.month] = e.total; });
+
+                if (months.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:2rem;">Bu dönemde veri bulunamadı.</td></tr>';
+                    tfoot.innerHTML = '';
+                    return;
+                }
+
+                let sumOrders = 0, sumCash = 0, sumCard = 0, sumSales = 0, sumTips = 0, sumExp = 0, sumNet = 0;
+
+                tbody.innerHTML = months.map(m => {
+                    const exp = expMap[m.month] || 0;
+                    const net = m.total_sales + m.tips - exp;
+                    const parts = m.month.split('-');
+                    const monthName = parts.length === 2 ? `${MONTH_NAMES[parseInt(parts[1],10)-1]} ${parts[0]}` : m.month;
+
+                    sumOrders += m.order_count;
+                    sumCash   += m.cash;
+                    sumCard   += m.card;
+                    sumSales  += m.total_sales;
+                    sumTips   += m.tips;
+                    sumExp    += exp;
+                    sumNet    += net;
+
+                    return `
+                        <tr>
+                            <td><b>${monthName}</b></td>
+                            <td style="text-align:center;font-weight:600;">${m.order_count}</td>
+                            <td style="text-align:right;">${fmt(m.cash)}</td>
+                            <td style="text-align:right;">${fmt(m.card)}</td>
+                            <td style="text-align:right;font-weight:700;color:var(--primary);">${fmt(m.total_sales)}</td>
+                            <td style="text-align:right;color:var(--warning);">${fmt(m.tips)}</td>
+                            <td style="text-align:right;color:var(--danger);">${fmt(exp)}</td>
+                            <td style="text-align:right;font-weight:800;color:${net>=0?'#16a34a':'#dc2626'};">${fmt(net)}</td>
+                            <td style="text-align:center;">
+                                <button class="action-icon-btn" onclick="drilldownMonth('${m.month}')" title="Bu Ayı Aç">🔍</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                tfoot.innerHTML = `
+                    <tr>
+                        <td>TOPLAM</td>
+                        <td style="text-align:center;">${sumOrders}</td>
+                        <td style="text-align:right;">${fmt(sumCash)}</td>
+                        <td style="text-align:right;">${fmt(sumCard)}</td>
+                        <td style="text-align:right;color:var(--primary);">${fmt(sumSales)}</td>
+                        <td style="text-align:right;color:var(--warning);">${fmt(sumTips)}</td>
+                        <td style="text-align:right;color:var(--danger);">${fmt(sumExp)}</td>
+                        <td style="text-align:right;color:${sumNet>=0?'#16a34a':'#dc2626'};">${fmt(sumNet)}</td>
+                        <td></td>
+                    </tr>
+                `;
+            } else {
+                // GÜN GÜN GÖRÜNÜM
+                titleEl.innerHTML = '📅 Gün Gün Kasa & Satış Dökümü';
+                subEl.textContent = 'Seçili dönemin günlük detaylı satış ve gider dağılımı';
+
+                const days = overviewData.daily || [];
+                const expMap = {};
+                (overviewData.daily_expenses || []).forEach(e => { expMap[e.day] = e.total; });
+
+                if (days.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:2rem;">Bu dönemde veri bulunamadı.</td></tr>';
+                    tfoot.innerHTML = '';
+                    return;
+                }
+
+                let sumOrders = 0, sumCash = 0, sumCard = 0, sumSales = 0, sumTips = 0, sumExp = 0, sumNet = 0;
+
+                tbody.innerHTML = days.map(d => {
+                    const exp = expMap[d.day] || 0;
+                    const net = d.total_sales + d.tips - exp;
+                    const dt = new Date(d.day);
+                    const dayName = dt.toLocaleDateString('tr-TR', { weekday: 'short' });
+
+                    sumOrders += d.order_count;
+                    sumCash   += d.cash;
+                    sumCard   += d.card;
+                    sumSales  += d.total_sales;
+                    sumTips   += d.tips;
+                    sumExp    += exp;
+                    sumNet    += net;
+
+                    return `
+                        <tr>
+                            <td><b>${formatDateTR(d.day)}</b> <small style="color:var(--text-muted);">(${dayName})</small></td>
+                            <td style="text-align:center;font-weight:600;">${d.order_count}</td>
+                            <td style="text-align:right;">${fmt(d.cash)}</td>
+                            <td style="text-align:right;">${fmt(d.card)}</td>
+                            <td style="text-align:right;font-weight:700;color:var(--primary);">${fmt(d.total_sales)}</td>
+                            <td style="text-align:right;color:var(--warning);">${fmt(d.tips)}</td>
+                            <td style="text-align:right;color:var(--danger);">${fmt(exp)}</td>
+                            <td style="text-align:right;font-weight:800;color:${net>=0?'#16a34a':'#dc2626'};">${fmt(net)}</td>
+                            <td style="text-align:center;">
+                                <button class="action-icon-btn" onclick="drilldownDay('${d.day}')" title="Bu Günün İşlemlerini Gör">🔍</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                tfoot.innerHTML = `
+                    <tr>
+                        <td>TOPLAM</td>
+                        <td style="text-align:center;">${sumOrders}</td>
+                        <td style="text-align:right;">${fmt(sumCash)}</td>
+                        <td style="text-align:right;">${fmt(sumCard)}</td>
+                        <td style="text-align:right;color:var(--primary);">${fmt(sumSales)}</td>
+                        <td style="text-align:right;color:var(--warning);">${fmt(sumTips)}</td>
+                        <td style="text-align:right;color:var(--danger);">${fmt(sumExp)}</td>
+                        <td style="text-align:right;color:${sumNet>=0?'#16a34a':'#dc2626'};">${fmt(sumNet)}</td>
+                        <td></td>
+                    </tr>
+                `;
+            }
+        }
+
+        function drilldownMonth(monthStr) {
+            const parts = monthStr.split('-');
+            if (parts.length === 2) {
+                currentAnchorDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, 1);
+                setPeriod('monthly');
+            }
+        }
+
+        function drilldownDay(dayStr) {
+            const parts = dayStr.split('-');
+            if (parts.length === 3) {
+                currentAnchorDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                setPeriod('daily');
+                setViewMode('individual');
+            }
+        }
+
         async function loadTxTable(page = 1) {
             txPage = page;
             const range = getDateRange();
@@ -1226,7 +1565,6 @@
             if (cat) url += `&category=${cat}`;
             if (method) url += `&method=${method}`;
 
-            // Update CSV Link
             const csvUrl = url.replace('format=json', '').replace('per_page=20', 'per_page=100000') + '&format=csv';
             document.getElementById('btnDownloadCsv').href = csvUrl;
 
@@ -1270,7 +1608,7 @@
                 return `
                     <tr>
                         <td style="color:var(--text-muted);font-size:.82rem;">
-                            ${r.date} ${r.created_at ? '<br><small>' + r.created_at.slice(11,16) + '</small>' : ''}
+                            ${formatDateTR(r.date)} ${r.created_at ? '<br><small>' + r.created_at.slice(11,16) + '</small>' : ''}
                         </td>
                         <td><span class="badge ${r.type}">${r.type === 'in' ? '▲ Giriş' : '▼ Çıkış'}</span></td>
                         <td>${desc}</td>
@@ -1361,21 +1699,50 @@
         function renderCharts() {
             if (!overviewData) return;
 
-            // 1. Daily Trend Chart
+            const isYearlyOrAll = (currentPeriod === 'yearly' || currentPeriod === 'all');
+            const trendTitleEl = document.getElementById('trendChartTitle');
+            const hourlyCard = document.getElementById('cardHourlyChart');
+
+            // 1. Trend Chart (Daily or Monthly bar chart)
             const ctxDaily = document.getElementById('chartDailyTrend');
             if (ctxDaily) {
-                const days = (overviewData.daily || []).map(d => d.day);
-                const sales = (overviewData.daily || []).map(d => d.total_sales);
-                
-                const expMap = {};
-                (overviewData.daily_expenses || []).forEach(e => { expMap[e.day] = e.total; });
-                const expenses = days.map(day => expMap[day] || 0);
+                let labels = [], sales = [], expenses = [];
+
+                if (isYearlyOrAll) {
+                    if (trendTitleEl) trendTitleEl.innerHTML = '📈 Aylık Satış & Gider Dağılımı';
+                    if (hourlyCard) hourlyCard.style.display = 'none';
+
+                    const months = overviewData.monthly || [];
+                    const expMap = {};
+                    (overviewData.monthly_expenses || []).forEach(e => { expMap[e.month] = e.total; });
+
+                    labels = months.map(m => {
+                        const p = m.month.split('-');
+                        return p.length === 2 ? `${MONTH_NAMES[parseInt(p[1],10)-1]} ${p[0].slice(2)}` : m.month;
+                    });
+                    sales = months.map(m => m.total_sales);
+                    expenses = months.map(m => expMap[m.month] || 0);
+                } else {
+                    if (trendTitleEl) trendTitleEl.innerHTML = '📈 Günlük Satış & Gider Dağılımı';
+                    if (hourlyCard) hourlyCard.style.display = 'block';
+
+                    const days = overviewData.daily || [];
+                    const expMap = {};
+                    (overviewData.daily_expenses || []).forEach(e => { expMap[e.day] = e.total; });
+
+                    labels = days.map(d => {
+                        const p = d.day.split('-');
+                        return p.length === 3 ? `${p[2]}/${p[1]}` : d.day;
+                    });
+                    sales = days.map(d => d.total_sales);
+                    expenses = days.map(d => expMap[d.day] || 0);
+                }
 
                 if (chartDailyTrendInstance) chartDailyTrendInstance.destroy();
                 chartDailyTrendInstance = new Chart(ctxDaily, {
                     type: 'bar',
                     data: {
-                        labels: days.map(d => d.slice(5)),
+                        labels: labels,
                         datasets: [
                             { label: 'Satış (₺)', data: sales, backgroundColor: '#2d6a4f', borderRadius: 4 },
                             { label: 'Gider (₺)', data: expenses, backgroundColor: '#e53e3e', borderRadius: 4 }
@@ -1416,7 +1783,7 @@
 
             // 3. Hourly Chart
             const ctxHourly = document.getElementById('chartHourly');
-            if (ctxHourly) {
+            if (ctxHourly && hourlyCard && hourlyCard.style.display !== 'none') {
                 const hourly = overviewData.hourly || [];
                 const hours = hourly.map(h => `${String(h.hour).padStart(2,'0')}:00`);
                 const sales = hourly.map(h => h.total_sales);
