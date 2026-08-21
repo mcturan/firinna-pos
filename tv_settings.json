@@ -3,7 +3,7 @@
     "layout": "modern_grid",
     "video_playlist": "",
     "local_videos": [
-        "/static/tv_media/videos/0.mp4"
+        "/static/tv_media/videos/bayrak.mp4"
     ],
     "local_audio": [],
     "media_source": "local",
@@ -65,8 +65,8 @@
     "last_push": {
         "action": "reload",
         "target": "tv_phius0l",
-        "timestamp": 1787304087004
+        "timestamp": 1787304413940
     },
-    "last_ping": "2026-08-21T12:24:25.717559",
-    "version": 1787303520134
+    "last_ping": "2026-08-21T12:28:59.761398",
+    "version": 1787304437163
 }
