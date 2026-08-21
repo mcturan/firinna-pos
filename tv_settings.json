@@ -4,7 +4,6 @@
     "video_playlist": "",
     "local_videos": [
         "/static/tv_media/videos/1.mp4",
-        "/static/tv_media/videos/0.mp4",
         "/static/tv_media/videos/bayrak.mp4"
     ],
     "local_audio": [],
@@ -69,6 +68,6 @@
         "target": "tv_btiwd47",
         "timestamp": 1787311487091
     },
-    "last_ping": "2026-08-21T19:04:01.148307",
+    "last_ping": "2026-08-21T19:07:25.176104",
     "version": 1787327722329
 }

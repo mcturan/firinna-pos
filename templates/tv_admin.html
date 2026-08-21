@@ -306,7 +306,7 @@
             allVideos.forEach((v, index) => {
                 const isEnabled = localVideos.includes(v);
                 const filename = v.split('/').pop();
-                const isCorePermanent = (filename.toLowerCase() === 'bayrak.mp4' || filename.toLowerCase() === '0.mp4');
+                const isCorePermanent = (filename.toLowerCase() === 'bayrak.mp4');
                 
                 html += `<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; background:${isCorePermanent ? '#f0fdf4' : '#f7fafc'}; padding:0.5rem; border-radius:4px; border:1px solid ${isCorePermanent ? '#bbf7d0' : '#e2e8f0'};">
                     <input type="checkbox" ${isEnabled || isCorePermanent ? 'checked' : ''} ${isCorePermanent ? 'disabled' : ''} onchange="toggleVideo('${v}', this.checked)" title="${isCorePermanent ? 'Kalıcı Başlangıç Videosu (Devre Dışı Bırakılamaz)' : 'Aktif/Pasif'}">
