@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dijital Tabela</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        @keyframes meshAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0B0F19;
+            color: #1A1A1A;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        html.native-video-active, html.native-video-active body {
+            background: #0B0F19 !important;
+        }
+
+        /* Legacy Layout (Default & Sidebar) */
+        body.layout-default #video-container, body.layout-sidebar #video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background:#000; }
+        body.layout-sidebar #video-container { width: 75%; }
+        
+        /* Modern Layout Redesign - Dark Background with Light Cards */
+        #modern-layout { 
+            display: none; 
+            width: 100vw; 
+            height: 100vh; 
+            padding: 2.5vh 3.5vw 2.5vh 3.5vw; 
+            box-sizing: border-box; 
+            gap: 1.5vw; 
+            grid-template-columns: 3fr 7fr; 
+            grid-template-rows: 9.5vh 1fr 5.8vh; 
+            contain: strict;
+            background: #0B0F19;
+        }
+        #modern-layout.no-ticker {
+            grid-template-rows: 9.5vh 1fr !important;
+        }
+        #modern-layout.no-ticker #ml-ticker-box {
+            display: none !important;
+        }
+        body.layout-modern_grid #modern-layout { display: grid; }
+        body.layout-modern_grid #legacy-overlay, body.layout-modern_grid #sidebar { display: none; }
+        
+        .grid-box { 
+            background: #FFFFFF; 
+            border-radius: 1vw; 
+            border: 1.5px solid #E2E8F0; 
+            overflow: hidden; 
+            contain: content;
+        }
+        
+        #ml-logo-box { grid-column: 1; grid-row: 1; padding: 0.5vw; display: flex; align-items: center; justify-content: center; background: #FFFFFF; border-radius: 1vw; position: relative; overflow: hidden; border: 1.5px solid #E2E8F0; }
+        #ml-logo { max-width: 90%; max-height: 8vh; object-fit: contain; position: absolute; opacity: 1; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
+        #ml-logo-domain { position: absolute; font-size: 1.6vw; font-weight: 800; color: #2D6A4F; text-align: center; letter-spacing: 1px; opacity: 0; transform: scale(0.92); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
+        .tr-domain { font-size: 1.5vw; font-weight: 800; color: #2D6A4F; text-align: center; }
+        
+        #ml-support-box { 
+            grid-column: 2; 
+            grid-row: 1; 
+            padding: 0 1.5vw 0 1.5vw; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #FFFFFF; 
+            color: #1A202C; 
+            border-radius: 1vw; 
+            position: relative; 
+            overflow: hidden; 
+            border: 1.5px solid #E2E8F0; 
+        }
+        .support-layers-container {
+            position: absolute;
+            left: 1.5vw;
+            right: 7vw;
+            top: 0;
+            bottom: 0;
+        }
+        #ml-support-flag {
+            position: absolute;
+            right: 1.2vw;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4.6vw;
+            height: 3.1vw;
+            border-radius: 0.4vw;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+            border: 1px solid #E2E8F0;
+            background: #E30A17;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        #ml-support-flag img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        #ml-left-top { grid-column: 1; grid-row: 2; background: #FFFFFF; border-radius: 1vw; display: flex; flex-direction: column; overflow: hidden; position: relative; border: 1.5px solid #E2E8F0; }
+        
+        #ml-main-video { grid-column: 2; grid-row: 2; position: relative; border-radius: 1vw; overflow: hidden; background: #000000; }
+        
+        #ml-ticker-box { 
+            grid-column: 1 / 3; 
+            grid-row: 3; 
+            background: #1A202C; 
+            color: #FFFFFF; 
+            border-radius: 1vw; 
+            position: relative; 
+            overflow: hidden; 
+            border: 1px solid rgba(255,255,255,0.1); 
+        }
+        .bot-slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2vw;
+            opacity: 0;
+            transform: translate3d(0, 100%, 0);
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease;
+            will-change: transform, opacity;
+            padding: 0 2vw;
+            box-sizing: border-box;
+        }
+        .bot-slide.active {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+            z-index: 2;
+        }
+        .bot-slide.exit {
+            opacity: 0;
+            transform: translate3d(0, -100%, 0);
+            z-index: 1;
+        }
+        .ticker-text { 
+            font-size: 1.8vw; 
+            font-weight: 600; 
+            display: inline-block; 
+            animation: marquee 30s linear infinite; 
+            padding-left: 100%; 
+            letter-spacing: 1px;
+            color: #FFFFFF;
+            will-change: transform;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+        }
+        @keyframes marquee { 
+            0% { transform: translate3d(0, 0, 0); } 
+            100% { transform: translate3d(-100%, 0, 0); } 
+        }
+        
+        #video-container { width: 100%; height: 100%; position: absolute; inset: 0; }
+
+        /* Product Carousel with Slow Ken Burns Zoom */
+        .product-slide { 
+            position: absolute; 
+            inset: 0; 
+            display: flex; 
+            flex-direction: column; 
+            opacity: 0; 
+            transition: opacity 0.8s ease; 
+            background: #FFFFFF; 
+            border-radius: 1vw; 
+            overflow: hidden; 
+            will-change: opacity; 
+        }
+        .product-slide.active { opacity: 1; z-index: 5; }
+        .prod-img-box {
+            width: 100%;
+            height: 85%;
+            overflow: hidden;
+            position: relative;
+            background: #FAFAFA;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .prod-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            padding: 0.4vw;
+            box-sizing: border-box;
+            transform: scale(0.96);
+            transition: transform 5.2s cubic-bezier(0.16, 1, 0.3, 1), filter 5.2s ease;
+            will-change: transform, filter;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.06));
+        }
+        .product-slide.active .prod-img {
+            transform: scale(1.22);
+            filter: drop-shadow(0 8px 20px rgba(0,0,0,0.14));
+        }
+        .prod-info { height: 15%; padding: 0.5vw 1vw; display: flex; align-items: center; justify-content: center; background: #FFFFFF; color: #1A202C; z-index: 2; border-top: 1.5px solid #E2E8F0; overflow: hidden; box-sizing: border-box; }
+        .prod-title { font-size: 1.5vw; font-weight: 800; color: #1A202C; text-align: center; margin: 0; line-height: 1.2; letter-spacing: 0.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+        .prod-desc, .prod-tags { display: none; }
+
+        /* Video Native Control Fixes for Mobile & Hardware Acceleration */
+        video::-webkit-media-controls { display: none !important; }
+        video::-webkit-media-controls-enclosure { display: none !important; }
+        video::part(-webkit-media-controls) { display: none !important; }
+        video { 
+            pointer-events: none; 
+            will-change: transform;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+        }
+
+        /* Messages Fade */
+        .msg-slide { position: absolute; inset: 1.5vw; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 1s ease; will-change: opacity; }
+        .msg-slide.active { opacity: 1; }
+        
+        /* Record Animation */
+        #record-player { position: absolute; top: 2vw; right: 2vw; width: 6vw; height: 6vw; background: url('/static/img/record.png') no-repeat center/cover; border-radius: 50%; z-index: 10; display: none; }
+        .spinning { animation: spin 4s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Legacy Overlays */
+        #ytplayer, #local-video { width: 100%; height: 100%; border: none; }
+        #local-video { object-fit: cover; }
+        #legacy-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        .logo { position: absolute; top: 40px; right: 40px; max-width: 250px; max-height: 120px; }
+        .ticker-wrap { position: absolute; bottom: 0; width: 100%; height: 70px; background: rgba(0, 0, 0, 0.85); display: flex; align-items: center; overflow: hidden; border-top: 3px solid #2d6a4f; pointer-events: auto; }
+        .ticker-title { background: #2d6a4f; color: white; padding: 0 30px; height: 100%; display: flex; align-items: center; font-weight: 800; font-size: 1.5rem; z-index: 2; white-space: nowrap; text-transform: uppercase; letter-spacing: 2px; }
+        .ticker-content { white-space: nowrap; font-size: 2.2rem; color: #fff; font-weight: 600; animation: ticker 25s linear infinite; padding-left: 100%; display: inline-block; will-change: transform; transform: translate3d(0, 0, 0); }
+        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+        .widgets { position: absolute; bottom: 90px; right: 40px; display: flex; flex-direction: column; gap: 20px; align-items: flex-end; }
+        .qr-box { background: #FFFFFF; padding: 15px; border-radius: 12px; text-align: center; border: 1.5px solid #E2E8F0; }
+        .qr-box img { width: 120px; height: 120px; display: block; margin: 0 auto;}
+        .qr-text { color: #000000; font-weight: 800; font-size: 1.1rem; margin-top: 10px; }
+        .clock-widget { background: rgba(0,0,0,0.8); padding: 15px 30px; border-radius: 12px; color: white; font-size: 3rem; font-weight: 700; border: 2px solid rgba(255,255,255,0.2); }
+        
+        body.layout-sidebar .sidebar { position: absolute; top: 0; right: 0; width: 25%; height: calc(100% - 70px); background: #1A202C; z-index: 5; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; box-sizing: border-box; border-left: 2px solid #2D3748; }
+        body.layout-sidebar .widgets { position: static; margin-top: auto; align-items: center; }
+        body.layout-sidebar .logo { position: static; max-width: 80%; margin-bottom: 40px; filter: none; }
+        .sidebar { display: none; }
+        body.layout-sidebar .sidebar { display: flex; }
+    </style>
+</head>
+<body class="layout-modern_grid">
+
+    <!-- MODERN GRID LAYOUT -->
+    <div id="modern-layout">
+        
+        <!-- TOP ROW: Logo & Domain (left) | Clock & Weather + Flag (right) -->
+        <div id="ml-logo-box" class="grid-box">
+            <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
+            <div id="ml-logo-domain">www.firinna.com</div>
+        </div>
+        
+        <div id="ml-support-box" class="grid-box">
+            <div class="support-layers-container">
+                <!-- Layer 0: Red Clock with Seconds & European Date in English (Default Active) -->
+                <div id="ml-layer-0" style="display:flex; justify-content: center; align-items:center; gap: 1.5vw; transition: opacity 1s ease; opacity: 1; position:absolute; inset:0;">
+                    <div style="display:flex; align-items:center; gap:0.5vw;">
+                        <span style="font-size:1.5vw; color:#EF4444;">🕒</span>
+                        <span id="ml-clock" style="font-size:2vw; font-weight:800; color:#EF4444; letter-spacing:1px; font-family:'Plus Jakarta Sans', monospace;">00:00:00</span>
+                    </div>
+                    <span style="font-size:1.5vw; font-weight:300; color:#CBD5E1;">|</span>
+                    <div style="display:flex; align-items:center; gap:0.5vw;">
+                        <span style="font-size:1.5vw; color:#718096;">📅</span>
+                        <span id="ml-date" style="font-size:1.8vw; font-weight:700; color:#2D6A4F; letter-spacing:0.5px;">18.08.2026, Tuesday</span>
+                    </div>
+                </div>
+                <!-- Layer 1: 3-Day Weather Forecast for Beyoglu -->
+                <div id="ml-layer-1" style="display:flex; justify-content: space-around; align-items:center; transition: opacity 1s ease; opacity: 0; position:absolute; inset:0; pointer-events:none;">
+                    <div id="ml-weather" style="font-size:1.7vw; font-weight:700; color:#1A202C; display:flex; justify-content:space-around; width:100%; align-items:center;">
+                        <span>Loading Weather...</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Waving Turkish Flag at Far-Right of the Top Bar -->
+            <div id="ml-support-flag">
+                <img src="/static/img/bayrak.gif" alt="Türk Bayrağı">
+            </div>
+        </div>
+
+        <!-- MIDDLE ROW: Products (left) & Video (right) -->
+        <div id="ml-left-top" class="grid-box">
+            <div id="product-carousel" style="width:100%; height:100%; position:relative;"></div>
+        </div>
+        
+        <div id="ml-main-video" class="grid-box" style="background: transparent !important; backdrop-filter: none !important;">
+            <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            <video id="local-video" style="display:none;" autoplay muted playsinline webkit-playsinline></video>
+            <div id="record-player"></div>
+            <!-- Watermark -->
+            <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 1.5vw 3vw; border-radius: 1.5vw; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+                <img id="ml-watermark" src="/static/uploads/logo.png" style="width:28vw; display:block; margin: 0 auto;">
+                <div id="ml-watermark-text" style="color: #2D6A4F; font-size: 2.2vw; font-weight: 800; margin-top: 1vw; opacity: 0; transition: opacity 1s ease; font-family: sans-serif; letter-spacing: 2px;">www.firinna.com</div>
+            </div>
+        </div>
+
+        <!-- BOTTOM ROW: Sliding Bar -->
+        <div id="ml-ticker-box" class="grid-box">
+            <!-- Slide 0: Support Us with Google Maps and Yandex Maps logos -->
+            <div id="ml-bot-support" class="bot-slide active">
+                <span style="font-size:1.6vw; font-weight:800; color:#34D399; letter-spacing:0.8px; display:flex; align-items:center; gap:0.5vw;">
+                    <span>⭐</span> SUPPORT FIRINNA BY A REVIEW ON:
+                </span>
+                <div style="display:flex; gap:1.2vw; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.25vw 1.1vw; background:#FFFFFF; border-radius: 0.4vw; font-size:1.55vw; font-weight:700; color:#1A202C; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        <span style="color:#4285F4;">G</span><span style="color:#EA4335;">o</span><span style="color:#FBBC05;">o</span><span style="color:#4285F4;">g</span><span style="color:#34A853;">l</span><span style="color:#EA4335;">e</span> <span style="color:#4A5568;">Maps</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.5vw; padding: 0.25vw 1.1vw; background:#FFFFFF; border-radius: 0.4vw; font-size:1.55vw; font-weight:700; color:#1A202C; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                        <span style="color:#FC3F1D;">Yandex</span> <span style="color:#4A5568;">Maps</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 1: Live Currencies & Crypto -->
+            <div id="ml-bot-currency" class="bot-slide">
+                <div id="ml-currency-content" style="font-size:1.6vw; font-weight:700; color:#F8FAFC; display:flex; align-items:center; gap:1.4vw; letter-spacing:0.5px; white-space:nowrap;">
+                    <span>💵 USD: -- ₺</span>
+                    <span style="color:#64748B;">•</span>
+                    <span>💶 EUR: -- ₺</span>
+                    <span style="color:#64748B;">•</span>
+                    <span style="color:#38BDF8;">EUR/USD: --</span>
+                    <span style="color:#64748B;">•</span>
+                    <span style="color:#F59E0B;">₿ BTC: -- $</span>
+                    <span style="color:#64748B;">•</span>
+                    <span style="color:#818CF8;">Ξ ETH: -- $</span>
+                </div>
+            </div>
+            <!-- Slide 2: Promo / Announcements (if any) -->
+            <div id="ml-bot-promo" class="bot-slide" style="display:none;">
+                <div id="ml-promo-content" style="font-size:1.7vw; font-weight:700; color:#F8FAFC; letter-spacing:0.5px; display:flex; align-items:center; gap:0.8vw;">
+                    <span>📢</span> <span id="ml-promo-text"></span>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- LEGACY LAYOUT ELEMENTS -->
+    <div class="sidebar" id="sidebar">
+        <img id="logo-sidebar" class="logo" src="" style="display:none;">
+        <div class="widgets" id="widgets-sidebar"></div>
+    </div>
+    <div id="legacy-overlay">
+        <img id="logo-overlay" class="logo" src="" style="display:none;">
+        <div class="widgets" id="widgets-overlay"></div>
+        <div class="ticker-wrap">
+            <div class="ticker-title">DUYURU</div>
+            <div class="ticker-content" id="ticker-text">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <audio id="local-audio" style="display:none;"></audio>
+
+    <!-- YouTube API Script -->
+    <script>
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var currentVideoId = "";
+        var currentAudioPriority = "video";
+        var currentMediaSource = "";
+        var ytReady = false;
+        var isPlayerInitialized = false;
+        
+        var localVideoList = [];
+        var localAudioList = [];
+        var currentLocalVideoIndex = 0;
+        var currentLocalAudioIndex = 0;
+
+        function onYouTubeIframeAPIReady() { ytReady = true; }
+
+        const vidEl = document.getElementById('local-video');
+        const audEl = document.getElementById('local-audio');
+        const recordPlayer = document.getElementById('record-player');
+
+        vidEl.onended = () => {
+            if(localVideoList.length > 0) {
+                currentLocalVideoIndex = (currentLocalVideoIndex + 1) % localVideoList.length;
+                vidEl.src = localVideoList[currentLocalVideoIndex];
+                vidEl.play().catch(e=>{});
+            }
+        };
+
+        audEl.onended = () => {
+            if(localAudioList.length > 0) {
+                currentLocalAudioIndex = (currentLocalAudioIndex + 1) % localAudioList.length;
+                audEl.src = localAudioList[currentLocalAudioIndex];
+                audEl.play().catch(e=>{});
+            }
+        };
+
+        audEl.onplay = () => { recordPlayer.style.display = 'block'; recordPlayer.classList.add('spinning'); };
+        audEl.onpause = () => { recordPlayer.style.display = 'none'; recordPlayer.classList.remove('spinning'); };
+
+        function switchSource(sourceType) {
+            console.log("Switching source to: " + sourceType + ", AndroidTV exists: " + (!!window.AndroidTV));
+            currentMediaSource = sourceType;
+            if(sourceType === 'local') {
+                document.getElementById('ytplayer').style.display = 'none';
+                document.getElementById('local-video').style.display = 'block';
+                document.documentElement.classList.remove('native-video-active');
+                if(player && player.pauseVideo) player.pauseVideo();
+            } else {
+                document.documentElement.classList.remove('native-video-active');
+                document.getElementById('local-video').style.display = 'none';
+                if (window.AndroidTV) window.AndroidTV.stopNativeVideo();
+                document.getElementById('ytplayer').style.display = 'block';
+                if(vidEl) vidEl.pause();
+                if(player && player.playVideo) player.playVideo();
+            }
+        }
+
+        const ytIframe = document.getElementById('ytplayer');
+        
+        window.playNextNativeVideo = function() {
+            if (localVideoList.length > 0) {
+                currentLocalVideoIndex = (currentLocalVideoIndex + 1) % localVideoList.length;
+                playLocalVideo(currentLocalVideoIndex);
+            }
+        };
+
+        function playLocalVideo(vIndex) {
+            if(!localVideoList || localVideoList.length === 0) return;
+            currentLocalVideoIndex = vIndex % localVideoList.length;
+            let srcUrl = localVideoList[currentLocalVideoIndex]; 
+            if(!srcUrl) return;
+            if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
+            console.log("Setting HTML5 src for: " + srcUrl);
+            vidEl.style.display = "block";
+            vidEl.muted = (currentAudioPriority === 'music');
+            if (vidEl.getAttribute('src') === srcUrl) {
+                vidEl.currentTime = 0;
+                vidEl.play().catch(e => {
+                    console.log("Local video play retry with muted:", e);
+                    vidEl.muted = true;
+                    vidEl.play().catch(err => console.log("Play failed completely:", err));
+                });
+            } else {
+                vidEl.setAttribute('src', srcUrl);
+                vidEl.play().catch(e => {
+                    console.log("Local video play retry with muted:", e);
+                    vidEl.muted = true;
+                    vidEl.play().catch(err => console.log("Play failed completely:", err));
+                });
+            }
+            vidEl.onended = () => { window.playNextNativeVideo(); };
+            vidEl.onerror = () => { setTimeout(window.playNextNativeVideo, 2000); };
+        }
+
+        function playLocalAudio(aIndex) {
+            if(localAudioList.length === 0) return;
+            currentLocalAudioIndex = aIndex % localAudioList.length;
+            const srcUrl = "/static/tv_media/audio/" + localAudioList[currentLocalAudioIndex];
+            audEl.src = srcUrl;
+            audEl.play().catch(e => {
+                console.log("Local audio play blocked:", e);
+            });
+            audEl.onended = () => {
+                playLocalAudio(currentLocalAudioIndex + 1);
+            };
+            audEl.onerror = () => {
+                setTimeout(() => playLocalAudio(currentLocalAudioIndex + 1), 2000);
+            };
+        }
+
+        let isYtInit = false;
+        function initOrUpdatePlayer(videoId, priority) {
+            if (!isYtInit) {
+                let vId = videoId;
+                if(vId.includes('v=')) vId = vId.split('v=')[1].split('&')[0];
+                else if(vId.includes('youtu.be/')) vId = vId.split('youtu.be/')[1].split('?')[0];
+                
+                let embedUrl = `https://www.youtube.com/embed/${vId}?autoplay=1&mute=1&loop=1&playlist=${vId}&controls=0&rel=0&showinfo=0&modestbranding=1`;
+                if(vId.startsWith('PL') || videoId.includes('list=')) {
+                    let pId = vId;
+                    if(videoId.includes('list=')) pId = videoId.split('list=')[1].split('&')[0];
+                    embedUrl = `https://www.youtube.com/embed/videoseries?list=${pId}&autoplay=1&mute=1&loop=1&controls=0&rel=0&showinfo=0&modestbranding=1`;
+                }
+                
+                ytIframe.src = embedUrl;
+                isYtInit = true;
+            }
+        }
+    </script>
+
+    <!-- Main App Logic -->
+    <script>
+        let lastSettingsStr = "";
+        let currentMessages = [];
+        let basePromoText = "";
+        let webProducts = [];
+        
+        let pIndex = 0;
+        let mIndex = 0;
+
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false});
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+            
+            document.querySelectorAll('.clock-text').forEach(el => el.textContent = timeStr);
+            const clockEl = document.getElementById('ml-clock');
+            if (clockEl) clockEl.textContent = timeStr;
+            const dateEl = document.getElementById('ml-date');
+            if (dateEl) dateEl.textContent = `${day}.${month}.${year}, ${dayName}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        const wCodeMap = {
+            0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 
+            45: '🌫️', 48: '🌫️', 51: '🌦️', 53: '🌦️', 55: '🌧️', 
+            61: '🌧️', 63: '🌧️', 65: '🌧️', 71: '🌨️', 73: '🌨️', 75: '❄️', 
+            80: '🌧️', 81: '⛈️', 82: '⛈️', 95: '🌩️', 96: '⛈️', 99: '⛈️'
+        };
+
+        const englishDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+        async function fetchWeather() {
+            try {
+                // Beyoğlu, Istanbul coordinates (41.0370, 28.9773)
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=41.0370&longitude=28.9773&current=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe%2FIstanbul&forecast_days=3");
+                const data = await res.json();
+                if(data && data.daily && data.daily.time && data.daily.time.length >= 3) {
+                    const currentTemp = data.current ? Math.round(data.current.temperature_2m) : null;
+                    const d0Max = Math.round(data.daily.temperature_2m_max[0]);
+                    const d0Min = Math.round(data.daily.temperature_2m_min[0]);
+                    const d0Icon = wCodeMap[data.daily.weathercode[0]] || '🌤️';
+
+                    const d1Max = Math.round(data.daily.temperature_2m_max[1]);
+                    const d1Min = Math.round(data.daily.temperature_2m_min[1]);
+                    const d1Icon = wCodeMap[data.daily.weathercode[1]] || '🌤️';
+
+                    const d2Date = new Date(data.daily.time[2]);
+                    const d2DayName = englishDays[d2Date.getDay()] || 'Next Day';
+                    const d2Max = Math.round(data.daily.temperature_2m_max[2]);
+                    const d2Min = Math.round(data.daily.temperature_2m_min[2]);
+                    const d2Icon = wCodeMap[data.daily.weathercode[2]] || '🌤️';
+                    
+                    const todayStr = currentTemp !== null ? `${d0Icon} ${currentTemp}°C` : `${d0Icon} ${d0Max}°C`;
+
+                    document.getElementById('ml-weather').innerHTML = `
+                        <div style="display:flex; align-items:center; gap:0.5vw;">
+                            <span style="color:#2D6A4F; font-weight:800;">Today</span>
+                            <span style="color:#1A202C;">${todayStr}</span>
+                        </div>
+                        <span style="color:#CBD5E1; font-weight:300;">•</span>
+                        <div style="display:flex; align-items:center; gap:0.5vw;">
+                            <span style="color:#2D6A4F; font-weight:800;">Tomorrow</span>
+                            <span>${d1Icon}</span>
+                            <span style="color:#1A202C;">${d1Max}°C</span>
+                        </div>
+                        <span style="color:#CBD5E1; font-weight:300;">•</span>
+                        <div style="display:flex; align-items:center; gap:0.5vw;">
+                            <span style="color:#2D6A4F; font-weight:800;">${d2DayName}</span>
+                            <span>${d2Icon}</span>
+                            <span style="color:#1A202C;">${d2Max}°C</span>
+                        </div>
+                    `;
+                }
+            } catch(e) {
+                console.error("Weather fetch error:", e);
+            }
+        }
+        fetchWeather();
+        setInterval(fetchWeather, 3600000);
+
+        function rotateProducts() {
+            if(webProducts.length > 0) {
+                const slides = document.querySelectorAll('.product-slide');
+                if(slides.length > 0) {
+                    slides.forEach(s => s.classList.remove('active'));
+                    slides[pIndex].classList.add('active');
+                    pIndex = (pIndex + 1) % slides.length;
+                }
+            }
+            if(currentMessages.length > 0) {
+                const slides = document.querySelectorAll('.msg-slide');
+                if(slides.length > 0) {
+                    slides.forEach(s => s.classList.remove('active'));
+                    slides[mIndex].classList.add('active');
+                    mIndex = (mIndex + 1) % slides.length;
+                }
+            }
+        }
+        setInterval(rotateProducts, 5250); // 5.25 seconds for products (%25 faster than 7s)
+        
+        let supportIndex = 0;
+        function rotateSupport() {
+            supportIndex = (supportIndex + 1) % 2; // 2 layers: Clock & Weather
+            for(let i = 0; i < 2; i++) {
+                const el = document.getElementById('ml-layer-' + i);
+                if(el) {
+                    el.style.opacity = (supportIndex === i) ? '1' : '0';
+                    el.style.pointerEvents = (supportIndex === i) ? 'auto' : 'none';
+                }
+            }
+        }
+        setInterval(rotateSupport, 8000); // 8 seconds per layer
+
+        // Logo / Domain Transition in Sol-Üst: Shows www.firinna.com for 5 seconds every 30 seconds
+        function triggerLogoDomainCycle() {
+            const logoEl = document.getElementById('ml-logo');
+            const domainEl = document.getElementById('ml-logo-domain');
+            if (!logoEl || !domainEl) return;
+
+            // 1. Show domain text, fade out logo
+            logoEl.style.opacity = '0';
+            logoEl.style.transform = 'scale(0.88)';
+            domainEl.style.opacity = '1';
+            domainEl.style.transform = 'scale(1)';
+
+            // 2. Return back to logo after 5 seconds
+            setTimeout(() => {
+                domainEl.style.opacity = '0';
+                domainEl.style.transform = 'scale(0.92)';
+                logoEl.style.opacity = '1';
+                logoEl.style.transform = 'scale(1)';
+            }, 5000);
+        }
+        // First domain reveal at 5 seconds after load, then every 30 seconds
+        setTimeout(triggerLogoDomainCycle, 5000);
+        setInterval(triggerLogoDomainCycle, 30000);
+
+        function triggerWatermarkCycle() {
+            const container = document.getElementById('ml-watermark-container');
+            const text = document.getElementById('ml-watermark-text');
+            if (!container) return;
+
+            // 1. Show watermark
+            container.style.opacity = '1';
+            setTimeout(() => {
+                container.style.top = '40%';
+                if (text) text.style.opacity = '1';
+            }, 500);
+
+            // 2. Hide after 7.5 seconds (%25 reduction from 10s)
+            setTimeout(() => {
+                container.style.opacity = '0';
+                setTimeout(() => {
+                    container.style.top = '50%';
+                    if (text) text.style.opacity = '0';
+                }, 1500);
+            }, 7500);
+        }
+        // First show after 20s, then every 90 seconds (1.5 minutes) for 7.5 seconds
+        setTimeout(triggerWatermarkCycle, 20000);
+        setInterval(triggerWatermarkCycle, 90000);
+
+        // C4: Video watchdog — if local video stalls, force next video
+        let _lastVideoTime = -1;
+        let _stalledCount = 0;
+        setInterval(() => {
+            if (currentMediaSource !== 'local' || !vidEl || vidEl.style.display === 'none') return;
+            if (vidEl.paused || vidEl.ended) return;
+            const ct = vidEl.currentTime;
+            if (ct === _lastVideoTime && !vidEl.paused) {
+                _stalledCount++;
+                if (_stalledCount >= 3) { // stalled for ~9 seconds
+                    console.log('[WATCHDOG] Video stalled, forcing next.');
+                    _stalledCount = 0;
+                    window.playNextNativeVideo();
+                }
+            } else {
+                _stalledCount = 0;
+            }
+            _lastVideoTime = ct;
+        }, 3000);
+
+        let liveCurrencyText = "";
+        let isTickerTextEnabled = true;
+        let isTickerCurrencyEnabled = true;
+
+        async function fetchCurrencies() {
+            try {
+                const res = await fetch("/api/tv/rates");
+                const data = await res.json();
+                if (data) {
+                    const usdBuy = data.usd_try ? data.usd_try.toFixed(2) : '--';
+                    const eurBuy = data.eur_try ? data.eur_try.toFixed(2) : '--';
+                    const eurUsd = data.eur_usd ? data.eur_usd.toFixed(4) : '--';
+                    const btcUsdt = data.btc_usdt ? Number(data.btc_usdt).toLocaleString('en-US') : '--';
+                    const ethUsdt = data.eth_usdt ? Number(data.eth_usdt).toLocaleString('en-US') : '--';
+
+                    const currEl = document.getElementById('ml-currency-content');
+                    if (currEl) {
+                        currEl.innerHTML = `
+                            <span style="display:flex; align-items:center; gap:0.4vw; color:#34D399; font-weight:800;">💵 USD: <span style="color:#FFFFFF;">${usdBuy} ₺</span></span>
+                            <span style="color:#64748B; font-weight:300;">•</span>
+                            <span style="display:flex; align-items:center; gap:0.4vw; color:#38BDF8; font-weight:800;">💶 EUR: <span style="color:#FFFFFF;">${eurBuy} ₺</span></span>
+                            <span style="color:#64748B; font-weight:300;">•</span>
+                            <span style="display:flex; align-items:center; gap:0.4vw; color:#FBBF24; font-weight:800;">📊 EUR/USD: <span style="color:#FFFFFF;">${eurUsd}</span></span>
+                            <span style="color:#64748B; font-weight:300;">•</span>
+                            <span style="display:flex; align-items:center; gap:0.4vw; color:#F59E0B; font-weight:800;">₿ BTC: <span style="color:#FFFFFF;">$${btcUsdt}</span></span>
+                            <span style="color:#64748B; font-weight:300;">•</span>
+                            <span style="display:flex; align-items:center; gap:0.4vw; color:#818CF8; font-weight:800;">Ξ ETH: <span style="color:#FFFFFF;">$${ethUsdt}</span></span>
+                        `;
+                    }
+
+                    liveCurrencyText = `USD: ${usdBuy} ₺  •  EUR: ${eurBuy} ₺  •  EUR/USD: ${eurUsd}  •  BTC: $${btcUsdt}  •  ETH: $${ethUsdt}`;
+                    updateTickerText();
+                }
+            } catch(e) {
+                console.error("Currency fetch error:", e);
+            }
+        }
+        fetchCurrencies();
+        setInterval(fetchCurrencies, 300000); // 5 mins
+
+        let botSlideIndex = 0;
+        function rotateBottomSlides() {
+            const slides = Array.from(document.querySelectorAll('#ml-ticker-box .bot-slide')).filter(el => el.style.display !== 'none');
+            if (slides.length <= 1) return;
+
+            const currentSlide = slides[botSlideIndex % slides.length];
+            botSlideIndex = (botSlideIndex + 1) % slides.length;
+            const nextSlide = slides[botSlideIndex];
+
+            slides.forEach(s => {
+                if (s !== currentSlide && s !== nextSlide) {
+                    s.className = 'bot-slide';
+                }
+            });
+
+            currentSlide.className = 'bot-slide exit';
+            nextSlide.className = 'bot-slide active';
+        }
+        setInterval(rotateBottomSlides, 7000); // Rotates every 7 seconds with vertical sweep!
+
+        function updateTickerText() {
+            let messageText = basePromoText;
+            const now = new Date();
+            const currentMin = now.getHours() * 60 + now.getMinutes();
+            currentMessages.forEach(msg => {
+                if(msg.start_time && msg.end_time) {
+                    const [sh, sm] = msg.start_time.split(':');
+                    const [eh, em] = msg.end_time.split(':');
+                    const startMin = parseInt(sh)*60 + parseInt(sm);
+                    const endMin = parseInt(eh)*60 + parseInt(em);
+                    if(currentMin >= startMin && currentMin <= endMin) {
+                        if(messageText) messageText += "  •  ";
+                        messageText += msg.text;
+                    }
+                }
+            });
+
+            const promoSlide = document.getElementById('ml-bot-promo');
+            const promoTextEl = document.getElementById('ml-promo-text');
+            if (isTickerTextEnabled && messageText && messageText.trim() !== "") {
+                if (promoSlide) promoSlide.style.display = 'flex';
+                if (promoTextEl) promoTextEl.textContent = messageText.trim();
+            } else {
+                if (promoSlide) promoSlide.style.display = 'none';
+            }
+
+            const currSlide = document.getElementById('ml-bot-currency');
+            if (currSlide) {
+                currSlide.style.display = isTickerCurrencyEnabled ? 'flex' : 'none';
+            }
+
+            const legacyTickerEl = document.getElementById('ticker-text');
+            if (legacyTickerEl) {
+                let parts = [];
+                if (isTickerTextEnabled && messageText) parts.push(messageText);
+                parts.push("⭐ SUPPORT FIRINNA BY A REVIEW ON: Google Maps • Yandex Maps ⭐");
+                if (isTickerCurrencyEnabled && liveCurrencyText) parts.push(liveCurrencyText);
+                legacyTickerEl.textContent = parts.join("  •  ");
+            }
+        }
+        setInterval(updateTickerText, 15000); 
+
+        async function fetchProducts() {
+            try {
+                const res = await fetch('/api/tv/products');
+                webProducts = await res.json();
+                
+                let html = "";
+                webProducts.forEach((p, idx) => {
+                    let imgUrl = (p.image_url && p.image_url.trim() !== "") ? p.image_url : null;
+                    let imgSrc = imgUrl ? (imgUrl.startsWith('http') ? imgUrl : '/' + imgUrl) : '';
+                    html += `
+                        <div class="product-slide ${idx===0?'active':''}">
+                            <div class="prod-img-box">
+                                ${imgSrc ? `<img src="${imgSrc}" class="prod-img" onerror="this.onerror=null; this.style.display='none';">` : ''}
+                            </div>
+                            <div class="prod-info">
+                                <div class="prod-title">${p.title}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById('product-carousel').innerHTML = html;
+            } catch(e) {}
+        }
+
+        async function fetchSettings() {
+            try {
+                fetch('/api/tv/ping', {method: 'POST'}).catch(e=>{});
+                const res = await fetch('/api/tv/settings');
+                if (!res.ok) return;
+                const text = await res.text();
+                if (!text || text.trim().startsWith('<')) return;
+                const data = JSON.parse(text);
+                const dataStr = JSON.stringify(data);
+                if (dataStr !== lastSettingsStr) {
+                    lastSettingsStr = dataStr;
+                    applySettings(data);
+                }
+            } catch (e) { console.log("Settings fetch error:", e); }
+        }
+
+        function applySettings(data) {
+            const layout = data.layout || 'modern_grid';
+            document.body.className = `layout-${layout}`;
+            
+            if(data.logo_url) {
+                document.getElementById('ml-logo').src = data.logo_url;
+                document.getElementById('ml-logo').style.display = 'block';
+                document.getElementById('logo-overlay').src = data.logo_url;
+                document.getElementById('logo-sidebar').src = data.logo_url;
+            }
+
+            isTickerTextEnabled = (data.ticker_text_enabled !== false);
+            isTickerCurrencyEnabled = (data.ticker_currency_enabled !== false);
+            basePromoText = data.promo_text || "";
+            currentMessages = data.messages || [];
+            updateTickerText();
+            
+            if(currentMessages.length > 0) {
+                let mHtml = "";
+                currentMessages.forEach((m, idx) => {
+                    if (m.image) {
+                        mHtml += `<div class="msg-slide ${idx===0?'active':''}" style="flex-direction:row; gap:1.5vw;">
+                                    <img src="${m.image}" style="max-height:80%; max-width:40%; border-radius:0.5vw; object-fit:cover;" onerror="this.style.display='none'">
+                                    <div>${m.text}</div>
+                                  </div>`;
+                    } else {
+                        mHtml += `<div class="msg-slide ${idx===0?'active':''}">${m.text}</div>`;
+                    }
+                });
+                if(data.messages && data.messages.length > 0) {
+                    document.getElementById('ml-left-bottom').style.display = 'flex';
+                    document.getElementById('message-carousel').innerHTML = mHtml;
+                } else {
+                    document.getElementById('ml-left-bottom').style.display = 'none';
+                }
+            }
+
+            let widgetsHtml = "";
+            if (data.widgets && data.widgets.clock) widgetsHtml += `<div class="clock-widget clock-text">00:00</div>`;
+            if (data.qr_code) {
+                let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data.qr_code)}`;
+                widgetsHtml += `<div class="qr-box"><img src="${qrUrl}" alt="QR"><div class="qr-text">${data.qr_text || 'Okutun'}</div></div>`;
+            }
+            document.getElementById('widgets-sidebar').innerHTML = layout==='sidebar' ? widgetsHtml : '';
+            document.getElementById('widgets-overlay').innerHTML = layout==='default' ? widgetsHtml : '';
+            
+            updateClock();
+
+            currentMediaSource = data.media_source || 'youtube';
+            currentAudioPriority = data.audio_priority || 'video';
+
+            if (currentMediaSource === 'youtube') {
+                document.documentElement.classList.remove('native-video-active');
+                document.getElementById('local-video').style.display = 'none';
+                document.getElementById('ytplayer').style.display = 'block';
+                if (data.video_playlist) {
+                    initOrUpdatePlayer(data.video_playlist, data.audio_priority);
+                }
+            } else if (currentMediaSource === 'local') {
+                document.getElementById('ytplayer').style.display = 'none';
+                vidEl.style.display = 'block';
+                document.documentElement.classList.remove('native-video-active');
+                let newLocalVideos = data.local_videos || [];
+                let oldSrc = vidEl.getAttribute('src');
+                localVideoList = newLocalVideos;
+                if (localVideoList.length > 0 && (!oldSrc || !localVideoList.includes(oldSrc))) {
+                    playLocalVideo(0);
+                }
+            }
+        }
+
+        fetchProducts();
+        setInterval(fetchSettings, 5000); 
+        setTimeout(fetchSettings, 1000); 
+
+        // Auto-Reload / Restart every 5 hours (5 * 60 * 60 * 1000 ms) to keep memory clean and auto-fetch updates
+        const AUTO_RELOAD_MS = 5 * 60 * 60 * 1000;
+        setTimeout(() => {
+            console.log("[AUTO-RELOAD] 5 hours reached, reloading TV player application...");
+            window.location.reload(true);
+        }, AUTO_RELOAD_MS); 
+
+        document.body.addEventListener('click', () => {
+            if(currentMediaSource === 'local') {
+                if(localVideoList.length > 0) vidEl.play().catch(e=>{});
+                if(currentAudioPriority === 'music' && localAudioList.length > 0) audEl.play().catch(e=>{});
+            } else if (currentMediaSource === 'youtube') {
+                if(player && player.playVideo) player.playVideo();
+                if (currentAudioPriority === 'video' && player && player.unMute) player.unMute();
+            }
+        });
+    </script>
+</body>
+</html>
