@@ -30,9 +30,12 @@
                 <strong>Oynatıcı Ekranı:</strong> <a href="/tv-player" target="_blank" style="font-weight:bold;color:#2d6a4f;text-decoration:underline;">Sistemin IP'si:5000/tv-player</a> 
                 <span id="pingStatus" style="margin-left:1rem;font-size:0.9rem;font-weight:bold;color:red;">🔴 Çevrimdışı (Son görülme: Yok)</span>
             </div>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <button type="button" onclick="pushInstantUpdate()" style="background:#2563eb; color:white; border:none; padding:0.6rem 1.2rem; border-radius:8px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow: 0 2px 4px rgba(37,99,235,0.2);">
-                    ⚡ Anında Ekrana Push Et (Canlı Yenile)
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <button type="button" onclick="pushInstantUpdate('sync')" style="background:#2563eb; color:white; border:none; padding:0.6rem 1.1rem; border-radius:8px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow: 0 2px 4px rgba(37,99,235,0.2);">
+                    ⚡ Ayarları Ekrana Gönder (Push)
+                </button>
+                <button type="button" onclick="pushInstantUpdate('reload')" style="background:#dc2626; color:white; border:none; padding:0.6rem 1.1rem; border-radius:8px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow: 0 2px 4px rgba(220,38,38,0.2);">
+                    🔄 TV'yi Yeniden Başlat (Force Restart)
                 </button>
                 <a href="/static/Firinna-TV-1.1.32.apk?v=12" class="btn-save" style="width:auto; margin-top:0; padding:0.5rem 1rem; background:#38a169; text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;" download="Firinna-TV-1.1.32.apk">
                     <i class="fas fa-download"></i> TV APK İndir (v1.1.32)
@@ -645,15 +648,18 @@
             btn.textContent = "💾 Ayarları Kaydet ve Ekrana Gönder";
         }
 
-        async function pushInstantUpdate() {
-            if (!confirm("TV ekranını beklemeden anında tazelemek (canlı reload) istiyor musunuz?")) return;
+        async function pushInstantUpdate(action='reload') {
+            const msg = action === 'reload' ? 
+                "TV ekranındaki uygulamayı tamamen kapatıp sıfırdan yeniden başlatmak (Force Restart) istiyor musunuz?" : 
+                "Tüm yeni ayarları, videoları ve filigranları TV'ye anında göndermek istiyor musunuz?";
+            if (!confirm(msg)) return;
             try {
                 await fetch('/api/tv/push', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({action: 'reload'})
+                    body: JSON.stringify({action: action})
                 });
-                alert("⚡ Push sinyali TV'ye gönderildi! Ekran 1 saniye içinde yenilenecek.");
+                alert("⚡ Sinyal TV'ye gönderildi! " + (action === 'reload' ? "TV yeniden başlatılıyor..." : "Ayarlar güncellendi."));
             } catch(e) {
                 alert("Push sinyali gönderilemedi.");
             }

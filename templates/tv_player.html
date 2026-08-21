@@ -625,14 +625,6 @@
         const audEl = document.getElementById('local-audio');
         const recordPlayer = document.getElementById('record-player');
 
-        vidEl.onended = () => {
-            if(localVideoList.length > 0) {
-                currentLocalVideoIndex = (currentLocalVideoIndex + 1) % localVideoList.length;
-                vidEl.src = localVideoList[currentLocalVideoIndex];
-                vidEl.play().catch(e=>{});
-            }
-        };
-
         audEl.onended = () => {
             if(localAudioList.length > 0) {
                 currentLocalAudioIndex = (currentLocalAudioIndex + 1) % localAudioList.length;
@@ -682,26 +674,32 @@
             vidEl.style.display = "block";
             vidEl.muted = true;
             vidEl.loop = true;
+            vidEl.setAttribute('autoplay', '');
+            vidEl.setAttribute('muted', '');
             vidEl.setAttribute('playsinline', '');
             vidEl.setAttribute('webkit-playsinline', '');
             
             if (vidEl.getAttribute('src') !== srcUrl) {
                 vidEl.src = srcUrl;
-                vidEl.load();
             }
 
+            // Always trigger play without blocking
             const playPromise = vidEl.play();
             if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    console.log("Local video playback active.");
-                }).catch(err => {
-                    console.log("Autoplay retry muted:", err);
+                playPromise.catch(err => {
                     vidEl.muted = true;
-                    vidEl.play().catch(e => console.log("Play error:", e));
+                    vidEl.play().catch(e => {});
                 });
             }
 
-            vidEl.onended = () => { window.playNextNativeVideo(); };
+            vidEl.onended = () => {
+                if (localVideoList.length > 1) {
+                    window.playNextNativeVideo();
+                } else {
+                    vidEl.currentTime = 0;
+                    vidEl.play().catch(e=>{});
+                }
+            };
             vidEl.onerror = () => { setTimeout(window.playNextNativeVideo, 2000); };
         }
 
@@ -941,19 +939,22 @@
         setTimeout(triggerWatermarkCycle, 15000);
         startWatermarkScheduler();
 
-        // C4: Video watchdog — if local video stalls, force next video
+        // C4: Video watchdog — if local video freezes without playing, trigger play
         let _lastVideoTime = -1;
         let _stalledCount = 0;
         setInterval(() => {
             if (currentMediaSource !== 'local' || !vidEl || vidEl.style.display === 'none') return;
-            if (vidEl.paused || vidEl.ended) return;
+            if (vidEl.paused) {
+                vidEl.play().catch(e=>{});
+                return;
+            }
             const ct = vidEl.currentTime;
             if (ct === _lastVideoTime && !vidEl.paused) {
                 _stalledCount++;
-                if (_stalledCount >= 3) { // stalled for ~9 seconds
-                    console.log('[WATCHDOG] Video stalled, forcing next.');
+                if (_stalledCount >= 5) { // stalled for ~15 seconds
+                    console.log('[WATCHDOG] Video frozen, re-triggering play.');
                     _stalledCount = 0;
-                    window.playNextNativeVideo();
+                    vidEl.play().catch(e=>{});
                 }
             } else {
                 _stalledCount = 0;
@@ -1166,7 +1167,7 @@
             } catch(e) {}
         }
 
-        let lastPushTimestamp = 0;
+        let lastPushTimestamp = -1;
 
         async function fetchSettings() {
             try {
@@ -1178,9 +1179,9 @@
                 const data = JSON.parse(text);
 
                 // Check for instant push signal (from admin panel)
-                if (data.last_push && data.last_push.timestamp && data.last_push.timestamp > lastPushTimestamp) {
-                    if (lastPushTimestamp > 0 && data.last_push.action === 'reload') {
-                        console.log("[PUSH] Instant reload signal received, refreshing TV player...");
+                if (data.last_push && data.last_push.timestamp) {
+                    if (lastPushTimestamp !== -1 && data.last_push.timestamp > lastPushTimestamp) {
+                        console.log("[PUSH] Instant reload signal received (" + data.last_push.action + "), refreshing TV player...");
                         window.location.reload(true);
                         return;
                     }
