@@ -254,17 +254,25 @@
             justify-content: flex-start;
             padding: 0 1.8vw;
             box-sizing: border-box;
-            font-size: 1.55vw;
+            font-size: 1.35vw;
+            line-height: 1.25;
             font-weight: 700;
             color: #0F172A;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             opacity: 0;
             pointer-events: none;
             z-index: 1;
             will-change: transform, opacity;
             transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tcard-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            word-break: break-word;
         }
 
         /* Active Card State */
@@ -1339,22 +1347,34 @@
                 }
             });
             if (isTickerTextEnabled && messageText && messageText.trim() !== '') {
-                items.push(`<span style="color:#D97706; font-weight:800;">📢 DUYURU:</span> <span style="margin-left:0.5vw; color:#0F172A; font-weight:700;">${messageText.trim()}</span>`);
+                items.push({
+                    icon: '📢',
+                    color: '#D97706',
+                    text: messageText.trim()
+                });
             }
 
-            // 2. RSS Live Headlines
+            // 2. RSS Live Headlines (clean icon without repeating HABER:)
             if (isTickerRssEnabled && liveRssTitles.length > 0) {
                 liveRssTitles.forEach(t => {
-                    items.push(`<span style="color:#2563EB; font-weight:800;">📰 HABER:</span> <span style="margin-left:0.5vw; color:#0F172A; font-weight:700;">${t}</span>`);
+                    items.push({
+                        icon: '📰',
+                        color: '#2563EB',
+                        text: t
+                    });
                 });
             }
 
             // 3. Fallback Brand Text
             if (items.length === 0) {
-                items.push('<span style="color:#0F172A; font-weight:700;">FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE • GALATA / BEYOĞLU</span>');
+                items.push({
+                    icon: '☕',
+                    color: '#059669',
+                    text: 'FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE • GALATA / BEYOĞLU'
+                });
             }
 
-            const currentKey = currentTickerEffect + '__' + items.join('__');
+            const currentKey = currentTickerEffect + '__' + JSON.stringify(items);
             if (!force && currentKey === lastRenderedItemsKey && currentTickerEffect !== 'marquee') {
                 return; // Content unchanged, keep smooth card rotation alive
             }
@@ -1365,7 +1385,7 @@
                 box.className = 'grid-box ticker-mode-marquee';
                 if (tickerSlideTimer) { clearInterval(tickerSlideTimer); tickerSlideTimer = null; }
                 
-                const singleHtml = `<div class="rss-single-strip" style="display:inline-flex; align-items:center; flex-shrink:0; padding-right:2.5vw;">${items.join('<span style="color:#CBD5E1; margin: 0 1.8vw;">|</span>')}</div>`;
+                const singleHtml = `<div class="rss-single-strip" style="display:inline-flex; align-items:center; flex-shrink:0; padding-right:2.5vw;">${items.map(it => `<span style="margin-right:0.4vw; font-size:1.3vw;">${it.icon}</span><span style="color:#0F172A; font-weight:700;">${it.text}</span>`).join('<span style="color:#CBD5E1; margin: 0 1.8vw;">|</span>')}</div>`;
                 marqueeEl.innerHTML = singleHtml + singleHtml + singleHtml;
                 
                 if (!marqueeAnimId) {
@@ -1377,8 +1397,11 @@
                 marqueeEl.style.transform = 'none';
 
                 let html = '';
-                items.forEach((c, idx) => {
-                    html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}">${c}</div>`;
+                items.forEach((it, idx) => {
+                    html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}">
+                        <span style="font-size:1.45vw; margin-right:0.6vw; flex-shrink:0; line-height:1;">${it.icon}</span>
+                        <div class="tcard-text">${it.text}</div>
+                    </div>`;
                 });
                 marqueeEl.innerHTML = html;
                 currentTickerCardIdx = 0;
