@@ -3422,24 +3422,75 @@ def api_tv_settings():
         return jsonify({"success": True, "version": current['version']})
     return jsonify(get_tv_settings())
 
-@app.route('/api/tv/push', methods=['POST'])
-def api_tv_push():
-    data = request.json or {}
-    action = data.get('action', 'reload') # 'reload' or 'sync'
-    current = get_tv_settings()
-    current['last_push'] = {
-        'action': action,
-        'timestamp': int(datetime.now().timestamp() * 1000)
-    }
-    save_tv_settings(current)
-    return jsonify({"success": True, "pushed": current['last_push']})
+# In-memory TV clients registry: { client_id: { ip, device_type, user_agent, last_ping, name } }
+_tv_clients = {}
 
 @app.route('/api/tv/ping', methods=['POST'])
 def api_tv_ping():
+    data = request.json or {}
+    client_id = data.get('client_id', 'unknown')
+    device_type = data.get('device_type', 'TV / Browser')
+    screen_name = data.get('name', 'Ekran')
+    
+    user_agent = request.headers.get('User-Agent', '')
+    ip_addr = request.remote_addr
+    
+    # Auto-detect device type if not provided
+    ua_lower = user_agent.lower()
+    if 'android' in ua_lower and 'tv' in ua_lower:
+        detected_type = '📺 Android TV'
+    elif 'android' in ua_lower or 'mobile' in ua_lower or 'iphone' in ua_lower:
+        detected_type = '📱 Mobil (Telefon/Tablet)'
+    else:
+        detected_type = '💻 Web / Masaüstü'
+        
+    _tv_clients[client_id] = {
+        'client_id': client_id,
+        'ip': ip_addr,
+        'device_type': device_type if device_type != 'TV / Browser' else detected_type,
+        'name': screen_name,
+        'user_agent': user_agent,
+        'last_ping': datetime.now().isoformat(),
+        'last_ping_ts': time.time()
+    }
+    
     current = get_tv_settings()
     current['last_ping'] = datetime.now().isoformat()
     save_tv_settings(current)
     return jsonify({"success": True})
+
+@app.route('/api/tv/clients', methods=['GET'])
+def api_tv_clients():
+    now_ts = time.time()
+    # Filter active clients in the last 60 seconds
+    active_list = []
+    for cid, info in list(_tv_clients.items()):
+        is_online = (now_ts - info.get('last_ping_ts', 0)) < 45
+        active_list.append({
+            'client_id': cid,
+            'ip': info.get('ip'),
+            'device_type': info.get('device_type'),
+            'name': info.get('name'),
+            'last_ping': info.get('last_ping'),
+            'is_online': is_online,
+            'seconds_ago': int(now_ts - info.get('last_ping_ts', 0))
+        })
+    return jsonify({"clients": active_list})
+
+@app.route('/api/tv/push', methods=['POST'])
+def api_tv_push():
+    data = request.json or {}
+    action = data.get('action', 'reload') # 'reload', 'sync', 'clear_cache'
+    target_client_id = data.get('client_id', 'all') # 'all' or specific client_id
+    
+    current = get_tv_settings()
+    current['last_push'] = {
+        'action': action,
+        'target': target_client_id,
+        'timestamp': int(datetime.now().timestamp() * 1000)
+    }
+    save_tv_settings(current)
+    return jsonify({"success": True, "pushed": current['last_push']})
 
 @app.route('/api/tv/rates', methods=['GET'])
 def api_tv_rates():

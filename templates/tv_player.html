@@ -1168,11 +1168,24 @@
         }
 
         let lastPushTimestamp = -1;
+        let myClientId = localStorage.getItem('firinna_tv_client_id');
+        if (!myClientId) {
+            myClientId = 'tv_' + Math.random().toString(36).substring(2, 9);
+            localStorage.setItem('firinna_tv_client_id', myClientId);
+        }
 
         async function fetchSettings() {
             try {
-                fetch('/api/tv/ping', {method: 'POST'}).catch(e=>{});
-                const res = await fetch('/api/tv/settings');
+                fetch('/api/tv/ping', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        client_id: myClientId,
+                        name: window.AndroidTV ? 'Salon Android TV' : (window.innerWidth < 768 ? 'Mobil Telefon' : 'Ana Ekran Tabela')
+                    })
+                }).catch(e=>{});
+
+                const res = await fetch('/api/tv/settings?_t=' + Date.now());
                 if (!res.ok) return;
                 const text = await res.text();
                 if (!text || text.trim().startsWith('<')) return;
@@ -1180,10 +1193,25 @@
 
                 // Check for instant push signal (from admin panel)
                 if (data.last_push && data.last_push.timestamp) {
-                    if (lastPushTimestamp !== -1 && data.last_push.timestamp > lastPushTimestamp) {
-                        console.log("[PUSH] Instant reload signal received (" + data.last_push.action + "), refreshing TV player...");
-                        window.location.reload(true);
-                        return;
+                    const target = data.last_push.target || 'all';
+                    if (target === 'all' || target === myClientId) {
+                        if (lastPushTimestamp !== -1 && data.last_push.timestamp > lastPushTimestamp) {
+                            console.log("[PUSH] Targeted reload signal received (" + data.last_push.action + ") for target: " + target);
+                            
+                            if (data.last_push.action === 'clear_cache' || data.last_push.action === 'reload') {
+                                if ('caches' in window) {
+                                    try {
+                                        const names = await caches.keys();
+                                        await Promise.all(names.map(name => caches.delete(name)));
+                                    } catch(err) {}
+                                }
+                                sessionStorage.clear();
+                            }
+
+                            // Reload completely with cache bust
+                            window.location.href = window.location.pathname + '?reload=' + Date.now();
+                            return;
+                        }
                     }
                     lastPushTimestamp = data.last_push.timestamp;
                 }
