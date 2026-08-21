@@ -1,14 +1,32 @@
-[2026-08-21 03:05:42]
-Gece 03:00 otomatik yeniden başlatma: 1434 dk sonra
+[2026-08-21 03:08:51]
+Gece 03:00 otomatik yeniden başlatma: 1433 dk sonra
 Boot sequence started.
 LAN failed, trying WAN: http://84.17.86.208:5000
 Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
 App is up to date.
 Settings fetched successfully.
-[JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 530
-[JS] Autoplay retry muted: [object DOMException] -- From line 698
-[JS] Complete play failure: [object DOMException] -- From line 700
-[JS] Autoplay retry muted: [object DOMException] -- From line 698
-[JS] Complete play failure: [object DOMException] -- From line 700
+Downloading video: 2.mp4
 
-[AUTO LOG DUMP AFTER 10s]
+[AUTO LOG DUMP AFTER 10s]ERROR in sync: java.net.SocketException: Software caused connection abort
+	at java.net.SocketInputStream.socketRead0(Native Method)
+	at java.net.SocketInputStream.socketRead(SocketInputStream.java:118)
+	at java.net.SocketInputStream.read(SocketInputStream.java:173)
+	at java.net.SocketInputStream.read(SocketInputStream.java:143)
+	at com.android.okhttp.okio.Okio$2.read(Okio.java:138)
+	at com.android.okhttp.okio.AsyncTimeout$2.read(AsyncTimeout.java:213)
+	at com.android.okhttp.okio.RealBufferedSource.read(RealBufferedSource.java:51)
+	at com.android.okhttp.internal.http.Http1xStream$FixedLengthSource.read(Http1xStream.java:395)
+	at com.android.okhttp.okio.RealBufferedSource$1.read(RealBufferedSource.java:372)
+	at java.io.BufferedInputStream.read1(BufferedInputStream.java:277)
+	at java.io.BufferedInputStream.read(BufferedInputStream.java:338)
+	at java.io.FilterInputStream.read(FilterInputStream.java:107)
+	at com.firinna.tv.MainActivity$BootTask.downloadFile(MainActivity.java:420)
+	at com.firinna.tv.MainActivity$BootTask.doInBackground(MainActivity.java:324)
+	at com.firinna.tv.MainActivity$BootTask.doInBackground(MainActivity.java:241)
+	at android.os.AsyncTask$3.call(AsyncTask.java:394)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:328)
+	at android.os.AsyncTask$SerialExecutor$1.run(AsyncTask.java:305)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1100)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:1572)
+

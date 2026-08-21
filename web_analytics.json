@@ -1,17 +1,17 @@
 {
-    "today": 3,
-    "month": 247,
-    "total": 247,
+    "today": 5,
+    "month": 249,
+    "total": 249,
     "menu": 6,
     "actions": 27,
     "last_date": "2026-08-21",
     "devices": {
         "💻 Masaüstü": 173,
-        "📱 Mobil": 74
+        "📱 Mobil": 76
     },
     "browsers": {
         "Google Chrome": 210,
-        "Apple Safari": 16,
+        "Apple Safari": 18,
         "Microsoft Edge": 17,
         "Diğer Tarayıcı": 4
     },
@@ -27,9 +27,63 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 93,
-        "🔗 Doğrudan (Direct)": 72
+        "🔗 Doğrudan (Direct)": 74
     },
     "recent_visitors": [
+        {
+            "id": "log_1787280796368",
+            "time": "21 Ağustos 05:53",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 05:53:16",
+            "ip": "83.229.36.175",
+            "country": "📍 Toronto / Canada",
+            "location": "📍 Toronto / Canada",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Linux)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (67s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "67 sn",
+            "lang_compare": "EN ➔ EN"
+        },
+        {
+            "id": "log_1787280729413",
+            "time": "21 Ağustos 05:52",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 05:52:09",
+            "ip": "83.229.36.24",
+            "country": "📍 Toronto / Canada",
+            "location": "📍 Toronto / Canada",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Apple iOS)",
+            "browser": "Apple Safari",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
+        {
+            "id": "log_1787280684913",
+            "time": "21 Ağustos 05:51",
+            "iso_date": "2026-08-21",
+            "raw_time": "2026-08-21 05:51:24",
+            "ip": "83.229.92.210",
+            "country": "📍 Toronto / Canada",
+            "location": "📍 Toronto / Canada",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Apple iOS)",
+            "browser": "Apple Safari",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
         {
             "id": "log_1787266439548",
             "time": "21 Ağustos 01:53",
@@ -9713,11 +9767,11 @@
         }
     ],
     "repeat_visitors": 198,
-    "new_visitors": 49,
+    "new_visitors": 51,
     "os": {
         "Linux": 149,
         "Windows PC": 13,
-        "Apple iOS": 12,
+        "Apple iOS": 14,
         "Android OS": 62,
         "Diğer Sistem": 6,
         "Apple macOS": 5
@@ -9726,7 +9780,7 @@
         "14:00 - 17:00 (İkindi Kahve/Tatlı)": 60,
         "17:00 - 20:00 (Akşam Yemeği)": 72,
         "20:00 - 23:00 (Gece Keyfi)": 58,
-        "23:00 - 08:00 (Gece / Erken)": 26,
+        "23:00 - 08:00 (Gece / Erken)": 28,
         "08:00 - 11:00 (Sabah Kahvaltı)": 1,
         "11:00 - 14:00 (Öğle Brunch)": 30
     },
@@ -9752,21 +9806,22 @@
         "📍 Almaty / Kazakhstan": 1,
         "📍 Falkenstein / Germany": 2,
         "📍 Cedar Knolls / United States": 2,
-        "📍 Santa Clara / United States": 1
+        "📍 Santa Clara / United States": 1,
+        "📍 Toronto / Canada": 2
     },
     "traffic_sources": {
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 93,
-        "🔗 Doğrudan (Direct)": 72
+        "🔗 Doğrudan (Direct)": 74
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 170
+        "🌐 Dışarıdan İnceleyen": 172
     },
     "lang_comparisons": {
         "TR ➔ TR": 81,
-        "EN ➔ TR": 34,
+        "EN ➔ TR": 36,
         "EN ➔ EN": 16,
         "TR ➔ ES": 8,
         "TR ➔ RU": 3,
