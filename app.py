@@ -3824,6 +3824,10 @@ def tv_admin():
 def tv_player():
     return render_template('tv_player.html')
 
+@app.route('/tv')
+def tv_redirect():
+    return redirect('/tv-player')
+
 
 @app.after_request
 def add_cache_headers(response):
