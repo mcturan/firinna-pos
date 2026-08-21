@@ -641,13 +641,18 @@
             currentMediaSource = sourceType;
             if(sourceType === 'local') {
                 document.getElementById('ytplayer').style.display = 'none';
-                document.getElementById('local-video').style.display = 'block';
-                document.documentElement.classList.remove('native-video-active');
+                if (!window.AndroidTV) {
+                    vidEl.style.display = 'block';
+                    document.documentElement.classList.remove('native-video-active');
+                } else {
+                    vidEl.style.display = 'none';
+                    document.documentElement.classList.add('native-video-active');
+                }
                 if(player && player.pauseVideo) player.pauseVideo();
             } else {
                 document.documentElement.classList.remove('native-video-active');
                 document.getElementById('local-video').style.display = 'none';
-                if (window.AndroidTV) window.AndroidTV.stopNativeVideo();
+                if (window.AndroidTV && window.AndroidTV.stopNativeVideo) window.AndroidTV.stopNativeVideo();
                 document.getElementById('ytplayer').style.display = 'block';
                 if(vidEl) vidEl.pause();
                 if(player && player.playVideo) player.playVideo();
@@ -665,10 +670,37 @@
 
         function playLocalVideo(vIndex) {
             if(!localVideoList || localVideoList.length === 0) {
-                localVideoList = ["/static/tv_media/videos/2.mp4"];
+                localVideoList = ["1.mp4"];
             }
             currentLocalVideoIndex = vIndex % localVideoList.length;
-            let srcUrl = localVideoList[currentLocalVideoIndex]; 
+            let rawVideo = localVideoList[currentLocalVideoIndex];
+            let fileName = rawVideo.includes("/") ? rawVideo.split("/").pop() : rawVideo;
+            
+            // 1. Android TV APK (Mi Stick Native ExoPlayer/VideoView)
+            if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
+                console.log("[AndroidTV] Triggering native video player for:", fileName);
+                vidEl.style.display = "none";
+                document.documentElement.classList.add('native-video-active');
+                
+                try {
+                    const videoBox = document.getElementById('ml-main-video');
+                    if (videoBox && window.AndroidTV.setVideoBounds) {
+                        const rect = videoBox.getBoundingClientRect();
+                        window.AndroidTV.setVideoBounds(
+                            Math.round(rect.left),
+                            Math.round(rect.top),
+                            Math.round(rect.width),
+                            Math.round(rect.height)
+                        );
+                    }
+                } catch(e) { console.error("setVideoBounds error:", e); }
+                
+                window.AndroidTV.playNativeVideo(fileName);
+                return;
+            }
+
+            // 2. Web & Mobile HTML5 Video Player
+            let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             
             vidEl.style.display = "block";
@@ -1305,20 +1337,25 @@
                 }
             } else if (currentMediaSource === 'local') {
                 document.getElementById('ytplayer').style.display = 'none';
-                vidEl.style.display = 'block';
-                document.documentElement.classList.remove('native-video-active');
                 let newLocalVideos = data.local_videos || [];
                 if (newLocalVideos.length === 0) {
                     newLocalVideos = ["/static/tv_media/videos/1.mp4"];
                 }
                 localVideoList = newLocalVideos;
                 
-                let targetSrc = localVideoList[0];
-                if (!targetSrc.startsWith("/static/")) targetSrc = "/static/tv_media/videos/" + targetSrc;
-                let currentSrcAttr = vidEl.getAttribute('src') || '';
-                
-                if (vidEl.paused || currentSrcAttr !== targetSrc) {
-                    playLocalVideo(0);
+                if (window.AndroidTV) {
+                    vidEl.style.display = 'none';
+                    document.documentElement.classList.add('native-video-active');
+                    playLocalVideo(currentLocalVideoIndex || 0);
+                } else {
+                    vidEl.style.display = 'block';
+                    document.documentElement.classList.remove('native-video-active');
+                    let targetSrc = localVideoList[0];
+                    if (!targetSrc.startsWith("/static/")) targetSrc = "/static/tv_media/videos/" + targetSrc;
+                    let currentSrcAttr = vidEl.getAttribute('src') || '';
+                    if (vidEl.paused || currentSrcAttr !== targetSrc) {
+                        playLocalVideo(0);
+                    }
                 }
             }
         }
