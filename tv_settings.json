@@ -3,7 +3,7 @@
     "layout": "modern_grid",
     "video_playlist": "",
     "local_videos": [
-        "/static/tv_media/videos/2.mp4"
+        "/static/tv_media/videos/1.mp4"
     ],
     "local_audio": [],
     "media_source": "local",
@@ -16,7 +16,7 @@
         "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-21T09:55:06.687020",
+    "last_ping": "2026-08-21T10:07:31.472284",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
