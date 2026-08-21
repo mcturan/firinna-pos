@@ -3,11 +3,11 @@
     "layout": "modern_grid",
     "video_playlist": "",
     "local_videos": [
-        "/static/tv_media/videos/2.mp4"
+        "/static/tv_media/videos/1.mp4"
     ],
     "local_audio": [],
     "media_source": "local",
-    "audio_priority": "video",
+    "audio_priority": "music",
     "promo_text": "",
     "qr_code": "",
     "qr_text": "",
@@ -66,5 +66,6 @@
         "action": "none",
         "timestamp": 0
     },
-    "last_ping": "2026-08-21T10:26:18.843528"
+    "last_ping": "2026-08-21T11:45:59.805570",
+    "version": 1787301768630
 }
