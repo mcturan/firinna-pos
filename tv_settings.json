@@ -2,50 +2,69 @@
     "logo_url": "/static/uploads/logo.png",
     "layout": "modern_grid",
     "video_playlist": "",
-    "local_videos": [],
+    "local_videos": [
+        "/static/tv_media/videos/2.mp4"
+    ],
     "local_audio": [],
-    "media_source": "youtube",
+    "media_source": "local",
     "audio_priority": "video",
     "promo_text": "",
     "qr_code": "",
     "qr_text": "",
     "widgets": {
-        "weather": false,
-        "clock": false
+        "weather": true,
+        "clock": true
     },
     "messages": [],
-    "last_ping": "2026-08-21T10:24:44.577740",
     "ticker_enabled": true,
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
-    "watermark_cycle": {
-        "interval_sec": 90,
-        "duration_sec": 10,
-        "cards": []
-    },
     "ticker_rss_enabled": true,
-    "rss_url": "",
-    "rss_bbc_enabled": true,
-    "rss_aljazeera_enabled": true,
-    "rss_aa_enabled": false,
-    "rss_trt_enabled": false,
-    "rss_custom_enabled": false,
-    "rss_timeout_enabled": true,
-    "rss_goodnews_enabled": true,
-    "rss_bbc_tech_enabled": true,
-    "rss_aa_kultur_enabled": false,
-    "rss_refresh_mins": 60,
-    "rss_ist_kultur_enabled": true,
-    "rss_ist_life_enabled": true,
-    "rss_tr_gurme_enabled": false,
-    "rss_aa_life_en_enabled": true,
+    "rss_turkey_archaeo_enabled": true,
     "rss_ds_arts_en_enabled": true,
+    "rss_aa_life_en_enabled": true,
     "rss_turkey_exp_en_enabled": true,
     "rss_goodnews_en_enabled": true,
-    "rss_turkey_archaeo_enabled": true,
+    "rss_custom_enabled": false,
+    "rss_refresh_mins": 60,
+    "rss_url": "",
+    "watermark_cycle": {
+        "interval_sec": 90,
+        "duration_sec": 12,
+        "cards": [
+            {
+                "id": "wm-card-0",
+                "title": "1. Fırınna Logo & Slogan",
+                "desc": "Klasik büyük logo ve www.firinna.com filigranı",
+                "image": "/static/img/watermarks/card_0_logo.png",
+                "enabled": true
+            },
+            {
+                "id": "wm-card-1",
+                "title": "2. Follow Us on Social Media",
+                "desc": "Instagram, TikTok, Google Maps ve Yandex Maps rozetleri",
+                "image": "/static/img/watermarks/card_1_social.png",
+                "enabled": true
+            },
+            {
+                "id": "wm-card-2",
+                "title": "3. Fırınna Supports Students",
+                "desc": "Beyoğlu Öğrenciye projesi, ücretsiz yemek ve burs desteği",
+                "image": "/static/img/watermarks/card_2_students.png",
+                "enabled": true
+            },
+            {
+                "id": "wm-card-3",
+                "title": "4. Fırınna Cares for Stray Animals",
+                "desc": "Sokak hayvanları mama, su ve yuva desteği",
+                "image": "/static/img/watermarks/card_3_animals.png",
+                "enabled": true
+            }
+        ]
+    },
     "last_push": {
         "action": "none",
         "timestamp": 0
     },
-    "version": 1787297051931
+    "last_ping": "2026-08-21T10:26:13.830996"
 }

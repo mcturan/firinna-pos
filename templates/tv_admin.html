@@ -412,13 +412,15 @@
                 document.getElementById('wm_interval_sec').value = wm.interval_sec || 90;
                 document.getElementById('wm_duration_sec').value = wm.duration_sec || 12;
                 
-                // Render Watermark Cards
-                renderWatermarkCards(wm.cards || [
+                const defaultCards = [
                     { id: 'wm-card-0', title: '1. Fırınna Logo & Slogan', desc: 'Klasik büyük logo ve www.firinna.com filigranı', image: '/static/img/watermarks/card_0_logo.png', enabled: true },
                     { id: 'wm-card-1', title: '2. Follow Us on Social Media', desc: 'Instagram, TikTok, Google Maps ve Yandex Maps rozetleri', image: '/static/img/watermarks/card_1_social.png', enabled: true },
                     { id: 'wm-card-2', title: '3. Fırınna Supports Students', desc: 'Beyoğlu Öğrenciye projesi, ücretsiz yemek ve burs desteği', image: '/static/img/watermarks/card_2_students.png', enabled: true },
                     { id: 'wm-card-3', title: '4. Fırınna Cares for Stray Animals', desc: 'Sokak hayvanları mama, su ve yuva desteği', image: '/static/img/watermarks/card_3_animals.png', enabled: true }
-                ]);
+                ];
+
+                // Render Watermark Cards
+                renderWatermarkCards((wm.cards && wm.cards.length > 0) ? wm.cards : defaultCards);
 
                 document.getElementById('messages_container').innerHTML = '';
                 (data.messages || []).forEach(m => {
