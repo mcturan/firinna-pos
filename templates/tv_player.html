@@ -528,7 +528,7 @@
         
         <div id="ml-main-video" class="grid-box" style="background: #000000 !important; backdrop-filter: none !important;">
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
-            <video id="local-video" src="/static/tv_media/videos/2.mp4" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
+            <video id="local-video" src="/static/tv_media/videos/bayrak.mp4" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
             <div id="record-player"></div>
             <!-- High-Definition Graphic Watermark Container -->
             <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; width: 48vw; aspect-ratio: 1000 / 520; max-height: 75%; border-radius: 1.5vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
@@ -652,38 +652,56 @@
                 if(vidEl) vidEl.pause();
                 if(player && player.playVideo) player.playVideo();
             }
-        }
+        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/0.mp4"];
+        var isPlayingFallback = false;
 
-        const ytIframe = document.getElementById('ytplayer');
-        
         window.playNextNativeVideo = function() {
-            if (localVideoList.length > 0) {
-                currentLocalVideoIndex = (currentLocalVideoIndex + 1) % localVideoList.length;
-                playLocalVideo(currentLocalVideoIndex);
-            }
+            const currentList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            currentLocalVideoIndex = (currentLocalVideoIndex + 1) % currentList.length;
+            playLocalVideo(currentLocalVideoIndex);
         };
 
         function playLocalVideo(vIndex) {
-            if(!localVideoList || localVideoList.length === 0) {
-                localVideoList = ["/static/tv_media/videos/2.mp4"];
+            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            isPlayingFallback = (!localVideoList || localVideoList.length === 0);
+            
+            currentLocalVideoIndex = vIndex % activeList.length;
+            let rawVideo = activeList[currentLocalVideoIndex];
+            if (!rawVideo) return;
+            let fileName = rawVideo.includes("/") ? rawVideo.split("/").pop() : rawVideo;
+            
+            // 1. Android TV APK
+            if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
+                vidEl.style.display = "none";
+                document.documentElement.classList.add('native-video-active');
+                try {
+                    const videoBox = document.getElementById('ml-main-video');
+                    if (videoBox && window.AndroidTV.setVideoBounds) {
+                        const rect = videoBox.getBoundingClientRect();
+                        window.AndroidTV.setVideoBounds(
+                            Math.round(rect.left),
+                            Math.round(rect.top),
+                            Math.round(rect.width),
+                            Math.round(rect.height)
+                        );
+                    }
+                } catch(e) {}
+                window.AndroidTV.playNativeVideo(fileName);
+                return;
             }
-            currentLocalVideoIndex = vIndex % localVideoList.length;
-            let srcUrl = localVideoList[currentLocalVideoIndex]; 
+
+            // 2. Web & Mobile HTML5 Video Player
+            let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             
             vidEl.style.display = "block";
-            vidEl.muted = true;
-            vidEl.loop = true;
-            vidEl.setAttribute('autoplay', '');
-            vidEl.setAttribute('muted', '');
-            vidEl.setAttribute('playsinline', '');
-            vidEl.setAttribute('webkit-playsinline', '');
+            vidEl.muted = (currentAudioPriority === 'music');
             
             if (vidEl.getAttribute('src') !== srcUrl) {
+                vidEl.setAttribute('src', srcUrl);
                 vidEl.src = srcUrl;
             }
 
-            // Always trigger play without blocking
             const playPromise = vidEl.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
@@ -693,14 +711,12 @@
             }
 
             vidEl.onended = () => {
-                if (localVideoList.length > 1) {
-                    window.playNextNativeVideo();
-                } else {
-                    vidEl.currentTime = 0;
-                    vidEl.play().catch(e=>{});
-                }
+                window.playNextNativeVideo();
             };
-            vidEl.onerror = () => { setTimeout(window.playNextNativeVideo, 2000); };
+            vidEl.onerror = () => { 
+                console.log("Video error, falling back to core video...");
+                setTimeout(window.playNextNativeVideo, 1500); 
+            };
         }
 
         function playLocalAudio(aIndex) {
@@ -1299,13 +1315,15 @@
                 document.getElementById('ytplayer').style.display = 'none';
                 vidEl.style.display = 'block';
                 document.documentElement.classList.remove('native-video-active');
+                
                 let newLocalVideos = data.local_videos || [];
-                if (newLocalVideos.length === 0) {
-                    newLocalVideos = ["/static/tv_media/videos/2.mp4"];
-                }
+                const oldListStr = JSON.stringify(localVideoList);
+                const newListStr = JSON.stringify(newLocalVideos);
+                
                 localVideoList = newLocalVideos;
-                let oldSrc = vidEl.getAttribute('src');
-                if (localVideoList.length > 0 && (!oldSrc || !localVideoList.includes(oldSrc) || vidEl.paused)) {
+                
+                // If custom videos just arrived while fallback was playing, or list changed, immediately switch
+                if (oldListStr !== newListStr || isPlayingFallback || vidEl.paused) {
                     playLocalVideo(0);
                 }
             }

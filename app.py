@@ -3749,6 +3749,10 @@ def api_delete_tv_media():
     if filename:
         from werkzeug.utils import secure_filename
         filename = secure_filename(filename)
+        # Protect core fallback videos from deletion
+        if filename.lower() in ['bayrak.mp4', '0.mp4']:
+            return jsonify({"success": False, "error": "Bu video sistemin kalıcı ana açılış videosudur ve silinemez."}), 400
+            
         folder = 'videos' if type_ == 'video' else 'audio'
         filepath = os.path.join(TV_MEDIA_FOLDER, folder, filename)
         if os.path.exists(filepath):
