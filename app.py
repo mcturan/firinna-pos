@@ -1664,10 +1664,18 @@ def api_reclose_order(order_id):
         SELECT COALESCE(SUM(CASE WHEN is_complimentary=0 THEN quantity*price ELSE 0 END),0) as t
         FROM order_items WHERE order_id=?
     ''', (order_id,)).fetchone()['t']
-    conn.execute('''UPDATE orders SET status='closed', total=?, closed_at=CURRENT_TIMESTAMP,
-        payment_cash=?, payment_card=?, tip_amount=?
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    conn.execute('''UPDATE orders SET status='closed', total=?, closed_at=?,
+        payment_cash=?, payment_card=?, tip_amount=?, tip_method=?
         WHERE id=?''',
-        (total, d.get('payment_cash',0), d.get('payment_card',0), d.get('tip_amount',0), order_id))
+        (total, now_str, d.get('payment_cash',0), d.get('payment_card',0), d.get('tip_amount',0), d.get('tip_method', 'cash'), order_id))
+    conn.execute('DELETE FROM transactions WHERE related_order_id = ?', (order_id,))
+    db.record_order_transaction(
+        conn, order_id,
+        d.get('payment_cash',0), d.get('payment_card',0),
+        d.get('tip_amount',0), d.get('tip_method', 'cash'),
+        now_str
+    )
     conn.commit()
     conn.close()
     return jsonify({'success': True, 'total': total})
@@ -1678,13 +1686,61 @@ def api_reclose_order(order_id):
 def backup_page():
     return render_template('backup.html', app_version=APP_VERSION)
 
+@app.route('/hesap')
+def page_hesap():
+    return render_template('hesap.html')
+
+@app.route('/api/hesap/overview')
+def api_hesap_overview():
+    start = request.args.get('start', datetime.now().strftime('%Y-%m-%d'))
+    end   = request.args.get('end',   datetime.now().strftime('%Y-%m-%d'))
+
+    data = db.get_report(start, end)
+    data['hourly'] = db.get_hourly_sales(start, end)
+    data['kasa_nakit'] = db.get_kasa_data(start, end, 'cash')
+    data['kasa_kart']  = db.get_kasa_data(start, end, 'card')
+    data['kasa_ana']   = db.get_kasa_data(start, end, None)
+
+    import sqlite3
+    conn = sqlite3.connect(db.DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cats = conn.execute('''
+        SELECT COALESCE(category,'Genel') as category,
+               SUM(amount) as total,
+               COUNT(*) as count
+        FROM expenses
+        WHERE DATE(created_at) BETWEEN ? AND ?
+        GROUP BY category
+        ORDER BY total DESC
+    ''', (start, end)).fetchall()
+
+    open_orders = conn.execute('''
+        SELECT o.id, t.name as table_name, o.total, o.created_at
+        FROM orders o
+        JOIN tables t ON o.table_id = t.id
+        WHERE o.status = 'open'
+        ORDER BY o.created_at
+    ''').fetchall()
+    conn.close()
+
+    data['expense_categories'] = [dict(r) for r in cats]
+    data['open_orders'] = [dict(r) for r in open_orders]
+    data['open_orders_count'] = len(open_orders)
+
+    vat_rate = float(db.get_setting('vat_rate', '18'))
+    data['vat_rate'] = vat_rate
+    data['vat_amount'] = round(data['total_sales'] * vat_rate / (100 + vat_rate), 2)
+    data['sales_excl_vat'] = round(data['total_sales'] - data['vat_amount'], 2)
+
+    return jsonify(data)
+
 @app.route('/muhasebe')
 def page_muhasebe():
     return render_template('muhasebe.html')
 
 @app.route('/reports')
 def page_reports_redirect():
-    return redirect('/muhasebe')
+    return redirect('/hesap')
 
 @app.route('/api/muhasebe')
 def api_muhasebe():

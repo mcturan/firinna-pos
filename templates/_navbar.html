@@ -51,6 +51,7 @@
         <div class="nav-dropdown" id="navDropdown">
             <button class="nav-dropdown-btn" onclick="toggleNav()">Yönetim ▾</button>
             <div class="nav-dropdown-menu">
+                <a href="/hesap"    {% if request.path == '/hesap'    %}class="active"{% endif %} style="font-weight:700;color:#2d6a4f;">💼 Hesap</a>
                 <a href="/kasa"     {% if request.path == '/kasa'     %}class="active"{% endif %}>Kasa</a>
                 <a href="/muhasebe" {% if request.path == '/muhasebe' %}class="active"{% endif %}>Muhasebe</a>
                 <a href="/reports"  {% if request.path == '/reports'  %}class="active"{% endif %}>Raporlar</a>

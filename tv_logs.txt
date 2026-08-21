@@ -1,12 +1,11 @@
-[2026-08-21 19:04:49]
-Gece 03:00 otomatik yeniden başlatma: 475 dk sonra
+[2026-08-21 20:01:19]
+Gece 03:00 otomatik yeniden başlatma: 418 dk sonra
 Boot sequence started.
 LAN failed, trying WAN: http://84.17.86.208:5000
 Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
 App is up to date.
 Settings fetched successfully.
 Video already exists: 1.mp4
-Video already exists: 0.mp4
 Video already exists: bayrak.mp4
 [JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 530
 [NATIVE] setVideoBounds called: left=313.0, top=57.0, w=704.0, h=347.0, density=2.34375

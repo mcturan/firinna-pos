@@ -976,6 +976,7 @@ def reopen_order(order_id):
             payment_cash = 0, payment_card = 0, tip_amount = 0
         WHERE id = ?
     ''', (order_id,))
+    conn.execute('DELETE FROM transactions WHERE related_order_id = ?', (order_id,))
     conn.commit()
     conn.close()
 
@@ -988,6 +989,7 @@ def delete_order(order_id):
     
     # Sonra order'ı sil
     conn.execute('DELETE FROM orders WHERE id = ?', (order_id,))
+    conn.execute('DELETE FROM transactions WHERE related_order_id = ?', (order_id,))
     
     conn.commit()
     conn.close()
@@ -1306,47 +1308,37 @@ def init_muhasebe_tables():
     conn.close()
 
 def migrate_orders_to_transactions():
-    """Mevcut kapalı siparişleri transactions tablosuna aktar (bir kez çalışır)"""
+    """Mevcut kapalı siparişleri ve eksik transactions kayıtlarını senkronize et"""
     try:
         conn = get_db()
-        existing = conn.execute('SELECT COUNT(*) as c FROM transactions WHERE related_order_id IS NOT NULL').fetchone()
-        if existing['c'] > 0:
-            conn.close()
-            return 0
-
-        orders = conn.execute('''
+        # Eksik olan kapalı siparişleri bul
+        missing = conn.execute('''
             SELECT id, closed_at, payment_cash, payment_card, tip_amount, tip_method, total
-            FROM orders WHERE status = 'closed' AND closed_at IS NOT NULL
+            FROM orders 
+            WHERE status = 'closed' AND closed_at IS NOT NULL
+              AND id NOT IN (SELECT DISTINCT related_order_id FROM transactions WHERE related_order_id IS NOT NULL)
         ''').fetchall()
 
         count = 0
-        for o in orders:
-            date = o['closed_at'][:10] if o['closed_at'] else datetime.now().strftime('%Y-%m-%d')
+        for o in missing:
+            date_str = o['closed_at'][:10] if o['closed_at'] else datetime.now().strftime('%Y-%m-%d')
             if o['payment_cash'] and o['payment_cash'] > 0:
                 conn.execute('''INSERT INTO transactions
                     (date, type, amount, category, payment_method, description, related_order_id, created_at)
                     VALUES (?, 'in', ?, 'satis', 'cash', 'Sipariş #' || ?, ?, ?)''',
-                    (date, o['payment_cash'], o['id'], o['id'], o['closed_at']))
+                    (date_str, o['payment_cash'], o['id'], o['id'], o['closed_at']))
             if o['payment_card'] and o['payment_card'] > 0:
                 conn.execute('''INSERT INTO transactions
                     (date, type, amount, category, payment_method, description, related_order_id, created_at)
                     VALUES (?, 'in', ?, 'satis', 'card', 'Sipariş #' || ?, ?, ?)''',
-                    (date, o['payment_card'], o['id'], o['id'], o['closed_at']))
+                    (date_str, o['payment_card'], o['id'], o['id'], o['closed_at']))
             if o['tip_amount'] and o['tip_amount'] > 0:
                 method = o['tip_method'] or 'cash'
                 conn.execute('''INSERT INTO transactions
                     (date, type, amount, category, payment_method, description, related_order_id, created_at)
                     VALUES (?, 'in', ?, 'bahsis', ?, 'Bahşiş - Sipariş #' || ?, ?, ?)''',
-                    (date, o['tip_amount'], method, o['id'], o['id'], o['closed_at']))
+                    (date_str, o['tip_amount'], method, o['id'], o['id'], o['closed_at']))
             count += 1
-
-        expenses = conn.execute('SELECT * FROM expenses').fetchall()
-        for e in expenses:
-            date = e['created_at'][:10] if e['created_at'] else datetime.now().strftime('%Y-%m-%d')
-            conn.execute('''INSERT INTO transactions
-                (date, type, amount, category, payment_method, description, created_at)
-                VALUES (?, 'out', ?, 'masraf', 'cash', ?, ?)''',
-                (date, e['amount'], e['description'] + ' (' + (e['category'] or 'Genel') + ')', e['created_at']))
 
         conn.commit()
         conn.close()
