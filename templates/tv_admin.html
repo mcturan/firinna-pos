@@ -187,69 +187,15 @@
                 </div>
             </div>
 
-            <h4 style="margin-bottom:0.8rem; color:#2d3748;">Filigran Kartları Sıralaması ve Aç/Kapa</h4>
-            <div style="display:flex; flex-direction:column; gap:14px;">
-                
-                <!-- Kart 0: Varsayılan Logo & Domain -->
-                <div style="border:1.5px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff; display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                    <div style="display:flex; align-items:center; gap:14px;">
-                        <span style="font-size:1.8rem;">🏷️</span>
-                        <div>
-                            <strong style="font-size:1rem; color:#1a202c; display:block;">1. Fırınna Logo & Web Sitesi Filigranı</strong>
-                            <span style="font-size:0.85rem; color:#718096;">Klasik büyük logo ve www.firinna.com açılış filigranı</span>
-                        </div>
-                    </div>
-                    <label class="switch" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:bold; color:#2d6a4f;">
-                        <input type="checkbox" id="wm_logo_enabled" checked style="width:1.3rem; height:1.3rem; cursor:pointer;">
-                        <span>Aktif</span>
-                    </label>
-                </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h4 style="margin:0; color:#2d3748;">Filigran Kartları Listesi</h4>
+                <button type="button" onclick="addWatermarkCard()" style="background:#059669; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                    ➕ Yeni Filigran Kartı Ekle
+                </button>
+            </div>
 
-                <!-- Kart 1: Sosyal Medya -->
-                <div style="border:1.5px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff; display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                    <div style="display:flex; align-items:center; gap:14px;">
-                        <span style="font-size:1.8rem;">📱</span>
-                        <div>
-                            <strong style="font-size:1rem; color:#1a202c; display:block;">2. Follow Us on Social Media & Share Your Day</strong>
-                            <span style="font-size:0.85rem; color:#718096;">Instagram & TikTok: <b>@firinnacafe</b> • Google Maps • Yandex Maps</span>
-                        </div>
-                    </div>
-                    <label class="switch" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:bold; color:#2d6a4f;">
-                        <input type="checkbox" id="wm_social_enabled" checked style="width:1.3rem; height:1.3rem; cursor:pointer;">
-                        <span>Aktif</span>
-                    </label>
-                </div>
-
-                <!-- Kart 2: Üniversite Öğrencilerine Destek -->
-                <div style="border:1.5px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff; display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                    <div style="display:flex; align-items:center; gap:14px;">
-                        <span style="font-size:1.8rem;">🎓</span>
-                        <div>
-                            <strong style="font-size:1rem; color:#1a202c; display:block;">3. Fırınna is Supporting University Students</strong>
-                            <span style="font-size:0.85rem; color:#718096;">"Beyoğlu Öğrenciye" projesi görseli + Sosyal medyada destek çağrısı</span>
-                        </div>
-                    </div>
-                    <label class="switch" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:bold; color:#2d6a4f;">
-                        <input type="checkbox" id="wm_students_enabled" checked style="width:1.3rem; height:1.3rem; cursor:pointer;">
-                        <span>Aktif</span>
-                    </label>
-                </div>
-
-                <!-- Kart 3: Sokak Hayvanlarına Sahip Çıkma -->
-                <div style="border:1.5px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff; display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                    <div style="display:flex; align-items:center; gap:14px;">
-                        <span style="font-size:1.8rem;">🐾</span>
-                        <div>
-                            <strong style="font-size:1rem; color:#1a202c; display:block;">4. Fırınna Cares for Stray Animals</strong>
-                            <span style="font-size:0.85rem; color:#718096;">"Fırınna cares for stray animals & paws — Help us by supporting us on social media!"</span>
-                        </div>
-                    </div>
-                    <label class="switch" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:bold; color:#2d6a4f;">
-                        <input type="checkbox" id="wm_animals_enabled" checked style="width:1.3rem; height:1.3rem; cursor:pointer;">
-                        <span>Aktif</span>
-                    </label>
-                </div>
-
+            <div id="watermark_cards_container" style="display:flex; flex-direction:column; gap:14px;">
+                <!-- Dinamik Kartlar JS ile Yüklenecek -->
             </div>
         </div>
 
@@ -513,10 +459,14 @@
                 const wm = data.watermark_cycle || {};
                 document.getElementById('wm_interval_sec').value = wm.interval_sec || 90;
                 document.getElementById('wm_duration_sec').value = wm.duration_sec || 10;
-                document.getElementById('wm_logo_enabled').checked = (wm.logo_enabled !== false);
-                document.getElementById('wm_social_enabled').checked = (wm.social_enabled !== false);
-                document.getElementById('wm_students_enabled').checked = (wm.students_enabled !== false);
-                document.getElementById('wm_animals_enabled').checked = (wm.animals_enabled !== false);
+                
+                // Render Watermark Cards
+                renderWatermarkCards(wm.cards || [
+                    { id: 'wm-card-0', title: '1. Fırınna Logo & Slogan', desc: 'Klasik büyük logo ve www.firinna.com filigranı', image: '/static/img/watermarks/card_0_logo.png', enabled: true },
+                    { id: 'wm-card-1', title: '2. Follow Us on Social Media', desc: 'Instagram, TikTok, Google Maps ve Yandex Maps rozetleri', image: '/static/img/watermarks/card_1_social.png', enabled: true },
+                    { id: 'wm-card-2', title: '3. Fırınna Supports Students', desc: 'Beyoğlu Öğrenciye projesi, ücretsiz yemek ve burs desteği', image: '/static/img/watermarks/card_2_students.png', enabled: true },
+                    { id: 'wm-card-3', title: '4. Fırınna Cares for Stray Animals', desc: 'Sokak hayvanları mama, su ve yuva desteği', image: '/static/img/watermarks/card_3_animals.png', enabled: true }
+                ]);
 
                 document.getElementById('messages_container').innerHTML = '';
                 (data.messages || []).forEach(m => {
@@ -544,6 +494,111 @@
             }
         }
 
+        let currentWatermarkCards = [];
+
+        function renderWatermarkCards(cards) {
+            currentWatermarkCards = cards;
+            const container = document.getElementById('watermark_cards_container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            currentWatermarkCards.forEach((c, idx) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'wm-setting-card';
+                cardDiv.style.cssText = "border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; background:#ffffff; display:flex; flex-direction:column; gap:12px; position:relative;";
+                cardDiv.innerHTML = `
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                        <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                            <span style="font-size:1.5rem;">🖼️</span>
+                            <input type="text" class="wm-card-title" value="${c.title || ''}" placeholder="Kart Başlığı" style="font-weight:bold; font-size:1rem; color:#1a202c; width:60%; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1;">
+                        </div>
+                        <div style="display:flex; align-items:center; gap:14px;">
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:bold; color:#2d6a4f; font-size:0.95rem;">
+                                <input type="checkbox" class="wm-card-enabled" ${c.enabled !== false ? 'checked' : ''} style="width:1.2rem; height:1.2rem; cursor:pointer;">
+                                <span>Aktif</span>
+                            </label>
+                            <button type="button" onclick="deleteWatermarkCard(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">
+                                🗑️ Sil
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <input type="text" class="wm-card-desc" value="${c.desc || ''}" placeholder="Kart Açıklaması (İsteğe bağlı)" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; font-size:0.9rem; color:#475569;">
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:16px; background:#f8fafc; padding:10px; border-radius:8px; border:1px dashed #cbd5e1;">
+                        <div style="width:140px; height:75px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                            <img class="wm-card-img-preview" src="${c.image || '/static/uploads/logo.png'}" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="this.src='/static/uploads/logo.png'">
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <label style="background:#2563eb; color:white; padding:6px 14px; border-radius:6px; font-size:0.88rem; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                                    📁 Fotoğraf Seç / Yükle
+                                    <input type="file" accept="image/*" style="display:none;" onchange="uploadWatermarkImage(this, ${idx})">
+                                </label>
+                                <span class="wm-upload-status" style="font-size:0.85rem; color:#64748b;"></span>
+                            </div>
+                            <input type="text" class="wm-card-image-url" value="${c.image || ''}" placeholder="Görsel URL (Örn: /static/img/watermarks/card_0_logo.png)" style="padding:4px 8px; border-radius:4px; border:1px solid #e2e8f0; font-size:0.82rem; color:#64748b; width:100%;">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(cardDiv);
+            });
+        }
+
+        function addWatermarkCard() {
+            currentWatermarkCards.push({
+                id: `wm-card-${Date.now()}`,
+                title: `Yeni Filigran Kartı ${currentWatermarkCards.length + 1}`,
+                desc: 'Tanıtım veya kampanya açıklaması',
+                image: '/static/uploads/logo.png',
+                enabled: true
+            });
+            renderWatermarkCards(currentWatermarkCards);
+        }
+
+        function deleteWatermarkCard(idx) {
+            if (confirm('Bu filigran kartını silmek istediğinize emin misiniz?')) {
+                currentWatermarkCards.splice(idx, 1);
+                renderWatermarkCards(currentWatermarkCards);
+            }
+        }
+
+        async function uploadWatermarkImage(input, idx) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            const cardEl = document.querySelectorAll('.wm-setting-card')[idx];
+            const statusEl = cardEl.querySelector('.wm-upload-status');
+            const previewEl = cardEl.querySelector('.wm-card-img-preview');
+            const urlInput = cardEl.querySelector('.wm-card-image-url');
+
+            statusEl.textContent = "⏳ Yükleniyor...";
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('/api/tv/watermark/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    statusEl.textContent = "✅ Yüklendi!";
+                    statusEl.style.color = "#059669";
+                    previewEl.src = data.url;
+                    urlInput.value = data.url;
+                    currentWatermarkCards[idx].image = data.url;
+                } else {
+                    statusEl.textContent = "❌ Hata: " + (data.error || 'Yüklenemedi');
+                    statusEl.style.color = "#dc2626";
+                }
+            } catch(e) {
+                statusEl.textContent = "❌ Sunucu hatası";
+                statusEl.style.color = "#dc2626";
+            }
+        }
+
         async function saveSettings() {
             const messages = Array.from(document.querySelectorAll('.message-row')).map(row => ({
                 text: row.querySelector('.m-text').value,
@@ -551,6 +606,15 @@
                 start_time: row.querySelector('.m-start').value,
                 end_time: row.querySelector('.m-end').value
             })).filter(m => m.text.trim() !== '');
+
+            // Collect dynamic watermark cards
+            const wmCards = Array.from(document.querySelectorAll('.wm-setting-card')).map((card, idx) => ({
+                id: currentWatermarkCards[idx]?.id || `wm-card-${idx}`,
+                title: card.querySelector('.wm-card-title').value.trim(),
+                desc: card.querySelector('.wm-card-desc').value.trim(),
+                image: card.querySelector('.wm-card-image-url').value.trim(),
+                enabled: card.querySelector('.wm-card-enabled').checked
+            })).filter(c => c.image !== '');
 
             const data = {
                 logo_url: document.getElementById('logo_url').value,
@@ -580,10 +644,7 @@
                 watermark_cycle: {
                     interval_sec: parseInt(document.getElementById('wm_interval_sec').value) || 90,
                     duration_sec: parseInt(document.getElementById('wm_duration_sec').value) || 10,
-                    logo_enabled: document.getElementById('wm_logo_enabled').checked,
-                    social_enabled: document.getElementById('wm_social_enabled').checked,
-                    students_enabled: document.getElementById('wm_students_enabled').checked,
-                    animals_enabled: document.getElementById('wm_animals_enabled').checked
+                    cards: wmCards
                 },
                 messages: messages
             };

@@ -3602,6 +3602,22 @@ def api_get_tv_media():
         "audio": ["/static/tv_media/audio/" + a for a in audio if a.endswith(('.mp3', '.wav', '.ogg'))]
     })
 
+@app.route('/api/tv/watermark/upload', methods=['POST'])
+def api_upload_tv_watermark():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    from werkzeug.utils import secure_filename
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    if file:
+        wm_dir = os.path.join(os.path.dirname(__file__), 'static', 'img', 'watermarks')
+        os.makedirs(wm_dir, exist_ok=True)
+        filename = f"wm_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+        filepath = os.path.join(wm_dir, filename)
+        file.save(filepath)
+        return jsonify({"success": True, "url": f"/static/img/watermarks/{filename}"})
+
 @app.route('/api/tv/media/upload', methods=['POST'])
 def api_upload_tv_media():
     if 'file' not in request.files:
