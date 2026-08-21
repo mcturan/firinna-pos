@@ -21,9 +21,9 @@
     "ticker_text_enabled": true,
     "ticker_currency_enabled": true,
     "ticker_rss_enabled": true,
-    "ticker_effect": "marquee",
-    "ticker_speed": 4.5,
-    "ticker_slide_duration": 8,
+    "ticker_effect": "fade",
+    "ticker_speed": 2.5,
+    "ticker_slide_duration": 6,
     "rss_turkey_archaeo_enabled": true,
     "rss_ds_arts_en_enabled": true,
     "rss_aa_life_en_enabled": true,
@@ -71,6 +71,6 @@
         "target": "tv_phius0l",
         "timestamp": 1787328925976
     },
-    "last_ping": "2026-08-21T21:11:51.482861",
-    "version": 1787344427873
+    "last_ping": "2026-08-21T23:39:32.171689",
+    "version": 1787344672199
 }

@@ -214,69 +214,78 @@
             overflow: hidden;
             padding: 0;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100%;
+            width: 100%;
+        }
+
+        #ml-continuous-marquee {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        #ml-rss-box.ticker-mode-marquee #ml-continuous-marquee {
+            display: inline-flex;
+            white-space: nowrap;
+            overflow: visible;
+            width: auto;
         }
 
         .rss-marquee-content {
-            display: inline-flex;
-            align-items: center;
-            white-space: nowrap;
             font-size: 1.55vw;
             font-weight: 700;
             color: #0F172A;
             letter-spacing: 0.2px;
             will-change: transform;
         }
-        .bot-slide.active {
-            opacity: 1;
-            transform: translate3d(0, 0, 0);
-            z-index: 2;
-        }
-        .bot-slide.exit {
-            opacity: 0;
-            transform: translate3d(0, -100%, 0);
-            z-index: 1;
-        }
 
         /* Ticker Card Effects (Fade, Slide Up, Slide Down) */
         .ticker-card {
             position: absolute;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
-            padding: 0 1.5vw;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            justify-content: flex-start;
+            padding: 0 1.8vw;
+            box-sizing: border-box;
             font-size: 1.55vw;
             font-weight: 700;
             color: #0F172A;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             opacity: 0;
             pointer-events: none;
+            z-index: 1;
             will-change: transform, opacity;
-            transition: all 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Active Card State */
+        .ticker-card.active {
+            opacity: 1 !important;
+            z-index: 5 !important;
+            pointer-events: auto !important;
+            transform: translate3d(0, 0, 0) scale(1) !important;
         }
 
         /* Effect 1: Fade */
-        .ticker-effect-fade .ticker-card.active {
-            opacity: 1;
-            transform: scale(1);
-        }
-        .ticker-effect-fade .ticker-card.enter {
-            opacity: 0;
-            transform: scale(0.97);
+        .ticker-effect-fade .ticker-card {
+            transform: scale(0.98);
         }
         .ticker-effect-fade .ticker-card.exit {
             opacity: 0;
-            transform: scale(1.03);
+            transform: scale(1.02);
         }
 
         /* Effect 2: Slide Up */
-        .ticker-effect-slide_up .ticker-card.active {
-            opacity: 1;
-            transform: translate3d(0, 0, 0);
-        }
-        .ticker-effect-slide_up .ticker-card.enter {
-            opacity: 0;
+        .ticker-effect-slide_up .ticker-card {
             transform: translate3d(0, 100%, 0);
         }
         .ticker-effect-slide_up .ticker-card.exit {
@@ -285,12 +294,7 @@
         }
 
         /* Effect 3: Slide Down */
-        .ticker-effect-slide_down .ticker-card.active {
-            opacity: 1;
-            transform: translate3d(0, 0, 0);
-        }
-        .ticker-effect-slide_down .ticker-card.enter {
-            opacity: 0;
+        .ticker-effect-slide_down .ticker-card {
             transform: translate3d(0, -100%, 0);
         }
         .ticker-effect-slide_down .ticker-card.exit {
@@ -1290,9 +1294,13 @@
         let currentTickerCardIdx = 0;
         let tickerCardItems = [];
         let marqueeAnimId = null;
+        let lastRenderedItemsKey = "";
 
         function animateMarquee() {
-            if (currentTickerEffect !== 'marquee') return;
+            if (currentTickerEffect !== 'marquee') {
+                marqueeAnimId = null;
+                return;
+            }
             const marqueeEl = document.getElementById('ml-continuous-marquee');
             if (marqueeEl && marqueeEl.firstElementChild) {
                 const singleWidth = marqueeEl.firstElementChild.offsetWidth;
@@ -1307,13 +1315,10 @@
             marqueeAnimId = requestAnimationFrame(animateMarquee);
         }
 
-        function updateUnifiedMarquee() {
+        function updateUnifiedMarquee(force = false) {
             const box = document.getElementById('ml-rss-box');
             const marqueeEl = document.getElementById('ml-continuous-marquee');
             if (!box || !marqueeEl) return;
-
-            // Apply active effect class on the container
-            box.className = 'grid-box ticker-effect-' + currentTickerEffect;
 
             let items = [];
 
@@ -1337,7 +1342,7 @@
                 items.push(`<span style="color:#D97706; font-weight:800;">📢 DUYURU:</span> <span style="margin-left:0.5vw; color:#0F172A; font-weight:700;">${messageText.trim()}</span>`);
             }
 
-            // 2. RSS Live Headlines (Clean high-contrast dark text on white)
+            // 2. RSS Live Headlines
             if (isTickerRssEnabled && liveRssTitles.length > 0) {
                 liveRssTitles.forEach(t => {
                     items.push(`<span style="color:#2563EB; font-weight:800;">📰 HABER:</span> <span style="margin-left:0.5vw; color:#0F172A; font-weight:700;">${t}</span>`);
@@ -1349,25 +1354,31 @@
                 items.push('<span style="color:#0F172A; font-weight:700;">FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE • GALATA / BEYOĞLU</span>');
             }
 
+            const currentKey = currentTickerEffect + '__' + items.join('__');
+            if (!force && currentKey === lastRenderedItemsKey && currentTickerEffect !== 'marquee') {
+                return; // Content unchanged, keep smooth card rotation alive
+            }
+            lastRenderedItemsKey = currentKey;
             tickerCardItems = items;
 
             if (currentTickerEffect === 'marquee') {
+                box.className = 'grid-box ticker-mode-marquee';
                 if (tickerSlideTimer) { clearInterval(tickerSlideTimer); tickerSlideTimer = null; }
+                
                 const singleHtml = `<div class="rss-single-strip" style="display:inline-flex; align-items:center; flex-shrink:0; padding-right:2.5vw;">${items.join('<span style="color:#CBD5E1; margin: 0 1.8vw;">|</span>')}</div>`;
-                marqueeEl.style.display = 'inline-flex';
                 marqueeEl.innerHTML = singleHtml + singleHtml + singleHtml;
                 
                 if (!marqueeAnimId) {
                     marqueeAnimId = requestAnimationFrame(animateMarquee);
                 }
             } else {
+                box.className = 'grid-box ticker-effect-' + currentTickerEffect;
                 if (marqueeAnimId) { cancelAnimationFrame(marqueeAnimId); marqueeAnimId = null; }
                 marqueeEl.style.transform = 'none';
-                marqueeEl.style.display = 'block';
 
                 let html = '';
                 items.forEach((c, idx) => {
-                    html += `<div class="ticker-card ${idx === 0 ? 'active' : 'enter'}" id="tcard-${idx}">${c}</div>`;
+                    html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}">${c}</div>`;
                 });
                 marqueeEl.innerHTML = html;
                 currentTickerCardIdx = 0;
@@ -1386,19 +1397,22 @@
             const newEl = document.getElementById(`tcard-${currentTickerCardIdx}`);
 
             if (oldEl) {
-                oldEl.className = 'ticker-card exit';
+                oldEl.classList.remove('active');
+                oldEl.classList.add('exit');
+                setTimeout(() => { 
+                    if (oldEl) oldEl.classList.remove('exit'); 
+                }, 600);
             }
             if (newEl) {
-                newEl.className = 'ticker-card enter';
-                void newEl.offsetWidth; // Trigger reflow for CSS animation
-                newEl.className = 'ticker-card active';
+                newEl.classList.remove('exit');
+                newEl.classList.add('active');
             }
         }
 
         function updateTickerText() {
-            updateUnifiedMarquee();
+            updateUnifiedMarquee(true);
         }
-        setInterval(updateUnifiedMarquee, 15000); 
+        setInterval(function() { updateUnifiedMarquee(false); }, 15000); 
 
         async function fetchProducts() {
             try {
