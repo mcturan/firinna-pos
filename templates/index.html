@@ -2326,9 +2326,13 @@ async function doMerge(targetTableId, targetTableName) {
 
         let backPressCount = 0;
         function closeTopModal() {
-            const modals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'block');
+            const modals = Array.from(document.querySelectorAll('.modal, .modal-overlay, #quickPayModal, #itemSplitModal, #quickNoteModal')).filter(m => {
+                const disp = m.style.display;
+                return disp && disp !== 'none';
+            });
             if (modals.length > 0) {
-                modals[modals.length - 1].style.display = 'none';
+                const topModal = modals[modals.length - 1];
+                topModal.style.display = 'none';
                 return true;
             }
             return false;
@@ -2339,18 +2343,28 @@ async function doMerge(targetTableId, targetTableName) {
             mutations.forEach(m => {
                 if (m.type === 'attributes' && m.attributeName === 'style') {
                     const target = m.target;
-                    if (target.classList.contains('modal') && target.style.display === 'block') {
+                    const isOpen = target.style.display && target.style.display !== 'none';
+                    if (isOpen) {
                         if (!target.dataset.isOpen) {
                             target.dataset.isOpen = 'true';
                             history.pushState({modal: target.id}, "", window.location.href);
                         }
-                    } else if (target.classList.contains('modal') && target.style.display === 'none') {
+                    } else {
                         target.dataset.isOpen = '';
                     }
                 }
             });
         });
-        document.querySelectorAll('.modal').forEach(m => modalObserver.observe(m, {attributes: true}));
+        document.querySelectorAll('.modal, .modal-overlay, #quickPayModal, #itemSplitModal, #quickNoteModal').forEach(m => modalObserver.observe(m, {attributes: true}));
+
+        document.addEventListener('backbutton', function(e) {
+            if (closeTopModal()) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+        }, false);
 
         history.pushState({page: 'home'}, "", window.location.href);
         window.addEventListener('popstate', function(e) {
@@ -2866,7 +2880,7 @@ let cachedSavedNotes = [];
 async function openQuickNotePrintModal() {
     const modal = document.getElementById('quickNoteModal');
     const select = document.getElementById('quickSavedNotesSelect');
-    modal.style.display = 'flex';
+    modal.style.display = 'block';
     
     try {
         cachedSavedNotes = await fetch('/api/notes/saved').then(r => r.json());
