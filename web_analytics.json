@@ -1,16 +1,16 @@
 {
-    "today": 2,
-    "month": 254,
-    "total": 254,
+    "today": 3,
+    "month": 255,
+    "total": 255,
     "menu": 6,
     "actions": 27,
     "last_date": "2026-08-22",
     "devices": {
         "💻 Masaüstü": 177,
-        "📱 Mobil": 77
+        "📱 Mobil": 78
     },
     "browsers": {
-        "Google Chrome": 215,
+        "Google Chrome": 216,
         "Apple Safari": 18,
         "Microsoft Edge": 17,
         "Diğer Tarayıcı": 4
@@ -27,9 +27,27 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 94,
-        "🔗 Doğrudan (Direct)": 78
+        "🔗 Doğrudan (Direct)": 79
     },
     "recent_visitors": [
+        {
+            "id": "log_1787400229479",
+            "time": "22 Ağustos 15:03",
+            "iso_date": "2026-08-22",
+            "raw_time": "2026-08-22 15:03:49",
+            "ip": "66.249.66.199",
+            "country": "📍 Pryor / United States",
+            "location": "📍 Pryor / United States",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
         {
             "id": "log_1787397619749",
             "time": "22 Ağustos 14:20",
@@ -9929,17 +9947,17 @@
         }
     ],
     "repeat_visitors": 201,
-    "new_visitors": 53,
+    "new_visitors": 54,
     "os": {
         "Linux": 153,
         "Windows PC": 13,
         "Apple iOS": 14,
-        "Android OS": 63,
+        "Android OS": 64,
         "Diğer Sistem": 6,
         "Apple macOS": 5
     },
     "peak_hours": {
-        "14:00 - 17:00 (İkindi Kahve/Tatlı)": 60,
+        "14:00 - 17:00 (İkindi Kahve/Tatlı)": 61,
         "17:00 - 20:00 (Akşam Yemeği)": 72,
         "20:00 - 23:00 (Gece Keyfi)": 58,
         "23:00 - 08:00 (Gece / Erken)": 28,
@@ -9958,7 +9976,7 @@
         "📍 Mountain View / United States": 7,
         "📍 Madrid / Spain": 1,
         "📍 San Jose / United States": 1,
-        "📍 Pryor / United States": 8,
+        "📍 Pryor / United States": 9,
         "📍 Minkler / United States": 1,
         "📍 Baku / Azerbaijan": 1,
         "📍 Sterling / United States": 1,
@@ -9976,15 +9994,15 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 94,
-        "🔗 Doğrudan (Direct)": 78
+        "🔗 Doğrudan (Direct)": 79
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 177
+        "🌐 Dışarıdan İnceleyen": 178
     },
     "lang_comparisons": {
         "TR ➔ TR": 85,
-        "EN ➔ TR": 37,
+        "EN ➔ TR": 38,
         "EN ➔ EN": 16,
         "TR ➔ ES": 8,
         "TR ➔ RU": 3,

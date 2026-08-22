@@ -3856,6 +3856,30 @@ def get_tv_products():
     except Exception as e:
         return jsonify([])
 
+@app.route('/api/tv/facts', methods=['GET'])
+def api_tv_facts():
+    settings = get_tv_settings()
+    facts = settings.get('did_you_know', [])
+    return jsonify({
+        "facts": facts,
+        "count": len(facts),
+        "enabled": settings.get('ticker_facts_enabled', True)
+    })
+
+@app.route('/api/tv/facts/save', methods=['POST'])
+def api_tv_facts_save():
+    try:
+        payload = request.json or {}
+        facts = payload.get('facts', [])
+        settings = get_tv_settings()
+        settings['did_you_know'] = facts
+        if 'enabled' in payload:
+            settings['ticker_facts_enabled'] = bool(payload['enabled'])
+        save_tv_settings(settings)
+        return jsonify({"success": True, "count": len(facts)})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 400
+
 @app.route('/api/tv/media', methods=['GET'])
 def api_get_tv_media():
     videos = os.listdir(os.path.join(TV_MEDIA_FOLDER, 'videos'))

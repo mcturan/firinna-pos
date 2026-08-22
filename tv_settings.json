@@ -28,7 +28,7 @@
     "rss_ds_arts_en_enabled": true,
     "rss_aa_life_en_enabled": true,
     "rss_turkey_exp_en_enabled": true,
-    "rss_goodnews_en_enabled": true,
+    "rss_goodnews_en_enabled": false,
     "rss_custom_enabled": false,
     "rss_refresh_mins": 15,
     "rss_url": "",
@@ -69,8 +69,251 @@
     "last_push": {
         "action": "clear_cache",
         "target": "all",
-        "timestamp": 1787399871518
+        "timestamp": 1787400156776
     },
-    "last_ping": "2026-08-22T14:59:47.751301",
-    "version": 1787398102495
+    "last_ping": "2026-08-22T15:15:41.945143",
+    "version": 1787400036235,
+    "did_you_know": [
+        {
+            "id": "dyk_1",
+            "category": "galata",
+            "icon": "💡",
+            "title": "Galata Kulesi",
+            "text": "Galata Kulesi, 1348 yılında Cenevizliler tarafından inşa edilmiş olup asırlarca fener ve yangın kulesi olarak kullanılmıştır.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_2",
+            "category": "galata",
+            "icon": "💡",
+            "title": "Hezârfen Ahmed Çelebi",
+            "text": "1632 yılında Hezârfen Ahmed Çelebi, Galata Kulesi'nden kanat takıp lodosla süzülerek Üsküdar Doğancılar'a uçmuştur.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_3",
+            "category": "galata",
+            "icon": "💡",
+            "title": "Tarihi Tünel (1875)",
+            "text": "Karaköy ile Beyoğlu'nu bağlayan Tünel, Londra'dan sonra dünyanın en eski ikinci yeraltı raylı taşıma sistemidir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_4",
+            "category": "coffee",
+            "icon": "💡",
+            "title": "İlk Kahvehane (1554)",
+            "text": "Dünyadaki ilk kahvehane 1554 yılında İstanbul Tahtakale'de açılmış ve kahve kültürü Avrupa'ya buradan yayılmıştır.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_5",
+            "category": "bakery",
+            "icon": "💡",
+            "title": "Ekşi Mayanın Sırrı",
+            "text": "Ekşi mayalı ekmeklerimiz 36 saat soğuk fermantasyonla olgunlaşır; glisemik indeksi en düşük, sindirimi en kolay ekmektir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_6",
+            "category": "bakery",
+            "icon": "💡",
+            "title": "Kruvasanın Hikayesi",
+            "text": "Kruvasanın hilal formu, gece fırında çalışırken Osmanlı kuşatmasını ilk fark edip haber veren Viyanalı fırıncılara ithafen doğmuştur.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_7",
+            "category": "galata",
+            "icon": "💡",
+            "title": "Galata Köprüsü",
+            "text": "Haliç üzerindeki ilk ahşap Galata Köprüsü, 1845 yılında Sultan Abdülmecid'in annesi Bezmialem Valide Sultan tarafından yaptırılmıştır.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_8",
+            "category": "galata",
+            "icon": "💡",
+            "title": "Ceneviz Sur Duvarları",
+            "text": "Galata sokaklarında yürürken binaların arasına ve avlulara gizlenmiş 700 yıllık tarihi Ceneviz sur kalıntılarına rastlayabilirsiniz.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_9",
+            "category": "history",
+            "icon": "💡",
+            "title": "Göbeklitepe (12.000 Yıl)",
+            "text": "Şanlıurfa'daki Göbeklitepe, 12.000 yıllık geçmişiyle piramitlerden 7500 yıl önce inşa edilmiş tarihin en eski tapınak kompleksidir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_10",
+            "category": "history",
+            "icon": "💡",
+            "title": "Ayasofya-i Kebir",
+            "text": "537 yılında inşa edilen Ayasofya, tam 1000 yıl boyunca dünyanın en büyük katedrali ve mimari şaheseri unvanını korumuştur.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_11",
+            "category": "galata",
+            "icon": "💡",
+            "title": "Karaköy Limanı",
+            "text": "Karaköy ve Galata, tarih boyunca Doğu ile Batı arasındaki deniz ticaretinin ve İpek & Baharat Yolu'nun Akdeniz'deki en canlı limanı olmuştur.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_12",
+            "category": "coffee",
+            "icon": "💡",
+            "title": "Specialty Coffee",
+            "text": "Nitelikli kahve (Specialty Coffee), 100 üzerinden 80 ve üzeri puan alan, özenle seçilmiş tek kökenli (Single Origin) çekirdeklerden demlenir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_13",
+            "category": "bakery",
+            "icon": "💡",
+            "title": "İstanbul Simiti",
+            "text": "İstanbul simiti, 1525 yılından bu yana saray kayıtlarında geçen, pekmezle harmanlanıp susamla kavrulan geleneksel bir fırın mirasıdır.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_14",
+            "category": "galata",
+            "icon": "💡",
+            "title": "Beyoğlu Pasajları",
+            "text": "19. yüzyılda inşa edilen Çiçek Pasajı, Hazzopulo ve Fransız Geçidi, İstanbul'un ilk modern ve zarif ticaret merkezleridir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_15",
+            "category": "history",
+            "icon": "💡",
+            "title": "Yerebatan Sarnıcı",
+            "text": "542 yılında inşa edilen sarnıç, 336 mermer sütunu ve gizemli Medusa başlarıyla 80.000 ton su depolama kapasitesine sahiptir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_16",
+            "category": "history",
+            "icon": "💡",
+            "title": "Kapalıçarşı (1461)",
+            "text": "1461 yılında kurulan Kapalıçarşı (Grand Bazaar), 4000'den fazla dükkanı ve 64 sokağı ile dünyanın en eski alışveriş merkezidir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_17",
+            "category": "istanbul",
+            "icon": "💡",
+            "title": "Boğaziçi Akıntıları",
+            "text": "İstanbul Boğazı'nda Karadeniz'den Marmara'ya üst akıntı, Marmara'dan Karadeniz'e ise derin dip akıntısı olmak üzere iki zıt akıntı vardır.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_18",
+            "category": "culture",
+            "icon": "💡",
+            "title": "Çay Kültürü",
+            "text": "Türkiye, kişi başına yıllık çay tüketiminde dünyanın 1 numaralı ülkesidir (kişi başı yılda ortalama 3.5 kg çay tüketilmektedir).",
+            "enabled": true
+        },
+        {
+            "id": "dyk_19",
+            "category": "history",
+            "icon": "💡",
+            "title": "Topkapı Sarayı",
+            "text": "Fatih Sultan Mehmed tarafından yaptırılan Topkapı Sarayı, tam 400 yıl boyunca Osmanlı İmparatorluğu'nun yönetim kalbi olmuştur.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_20",
+            "category": "galata",
+            "icon": "💡",
+            "title": "Galata St. Pierre",
+            "text": "Galata'daki tarihi St. Pierre Kilisesi, Ceneviz döneminden kalan 14. yüzyıl Fransisken manastırının temelleri üzerinde yükselir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_21",
+            "category": "bakery",
+            "icon": "💡",
+            "title": "Fransız Bageti",
+            "text": "Gerçek baget sadece un, su, tuz ve maya ile yapılır; dış kabuğunun altın rengi çıtırlığı fırındaki yoğun taş buharından gelir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_22",
+            "category": "history",
+            "icon": "💡",
+            "title": "Efes Antik Kenti",
+            "text": "İzmir Selçuk'taki Efes, antik dünyanın 7 harikasından biri olan Artemis Tapınağı ve devasa Celsus Kütüphanesi ile ünlüdür.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_23",
+            "category": "coffee",
+            "icon": "💡",
+            "title": "Espresso & Crema",
+            "text": "Taze çekilmiş espressonun üzerindeki kadifemsi altın krema (crema), kahve çekirdeğindeki zengin aromatik yağların kusursuz ifadesidir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_24",
+            "category": "galata",
+            "icon": "💡",
+            "title": "Nostaljik Tramvay",
+            "text": "1871 yılında atlı tramvay olarak başlayan İstiklal Caddesi hattı, 1990'dan beri kırmızı nostaljik tramvayıyla semtin simgesidir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_25",
+            "category": "istanbul",
+            "icon": "💡",
+            "title": "Kız Kulesi",
+            "text": "2500 yıllık efsanevi geçmişiyle Boğaz'ın girişinde yer alan Kız Kulesi, antik çağlardan bu yana fener ve gözetleme kulesi olmuştur.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_26",
+            "category": "history",
+            "icon": "💡",
+            "title": "Troya Antik Kenti",
+            "text": "Çanakkale'deki 4000 yıllık Troya, Homeros'un İlyada Destanı'na konu olan efsanevi Truva Atı ve Helen efsanesinin beşiğidir.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_27",
+            "category": "bakery",
+            "icon": "💡",
+            "title": "Otoliz Yöntemi",
+            "text": "Fırıncılıkta un ve suyun yoğurmadan önce bekletilmesi (otoliz), glüten ağını doğal olarak güçlendirir ve ekmeğe eşsiz bir lezzet katar.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_28",
+            "category": "history",
+            "icon": "💡",
+            "title": "Piri Reis Haritası",
+            "text": "1513 yılında ceylan derisine çizilen Piri Reis haritası, Amerika kıtasını şaşırtıcı bir doğrulukla gösteren en eski dünya haritalarındandır.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_29",
+            "category": "coffee",
+            "icon": "💡",
+            "title": "Cold Brew Demleme",
+            "text": "Soğuk suyla 16-24 saatte yavaşça demlenen Cold Brew kahve, sıcak demlenen kahvelere göre %65 daha az asidiktir ve tatlı bir içim sunar.",
+            "enabled": true
+        },
+        {
+            "id": "dyk_30",
+            "category": "culture",
+            "icon": "💡",
+            "title": "Askıda Ekmek Geleneği",
+            "text": "Osmanlı fırın kültüründen günümüze miras kalan 'Askıda Ekmek', yardımlaşma ve dayanışmanın en zarif ve köklü simgesidir.",
+            "enabled": true
+        }
+    ],
+    "ticker_mode": "facts"
 }

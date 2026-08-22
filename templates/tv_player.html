@@ -38,7 +38,7 @@
             padding: 1.2vh 1.2vw;
             box-sizing: border-box;
             grid-template-columns: 28vw 1fr;
-            grid-template-rows: 10vh 1fr 10vh;
+            grid-template-rows: 10vh 1fr 13.5vh;
             gap: 1.2vh 1.2vw;
             background: #0B0F19;
             overflow: hidden;
@@ -233,10 +233,10 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            padding: 0 1.8vw;
+            padding: 0 2.2vw;
             box-sizing: border-box;
-            font-size: 1.35vw;
-            line-height: 1.25;
+            font-size: 1.55vw;
+            line-height: 1.35;
             font-weight: 700;
             color: #0F172A;
             opacity: 0;
@@ -254,6 +254,7 @@
             text-overflow: ellipsis;
             white-space: normal;
             word-break: break-word;
+            flex: 1;
         }
 
         /* Active Card State */
@@ -560,10 +561,12 @@
             <div id="product-carousel" style="width:100%; height:100%; position:relative;"></div>
         </div>
         
-        <div id="ml-main-video" class="grid-box" style="background: #000000 !important; backdrop-filter: none !important;">
+        <div id="ml-main-video" class="grid-box" style="background: #000000 !important; backdrop-filter: none !important; position:relative;">
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
             <video id="local-video" src="/static/tv_media/videos/bayrak.mp4" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
             <div id="record-player"></div>
+            <!-- Small live download progress & speed badge -->
+            <div id="ml-dl-badge" style="position:absolute; bottom:12px; right:12px; background:rgba(15,23,42,0.88); border:1px solid rgba(56,189,248,0.5); color:#38bdf8; font-size:0.85rem; font-weight:700; padding:4px 10px; border-radius:6px; z-index:40; display:none; box-shadow:0 2px 8px rgba(0,0,0,0.3); letter-spacing:0.3px;"></div>
             <!-- High-Definition Graphic Watermark Container -->
             <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.6s ease; z-index: 50; pointer-events: none; width: 48vw; aspect-ratio: 1000 / 520; max-height: 75%; border-radius: 1.5vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
                 
@@ -672,28 +675,123 @@
         }
 
         const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4"];
-        var isPlayingFallback = false;
-        var preloadedVideoUrl = null;
-        var isPreloading = false;
-
-        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4"];
-        var isPlayingFallback = false;
+        var isPlayingFallback = true;
+        var targetVideoReady = false;
+        var isDownloadingTarget = false;
 
         window.playNextNativeVideo = function() {
-            let currentList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
-            currentLocalVideoIndex = (currentLocalVideoIndex + 1) % currentList.length;
+            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            currentLocalVideoIndex = (currentLocalVideoIndex + 1) % activeList.length;
             playLocalVideo(currentLocalVideoIndex);
         };
 
+        function checkAndBufferTargetVideo() {
+            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : [];
+            let targetVideo = activeList.find(v => !v.includes('bayrak.mp4')) || activeList[0];
+            if (!targetVideo) return;
+
+            let fileName = targetVideo.includes("/") ? targetVideo.split("/").pop() : targetVideo;
+            let targetUrl = targetVideo.startsWith("/static/") ? targetVideo : "/static/tv_media/videos/" + targetVideo;
+
+            const badge = document.getElementById('ml-dl-badge');
+
+            // If already playing target or target is ready, no need to download
+            if (vidEl && vidEl.src && vidEl.src.includes(fileName) && !vidEl.paused && !isPlayingFallback) {
+                if (badge) badge.style.display = 'none';
+                return;
+            }
+
+            if (isDownloadingTarget) return;
+            isDownloadingTarget = true;
+
+            if (badge) {
+                badge.style.display = 'block';
+                badge.innerHTML = `📥 <b>${fileName}</b>: %0 (başlatılıyor)`;
+            }
+
+            let lastLoaded = 0;
+            let lastTime = Date.now();
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', targetUrl, true);
+            xhr.responseType = 'blob';
+
+            xhr.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const pct = Math.round((e.loaded / e.total) * 100);
+                    const now = Date.now();
+                    const timeDiffSec = (now - lastTime) / 1000;
+                    let speedStr = "";
+
+                    if (timeDiffSec >= 0.5) {
+                        const bytesDiff = e.loaded - lastLoaded;
+                        const speedBps = bytesDiff / Math.max(0.1, timeDiffSec);
+                        if (speedBps > 1024 * 1024) {
+                            speedStr = ` • ${(speedBps / (1024 * 1024)).toFixed(1)} MB/s`;
+                        } else {
+                            speedStr = ` • ${(speedBps / 1024).toFixed(0)} KB/s`;
+                        }
+                        lastLoaded = e.loaded;
+                        lastTime = now;
+                    }
+
+                    if (badge) {
+                        badge.style.display = 'block';
+                        badge.innerHTML = `📥 <b>${fileName}</b>: %${pct}${speedStr}`;
+                    }
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    isDownloadingTarget = false;
+                    targetVideoReady = true;
+                    const blobUrl = URL.createObjectURL(xhr.response);
+
+                    if (badge) {
+                        badge.style.display = 'block';
+                        badge.innerHTML = `✅ <b>${fileName}</b> hazır!`;
+                        setTimeout(() => { if (badge) badge.style.display = 'none'; }, 3500);
+                    }
+
+                    // Seamlessly switch video player to ready video
+                    isPlayingFallback = false;
+                    vidEl.src = blobUrl;
+                    vidEl.play().catch(e => {
+                        vidEl.src = targetUrl;
+                        vidEl.play().catch(()=>{});
+                    });
+
+                    // If Android TV native bridge exists, also notify native APK
+                    if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
+                        window.AndroidTV.playNativeVideo(fileName);
+                    }
+                } else {
+                    isDownloadingTarget = false;
+                    if (badge) badge.style.display = 'none';
+                }
+            };
+
+            xhr.onerror = function() {
+                isDownloadingTarget = false;
+                if (badge) badge.style.display = 'none';
+            };
+
+            xhr.send();
+        }
+
+        // Start checking target video download immediately and every 5 minutes
+        setTimeout(checkAndBufferTargetVideo, 2500);
+        setInterval(checkAndBufferTargetVideo, 300000);
+
         function playLocalVideo(vIndex) {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
-            
             currentLocalVideoIndex = vIndex % activeList.length;
             let rawVideo = activeList[currentLocalVideoIndex];
             if (!rawVideo) return;
             let fileName = rawVideo.includes("/") ? rawVideo.split("/").pop() : rawVideo;
             
-            // 1. Android TV APK - Hardware Native Playback (No Web Decoder Overlap)
+            // 1. Android TV APK - Hardware Native Playback
             if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
                 if (vidEl) {
                     vidEl.pause();
@@ -721,8 +819,6 @@
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             
-            const syncBar = document.getElementById('ml-video-sync-bar');
-            
             vidEl.style.display = "block";
             vidEl.muted = (currentAudioPriority === 'music');
             
@@ -731,47 +827,21 @@
                 vidEl.src = srcUrl;
             }
 
-            const playPromise = vidEl.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    if (syncBar) {
-                        syncBar.style.width = '100%';
-                        setTimeout(() => { if (syncBar) syncBar.style.width = '0%'; }, 1500);
-                    }
-                }).catch(err => {
-                    vidEl.muted = true;
-                    vidEl.play().catch(e => {
-                        console.log("Play failed, fallback to bayrak.mp4:", e);
-                        vidEl.src = "/static/tv_media/videos/bayrak.mp4";
-                        vidEl.play().catch(()=>{});
-                    });
-                });
-            }
-
-            // Watchdog: If video stays paused/stalled for >5s, fallback to core video
-            if (window._videoLoadWatchdog) clearTimeout(window._videoLoadWatchdog);
-            window._videoLoadWatchdog = setTimeout(() => {
-                if (vidEl.paused || vidEl.readyState < 2) {
-                    console.warn("[VIDEO WATCHDOG] Video stalled, resetting to bayrak.mp4...");
+            vidEl.play().catch(err => {
+                vidEl.muted = true;
+                vidEl.play().catch(e => {
                     vidEl.src = "/static/tv_media/videos/bayrak.mp4";
                     vidEl.play().catch(()=>{});
-                }
-            }, 5000);
-
-            vidEl.onplaying = () => {
-                if (window._videoLoadWatchdog) clearTimeout(window._videoLoadWatchdog);
-                if (syncBar) {
-                    syncBar.style.width = '100%';
-                    setTimeout(() => { if (syncBar) syncBar.style.width = '0%'; }, 1500);
-                }
-            };
+                });
+            });
 
             vidEl.onended = () => {
                 window.playNextNativeVideo();
             };
             vidEl.onerror = () => { 
-                console.log("Video error, falling back to core video...");
-                setTimeout(window.playNextNativeVideo, 1000); 
+                console.log("Video error, falling back to core fallback video...");
+                vidEl.src = "/static/tv_media/videos/bayrak.mp4";
+                vidEl.play().catch(()=>{});
             };
         }
 
@@ -898,8 +968,6 @@
         let isTickerCurrencyEnabled = true;
         let isTickerRssEnabled = true;
         let liveRssTitles = [];
-        let basePromoText = "";
-        let currentMessages = [];
         let currentTickerEffect = 'fade'; // Default to ultra-smooth card fade
 
         function executeMasterBeat() {
@@ -1049,19 +1117,20 @@
         fetchCurrencies();
         setInterval(fetchCurrencies, 300000); // 5 mins
 
-        async function fetchRssFeed() {
+        let liveFacts = [];
+
+        async function fetchTvFacts() {
             try {
-                const res = await fetch('/api/tv/rss');
+                const res = await fetch('/api/tv/facts');
                 const data = await res.json();
-                if (data && data.titles && data.titles.length > 0) {
-                    liveRssTitles = data.titles;
-                } else {
-                    liveRssTitles = [];
+                if (data && data.facts) {
+                    liveFacts = data.facts.filter(f => f.enabled !== false);
                 }
                 updateUnifiedMarquee();
             } catch(e) {}
         }
-        fetchRssFeed();
+        fetchTvFacts();
+        setInterval(fetchTvFacts, 60000); // 1 min sync
 
         function rotateTickerCard() {
             if (!tickerCardItems || tickerCardItems.length <= 1) return;
@@ -1101,18 +1170,26 @@
             if (isTickerTextEnabled && messageText && messageText.trim() !== '') {
                 items.push({
                     icon: '📢',
-                    color: '#D97706',
+                    badge: 'DUYURU',
+                    badgeColor: '#B45309',
+                    badgeBg: '#FEF3C7',
+                    badgeBorder: '#FDE68A',
+                    title: '',
                     text: messageText.trim()
                 });
             }
 
-            // 2. RSS Live Headlines
-            if (isTickerRssEnabled && liveRssTitles.length > 0) {
-                liveRssTitles.forEach(t => {
+            // 2. Curated 30 "Biliyor Muydunuz?" Cultural & Historical Facts
+            if (liveFacts.length > 0) {
+                liveFacts.forEach(f => {
                     items.push({
-                        icon: '📰',
-                        color: '#2563EB',
-                        text: t
+                        icon: f.icon || '💡',
+                        badge: 'BİLİYOR MUYDUNUZ?',
+                        badgeColor: '#1D4ED8',
+                        badgeBg: '#EFF6FF',
+                        badgeBorder: '#BFDBFE',
+                        title: f.title || '',
+                        text: f.text
                     });
                 });
             }
@@ -1120,9 +1197,13 @@
             // 3. Fallback Brand Text
             if (items.length === 0) {
                 items.push({
-                    icon: '☕',
-                    color: '#059669',
-                    text: 'FIRINNA • ARTISAN BAKERY & SPECIALTY CAFE • GALATA / BEYOĞLU'
+                    icon: '🥐',
+                    badge: 'FIRINNA',
+                    badgeColor: '#15803D',
+                    badgeBg: '#F0FDF4',
+                    badgeBorder: '#BBF7D0',
+                    title: 'Artisan Bakery & Specialty Cafe',
+                    text: 'Galata ve Beyoğlu\'nun kalbinde taze fırın lezzetleri ve nitelikli kahve deneyimi.'
                 });
             }
 
@@ -1135,9 +1216,15 @@
 
             let html = '';
             items.forEach((it, idx) => {
+                const titleHtml = it.title ? `<span style="color:#0F172A; font-weight:800; margin-right:0.6vw;">${it.title}:</span>` : '';
                 html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}">
-                    <span style="font-size:1.45vw; margin-right:0.6vw; flex-shrink:0; line-height:1;">${it.icon}</span>
-                    <div class="tcard-text">${it.text}</div>
+                    <div style="display:inline-flex; align-items:center; gap:0.4vw; background:${it.badgeBg}; border:1.5px solid ${it.badgeBorder}; color:${it.badgeColor}; padding:0.35vw 0.9vw; border-radius:0.5vw; font-size:1.15vw; font-weight:800; letter-spacing:0.5px; margin-right:1.2vw; flex-shrink:0; white-space:nowrap; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                        <span style="font-size:1.2vw;">${it.icon}</span>
+                        <span>${it.badge}</span>
+                    </div>
+                    <div class="tcard-text">
+                        ${titleHtml}${it.text}
+                    </div>
                 </div>`;
             });
             marqueeEl.innerHTML = html;
