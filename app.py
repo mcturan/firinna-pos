@@ -3982,6 +3982,35 @@ def api_tv_celebration_save():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
 
+@app.route('/api/tv/night_media/upload', methods=['POST'])
+def api_upload_tv_night_media():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    from werkzeug.utils import secure_filename
+    file = request.files['file']
+    media_type = request.form.get('type', 'image') # 'video' or 'image'
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    if file:
+        folder = 'videos' if media_type == 'video' else 'images'
+        night_dir = os.path.join(os.path.dirname(__file__), 'static', 'tv_media', 'night', folder)
+        os.makedirs(night_dir, exist_ok=True)
+        filename = f"night_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+        filepath = os.path.join(night_dir, filename)
+        file.save(filepath)
+        return jsonify({"success": True, "url": f"/static/tv_media/night/{folder}/{filename}"})
+
+@app.route('/api/tv/night_mode/save', methods=['POST'])
+def api_tv_night_mode_save():
+    try:
+        payload = request.json or {}
+        settings = get_tv_settings()
+        settings['night_mode'] = payload
+        save_tv_settings(settings)
+        return jsonify({"success": True, "night_mode": settings['night_mode']})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 400
+
 @app.route('/api/tv/media', methods=['GET'])
 def api_get_tv_media():
     videos = os.listdir(os.path.join(TV_MEDIA_FOLDER, 'videos'))

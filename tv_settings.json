@@ -129,7 +129,7 @@
         "target": "all",
         "timestamp": 1787418650151
     },
-    "last_ping": "2026-08-23T02:10:31.469820",
+    "last_ping": "2026-08-23T02:40:31.466788",
     "version": 1787412836295,
     "did_you_know": [
         {
@@ -523,5 +523,22 @@
             "enabled": true
         }
     ],
-    "ticker_mode": "facts"
+    "ticker_mode": "facts",
+    "night_mode": {
+        "enabled": true,
+        "force_active": false,
+        "auto_schedule": true,
+        "start_time": "23:00",
+        "end_time": "08:00",
+        "media_type": "video",
+        "video_url": "/static/tv_media/videos/1.mp4",
+        "image_url": "/static/uploads/logo.png",
+        "overlay_logo": true,
+        "overlay_clock": true,
+        "overlay_qr": true,
+        "qr_title": "visit www.firinna.com",
+        "qr_link": "https://firinna.com",
+        "promo_text": "Fırınna Cafe & Restaurant — Sabah 08:00'de sıcacık taş fırın lezzetlerimiz ve taze demlenmiş çayımızla tekrar görüşmek üzere.",
+        "dim_level": 15
+    }
 }

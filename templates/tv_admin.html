@@ -88,6 +88,7 @@
             <button class="tv-tab" onclick="switchTab('medya', this)">🎬 Video & Müzik</button>
             <button class="tv-tab" onclick="switchTab('filigran', this)">💎 Filigranlar (Video Üstü)</button>
             <button class="tv-tab" onclick="switchTab('mesajlar', this)">💡 Kültür Notları & Alt Bant</button>
+            <button class="tv-tab" onclick="switchTab('gecemodu', this)">🌙 Gece Modu (Night Mode)</button>
             <button class="tv-tab" onclick="switchTab('qr', this)">⚙️ QR & Ekstralar</button>
         </div>
 
@@ -403,6 +404,130 @@
             <button onclick="addMessage()" style="margin-top:1rem;padding:.5rem 1rem; background:#edf2f7; border:none; border-radius:6px; cursor:pointer; font-weight:600;">+ Yeni Mesaj Ekle</button>
         </div>
 
+        <!-- GECE MODU (NIGHT / AFTER-HOURS MODE) SEKMESİ -->
+        <div id="gecemodu" class="tv-pane card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h3 style="margin:0; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                        🌙 TV Gece & Kapanış Modu (After-Hours Showcase)
+                    </h3>
+                    <p style="font-size:0.88rem; color:#64748b; margin-top:4px; margin-bottom:0;">
+                        Fırınna Cafe kapalıyken (örn. 23:00 - 08:00) ekranı tam boy sinematik gece videosuna / afişine geçirir, QR menü ve sabah açılış saatini şık bir şekilde sunar.
+                    </p>
+                </div>
+                <button type="button" onclick="saveNightModeToServer()" style="background:#2563eb; color:white; border:none; padding:8px 18px; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.9rem;">
+                    💾 Gece Modunu Kaydet & TV'ye Gönder
+                </button>
+            </div>
+
+            <!-- ⚡ CANLI TEST & MANUEL GEÇİŞ KUTUSU -->
+            <div style="background:#fef3c7; border:1.5px solid #f59e0b; border-radius:10px; padding:16px; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+                <div>
+                    <strong style="color:#92400e; font-size:1rem; display:block;">⚡ Canlı Test & Manuel Gösterim:</strong>
+                    <span style="font-size:0.85rem; color:#78350f;">Saat beklemeksizin gece modunu TV'de anında açıp kapatarak canlı test edebilirsiniz.</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <label style="display:flex; align-items:center; gap:8px; background:#ffffff; border:1.5px solid #d97706; padding:8px 14px; border-radius:8px; font-weight:800; color:#b45309; cursor:pointer;">
+                        <input type="checkbox" id="nm_force_active" style="width:1.3rem; height:1.3rem; cursor:pointer;" onchange="toggleNightModeInstantTest(this.checked)">
+                        <span>🌙 Şimdi Gece Moduna Geç (Canlı Test)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ⏰ OTOMATİK SAAT VE ÇALIŞMA SAATLERİ AYARI -->
+            <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:1.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                    <label style="display:flex; align-items:center; gap:8px; font-size:0.95rem; font-weight:bold; color:#1e293b; cursor:pointer;">
+                        <input type="checkbox" id="nm_auto_schedule" style="width:1.2rem; height:1.2rem;" checked>
+                        <span>⏰ Otomatik Saat Takvimi (Belirlenen saatlerde otomatik açılır)</span>
+                    </label>
+                    <button type="button" onclick="fetchWebOpeningHours()" style="background:#059669; color:white; border:none; padding:5px 12px; border-radius:6px; font-size:0.82rem; font-weight:bold; cursor:pointer;">
+                        🔄 Fırınna Web Saatlerini Uygula (23:00 - 08:00)
+                    </button>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                    <div>
+                        <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">
+                            🌙 Başlangıç Saati (Akşam Kapanış):
+                        </label>
+                        <input type="time" id="nm_start_time" value="23:00" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:1rem; color:#0f172a;">
+                        <small style="color:#64748b;">Örnek: 23:00 (Bu saatten sonra gece modu aktif olur)</small>
+                    </div>
+                    <div>
+                        <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">
+                            ☀️ Bitiş Saati (Sabah Açılış):
+                        </label>
+                        <input type="time" id="nm_end_time" value="08:00" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:1rem; color:#0f172a;">
+                        <small style="color:#64748b;">Örnek: 08:00 (Bu saatte normal tabela ekranına döner)</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🎬 GECE MODU MEDYA SEÇİMİ (VİDEO VEYA AFİŞ) -->
+            <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:1.5rem;">
+                <h4 style="margin:0 0 12px 0; color:#0f172a; font-size:1.05rem;">🎬 Gece Modu Medya Seçimi & Yükleme:</h4>
+                
+                <!-- Ölçü Rehberi -->
+                <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px; margin-bottom:14px; font-size:0.85rem; color:#1e40af;">
+                    📐 <b>Önerilen Ölçü & Format:</b> <b>16:9 Full HD (1920x1080)</b> video (.mp4) veya yüksek çözünürlüklü fotoğraf (.jpg / .webp). Gece modunda ekranı tam boy sinematik olarak kaplar.
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:14px;">
+                    <div>
+                        <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:6px;">Medya Türü:</label>
+                        <select id="nm_media_type" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700;" onchange="onNightMediaTypeChange()">
+                            <option value="video">🎬 Sinematik Gece Videosu (.mp4)</option>
+                            <option value="image">🖼️ Yüksek Çözünürlüklü Afiş / Fotoğraf (.jpg / .png)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:6px;">Bilgisayardan Yeni Medya Yükle:</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="file" id="nm_upload_file" accept="video/mp4,image/*" style="flex:1; padding:6px; border:1px solid #cbd5e1; border-radius:6px; background:#ffffff; font-size:0.85rem;">
+                            <button type="button" onclick="uploadNightMedia()" style="background:#2563eb; color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem;">
+                                📤 Yükle
+                            </button>
+                        </div>
+                        <span id="nm_upload_status" style="font-size:0.82rem; margin-top:4px; display:block;"></span>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:14px; align-items:center;">
+                    <div>
+                        <label style="font-weight:700; color:#334155; font-size:0.85rem; display:block; margin-bottom:4px;">Aktif Medya URL Adresi:</label>
+                        <input type="text" id="nm_media_url" value="/static/tv_media/videos/1.mp4" style="width:100%; padding:8px 10px; border-radius:6px; border:1.5px solid #cbd5e1; font-size:0.85rem; color:#475569;" oninput="updateNightMediaPreview()">
+                    </div>
+                    <div style="height:90px; background:#000000; border-radius:6px; border:1px solid #cbd5e1; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                        <video id="nm_preview_video" src="/static/tv_media/videos/1.mp4" style="width:100%; height:100%; object-fit:cover;" muted loop autoplay></video>
+                        <img id="nm_preview_image" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ✨ EKRAN KATMANLARI VE METİNLER -->
+            <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:1.5rem;">
+                <h4 style="margin:0 0 12px 0; color:#0f172a; font-size:1.05rem;">✨ Gece Modu Ekran Katmanları ve Tanıtım Metinleri:</h4>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:14px;">
+                    <div>
+                        <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">Kapanış & Karşılama Başlığı:</label>
+                        <input type="text" id="nm_title" value="🌙 İyi Geceler • Good Night" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:0.95rem; color:#0f172a;">
+                    </div>
+                    <div>
+                        <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">QR Menü Yönlendirme Linki:</label>
+                        <input type="text" id="nm_qr_link" value="https://firinna.com" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:0.95rem; color:#2563eb;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">Gece Tanıtım ve Bilgi Metni:</label>
+                    <textarea id="nm_promo_text" rows="2" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-size:0.9rem; font-family:sans-serif; color:#334155;">Fırınna Cafe & Restaurant — Sabah 08:00'de sıcacık taş fırın lezzetlerimiz ve taze demlenmiş çayımızla tekrar görüşmek üzere.</textarea>
+                </div>
+            </div>
+        </div>
+
         <div id="qr" class="tv-pane card">
             <h3 style="margin-top:0;">QR Kod ve Hava Durumu</h3>
             <div class="form-group">
@@ -621,6 +746,19 @@
 
                 // Render Watermark Cards
                 renderWatermarkCards((wm.cards && wm.cards.length > 0) ? wm.cards : defaultCards);
+
+                // Gece Modu (Night Mode) Ayarları
+                const nm = data.night_mode || {};
+                setChecked('nm_force_active', !!nm.force_active);
+                setChecked('nm_auto_schedule', nm.auto_schedule !== false);
+                setVal('nm_start_time', nm.start_time || '23:00');
+                setVal('nm_end_time', nm.end_time || '08:00');
+                setVal('nm_media_type', nm.media_type || 'video');
+                setVal('nm_media_url', nm.media_type === 'image' ? (nm.image_url || '/static/uploads/logo.png') : (nm.video_url || '/static/tv_media/videos/1.mp4'));
+                setVal('nm_title', nm.title || '🌙 İyi Geceler • Good Night');
+                setVal('nm_qr_link', nm.qr_link || 'https://firinna.com');
+                setVal('nm_promo_text', nm.promo_text || 'Fırınna Cafe & Restaurant — Sabah 08:00\'de sıcacık taş fırın lezzetlerimiz ve taze demlenmiş çayımızla tekrar görüşmek üzere.');
+                onNightMediaTypeChange();
 
                 const msgCont = document.getElementById('messages_container');
                 if (msgCont) {
@@ -951,6 +1089,22 @@
                     duration_sec: document.getElementById('wm_duration_sec') ? (parseInt(document.getElementById('wm_duration_sec').value) || 12) : 12,
                     cards: wmCards
                 },
+                night_mode: {
+                    enabled: true,
+                    force_active: document.getElementById('nm_force_active') ? document.getElementById('nm_force_active').checked : false,
+                    auto_schedule: document.getElementById('nm_auto_schedule') ? document.getElementById('nm_auto_schedule').checked : true,
+                    start_time: document.getElementById('nm_start_time') ? document.getElementById('nm_start_time').value : '23:00',
+                    end_time: document.getElementById('nm_end_time') ? document.getElementById('nm_end_time').value : '08:00',
+                    media_type: document.getElementById('nm_media_type') ? document.getElementById('nm_media_type').value : 'video',
+                    video_url: (document.getElementById('nm_media_type')?.value === 'video') ? (document.getElementById('nm_media_url')?.value || '/static/tv_media/videos/1.mp4') : '/static/tv_media/videos/1.mp4',
+                    image_url: (document.getElementById('nm_media_type')?.value === 'image') ? (document.getElementById('nm_media_url')?.value || '/static/uploads/logo.png') : '/static/uploads/logo.png',
+                    title: document.getElementById('nm_title') ? document.getElementById('nm_title').value : '🌙 İyi Geceler • Good Night',
+                    qr_link: document.getElementById('nm_qr_link') ? document.getElementById('nm_qr_link').value : 'https://firinna.com',
+                    promo_text: document.getElementById('nm_promo_text') ? document.getElementById('nm_promo_text').value : '',
+                    overlay_logo: true,
+                    overlay_clock: true,
+                    overlay_qr: true
+                },
                 messages: messages
             };
 
@@ -967,6 +1121,144 @@
                 alert("Hata oluştu.");
             }
             btn.textContent = "💾 Ayarları Kaydet ve Ekrana Gönder";
+        }
+
+        // ==========================================
+        // GECE MODU (NIGHT MODE) YÖNETİMİ
+        // ==========================================
+        function onNightMediaTypeChange() {
+            const mType = document.getElementById('nm_media_type').value;
+            const pVid = document.getElementById('nm_preview_video');
+            const pImg = document.getElementById('nm_preview_image');
+            const urlInput = document.getElementById('nm_media_url');
+
+            if (mType === 'image') {
+                pVid.style.display = 'none';
+                pVid.pause();
+                pImg.style.display = 'block';
+                if (urlInput.value.endsWith('.mp4')) {
+                    urlInput.value = '/static/uploads/logo.png';
+                }
+                pImg.src = urlInput.value;
+            } else {
+                pImg.style.display = 'none';
+                pVid.style.display = 'block';
+                if (!urlInput.value.endsWith('.mp4') && !urlInput.value.endsWith('.webm')) {
+                    urlInput.value = '/static/tv_media/videos/1.mp4';
+                }
+                pVid.src = urlInput.value;
+                pVid.play().catch(e=>{});
+            }
+        }
+
+        function updateNightMediaPreview() {
+            const mType = document.getElementById('nm_media_type').value;
+            const urlVal = document.getElementById('nm_media_url').value.trim();
+            const pVid = document.getElementById('nm_preview_video');
+            const pImg = document.getElementById('nm_preview_image');
+
+            if (mType === 'image') {
+                pImg.src = urlVal || '/static/uploads/logo.png';
+            } else {
+                pVid.src = urlVal || '/static/tv_media/videos/1.mp4';
+                pVid.play().catch(e=>{});
+            }
+        }
+
+        function fetchWebOpeningHours() {
+            document.getElementById('nm_start_time').value = '23:00';
+            document.getElementById('nm_end_time').value = '08:00';
+            alert("✅ Fırınna web çalışma saatleri uygulandı (Kapanış: 23:00, Açılış: 08:00).");
+        }
+
+        async function uploadNightMedia() {
+            const fileInput = document.getElementById('nm_upload_file');
+            const statusEl = document.getElementById('nm_upload_status');
+            const mType = document.getElementById('nm_media_type').value;
+            const urlInput = document.getElementById('nm_media_url');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Lütfen yüklenecek bir video veya fotoğraf seçin.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            statusEl.textContent = "⏳ Medya yükleniyor...";
+            statusEl.style.color = "#2563eb";
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('type', mType);
+
+            try {
+                const res = await fetch('/api/tv/night_media/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    statusEl.textContent = "✅ Başarıyla yüklendi!";
+                    statusEl.style.color = "#059669";
+                    urlInput.value = data.url;
+                    updateNightMediaPreview();
+                } else {
+                    statusEl.textContent = "❌ Hata: " + (data.error || 'Yüklenemedi');
+                    statusEl.style.color = "#dc2626";
+                }
+            } catch(e) {
+                statusEl.textContent = "❌ Sunucu hatası";
+                statusEl.style.color = "#dc2626";
+            }
+        }
+
+        async function toggleNightModeInstantTest(isActive) {
+            await saveNightModeToServer(false);
+            console.log(isActive ? "🌙 TV anında Gece Moduna geçirildi!" : "☀️ TV normal tabela moduna döndürüldü.");
+        }
+
+        async function saveNightModeToServer(showAlert = true) {
+            const mType = document.getElementById('nm_media_type').value;
+            const mUrl = document.getElementById('nm_media_url').value.trim();
+
+            const nightData = {
+                enabled: true,
+                force_active: document.getElementById('nm_force_active').checked,
+                auto_schedule: document.getElementById('nm_auto_schedule').checked,
+                start_time: document.getElementById('nm_start_time').value || '23:00',
+                end_time: document.getElementById('nm_end_time').value || '08:00',
+                media_type: mType,
+                video_url: mType === 'video' ? mUrl : '/static/tv_media/videos/1.mp4',
+                image_url: mType === 'image' ? mUrl : '/static/uploads/logo.png',
+                title: document.getElementById('nm_title').value.trim(),
+                qr_link: document.getElementById('nm_qr_link').value.trim(),
+                promo_text: document.getElementById('nm_promo_text').value.trim(),
+                overlay_logo: true,
+                overlay_clock: true,
+                overlay_qr: true
+            };
+
+            try {
+                const res = await fetch('/api/tv/night_mode/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(nightData)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (showAlert) {
+                        alert("✅ Gece Modu ayarları başarıyla kaydedildi ve TV ekranlarına gönderildi!");
+                    }
+                    fetch('/api/tv/push', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({action: 'reload', client_id: 'all'})
+                    });
+                } else {
+                    if (showAlert) alert("❌ Kaydedilemedi: " + (data.error || 'Bilinmeyen hata'));
+                }
+            } catch(e) {
+                if (showAlert) alert("❌ Kayıt sırasında sunucu hatası oluştu.");
+            }
         }
 
         async function fetchClients() {
