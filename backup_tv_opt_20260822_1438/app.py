@@ -14,8 +14,6 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
-app.config['TEMPLATES_AUTO_RELOAD'] = True
-app.jinja_env.auto_reload = True
 
 limiter = Limiter(
     get_remote_address,
@@ -45,7 +43,7 @@ def allowed_file(filename):
 
 @app.after_request
 def add_no_cache_headers(response):
-    if request.path.startswith('/api/web/analytics') or 'admin' in request.path or 'yonetim' in request.path or 'tv' in request.path:
+    if request.path.startswith('/api/web/analytics') or 'admin' in request.path or 'yonetim' in request.path:
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'

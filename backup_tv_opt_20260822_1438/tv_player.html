@@ -98,8 +98,8 @@
             justify-content: center;
             pointer-events: none;
         }
-        #ml-logo { max-width: 72%; max-height: 7.5vh; object-fit: contain; position: absolute; opacity: 1; transition: opacity 0.5s ease; will-change: opacity; transform: translateZ(0); }
-        #ml-logo-domain { position: absolute; font-size: 1.8vw; font-weight: 800; color: #2D6A4F; text-align: center; letter-spacing: 1.5px; opacity: 0; transition: opacity 0.5s ease; will-change: opacity; transform: translateZ(0); }
+        #ml-logo { max-width: 72%; max-height: 7.5vh; object-fit: contain; position: absolute; opacity: 1; transform: scale(1); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
+        #ml-logo-domain { position: absolute; font-size: 1.8vw; font-weight: 800; color: #2D6A4F; text-align: center; letter-spacing: 1.5px; opacity: 0; transform: scale(0.92); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
         
         /* Top Middle & Right Container (Split grid inside grid-column 2: 1.15fr 1fr gives ample room for clock & weather) */
         #ml-top-right-wrapper {
@@ -147,11 +147,10 @@
             justify-content: center;
             padding: 0 0.8vw;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
             box-sizing: border-box;
             white-space: nowrap;
-            transform: translateZ(0);
         }
         .top-layer.active {
             opacity: 1;
@@ -182,10 +181,30 @@
         
         #ml-main-video { grid-column: 2; grid-row: 2; position: relative; border-radius: 0.8vw; overflow: hidden; background: #000000; border: 1.5px solid #E2E8F0; }
         
-        /* BOTTOM ROW: Full Width RSS News Feed */
-        #ml-rss-box {
+        /* BOTTOM ROW: Split Grid (Left: Currency/Crypto | Right: Wide RSS News Feed) */
+        #ml-bottom-row {
             grid-column: 1 / 3;
             grid-row: 3;
+            display: grid;
+            grid-template-columns: 28vw 1fr;
+            gap: 1.2vw;
+            height: 100%;
+        }
+
+        #ml-currency-box {
+            background: #FFFFFF;
+            border-radius: 0.8vw;
+            border: 1.5px solid #E2E8F0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 0 0.8vw;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        #ml-rss-box {
             background: #FFFFFF;
             border-radius: 0.8vw;
             border: 1.5px solid #E2E8F0;
@@ -223,7 +242,7 @@
             will-change: transform;
         }
 
-        /* Ticker Card Effects - Clean GPU-accelerated opacity fade */
+        /* Ticker Card Effects (Fade, Slide Up, Slide Down) */
         .ticker-card {
             position: absolute;
             top: 0;
@@ -242,8 +261,8 @@
             opacity: 0;
             pointer-events: none;
             z-index: 1;
-            transform: translateZ(0);
-            transition: opacity 0.5s ease;
+            will-change: transform, opacity;
+            transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .tcard-text {
@@ -261,6 +280,34 @@
             opacity: 1 !important;
             z-index: 5 !important;
             pointer-events: auto !important;
+            transform: translate3d(0, 0, 0) scale(1) !important;
+        }
+
+        /* Effect 1: Fade */
+        .ticker-effect-fade .ticker-card {
+            transform: scale(0.98);
+        }
+        .ticker-effect-fade .ticker-card.exit {
+            opacity: 0;
+            transform: scale(1.02);
+        }
+
+        /* Effect 2: Slide Up */
+        .ticker-effect-slide_up .ticker-card {
+            transform: translate3d(0, 100%, 0);
+        }
+        .ticker-effect-slide_up .ticker-card.exit {
+            opacity: 0;
+            transform: translate3d(0, -100%, 0);
+        }
+
+        /* Effect 3: Slide Down */
+        .ticker-effect-slide_down .ticker-card {
+            transform: translate3d(0, -100%, 0);
+        }
+        .ticker-effect-slide_down .ticker-card.exit {
+            opacity: 0;
+            transform: translate3d(0, 100%, 0);
         }
         .ticker-text { 
             font-size: 1.8vw; 
@@ -281,14 +328,14 @@
         
         #video-container { width: 100%; height: 100%; position: absolute; inset: 0; }
 
-        /* Product Carousel - Clean, lightweight and GPU-friendly */
+        /* Product Carousel with Slow Ken Burns Zoom */
         .product-slide { 
             position: absolute; 
             inset: 0; 
             display: flex; 
             flex-direction: column; 
             opacity: 0; 
-            transition: opacity 0.6s ease; 
+            transition: opacity 0.8s ease; 
             background: #FFFFFF; 
             border-radius: 1vw; 
             overflow: hidden; 
@@ -311,8 +358,14 @@
             object-fit: contain; 
             padding: 0.4vw;
             box-sizing: border-box;
-            transform: translateZ(0);
-            backface-visibility: hidden;
+            transform: scale(0.96);
+            transition: transform 5.2s cubic-bezier(0.16, 1, 0.3, 1), filter 5.2s ease;
+            will-change: transform, filter;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.06));
+        }
+        .product-slide.active .prod-img {
+            transform: scale(1.22);
+            filter: drop-shadow(0 8px 20px rgba(0,0,0,0.14));
         }
         .prod-info { height: 15%; padding: 0.5vw 1vw; display: flex; align-items: center; justify-content: center; background: #FFFFFF; color: #1A202C; z-index: 2; border-top: 1.5px solid #E2E8F0; overflow: hidden; box-sizing: border-box; }
         .prod-title { font-size: 1.5vw; font-weight: 800; color: #1A202C; text-align: center; margin: 0; line-height: 1.2; letter-spacing: 0.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
@@ -331,7 +384,7 @@
             object-fit: cover;
         }
 
-        /* Filigran & Watermark Cards - Lightweight Fade */
+        /* Filigran & Watermark Cards */
         .wm-card {
             position: absolute;
             inset: 0;
@@ -342,13 +395,13 @@
             padding: 1.6vw 2.2vw;
             box-sizing: border-box;
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transform: scale(0.95);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
-            will-change: opacity;
-            transform: translateZ(0);
         }
         .wm-card.active {
             opacity: 1;
+            transform: scale(1);
         }
         .wm-content {
             display: flex;
@@ -371,7 +424,7 @@
             letter-spacing: 1px;
             text-transform: uppercase;
             margin-bottom: 0.8vw;
-            box-shadow: 0 2px 6px rgba(45,106,79,0.25);
+            box-shadow: 0 4px 14px rgba(45,106,79,0.35);
         }
         .wm-title {
             font-size: 2.1vw;
@@ -497,24 +550,10 @@
                 </div>
             </div>
 
-            <!-- Box 3: Right (Layer 0: Forex | Layer 1: Crypto | Layer 2: Social Media | Layer 3: Support Maps) -->
+            <!-- Box 3: Right (Layer 0: Follow/Share Instagram & TikTok | Layer 1: Support Us Maps) -->
             <div id="ml-review-box" class="grid-box">
-                <!-- Layer 0: Forex (USD/TRY & EUR/TRY) -->
-                <div id="ml-review-layer-0" class="top-layer active" style="font-size:1.3vw; font-weight:700; color:#1E293B; gap:0.8vw;">
-                    <span style="color:#059669;">💵 USD: <b id="val-usd" style="color:#0F172A;">-- ₺</b></span>
-                    <span style="color:#CBD5E1;">•</span>
-                    <span style="color:#2563EB;">💶 EUR: <b id="val-eur" style="color:#0F172A;">-- ₺</b></span>
-                </div>
-
-                <!-- Layer 1: Crypto (BTC & ETH) -->
-                <div id="ml-review-layer-1" class="top-layer" style="font-size:1.3vw; font-weight:700; color:#1E293B; gap:0.8vw;">
-                    <span style="color:#D97706;">₿ BTC: <b id="val-btc" style="color:#0F172A;">-- $</b></span>
-                    <span style="color:#CBD5E1;">•</span>
-                    <span style="color:#7C3AED;">Ξ ETH: <b id="val-eth" style="color:#0F172A;">-- $</b></span>
-                </div>
-
-                <!-- Layer 2: Follow / Share (Instagram & TikTok) -->
-                <div id="ml-review-layer-2" class="top-layer" style="justify-content:center; gap:0.8vw;">
+                <!-- Layer 0: Follow / Share (Instagram & TikTok) -->
+                <div id="ml-review-layer-0" class="top-layer active" style="justify-content:center; gap:0.8vw;">
                     <span style="font-size:1.15vw; font-weight:800; color:#2D6A4F; letter-spacing:0.4px;">📸 FOLLOW:</span>
                     <!-- Instagram Official Logo Pill -->
                     <div class="social-pill">
@@ -532,8 +571,8 @@
                     </div>
                 </div>
 
-                <!-- Layer 3: Support Us (Google Maps & Yandex Maps) -->
-                <div id="ml-review-layer-3" class="top-layer" style="justify-content:center; gap:0.8vw;">
+                <!-- Layer 1: Support Us (Google Maps & Yandex Maps) -->
+                <div id="ml-review-layer-1" class="top-layer" style="justify-content:center; gap:0.8vw;">
                     <span style="font-size:1.15vw; font-weight:800; color:#2D6A4F; letter-spacing:0.4px;">⭐ SUPPORT:</span>
                     <!-- Google Maps Official Logo Pill -->
                     <div class="social-pill">
@@ -565,38 +604,57 @@
             <video id="local-video" src="/static/tv_media/videos/bayrak.mp4" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
             <div id="record-player"></div>
             <!-- High-Definition Graphic Watermark Container -->
-            <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.6s ease; z-index: 50; pointer-events: none; width: 48vw; aspect-ratio: 1000 / 520; max-height: 75%; border-radius: 1.5vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
+            <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; width: 48vw; aspect-ratio: 1000 / 520; max-height: 75%; border-radius: 1.5vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
                 
                 <!-- Card 0: Brand & Web -->
                 <div id="wm-card-logo" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_0_logo.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw;">
+                    <img src="/static/img/watermarks/card_0_logo.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.18));">
                 </div>
 
                 <!-- Card 1: Social Media -->
                 <div id="wm-card-social" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_1_social.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw;">
+                    <img src="/static/img/watermarks/card_1_social.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.18));">
                 </div>
 
                 <!-- Card 2: Support University Students -->
                 <div id="wm-card-students" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_2_students.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw;">
+                    <img src="/static/img/watermarks/card_2_students.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.18));">
                 </div>
 
                 <!-- Card 3: Stray Animals Support -->
                 <div id="wm-card-animals" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_3_animals.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw;">
+                    <img src="/static/img/watermarks/card_3_animals.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.18));">
                 </div>
 
             </div>
         </div>
 
-        <!-- BOTTOM ROW: Full Width RSS News & Promo Stream -->
-        <div id="ml-rss-box" class="grid-box" style="position:relative;">
-            <div id="ml-continuous-marquee" class="rss-marquee-content">
-                <span>Loading Live World News...</span>
+        <!-- BOTTOM ROW: Split Grid (Left: Currencies/Crypto | Right: Wide Live RSS Feed) -->
+        <div id="ml-bottom-row">
+            <!-- Left: Currencies & Crypto Box (TCMB + Crypto) -->
+            <div id="ml-currency-box" class="grid-box">
+                <!-- Slide 0: Forex (USD/TRY, EUR/TRY, EUR/USD) -->
+                <div id="ml-curr-slide-0" class="top-layer active" style="font-size:1.45vw; font-weight:700; color:#1E293B; gap:0.8vw;">
+                    <span style="color:#059669;">💵 USD: <b id="val-usd" style="color:#0F172A;">-- ₺</b></span>
+                    <span style="color:#94A3B8;">•</span>
+                    <span style="color:#2563EB;">💶 EUR: <b id="val-eur" style="color:#0F172A;">-- ₺</b></span>
+                </div>
+                <!-- Slide 1: Crypto (BTC/USDT, ETH/USDT) -->
+                <div id="ml-curr-slide-1" class="top-layer" style="font-size:1.45vw; font-weight:700; color:#1E293B; gap:0.8vw;">
+                    <span style="color:#D97706;">₿ BTC: <b id="val-btc" style="color:#0F172A;">-- $</b></span>
+                    <span style="color:#94A3B8;">•</span>
+                    <span style="color:#7C3AED;">Ξ ETH: <b id="val-eth" style="color:#0F172A;">-- $</b></span>
+                </div>
             </div>
-            <!-- Subtle Background Video Preload Line -->
-            <div id="ml-video-sync-bar" style="position:absolute; bottom:0; left:0; height:2.5px; width:0%; background:linear-gradient(90deg, #10B981, #3B82F6); transition: width 0.4s ease; opacity:0.85; z-index:100; pointer-events:none;" title="Sync Status"></div>
+
+            <!-- Right: Wide Continuous RSS News Stream -->
+            <div id="ml-rss-box" class="grid-box" style="position:relative;">
+                <div id="ml-continuous-marquee" class="rss-marquee-content">
+                    <span>Loading Live World News...</span>
+                </div>
+                <!-- Subtle Background Video Preload Line (Only visible as a tiny 2px line at the very bottom) -->
+                <div id="ml-video-sync-bar" style="position:absolute; bottom:0; left:0; height:2.5px; width:0%; background:linear-gradient(90deg, #10B981, #3B82F6); transition: width 0.4s ease; opacity:0.85; z-index:100; pointer-events:none;" title="Sync Status"></div>
+            </div>
         </div>
         
     </div>
@@ -676,8 +734,64 @@
         var preloadedVideoUrl = null;
         var isPreloading = false;
 
-        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4"];
-        var isPlayingFallback = false;
+        // Background Preloader: Continuously downloads and buffers custom selected video in the background while fallback plays
+        function preloadTargetVideo(targetUrl) {
+            if (!targetUrl || isPreloading || targetUrl === preloadedVideoUrl) return;
+            isPreloading = true;
+            
+            const syncBar = document.getElementById('ml-video-sync-bar');
+            if (syncBar) {
+                syncBar.style.width = '25%';
+                syncBar.style.display = 'block';
+                syncBar.style.opacity = '1';
+            }
+
+            console.log("[PRELOAD] Background prefetching selected video in background:", targetUrl);
+            
+            const tempVid = document.createElement('video');
+            tempVid.muted = true;
+            tempVid.preload = 'auto';
+            tempVid.src = targetUrl;
+            tempVid.load();
+
+            tempVid.onprogress = () => {
+                try {
+                    if (tempVid.buffered && tempVid.buffered.length > 0 && tempVid.duration) {
+                        const bufferedEnd = tempVid.buffered.end(tempVid.buffered.length - 1);
+                        const pct = Math.min(100, Math.round((bufferedEnd / tempVid.duration) * 100));
+                        if (syncBar) syncBar.style.width = Math.max(25, pct) + '%';
+                    }
+                } catch(e) {}
+            };
+
+            const onVideoReady = () => {
+                console.log("[PRELOAD] Target video successfully buffered and ready to play!", targetUrl);
+                preloadedVideoUrl = targetUrl;
+                isPreloading = false;
+                if (syncBar) {
+                    syncBar.style.width = '100%';
+                    setTimeout(() => { if (syncBar) syncBar.style.width = '0%'; }, 2000);
+                }
+                // If we are currently playing fallback bayrak/0.mp4, switch immediately to custom video
+                if (isPlayingFallback) {
+                    console.log("[AUTO-SWITCH] Switching from fallback loop to ready custom video!");
+                    isPlayingFallback = false;
+                    playLocalVideo(0);
+                }
+            };
+
+            tempVid.oncanplaythrough = onVideoReady;
+            tempVid.oncanplay = () => {
+                if (syncBar) syncBar.style.width = '75%';
+                onVideoReady();
+            };
+
+            tempVid.onerror = (e) => {
+                console.warn("[PRELOAD] Failed loading custom video in background:", e);
+                isPreloading = false;
+                if (syncBar) syncBar.style.width = '0%';
+            };
+        }
 
         window.playNextNativeVideo = function() {
             let currentList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
@@ -693,14 +807,8 @@
             if (!rawVideo) return;
             let fileName = rawVideo.includes("/") ? rawVideo.split("/").pop() : rawVideo;
             
-            // 1. Android TV APK - Hardware Native Playback (No Web Decoder Overlap)
+            // 1. Android TV APK
             if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
-                if (vidEl) {
-                    vidEl.pause();
-                    vidEl.style.display = "none";
-                    vidEl.removeAttribute('src');
-                }
-                document.documentElement.classList.add('native-video-active');
                 try {
                     const videoBox = document.getElementById('ml-main-video');
                     if (videoBox && window.AndroidTV.setVideoBounds) {
@@ -713,16 +821,25 @@
                         );
                     }
                 } catch(e) {}
+                
+                // Trigger native video playback
                 window.AndroidTV.playNativeVideo(fileName);
-                return;
             }
 
-            // 2. Web & Mobile HTML5 Single Video Player
+            // 2. Web & Mobile & Fallback HTML5 Video Player (Always active to ensure video NEVER disappears)
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             
             const syncBar = document.getElementById('ml-video-sync-bar');
             
+            // Show subtle sync bar while loading custom video
+            if (!fileName.includes('bayrak') && !fileName.includes('0.mp4')) {
+                if (syncBar) {
+                    syncBar.style.width = '30%';
+                    syncBar.style.display = 'block';
+                }
+            }
+
             vidEl.style.display = "block";
             vidEl.muted = (currentAudioPriority === 'music');
             
@@ -741,22 +858,33 @@
                 }).catch(err => {
                     vidEl.muted = true;
                     vidEl.play().catch(e => {
-                        console.log("Play failed, fallback to bayrak.mp4:", e);
+                        console.log("Play failed, switching to core fallback:", e);
+                        // Fallback to bayrak.mp4 if play failed
                         vidEl.src = "/static/tv_media/videos/bayrak.mp4";
                         vidEl.play().catch(()=>{});
                     });
                 });
             }
 
-            // Watchdog: If video stays paused/stalled for >5s, fallback to core video
+            vidEl.onprogress = () => {
+                try {
+                    if (vidEl.buffered && vidEl.buffered.length > 0 && vidEl.duration) {
+                        const bufferedEnd = vidEl.buffered.end(vidEl.buffered.length - 1);
+                        const pct = Math.min(100, Math.round((bufferedEnd / vidEl.duration) * 100));
+                        if (syncBar) syncBar.style.width = Math.max(30, pct) + '%';
+                    }
+                } catch(e) {}
+            };
+
+            // Watchdog: If video stays paused/stalled for >4s, fallback to core loop
             if (window._videoLoadWatchdog) clearTimeout(window._videoLoadWatchdog);
             window._videoLoadWatchdog = setTimeout(() => {
                 if (vidEl.paused || vidEl.readyState < 2) {
-                    console.warn("[VIDEO WATCHDOG] Video stalled, resetting to bayrak.mp4...");
+                    console.warn("[VIDEO WATCHDOG] Video not playing after 4s, playing bayrak.mp4...");
                     vidEl.src = "/static/tv_media/videos/bayrak.mp4";
                     vidEl.play().catch(()=>{});
                 }
-            }, 5000);
+            }, 4000);
 
             vidEl.onplaying = () => {
                 if (window._videoLoadWatchdog) clearTimeout(window._videoLoadWatchdog);
@@ -765,6 +893,26 @@
                     setTimeout(() => { if (syncBar) syncBar.style.width = '0%'; }, 1500);
                 }
             };
+            
+            // 1. Android TV APK
+            if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
+                vidEl.style.display = "none";
+                document.documentElement.classList.add('native-video-active');
+                try {
+                    const videoBox = document.getElementById('ml-main-video');
+                    if (videoBox && window.AndroidTV.setVideoBounds) {
+                        const rect = videoBox.getBoundingClientRect();
+                        window.AndroidTV.setVideoBounds(
+                            Math.round(rect.left),
+                            Math.round(rect.top),
+                            Math.round(rect.width),
+                            Math.round(rect.height)
+                        );
+                    }
+                } catch(e) {}
+                window.AndroidTV.playNativeVideo(fileName);
+                return;
+            }
 
             vidEl.onended = () => {
                 window.playNextNativeVideo();
@@ -886,83 +1034,62 @@
         fetchWeather();
         setInterval(fetchWeather, 3600000);
 
-        // ==========================================
-        // SYNCHRONIZED MASTER BEAT CONTROLLER (Unified Cycle)
-        // ==========================================
-        let masterBeatCount = 0;
-        let masterBeatTimer = null;
-        let tickerCardItems = [];
-        let currentTickerCardIdx = 0;
-        let lastRenderedItemsKey = "";
-        let isTickerTextEnabled = true;
-        let isTickerCurrencyEnabled = true;
-        let isTickerRssEnabled = true;
-        let liveRssTitles = [];
-        let basePromoText = "";
-        let currentMessages = [];
-        let currentTickerEffect = 'fade'; // Default to ultra-smooth card fade
-
-        function executeMasterBeat() {
-            masterBeatCount++;
-
-            // 1. Sol-Üst (Logo & Domain): Every 4th beat (every 32s) show domain, else logo
-            const logoEl = document.getElementById('ml-logo');
-            const domainEl = document.getElementById('ml-logo-domain');
-            if (logoEl && domainEl) {
-                const showDomain = (masterBeatCount % 4 === 0);
-                logoEl.style.opacity = showDomain ? '0' : '1';
-                domainEl.style.opacity = showDomain ? '1' : '0';
-            }
-
-            // 2. Üst-Orta (Saat/Tarih & Hava Durumu): Synchronized alternate
-            const l0 = document.getElementById('ml-center-layer-0');
-            const l1 = document.getElementById('ml-center-layer-1');
-            if (l0 && l1) {
-                const showWeather = (masterBeatCount % 2 === 1);
-                l0.classList.toggle('active', !showWeather);
-                l1.classList.toggle('active', showWeather);
-            }
-
-            // 3. Sağ-Üst (Döviz, Kripto, Sosyal Medya, Support): 4-step rotation on each beat
-            const r0 = document.getElementById('ml-review-layer-0'); // Forex (USD & EUR)
-            const r1 = document.getElementById('ml-review-layer-1'); // Crypto (BTC & ETH)
-            const r2 = document.getElementById('ml-review-layer-2'); // Social Media (Instagram & TikTok)
-            const r3 = document.getElementById('ml-review-layer-3'); // Support (Maps)
-            const activeLayerIdx = masterBeatCount % 4;
-            if (r0) r0.classList.toggle('active', activeLayerIdx === 0);
-            if (r1) r1.classList.toggle('active', activeLayerIdx === 1);
-            if (r2) r2.classList.toggle('active', activeLayerIdx === 2);
-            if (r3) r3.classList.toggle('active', activeLayerIdx === 3);
-
-            // 4. Sol-Orta (Ürünler & Duyuru Slaytları): Next product slide
-            if (webProducts.length > 0) {
+        function rotateProducts() {
+            if(webProducts.length > 0) {
                 const slides = document.querySelectorAll('.product-slide');
-                if (slides.length > 0) {
+                if(slides.length > 0) {
                     slides.forEach(s => s.classList.remove('active'));
-                    slides[pIndex % slides.length].classList.add('active');
+                    slides[pIndex].classList.add('active');
                     pIndex = (pIndex + 1) % slides.length;
                 }
             }
-            if (currentMessages.length > 0) {
-                const msgSlides = document.querySelectorAll('.msg-slide');
-                if (msgSlides.length > 0) {
-                    msgSlides.forEach(s => s.classList.remove('active'));
-                    msgSlides[mIndex % msgSlides.length].classList.add('active');
-                    mIndex = (mIndex + 1) % msgSlides.length;
+            if(currentMessages.length > 0) {
+                const slides = document.querySelectorAll('.msg-slide');
+                if(slides.length > 0) {
+                    slides.forEach(s => s.classList.remove('active'));
+                    slides[mIndex].classList.add('active');
+                    mIndex = (mIndex + 1) % slides.length;
                 }
             }
-
-            // 5. Alt Bant (Tam Boy Canlı Haberler & Duyurular): Next news card on the exact same beat
-            if (tickerCardItems && tickerCardItems.length > 0) {
-                rotateTickerCard();
+        }
+        setInterval(rotateProducts, 5250); // 5.25 seconds for products (%25 faster than 7s)
+        
+        let supportIndex = 0;
+        function rotateSupport() {
+            supportIndex = (supportIndex + 1) % 2; // 2 layers: Clock & Weather
+            for(let i = 0; i < 2; i++) {
+                const el = document.getElementById('ml-layer-' + i);
+                if(el) {
+                    el.style.opacity = (supportIndex === i) ? '1' : '0';
+                    el.style.pointerEvents = (supportIndex === i) ? 'auto' : 'none';
+                }
             }
         }
+        setInterval(rotateSupport, 8000); // 8 seconds per layer
 
-        function startMasterBeatScheduler() {
-            if (masterBeatTimer) clearInterval(masterBeatTimer);
-            masterBeatTimer = setInterval(executeMasterBeat, 8000); // 8 seconds unified rhythm
+        // Logo / Domain Transition in Sol-Üst: Shows www.firinna.com for 5 seconds every 30 seconds
+        function triggerLogoDomainCycle() {
+            const logoEl = document.getElementById('ml-logo');
+            const domainEl = document.getElementById('ml-logo-domain');
+            if (!logoEl || !domainEl) return;
+
+            // 1. Show domain text, fade out logo
+            logoEl.style.opacity = '0';
+            logoEl.style.transform = 'scale(0.88)';
+            domainEl.style.opacity = '1';
+            domainEl.style.transform = 'scale(1)';
+
+            // 2. Return back to logo after 5 seconds
+            setTimeout(() => {
+                domainEl.style.opacity = '0';
+                domainEl.style.transform = 'scale(0.92)';
+                logoEl.style.opacity = '1';
+                logoEl.style.transform = 'scale(1)';
+            }, 5000);
         }
-        startMasterBeatScheduler();
+        // First domain reveal at 5 seconds after load, then every 30 seconds
+        setTimeout(triggerLogoDomainCycle, 5000);
+        setInterval(triggerLogoDomainCycle, 30000);
 
         // Dynamic Multi-Card Watermark Carousel
         let wmSettings = {
@@ -1001,18 +1128,24 @@
                 wmHideTimeoutId = null;
             }
 
+            // Deactivate all cards first
             document.querySelectorAll('.wm-card').forEach(c => c.classList.remove('active'));
+
             const cardEl = document.getElementById(targetCardId);
             if (cardEl) cardEl.classList.add('active');
 
+            // 1. Show watermark container centered with smooth subtle zoom/fade
             container.style.opacity = '1';
+            container.style.transform = 'translate(-50%, -50%) scale(1)';
 
+            // 2. Hide exactly after configured duration (e.g. 12s)
             const durationMs = Math.max(3, parseInt(wmSettings.duration_sec) || 12) * 1000;
             wmHideTimeoutId = setTimeout(() => {
                 container.style.opacity = '0';
+                container.style.transform = 'translate(-50%, -50%) scale(0.96)';
                 setTimeout(() => {
                     document.querySelectorAll('.wm-card').forEach(c => c.classList.remove('active'));
-                }, 600);
+                }, 800);
             }, durationMs);
         }
 
@@ -1021,8 +1154,88 @@
             const intervalMs = Math.max(10, parseInt(wmSettings.interval_sec) || 90) * 1000;
             wmIntervalId = setInterval(triggerWatermarkCycle, intervalMs);
         }
+
+        // First show quickly after 15s, then follows configured interval
         setTimeout(triggerWatermarkCycle, 15000);
         startWatermarkScheduler();
+
+        // C4: Video watchdog — if local video freezes without playing, trigger play
+        let _lastVideoTime = -1;
+        let _stalledCount = 0;
+        setInterval(() => {
+            if (currentMediaSource !== 'local' || !vidEl || vidEl.style.display === 'none') return;
+            if (vidEl.paused) {
+                vidEl.play().catch(e=>{});
+                return;
+            }
+            const ct = vidEl.currentTime;
+            if (ct === _lastVideoTime && !vidEl.paused) {
+                _stalledCount++;
+                if (_stalledCount >= 5) { // stalled for ~15 seconds
+                    console.log('[WATCHDOG] Video frozen, re-triggering play.');
+                    _stalledCount = 0;
+                    vidEl.play().catch(e=>{});
+                }
+            } else {
+                _stalledCount = 0;
+            }
+            _lastVideoTime = ct;
+        }, 3000);
+
+        let liveCurrencyText = "";
+        let isTickerTextEnabled = true;
+        let isTickerCurrencyEnabled = true;
+
+        // Top-Middle Rotation (Layer 0: Clock & Date | Layer 1: Weather)
+        let topCenterIndex = 0;
+        function rotateTopCenter() {
+            const l0 = document.getElementById('ml-center-layer-0');
+            const l1 = document.getElementById('ml-center-layer-1');
+            if (!l0 || !l1) return;
+            topCenterIndex = (topCenterIndex + 1) % 2;
+            if (topCenterIndex === 0) {
+                l1.classList.remove('active');
+                l0.classList.add('active');
+            } else {
+                l0.classList.remove('active');
+                l1.classList.add('active');
+            }
+        }
+        setInterval(rotateTopCenter, 8000); // Rotates every 8 seconds
+
+        // Top-Right Rotation (Layer 0: Follow Instagram & TikTok | Layer 1: Rate Us Google & Yandex Maps)
+        let topRightIndex = 0;
+        function rotateTopRight() {
+            const r0 = document.getElementById('ml-review-layer-0');
+            const r1 = document.getElementById('ml-review-layer-1');
+            if (!r0 || !r1) return;
+            topRightIndex = (topRightIndex + 1) % 2;
+            if (topRightIndex === 0) {
+                r1.classList.remove('active');
+                r0.classList.add('active');
+            } else {
+                r0.classList.remove('active');
+                r1.classList.add('active');
+            }
+        }
+        setInterval(rotateTopRight, 7000); // Rotates every 7 seconds
+
+        // Bottom-Left Currency & Crypto Rotation (Slide 0: Forex | Slide 1: Crypto)
+        let currSlideIndex = 0;
+        function rotateCurrencies() {
+            const c0 = document.getElementById('ml-curr-slide-0');
+            const c1 = document.getElementById('ml-curr-slide-1');
+            if (!c0 || !c1) return;
+            currSlideIndex = (currSlideIndex + 1) % 2;
+            if (currSlideIndex === 0) {
+                c1.classList.remove('active');
+                c0.classList.add('active');
+            } else {
+                c0.classList.remove('active');
+                c1.classList.add('active');
+            }
+        }
+        setInterval(rotateCurrencies, 5000); // Rotates every 5 seconds
 
         async function fetchCurrencies() {
             try {
@@ -1031,6 +1244,7 @@
                 if (data) {
                     const usdBuy = data.usd_try ? data.usd_try.toFixed(2) : '--';
                     const eurBuy = data.eur_try ? data.eur_try.toFixed(2) : '--';
+                    const eurUsd = data.eur_usd ? data.eur_usd.toFixed(4) : '--';
                     const btcUsdt = data.btc_usdt ? Number(data.btc_usdt).toLocaleString('en-US') : '--';
                     const ethUsdt = data.eth_usdt ? Number(data.eth_usdt).toLocaleString('en-US') : '--';
 
@@ -1043,11 +1257,19 @@
                     if (valEur) valEur.textContent = `${eurBuy} ₺`;
                     if (valBtc) valBtc.textContent = `$${btcUsdt}`;
                     if (valEth) valEth.textContent = `$${ethUsdt}`;
+
+                    liveCurrencyText = `USD: ${usdBuy} ₺  •  EUR: ${eurBuy} ₺  •  EUR/USD: ${eurUsd}  •  BTC: $${btcUsdt}  •  ETH: $${ethUsdt}`;
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error("Currency fetch error:", e);
+            }
         }
         fetchCurrencies();
         setInterval(fetchCurrencies, 300000); // 5 mins
+
+        let liveRssTitles = [];
+        let isTickerRssEnabled = true;
+        let rssIntervalId = null;
 
         async function fetchRssFeed() {
             try {
@@ -1059,20 +1281,46 @@
                     liveRssTitles = [];
                 }
                 updateUnifiedMarquee();
-            } catch(e) {}
+            } catch(e) {
+                console.error("RSS fetch error:", e);
+            }
         }
         fetchRssFeed();
 
-        function rotateTickerCard() {
-            if (!tickerCardItems || tickerCardItems.length <= 1) return;
-            const oldIdx = currentTickerCardIdx;
-            currentTickerCardIdx = (currentTickerCardIdx + 1) % tickerCardItems.length;
+        function startRssScheduler(mins) {
+            if (rssIntervalId) clearInterval(rssIntervalId);
+            const intervalMs = (mins || 60) * 60 * 1000;
+            rssIntervalId = setInterval(fetchRssFeed, intervalMs);
+        }
+        startRssScheduler(60);
 
-            const oldEl = document.getElementById(`tcard-${oldIdx}`);
-            const newEl = document.getElementById(`tcard-${currentTickerCardIdx}`);
+        let currentTickerEffect = 'marquee'; // 'marquee' | 'fade' | 'slide_up' | 'slide_down'
+        let marqueeOffset = 0;
+        let marqueeSpeed = 4.5; // Configurable (pixels per frame)
+        let tickerSlideDurationSec = 8;
+        let tickerSlideTimer = null;
+        let currentTickerCardIdx = 0;
+        let tickerCardItems = [];
+        let marqueeAnimId = null;
+        let lastRenderedItemsKey = "";
 
-            if (oldEl) oldEl.classList.remove('active');
-            if (newEl) newEl.classList.add('active');
+        function animateMarquee() {
+            if (currentTickerEffect !== 'marquee') {
+                marqueeAnimId = null;
+                return;
+            }
+            const marqueeEl = document.getElementById('ml-continuous-marquee');
+            if (marqueeEl && marqueeEl.firstElementChild) {
+                const singleWidth = marqueeEl.firstElementChild.offsetWidth;
+                if (singleWidth > 0) {
+                    marqueeOffset += marqueeSpeed;
+                    if (marqueeOffset >= singleWidth) {
+                        marqueeOffset -= singleWidth;
+                    }
+                    marqueeEl.style.transform = `translate3d(-${marqueeOffset}px, 0, 0)`;
+                }
+            }
+            marqueeAnimId = requestAnimationFrame(animateMarquee);
         }
 
         function updateUnifiedMarquee(force = false) {
@@ -1106,7 +1354,7 @@
                 });
             }
 
-            // 2. RSS Live Headlines
+            // 2. RSS Live Headlines (clean icon without repeating HABER:)
             if (isTickerRssEnabled && liveRssTitles.length > 0) {
                 liveRssTitles.forEach(t => {
                     items.push({
@@ -1126,23 +1374,68 @@
                 });
             }
 
-            const currentKey = JSON.stringify(items);
-            if (!force && currentKey === lastRenderedItemsKey) {
-                return;
+            const currentKey = currentTickerEffect + '__' + JSON.stringify(items);
+            if (!force && currentKey === lastRenderedItemsKey && currentTickerEffect !== 'marquee') {
+                return; // Content unchanged, keep smooth card rotation alive
             }
             lastRenderedItemsKey = currentKey;
             tickerCardItems = items;
 
-            let html = '';
-            items.forEach((it, idx) => {
-                html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}">
-                    <span style="font-size:1.45vw; margin-right:0.6vw; flex-shrink:0; line-height:1;">${it.icon}</span>
-                    <div class="tcard-text">${it.text}</div>
-                </div>`;
-            });
-            marqueeEl.innerHTML = html;
-            currentTickerCardIdx = 0;
-        } 
+            if (currentTickerEffect === 'marquee') {
+                box.className = 'grid-box ticker-mode-marquee';
+                if (tickerSlideTimer) { clearInterval(tickerSlideTimer); tickerSlideTimer = null; }
+                
+                const singleHtml = `<div class="rss-single-strip" style="display:inline-flex; align-items:center; flex-shrink:0; padding-right:2.5vw;">${items.map(it => `<span style="margin-right:0.4vw; font-size:1.3vw;">${it.icon}</span><span style="color:#0F172A; font-weight:700;">${it.text}</span>`).join('<span style="color:#CBD5E1; margin: 0 1.8vw;">|</span>')}</div>`;
+                marqueeEl.innerHTML = singleHtml + singleHtml + singleHtml;
+                
+                if (!marqueeAnimId) {
+                    marqueeAnimId = requestAnimationFrame(animateMarquee);
+                }
+            } else {
+                box.className = 'grid-box ticker-effect-' + currentTickerEffect;
+                if (marqueeAnimId) { cancelAnimationFrame(marqueeAnimId); marqueeAnimId = null; }
+                marqueeEl.style.transform = 'none';
+
+                let html = '';
+                items.forEach((it, idx) => {
+                    html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}">
+                        <span style="font-size:1.45vw; margin-right:0.6vw; flex-shrink:0; line-height:1;">${it.icon}</span>
+                        <div class="tcard-text">${it.text}</div>
+                    </div>`;
+                });
+                marqueeEl.innerHTML = html;
+                currentTickerCardIdx = 0;
+
+                if (tickerSlideTimer) clearInterval(tickerSlideTimer);
+                tickerSlideTimer = setInterval(rotateTickerCard, tickerSlideDurationSec * 1000);
+            }
+        }
+
+        function rotateTickerCard() {
+            if (!tickerCardItems || tickerCardItems.length <= 1) return;
+            const oldIdx = currentTickerCardIdx;
+            currentTickerCardIdx = (currentTickerCardIdx + 1) % tickerCardItems.length;
+
+            const oldEl = document.getElementById(`tcard-${oldIdx}`);
+            const newEl = document.getElementById(`tcard-${currentTickerCardIdx}`);
+
+            if (oldEl) {
+                oldEl.classList.remove('active');
+                oldEl.classList.add('exit');
+                setTimeout(() => { 
+                    if (oldEl) oldEl.classList.remove('exit'); 
+                }, 600);
+            }
+            if (newEl) {
+                newEl.classList.remove('exit');
+                newEl.classList.add('active');
+            }
+        }
+
+        function updateTickerText() {
+            updateUnifiedMarquee(true);
+        }
+        setInterval(function() { updateUnifiedMarquee(false); }, 15000); 
 
         async function fetchProducts() {
             try {

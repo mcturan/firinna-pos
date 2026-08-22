@@ -67,10 +67,10 @@
         ]
     },
     "last_push": {
-        "action": "clear_cache",
-        "target": "all",
-        "timestamp": 1787399871518
+        "action": "reload",
+        "target": "tv_3dj0p6c",
+        "timestamp": 1787398201812
     },
-    "last_ping": "2026-08-22T14:59:47.751301",
+    "last_ping": "2026-08-22T14:38:33.877359",
     "version": 1787398102495
 }
