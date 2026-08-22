@@ -3905,6 +3905,32 @@ def get_tv_products():
     except Exception as e:
         return jsonify([])
 
+@app.route('/api/tv/products/save', methods=['POST'])
+def save_tv_products():
+    try:
+        products = request.json or []
+        with open('/opt/firinna-pos/web_products.json', 'w', encoding='utf-8') as f:
+            json.dump(products, f, indent=4, ensure_ascii=False)
+        return jsonify({"success": True, "count": len(products)})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 400
+
+@app.route('/api/tv/products/upload', methods=['POST'])
+def upload_tv_product_image():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    from werkzeug.utils import secure_filename
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    if file:
+        prod_dir = os.path.join(os.path.dirname(__file__), 'static', 'uploads', 'products')
+        os.makedirs(prod_dir, exist_ok=True)
+        filename = f"prod_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+        filepath = os.path.join(prod_dir, filename)
+        file.save(filepath)
+        return jsonify({"success": True, "url": f"/static/uploads/products/{filename}"})
+
 @app.route('/api/tv/facts', methods=['GET'])
 def api_tv_facts():
     settings = get_tv_settings()

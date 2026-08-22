@@ -31,12 +31,12 @@
         },
         "Cumartesi": {
             "open": "11:00",
-            "close": "22:00",
+            "close": "20:30",
             "active": true
         },
         "Pazar": {
             "open": "11:00",
-            "close": "19:15",
+            "close": "20:30",
             "active": true
         }
     },

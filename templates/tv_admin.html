@@ -84,6 +84,7 @@
         
         <div class="tv-tabs">
             <button class="tv-tab active" onclick="switchTab('genel', this)">🏛️ Ekran & Düzen</button>
+            <button class="tv-tab" onclick="switchTab('urunler', this)">🥐 Sol Ürünler (Vitrin Slaytları)</button>
             <button class="tv-tab" onclick="switchTab('medya', this)">🎬 Video & Müzik</button>
             <button class="tv-tab" onclick="switchTab('filigran', this)">💎 Filigranlar (Video Üstü)</button>
             <button class="tv-tab" onclick="switchTab('mesajlar', this)">💡 Kültür Notları & Alt Bant</button>
@@ -122,13 +123,65 @@
                 </div>
                 <div style="background:#ffffff; border:1.5px solid #86efac; border-radius:8px; padding:12px;">
                     <strong style="color:#15803d; display:block; font-size:0.95rem;">6. Alt Bant (Tam Boy - %100 Genişlik):</strong>
-                    <span style="font-size:0.85rem; color:#334155;">Büyük Türk Bayrağı + İngilizce & Rusça Kültür/Tarih/Gezi Notları (30 Bilgi) + Özel Renkli Duyurular</span>
+                    <span style="font-size:0.85rem; color:#334155;">Büyük Türk Bayrağı + 4 Dilde Kültür/Tarih/Gezi Notları (30 Bilgi) + Özel Renkli Duyurular</span>
                 </div>
             </div>
 
             <div class="form-group">
                 <label style="font-weight:bold;">Logo URL (PNG tavsiye edilir)</label>
                 <input type="text" id="logo_url" placeholder="/static/uploads/logo.png veya http://...">
+            </div>
+        </div>
+
+        <!-- SOL ÜRÜNLER (VİTRİN SLAYTLARI) SEKMESİ -->
+        <div id="urunler" class="tv-pane card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h3 style="margin:0; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                        🥐 Sol Ürün Vitrini & Slayt Yönetimi
+                        <span id="tv_products_count_badge" style="background:#dcfce7; color:#15803d; font-size:0.82rem; padding:2px 10px; border-radius:12px; font-weight:bold; border:1px solid #86efac;">0 Ürün</span>
+                    </h3>
+                    <p style="font-size:0.88rem; color:#64748b; margin-top:4px; margin-bottom:0;">
+                        Ekranın sol sütununda 8 saniyede bir sırayla dönen iştah açıcı lezzet fotoğrafları ve ürün tanıtımları.
+                    </p>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <button type="button" onclick="addTvProduct()" style="background:#16a34a; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.9rem;">
+                        ➕ Yeni Ürün Ekle
+                    </button>
+                    <button type="button" onclick="saveTvProductsToServer()" style="background:#2563eb; color:white; border:none; padding:8px 18px; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.9rem;">
+                        💾 Ürünleri Kaydet & TV'ye Gönder
+                    </button>
+                </div>
+            </div>
+
+            <!-- 📐 DİKEY GÖRSEL / FOTOĞRAF ÖLÇÜ REHBERİ -->
+            <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:10px; padding:16px; margin-bottom:1.5rem;">
+                <h4 style="margin:0 0 8px 0; color:#166534; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                    📐 Sol Ürünler İçin En İdeal Dikey Fotoğraf Ölçüleri:
+                </h4>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:12px; font-size:0.88rem; color:#1e293b;">
+                    <div style="background:#ffffff; border:1px solid #bbf7d0; border-radius:8px; padding:10px;">
+                        <strong style="color:#15803d; display:block; margin-bottom:2px;">📱 En / Boy Oranı:</strong>
+                        <span><b>3:4</b> veya <b>9:16</b> (Dikey / Portre Dik Çekim)</span>
+                    </div>
+                    <div style="background:#ffffff; border:1px solid #bbf7d0; border-radius:8px; padding:10px;">
+                        <strong style="color:#15803d; display:block; margin-bottom:2px;">🎯 Tavsiye Edilen Çözünürlük:</strong>
+                        <span><b>800 x 1060 px</b> veya <b>1080 x 1440 px</b> (Min: 600x800)</span>
+                    </div>
+                    <div style="background:#ffffff; border:1px solid #bbf7d0; border-radius:8px; padding:10px;">
+                        <strong style="color:#15803d; display:block; margin-bottom:2px;">🖼️ Desteklenen Formatlar:</strong>
+                        <span><b>JPG, PNG, WebP</b></span>
+                    </div>
+                </div>
+                <p style="margin:8px 0 0 0; font-size:0.83rem; color:#166534;">
+                    💡 <b>Tavsiye:</b> Telefonunuzla dik olarak çektiğiniz lezzetli kahve, pasta, kahvaltı ve taze fırın fotoğraflarını doğrudan yükleyebilirsiniz. Görseller alanı dikey olarak en verimli şekilde dolduracaktır.
+                </p>
+            </div>
+
+            <!-- Ürün Listesi Konteyneri -->
+            <div id="tv_products_container" style="display:flex; flex-direction:column; gap:14px;">
+                <!-- Dinamik ürün kartları JS ile yüklenecek -->
             </div>
         </div>
 
@@ -200,6 +253,30 @@
                         💾 Filigranları Kaydet & TV'ye Gönder
                     </button>
                 </div>
+            </div>
+
+            <!-- 📐 FİLİGRAN / KUTLAMA GÖRSELİ ÖLÇÜ REHBERİ -->
+            <div style="background:#eff6ff; border:1.5px solid #93c5fd; border-radius:10px; padding:16px; margin-bottom:1.5rem;">
+                <h4 style="margin:0 0 8px 0; color:#1e40af; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                    📐 Video Üstü Filigranlar İçin En İdeal Görsel Ölçüleri:
+                </h4>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:12px; font-size:0.88rem; color:#1e293b;">
+                    <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:8px; padding:10px;">
+                        <strong style="color:#2563eb; display:block; margin-bottom:2px;">🖥️ En / Boy Oranı:</strong>
+                        <span><b>16:9</b> veya <b>1000 x 520 px (~1.92:1)</b> (Yatay Geniş Format)</span>
+                    </div>
+                    <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:8px; padding:10px;">
+                        <strong style="color:#2563eb; display:block; margin-bottom:2px;">🎯 Tavsiye Edilen Çözünürlük:</strong>
+                        <span><b>1920 x 1080 px</b> veya <b>1000 x 520 px</b> (Full HD)</span>
+                    </div>
+                    <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:8px; padding:10px;">
+                        <strong style="color:#2563eb; display:block; margin-bottom:2px;">✨ Şeffaf Arka Plan (Kritik):</strong>
+                        <span><b>Şeffaf (Transparent) PNG veya WebP</b></span>
+                    </div>
+                </div>
+                <p style="margin:8px 0 0 0; font-size:0.83rem; color:#1e40af;">
+                    💡 <b>Kritik İpucu:</b> Filigranlar ana videonun tam ortasında belirdiği için arkası şeffaf (saydam PNG) logolar, tebrik ve kampanya görselleri videonun akışını kapatmadan sinematik ve çok profesyonel görünür.
+                </p>
             </div>
 
             <!-- Döngü Süre Ayarları -->
@@ -1027,8 +1104,12 @@
                 const isChecked = f.enabled !== false ? 'checked' : '';
                 const titleEn = (f.title_en || f.title || '').replace(/"/g, '&quot;');
                 const textEn = f.text_en || f.text || '';
+                const titleEs = (f.title_es || '').replace(/"/g, '&quot;');
+                const textEs = f.text_es || '';
                 const titleRu = (f.title_ru || '').replace(/"/g, '&quot;');
                 const textRu = f.text_ru || '';
+                const titleAr = (f.title_ar || '').replace(/"/g, '&quot;');
+                const textAr = f.text_ar || '';
                 const icon = f.icon || '🏛️';
                 const curColor = f.color || '#0F172A';
 
@@ -1058,11 +1139,26 @@
                             </div>
                             <textarea id="fact_text_en_${idx}" rows="2" placeholder="English text..." style="width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.88rem; font-family:sans-serif;">${textEn}</textarea>
                             
+                            <!-- İspanyolca (ES) -->
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <span style="font-weight:bold; color:#d97706; font-size:0.85rem; width:36px; text-align:center;">🇪🇸 ES:</span>
+                                <input type="text" id="fact_title_es_${idx}" value="${titleEs}" placeholder="Título en español (e.g. Torre de Gálata)" style="flex:1; padding:4px 8px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700; font-size:0.9rem;">
+                            </div>
+                            <textarea id="fact_text_es_${idx}" rows="2" placeholder="Texto en español..." style="width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.88rem; font-family:sans-serif;">${textEs}</textarea>
+
+                            <!-- Rusça (RU) -->
                             <div style="display:flex; gap:8px; align-items:center;">
                                 <span style="font-weight:bold; color:#b91c1c; font-size:0.85rem; width:36px; text-align:center;">🇷🇺 RU:</span>
                                 <input type="text" id="fact_title_ru_${idx}" value="${titleRu}" placeholder="Russian Title (e.g. Галатская башня)" style="flex:1; padding:4px 8px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700; font-size:0.9rem;">
                             </div>
                             <textarea id="fact_text_ru_${idx}" rows="2" placeholder="Russian text..." style="width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.88rem; font-family:sans-serif;">${textRu}</textarea>
+
+                            <!-- Arapça (AR) -->
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <span style="font-weight:bold; color:#059669; font-size:0.85rem; width:36px; text-align:center;">🇸🇦 AR:</span>
+                                <input type="text" id="fact_title_ar_${idx}" value="${titleAr}" dir="rtl" placeholder="العنوان بالعربية (مثل: برج غالاتا)" style="flex:1; padding:4px 8px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700; font-size:0.9rem; text-align:right;">
+                            </div>
+                            <textarea id="fact_text_ar_${idx}" rows="2" dir="rtl" placeholder="النص بالعربية..." style="width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.88rem; font-family:sans-serif; text-align:right;">${textAr}</textarea>
                         </div>
                         <button type="button" onclick="deleteFact(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.8rem; margin-top:2px;" title="Bu bilgiyi sil">
                             🗑️
@@ -1079,9 +1175,13 @@
                 icon: '🏛️',
                 color: '#DC2626',
                 title_en: 'Özel Duyuru / Custom Notice',
-                text_en: 'Buraya duyuru veya bilgi metnini yazın...',
+                text_en: 'Buraya İngilizce metni yazın...',
+                title_es: 'Aviso especial',
+                text_es: 'Escribe aquí el texto en español...',
                 title_ru: 'Специальное объявление',
                 text_ru: 'Напишите текст на русском...',
+                title_ar: 'إعلان خاص',
+                text_ar: 'اكتب النص بالعربية هنا...',
                 enabled: true
             });
             renderTvFactsList();
@@ -1099,16 +1199,24 @@
                 const colorInput = document.getElementById(`fact_color_${idx}`);
                 const titleEnInput = document.getElementById(`fact_title_en_${idx}`);
                 const textEnInput = document.getElementById(`fact_text_en_${idx}`);
+                const titleEsInput = document.getElementById(`fact_title_es_${idx}`);
+                const textEsInput = document.getElementById(`fact_text_es_${idx}`);
                 const titleRuInput = document.getElementById(`fact_title_ru_${idx}`);
                 const textRuInput = document.getElementById(`fact_text_ru_${idx}`);
+                const titleArInput = document.getElementById(`fact_title_ar_${idx}`);
+                const textArInput = document.getElementById(`fact_text_ar_${idx}`);
                 const enabledInput = document.getElementById(`fact_enabled_${idx}`);
 
                 if (iconInput) f.icon = iconInput.value.trim() || '🏛️';
                 if (colorInput) f.color = colorInput.value;
                 if (titleEnInput) f.title_en = titleEnInput.value.trim();
                 if (textEnInput) f.text_en = textEnInput.value.trim();
+                if (titleEsInput) f.title_es = titleEsInput.value.trim();
+                if (textEsInput) f.text_es = textEsInput.value.trim();
                 if (titleRuInput) f.title_ru = titleRuInput.value.trim();
                 if (textRuInput) f.text_ru = textRuInput.value.trim();
+                if (titleArInput) f.title_ar = titleArInput.value.trim();
+                if (textArInput) f.text_ar = textArInput.value.trim();
                 if (enabledInput) f.enabled = enabledInput.checked;
             });
 
@@ -1121,7 +1229,211 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert(`✅ ${globalFactsList.length} adet İngilizce & Rusça kültür bilgisi kaydedildi ve yayına verildi!`);
+                    alert(`✅ ${globalFactsList.length} adet 4 dilde (İngilizce, İspanyolca, Rusça, Arapça) kültür bilgisi kaydedildi ve yayına verildi!`);
+                    fetch('/api/tv/push', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({action: 'reload', client_id: 'all'})
+                    });
+                } else {
+                    alert("❌ Kaydedilemedi: " + (data.error || 'Bilinmeyen hata'));
+                }
+            } catch(e) {
+                alert("❌ Kayıt sırasında hata oluştu.");
+            }
+        }
+
+        // ==========================================
+        // SOL ÜRÜN VİTRİNİ & SLAYTLAR YÖNETİMİ
+        // ==========================================
+        let globalTvProducts = [];
+
+        async function loadTvProductsAdmin() {
+            try {
+                const res = await fetch('/api/tv/products');
+                globalTvProducts = await res.json();
+                renderTvProducts();
+            } catch(e) {
+                console.error("Ürünler yüklenemedi:", e);
+            }
+        }
+
+        function renderTvProducts() {
+            const container = document.getElementById('tv_products_container');
+            const badge = document.getElementById('tv_products_count_badge');
+            if (!container) return;
+
+            if (badge) badge.textContent = `${globalTvProducts.length} Ürün`;
+
+            if (globalTvProducts.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:24px; color:#94a3b8; background:#f8fafc; border-radius:8px; border:1px dashed #cbd5e1;">Henüz kayıtlı ürün bulunamadı. "➕ Yeni Ürün Ekle" butonuna tıklayarak vitrine ürün ekleyebilirsiniz.</div>`;
+                return;
+            }
+
+            let html = '';
+            globalTvProducts.forEach((p, idx) => {
+                const isChecked = p.is_active !== false ? 'checked' : '';
+                const title = (p.title || '').replace(/"/g, '&quot;');
+                const category = (p.category || '').replace(/"/g, '&quot;');
+                const price = (p.price || '').replace(/"/g, '&quot;');
+                const desc = (p.description || '').replace(/"/g, '&quot;');
+                const img = p.image_url || '';
+
+                html += `
+                    <div class="tv-prod-card" style="display:flex; gap:14px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:14px; align-items:flex-start; position:relative;">
+                        <!-- Sıra & Taşıma Butonları -->
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; margin-top:4px;">
+                            <span style="font-weight:800; color:#475569; font-size:0.95rem;">${idx + 1}</span>
+                            <button type="button" onclick="moveTvProduct(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} style="background:#e2e8f0; border:none; border-radius:4px; padding:2px 6px; font-weight:bold; cursor:pointer; font-size:0.75rem;" title="Yukarı Taşı">▲</button>
+                            <button type="button" onclick="moveTvProduct(${idx}, 1)" ${idx === globalTvProducts.length - 1 ? 'disabled' : ''} style="background:#e2e8f0; border:none; border-radius:4px; padding:2px 6px; font-weight:bold; cursor:pointer; font-size:0.75rem;" title="Aşağı Taşı">▼</button>
+                        </div>
+
+                        <!-- Dikey Görsel Önizleme -->
+                        <div style="width:110px; height:140px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative; box-shadow:0 2px 5px rgba(0,0,0,0.06);">
+                            <img class="tv-prod-img-preview" src="${img || '/static/uploads/logo.png'}" style="width:100%; height:100%; object-fit:contain;" onerror="this.onerror=null; this.src='/static/uploads/logo.png';">
+                        </div>
+
+                        <!-- Ürün Detay Formu -->
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                                <input type="text" class="tv-prod-title" value="${title}" placeholder="Ürün Adı (Örn: Geleneksel Türk Kahvesi)" style="flex:2; min-width:200px; padding:7px 10px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:0.92rem; color:#0f172a;">
+                                <input type="text" class="tv-prod-price" value="${price}" placeholder="Fiyat (Örn: 120 TL)" style="width:110px; padding:7px 10px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:0.92rem; color:#15803d;">
+                                <input type="text" class="tv-prod-category" value="${category}" placeholder="Kategori (Örn: Sıcak İçecekler)" style="flex:1; min-width:140px; padding:7px 10px; border-radius:6px; border:1.5px solid #cbd5e1; font-size:0.88rem; color:#475569;">
+                                
+                                <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; color:#15803d; font-weight:bold; cursor:pointer; background:#ffffff; padding:5px 10px; border-radius:6px; border:1px solid #bbf7d0;">
+                                    <input type="checkbox" class="tv-prod-active" ${isChecked} style="width:1.1rem; height:1.1rem;">
+                                    <span>Vitrinde Göster</span>
+                                </label>
+                            </div>
+
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <label style="background:#2563eb; color:white; padding:5px 12px; border-radius:6px; font-size:0.82rem; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; flex-shrink:0;">
+                                    📱 Dikey Fotoğraf Yükle
+                                    <input type="file" accept="image/*" style="display:none;" onchange="uploadProductImage(this, ${idx})">
+                                </label>
+                                <input type="text" class="tv-prod-image-url" value="${img}" placeholder="Fotoğraf URL (Örn: /static/uploads/products/kahve.jpg veya https://...)" style="flex:1; padding:5px 8px; border-radius:4px; border:1px solid #cbd5e1; font-size:0.82rem; color:#64748b;" oninput="updateProductImgPreview(this, ${idx})">
+                                <span class="tv-prod-upload-status" style="font-size:0.82rem; color:#64748b;"></span>
+                            </div>
+
+                            <input type="text" class="tv-prod-desc" value="${desc}" placeholder="Kısa Tanıtım / Açıklama (İsteğe bağlı)" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; font-size:0.85rem; color:#475569; box-sizing:border-box;">
+                        </div>
+
+                        <!-- Sil Butonu -->
+                        <button type="button" onclick="deleteTvProduct(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca; padding:7px 10px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem;" title="Bu ürünü vitrinden sil">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function syncTvProductInputs() {
+            const cardEls = document.querySelectorAll('.tv-prod-card');
+            cardEls.forEach((card, idx) => {
+                if (globalTvProducts && globalTvProducts[idx]) {
+                    const titleEl = card.querySelector('.tv-prod-title');
+                    const priceEl = card.querySelector('.tv-prod-price');
+                    const catEl = card.querySelector('.tv-prod-category');
+                    const imgEl = card.querySelector('.tv-prod-image-url');
+                    const descEl = card.querySelector('.tv-prod-desc');
+                    const actEl = card.querySelector('.tv-prod-active');
+
+                    if (titleEl) globalTvProducts[idx].title = titleEl.value.trim();
+                    if (priceEl) globalTvProducts[idx].price = priceEl.value.trim();
+                    if (catEl) globalTvProducts[idx].category = catEl.value.trim();
+                    if (imgEl) globalTvProducts[idx].image_url = imgEl.value.trim();
+                    if (descEl) globalTvProducts[idx].description = descEl.value.trim();
+                    if (actEl) globalTvProducts[idx].is_active = actEl.checked;
+                }
+            });
+        }
+
+        function addTvProduct() {
+            syncTvProductInputs();
+            if (!globalTvProducts) globalTvProducts = [];
+            globalTvProducts.unshift({
+                id: 'prod_' + Date.now(),
+                title: 'Yeni Lezzet / Ürün Adı',
+                category: 'Fırın & Mutfak',
+                price: '100 TL',
+                description: 'Taze ve lezzetli fırın lezzeti',
+                image_url: '/static/uploads/logo.png',
+                is_active: true
+            });
+            renderTvProducts();
+        }
+
+        function deleteTvProduct(idx) {
+            if (!confirm("Bu ürünü vitrin listesinden silmek istediğinize emin misiniz?")) return;
+            syncTvProductInputs();
+            globalTvProducts.splice(idx, 1);
+            renderTvProducts();
+        }
+
+        function moveTvProduct(idx, dir) {
+            syncTvProductInputs();
+            const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= globalTvProducts.length) return;
+            const temp = globalTvProducts[idx];
+            globalTvProducts[idx] = globalTvProducts[newIdx];
+            globalTvProducts[newIdx] = temp;
+            renderTvProducts();
+        }
+
+        function updateProductImgPreview(input, idx) {
+            const cardEls = document.querySelectorAll('.tv-prod-card');
+            if (cardEls[idx]) {
+                const preview = cardEls[idx].querySelector('.tv-prod-img-preview');
+                if (preview) preview.src = input.value.trim() || '/static/uploads/logo.png';
+            }
+        }
+
+        async function uploadProductImage(input, idx) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            const cardEl = document.querySelectorAll('.tv-prod-card')[idx];
+            const statusEl = cardEl.querySelector('.tv-prod-upload-status');
+            const previewEl = cardEl.querySelector('.tv-prod-img-preview');
+            const urlInput = cardEl.querySelector('.tv-prod-image-url');
+
+            statusEl.textContent = "⏳ Yükleniyor...";
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('/api/tv/products/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    statusEl.textContent = "✅ Yüklendi!";
+                    statusEl.style.color = "#059669";
+                    previewEl.src = data.url;
+                    urlInput.value = data.url;
+                    if (globalTvProducts[idx]) globalTvProducts[idx].image_url = data.url;
+                } else {
+                    statusEl.textContent = "❌ Hata: " + (data.error || 'Yüklenemedi');
+                    statusEl.style.color = "#dc2626";
+                }
+            } catch(e) {
+                statusEl.textContent = "❌ Sunucu hatası";
+                statusEl.style.color = "#dc2626";
+            }
+        }
+
+        async function saveTvProductsToServer() {
+            syncTvProductInputs();
+            try {
+                const res = await fetch('/api/tv/products/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(globalTvProducts)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`✅ ${globalTvProducts.length} adet vitrin ürünü kaydedildi ve TV ekranlarına gönderildi!`);
                     fetch('/api/tv/push', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -1141,6 +1453,7 @@
         loadSettings();
         fetchClients();
         loadTvFactsAdmin();
+        loadTvProductsAdmin();
         setInterval(fetchClients, 4000);
     </script>
 </body>

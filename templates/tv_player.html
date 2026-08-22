@@ -51,7 +51,10 @@
             border-radius: 0.8vw; 
             border: 1.5px solid #253046; 
             overflow: hidden; 
-            contain: content;
+            contain: layout paint;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
         
         /* Top Left: Logo, Flag & www.firinna.com */
@@ -464,11 +467,33 @@
     <!-- MODERN GRID LAYOUT -->
     <div id="modern-layout">
         
-        <!-- Box 1: Logo & Domain (Center) -->
+        <!-- Box 1: Logo, Domain & 12 Dil Bayrakları (Center) -->
         <div id="ml-logo-box" class="grid-box" style="justify-content:center;">
             <div id="ml-logo-center-wrap">
                 <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
-                <div id="ml-logo-domain">www.firinna.com</div>
+                <div id="ml-logo-domain" style="display:flex; align-items:center; justify-content:center; gap:0.4vw;">
+                    <span style="font-size:1.25vw; font-weight:700; color:#64748b; letter-spacing:0.5px;">visit</span>
+                    <span style="color:#2D6A4F; font-weight:800; font-size:1.65vw; letter-spacing:1px;">www.firinna.com</span>
+                </div>
+                <div id="ml-logo-flags" style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.35vw; opacity:0; transition:opacity 0.5s ease; will-change:opacity; transform:translateZ(0);">
+                    <div style="font-size:0.75vw; font-weight:800; color:#2D6A4F; letter-spacing:0.8px; margin-bottom:0.1vw;">🌐 visit www.firinna.com (12 Languages)</div>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:0.65vw; font-size:1.65vw; line-height:1;">
+                        <span title="Türkçe">🇹🇷</span>
+                        <span title="English">🇬🇧</span>
+                        <span title="Deutsch">🇩🇪</span>
+                        <span title="Español">🇪🇸</span>
+                        <span title="Français">🇫🇷</span>
+                        <span title="Italiano">🇮🇹</span>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:0.65vw; font-size:1.65vw; line-height:1;">
+                        <span title="Русский">🇷🇺</span>
+                        <span title="Українська">🇺🇦</span>
+                        <span title="中文">🇨🇳</span>
+                        <span title="हिन्दी">🇮🇳</span>
+                        <span title="العربية">🇸🇦</span>
+                        <span title="فارسی">🇮🇷</span>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -577,9 +602,14 @@
 
         <!-- BOTTOM ROW: Full Width Knowledge & Promo Stream with Enlarged Flag on Left -->
         <div id="ml-rss-box" class="grid-box" style="position:relative; display:flex; align-items:center; background:#FFFFFF;">
-            <!-- Extra Enlarged Turkish Flag in Sol-Alt -->
+            <!-- Extra Enlarged Turkish Flag in Sol-Alt (Zero CPU Vector Rendering) -->
             <div id="ml-support-flag" style="width:9.0vw; height:6.0vw; border-radius:0.6vw; overflow:hidden; flex-shrink:0; margin-left:1.2vw; margin-right:1.2vw; box-shadow:0 4px 14px rgba(0,0,0,0.25); border:2.5px solid #CBD5E1; background:#E30A17; z-index:10; display:flex; align-items:center; justify-content:center;">
-                <img src="/static/img/bayrak.gif" alt="Türk Bayrağı" style="width:100%; height:100%; object-fit:cover; display:block;">
+                <svg viewBox="0 0 1200 800" style="width:100%; height:100%; display:block;">
+                    <rect width="1200" height="800" fill="#E30A17"/>
+                    <circle cx="425" cy="400" r="200" fill="#FFFFFF"/>
+                    <circle cx="475" cy="400" r="160" fill="#E30A17"/>
+                    <polygon fill="#FFFFFF" points="583.33,400 706.58,439.9 630.41,335.1 630.41,464.9 706.58,360.1"/>
+                </svg>
             </div>
             <div id="ml-continuous-marquee" class="rss-marquee-content" style="flex:1; height:100%; position:relative; overflow:hidden;">
                 <span>Loading Turkey & Istanbul Cultural Guide...</span>
@@ -979,13 +1009,15 @@
         function executeMasterBeat() {
             masterBeatCount++;
 
-            // 1. Sol-Üst (Logo & Domain): Every 4th beat (every 32s) show domain, else logo
+            // 1. Sol-Üst (Logo, Domain & 12 Dil Bayrakları): 4-step rotation
             const logoEl = document.getElementById('ml-logo');
             const domainEl = document.getElementById('ml-logo-domain');
+            const flagsEl = document.getElementById('ml-logo-flags');
             if (logoEl && domainEl) {
-                const showDomain = (masterBeatCount % 4 === 0);
-                logoEl.style.opacity = showDomain ? '0' : '1';
-                domainEl.style.opacity = showDomain ? '1' : '0';
+                const step = masterBeatCount % 4;
+                logoEl.style.opacity = (step === 0 || step === 1) ? '1' : '0';
+                domainEl.style.opacity = (step === 2) ? '1' : '0';
+                if (flagsEl) flagsEl.style.opacity = (step === 3) ? '1' : '0';
             }
 
             // 2. Üst-Orta (Saat/Tarih & Hava Durumu): Synchronized alternate
@@ -1008,7 +1040,14 @@
             if (r2) r2.classList.toggle('active', activeLayerIdx === 2);
             if (r3) r3.classList.toggle('active', activeLayerIdx === 3);
 
-            // 4. Sol-Orta (Ürünler & Duyuru Slaytları): Next product slide
+            // 4. Alt Bant (Kültür & Duyuru Notları): Rotate ticker card
+            if (tickerCardItems && tickerCardItems.length > 0) {
+                rotateTickerCard();
+            }
+        }
+
+        // Staggered Product Rotation (Offset by 4 seconds to eliminate GPU bottleneck on TV sticks)
+        function executeProductBeat() {
             if (webProducts.length > 0) {
                 const slides = document.querySelectorAll('.product-slide');
                 if (slides.length > 0) {
@@ -1025,16 +1064,17 @@
                     mIndex = (mIndex + 1) % msgSlides.length;
                 }
             }
-
-            // 5. Alt Bant (Tam Boy Canlı Haberler & Duyurular): Next news card on the exact same beat
-            if (tickerCardItems && tickerCardItems.length > 0) {
-                rotateTickerCard();
-            }
         }
 
+        let productBeatTimer = null;
         function startMasterBeatScheduler() {
             if (masterBeatTimer) clearInterval(masterBeatTimer);
-            masterBeatTimer = setInterval(executeMasterBeat, 8000); // 8 seconds unified rhythm
+            if (productBeatTimer) clearInterval(productBeatTimer);
+            masterBeatTimer = setInterval(executeMasterBeat, 8000);
+            setTimeout(() => {
+                executeProductBeat();
+                productBeatTimer = setInterval(executeProductBeat, 8000);
+            }, 4000); // 4-second stagger offset
         }
         startMasterBeatScheduler();
 
@@ -1135,13 +1175,14 @@
                 c.style.display = 'none';
             });
 
-            // Show selected card
+            // Show selected card asynchronously with hardware V-SYNC
             const cardEl = document.getElementById(`dyn-wm-card-${curIdx}`);
             if (cardEl) {
                 cardEl.style.display = 'flex';
-                void cardEl.offsetWidth; // Force layout reflow for clean fade-in
-                cardEl.classList.add('active');
-                cardEl.style.opacity = '1';
+                requestAnimationFrame(() => {
+                    cardEl.classList.add('active');
+                    cardEl.style.opacity = '1';
+                });
             }
 
             container.style.display = 'block';
@@ -1481,11 +1522,12 @@
                 });
             }
 
-            // 2. Curated 30 Bilingual (EN first, then RU) Turkey & Istanbul Cultural Facts + Custom User Entries
+            // 2. Curated 30 Quadrilingual (EN, ES, RU, AR) Turkey & Istanbul Cultural Facts + Custom User Entries
             if (liveFacts.length > 0) {
                 liveFacts.forEach(f => {
                     const icon = f.icon || '🏛️';
                     const customColor = f.color || '#0F172A';
+
                     // 1. English Version
                     const titleEn = f.title_en || f.title || '';
                     const textEn = f.text_en || f.text || '';
@@ -1494,11 +1536,25 @@
                             icon: icon,
                             color: customColor,
                             title: titleEn,
-                            text: textEn
+                            text: textEn,
+                            lang: 'en'
                         });
                     }
 
-                    // 2. Russian Version
+                    // 2. Spanish Version (Español)
+                    const titleEs = f.title_es || '';
+                    const textEs = f.text_es || '';
+                    if (textEs) {
+                        items.push({
+                            icon: icon,
+                            color: customColor,
+                            title: titleEs,
+                            text: textEs,
+                            lang: 'es'
+                        });
+                    }
+
+                    // 3. Russian Version (Русский)
                     const titleRu = f.title_ru || '';
                     const textRu = f.text_ru || '';
                     if (textRu) {
@@ -1506,7 +1562,22 @@
                             icon: icon,
                             color: customColor,
                             title: titleRu,
-                            text: textRu
+                            text: textRu,
+                            lang: 'ru'
+                        });
+                    }
+
+                    // 4. Arabic Version (العربية)
+                    const titleAr = f.title_ar || '';
+                    const textAr = f.text_ar || '';
+                    if (textAr) {
+                        items.push({
+                            icon: icon,
+                            color: customColor,
+                            title: titleAr,
+                            text: textAr,
+                            lang: 'ar',
+                            dir: 'rtl'
                         });
                     }
                 });
@@ -1536,6 +1607,7 @@
             let html = '';
             items.forEach((it, idx) => {
                 const textColor = it.color || '#0F172A';
+                const isRtl = it.dir === 'rtl';
                 const badgeHtml = it.badge ? `
                     <div style="display:inline-flex; align-items:center; gap:0.5vw; background:${it.badgeBg}; border:2px solid ${it.badgeBorder}; color:${it.badgeColor}; padding:0.35vw 0.85vw; border-radius:0.6vw; font-size:1.35vw; font-weight:800; margin-right:1.2vw; flex-shrink:0; white-space:nowrap; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
                         <span style="font-size:2.2vw; line-height:1;">${it.icon}</span>
@@ -1546,9 +1618,9 @@
                     </div>`;
 
                 const titleHtml = it.title ? `<span style="font-weight:800; margin-right:0.6vw; color:${textColor};">${it.title}:</span>` : '';
-                html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}">
+                html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}" ${isRtl ? 'dir="rtl"' : ''}>
                     ${badgeHtml}
-                    <div class="tcard-text" style="color:${textColor}; font-size:1.62vw; line-height:1.24; font-weight:700;">
+                    <div class="tcard-text" style="color:${textColor}; font-size:1.62vw; line-height:1.24; font-weight:700; ${isRtl ? 'text-align:right;' : ''}">
                         ${titleHtml}${it.text}
                     </div>
                 </div>`;

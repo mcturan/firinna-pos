@@ -127,9 +127,9 @@
     "last_push": {
         "action": "clear_cache",
         "target": "all",
-        "timestamp": 1787412936266
+        "timestamp": 1787415079405
     },
-    "last_ping": "2026-08-22T18:54:29.180970",
+    "last_ping": "2026-08-22T20:10:26.735913",
     "version": 1787412836295,
     "did_you_know": [
         {
@@ -137,8 +137,12 @@
             "icon": "🏛️",
             "title_en": "Galata Tower",
             "text_en": "Galata Tower was built in 1348 by the Genoese as the \"Tower of Christ\" and was once the tallest structure in Istanbul.",
+            "title_es": "Torre de Gálata",
+            "text_es": "La Torre de Gálata fue construida en 1348 por los genoveses como \"Torre de Cristo\" y fue la estructura más alta de Estambul.",
             "title_ru": "Галатская башня",
             "text_ru": "Галатская башня была построена генуэзцами в 1348 году под названием \"Башня Христа\" и долгое время была самым высоким зданием Стамбула.",
+            "title_ar": "برج غالاتا",
+            "text_ar": "بنى الجنويون برج غالاتا عام 1348 باسم \"برج المسيح\" وكان لفترة طويلة أعلى مبنى في إسطنبول.",
             "enabled": true
         },
         {
@@ -146,8 +150,12 @@
             "icon": "🦅",
             "title_en": "Hezârfen Ahmed Çelebi",
             "text_en": "In 1632, Ottoman aviator Hezârfen Ahmed Çelebi flew across the Bosphorus from Galata Tower to Üsküdar using artificial wings.",
+            "title_es": "Hezârfen Ahmed Çelebi",
+            "text_es": "En 1632, el aviador otomano Hezârfen voló a través del Bósforo desde la Torre de Gálata hasta Üsküdar usando alas artificiales.",
             "title_ru": "Хезарфен Ахмед Челеби",
             "text_ru": "В 1632 году османский ученый Хезарфен Ахмед Челеби совершил исторический перелет через Босфор с Галатской башни в Ускюдар на искусственных крыльях.",
+            "title_ar": "هزارفن أحمد جلبي",
+            "text_ar": "في عام 1632، طار العالم العثماني هزارفن أحمد جلبي بأجنحة اصطناعية عبر مضيق البوسفور من برج غالاتا إلى أوسكودار.",
             "enabled": true
         },
         {
@@ -155,8 +163,12 @@
             "icon": "🚇",
             "title_en": "Karaköy Tünel (1875)",
             "text_en": "Opened in 1875, the historic Tünel funicular in Karaköy is the second-oldest underground urban railway in the world after London.",
+            "title_es": "Tünel Histórico de Karaköy (1875)",
+            "text_es": "Inaugurado en 1875, el funicular Tünel en Karaköy es el segundo ferrocarril urbano subterráneo más antiguo del mundo después de Londres.",
             "title_ru": "Исторический Тюнель (1875)",
             "text_ru": "Открытый в 1875 году фуникулер Тюнель в Каракёе — вторая старейшая подземная железная дорога в мире после лондонского метро.",
+            "title_ar": "نفق كاراكوي التاريخي (1875)",
+            "text_ar": "افتتح في عام 1875، وهو ثاني أقدم خط سكة حديد تحت الأرض في العالم بعد مترو أنفاق لندن.",
             "enabled": true
         },
         {
@@ -164,8 +176,12 @@
             "icon": "🕌",
             "title_en": "Hagia Sophia (Sultanahmet)",
             "text_en": "Built in 537 AD, Hagia Sophia in Sultanahmet was the world's largest cathedral for nearly 1,000 years.",
+            "title_es": "Santa Sofía (Hagia Sophia)",
+            "text_es": "Construida en el año 537 d.C., Santa Sofía en Sultanahmet fue la catedral más grande del mundo durante casi 1.000 años.",
             "title_ru": "Собор Святой Софии (Айя-София)",
             "text_ru": "Собор Святой Софии в Султанахмете, построенный в 537 году, оставался крупнейшим собором мира на протяжении почти 1000 лет.",
+            "title_ar": "آيا صوفيا (السلطان أحمد)",
+            "text_ar": "بنيت عام 537 م في منطقة السلطان أحمد وكانت أكبر كاتدرائية في العالم لما يقرب من 1000 عام.",
             "enabled": true
         },
         {
@@ -173,8 +189,12 @@
             "icon": "💧",
             "title_en": "Basilica Cistern (Yerebatan)",
             "text_en": "The 6th-century Basilica Cistern features 336 marble columns and can store up to 80,000 tons of water beneath Sultanahmet.",
+            "title_es": "Cisterna Basílica (Yerebatan)",
+            "text_es": "La Cisterna Basílica del siglo VI cuenta con 336 columnas de mármol y puede almacenar hasta 80.000 toneladas de agua bajo Sultanahmet.",
             "title_ru": "Цистерна Базилика",
             "text_ru": "Цистерна Базилика VI века в Султанахмете поддерживается 336 мраморными колоннами и способна вместить до 80 000 тонн воды.",
+            "title_ar": "صهريج البازيليك (يره باتان)",
+            "text_ar": "يعود للقرن السادس ويضم 336 عموداً رخامياً ويمكنه تخزين ما يصل إلى 80,000 طن من الماء تحت السلطان أحمد.",
             "enabled": true
         },
         {
@@ -182,8 +202,12 @@
             "icon": "🎨",
             "title_en": "Colorful Balat & Fener",
             "text_en": "Balat is famous for its picturesque colorful historical houses, cobblestone slopes, and centuries-old multicultural heritage.",
+            "title_es": "Colorido Balat y Fener",
+            "text_es": "Balat es famoso por sus pintorescas casas históricas de colores, calles empedradas y su patrimonio multicultural centenario.",
             "title_ru": "Красочный Балат и Фенер",
             "text_ru": "Район Балат знаменит своими живописными разноцветными историческими домами, мощеными улочками и многовековым культурным наследием.",
+            "title_ar": "حي بلاط وفنار الملون",
+            "text_ar": "يشتهر حي بلاط بمنازله التاريخية الملونة وشوارعه المرصوفة بالحصى وتراثه الثقافي العريق.",
             "enabled": true
         },
         {
@@ -191,8 +215,12 @@
             "icon": "📜",
             "title_en": "Grand Bazaar (Kapalıçarşı)",
             "text_en": "Established in 1461, the Grand Bazaar is one of the world's oldest and largest covered markets, housing over 4,000 shops.",
+            "title_es": "Gran Bazar (Kapalıçarşı)",
+            "text_es": "Fundado en 1461, el Gran Bazar es uno de los mercados cubiertos más antiguos y grandes del mundo, con más de 4.000 tiendas.",
             "title_ru": "Гранд-Базар (Капалы-чарши)",
             "text_ru": "Гранд-Базар, основанный в 1461 году, является одним из старейших и крупнейших крытых рынков в мире, насчитывающим более 4000 магазинов.",
+            "title_ar": "البازار الكبير (غراند بازار)",
+            "text_ar": "تأسس عام 1461، وهو أحد أقدم وأكبر الأسواق المغطاة في العالم، ويضم أكثر من 4000 متجر.",
             "enabled": true
         },
         {
@@ -200,8 +228,12 @@
             "icon": "👑",
             "title_en": "Topkapı Palace",
             "text_en": "Topkapı Palace in Sultanahmet served as the administrative headquarters and residence of Ottoman Sultans for 400 years.",
+            "title_es": "Palacio de Topkapı",
+            "text_es": "El Palacio de Topkapı sirvió como sede administrativa y residencia de los sultanes otomanos durante 400 años.",
             "title_ru": "Дворец Топкапы",
             "text_ru": "Дворец Топкапы в Султанахмете служил резиденцией османских султанов и главным центром управления империей на протяжении 400 лет.",
+            "title_ar": "قصر طوب قابي",
+            "text_ar": "كان قصر طوب قابي المقر الإداري وسكن السلاطين العثمانيين لأكثر من 400 عام.",
             "enabled": true
         },
         {
@@ -209,8 +241,12 @@
             "icon": "🌊",
             "title_en": "The Bosphorus Strait",
             "text_en": "Istanbul is the only metropolis in the world spanning two continents—Europe and Asia—separated by the magnificent Bosphorus Strait.",
+            "title_es": "El Estrecho del Bósforo",
+            "text_es": "Estambul es la única metrópoli del mundo que se extiende sobre dos continentes (Europa y Asia), separados por el Bósforo.",
             "title_ru": "Пролив Босфор",
             "text_ru": "Стамбул — единственный мегаполис в мире, расположенный сразу на двух континентах (в Европе и Азии), разделенных проливом Босфор.",
+            "title_ar": "مضيق البوسفور",
+            "text_ar": "إسطنبول هي المدينة الكبرى الوحيدة في العالم التي تقع على قارتين (أوروبا وآسيا) ويفصل بينهما مضيق البوسفور.",
             "enabled": true
         },
         {
@@ -218,8 +254,12 @@
             "icon": "🕌",
             "title_en": "The Blue Mosque",
             "text_en": "The Sultanahmet Mosque is known worldwide as the Blue Mosque due to over 20,000 handmade blue Iznik ceramic tiles adorning its interior.",
+            "title_es": "La Mezquita Azul",
+            "text_es": "La Mezquita del Sultán Ahmed es conocida como Mezquita Azul por sus más de 20.000 azulejos de cerámica artesanal de İznik.",
             "title_ru": "Голубая мечеть (Султанахмет)",
             "text_ru": "Голубая мечеть в Султанахмете получила свое название благодаря более чем 20 000 изразцов ручной работы из Изника, украшающих ее интерьер.",
+            "title_ar": "المسجد الأزرق (السلطان أحمد)",
+            "text_ar": "يشتهر بالمسجد الأزرق لوجود أكثر من 20,000 قطعة خزفية زرقاء مصنوعة يدوياً من إزنيق تزين جدرانه.",
             "enabled": true
         },
         {
@@ -227,8 +267,12 @@
             "icon": "🏰",
             "title_en": "Genoese Walls in Galata",
             "text_en": "Galata was an autonomous Genoese trading colony from 1273 to 1453, protected by massive stone ramparts still visible today.",
+            "title_es": "Murallas Genovesas de Gálata",
+            "text_es": "Gálata fue una colonia comercial genovesa autónoma entre 1273 y 1453, protegida por imponentes murallas de piedra.",
             "title_ru": "Генуэзские стены в Галате",
             "text_ru": "С 1273 по 1453 год Галата была автономной генуэзской колонией, защищенной массивными каменными стенами, сохранившимися и по сей день.",
+            "title_ar": "الأسوار الجنوية في غالاتا",
+            "text_ar": "كانت غالاتا مستعمرة تجارية جنوية مستقلة من 1273 إلى 1453 ومحاطة بأسوار حجرية ضخمة.",
             "enabled": true
         },
         {
@@ -236,8 +280,12 @@
             "icon": "🏰",
             "title_en": "Maiden's Tower (Kız Kulesi)",
             "text_en": "With a 2,500-year history, the Maiden's Tower stands proudly on a tiny islet at the southern entrance of the Bosphorus.",
+            "title_es": "Torre de la Doncella (Kız Kulesi)",
+            "text_es": "Con 2.500 años de historia, la Torre de la Doncella se alza sobre un islote en la entrada sur del Bósforo.",
             "title_ru": "Девичья башня (Кыз Кулеси)",
             "text_ru": "Девичья башня с 2500-летней историей возвышается на небольшом островке у южного входа в пролив Босфор.",
+            "title_ar": "برج الفتاة (كز كوليسي)",
+            "text_ar": "يمتلك برج الفتاة تاريخاً يمتد لأكثر من 2500 عام، ويقف بشموخ على جزيرة صغيرة عند المدخل الجنوبي للبوسفور.",
             "enabled": true
         },
         {
@@ -245,8 +293,12 @@
             "icon": "🧱",
             "title_en": "Göbeklitepe (12,000 Years Old)",
             "text_en": "Located in Southeastern Turkey, Göbeklitepe is the world's oldest known temple complex, predating the Egyptian pyramids by 7,000 years.",
+            "title_es": "Göbeklitepe (12.000 años)",
+            "text_es": "Ubicado en el sureste de Turquía, Göbeklitepe es el templo más antiguo del mundo, 7.000 años anterior a las pirámides de Egipto.",
             "title_ru": "Гёбекли-Тепе (12 000 лет)",
             "text_ru": "Гёбекли-Тепе в Турции — древнейший храмовый комплекс на Земле возрастом 12 000 лет, построенный на 7000 лет раньше египетских пирамид.",
+            "title_ar": "غوبكلي تبه (12,000 عام)",
+            "text_ar": "أقدم مجمع معابد معروف في العالم، يقع في جنوب شرق تركيا ويسبق أهرامات مصر بنحو 7000 عام.",
             "enabled": true
         },
         {
@@ -254,8 +306,12 @@
             "icon": "🕌",
             "title_en": "Süleymaniye Mosque",
             "text_en": "Built by master architect Mimar Sinan in 1557, Süleymaniye Mosque crowns the Third Hill of Istanbul overlooking the Golden Horn.",
+            "title_es": "Mezquita de Süleymaniye",
+            "text_es": "Construida por el maestro arquitecto Mimar Sinan en 1557, corona la tercera colina de Estambul sobre el Cuerno de Oro.",
             "title_ru": "Мечеть Сулеймание",
             "text_ru": "Мечеть Сулеймание, возведенная великим зодчим Мимаром Синаном в 1557 году, венчает третий холм Стамбула с видом на Золотой Рог.",
+            "title_ar": "جامع السليمانية",
+            "text_ar": "بناه المعماري العظيم سنان عام 1557، ويتوج التلة الثالثة لإسطنبول بإطلالة ساحرة على القرن الذهبي.",
             "enabled": true
         },
         {
@@ -263,8 +319,12 @@
             "icon": "🎈",
             "title_en": "Cappadocia (Kapadokya)",
             "text_en": "Cappadocia in Central Anatolia is famous worldwide for its surreal fairy chimneys, ancient underground cities, and sunrise hot air balloons.",
+            "title_es": "Capadocia (Kapadokya)",
+            "text_es": "Capadocia es mundialmente famosa por sus chimeneas de hadas, ciudades subterráneas y paseos en globo aerostático al amanecer.",
             "title_ru": "Каппадокия",
             "text_ru": "Каппадокия в Центральной Анатолии всемирно известна своими 'сказочными дымоходами', подземными городами и полетами на воздушных шарах.",
+            "title_ar": "كابادوكيا",
+            "text_ar": "تشتهر عالمياً بمداخن الجنيات الفريدة والمدن القديمة تحت الأرض وجولات مناطيد الهواء الساخن عند شروق الشمس.",
             "enabled": true
         },
         {
@@ -272,8 +332,12 @@
             "icon": "🏛️",
             "title_en": "Ancient City of Ephesus",
             "text_en": "The ancient city of Ephesus near Izmir was home to the Temple of Artemis—one of the Seven Wonders of the Ancient World.",
+            "title_es": "Antigua Ciudad de Éfeso",
+            "text_es": "La antigua ciudad de Éfeso albergaba el Templo de Artemisa, una de las Siete Maravillas del Mundo Antiguo.",
             "title_ru": "Древний Эфес",
             "text_ru": "Древний город Эфес возле Измира был домом для храма Артемиды — одного из семи чудес древнего мира.",
+            "title_ar": "مدينة أفسس الأثرية",
+            "text_ar": "مدينة تاريخية عريقة بالقرب من إزمير، كانت تضم معبد أرتميس أحد عجائب الدنيا السبع القديمة.",
             "enabled": true
         },
         {
@@ -281,8 +345,12 @@
             "icon": "🕊️",
             "title_en": "Galata Mevlevi Lodge",
             "text_en": "Founded in 1491, the Galata Mevlevi Lodge is Istanbul's oldest lodge of the Whirling Dervishes, teaching tolerance and spiritual music.",
+            "title_es": "Mevlevihane de Gálata",
+            "text_es": "Fundada en 1491, es la casa de derviches giróvagos más antigua de Estambul, símbolo de tolerancia y música sufí.",
             "title_ru": "Галатская обитель дервишей",
             "text_ru": "Обитель дервишей в Галате, основанная в 1491 году, является старейшим центром ордена Мевлеви в Стамбуле.",
+            "title_ar": "تكية غالاتا المولوية",
+            "text_ar": "تأسست عام 1491، وهي أقدم مركز للدراويش المولوية في إسطنبول لتعليم التسامح والموسيقى الروحية.",
             "enabled": true
         },
         {
@@ -290,8 +358,12 @@
             "icon": "🎨",
             "title_en": "Historical Walls of Constantinople",
             "text_en": "The massive 5th-century Theodosian Land Walls protected Constantinople from hundreds of sieges for over a millennium.",
+            "title_es": "Murallas de Constantinopla",
+            "text_es": "Las imponentes murallas teodosianas del siglo V protegieron Constantinopla de cientos de asedios durante más de mil años.",
             "title_ru": "Стены Константинополя",
             "text_ru": "Массивные крепостные стены Феодосия V века защищали Константинополь от сотен осад на протяжении более тысячи лет.",
+            "title_ar": "أسوار القسطنطينية التاريخية",
+            "text_ar": "أسوار ثيودوسيوس الضخمة من القرن الخامس حمت القسطنطينية من مئات الحصارات لأكثر من ألف عام.",
             "enabled": true
         },
         {
@@ -299,8 +371,12 @@
             "icon": "🫖",
             "title_en": "Turkish Tea Tradition",
             "text_en": "Turkey has the highest per capita tea consumption in the world, served in iconic tulip-shaped glasses symbolizing hospitality.",
+            "title_es": "Tradición del Té Turco",
+            "text_es": "Turquía tiene el mayor consumo de té per cápita del mundo, servido en tradicionales vasos con forma de tulipán.",
             "title_ru": "Традиция турецкого чая",
             "text_ru": "Турция занимает первое место в мире по потреблению чая на душу населения; чай традиционно подают в изящных стаканах-армудах.",
+            "title_ar": "تقاليد الشاي التركي",
+            "text_ar": "تحتل تركيا المرتبة الأولى عالمياً في استهلاك الشاي، ويقدم في كؤوس زجاجية تقليدية على شكل زهرة التوليب.",
             "enabled": true
         },
         {
@@ -308,8 +384,12 @@
             "icon": "☕",
             "title_en": "World's First Coffeehouse (1554)",
             "text_en": "The world's first coffeehouse opened in Istanbul in 1554 (Tahtakale), sparking a global coffee culture that later spread to Europe.",
+            "title_es": "Primera Cafetería del Mundo (1554)",
+            "text_es": "La primera cafetería de la historia abrió en Estambul en 1554 (Tahtakale), expandiendo la cultura del café a Europa y al mundo.",
             "title_ru": "Первая кофейня в истории (1554)",
             "text_ru": "Первая в мире кофейня открылась в Стамбуле в 1554 году (район Тахтакале), положив начало мировой кофейной культуре.",
+            "title_ar": "أول مقهى في العالم (1554)",
+            "text_ar": "افتتح أول مقهى في التاريخ بإسطنبول عام 1554 في منطقة تحتا قلعة، ونشر ثقافة القهوة في أوروبا والعالم.",
             "enabled": true
         },
         {
@@ -317,8 +397,12 @@
             "icon": "🏰",
             "title_en": "Dolmabahçe Palace",
             "text_en": "Located on the European shore of the Bosphorus, Dolmabahçe Palace houses the world's largest Bohemian crystal chandelier, weighing 4.5 tons.",
+            "title_es": "Palacio de Dolmabahçe",
+            "text_es": "A orillas del Bósforo, el Palacio de Dolmabahçe alberga la lámpara de cristal de Bohemia más grande del mundo, con un peso de 4,5 toneladas.",
             "title_ru": "Дворец Долмабахче",
             "text_ru": "Дворец Долмабахче на берегу Босфора украшает самая большая в мире люстра из богемского хрусталя весом 4,5 тонны.",
+            "title_ar": "قصر دولمة بهجة",
+            "text_ar": "يقع على ضفاف البوسفور ويضم أكبر ثريا من الكريستال البوهيمي في العالم بوزن 4.5 طن.",
             "enabled": true
         },
         {
@@ -326,8 +410,12 @@
             "icon": "🏺",
             "title_en": "Ancient City of Troy",
             "text_en": "Located in northwestern Turkey, the legendary city of Troy has 4,000 years of history and was immortalized in Homer's Iliad.",
+            "title_es": "La Legendaria Troya",
+            "text_es": "Ubicada en el noroeste de Turquía, la legendaria Troya cuenta con 4.000 años de historia y fue inmortalizada en la Ilíada de Homero.",
             "title_ru": "Легендарная Троя",
             "text_ru": "Легендарная Троя на северо-западе Турции насчитывает 4000 лет истории и была увековечена в 'Илиаде' Гомера.",
+            "title_ar": "مدينة طروادة الأسطورية",
+            "text_ar": "تقع شمال غرب تركيا وتملك 4000 عام من التاريخ، وقد خلدت في ملحمة الإلياذة لهوميروس.",
             "enabled": true
         },
         {
@@ -335,8 +423,12 @@
             "icon": "🌉",
             "title_en": "Historic Galata Bridge",
             "text_en": "The historic Galata Bridge connects the bohemian Galata quarter with the historic Sultanahmet peninsula across the Golden Horn.",
+            "title_es": "Puente Histórico de Gálata",
+            "text_es": "El histórico Puente de Gálata une el bohemio barrio de Gálata con la península histórica a través del Cuerno de Oro.",
             "title_ru": "Галатский мост",
             "text_ru": "Исторический Галатский мост соединяет колоритный квартал Галата с историческим полуостровом через залив Золотой Рог.",
+            "title_ar": "جسر غالاتا التاريخي",
+            "text_ar": "يربط جسر غالاتا التاريخي حي غالاتا النابض بالحياة مع شبه الجزيرة التاريخية عبر خليج القرن الذهبي.",
             "enabled": true
         },
         {
@@ -344,8 +436,12 @@
             "icon": "♨️",
             "title_en": "Pamukkale Thermal Terraces",
             "text_en": "Pamukkale in Southwestern Turkey features gleaming white mineral terraces and thermal pools used as a natural spa since Roman times.",
+            "title_es": "Terrazas Termales de Pamukkale",
+            "text_es": "Pamukkale presenta relucientes terrazas de travertino blanco y piscinas termales usadas como balneario natural desde la época romana.",
             "title_ru": "Террасы Памуккале",
             "text_ru": "Памуккале на юго-западе Турции славится белоснежными травертиновыми террасами и термальными источниками со времен Древнего Рима.",
+            "title_ar": "ينابيع باموكالي الحرارية",
+            "text_ar": "تشتهر بمدرجاتها الحجرية البيضاء الناصعة ومياهها الحرارية المستخدمة للاستشفاء منذ العصر الروماني.",
             "enabled": true
         },
         {
@@ -353,8 +449,12 @@
             "icon": "🌲",
             "title_en": "Princes' Islands (Adalar)",
             "text_en": "The Princes' Islands in the Sea of Marmara are completely free of cars, renowned for Victorian wooden mansions and pine forests.",
+            "title_es": "Islas Príncipe (Adalar)",
+            "text_es": "Las Islas Príncipe en el mar de Mármara están libres de coches y son famosas por sus mansiones victorianas de madera y bosques de pinos.",
             "title_ru": "Принцевы острова (Адалар)",
             "text_ru": "Принцевы острова в Мраморном море свободны от автотранспорта и знамениты деревянными особняками и сосновыми лесами.",
+            "title_ar": "جزر الأميرات (أدالار)",
+            "text_ar": "جزر هادئة في بحر مرمرة خالية تماماً من السيارات وتشتهر بالقصور الخشبية التاريخية وغابات الصنوبر.",
             "enabled": true
         },
         {
@@ -362,8 +462,12 @@
             "icon": "🏛️",
             "title_en": "Celsus Library in Ephesus",
             "text_en": "The Library of Celsus in Ephesus once held more than 12,000 scrolls and is one of the most magnificent facades of the Roman Empire.",
+            "title_es": "Biblioteca de Celso en Éfeso",
+            "text_es": "La Biblioteca de Celso en Éfeso llegó a albergar más de 12.000 rollos y es una de las fachadas más imponentes del Imperio Romano.",
             "title_ru": "Библиотека Цельса в Эфесе",
             "text_ru": "Библиотека Цельса в Эфесе когда-то хранила более 12 000 свитков и является одним из красивейших памятников Римской империи.",
+            "title_ar": "مكتبة سيلسوس في أفسس",
+            "text_ar": "كانت مكتبة سيلسوس تضم أكثر من 12,000 لفافة ومخطوطة، وتعد إحدى أروع واجهات الإمبراطورية الرومانية.",
             "enabled": true
         },
         {
@@ -371,8 +475,12 @@
             "icon": "⛰️",
             "title_en": "Seven Hills of Istanbul",
             "text_en": "Like Rome, historical Istanbul within the ancient walls was built upon seven scenic hills, each crowned with a magnificent imperial mosque.",
+            "title_es": "Las Siete Colinas de Estambul",
+            "text_es": "Al igual que Roma, la histórica Estambul intramuros fue construida sobre siete colinas, cada una coronada por una mezquita imperial.",
             "title_ru": "Семь холмов Стамбула",
             "text_ru": "Подобно Риму, исторический Стамбул в пределах древних стен был построен на семи холмах, увенчанных мечетями.",
+            "title_ar": "تلال إسطنبول السبع",
+            "text_ar": "مثل روما، بنيت إسطنبول التاريخية داخل الأسوار القديمة على سبع تلال، تعلو كل تلة منها تحفة معمارية إسلامية.",
             "enabled": true
         },
         {
@@ -380,8 +488,12 @@
             "icon": "🗺️",
             "title_en": "Piri Reis Map (1513)",
             "text_en": "Drawn in 1513 in Istanbul on gazelle skin, Ottoman Admiral Piri Reis's map is one of the earliest surviving maps showing the Americas.",
+            "title_es": "Mapa de Piri Reis (1513)",
+            "text_es": "Dibujado en 1513 sobre piel de gacela, el mapa del almirante otomano Piri Reis es uno de los más antiguos que muestra América.",
             "title_ru": "Карта Пири Рейса (1513)",
             "text_ru": "Карта Пири Рейса, составленная в 1513 году в Стамбуле на коже газели, — одна из старейших сохранившихся карт с изображением Америки.",
+            "title_ar": "خريطة بيري ريس (1513)",
+            "text_ar": "رسمها القبطان العثماني بيري ريس عام 1513 على جلد غزال، وهي من أقدم الخرائط التي توضح قارة أمريكا.",
             "enabled": true
         },
         {
@@ -389,8 +501,12 @@
             "icon": "🚋",
             "title_en": "Nostalgic Tram of Istiklal",
             "text_en": "The iconic red vintage tram running along Istiklal Street has connected Taksim Square and Tünel through the heart of Beyoğlu since 1990.",
+            "title_es": "Tranvía Nostálgico de Istiklal",
+            "text_es": "El emblemático tranvía rojo recorre la avenida Istiklal conectando la plaza Taksim y Tünel a través del corazón de Beyoğlu.",
             "title_ru": "Исторический трамвай на Истикляль",
             "text_ru": "Красный исторический трамвай на улице Истикляль курсирует между площадью Таксим и Тюнелем через самое сердце Бейоглу.",
+            "title_ar": "ترامواي استقلال التراثي",
+            "text_ar": "الترام الأحمر الشهير الذي يعبر شارع الاستقلال ويربط بين ميدان تقسيم وتونيل في قلب بيوغلو.",
             "enabled": true
         },
         {
@@ -398,8 +514,12 @@
             "icon": "🍋",
             "title_en": "Turkish Hospitality & Kolonya",
             "text_en": "Offering traditional lemon cologne (kolonya) and sweets to guests is a timeless symbol of Turkish warmth, hygiene, and welcome.",
+            "title_es": "Hospitalidad Turca y Kolonya",
+            "text_es": "Ofrecer agua de colonia de limón (kolonya) y dulces a los visitantes es un símbolo milenario de la calidez y bienvenida turca.",
             "title_ru": "Турецкое гостеприимство",
             "text_ru": "Подношение гостям традиционного лимонного одеколона (kolonya) и сладостей — многовековой символ турецкого гостеприимства и радушия.",
+            "title_ar": "كرم الضيافة التركية والكولونيا",
+            "text_ar": "تقديم كولونيا الليمون التقليدية والحلوى للضيوف رمز أصيل لكرم الضيافة والترحيب التركي العريق.",
             "enabled": true
         }
     ],
