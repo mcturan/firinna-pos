@@ -38,32 +38,45 @@
         </div>
         <div class="tables-grid" id="tablesGrid"></div>
 
-        <!-- Sipariş Geçmişi — Collapsible Panel -->
-        <div style="margin-top:1.5rem;border-top:2px solid #e2e8f0;">
-            <button onclick="toggleHistPanel()" id="histToggleBtn"
-                style="display:flex;align-items:center;gap:.5rem;width:100%;padding:.75rem 0;background:none;border:none;cursor:pointer;font-family:inherit;color:#4a5568;font-size:.88rem;font-weight:700;">
-                <span id="histToggleArrow" style="font-size:.75rem;transition:transform .2s;">▶</span>
-                <span>Sipariş Geçmişi</span>
-                <span id="histToggleCount" style="background:#e2e8f0;color:#4a5568;font-size:.72rem;padding:.1rem .5rem;border-radius:20px;font-weight:600;"></span>
-            </button>
-            <div id="orderHistoryPanel" style="display:none;padding-bottom:1.5rem;">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:.85rem;">
-                    <div style="display:flex;gap:0;border-radius:8px;overflow:hidden;border:2px solid #e2e8f0;">
-                        <button id="histTabToday" onclick="switchHistTab('today')"
-                            style="padding:.4rem 1rem;border:none;font-weight:700;font-size:.83rem;cursor:pointer;background:#2d6a4f;color:white;font-family:inherit;">Bugün</button>
-                        <button id="histTabRange" onclick="switchHistTab('range')"
-                            style="padding:.4rem 1rem;border:none;font-weight:700;font-size:.83rem;cursor:pointer;background:white;color:#4a5568;font-family:inherit;">Geçmiş</button>
-                    </div>
-                    <div id="histRangeFilter" style="display:none;align-items:center;gap:.4rem;flex-wrap:wrap;">
-                        <input type="date" id="histStart" style="padding:.35rem .5rem;border:2px solid #e2e8f0;border-radius:6px;font-size:.83rem;">
-                        <span style="color:#718096;">—</span>
-                        <input type="date" id="histEnd" style="padding:.35rem .5rem;border:2px solid #e2e8f0;border-radius:6px;font-size:.83rem;">
-                        <button onclick="loadHistoryPanel()" style="padding:.35rem .75rem;background:#4a5568;color:white;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:.83rem;font-family:inherit;">Filtrele</button>
-                    </div>
-                    <button onclick="exportHistoryCSV()" style="padding:.35rem .85rem;background:#2b6cb0;color:white;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:.83rem;font-family:inherit;">📥 Excel</button>
+        <!-- Bugünün Siparişleri — Collapsible & Modal Panel -->
+        <div style="margin-top:1.5rem; background:white; border:1.5px solid #cbd5e1; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+            <div onclick="toggleHistPanel()" id="histToggleHeader"
+                style="display:flex; align-items:center; justify-content:space-between; padding:0.85rem 1.25rem; background:#f8fafc; cursor:pointer; user-select:none; transition:background 0.15s;"
+                onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+                <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                    <span style="font-size:1.15rem;">📋</span>
+                    <span style="font-size:0.95rem; font-weight:800; color:#0f172a;">Bugünün Siparişleri</span>
+                    <span id="histToggleCount" style="background:#e2e8f0; color:#334155; font-size:0.75rem; padding:0.2rem 0.6rem; border-radius:20px; font-weight:700;">0 Sipariş</span>
+                    <span id="histToggleTotal" style="background:#dcfce7; color:#166534; font-size:0.75rem; padding:0.2rem 0.6rem; border-radius:20px; font-weight:700; border:1px solid #bbf7d0;">0.00 TL</span>
                 </div>
-                <div id="histSummaryRow" style="display:flex;gap:.6rem;margin-bottom:.85rem;flex-wrap:wrap;"></div>
-                <div id="orderHistoryPanelList"></div>
+                <div style="display:flex; align-items:center; gap:0.6rem;">
+                    <button type="button" onclick="event.stopPropagation(); openTodayOrdersModal()" style="display:inline-flex; align-items:center; gap:0.35rem; padding:0.35rem 0.75rem; background:white; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.78rem; font-weight:700; color:#334155; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.borderColor='#94a3b8'; this.style.background='#f8fafc';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='white';" title="Ayrı pencerede (Modal) görüntüle">
+                        <span>↗ Pencerede Aç</span>
+                    </button>
+                    <div style="display:inline-flex; align-items:center; gap:0.35rem; font-size:0.82rem; font-weight:700; color:#64748b; padding:0.35rem 0.6rem; background:#f1f5f9; border-radius:8px;">
+                        <span id="histToggleLabel">Göster</span>
+                        <span id="histToggleArrow" style="font-size:0.65rem; transition:transform .2s; display:inline-block;">▼</span>
+                    </div>
+                </div>
+            </div>
+            <div id="orderHistoryPanel" style="display:none; padding:1.25rem; border-top:1px solid #e2e8f0;">
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.6rem; margin-bottom:.85rem;">
+                    <div style="display:flex; gap:0; border-radius:8px; overflow:hidden; border:2px solid #e2e8f0;">
+                        <button id="histTabToday" onclick="switchHistTab('today')"
+                            style="padding:.4rem 1rem; border:none; font-weight:700; font-size:.83rem; cursor:pointer; background:#2d6a4f; color:white; font-family:inherit;">Bugün</button>
+                        <button id="histTabRange" onclick="switchHistTab('range')"
+                            style="padding:.4rem 1rem; border:none; font-weight:700; font-size:.83rem; cursor:pointer; background:white; color:#4a5568; font-family:inherit;">Geçmiş</button>
+                    </div>
+                    <div id="histRangeFilter" style="display:none; align-items:center; gap:.4rem; flex-wrap:wrap;">
+                        <input type="date" id="histStart" style="padding:.35rem .5rem; border:2px solid #e2e8f0; border-radius:6px; font-size:.83rem;">
+                        <span style="color:#718096;">—</span>
+                        <input type="date" id="histEnd" style="padding:.35rem .5rem; border:2px solid #e2e8f0; border-radius:6px; font-size:.83rem;">
+                        <button onclick="loadHistoryPanel()" style="padding:.35rem .75rem; background:#4a5568; color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:.83rem; font-family:inherit;">Filtrele</button>
+                    </div>
+                    <button onclick="exportHistoryCSV()" style="padding:.35rem .85rem; background:#2b6cb0; color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:.83rem; font-family:inherit;">📥 Excel</button>
+                </div>
+                <div id="histSummaryRow" style="display:flex; gap:.6rem; margin-bottom:.85rem; flex-wrap:wrap;"></div>
+                <div id="orderHistoryPanelList" style="max-height:480px; overflow-y:auto; padding-right:0.25rem;"></div>
             </div>
         </div>
     </div>
@@ -749,6 +762,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             loadZones();
+            updateTodaySummaryBadge();
             fetch('/api/settings/logo').then(r=>r.json()).then(d=>{
                 if (d.url) {
                     document.getElementById('logoWatermarkImg').src = d.url;
@@ -1540,9 +1554,28 @@
             }
         }
 
-        // === SİPARİŞ GEÇMİŞİ INLINE PANEL ===
+        // === SİPARİŞ GEÇMİŞİ / BUGÜNÜN SİPARİŞLERİ ===
         let _histTab = 'today';
         let _histOrders = [];
+        let _modalHistTab = 'today';
+        let _modalHistOrders = [];
+
+        async function updateTodaySummaryBadge() {
+            try {
+                const today = new Date().toISOString().slice(0,10);
+                const orders = await fetch(`/api/orders/history?date=${today}`).then(r => r.json());
+                const count = orders.length;
+                const total = orders.reduce((s, o) => s + (o.total || 0), 0);
+                
+                const countBadge = document.getElementById('histToggleCount');
+                if (countBadge) countBadge.textContent = `${count} Sipariş`;
+                
+                const totalBadge = document.getElementById('histToggleTotal');
+                if (totalBadge) totalBadge.textContent = fmtTL(total);
+            } catch(e) {
+                console.error('Error updating today summary badge:', e);
+            }
+        }
 
         function switchHistTab(tab) {
             _histTab = tab;
@@ -1553,6 +1586,35 @@
             const rf = document.getElementById('histRangeFilter');
             rf.style.display = tab === 'range' ? 'flex' : 'none';
             loadHistoryPanel();
+        }
+
+        function renderOrdersHtmlList(orders) {
+            const todayStr = new Date().toISOString().slice(0,10);
+            return orders.map(order => {
+                const isToday = (order.closed_at||'').slice(0,10) === todayStr;
+                const dt = order.closed_at ? new Date(order.closed_at + (order.closed_at.includes('T') ? '' : 'Z')).toLocaleString('tr-TR') : '—';
+                return `
+                <div style="border:1.5px solid #e2e8f0;border-radius:10px;padding:.75rem 1rem;margin-bottom:.6rem;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:200px;">
+                            <strong style="font-size:.9rem;color:#0f172a;">${order.table_name} <span style="color:#64748b;font-weight:500;font-size:.82rem;">(${order.zone_name})</span></strong>
+                            <div style="color:#64748b;font-size:.76rem;margin-top:.15rem;">🕒 ${dt}</div>
+                            <div style="font-size:.78rem;color:#334155;margin-top:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(order.items||[]).map(i=>`${i.quantity}x ${i.product_name}`).join(', ')}</div>
+                            ${order.discount_value ? `<div style="font-size:.75rem;color:#dc2626;margin-top:.15rem;font-weight:700;">🏷️ İndirim: ${fmtTL(order.discount_value)}</div>` : ''}
+                        </div>
+                        <div style="text-align:right;flex-shrink:0;">
+                            <div style="font-size:1.05rem;font-weight:800;color:#2d6a4f;">${fmtTL(order.total||0)}</div>
+                            <div style="display:flex;gap:.35rem;margin-top:.4rem;justify-content:flex-end;">
+                                ${isToday
+                                    ? `<button onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.35rem .65rem;background:#e2e8f0;color:#1e293b;border:none;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;">✏️ Düzenle</button>`
+                                    : `<button onclick="viewOrderModal(${order.id})" title="Görüntüle" style="padding:.35rem .65rem;background:#667eea;color:white;border:none;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;">👁️ İncele</button>`}
+                                <button onclick="printHistoryReceipt(${order.id})" title="Fiş Yazdır" style="padding:.35rem .65rem;background:#10b981;color:white;border:none;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;">🖨️ Fiş</button>
+                                <button onclick="deleteOrder(${order.id})" title="Sil" style="padding:.35rem .65rem;background:#fee2e2;color:#dc2626;border:none;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;">🗑️ Sil</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         async function loadHistoryPanel() {
@@ -1574,9 +1636,6 @@
                 list.innerHTML = '<div style="color:#e53e3e;padding:1rem;text-align:center;">Yüklenemedi</div>';
                 return;
             }
-            // Toggle button count güncelle
-            const countBadge = document.getElementById('histToggleCount');
-            if (countBadge) countBadge.textContent = _histOrders.length ? `${_histOrders.length} sipariş` : '';
 
             // Özet satırı
             const total   = _histOrders.reduce((s,o) => s + (o.total||0), 0);
@@ -1594,71 +1653,86 @@
                 list.innerHTML = '<p class="no-data">Sipariş bulunamadı.</p>';
                 return;
             }
-            const todayStr = new Date().toISOString().slice(0,10);
-            list.innerHTML = _histOrders.map(order => {
-                const isToday = (order.closed_at||'').slice(0,10) === todayStr;
-                const dt = order.closed_at ? new Date(order.closed_at + (order.closed_at.includes('T') ? '' : 'Z')).toLocaleString('tr-TR') : '—';
-                return `
-                <div style="border:1px solid #e2e8f0;border-radius:10px;padding:.75rem 1rem;margin-bottom:.5rem;background:white;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;">
-                        <div style="flex:1;min-width:0;">
-                            <strong style="font-size:.88rem;">${order.table_name} <span style="color:#a0aec0;font-weight:400;">(${order.zone_name})</span></strong>
-                            <div style="color:#718096;font-size:.76rem;margin-top:.1rem;">${dt}</div>
-                            <div style="font-size:.76rem;color:#94a3b8;margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(order.items||[]).map(i=>`${i.quantity}x ${i.product_name}`).join(', ')}</div>
-                            ${order.discount_value ? `<div style="font-size:.73rem;color:#f56565;margin-top:.1rem;">İndirim: ${order.discount_value} ₺</div>` : ''}
-                        </div>
-                        <div style="text-align:right;flex-shrink:0;">
-                            <div style="font-size:.95rem;font-weight:700;color:#2d6a4f;">${fmtTL(order.total||0)}</div>
-                            <div style="display:flex;gap:.25rem;margin-top:.35rem;justify-content:flex-end;">
-                                ${isToday
-                                    ? `<button onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.28rem .55rem;background:#e2e8f0;color:#2d3748;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;">✏️</button>`
-                                    : `<button onclick="viewOrderModal(${order.id})" title="Görüntüle" style="padding:.28rem .55rem;background:#667eea;color:white;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;">👁️</button>`}
-                                <button onclick="printHistoryReceipt(${order.id})" title="Fiş Yazdır" style="padding:.28rem .55rem;background:#48bb78;color:white;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;">🖨️</button>
-                                <button onclick="deleteOrder(${order.id})" title="Sil" style="padding:.28rem .55rem;background:#f56565;color:white;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;">🗑️</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function exportHistoryCSV() {
-            if (!_histOrders.length) { showToast('Dışa aktarılacak veri yok', 'warn'); return; }
-            const rows = [['#', 'Masa', 'Bölge', 'Tarih', 'Ürünler', 'Toplam ₺', 'Nakit ₺', 'Kart ₺', 'Bahşiş ₺', 'İndirim ₺']];
-            _histOrders.forEach(o => rows.push([
-                o.id, o.table_name, o.zone_name,
-                o.closed_at ? new Date(o.closed_at + (o.closed_at.includes('T')?'':'Z')).toLocaleString('tr-TR') : '',
-                (o.items||[]).map(i=>`${i.quantity}x ${i.product_name}`).join(' | '),
-                Number(o.total||0).toFixed(2),
-                Number(o.payment_cash||0).toFixed(2),
-                Number(o.payment_card||0).toFixed(2),
-                Number(o.tip_amount||0).toFixed(2),
-                Number(o.discount_value||0).toFixed(2)
-            ]));
-            const csv = '\uFEFF' + rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\r\n');
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
-            a.download = `siparisler_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-        }
-
-        async function printHistoryReceipt(orderId) {
-            const result = await fetch(`/api/print/receipt/${orderId}`, {method: 'POST'}).then(r => r.json());
-            if (!result.success) showToast('Yazıcı hatası: ' + (result.error || 'bilinmiyor'), 'error');
+            list.innerHTML = renderOrdersHtmlList(_histOrders);
+            updateTodaySummaryBadge();
         }
 
         function toggleHistPanel() {
             const panel = document.getElementById('orderHistoryPanel');
             const arrow = document.getElementById('histToggleArrow');
-            const open = panel.style.display === 'none';
-            panel.style.display = open ? '' : 'none';
-            arrow.style.transform = open ? 'rotate(90deg)' : '';
-            if (open) loadHistoryPanel();
+            const label = document.getElementById('histToggleLabel');
+            const isClosed = panel.style.display === 'none';
+            panel.style.display = isClosed ? 'block' : 'none';
+            if (arrow) arrow.style.transform = isClosed ? 'rotate(180deg)' : '';
+            if (label) label.textContent = isClosed ? 'Gizle' : 'Göster';
+            if (isClosed) loadHistoryPanel();
+        }
+
+        // Modal Yönetimi
+        function openTodayOrdersModal() {
+            switchModalHistTab('today');
+            document.getElementById('todayOrdersModal').style.display = 'block';
+        }
+
+        function closeTodayOrdersModal() {
+            document.getElementById('todayOrdersModal').style.display = 'none';
+        }
+
+        function switchModalHistTab(tab) {
+            _modalHistTab = tab;
+            document.getElementById('modalHistTabToday').style.background = tab === 'today' ? '#2d6a4f' : 'white';
+            document.getElementById('modalHistTabToday').style.color      = tab === 'today' ? 'white'   : '#4a5568';
+            document.getElementById('modalHistTabRange').style.background = tab === 'range' ? '#2d6a4f' : 'white';
+            document.getElementById('modalHistTabRange').style.color      = tab === 'range' ? 'white'   : '#4a5568';
+            const rf = document.getElementById('modalHistRangeFilter');
+            if (rf) rf.style.display = tab === 'range' ? 'flex' : 'none';
+            loadModalHistoryPanel();
+        }
+
+        async function loadModalHistoryPanel() {
+            const list    = document.getElementById('modalOrderHistoryList');
+            const summary = document.getElementById('modalHistSummaryRow');
+            if (!list || !summary) return;
+            list.innerHTML = '<div style="color:#a0aec0;padding:1rem;text-align:center;font-size:.85rem;">Yükleniyor...</div>';
+            let url;
+            if (_modalHistTab === 'today') {
+                const today = new Date().toISOString().slice(0,10);
+                url = `/api/orders/history?date=${today}`;
+            } else {
+                const s = document.getElementById('modalHistStart') ? document.getElementById('modalHistStart').value : '';
+                const e = document.getElementById('modalHistEnd') ? document.getElementById('modalHistEnd').value : '';
+                url = s && e ? `/api/orders/history?start=${s}&end=${e}` : '/api/orders/history';
+            }
+            try {
+                _modalHistOrders = await fetch(url).then(r => r.json());
+                _histOrders = _modalHistOrders;
+            } catch(err) {
+                list.innerHTML = '<div style="color:#e53e3e;padding:1rem;text-align:center;">Yüklenemedi</div>';
+                return;
+            }
+
+            const total   = _modalHistOrders.reduce((s,o) => s + (o.total||0), 0);
+            const cash    = _modalHistOrders.reduce((s,o) => s + (o.payment_cash||0), 0);
+            const card    = _modalHistOrders.reduce((s,o) => s + (o.payment_card||0), 0);
+            const tip     = _modalHistOrders.reduce((s,o) => s + (o.tip_amount||0), 0);
+            summary.innerHTML = `
+                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:700;color:#065f46;">${_modalHistOrders.length} sipariş</div>
+                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:700;color:#065f46;">Toplam: ${fmtTL(total)}</div>
+                ${cash > 0 ? `<div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#78350f;">Nakit: ${fmtTL(cash)}</div>` : ''}
+                ${card > 0 ? `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#1e40af;">Kart: ${fmtTL(card)}</div>` : ''}
+                ${tip  > 0 ? `<div style="background:#fdf4ff;border:1px solid #e9d5ff;border-radius:8px;padding:.5rem .9rem;font-size:.82rem;font-weight:600;color:#6b21a8;">Bahşiş: ${fmtTL(tip)}</div>` : ''}
+            `;
+            if (_modalHistOrders.length === 0) {
+                list.innerHTML = '<p class="no-data">Sipariş bulunamadı.</p>';
+                return;
+            }
+            list.innerHTML = renderOrdersHtmlList(_modalHistOrders);
+            updateTodaySummaryBadge();
         }
 
         // Eski modal referansları için geriye dönük uyumluluk
-        function openOrderHistory()  { loadHistoryPanel(); }
-        function closeOrderHistory() {}
+        function openOrderHistory()  { openTodayOrdersModal(); }
+        function closeOrderHistory() { closeTodayOrdersModal(); }
 
         async function viewOrderModal(orderId) {
             try {
@@ -2201,6 +2275,35 @@
         </div>
     </div>
 
+    <!-- BUGÜNÜN SİPARİŞLERİ MODALI -->
+    <div id="todayOrdersModal" class="modal">
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh;">
+            <div class="modal-header">
+                <h2>📋 Bugünün Siparişleri</h2>
+                <span class="close" onclick="closeTodayOrdersModal()">&times;</span>
+            </div>
+            <div style="padding:1.25rem; overflow-y:auto; flex:1;">
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.6rem; margin-bottom:.85rem;">
+                    <div style="display:flex; gap:0; border-radius:8px; overflow:hidden; border:2px solid #e2e8f0;">
+                        <button id="modalHistTabToday" onclick="switchModalHistTab('today')"
+                            style="padding:.4rem 1rem; border:none; font-weight:700; font-size:.83rem; cursor:pointer; background:#2d6a4f; color:white; font-family:inherit;">Bugün</button>
+                        <button id="modalHistTabRange" onclick="switchModalHistTab('range')"
+                            style="padding:.4rem 1rem; border:none; font-weight:700; font-size:.83rem; cursor:pointer; background:white; color:#4a5568; font-family:inherit;">Geçmiş</button>
+                    </div>
+                    <div id="modalHistRangeFilter" style="display:none; align-items:center; gap:.4rem; flex-wrap:wrap;">
+                        <input type="date" id="modalHistStart" style="padding:.35rem .5rem; border:2px solid #e2e8f0; border-radius:6px; font-size:.83rem;">
+                        <span style="color:#718096;">—</span>
+                        <input type="date" id="modalHistEnd" style="padding:.35rem .5rem; border:2px solid #e2e8f0; border-radius:6px; font-size:.83rem;">
+                        <button onclick="loadModalHistoryPanel()" style="padding:.35rem .75rem; background:#4a5568; color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:.83rem; font-family:inherit;">Filtrele</button>
+                    </div>
+                    <button onclick="exportHistoryCSV()" style="padding:.35rem .85rem; background:#2b6cb0; color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:.83rem; font-family:inherit;">📥 Excel</button>
+                </div>
+                <div id="modalHistSummaryRow" style="display:flex; gap:.6rem; margin-bottom:.85rem; flex-wrap:wrap;"></div>
+                <div id="modalOrderHistoryList"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
 async function openTransferModal() {
     if (!currentOrder || !currentOrder.id) return;
@@ -2651,6 +2754,7 @@ async function cancelOrder() {
 
 async function refreshZone() {
     await selectZone(currentZone);
+    updateTodaySummaryBadge();
 }
 
 function previewReceiptPDF() {
