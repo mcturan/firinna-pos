@@ -127,9 +127,9 @@
     "last_push": {
         "action": "clear_cache",
         "target": "all",
-        "timestamp": 1787418650151
+        "timestamp": 1787442096656
     },
-    "last_ping": "2026-08-23T02:40:31.466788",
+    "last_ping": "2026-08-23T02:59:26.339667",
     "version": 1787412836295,
     "did_you_know": [
         {
@@ -530,15 +530,98 @@
         "auto_schedule": true,
         "start_time": "23:00",
         "end_time": "08:00",
+        "opening_days": "Her Gün",
         "media_type": "video",
         "video_url": "/static/tv_media/videos/1.mp4",
         "image_url": "/static/uploads/logo.png",
-        "overlay_logo": true,
-        "overlay_clock": true,
-        "overlay_qr": true,
-        "qr_title": "visit www.firinna.com",
         "qr_link": "https://firinna.com",
-        "promo_text": "Fırınna Cafe & Restaurant — Sabah 08:00'de sıcacık taş fırın lezzetlerimiz ve taze demlenmiş çayımızla tekrar görüşmek üzere.",
-        "dim_level": 15
+        "cycle_duration": 7,
+        "messages": [
+            {
+                "lang": "tr",
+                "flag": "🇹🇷",
+                "title": "Şu Anda Hizmet Vermemekteyiz",
+                "text": "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:00'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
+                "opening_badge": "☀️ Açılış: Sabah 08:00 (Her Gün)"
+            },
+            {
+                "lang": "en",
+                "flag": "🇬🇧",
+                "title": "We Are Currently Closed",
+                "text": "Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 08:00 with fresh bakery and warm hospitality.",
+                "opening_badge": "☀️ Opening: 08:00 AM (Daily)"
+            },
+            {
+                "lang": "ru",
+                "flag": "🇷🇺",
+                "title": "В настоящее время мы закрыты",
+                "text": "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 08:00 со свежей выпечкой и горячим чаем.",
+                "opening_badge": "☀️ Открытие: 08:00 (Ежедневно)"
+            },
+            {
+                "lang": "ar",
+                "flag": "🇸🇦",
+                "title": "نحن مغلقون حالياً",
+                "text": "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 08:00 صباحاً مع أشهى المخبوزات الطازجة.",
+                "opening_badge": "☀️ الافتتاح: 08:00 صباحاً (يومياً)"
+            },
+            {
+                "lang": "es",
+                "flag": "🇪🇸",
+                "title": "Actualmente estamos cerrados",
+                "text": "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 08:00 con nuestros deliciosos productos de panadería.",
+                "opening_badge": "☀️ Apertura: 08:00 (Todos los días)"
+            }
+        ]
+    },
+    "after_hours": {
+        "enabled": true,
+        "force_active": false,
+        "auto_schedule": true,
+        "start_time": "23:00",
+        "end_time": "08:00",
+        "opening_days": "Her Gün",
+        "media_type": "video",
+        "video_url": "/static/tv_media/videos/1.mp4",
+        "image_url": "/static/uploads/logo.png",
+        "qr_link": "https://firinna.com",
+        "cycle_duration": 7,
+        "messages": [
+            {
+                "lang": "tr",
+                "flag": "🇹🇷",
+                "title": "Şu Anda Hizmet Vermemekteyiz",
+                "text": "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:00'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
+                "opening_badge": "☀️ Açılış: Sabah 08:00 (Her Gün)"
+            },
+            {
+                "lang": "en",
+                "flag": "🇬🇧",
+                "title": "We Are Currently Closed",
+                "text": "Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 08:00 with fresh bakery and warm hospitality.",
+                "opening_badge": "☀️ Opening: 08:00 AM (Daily)"
+            },
+            {
+                "lang": "ru",
+                "flag": "🇷🇺",
+                "title": "В настоящее время мы закрыты",
+                "text": "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 08:00 со свежей выпечкой и горячим чаем.",
+                "opening_badge": "☀️ Открытие: 08:00 (Ежедневно)"
+            },
+            {
+                "lang": "ar",
+                "flag": "🇸🇦",
+                "title": "نحن مغلقون حالياً",
+                "text": "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 08:00 صباحاً مع أشهى المخبوزات الطازجة.",
+                "opening_badge": "☀️ الافتتاح: 08:00 صباحاً (يومياً)"
+            },
+            {
+                "lang": "es",
+                "flag": "🇪🇸",
+                "title": "Actualmente estamos cerrados",
+                "text": "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 08:00 con nuestros deliciosos productos de panadería.",
+                "opening_badge": "☀️ Apertura: 08:00 (Todos los días)"
+            }
+        ]
     }
 }

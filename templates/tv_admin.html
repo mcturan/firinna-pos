@@ -88,7 +88,7 @@
             <button class="tv-tab" onclick="switchTab('medya', this)">🎬 Video & Müzik</button>
             <button class="tv-tab" onclick="switchTab('filigran', this)">💎 Filigranlar (Video Üstü)</button>
             <button class="tv-tab" onclick="switchTab('mesajlar', this)">💡 Kültür Notları & Alt Bant</button>
-            <button class="tv-tab" onclick="switchTab('gecemodu', this)">🌙 Gece Modu (Night Mode)</button>
+            <button class="tv-tab" onclick="switchTab('mesaidisi', this)">⏳ Mesai Dışı (Kapanış)</button>
             <button class="tv-tab" onclick="switchTab('qr', this)">⚙️ QR & Ekstralar</button>
         </div>
 
@@ -404,19 +404,19 @@
             <button onclick="addMessage()" style="margin-top:1rem;padding:.5rem 1rem; background:#edf2f7; border:none; border-radius:6px; cursor:pointer; font-weight:600;">+ Yeni Mesaj Ekle</button>
         </div>
 
-        <!-- GECE MODU (NIGHT / AFTER-HOURS MODE) SEKMESİ -->
-        <div id="gecemodu" class="tv-pane card">
+        <!-- MESAİ DIŞI (KAPANIŞ / AFTER-HOURS) SEKMESİ -->
+        <div id="mesaidisi" class="tv-pane card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
                 <div>
                     <h3 style="margin:0; color:#0f172a; display:flex; align-items:center; gap:8px;">
-                        🌙 TV Gece & Kapanış Modu (After-Hours Showcase)
+                        ⏳ TV Mesai Dışı / Kapanış Modu (After-Hours Showcase)
                     </h3>
                     <p style="font-size:0.88rem; color:#64748b; margin-top:4px; margin-bottom:0;">
-                        Fırınna Cafe kapalıyken (örn. 23:00 - 08:00) ekranı tam boy sinematik gece videosuna / afişine geçirir, QR menü ve sabah açılış saatini şık bir şekilde sunar.
+                        Fırınna Cafe kapalıyken ekranı tam boy sinematik videoya / afişe geçirir, 5 dilde (TR, EN, RU, AR, ES) kibar karşılama ve açılış duyurusu yapar, altta imza lezzetlerimizi sergiler.
                     </p>
                 </div>
-                <button type="button" onclick="saveNightModeToServer()" style="background:#2563eb; color:white; border:none; padding:8px 18px; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.9rem;">
-                    💾 Gece Modunu Kaydet & TV'ye Gönder
+                <button type="button" onclick="saveAfterHoursToServer()" style="background:#2563eb; color:white; border:none; padding:8px 18px; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.9rem;">
+                    💾 Mesai Dışı Ayarlarını Kaydet & TV'ye Gönder
                 </button>
             </div>
 
@@ -424,12 +424,12 @@
             <div style="background:#fef3c7; border:1.5px solid #f59e0b; border-radius:10px; padding:16px; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
                 <div>
                     <strong style="color:#92400e; font-size:1rem; display:block;">⚡ Canlı Test & Manuel Gösterim:</strong>
-                    <span style="font-size:0.85rem; color:#78350f;">Saat beklemeksizin gece modunu TV'de anında açıp kapatarak canlı test edebilirsiniz.</span>
+                    <span style="font-size:0.85rem; color:#78350f;">Saat beklemeksizin mesai dışı ekranını TV'de anında açıp kapatarak canlı test edebilirsiniz.</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
                     <label style="display:flex; align-items:center; gap:8px; background:#ffffff; border:1.5px solid #d97706; padding:8px 14px; border-radius:8px; font-weight:800; color:#b45309; cursor:pointer;">
-                        <input type="checkbox" id="nm_force_active" style="width:1.3rem; height:1.3rem; cursor:pointer;" onchange="toggleNightModeInstantTest(this.checked)">
-                        <span>🌙 Şimdi Gece Moduna Geç (Canlı Test)</span>
+                        <input type="checkbox" id="ah_force_active" style="width:1.3rem; height:1.3rem; cursor:pointer;" onchange="toggleAfterHoursInstantTest(this.checked)">
+                        <span>⏳ Şimdi Mesai Dışı Moduna Geç (Canlı Test)</span>
                     </label>
                 </div>
             </div>
@@ -438,7 +438,7 @@
             <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:1.5rem;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
                     <label style="display:flex; align-items:center; gap:8px; font-size:0.95rem; font-weight:bold; color:#1e293b; cursor:pointer;">
-                        <input type="checkbox" id="nm_auto_schedule" style="width:1.2rem; height:1.2rem;" checked>
+                        <input type="checkbox" id="ah_auto_schedule" style="width:1.2rem; height:1.2rem;" checked>
                         <span>⏰ Otomatik Saat Takvimi (Belirlenen saatlerde otomatik açılır)</span>
                     </label>
                     <button type="button" onclick="fetchWebOpeningHours()" style="background:#059669; color:white; border:none; padding:5px 12px; border-radius:6px; font-size:0.82rem; font-weight:bold; cursor:pointer;">
@@ -449,35 +449,30 @@
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
                     <div>
                         <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">
-                            🌙 Başlangıç Saati (Akşam Kapanış):
+                            🌙 Başlangıç Saati (Kapanış):
                         </label>
-                        <input type="time" id="nm_start_time" value="23:00" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:1rem; color:#0f172a;">
-                        <small style="color:#64748b;">Örnek: 23:00 (Bu saatten sonra gece modu aktif olur)</small>
+                        <input type="time" id="ah_start_time" value="23:00" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:1rem; color:#0f172a;">
+                        <small style="color:#64748b;">Örnek: 23:00 (Bu saatten sonra mesai dışı ekranı devreye girer)</small>
                     </div>
                     <div>
                         <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">
                             ☀️ Bitiş Saati (Sabah Açılış):
                         </label>
-                        <input type="time" id="nm_end_time" value="08:00" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:1rem; color:#0f172a;">
+                        <input type="time" id="ah_end_time" value="08:00" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:1rem; color:#0f172a;">
                         <small style="color:#64748b;">Örnek: 08:00 (Bu saatte normal tabela ekranına döner)</small>
                     </div>
                 </div>
             </div>
 
-            <!-- 🎬 GECE MODU MEDYA SEÇİMİ (VİDEO VEYA AFİŞ) -->
+            <!-- 🎬 MEDYA SEÇİMİ & YÜKLEME -->
             <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:1.5rem;">
-                <h4 style="margin:0 0 12px 0; color:#0f172a; font-size:1.05rem;">🎬 Gece Modu Medya Seçimi & Yükleme:</h4>
+                <h4 style="margin:0 0 12px 0; color:#0f172a; font-size:1.05rem;">🎬 Arka Plan Medya Seçimi & Yükleme:</h4>
                 
-                <!-- Ölçü Rehberi -->
-                <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px; margin-bottom:14px; font-size:0.85rem; color:#1e40af;">
-                    📐 <b>Önerilen Ölçü & Format:</b> <b>16:9 Full HD (1920x1080)</b> video (.mp4) veya yüksek çözünürlüklü fotoğraf (.jpg / .webp). Gece modunda ekranı tam boy sinematik olarak kaplar.
-                </div>
-
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:14px;">
                     <div>
                         <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:6px;">Medya Türü:</label>
-                        <select id="nm_media_type" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700;" onchange="onNightMediaTypeChange()">
-                            <option value="video">🎬 Sinematik Gece Videosu (.mp4)</option>
+                        <select id="ah_media_type" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700;" onchange="onAfterHoursMediaTypeChange()">
+                            <option value="video">🎬 Sinematik Arka Plan Videosu (.mp4)</option>
                             <option value="image">🖼️ Yüksek Çözünürlüklü Afiş / Fotoğraf (.jpg / .png)</option>
                         </select>
                     </div>
@@ -485,45 +480,96 @@
                     <div>
                         <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:6px;">Bilgisayardan Yeni Medya Yükle:</label>
                         <div style="display:flex; gap:8px;">
-                            <input type="file" id="nm_upload_file" accept="video/mp4,image/*" style="flex:1; padding:6px; border:1px solid #cbd5e1; border-radius:6px; background:#ffffff; font-size:0.85rem;">
-                            <button type="button" onclick="uploadNightMedia()" style="background:#2563eb; color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem;">
+                            <input type="file" id="ah_upload_file" accept="video/mp4,image/*" style="flex:1; padding:6px; border:1px solid #cbd5e1; border-radius:6px; background:#ffffff; font-size:0.85rem;">
+                            <button type="button" onclick="uploadAfterHoursMedia()" style="background:#2563eb; color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem;">
                                 📤 Yükle
                             </button>
                         </div>
-                        <span id="nm_upload_status" style="font-size:0.82rem; margin-top:4px; display:block;"></span>
+                        <span id="ah_upload_status" style="font-size:0.82rem; margin-top:4px; display:block;"></span>
                     </div>
                 </div>
 
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:14px; align-items:center;">
                     <div>
                         <label style="font-weight:700; color:#334155; font-size:0.85rem; display:block; margin-bottom:4px;">Aktif Medya URL Adresi:</label>
-                        <input type="text" id="nm_media_url" value="/static/tv_media/videos/1.mp4" style="width:100%; padding:8px 10px; border-radius:6px; border:1.5px solid #cbd5e1; font-size:0.85rem; color:#475569;" oninput="updateNightMediaPreview()">
+                        <input type="text" id="ah_media_url" value="/static/tv_media/videos/1.mp4" style="width:100%; padding:8px 10px; border-radius:6px; border:1.5px solid #cbd5e1; font-size:0.85rem; color:#475569;" oninput="updateAfterHoursMediaPreview()">
                     </div>
                     <div style="height:90px; background:#000000; border-radius:6px; border:1px solid #cbd5e1; overflow:hidden; display:flex; align-items:center; justify-content:center;">
-                        <video id="nm_preview_video" src="/static/tv_media/videos/1.mp4" style="width:100%; height:100%; object-fit:cover;" muted loop autoplay></video>
-                        <img id="nm_preview_image" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+                        <video id="ah_preview_video" src="/static/tv_media/videos/1.mp4" style="width:100%; height:100%; object-fit:cover;" muted loop autoplay></video>
+                        <img id="ah_preview_image" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
                     </div>
                 </div>
             </div>
 
-            <!-- ✨ EKRAN KATMANLARI VE METİNLER -->
+            <!-- 🌐 5 DİLDE KİBAR KARŞILAMA VE AÇIKLAMA METİNLERİ -->
             <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:1.5rem;">
-                <h4 style="margin:0 0 12px 0; color:#0f172a; font-size:1.05rem;">✨ Gece Modu Ekran Katmanları ve Tanıtım Metinleri:</h4>
-
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:14px;">
-                    <div>
-                        <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">Kapanış & Karşılama Başlığı:</label>
-                        <input type="text" id="nm_title" value="🌙 İyi Geceler • Good Night" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:0.95rem; color:#0f172a;">
-                    </div>
-                    <div>
-                        <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">QR Menü Yönlendirme Linki:</label>
-                        <input type="text" id="nm_qr_link" value="https://firinna.com" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:0.95rem; color:#2563eb;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                    <h4 style="margin:0; color:#0f172a; font-size:1.05rem;">🌐 5 Dilde Kibar Karşılama ve Bilgilendirme Metinleri:</h4>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <label style="font-weight:700; font-size:0.85rem; color:#475569;">⏱️ Diller Arası Geçiş:</label>
+                        <input type="number" id="ah_cycle_duration" value="7" min="3" max="30" style="width:60px; padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; font-weight:700; text-align:center;">
+                        <span style="font-size:0.82rem; color:#64748b;">sn</span>
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom:12px;">
-                    <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">Gece Tanıtım ve Bilgi Metni:</label>
-                    <textarea id="nm_promo_text" rows="2" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-size:0.9rem; font-family:sans-serif; color:#334155;">Fırınna Cafe & Restaurant — Sabah 08:00'de sıcacık taş fırın lezzetlerimiz ve taze demlenmiş çayımızla tekrar görüşmek üzere.</textarea>
+                <!-- 🇹🇷 Türkçe (TR) -->
+                <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        <span style="font-size:1.2rem;">🇹🇷</span>
+                        <strong style="color:#0f172a; font-size:0.92rem;">Türkçe:</strong>
+                        <input type="text" id="ah_title_tr" value="Şu Anda Hizmet Vermemekteyiz" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
+                    </div>
+                    <textarea id="ah_text_tr" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:00'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.</textarea>
+                    <input type="text" id="ah_badge_tr" value="☀️ Açılış: Sabah 08:00 (Her Gün)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
+                </div>
+
+                <!-- 🇬🇧 İngilizce (EN) -->
+                <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        <span style="font-size:1.2rem;">🇬🇧</span>
+                        <strong style="color:#0f172a; font-size:0.92rem;">English:</strong>
+                        <input type="text" id="ah_title_en" value="We Are Currently Closed" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
+                    </div>
+                    <textarea id="ah_text_en" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 08:00 with fresh bakery and warm hospitality.</textarea>
+                    <input type="text" id="ah_badge_en" value="☀️ Opening: 08:00 AM (Daily)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
+                </div>
+
+                <!-- 🇷🇺 Rusça (RU) -->
+                <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        <span style="font-size:1.2rem;">🇷🇺</span>
+                        <strong style="color:#0f172a; font-size:0.92rem;">Русский:</strong>
+                        <input type="text" id="ah_title_ru" value="В настоящее время мы закрыты" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
+                    </div>
+                    <textarea id="ah_text_ru" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 08:00 со свежей выпечкой и горячим чаем.</textarea>
+                    <input type="text" id="ah_badge_ru" value="☀️ Открытие: 08:00 (Ежедневно)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
+                </div>
+
+                <!-- 🇸🇦 Arapça (AR) -->
+                <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        <span style="font-size:1.2rem;">🇸🇦</span>
+                        <strong style="color:#0f172a; font-size:0.92rem;">العربية:</strong>
+                        <input type="text" id="ah_title_ar" value="نحن مغلقون حالياً" dir="rtl" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700; text-align:right;">
+                    </div>
+                    <textarea id="ah_text_ar" rows="2" dir="rtl" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; text-align:right; box-sizing:border-box;">ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 08:00 صباحاً مع أشهى المخبوزات الطازجة.</textarea>
+                    <input type="text" id="ah_badge_ar" value="☀️ الافتتاح: 08:00 صباحاً (يومياً)" dir="rtl" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; text-align:right; box-sizing:border-box;">
+                </div>
+
+                <!-- 🇪🇸 İspanyolca (ES) -->
+                <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        <span style="font-size:1.2rem;">🇪🇸</span>
+                        <strong style="color:#0f172a; font-size:0.92rem;">Español:</strong>
+                        <input type="text" id="ah_title_es" value="Actualmente estamos cerrados" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
+                    </div>
+                    <textarea id="ah_text_es" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 08:00 con nuestros deliciosos productos de panadería.</textarea>
+                    <input type="text" id="ah_badge_es" value="☀️ Apertura: 08:00 (Todos los días)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
+                </div>
+
+                <div style="margin-top:10px;">
+                    <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">QR Menü Yönlendirme Linki:</label>
+                    <input type="text" id="ah_qr_link" value="https://firinna.com" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:0.95rem; color:#2563eb; box-sizing:border-box;">
                 </div>
             </div>
         </div>
@@ -747,18 +793,46 @@
                 // Render Watermark Cards
                 renderWatermarkCards((wm.cards && wm.cards.length > 0) ? wm.cards : defaultCards);
 
-                // Gece Modu (Night Mode) Ayarları
-                const nm = data.night_mode || {};
-                setChecked('nm_force_active', !!nm.force_active);
-                setChecked('nm_auto_schedule', nm.auto_schedule !== false);
-                setVal('nm_start_time', nm.start_time || '23:00');
-                setVal('nm_end_time', nm.end_time || '08:00');
-                setVal('nm_media_type', nm.media_type || 'video');
-                setVal('nm_media_url', nm.media_type === 'image' ? (nm.image_url || '/static/uploads/logo.png') : (nm.video_url || '/static/tv_media/videos/1.mp4'));
-                setVal('nm_title', nm.title || '🌙 İyi Geceler • Good Night');
-                setVal('nm_qr_link', nm.qr_link || 'https://firinna.com');
-                setVal('nm_promo_text', nm.promo_text || 'Fırınna Cafe & Restaurant — Sabah 08:00\'de sıcacık taş fırın lezzetlerimiz ve taze demlenmiş çayımızla tekrar görüşmek üzere.');
-                onNightMediaTypeChange();
+                // Mesai Dışı (After-Hours / Kapanış) Ayarları
+                const ah = data.after_hours || data.night_mode || {};
+                setChecked('ah_force_active', !!ah.force_active);
+                setChecked('ah_auto_schedule', ah.auto_schedule !== false);
+                setVal('ah_start_time', ah.start_time || '23:00');
+                setVal('ah_end_time', ah.end_time || '08:00');
+                setVal('ah_media_type', ah.media_type || 'video');
+                setVal('ah_media_url', ah.media_type === 'image' ? (ah.image_url || '/static/uploads/logo.png') : (ah.video_url || '/static/tv_media/videos/1.mp4'));
+                setVal('ah_cycle_duration', ah.cycle_duration || 7);
+                setVal('ah_qr_link', ah.qr_link || 'https://firinna.com');
+
+                // 5 Dilli Mesajları Yükle
+                const msgs = ah.messages || [];
+                const trMsg = msgs.find(m => m.lang === 'tr') || {};
+                const enMsg = msgs.find(m => m.lang === 'en') || {};
+                const ruMsg = msgs.find(m => m.lang === 'ru') || {};
+                const arMsg = msgs.find(m => m.lang === 'ar') || {};
+                const esMsg = msgs.find(m => m.lang === 'es') || {};
+
+                setVal('ah_title_tr', trMsg.title || 'Şu Anda Hizmet Vermemekteyiz');
+                setVal('ah_text_tr', trMsg.text || 'Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:00\'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.');
+                setVal('ah_badge_tr', trMsg.badge || trMsg.opening_badge || '☀️ Açılış: Sabah 08:00 (Her Gün)');
+
+                setVal('ah_title_en', enMsg.title || 'We Are Currently Closed');
+                setVal('ah_text_en', enMsg.text || 'Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 08:00 with fresh bakery and warm hospitality.');
+                setVal('ah_badge_en', enMsg.badge || enMsg.opening_badge || '☀️ Opening: 08:00 AM (Daily)');
+
+                setVal('ah_title_ru', ruMsg.title || 'В настоящее время мы закрыты');
+                setVal('ah_text_ru', ruMsg.text || 'Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 08:00 со свежей выпечкой и горячим чаем.');
+                setVal('ah_badge_ru', ruMsg.badge || ruMsg.opening_badge || '☀️ Открытие: 08:00 (Ежедневно)');
+
+                setVal('ah_title_ar', arMsg.title || 'نحن مغلقون حالياً');
+                setVal('ah_text_ar', arMsg.text || 'ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 08:00 صباحاً مع أشهى المخبوزات الطازجة.');
+                setVal('ah_badge_ar', arMsg.badge || arMsg.opening_badge || '☀️ الافتتاح: 08:00 صباحاً (يومياً)');
+
+                setVal('ah_title_es', esMsg.title || 'Actualmente estamos cerrados');
+                setVal('ah_text_es', esMsg.text || 'Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 08:00 con nuestros deliciosos productos de panadería.');
+                setVal('ah_badge_es', esMsg.badge || esMsg.opening_badge || '☀️ Apertura: 08:00 (Todos los días)');
+
+                onAfterHoursMediaTypeChange();
 
                 const msgCont = document.getElementById('messages_container');
                 if (msgCont) {
@@ -1089,21 +1163,59 @@
                     duration_sec: document.getElementById('wm_duration_sec') ? (parseInt(document.getElementById('wm_duration_sec').value) || 12) : 12,
                     cards: wmCards
                 },
-                night_mode: {
+                after_hours: {
                     enabled: true,
-                    force_active: document.getElementById('nm_force_active') ? document.getElementById('nm_force_active').checked : false,
-                    auto_schedule: document.getElementById('nm_auto_schedule') ? document.getElementById('nm_auto_schedule').checked : true,
-                    start_time: document.getElementById('nm_start_time') ? document.getElementById('nm_start_time').value : '23:00',
-                    end_time: document.getElementById('nm_end_time') ? document.getElementById('nm_end_time').value : '08:00',
-                    media_type: document.getElementById('nm_media_type') ? document.getElementById('nm_media_type').value : 'video',
-                    video_url: (document.getElementById('nm_media_type')?.value === 'video') ? (document.getElementById('nm_media_url')?.value || '/static/tv_media/videos/1.mp4') : '/static/tv_media/videos/1.mp4',
-                    image_url: (document.getElementById('nm_media_type')?.value === 'image') ? (document.getElementById('nm_media_url')?.value || '/static/uploads/logo.png') : '/static/uploads/logo.png',
-                    title: document.getElementById('nm_title') ? document.getElementById('nm_title').value : '🌙 İyi Geceler • Good Night',
-                    qr_link: document.getElementById('nm_qr_link') ? document.getElementById('nm_qr_link').value : 'https://firinna.com',
-                    promo_text: document.getElementById('nm_promo_text') ? document.getElementById('nm_promo_text').value : '',
-                    overlay_logo: true,
-                    overlay_clock: true,
-                    overlay_qr: true
+                    force_active: document.getElementById('ah_force_active') ? document.getElementById('ah_force_active').checked : false,
+                    auto_schedule: document.getElementById('ah_auto_schedule') ? document.getElementById('ah_auto_schedule').checked : true,
+                    start_time: document.getElementById('ah_start_time') ? document.getElementById('ah_start_time').value : '23:00',
+                    end_time: document.getElementById('ah_end_time') ? document.getElementById('ah_end_time').value : '08:00',
+                    media_type: document.getElementById('ah_media_type') ? document.getElementById('ah_media_type').value : 'video',
+                    video_url: (document.getElementById('ah_media_type')?.value === 'video') ? (document.getElementById('ah_media_url')?.value || '/static/tv_media/videos/1.mp4') : '/static/tv_media/videos/1.mp4',
+                    image_url: (document.getElementById('ah_media_type')?.value === 'image') ? (document.getElementById('ah_media_url')?.value || '/static/uploads/logo.png') : '/static/uploads/logo.png',
+                    cycle_duration: parseInt(document.getElementById('ah_cycle_duration')?.value) || 7,
+                    qr_link: document.getElementById('ah_qr_link') ? document.getElementById('ah_qr_link').value : 'https://firinna.com',
+                    messages: [
+                        {
+                            lang: 'tr',
+                            flag: '🇹🇷',
+                            tag: '🇹🇷 TÜRKÇE',
+                            title: document.getElementById('ah_title_tr') ? document.getElementById('ah_title_tr').value : 'Şu Anda Hizmet Vermemekteyiz',
+                            text: document.getElementById('ah_text_tr') ? document.getElementById('ah_text_tr').value : '',
+                            badge: document.getElementById('ah_badge_tr') ? document.getElementById('ah_badge_tr').value : '☀️ Açılış: Sabah 08:00 (Her Gün)'
+                        },
+                        {
+                            lang: 'en',
+                            flag: '🇬🇧',
+                            tag: '🇬🇧 ENGLISH',
+                            title: document.getElementById('ah_title_en') ? document.getElementById('ah_title_en').value : 'We Are Currently Closed',
+                            text: document.getElementById('ah_text_en') ? document.getElementById('ah_text_en').value : '',
+                            badge: document.getElementById('ah_badge_en') ? document.getElementById('ah_badge_en').value : '☀️ Opening: 08:00 AM (Daily)'
+                        },
+                        {
+                            lang: 'ru',
+                            flag: '🇷🇺',
+                            tag: '🇷🇺 РУССКИЙ',
+                            title: document.getElementById('ah_title_ru') ? document.getElementById('ah_title_ru').value : 'В настоящее время мы закрыты',
+                            text: document.getElementById('ah_text_ru') ? document.getElementById('ah_text_ru').value : '',
+                            badge: document.getElementById('ah_badge_ru') ? document.getElementById('ah_badge_ru').value : '☀️ Открытие: 08:00 (Ежедневно)'
+                        },
+                        {
+                            lang: 'ar',
+                            flag: '🇸🇦',
+                            tag: '🇸🇦 العربية',
+                            title: document.getElementById('ah_title_ar') ? document.getElementById('ah_title_ar').value : 'نحن مغلقون حالياً',
+                            text: document.getElementById('ah_text_ar') ? document.getElementById('ah_text_ar').value : '',
+                            badge: document.getElementById('ah_badge_ar') ? document.getElementById('ah_badge_ar').value : '☀️ الافتتاح: 08:00 صباحاً (يومياً)'
+                        },
+                        {
+                            lang: 'es',
+                            flag: '🇪🇸',
+                            tag: '🇪🇸 ESPAÑOL',
+                            title: document.getElementById('ah_title_es') ? document.getElementById('ah_title_es').value : 'Actualmente estamos cerrados',
+                            text: document.getElementById('ah_text_es') ? document.getElementById('ah_text_es').value : '',
+                            badge: document.getElementById('ah_badge_es') ? document.getElementById('ah_badge_es').value : '☀️ Apertura: 08:00 (Todos los días)'
+                        }
+                    ]
                 },
                 messages: messages
             };
@@ -1124,13 +1236,13 @@
         }
 
         // ==========================================
-        // GECE MODU (NIGHT MODE) YÖNETİMİ
+        // MESAİ DIŞI (AFTER-HOURS / KAPANIŞ) YÖNETİMİ
         // ==========================================
-        function onNightMediaTypeChange() {
-            const mType = document.getElementById('nm_media_type').value;
-            const pVid = document.getElementById('nm_preview_video');
-            const pImg = document.getElementById('nm_preview_image');
-            const urlInput = document.getElementById('nm_media_url');
+        function onAfterHoursMediaTypeChange() {
+            const mType = document.getElementById('ah_media_type').value;
+            const pVid = document.getElementById('ah_preview_video');
+            const pImg = document.getElementById('ah_preview_image');
+            const urlInput = document.getElementById('ah_media_url');
 
             if (mType === 'image') {
                 pVid.style.display = 'none';
@@ -1151,11 +1263,11 @@
             }
         }
 
-        function updateNightMediaPreview() {
-            const mType = document.getElementById('nm_media_type').value;
-            const urlVal = document.getElementById('nm_media_url').value.trim();
-            const pVid = document.getElementById('nm_preview_video');
-            const pImg = document.getElementById('nm_preview_image');
+        function updateAfterHoursMediaPreview() {
+            const mType = document.getElementById('ah_media_type').value;
+            const urlVal = document.getElementById('ah_media_url').value.trim();
+            const pVid = document.getElementById('ah_preview_video');
+            const pImg = document.getElementById('ah_preview_image');
 
             if (mType === 'image') {
                 pImg.src = urlVal || '/static/uploads/logo.png';
@@ -1166,16 +1278,16 @@
         }
 
         function fetchWebOpeningHours() {
-            document.getElementById('nm_start_time').value = '23:00';
-            document.getElementById('nm_end_time').value = '08:00';
+            document.getElementById('ah_start_time').value = '23:00';
+            document.getElementById('ah_end_time').value = '08:00';
             alert("✅ Fırınna web çalışma saatleri uygulandı (Kapanış: 23:00, Açılış: 08:00).");
         }
 
-        async function uploadNightMedia() {
-            const fileInput = document.getElementById('nm_upload_file');
-            const statusEl = document.getElementById('nm_upload_status');
-            const mType = document.getElementById('nm_media_type').value;
-            const urlInput = document.getElementById('nm_media_url');
+        async function uploadAfterHoursMedia() {
+            const fileInput = document.getElementById('ah_upload_file');
+            const statusEl = document.getElementById('ah_upload_status');
+            const mType = document.getElementById('ah_media_type').value;
+            const urlInput = document.getElementById('ah_media_url');
 
             if (!fileInput.files || fileInput.files.length === 0) {
                 alert("Lütfen yüklenecek bir video veya fotoğraf seçin.");
@@ -1200,7 +1312,7 @@
                     statusEl.textContent = "✅ Başarıyla yüklendi!";
                     statusEl.style.color = "#059669";
                     urlInput.value = data.url;
-                    updateNightMediaPreview();
+                    updateAfterHoursMediaPreview();
                 } else {
                     statusEl.textContent = "❌ Hata: " + (data.error || 'Yüklenemedi');
                     statusEl.style.color = "#dc2626";
@@ -1211,42 +1323,80 @@
             }
         }
 
-        async function toggleNightModeInstantTest(isActive) {
-            await saveNightModeToServer(false);
-            console.log(isActive ? "🌙 TV anında Gece Moduna geçirildi!" : "☀️ TV normal tabela moduna döndürüldü.");
+        async function toggleAfterHoursInstantTest(isActive) {
+            await saveAfterHoursToServer(false);
+            console.log(isActive ? "⏳ TV anında Mesai Dışı Moduna geçirildi!" : "☀️ TV normal tabela moduna döndürüldü.");
         }
 
-        async function saveNightModeToServer(showAlert = true) {
-            const mType = document.getElementById('nm_media_type').value;
-            const mUrl = document.getElementById('nm_media_url').value.trim();
+        async function saveAfterHoursToServer(showAlert = true) {
+            const mType = document.getElementById('ah_media_type').value;
+            const mUrl = document.getElementById('ah_media_url').value.trim();
 
-            const nightData = {
+            const ahData = {
                 enabled: true,
-                force_active: document.getElementById('nm_force_active').checked,
-                auto_schedule: document.getElementById('nm_auto_schedule').checked,
-                start_time: document.getElementById('nm_start_time').value || '23:00',
-                end_time: document.getElementById('nm_end_time').value || '08:00',
+                force_active: document.getElementById('ah_force_active').checked,
+                auto_schedule: document.getElementById('ah_auto_schedule').checked,
+                start_time: document.getElementById('ah_start_time').value || '23:00',
+                end_time: document.getElementById('ah_end_time').value || '08:00',
                 media_type: mType,
                 video_url: mType === 'video' ? mUrl : '/static/tv_media/videos/1.mp4',
                 image_url: mType === 'image' ? mUrl : '/static/uploads/logo.png',
-                title: document.getElementById('nm_title').value.trim(),
-                qr_link: document.getElementById('nm_qr_link').value.trim(),
-                promo_text: document.getElementById('nm_promo_text').value.trim(),
-                overlay_logo: true,
-                overlay_clock: true,
-                overlay_qr: true
+                cycle_duration: parseInt(document.getElementById('ah_cycle_duration')?.value) || 7,
+                qr_link: document.getElementById('ah_qr_link').value.trim(),
+                messages: [
+                    {
+                        lang: 'tr',
+                        flag: '🇹🇷',
+                        tag: '🇹🇷 TÜRKÇE',
+                        title: document.getElementById('ah_title_tr').value.trim(),
+                        text: document.getElementById('ah_text_tr').value.trim(),
+                        badge: document.getElementById('ah_badge_tr').value.trim()
+                    },
+                    {
+                        lang: 'en',
+                        flag: '🇬🇧',
+                        tag: '🇬🇧 ENGLISH',
+                        title: document.getElementById('ah_title_en').value.trim(),
+                        text: document.getElementById('ah_text_en').value.trim(),
+                        badge: document.getElementById('ah_badge_en').value.trim()
+                    },
+                    {
+                        lang: 'ru',
+                        flag: '🇷🇺',
+                        tag: '🇷🇺 РУССКИЙ',
+                        title: document.getElementById('ah_title_ru').value.trim(),
+                        text: document.getElementById('ah_text_ru').value.trim(),
+                        badge: document.getElementById('ah_badge_ru').value.trim()
+                    },
+                    {
+                        lang: 'ar',
+                        flag: '🇸🇦',
+                        tag: '🇸🇦 العربية',
+                        title: document.getElementById('ah_title_ar').value.trim(),
+                        text: document.getElementById('ah_text_ar').value.trim(),
+                        badge: document.getElementById('ah_badge_ar').value.trim()
+                    },
+                    {
+                        lang: 'es',
+                        flag: '🇪🇸',
+                        tag: '🇪🇸 ESPAÑOL',
+                        title: document.getElementById('ah_title_es').value.trim(),
+                        text: document.getElementById('ah_text_es').value.trim(),
+                        badge: document.getElementById('ah_badge_es').value.trim()
+                    }
+                ]
             };
 
             try {
-                const res = await fetch('/api/tv/night_mode/save', {
+                const res = await fetch('/api/tv/after_hours/save', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(nightData)
+                    body: JSON.stringify(ahData)
                 });
                 const data = await res.json();
                 if (data.success) {
                     if (showAlert) {
-                        alert("✅ Gece Modu ayarları başarıyla kaydedildi ve TV ekranlarına gönderildi!");
+                        alert("✅ Mesai Dışı ayarları başarıyla kaydedildi ve TV ekranlarına gönderildi!");
                     }
                     fetch('/api/tv/push', {
                         method: 'POST',

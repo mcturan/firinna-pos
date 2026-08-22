@@ -4000,14 +4000,16 @@ def api_upload_tv_night_media():
         file.save(filepath)
         return jsonify({"success": True, "url": f"/static/tv_media/night/{folder}/{filename}"})
 
+@app.route('/api/tv/after_hours/save', methods=['POST'])
 @app.route('/api/tv/night_mode/save', methods=['POST'])
-def api_tv_night_mode_save():
+def api_tv_after_hours_save():
     try:
         payload = request.json or {}
         settings = get_tv_settings()
+        settings['after_hours'] = payload
         settings['night_mode'] = payload
         save_tv_settings(settings)
-        return jsonify({"success": True, "night_mode": settings['night_mode']})
+        return jsonify({"success": True, "after_hours": settings['after_hours']})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
 
