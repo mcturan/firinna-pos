@@ -38,7 +38,7 @@
             padding: 1.2vh 1.2vw;
             box-sizing: border-box;
             grid-template-columns: 28vw 1fr;
-            grid-template-rows: 10vh 1fr 13.5vh;
+            grid-template-rows: 10vh 1fr 14.5vh;
             gap: 1.2vh 1.2vw;
             background: #0B0F19;
             overflow: hidden;
@@ -461,12 +461,8 @@
     <!-- MODERN GRID LAYOUT -->
     <div id="modern-layout">
         
-        <!-- TOP ROW: 3 Distinct Modern Glass Boxes -->
-        <!-- Box 1: Turkish Flag (Left) + Logo & Domain (Center) -->
-        <div id="ml-logo-box" class="grid-box">
-            <div id="ml-support-flag">
-                <img src="/static/img/bayrak.gif" alt="Türk Bayrağı">
-            </div>
+        <!-- Box 1: Logo & Domain (Center) -->
+        <div id="ml-logo-box" class="grid-box" style="justify-content:center;">
             <div id="ml-logo-center-wrap">
                 <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
                 <div id="ml-logo-domain">www.firinna.com</div>
@@ -563,40 +559,70 @@
         
         <div id="ml-main-video" class="grid-box" style="background: #000000 !important; backdrop-filter: none !important; position:relative;">
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
-            <video id="local-video" src="/static/tv_media/videos/bayrak.mp4" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
+            <video id="local-video" src="/static/tv_media/videos/1.mp4" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
             <div id="record-player"></div>
             <!-- Small live download progress & speed badge -->
             <div id="ml-dl-badge" style="position:absolute; bottom:12px; right:12px; background:rgba(15,23,42,0.88); border:1px solid rgba(56,189,248,0.5); color:#38bdf8; font-size:0.85rem; font-weight:700; padding:4px 10px; border-radius:6px; z-index:40; display:none; box-shadow:0 2px 8px rgba(0,0,0,0.3); letter-spacing:0.3px;"></div>
-            <!-- High-Definition Graphic Watermark Container -->
-            <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.6s ease; z-index: 50; pointer-events: none; width: 48vw; aspect-ratio: 1000 / 520; max-height: 75%; border-radius: 1.5vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
+            <!-- High-Definition Graphic Watermark Container (Enlarged) -->
+            <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.6s ease; z-index: 50; pointer-events: none; width: 62vw; aspect-ratio: 1000 / 520; max-height: 86%; border-radius: 1.8vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
                 
                 <!-- Card 0: Brand & Web -->
                 <div id="wm-card-logo" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_0_logo.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw;">
+                    <img src="/static/img/watermarks/card_0_logo.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
                 </div>
 
                 <!-- Card 1: Social Media -->
                 <div id="wm-card-social" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_1_social.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw;">
+                    <img src="/static/img/watermarks/card_1_social.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
                 </div>
 
                 <!-- Card 2: Support University Students -->
                 <div id="wm-card-students" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_2_students.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw;">
+                    <img src="/static/img/watermarks/card_2_students.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
                 </div>
 
                 <!-- Card 3: Stray Animals Support -->
                 <div id="wm-card-animals" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_3_animals.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.5vw;">
+                    <img src="/static/img/watermarks/card_3_animals.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
+                </div>
+
+                <!-- Card 4: Dedicated Birthday & Celebration Card (Pinned Overlay) -->
+                <div id="wm-card-celebration" class="wm-card" style="padding:0; background:radial-gradient(ellipse at center, rgba(30,27,75,0.95) 0%, rgba(15,23,42,0.98) 100%); border:3px solid #E879F9; box-shadow:0 0 45px rgba(217,70,239,0.5); border-radius:1.8vw; width:100%; height:100%; display:none; align-items:center; justify-content:center; box-sizing:border-box; overflow:hidden; position:relative;">
+                    <div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; padding:2.2vw; box-sizing:border-box; gap:2.2vw;">
+                        <!-- Celebration Photo with Glowing Border -->
+                        <div id="celeb-img-box" style="width:15vw; height:15vw; border-radius:50%; border:3.5px solid #F472B6; box-shadow:0 0 25px rgba(244,114,182,0.7); overflow:hidden; flex-shrink:0; background:#0F172A; display:flex; align-items:center; justify-content:center;">
+                            <img id="celeb-img" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+                            <span id="celeb-cake-icon" style="font-size:5.5vw;">🎂</span>
+                        </div>
+                        <!-- Celebration Texts -->
+                        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; text-align:left;">
+                            <div style="font-size:1.1vw; font-weight:800; color:#F472B6; letter-spacing:2px; text-transform:uppercase; margin-bottom:0.4vw; display:flex; align-items:center; gap:0.5vw;">
+                                <span>🎉</span><span>FIRINNA KUTLAMA</span><span>🎉</span>
+                            </div>
+                            <div id="celeb-title-txt" style="font-size:2.4vw; font-weight:900; color:#FFFFFF; line-height:1.2; text-shadow:0 2px 10px rgba(0,0,0,0.7); margin-bottom:0.6vw;">
+                                İyi ki Doğdun!
+                            </div>
+                            <div id="celeb-sub-txt" style="font-size:1.4vw; font-weight:700; color:#E2E8F0; line-height:1.35; text-shadow:0 1px 4px rgba(0,0,0,0.5);">
+                                Nice mutlu, sağlıklı ve neşeli yaşlara! 🎈
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
         </div>
 
-        <!-- BOTTOM ROW: Full Width RSS News & Promo Stream -->
-        <div id="ml-rss-box" class="grid-box" style="position:relative;">
-            <div id="ml-continuous-marquee" class="rss-marquee-content">
-                <span>Loading Live World News...</span>
+        <!-- FULL-SCREEN CELEBRATION CANVAS (Balloons, Fireworks & Confetti) -->
+        <canvas id="celebration-canvas" style="position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:99999; display:none;"></canvas>
+
+        <!-- BOTTOM ROW: Full Width Knowledge & Promo Stream with Enlarged Flag on Left -->
+        <div id="ml-rss-box" class="grid-box" style="position:relative; display:flex; align-items:center; background:#FFFFFF;">
+            <!-- Extra Enlarged Turkish Flag in Sol-Alt -->
+            <div id="ml-support-flag" style="width:9.0vw; height:6.0vw; border-radius:0.6vw; overflow:hidden; flex-shrink:0; margin-left:1.2vw; margin-right:1.2vw; box-shadow:0 4px 14px rgba(0,0,0,0.25); border:2.5px solid #CBD5E1; background:#E30A17; z-index:10; display:flex; align-items:center; justify-content:center;">
+                <img src="/static/img/bayrak.gif" alt="Türk Bayrağı" style="width:100%; height:100%; object-fit:cover; display:block;">
+            </div>
+            <div id="ml-continuous-marquee" class="rss-marquee-content" style="flex:1; height:100%; position:relative; overflow:hidden;">
+                <span>Loading Turkey & Istanbul Cultural Guide...</span>
             </div>
             <!-- Subtle Background Video Preload Line -->
             <div id="ml-video-sync-bar" style="position:absolute; bottom:0; left:0; height:2.5px; width:0%; background:linear-gradient(90deg, #10B981, #3B82F6); transition: width 0.4s ease; opacity:0.85; z-index:100; pointer-events:none;" title="Sync Status"></div>
@@ -627,14 +653,15 @@
         var firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+        // Application Initialization Script
         var player;
         var currentVideoId = "";
         var currentAudioPriority = "video";
-        var currentMediaSource = "";
+        var currentMediaSource = "local";
         var ytReady = false;
         var isPlayerInitialized = false;
         
-        var localVideoList = [];
+        var localVideoList = ["/static/tv_media/videos/1.mp4"];
         var localAudioList = [];
         var currentLocalVideoIndex = 0;
         var currentLocalAudioIndex = 0;
@@ -644,6 +671,21 @@
         const vidEl = document.getElementById('local-video');
         const audEl = document.getElementById('local-audio');
         const recordPlayer = document.getElementById('record-player');
+
+        if (vidEl) {
+            vidEl.addEventListener('playing', () => {
+                const badge = document.getElementById('ml-dl-badge');
+                if (badge) badge.style.display = 'none';
+            });
+            vidEl.addEventListener('canplay', () => {
+                const badge = document.getElementById('ml-dl-badge');
+                if (badge) badge.style.display = 'none';
+            });
+            vidEl.addEventListener('loadeddata', () => {
+                const badge = document.getElementById('ml-dl-badge');
+                if (badge) badge.style.display = 'none';
+            });
+        }
 
         audEl.onended = () => {
             if(localAudioList.length > 0) {
@@ -674,8 +716,8 @@
             }
         }
 
-        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4"];
-        var isPlayingFallback = true;
+        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/1.mp4", "/static/tv_media/videos/bayrak.mp4"];
+        var isPlayingFallback = false;
         var targetVideoReady = false;
         var isDownloadingTarget = false;
 
@@ -686,28 +728,32 @@
         };
 
         function checkAndBufferTargetVideo() {
+            const badge = document.getElementById('ml-dl-badge');
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : [];
             let targetVideo = activeList.find(v => !v.includes('bayrak.mp4')) || activeList[0];
-            if (!targetVideo) return;
-
-            let fileName = targetVideo.includes("/") ? targetVideo.split("/").pop() : targetVideo;
-            let targetUrl = targetVideo.startsWith("/static/") ? targetVideo : "/static/tv_media/videos/" + targetVideo;
-
-            const badge = document.getElementById('ml-dl-badge');
-
-            // If already playing target or target is ready, no need to download
-            if (vidEl && vidEl.src && vidEl.src.includes(fileName) && !vidEl.paused && !isPlayingFallback) {
+            if (!targetVideo) {
                 if (badge) badge.style.display = 'none';
                 return;
             }
 
+            let fileName = targetVideo.includes("/") ? targetVideo.split("/").pop() : targetVideo;
+
+            // If already playing target or on AndroidTV native playback, never show badge
+            if (window.AndroidTV || (vidEl && vidEl.src && vidEl.src.includes(fileName) && !vidEl.paused)) {
+                if (badge) badge.style.display = 'none';
+                return;
+            }
+
+            // Only buffer in background if fallback bayrak.mp4 is actively playing
+            if (!isPlayingFallback) {
+                if (badge) badge.style.display = 'none';
+                return;
+            }
+
+            let targetUrl = targetVideo.startsWith("/static/") ? targetVideo : "/static/tv_media/videos/" + targetVideo;
+
             if (isDownloadingTarget) return;
             isDownloadingTarget = true;
-
-            if (badge) {
-                badge.style.display = 'block';
-                badge.innerHTML = `📥 <b>${fileName}</b>: %0 (başlatılıyor)`;
-            }
 
             let lastLoaded = 0;
             let lastTime = Date.now();
@@ -717,7 +763,7 @@
             xhr.responseType = 'blob';
 
             xhr.onprogress = function(e) {
-                if (e.lengthComputable) {
+                if (e.lengthComputable && isPlayingFallback) {
                     const pct = Math.round((e.loaded / e.total) * 100);
                     const now = Date.now();
                     const timeDiffSec = (now - lastTime) / 1000;
@@ -751,7 +797,7 @@
                     if (badge) {
                         badge.style.display = 'block';
                         badge.innerHTML = `✅ <b>${fileName}</b> hazır!`;
-                        setTimeout(() => { if (badge) badge.style.display = 'none'; }, 3500);
+                        setTimeout(() => { if (badge) badge.style.display = 'none'; }, 2000);
                     }
 
                     // Seamlessly switch video player to ready video
@@ -762,7 +808,6 @@
                         vidEl.play().catch(()=>{});
                     });
 
-                    // If Android TV native bridge exists, also notify native APK
                     if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
                         window.AndroidTV.playNativeVideo(fileName);
                     }
@@ -820,28 +865,29 @@
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             
             vidEl.style.display = "block";
-            vidEl.muted = (currentAudioPriority === 'music');
+            vidEl.muted = true;
             
             if (vidEl.getAttribute('src') !== srcUrl) {
                 vidEl.setAttribute('src', srcUrl);
                 vidEl.src = srcUrl;
             }
 
-            vidEl.play().catch(err => {
-                vidEl.muted = true;
-                vidEl.play().catch(e => {
-                    vidEl.src = "/static/tv_media/videos/bayrak.mp4";
-                    vidEl.play().catch(()=>{});
+            const playPromise = vidEl.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    console.log("Autoplay retry with muted...", err);
+                    vidEl.muted = true;
+                    vidEl.play().catch(e => {
+                        console.error("Play error:", e);
+                    });
                 });
-            });
+            }
 
             vidEl.onended = () => {
                 window.playNextNativeVideo();
             };
-            vidEl.onerror = () => { 
-                console.log("Video error, falling back to core fallback video...");
-                vidEl.src = "/static/tv_media/videos/bayrak.mp4";
-                vidEl.play().catch(()=>{});
+            vidEl.onerror = (e) => { 
+                console.log("Video source load error, retrying...", e);
             };
         }
 
@@ -1055,6 +1101,15 @@
         }
 
         function triggerWatermarkCycle() {
+            if (celebrationActive) {
+                // If celebration mode is pinned, keep celebration card fixed on screen
+                const container = document.getElementById('ml-watermark-container');
+                if (container) container.style.opacity = '1';
+                const card = document.getElementById('wm-card-celebration');
+                if (card) card.style.display = 'flex';
+                return;
+            }
+
             const container = document.getElementById('ml-watermark-container');
             if (!container) return;
 
@@ -1077,11 +1132,256 @@
 
             const durationMs = Math.max(3, parseInt(wmSettings.duration_sec) || 12) * 1000;
             wmHideTimeoutId = setTimeout(() => {
+                if (celebrationActive) return;
                 container.style.opacity = '0';
                 setTimeout(() => {
+                    if (celebrationActive) return;
                     document.querySelectorAll('.wm-card').forEach(c => c.classList.remove('active'));
                 }, 600);
             }, durationMs);
+        }
+
+        // ==========================================
+        // CELEBRATION & BIRTHDAY PINNED MODE ENGINE
+        // ==========================================
+        let celebrationActive = false;
+        let celebrationData = null;
+        let celebCanvas = null;
+        let celebCtx = null;
+        let celebAnimId = null;
+        let celebBalloons = [];
+        let celebFireworks = [];
+        let celebConfetti = [];
+
+        function initCelebrationCanvas() {
+            celebCanvas = document.getElementById('celebration-canvas');
+            if (!celebCanvas) return;
+            celebCtx = celebCanvas.getContext('2d');
+            resizeCelebrationCanvas();
+            window.addEventListener('resize', resizeCelebrationCanvas);
+        }
+
+        function resizeCelebrationCanvas() {
+            if (!celebCanvas) return;
+            celebCanvas.width = window.innerWidth;
+            celebCanvas.height = window.innerHeight;
+        }
+
+        function applyCelebrationState(data) {
+            celebrationData = data;
+            const card = document.getElementById('wm-card-celebration');
+            const container = document.getElementById('ml-watermark-container');
+            const canvas = document.getElementById('celebration-canvas');
+
+            if (data && data.active) {
+                celebrationActive = true;
+                if (canvas) canvas.style.display = 'block';
+
+                // Populate Card
+                const imgEl = document.getElementById('celeb-img');
+                const iconEl = document.getElementById('celeb-cake-icon');
+                const titleEl = document.getElementById('celeb-title-txt');
+                const subEl = document.getElementById('celeb-sub-txt');
+
+                if (titleEl) titleEl.textContent = data.title || 'İyi ki Doğdun!';
+                if (subEl) subEl.textContent = data.subtitle || 'Nice Mutlu Yıllara! 🎂🎉';
+
+                if (data.image_url && data.image_url.trim() !== '') {
+                    if (imgEl) { imgEl.src = data.image_url; imgEl.style.display = 'block'; }
+                    if (iconEl) iconEl.style.display = 'none';
+                } else {
+                    if (imgEl) imgEl.style.display = 'none';
+                    if (iconEl) iconEl.style.display = 'block';
+                }
+
+                // Pin Card in Watermark Container
+                if (card) card.style.display = 'flex';
+                document.querySelectorAll('.wm-card').forEach(c => {
+                    if (c.id !== 'wm-card-celebration') c.classList.remove('active');
+                });
+                if (container) {
+                    container.style.opacity = '1';
+                }
+
+                startCelebrationAnimation();
+            } else {
+                celebrationActive = false;
+                if (canvas) canvas.style.display = 'none';
+                if (card) card.style.display = 'none';
+                stopCelebrationAnimation();
+            }
+        }
+
+        function startCelebrationAnimation() {
+            if (!celebCanvas) initCelebrationCanvas();
+            if (celebAnimId) cancelAnimationFrame(celebAnimId);
+
+            const W = celebCanvas ? (celebCanvas.width || window.innerWidth) : window.innerWidth;
+            const H = celebCanvas ? (celebCanvas.height || window.innerHeight) : window.innerHeight;
+
+            const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4', '#E11D48'];
+
+            // Initialize Balloons
+            celebBalloons = [];
+            for (let i = 0; i < 22; i++) {
+                celebBalloons.push({
+                    x: Math.random() * W,
+                    y: H + Math.random() * H * 0.8,
+                    r: 22 + Math.random() * 18,
+                    speed: 1.2 + Math.random() * 1.8,
+                    swaySpeed: 0.02 + Math.random() * 0.03,
+                    swayOffset: Math.random() * Math.PI * 2,
+                    swayAmount: 25 + Math.random() * 35,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+
+            // Initialize Confetti
+            celebConfetti = [];
+            for (let i = 0; i < 60; i++) {
+                celebConfetti.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H - H,
+                    w: 8 + Math.random() * 8,
+                    h: 5 + Math.random() * 6,
+                    speedY: 2 + Math.random() * 3,
+                    speedX: (Math.random() - 0.5) * 2,
+                    rot: Math.random() * 360,
+                    rotSpeed: (Math.random() - 0.5) * 6,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+
+            celebFireworks = [];
+            let lastFireworkTime = Date.now();
+
+            function spawnFirework() {
+                const targetX = W * 0.15 + Math.random() * W * 0.7;
+                const targetY = H * 0.12 + Math.random() * H * 0.35;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const count = 40;
+                for (let i = 0; i < count; i++) {
+                    const angle = (Math.PI * 2 / count) * i + (Math.random() * 0.2);
+                    const speed = 2.5 + Math.random() * 5.0;
+                    celebFireworks.push({
+                        x: targetX,
+                        y: targetY,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        color: color,
+                        alpha: 1,
+                        size: 3 + Math.random() * 2.5,
+                        decay: 0.015 + Math.random() * 0.015
+                    });
+                }
+            }
+
+            function loop() {
+                if (!celebrationActive || !celebCtx) return;
+
+                celebCtx.clearRect(0, 0, celebCanvas.width, celebCanvas.height);
+                const time = Date.now();
+
+                // 1. Draw & Update Balloons
+                celebBalloons.forEach(b => {
+                    b.y -= b.speed;
+                    const swayX = b.x + Math.sin(time * b.swaySpeed + b.swayOffset) * b.swayAmount;
+                    if (b.y < -b.r * 2) {
+                        b.y = H + 40;
+                        b.x = Math.random() * W;
+                    }
+
+                    // String
+                    celebCtx.beginPath();
+                    celebCtx.moveTo(swayX, b.y + b.r);
+                    celebCtx.quadraticCurveTo(swayX + Math.sin(time*0.03)*10, b.y + b.r + 25, swayX, b.y + b.r + 50);
+                    celebCtx.strokeStyle = 'rgba(255,255,255,0.6)';
+                    celebCtx.lineWidth = 1.5;
+                    celebCtx.stroke();
+
+                    // Balloon Body
+                    celebCtx.beginPath();
+                    celebCtx.ellipse(swayX, b.y, b.r * 0.85, b.r, 0, 0, Math.PI * 2);
+                    celebCtx.fillStyle = b.color;
+                    celebCtx.shadowColor = b.color;
+                    celebCtx.shadowBlur = 10;
+                    celebCtx.fill();
+                    celebCtx.shadowBlur = 0;
+
+                    // Knot
+                    celebCtx.beginPath();
+                    celebCtx.moveTo(swayX - 4, b.y + b.r + 2);
+                    celebCtx.lineTo(swayX + 4, b.y + b.r + 2);
+                    celebCtx.lineTo(swayX, b.y + b.r - 2);
+                    celebCtx.fillStyle = b.color;
+                    celebCtx.fill();
+
+                    // Highlight
+                    celebCtx.beginPath();
+                    celebCtx.ellipse(swayX - b.r*0.3, b.y - b.r*0.35, b.r*0.2, b.r*0.35, Math.PI / 4, 0, Math.PI * 2);
+                    celebCtx.fillStyle = 'rgba(255,255,255,0.45)';
+                    celebCtx.fill();
+                });
+
+                // 2. Spawn & Update Fireworks
+                if (time - lastFireworkTime > 1200) {
+                    spawnFirework();
+                    lastFireworkTime = time;
+                }
+
+                for (let i = celebFireworks.length - 1; i >= 0; i--) {
+                    const p = celebFireworks[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.06; // gravity
+                    p.vx *= 0.98;
+                    p.alpha -= p.decay;
+
+                    if (p.alpha <= 0) {
+                        celebFireworks.splice(i, 1);
+                        continue;
+                    }
+
+                    celebCtx.save();
+                    celebCtx.globalAlpha = p.alpha;
+                    celebCtx.fillStyle = p.color;
+                    celebCtx.shadowColor = p.color;
+                    celebCtx.shadowBlur = 8;
+                    celebCtx.beginPath();
+                    celebCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    celebCtx.fill();
+                    celebCtx.restore();
+                }
+
+                // 3. Draw & Update Confetti
+                celebConfetti.forEach(c => {
+                    c.y += c.speedY;
+                    c.x += c.speedX;
+                    c.rot += c.rotSpeed;
+                    if (c.y > H + 20) {
+                        c.y = -20;
+                        c.x = Math.random() * W;
+                    }
+
+                    celebCtx.save();
+                    celebCtx.translate(c.x, c.y);
+                    celebCtx.rotate((c.rot * Math.PI) / 180);
+                    celebCtx.fillStyle = c.color;
+                    celebCtx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+                    celebCtx.restore();
+                });
+
+                celebAnimId = requestAnimationFrame(loop);
+            }
+
+            loop();
+        }
+
+        function stopCelebrationAnimation() {
+            if (celebAnimId) cancelAnimationFrame(celebAnimId);
+            if (celebCtx && celebCanvas) {
+                celebCtx.clearRect(0, 0, celebCanvas.width, celebCanvas.height);
+            }
         }
 
         function startWatermarkScheduler() {
@@ -1179,18 +1479,34 @@
                 });
             }
 
-            // 2. Curated 30 "Biliyor Muydunuz?" Cultural & Historical Facts
+            // 2. Curated 30 Bilingual (EN first, then RU) Turkey & Istanbul Cultural Facts + Custom User Entries
             if (liveFacts.length > 0) {
                 liveFacts.forEach(f => {
-                    items.push({
-                        icon: f.icon || '💡',
-                        badge: 'BİLİYOR MUYDUNUZ?',
-                        badgeColor: '#1D4ED8',
-                        badgeBg: '#EFF6FF',
-                        badgeBorder: '#BFDBFE',
-                        title: f.title || '',
-                        text: f.text
-                    });
+                    const icon = f.icon || '🏛️';
+                    const customColor = f.color || '#0F172A';
+                    // 1. English Version
+                    const titleEn = f.title_en || f.title || '';
+                    const textEn = f.text_en || f.text || '';
+                    if (textEn) {
+                        items.push({
+                            icon: icon,
+                            color: customColor,
+                            title: titleEn,
+                            text: textEn
+                        });
+                    }
+
+                    // 2. Russian Version
+                    const titleRu = f.title_ru || '';
+                    const textRu = f.text_ru || '';
+                    if (textRu) {
+                        items.push({
+                            icon: icon,
+                            color: customColor,
+                            title: titleRu,
+                            text: textRu
+                        });
+                    }
                 });
             }
 
@@ -1202,6 +1518,7 @@
                     badgeColor: '#15803D',
                     badgeBg: '#F0FDF4',
                     badgeBorder: '#BBF7D0',
+                    color: '#0F172A',
                     title: 'Artisan Bakery & Specialty Cafe',
                     text: 'Galata ve Beyoğlu\'nun kalbinde taze fırın lezzetleri ve nitelikli kahve deneyimi.'
                 });
@@ -1216,13 +1533,18 @@
 
             let html = '';
             items.forEach((it, idx) => {
-                const titleHtml = it.title ? `<span style="color:#0F172A; font-weight:800; margin-right:0.6vw;">${it.title}:</span>` : '';
-                html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}">
-                    <div style="display:inline-flex; align-items:center; gap:0.4vw; background:${it.badgeBg}; border:1.5px solid ${it.badgeBorder}; color:${it.badgeColor}; padding:0.35vw 0.9vw; border-radius:0.5vw; font-size:1.15vw; font-weight:800; letter-spacing:0.5px; margin-right:1.2vw; flex-shrink:0; white-space:nowrap; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-                        <span style="font-size:1.2vw;">${it.icon}</span>
+                const textColor = it.color || '#0F172A';
+                const badgeHtml = it.badge ? `
+                    <div style="display:inline-flex; align-items:center; gap:0.4vw; background:${it.badgeBg}; border:1.5px solid ${it.badgeBorder}; color:${it.badgeColor}; padding:0.25vw 0.75vw; border-radius:0.5vw; font-size:1.2vw; font-weight:800; margin-right:1vw; flex-shrink:0; white-space:nowrap; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                        <span style="font-size:1.4vw;">${it.icon}</span>
                         <span>${it.badge}</span>
-                    </div>
-                    <div class="tcard-text">
+                    </div>` : `
+                    <span style="font-size:2.2vw; margin-right:0.8vw; flex-shrink:0; line-height:1;">${it.icon}</span>`;
+
+                const titleHtml = it.title ? `<span style="font-weight:800; margin-right:0.6vw;">${it.title}:</span>` : '';
+                html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}">
+                    ${badgeHtml}
+                    <div class="tcard-text" style="color:${textColor}; font-size:1.85vw; line-height:1.26; font-weight:700;">
                         ${titleHtml}${it.text}
                     </div>
                 </div>`;
@@ -1344,6 +1666,11 @@
                 if (wmSettings.interval_sec !== oldInterval) {
                     startWatermarkScheduler();
                 }
+            }
+
+            // Apply Celebration / Birthday Pinned Mode
+            if (data.celebration !== undefined) {
+                applyCelebrationState(data.celebration);
             }
             
             if(currentMessages.length > 0) {

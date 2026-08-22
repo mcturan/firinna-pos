@@ -3439,34 +3439,52 @@ TV_MEDIA_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'tv_media')
 os.makedirs(os.path.join(TV_MEDIA_FOLDER, 'videos'), exist_ok=True)
 os.makedirs(os.path.join(TV_MEDIA_FOLDER, 'audio'), exist_ok=True)
 
+import tempfile
+import time
+
 def get_tv_settings():
     if os.path.exists(TV_SETTINGS_FILE):
-        with open(TV_SETTINGS_FILE, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            if not data.get('logo_url'):
-                data['logo_url'] = db.get_setting('logo_url', '')
-            return data
+        for _ in range(3):
+            try:
+                with open(TV_SETTINGS_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if not data.get('logo_url'):
+                        data['logo_url'] = db.get_setting('logo_url', '')
+                    return data
+            except Exception:
+                time.sleep(0.05)
     return {
         "logo_url": db.get_setting('logo_url', ''),
         "layout": "modern_grid",
         "video_playlist": "",
-        "local_videos": [],
+        "local_videos": ["/static/tv_media/videos/1.mp4", "/static/tv_media/videos/bayrak.mp4"],
         "local_audio": [],
-        "media_source": "youtube",
+        "media_source": "local",
         "audio_priority": "video",
         "ticker_text_enabled": True,
         "ticker_currency_enabled": True,
+        "ticker_rss_enabled": True,
         "promo_text": "",
         "qr_code": "",
         "qr_text": "",
-        "widgets": {"weather": False, "clock": False},
+        "celebration": {
+            "active": False,
+            "title": "İyi ki Doğdun!",
+            "subtitle": "Fırınna Ailesi Olarak Nice Mutlu Yıllara Dileriz! 🎂🎉",
+            "image_url": "",
+            "effects": {"balloons": True, "fireworks": True, "confetti": True}
+        },
+        "widgets": {"weather": True, "clock": True},
         "messages": [],
         "last_ping": None
     }
 
 def save_tv_settings(data):
-    with open(TV_SETTINGS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
+    dir_name = os.path.dirname(TV_SETTINGS_FILE) or '.'
+    with tempfile.NamedTemporaryFile('w', dir=dir_name, delete=False, encoding='utf-8') as tf:
+        json.dump(data, tf, ensure_ascii=False, indent=4)
+        temp_name = tf.name
+    os.replace(temp_name, TV_SETTINGS_FILE)
 
 @app.route('/api/tv/settings', methods=['GET', 'POST'])
 def api_tv_settings():
@@ -3863,6 +3881,7 @@ def api_tv_facts():
     return jsonify({
         "facts": facts,
         "count": len(facts),
+        "cycle_speed": settings.get('facts_cycle_speed', settings.get('ticker_slide_duration', 8)),
         "enabled": settings.get('ticker_facts_enabled', True)
     })
 
@@ -3873,10 +3892,36 @@ def api_tv_facts_save():
         facts = payload.get('facts', [])
         settings = get_tv_settings()
         settings['did_you_know'] = facts
+        if 'cycle_speed' in payload:
+            speed = int(payload['cycle_speed'])
+            settings['facts_cycle_speed'] = speed
+            settings['ticker_slide_duration'] = speed
         if 'enabled' in payload:
             settings['ticker_facts_enabled'] = bool(payload['enabled'])
         save_tv_settings(settings)
-        return jsonify({"success": True, "count": len(facts)})
+        return jsonify({"success": True, "count": len(facts), "cycle_speed": settings.get('facts_cycle_speed', 8)})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 400
+
+@app.route('/api/tv/celebration', methods=['GET'])
+def api_tv_celebration():
+    settings = get_tv_settings()
+    return jsonify(settings.get('celebration', {
+        "active": False,
+        "title": "İyi ki Doğdun!",
+        "subtitle": "Fırınna Ailesi Olarak Nice Mutlu Yıllara Dileriz! 🎂🎉",
+        "image_url": "",
+        "effects": {"balloons": True, "fireworks": True, "confetti": True}
+    }))
+
+@app.route('/api/tv/celebration/save', methods=['POST'])
+def api_tv_celebration_save():
+    try:
+        payload = request.json or {}
+        settings = get_tv_settings()
+        settings['celebration'] = payload
+        save_tv_settings(settings)
+        return jsonify({"success": True, "celebration": settings['celebration']})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
 

@@ -56,24 +56,52 @@
         </div>
         
         <div class="tv-tabs">
-            <button class="tv-tab active" onclick="switchTab('genel', this)">Genel & Logo</button>
-            <button class="tv-tab" onclick="switchTab('medya', this)">Video & Müzik (PC / YouTube)</button>
-            <button class="tv-tab" onclick="switchTab('filigran', this)">🎨 Filigran Döngüsü</button>
-            <button class="tv-tab" onclick="switchTab('mesajlar', this)">📰 Canlı Haberler & Mesajlar</button>
-            <button class="tv-tab" onclick="switchTab('qr', this)">QR & Araçlar</button>
+            <button class="tv-tab active" onclick="switchTab('genel', this)">🏛️ Ekran & Düzen</button>
+            <button class="tv-tab" onclick="switchTab('medya', this)">🎬 Video & Müzik</button>
+            <button class="tv-tab" onclick="switchTab('filigran', this)">💎 Filigranlar (Video Üstü)</button>
+            <button class="tv-tab" onclick="switchTab('mesajlar', this)">💡 Kültür Notları & Alt Bant</button>
+            <button class="tv-tab" onclick="switchTab('qr', this)">⚙️ QR & Ekstralar</button>
         </div>
 
         <div id="genel" class="tv-pane active card">
-            <h3 style="margin-top:0;">Genel Ayarlar ve Logo</h3>
-            <div class="form-group">
-                <label>Logo URL (PNG tavsiye edilir)</label>
-                <input type="text" id="logo_url" placeholder="/static/uploads/logo.png veya http://...">
+            <h3 style="margin-top:0; color:#1e293b;">🏛️ Modern Tabela Ekran Düzeni & Bileşenler</h3>
+            
+            <!-- Visual Layout Architecture Guide -->
+            <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:1.5rem;">
+                <h4 style="margin:0 0 10px 0; color:#0f172a; font-size:1.05rem;">📐 Ekrandaki Alanların Görev Dağılımı:</h4>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+                    <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px;">
+                        <strong style="color:#059669; display:block; font-size:0.9rem;">1. Sol Üst:</strong>
+                        <span style="font-size:0.82rem; color:#475569;">Fırınna Logosu ve www.firinna.com marka alanı</span>
+                    </div>
+                    <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px;">
+                        <strong style="color:#dc2626; display:block; font-size:0.9rem;">2. Üst Orta:</strong>
+                        <span style="font-size:0.82rem; color:#475569;">Dijital Saat & Tarih ve Beyoğlu Canlı Hava Durumu</span>
+                    </div>
+                    <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px;">
+                        <strong style="color:#2563eb; display:block; font-size:0.9rem;">3. Sağ Üst (4'lü Döngü):</strong>
+                        <span style="font-size:0.82rem; color:#475569;">Döviz (USD/EUR) ➡️ Kripto (BTC/ETH) ➡️ Sosyal Medya ➡️ Harita Yorumları</span>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px; margin-bottom:12px;">
+                    <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px;">
+                        <strong style="color:#d97706; display:block; font-size:0.9rem;">4. Sol Orta:</strong>
+                        <span style="font-size:0.82rem; color:#475569;">Ürün Vitrini & Fırın Görselleri</span>
+                    </div>
+                    <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px;">
+                        <strong style="color:#7c3aed; display:block; font-size:0.9rem;">5. Sağ Orta:</strong>
+                        <span style="font-size:0.82rem; color:#475569;">Büyük Ana Video (1.mp4 vb.) & 4 Büyük Filigran Kartı</span>
+                    </div>
+                </div>
+                <div style="background:#ffffff; border:1.5px solid #86efac; border-radius:8px; padding:12px;">
+                    <strong style="color:#15803d; display:block; font-size:0.95rem;">6. Alt Bant (Tam Boy - %100 Genişlik):</strong>
+                    <span style="font-size:0.85rem; color:#334155;">Büyük Türk Bayrağı + İngilizce & Rusça Kültür/Tarih/Gezi Notları (30 Bilgi) + Özel Renkli Duyurular</span>
+                </div>
             </div>
-            <div class="form-group" style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0;">
-                <label style="color:#166534; font-weight:bold; font-size:1.05rem;">📐 Ekran Düzeni: Modern 3-Bölge Tabela</label>
-                <p style="font-size:0.88rem; color:#64748b; margin-top:4px; margin-bottom:0;">
-                    Üstte Logo/Bayrak, Saat/Hava ve Sosyal Medya; Ortada Menü ve Ana Video; Altta Canlı Kurlar ve Haber Akışı aktiftir.
-                </p>
+
+            <div class="form-group">
+                <label style="font-weight:bold;">Logo URL (PNG tavsiye edilir)</label>
+                <input type="text" id="logo_url" placeholder="/static/uploads/logo.png veya http://...">
             </div>
         </div>
 
@@ -130,10 +158,79 @@
         </div>
 
         <div id="filigran" class="tv-pane card">
-            <h3 style="margin-top:0;">🎨 Filigran Döngüsü & Özel Kartlar</h3>
+            <h3 style="margin-top:0; color:#1e293b;">💎 Filigran Döngüsü & Özel Kutlama Kartları</h3>
             <p style="font-size:0.88rem; color:#718096; margin-bottom:1.5rem;">
-                Videonun üzerinde periyodik olarak beliren kurumsal filigran ve sosyal sorumluluk tanıtım kartları.
+                Videonun üzerinde periyodik olarak beliren kurumsal filigranlar ve özel doğum günü/kutlama modları.
             </p>
+
+            <!-- CELEBRATION / BIRTHDAY PINNED CARD CONTAINER -->
+            <div style="background:linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%); border:2px solid #e879f9; border-radius:12px; padding:18px; margin-bottom:1.8rem; box-shadow:0 4px 12px rgba(217, 70, 239, 0.12);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:2rem;">🎂</span>
+                        <div>
+                            <h4 style="margin:0; color:#86198f; font-size:1.15rem; font-weight:800;">Doğum Günü & Özel Kutlama Modu (Sabitle)</h4>
+                            <span style="font-size:0.84rem; color:#a21caf;">Bu mod açıldığında video üzerinde kutlama kartı sabitlenir ve tüm ekranda uçuşan balonlar, havai fişekler ve konfetiler oynar!</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display:inline-flex; align-items:center; gap:8px; background:#ffffff; padding:8px 16px; border-radius:24px; border:2.5px solid #d946ef; font-weight:800; color:#86198f; cursor:pointer; font-size:0.95rem; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                            <input type="checkbox" id="celeb_active" style="width:1.3rem; height:1.3rem; accent-color:#d946ef; cursor:pointer;" onchange="onCelebrationToggleChange(this.checked)">
+                            <span>📌 KUTLAMAYI TV'DE SABİTLE</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:16px; margin-bottom:14px;">
+                    <!-- Fotoğraf Yükleme -->
+                    <div style="background:#ffffff; border:1px solid #f0abfc; border-radius:8px; padding:12px;">
+                        <label style="font-weight:700; color:#86198f; font-size:0.9rem; display:block; margin-bottom:6px;">📸 Kutlama Fotoğrafı / Görseli:</label>
+                        <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+                            <input type="file" id="celeb_file_input" accept="image/*" style="display:none;" onchange="uploadCelebrationPhoto(this)">
+                            <button type="button" onclick="document.getElementById('celeb_file_input').click()" style="background:#d946ef; color:white; border:none; padding:6px 12px; border-radius:6px; font-weight:700; font-size:0.85rem; cursor:pointer;">
+                                📤 Fotoğraf Seç & Yükle
+                            </button>
+                            <button type="button" onclick="clearCelebrationPhoto()" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca; padding:6px 10px; border-radius:6px; font-weight:700; font-size:0.85rem; cursor:pointer;">
+                                🗑️ Kaldır
+                            </button>
+                        </div>
+                        <input type="text" id="celeb_image_url" placeholder="/static/img/watermarks/..." style="width:100%; padding:6px 8px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.82rem; margin-bottom:6px;" oninput="updateCelebrationPreview()">
+                        <div id="celeb_preview_wrap" style="width:100%; height:110px; border-radius:6px; border:1px dashed #d946ef; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#faf5ff;">
+                            <img id="celeb_img_preview" src="" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
+                            <span id="celeb_no_img_txt" style="color:#c084fc; font-size:0.85rem;">Fotoğraf seçildiğinde burada görünür</span>
+                        </div>
+                    </div>
+
+                    <!-- Başlık & Mesaj -->
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div>
+                            <label style="font-weight:700; color:#86198f; font-size:0.9rem; display:block; margin-bottom:4px;">🎉 Kutlama Başlığı:</label>
+                            <input type="text" id="celeb_title" placeholder="Örn: 🎂 İyi ki Doğdun Zeynep! 🎉" style="width:100%; padding:8px 12px; border:1.5px solid #d946ef; border-radius:6px; font-weight:800; font-size:1rem; color:#86198f; background:#ffffff;">
+                        </div>
+                        <div>
+                            <label style="font-weight:700; color:#86198f; font-size:0.9rem; display:block; margin-bottom:4px;">💌 Kutlama & Tebrik Mesajı:</label>
+                            <textarea id="celeb_subtitle" rows="3" placeholder="Fırınna ailesi olarak sağlıklı, mutlu ve neşeli yaşlar dileriz! 🎈" style="width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.9rem; font-family:sans-serif;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed #f0abfc; padding-top:12px;">
+                    <div style="display:flex; gap:14px; align-items:center;">
+                        <label style="display:flex; align-items:center; gap:5px; font-size:0.88rem; font-weight:700; color:#86198f; cursor:pointer;">
+                            <input type="checkbox" id="celeb_eff_balloons" checked style="accent-color:#d946ef;"> 🎈 Yükselen Balonlar
+                        </label>
+                        <label style="display:flex; align-items:center; gap:5px; font-size:0.88rem; font-weight:700; color:#86198f; cursor:pointer;">
+                            <input type="checkbox" id="celeb_eff_fireworks" checked style="accent-color:#d946ef;"> 🎆 Havai Fişekler
+                        </label>
+                        <label style="display:flex; align-items:center; gap:5px; font-size:0.88rem; font-weight:700; color:#86198f; cursor:pointer;">
+                            <input type="checkbox" id="celeb_eff_confetti" checked style="accent-color:#d946ef;"> 🎊 Dökülen Konfetiler
+                        </label>
+                    </div>
+                    <button type="button" onclick="saveCelebrationSettings()" style="background:#86198f; color:white; border:none; padding:8px 20px; border-radius:6px; font-weight:800; cursor:pointer; font-size:0.92rem; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(134, 25, 143, 0.25);">
+                        💾 Kutlamayı Kaydet & TV'ye Gönder
+                    </button>
+                </div>
+            </div>
 
             <div class="form-group" style="background:#f8fafc; padding:16px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:1.5rem; display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
                 <div>
@@ -198,57 +295,58 @@
                     </div>
 
                     <div>
-                        <label style="font-weight:600; color:#1e3a8a; font-size:0.92rem; display:block; margin-bottom:6px;" id="lbl_ticker_speed">
-                            🚀 Kayan Yazı Hızı:
+                        <label style="font-weight:700; color:#1e3a8a; font-size:0.95rem; display:block; margin-bottom:6px;">
+                            ⏱️ Kültür Notları & Bilgi Döngü Hızı:
                         </label>
-                        <!-- Marquee Hız Seçimi -->
-                        <div id="container_marquee_speed">
-                            <select id="ticker_speed" style="width:100%; padding:9px 12px; border-radius:6px; border:1.5px solid #93c5fd; font-size:0.95rem; font-weight:600; background:#ffffff; color:#1e293b;">
-                                <option value="1.5">1 - Yavaş (1.5 px/frame)</option>
-                                <option value="2.5">2 - Normal (2.5 px/frame)</option>
-                                <option value="3.5">3 - Akıcı / Orta (3.5 px/frame)</option>
-                                <option value="4.5" selected>4 - Hızlı (4.5 px/frame - TV İçin Tavsiye)</option>
-                                <option value="6.0">5 - Çok Hızlı (6.0 px/frame)</option>
-                                <option value="8.0">6 - Ekstra Hızlı (8.0 px/frame)</option>
-                            </select>
-                        </div>
-                        <!-- Fade/Slide Süre Seçimi -->
-                        <div id="container_slide_duration" style="display:none;">
-                            <select id="ticker_slide_duration" style="width:100%; padding:9px 12px; border-radius:6px; border:1.5px solid #93c5fd; font-size:0.95rem; font-weight:600; background:#ffffff; color:#1e293b;">
-                                <option value="4">4 Saniye (Hızlı)</option>
-                                <option value="6">6 Saniye</option>
-                                <option value="8" selected>8 Saniye (Tavsiye)</option>
-                                <option value="10">10 Saniye</option>
+                        <div>
+                            <select id="ticker_slide_duration" style="width:100%; padding:9px 12px; border-radius:6px; border:1.5px solid #93c5fd; font-size:0.95rem; font-weight:700; background:#ffffff; color:#1e293b;">
+                                <option value="4">4 Saniye (Ekstra Hızlı)</option>
+                                <option value="6">6 Saniye (Hızlı)</option>
+                                <option value="8" selected>8 Saniye (Standart & Önerilen)</option>
+                                <option value="10">10 Saniye (Dengeli)</option>
+                                <option value="12">12 Saniye (Geniş Okuma Süresi)</option>
                                 <option value="15">15 Saniye (Yavaş)</option>
                             </select>
                         </div>
                     </div>
                 </div>
                 <small style="color:#1d4ed8; display:block; margin-top:4px;">
-                    💡 TV ekranınızda haberlerin ve duyuruların akış stilini ve hızını buradan belirleyebilirsiniz.
+                    💡 Ekranın altındaki İngilizce ve Rusça kültür notlarının kaç saniyede bir değişeceğini buradan belirleyebilirsiniz.
                 </small>
             </div>
 
-            <div class="form-group" style="background:#f0fdf4; padding:16px; border-radius:8px; border:1.5px solid #bbf7d0; margin-bottom:1.5rem;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+            <div class="form-group" style="background:#f0fdf4; padding:18px; border-radius:10px; border:1.5px solid #bbf7d0; margin-bottom:1.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
                     <div>
-                        <label style="font-weight:bold; color:#166534; display:flex; align-items:center; gap:8px; margin-bottom:4px; font-size:1.1rem;">
-                            💡 "Biliyor Muydunuz?" Kültür & Tarih Notları (30 Adet)
-                            <span id="facts_count_badge" style="background:#dcfce7; color:#15803d; font-size:0.8rem; padding:2px 10px; border-radius:12px; font-weight:bold; border:1px solid #86efac;">30 Bilgi</span>
+                        <label style="font-weight:bold; color:#166534; display:flex; align-items:center; gap:8px; margin-bottom:4px; font-size:1.15rem;">
+                            💡 Türkiye & İstanbul Kültür/Tarih Bilgileri (30 Adet)
+                            <span id="facts_count_badge" style="background:#dcfce7; color:#15803d; font-size:0.82rem; padding:2px 10px; border-radius:12px; font-weight:bold; border:1px solid #86efac;">30 Bilgi</span>
                         </label>
-                        <small style="color:#15803d; display:block;">Ekranın altındaki geniş bantta dönecek İstanbul, Galata, Türk tarihi, fırın ve kahve kültürü bilgileri. İstediğinizi düzenleyebilir, silebilir veya yeni ekleyebilirsiniz.</small>
+                        <small style="color:#15803d; display:block;">Ekranın altındaki geniş bantta dönecek İngilizce ve Rusça kültürel gezi ve tarih notları.</small>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button type="button" onclick="addNewFact()" style="background:#16a34a; color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem;">
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <!-- Bilgi Döngü Süresi Seçimi -->
+                        <div style="display:flex; align-items:center; gap:6px; background:#ffffff; padding:5px 10px; border-radius:6px; border:1.5px solid #86efac;">
+                            <label style="font-weight:bold; color:#166534; font-size:0.88rem; margin-bottom:0; white-space:nowrap;">⏱️ Döngü Hızı:</label>
+                            <select id="facts_cycle_speed" style="padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; font-weight:bold; color:#15803d; font-size:0.88rem; background:#f8fafc;">
+                                <option value="4">4 Saniye (Çok Hızlı)</option>
+                                <option value="6">6 Saniye (Hızlı)</option>
+                                <option value="8" selected>8 Saniye (Standart & Önerilen)</option>
+                                <option value="10">10 Saniye (Dengeli)</option>
+                                <option value="12">12 Saniye (Geniş Okuma)</option>
+                                <option value="15">15 Saniye (Yavaş)</option>
+                            </select>
+                        </div>
+                        <button type="button" onclick="addNewFact()" style="background:#16a34a; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem; display:inline-flex; align-items:center; gap:4px;">
                             ➕ Yeni Bilgi Ekle
                         </button>
-                        <button type="button" onclick="saveFactsToServer()" style="background:#0284c7; color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem;">
+                        <button type="button" onclick="saveFactsToServer()" style="background:#0284c7; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem; display:inline-flex; align-items:center; gap:4px;">
                             💾 Bilgileri Kaydet
                         </button>
                     </div>
                 </div>
 
-                <div id="facts_list_container" style="max-height:420px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding:6px; background:#ffffff; border:1px solid #bbf7d0; border-radius:8px;">
+                <div id="facts_list_container" style="max-height:450px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding:6px; background:#ffffff; border:1px solid #bbf7d0; border-radius:8px;">
                     <!-- Dynamically rendered fact items -->
                 </div>
             </div>
@@ -815,6 +913,10 @@
                 const res = await fetch('/api/tv/facts');
                 const data = await res.json();
                 globalFactsList = data.facts || [];
+                const speedSelect = document.getElementById('facts_cycle_speed');
+                if (speedSelect && data.cycle_speed) {
+                    speedSelect.value = String(data.cycle_speed);
+                }
                 renderTvFactsList();
             } catch(e) {
                 console.error("Facts load error:", e);
@@ -836,19 +938,44 @@
             let html = '';
             globalFactsList.forEach((f, idx) => {
                 const isChecked = f.enabled !== false ? 'checked' : '';
+                const titleEn = (f.title_en || f.title || '').replace(/"/g, '&quot;');
+                const textEn = f.text_en || f.text || '';
+                const titleRu = (f.title_ru || '').replace(/"/g, '&quot;');
+                const textRu = f.text_ru || '';
+                const icon = f.icon || '🏛️';
+                const curColor = f.color || '#0F172A';
+
                 html += `
-                    <div style="display:flex; gap:10px; align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px;">
+                    <div style="display:flex; gap:10px; align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:8px;">
                         <span style="font-weight:bold; color:#64748b; font-size:0.85rem; width:24px; text-align:right; margin-top:6px; flex-shrink:0;">${idx+1}.</span>
-                        <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
-                            <div style="display:flex; gap:8px; align-items:center;">
-                                <span style="font-size:1.1rem;">${f.icon || '💡'}</span>
-                                <input type="text" id="fact_title_${idx}" value="${(f.title || '').replace(/"/g, '&quot;')}" placeholder="Başlık (Örn: Galata Kulesi)" style="flex:1; padding:4px 8px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700; font-size:0.9rem;">
+                        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+                            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                <input type="text" id="fact_icon_${idx}" value="${icon}" style="width:36px; text-align:center; font-size:1.1rem; padding:4px; border:1px solid #cbd5e1; border-radius:4px;" title="Emoji / İkon">
+                                <span style="font-weight:bold; color:#1e40af; font-size:0.85rem;">🇬🇧 EN:</span>
+                                <input type="text" id="fact_title_en_${idx}" value="${titleEn}" placeholder="English Title (e.g. Galata Tower)" style="flex:1; min-width:180px; padding:4px 8px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700; font-size:0.9rem;">
+                                
+                                <!-- Renk Seçimi -->
+                                <select id="fact_color_${idx}" style="padding:4px 8px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700; font-size:0.85rem; background:#ffffff;">
+                                    <option value="#0F172A" ${curColor==='#0F172A'?'selected':''}>⚫ Standart (Koyu)</option>
+                                    <option value="#DC2626" ${curColor==='#DC2626'?'selected':''}>🔴 Kırmızı (Özel/Acil)</option>
+                                    <option value="#16A34A" ${curColor==='#16A34A'?'selected':''}>🟢 Yeşil (Fırınna)</option>
+                                    <option value="#2563EB" ${curColor==='#2563EB'?'selected':''}>🔵 Mavi (Kültür)</option>
+                                    <option value="#D97706" ${curColor==='#D97706'?'selected':''}>🟠 Turuncu/Amber</option>
+                                    <option value="#7C3AED" ${curColor==='#7C3AED'?'selected':''}>🟣 Mor (VIP)</option>
+                                </select>
+
                                 <label style="display:flex; align-items:center; gap:4px; font-size:0.8rem; color:#15803d; font-weight:bold; cursor:pointer;">
                                     <input type="checkbox" id="fact_enabled_${idx}" ${isChecked} style="width:1rem; height:1rem;">
                                     <span>Yayında</span>
                                 </label>
                             </div>
-                            <textarea id="fact_text_${idx}" rows="2" style="width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.88rem; font-family:sans-serif;">${f.text || ''}</textarea>
+                            <textarea id="fact_text_en_${idx}" rows="2" placeholder="English text..." style="width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.88rem; font-family:sans-serif;">${textEn}</textarea>
+                            
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <span style="font-weight:bold; color:#b91c1c; font-size:0.85rem; width:36px; text-align:center;">🇷🇺 RU:</span>
+                                <input type="text" id="fact_title_ru_${idx}" value="${titleRu}" placeholder="Russian Title (e.g. Галатская башня)" style="flex:1; padding:4px 8px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700; font-size:0.9rem;">
+                            </div>
+                            <textarea id="fact_text_ru_${idx}" rows="2" placeholder="Russian text..." style="width:100%; box-sizing:border-box; padding:6px 8px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.88rem; font-family:sans-serif;">${textRu}</textarea>
                         </div>
                         <button type="button" onclick="deleteFact(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.8rem; margin-top:2px;" title="Bu bilgiyi sil">
                             🗑️
@@ -862,9 +989,12 @@
         function addNewFact() {
             globalFactsList.unshift({
                 id: 'dyk_' + Date.now(),
-                icon: '💡',
-                title: 'Yeni Bilgi',
-                text: 'Buraya bilginin detayını yazın...',
+                icon: '🏛️',
+                color: '#DC2626',
+                title_en: 'Özel Duyuru / Custom Notice',
+                text_en: 'Buraya duyuru veya bilgi metnini yazın...',
+                title_ru: 'Специальное объявление',
+                text_ru: 'Напишите текст на русском...',
                 enabled: true
             });
             renderTvFactsList();
@@ -878,23 +1008,33 @@
 
         async function saveFactsToServer() {
             globalFactsList.forEach((f, idx) => {
-                const titleInput = document.getElementById(`fact_title_${idx}`);
-                const textInput = document.getElementById(`fact_text_${idx}`);
+                const iconInput = document.getElementById(`fact_icon_${idx}`);
+                const colorInput = document.getElementById(`fact_color_${idx}`);
+                const titleEnInput = document.getElementById(`fact_title_en_${idx}`);
+                const textEnInput = document.getElementById(`fact_text_en_${idx}`);
+                const titleRuInput = document.getElementById(`fact_title_ru_${idx}`);
+                const textRuInput = document.getElementById(`fact_text_ru_${idx}`);
                 const enabledInput = document.getElementById(`fact_enabled_${idx}`);
-                if (titleInput) f.title = titleInput.value.trim();
-                if (textInput) f.text = textInput.value.trim();
+
+                if (iconInput) f.icon = iconInput.value.trim() || '🏛️';
+                if (colorInput) f.color = colorInput.value;
+                if (titleEnInput) f.title_en = titleEnInput.value.trim();
+                if (textEnInput) f.text_en = textEnInput.value.trim();
+                if (titleRuInput) f.title_ru = titleRuInput.value.trim();
+                if (textRuInput) f.text_ru = textRuInput.value.trim();
                 if (enabledInput) f.enabled = enabledInput.checked;
             });
 
+            const speedVal = document.getElementById('facts_cycle_speed') ? document.getElementById('facts_cycle_speed').value : '8';
             try {
                 const res = await fetch('/api/tv/facts/save', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({facts: globalFactsList})
+                    body: JSON.stringify({facts: globalFactsList, cycle_speed: speedVal})
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert(`✅ ${globalFactsList.length} adet "Biliyor Muydunuz?" bilgisi kaydedildi ve yayına verildi!`);
+                    alert(`✅ ${globalFactsList.length} adet İngilizce & Rusça kültür bilgisi kaydedildi ve yayına verildi!`);
                     fetch('/api/tv/push', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -908,9 +1048,132 @@
             }
         }
 
+        // ==========================================
+        // CELEBRATION / BIRTHDAY ADMIN MANAGEMENT
+        // ==========================================
+        async function loadCelebrationSettings() {
+            try {
+                const res = await fetch('/api/tv/celebration');
+                const data = await res.json();
+                if (!data) return;
+
+                const activeCheck = document.getElementById('celeb_active');
+                const titleInput = document.getElementById('celeb_title');
+                const subInput = document.getElementById('celeb_subtitle');
+                const urlInput = document.getElementById('celeb_image_url');
+                const ballCheck = document.getElementById('celeb_eff_balloons');
+                const fireCheck = document.getElementById('celeb_eff_fireworks');
+                const confCheck = document.getElementById('celeb_eff_confetti');
+
+                if (activeCheck) activeCheck.checked = !!data.active;
+                if (titleInput) titleInput.value = data.title || '';
+                if (subInput) subInput.value = data.subtitle || '';
+                if (urlInput) urlInput.value = data.image_url || '';
+
+                if (data.effects) {
+                    if (ballCheck) ballCheck.checked = data.effects.balloons !== false;
+                    if (fireCheck) fireCheck.checked = data.effects.fireworks !== false;
+                    if (confCheck) confCheck.checked = data.effects.confetti !== false;
+                }
+                updateCelebrationPreview();
+            } catch(e) {
+                console.error("Celebration load error:", e);
+            }
+        }
+
+        function updateCelebrationPreview() {
+            const url = document.getElementById('celeb_image_url') ? document.getElementById('celeb_image_url').value.trim() : '';
+            const previewImg = document.getElementById('celeb_img_preview');
+            const noImgTxt = document.getElementById('celeb_no_img_txt');
+            if (url && previewImg) {
+                previewImg.src = url;
+                previewImg.style.display = 'block';
+                if (noImgTxt) noImgTxt.style.display = 'none';
+            } else {
+                if (previewImg) previewImg.style.display = 'none';
+                if (noImgTxt) noImgTxt.style.display = 'block';
+            }
+        }
+
+        async function uploadCelebrationPhoto(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('/api/tv/watermark/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success && data.url) {
+                    document.getElementById('celeb_image_url').value = data.url;
+                    updateCelebrationPreview();
+                    alert("✅ Fotoğraf başarıyla yüklendi!");
+                } else {
+                    alert("❌ Yükleme başarısız: " + (data.error || 'Bilinmeyen hata'));
+                }
+            } catch(e) {
+                alert("❌ Yükleme sırasında hata oluştu.");
+            }
+        }
+
+        function clearCelebrationPhoto() {
+            document.getElementById('celeb_image_url').value = '';
+            updateCelebrationPreview();
+        }
+
+        async function onCelebrationToggleChange(isActive) {
+            if (isActive) {
+                if (!confirm("📌 Doğum günü / kutlama modunu TV'de sabitleyip canlı yayına vermek istiyor musunuz?")) {
+                    document.getElementById('celeb_active').checked = false;
+                    return;
+                }
+            }
+            await saveCelebrationSettings(true);
+        }
+
+        async function saveCelebrationSettings(silent = false) {
+            const payload = {
+                active: document.getElementById('celeb_active') ? document.getElementById('celeb_active').checked : false,
+                title: document.getElementById('celeb_title') ? document.getElementById('celeb_title').value.trim() : '',
+                subtitle: document.getElementById('celeb_subtitle') ? document.getElementById('celeb_subtitle').value.trim() : '',
+                image_url: document.getElementById('celeb_image_url') ? document.getElementById('celeb_image_url').value.trim() : '',
+                effects: {
+                    balloons: document.getElementById('celeb_eff_balloons') ? document.getElementById('celeb_eff_balloons').checked : true,
+                    fireworks: document.getElementById('celeb_eff_fireworks') ? document.getElementById('celeb_eff_fireworks').checked : true,
+                    confetti: document.getElementById('celeb_eff_confetti') ? document.getElementById('celeb_eff_confetti').checked : true
+                }
+            };
+
+            try {
+                const res = await fetch('/api/tv/celebration/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (!silent) {
+                        const statusTxt = payload.active ? "SABİTLENDİ & YAYINDA! 🎉" : "Kaydedildi (Mod Kapalı).";
+                        alert(`✅ Kutlama ayarları ${statusTxt}`);
+                    }
+                    fetch('/api/tv/push', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({action: 'reload', client_id: 'all'})
+                    });
+                }
+            } catch(e) {
+                if (!silent) alert("❌ Kayıt sırasında hata oluştu.");
+            }
+        }
+
         loadSettings();
         fetchClients();
         loadTvFactsAdmin();
+        loadCelebrationSettings();
         setInterval(fetchClients, 4000);
     </script>
 </body>
