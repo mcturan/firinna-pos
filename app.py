@@ -3492,10 +3492,15 @@ def api_tv_settings():
         data = request.json
         current = get_tv_settings()
         current.update(data)
-        # Update config version timestamp so TV detects push immediately
-        current['version'] = int(datetime.now().timestamp() * 1000)
+        now_ts = int(datetime.now().timestamp() * 1000)
+        current['version'] = now_ts
+        current['last_push'] = {
+            "action": "clear_cache",
+            "target": "all",
+            "timestamp": now_ts
+        }
         save_tv_settings(current)
-        return jsonify({"success": True, "version": current['version']})
+        return jsonify({"success": True, "version": current['version'], "pushed": current['last_push']})
     return jsonify(get_tv_settings())
 
 # In-memory TV clients registry: { client_id: { ip, device_type, user_agent, last_ping, name } }
@@ -3509,13 +3514,10 @@ def api_tv_ping():
             data = request.get_json(silent=True) or {}
     except Exception:
         pass
-    client_id = data.get('client_id', 'unknown')
-    device_type = data.get('device_type', 'TV / Browser')
-    screen_name = data.get('name', 'Ekran')
     
     user_agent = request.headers.get('User-Agent', '')
     ip_addr = request.remote_addr
-    
+
     # Auto-detect device type if not provided
     ua_lower = user_agent.lower()
     if 'android' in ua_lower and 'tv' in ua_lower:
@@ -3524,11 +3526,26 @@ def api_tv_ping():
         detected_type = '📱 Mobil (Telefon/Tablet)'
     else:
         detected_type = '💻 Web / Masaüstü'
-        
+
+    device_type = data.get('device_type') or detected_type
+    screen_name = data.get('name', 'Ekran')
+    
+    # Deterministic client_id fallback if missing
+    client_id = data.get('client_id')
+    if not client_id or client_id == 'unknown':
+        import hashlib
+        raw_key = f"{ip_addr}_{user_agent}"
+        client_id = f"tv_{hashlib.md5(raw_key.encode()).hexdigest()[:8]}"
+
+    # Deduplicate: if another entry has the SAME IP and device_type, clean it up so physical devices are never duplicated
+    for old_cid, old_info in list(_tv_clients.items()):
+        if old_cid != client_id and old_info.get('ip') == ip_addr and old_info.get('device_type') == device_type:
+            del _tv_clients[old_cid]
+
     _tv_clients[client_id] = {
         'client_id': client_id,
         'ip': ip_addr,
-        'device_type': device_type if device_type != 'TV / Browser' else detected_type,
+        'device_type': device_type,
         'name': screen_name,
         'user_agent': user_agent,
         'last_ping': datetime.now().isoformat(),
@@ -3538,12 +3555,16 @@ def api_tv_ping():
     current = get_tv_settings()
     current['last_ping'] = datetime.now().isoformat()
     save_tv_settings(current)
-    return jsonify({"success": True})
+    return jsonify({"success": True, "client_id": client_id})
 
 @app.route('/api/tv/clients', methods=['GET'])
 def api_tv_clients():
     now_ts = time.time()
-    # Filter active clients in the last 60 seconds
+    # Purge entries older than 30 minutes
+    for cid, info in list(_tv_clients.items()):
+        if (now_ts - info.get('last_ping_ts', 0)) > 1800:
+            del _tv_clients[cid]
+
     active_list = []
     for cid, info in list(_tv_clients.items()):
         is_online = (now_ts - info.get('last_ping_ts', 0)) < 45
@@ -3556,7 +3577,17 @@ def api_tv_clients():
             'is_online': is_online,
             'seconds_ago': int(now_ts - info.get('last_ping_ts', 0))
         })
+    # Sort online first, then by most recent ping
+    active_list.sort(key=lambda x: (not x['is_online'], x['seconds_ago']))
     return jsonify({"clients": active_list})
+
+@app.route('/api/tv/clients/clean', methods=['POST'])
+def api_tv_clients_clean():
+    now_ts = time.time()
+    for cid, info in list(_tv_clients.items()):
+        if (now_ts - info.get('last_ping_ts', 0)) >= 45:
+            del _tv_clients[cid]
+    return jsonify({"success": True, "remaining": len(_tv_clients)})
 
 @app.route('/api/tv/push', methods=['POST'])
 def api_tv_push():

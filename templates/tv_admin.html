@@ -36,6 +36,9 @@
                     <small style="color:#64748b;">Sisteme canlı bağlı TV'ler, tabletler ve telefonlar</small>
                 </div>
                 <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <button type="button" onclick="cleanOfflineClients()" style="background:#475569; color:white; border:none; padding:0.5rem 0.9rem; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.85rem;" title="Çevrimdışı eski kayıtları listeden siler">
+                        🧹 Çevrimdışıları Temizle
+                    </button>
                     <button type="button" onclick="pushInstantUpdate('sync', 'all')" style="background:#2563eb; color:white; border:none; padding:0.5rem 1rem; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.88rem;">
                         ⚡ Tümüne Push Et
                     </button>
@@ -48,9 +51,33 @@
                 </div>
             </div>
 
-            <div id="connected_clients_list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px;">
+            <div id="connected_clients_list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px; margin-bottom:14px;">
                 <div style="color:#94a3b8; font-size:0.9rem; padding:10px; background:#f8fafc; border-radius:6px; text-align:center;">
                     Bağlı cihazlar taranıyor...
+                </div>
+            </div>
+
+            <!-- Live TV Screen Preview Mini TV (Canlı Ekran Önizleme) -->
+            <div style="background:#0f172a; border-radius:10px; border:2px solid #334155; padding:14px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:1.4rem;">📺</span>
+                        <h3 style="margin:0; font-size:1.05rem; color:#f8fafc; font-weight:800;">
+                            Canlı Tabela TV Önizleme Ekranı
+                        </h3>
+                        <span style="background:#16a34a; color:#ffffff; font-size:0.75rem; padding:2px 8px; border-radius:10px; font-weight:bold;">CANLI YAYIN</span>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button type="button" onclick="refreshTvPreview()" style="background:#334155; color:#cbd5e1; border:1px solid #475569; padding:4px 10px; border-radius:4px; font-size:0.8rem; cursor:pointer; font-weight:bold;">
+                            🔄 Önizlemeyi Yenile
+                        </button>
+                        <a href="/tv" target="_blank" style="background:#2563eb; color:#ffffff; text-decoration:none; padding:4px 12px; border-radius:4px; font-size:0.8rem; font-weight:bold; display:inline-flex; align-items:center; gap:4px;">
+                            🔗 Tam Ekranda Aç ↗️
+                        </a>
+                    </div>
+                </div>
+                <div style="width:100%; aspect-ratio:16/9; background:#000000; border-radius:8px; overflow:hidden; border:2px solid #1e293b; position:relative; box-shadow:inset 0 0 20px rgba(0,0,0,0.8);">
+                    <iframe id="tv_live_preview_iframe" src="/tv" style="width:100%; height:100%; border:none; pointer-events:auto;" allow="autoplay; fullscreen"></iframe>
                 </div>
             </div>
         </div>
@@ -158,101 +185,38 @@
         </div>
 
         <div id="filigran" class="tv-pane card">
-            <h3 style="margin-top:0; color:#1e293b;">💎 Filigran Döngüsü & Özel Kutlama Kartları</h3>
-            <p style="font-size:0.88rem; color:#718096; margin-bottom:1.5rem;">
-                Videonun üzerinde periyodik olarak beliren kurumsal filigranlar ve özel doğum günü/kutlama modları.
-            </p>
-
-            <!-- CELEBRATION / BIRTHDAY PINNED CARD CONTAINER -->
-            <div style="background:linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%); border:2px solid #e879f9; border-radius:12px; padding:18px; margin-bottom:1.8rem; box-shadow:0 4px 12px rgba(217, 70, 239, 0.12);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:2rem;">🎂</span>
-                        <div>
-                            <h4 style="margin:0; color:#86198f; font-size:1.15rem; font-weight:800;">Doğum Günü & Özel Kutlama Modu (Sabitle)</h4>
-                            <span style="font-size:0.84rem; color:#a21caf;">Bu mod açıldığında video üzerinde kutlama kartı sabitlenir ve tüm ekranda uçuşan balonlar, havai fişekler ve konfetiler oynar!</span>
-                        </div>
-                    </div>
-                    <div>
-                        <label style="display:inline-flex; align-items:center; gap:8px; background:#ffffff; padding:8px 16px; border-radius:24px; border:2.5px solid #d946ef; font-weight:800; color:#86198f; cursor:pointer; font-size:0.95rem; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                            <input type="checkbox" id="celeb_active" style="width:1.3rem; height:1.3rem; accent-color:#d946ef; cursor:pointer;" onchange="onCelebrationToggleChange(this.checked)">
-                            <span>📌 KUTLAMAYI TV'DE SABİTLE</span>
-                        </label>
-                    </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h3 style="margin:0; color:#1e293b;">💎 Video Filigranları & Özel Kutlama/Duyuru Kartları</h3>
+                    <p style="font-size:0.88rem; color:#64748b; margin-top:4px; margin-bottom:0;">
+                        Videonun üzerinde periyodik olarak beliren veya sabitlenebilen kurumsal kartlar, logolar ve doğum günü afişleri.
+                    </p>
                 </div>
-
-                <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:16px; margin-bottom:14px;">
-                    <!-- Fotoğraf Yükleme -->
-                    <div style="background:#ffffff; border:1px solid #f0abfc; border-radius:8px; padding:12px;">
-                        <label style="font-weight:700; color:#86198f; font-size:0.9rem; display:block; margin-bottom:6px;">📸 Kutlama Fotoğrafı / Görseli:</label>
-                        <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
-                            <input type="file" id="celeb_file_input" accept="image/*" style="display:none;" onchange="uploadCelebrationPhoto(this)">
-                            <button type="button" onclick="document.getElementById('celeb_file_input').click()" style="background:#d946ef; color:white; border:none; padding:6px 12px; border-radius:6px; font-weight:700; font-size:0.85rem; cursor:pointer;">
-                                📤 Fotoğraf Seç & Yükle
-                            </button>
-                            <button type="button" onclick="clearCelebrationPhoto()" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca; padding:6px 10px; border-radius:6px; font-weight:700; font-size:0.85rem; cursor:pointer;">
-                                🗑️ Kaldır
-                            </button>
-                        </div>
-                        <input type="text" id="celeb_image_url" placeholder="/static/img/watermarks/..." style="width:100%; padding:6px 8px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.82rem; margin-bottom:6px;" oninput="updateCelebrationPreview()">
-                        <div id="celeb_preview_wrap" style="width:100%; height:110px; border-radius:6px; border:1px dashed #d946ef; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#faf5ff;">
-                            <img id="celeb_img_preview" src="" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
-                            <span id="celeb_no_img_txt" style="color:#c084fc; font-size:0.85rem;">Fotoğraf seçildiğinde burada görünür</span>
-                        </div>
-                    </div>
-
-                    <!-- Başlık & Mesaj -->
-                    <div style="display:flex; flex-direction:column; gap:10px;">
-                        <div>
-                            <label style="font-weight:700; color:#86198f; font-size:0.9rem; display:block; margin-bottom:4px;">🎉 Kutlama Başlığı:</label>
-                            <input type="text" id="celeb_title" placeholder="Örn: 🎂 İyi ki Doğdun Zeynep! 🎉" style="width:100%; padding:8px 12px; border:1.5px solid #d946ef; border-radius:6px; font-weight:800; font-size:1rem; color:#86198f; background:#ffffff;">
-                        </div>
-                        <div>
-                            <label style="font-weight:700; color:#86198f; font-size:0.9rem; display:block; margin-bottom:4px;">💌 Kutlama & Tebrik Mesajı:</label>
-                            <textarea id="celeb_subtitle" rows="3" placeholder="Fırınna ailesi olarak sağlıklı, mutlu ve neşeli yaşlar dileriz! 🎈" style="width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.9rem; font-family:sans-serif;"></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed #f0abfc; padding-top:12px;">
-                    <div style="display:flex; gap:14px; align-items:center;">
-                        <label style="display:flex; align-items:center; gap:5px; font-size:0.88rem; font-weight:700; color:#86198f; cursor:pointer;">
-                            <input type="checkbox" id="celeb_eff_balloons" checked style="accent-color:#d946ef;"> 🎈 Yükselen Balonlar
-                        </label>
-                        <label style="display:flex; align-items:center; gap:5px; font-size:0.88rem; font-weight:700; color:#86198f; cursor:pointer;">
-                            <input type="checkbox" id="celeb_eff_fireworks" checked style="accent-color:#d946ef;"> 🎆 Havai Fişekler
-                        </label>
-                        <label style="display:flex; align-items:center; gap:5px; font-size:0.88rem; font-weight:700; color:#86198f; cursor:pointer;">
-                            <input type="checkbox" id="celeb_eff_confetti" checked style="accent-color:#d946ef;"> 🎊 Dökülen Konfetiler
-                        </label>
-                    </div>
-                    <button type="button" onclick="saveCelebrationSettings()" style="background:#86198f; color:white; border:none; padding:8px 20px; border-radius:6px; font-weight:800; cursor:pointer; font-size:0.92rem; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(134, 25, 143, 0.25);">
-                        💾 Kutlamayı Kaydet & TV'ye Gönder
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button type="button" onclick="addWatermarkCard()" style="background:#059669; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                        ➕ Yeni Kart Ekle
+                    </button>
+                    <button type="button" onclick="saveSettings()" style="background:#2563eb; color:white; border:none; padding:8px 18px; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                        💾 Filigranları Kaydet & TV'ye Gönder
                     </button>
                 </div>
             </div>
 
+            <!-- Döngü Süre Ayarları -->
             <div class="form-group" style="background:#f8fafc; padding:16px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:1.5rem; display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
                 <div>
-                    <label style="font-weight:bold; color:#1a202c; display:block; margin-bottom:6px;">⏱️ Döngü Aralığı (Saniyede bir)</label>
-                    <input type="number" id="wm_interval_sec" value="90" min="10" max="600" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
-                    <small style="color:#718096;">Varsayılan: 90 saniye</small>
+                    <label style="font-weight:bold; color:#1a202c; display:block; margin-bottom:6px;">⏱️ Döngü Aralığı (Saniyede bir çıksın)</label>
+                    <input type="number" id="wm_interval_sec" value="90" min="5" max="600" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
+                    <small style="color:#718096;">Örnek: 90 saniye (Kartsız aralık)</small>
                 </div>
                 <div>
                     <label style="font-weight:bold; color:#1a202c; display:block; margin-bottom:6px;">⏳ Ekranda Kalma Süresi (Saniye)</label>
-                    <input type="number" id="wm_duration_sec" value="10" min="3" max="60" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
-                    <small style="color:#718096;">Varsayılan: 10 saniye</small>
+                    <input type="number" id="wm_duration_sec" value="12" min="3" max="120" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
+                    <small style="color:#718096;">Örnek: 12 saniye boyunca ekranda durur</small>
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <h4 style="margin:0; color:#2d3748;">Filigran Kartları Listesi</h4>
-                <button type="button" onclick="addWatermarkCard()" style="background:#059669; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:6px;">
-                    ➕ Yeni Filigran Kartı Ekle
-                </button>
-            </div>
-
-            <div id="watermark_cards_container" style="display:flex; flex-direction:column; gap:14px;">
+            <div id="watermark_cards_container" style="display:flex; flex-direction:column; gap:16px;">
                 <!-- Dinamik Kartlar JS ile Yüklenecek -->
             </div>
         </div>
@@ -546,69 +510,69 @@
                 const res = await fetch('/api/tv/settings');
                 const data = await res.json();
                 
-                document.getElementById('logo_url').value = data.logo_url || '';
-                document.getElementById('media_source').value = data.media_source || 'youtube';
-                document.getElementById('video_playlist').value = data.video_playlist || '';
-                localVideos = (data.local_videos && data.local_videos.length > 0) ? data.local_videos : ['/static/tv_media/videos/2.mp4'];
-                localAudio = data.local_audio || [];
-                document.getElementById('audio_priority').value = data.audio_priority || 'video';
-                document.getElementById('ticker_text_enabled').checked = (data.ticker_text_enabled !== false);
-                document.getElementById('ticker_currency_enabled').checked = (data.ticker_currency_enabled !== false);
-                document.getElementById('ticker_rss_enabled').checked = (data.ticker_rss_enabled !== false);
-                document.getElementById('ticker_effect').value = data.ticker_effect || 'marquee';
-                document.getElementById('ticker_speed').value = (data.ticker_speed !== undefined) ? String(data.ticker_speed) : '4.5';
-                document.getElementById('ticker_slide_duration').value = data.ticker_slide_duration || 8;
-                onTickerEffectChange();
+                const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+                const setChecked = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
 
-                document.getElementById('rss_turkey_archaeo_enabled').checked = (data.rss_turkey_archaeo_enabled !== false);
-                document.getElementById('rss_ds_arts_en_enabled').checked = (data.rss_ds_arts_en_enabled !== false);
-                document.getElementById('rss_aa_life_en_enabled').checked = (data.rss_aa_life_en_enabled !== false);
-                document.getElementById('rss_turkey_exp_en_enabled').checked = (data.rss_turkey_exp_en_enabled !== false);
-                document.getElementById('rss_goodnews_en_enabled').checked = (data.rss_goodnews_en_enabled !== false);
-                document.getElementById('rss_custom_enabled').checked = !!data.rss_custom_enabled;
-                document.getElementById('rss_refresh_mins').value = data.rss_refresh_mins || 60;
-                document.getElementById('rss_url').value = data.rss_url || '';
-                document.getElementById('promo_text').value = data.promo_text || '';
-                
-                document.getElementById('qr_code').value = data.qr_code || '';
-                document.getElementById('qr_text').value = data.qr_text || '';
-                document.getElementById('w_weather').checked = data.widgets?.weather;
-                document.getElementById('w_clock').checked = data.widgets?.clock;
+                setVal('logo_url', data.logo_url || '');
+                setVal('media_source', data.media_source || 'local');
+                setVal('video_playlist', data.video_playlist || '');
+                localVideos = (data.local_videos && data.local_videos.length > 0) ? data.local_videos : ['/static/tv_media/videos/1.mp4', '/static/tv_media/videos/bayrak.mp4'];
+                localAudio = data.local_audio || [];
+                setVal('audio_priority', data.audio_priority || 'video');
+                setChecked('ticker_text_enabled', data.ticker_text_enabled !== false);
+                setChecked('ticker_currency_enabled', data.ticker_currency_enabled !== false);
+                setChecked('ticker_rss_enabled', data.ticker_rss_enabled !== false);
+                setVal('ticker_effect', data.ticker_effect || 'marquee');
+                setVal('ticker_slide_duration', data.ticker_slide_duration || 8);
+                setVal('promo_text', data.promo_text || '');
+                setVal('qr_code', data.qr_code || '');
+                setVal('qr_text', data.qr_text || '');
+                setChecked('w_weather', data.widgets?.weather);
+                setChecked('w_clock', data.widgets?.clock);
 
                 // Filigran Döngüsü Ayarları
                 const wm = data.watermark_cycle || {};
-                document.getElementById('wm_interval_sec').value = wm.interval_sec || 90;
-                document.getElementById('wm_duration_sec').value = wm.duration_sec || 12;
+                setVal('wm_interval_sec', wm.interval_sec || 90);
+                setVal('wm_duration_sec', wm.duration_sec || 12);
                 
                 const defaultCards = [
-                    { id: 'wm-card-0', title: '1. Fırınna Logo & Slogan', desc: 'Klasik büyük logo ve www.firinna.com filigranı', image: '/static/img/watermarks/card_0_logo.png', enabled: true },
-                    { id: 'wm-card-1', title: '2. Follow Us on Social Media', desc: 'Instagram, TikTok, Google Maps ve Yandex Maps rozetleri', image: '/static/img/watermarks/card_1_social.png', enabled: true },
-                    { id: 'wm-card-2', title: '3. Fırınna Supports Students', desc: 'Beyoğlu Öğrenciye projesi, ücretsiz yemek ve burs desteği', image: '/static/img/watermarks/card_2_students.png', enabled: true },
-                    { id: 'wm-card-3', title: '4. Fırınna Cares for Stray Animals', desc: 'Sokak hayvanları mama, su ve yuva desteği', image: '/static/img/watermarks/card_3_animals.png', enabled: true }
+                    { id: 'wm-card-0', title: '1. Fırınna Logo & Slogan', desc: 'Klasik büyük logo ve www.firinna.com filigranı', image: '/static/img/watermarks/card_0_logo.png', enabled: true, is_pinned: false, effects: {balloons: false, fireworks: false, confetti: false} },
+                    { id: 'wm-card-1', title: '2. Follow Us on Social Media', desc: 'Instagram, TikTok, Google Maps ve Yandex Maps rozetleri', image: '/static/img/watermarks/card_1_social.png', enabled: true, is_pinned: false, effects: {balloons: false, fireworks: false, confetti: false} },
+                    { id: 'wm-card-2', title: '3. Fırınna Supports Students', desc: 'Beyoğlu Öğrenciye projesi, ücretsiz yemek ve burs desteği', image: '/static/img/watermarks/card_2_students.png', enabled: true, is_pinned: false, effects: {balloons: false, fireworks: false, confetti: false} },
+                    { id: 'wm-card-3', title: '4. Fırınna Cares for Stray Animals', desc: 'Sokak hayvanları mama, su ve yuva desteği', image: '/static/img/watermarks/card_3_animals.png', enabled: true, is_pinned: false, effects: {balloons: false, fireworks: false, confetti: false} }
                 ];
 
                 // Render Watermark Cards
                 renderWatermarkCards((wm.cards && wm.cards.length > 0) ? wm.cards : defaultCards);
 
-                document.getElementById('messages_container').innerHTML = '';
-                (data.messages || []).forEach(m => {
-                    addMessage(m.text, m.start_time, m.end_time);
-                    const rows = document.querySelectorAll('.message-row');
-                    const lastRow = rows[rows.length-1];
-                    lastRow.querySelector('.m-image').value = m.image || '';
-                });
+                const msgCont = document.getElementById('messages_container');
+                if (msgCont) {
+                    msgCont.innerHTML = '';
+                    (data.messages || []).forEach(m => {
+                        addMessage(m.text, m.start_time, m.end_time);
+                        const rows = document.querySelectorAll('.message-row');
+                        const lastRow = rows[rows.length-1];
+                        if (lastRow) {
+                            const imgInp = lastRow.querySelector('.m-image');
+                            if (imgInp) imgInp.value = m.image || '';
+                        }
+                    });
+                }
 
                 toggleSource();
+                await fetchLocalMedia();
 
                 if (data.last_ping) {
                     const diff = (new Date() - new Date(data.last_ping)) / 1000;
                     const pStatus = document.getElementById('pingStatus');
-                    if (diff < 40) {
-                        pStatus.textContent = '🟢 Çevrimiçi (Ekran Açık)';
-                        pStatus.style.color = '#047857';
-                    } else {
-                        pStatus.textContent = `🔴 Çevrimdışı (Son görülme: ${Math.floor(diff/60)} dk önce)`;
-                        pStatus.style.color = '#dc2626';
+                    if (pStatus) {
+                        if (diff < 40) {
+                            pStatus.textContent = '🟢 Çevrimiçi (Ekran Açık)';
+                            pStatus.style.color = '#047857';
+                        } else {
+                            pStatus.textContent = `🔴 Çevrimdışı (Son görülme: ${Math.floor(diff/60)} dk önce)`;
+                            pStatus.style.color = '#dc2626';
+                        }
                     }
                 }
             } catch(e) {
@@ -625,50 +589,114 @@
             container.innerHTML = '';
 
             currentWatermarkCards.forEach((c, idx) => {
+                const isEnabled = c.enabled !== false;
+                const isPinned = !!c.is_pinned;
+                
+                // Determine active effect
+                let currentEffect = c.effect;
+                if (!currentEffect) {
+                    if (c.effects?.balloons && c.effects?.fireworks && c.effects?.confetti) currentEffect = 'all_celebration';
+                    else if (c.effects?.balloons) currentEffect = 'balloons';
+                    else if (c.effects?.fireworks) currentEffect = 'fireworks';
+                    else if (c.effects?.confetti) currentEffect = 'confetti';
+                    else currentEffect = 'none';
+                }
+
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'wm-setting-card';
-                cardDiv.style.cssText = "border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; background:#ffffff; display:flex; flex-direction:column; gap:12px; position:relative;";
+                cardDiv.style.cssText = `border:${isPinned ? '2.5px solid #d946ef' : '1.5px solid #e2e8f0'}; border-radius:10px; padding:16px; background:${isPinned ? '#fdf4ff' : '#ffffff'}; display:flex; flex-direction:column; gap:12px; position:relative; box-shadow:${isPinned ? '0 4px 14px rgba(217,70,239,0.18)' : '0 2px 6px rgba(0,0,0,0.04)'};`;
                 cardDiv.innerHTML = `
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                        <div style="display:flex; align-items:center; gap:10px; flex:1;">
-                            <span style="font-size:1.5rem;">🖼️</span>
-                            <input type="text" class="wm-card-title" value="${c.title || ''}" placeholder="Kart Başlığı" style="font-weight:bold; font-size:1rem; color:#1a202c; width:55%; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1;">
+                    ${isPinned ? `
+                    <div style="background:#f5d0fe; color:#86198f; font-weight:800; font-size:0.85rem; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:6px; margin-bottom:2px; border:1px solid #f0abfc;">
+                        <span>📌 SABİTLENDİ (SADECE BU KART TV'DE SÜREKLİ YAYINDA)</span>
+                    </div>` : ''}
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:260px;">
+                            <span style="font-size:1.4rem;">${isPinned ? '📌' : '🖼️'}</span>
+                            <span style="font-weight:bold; color:#64748b; font-size:0.9rem;">${idx+1}.</span>
+                            <input type="text" class="wm-card-title" value="${(c.title || '').replace(/"/g, '&quot;')}" placeholder="Kart Başlığı (Örn: 🎂 Doğum Günü Kutlaması veya Logo)" style="font-weight:bold; font-size:0.95rem; color:#1e293b; flex:1; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1;">
                             <button type="button" onclick="moveWatermarkCard(${idx}, -1)" style="padding:4px 8px; border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; cursor:pointer;" title="Yukarı Taşı">⬆️</button>
                             <button type="button" onclick="moveWatermarkCard(${idx}, 1)" style="padding:4px 8px; border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; cursor:pointer;" title="Aşağı Taşı">⬇️</button>
                         </div>
-                        <div style="display:flex; align-items:center; gap:14px;">
-                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:bold; color:#2d6a4f; font-size:0.95rem;">
-                                <input type="checkbox" class="wm-card-enabled" ${c.enabled !== false ? 'checked' : ''} style="width:1.2rem; height:1.2rem; cursor:pointer;">
-                                <span>Aktif</span>
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <!-- Etkinleştirme Tiki -->
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:bold; color:#15803d; font-size:0.92rem; background:#f0fdf4; padding:5px 12px; border-radius:6px; border:1.5px solid #86efac;">
+                                <input type="checkbox" class="wm-card-enabled" ${isEnabled ? 'checked' : ''} style="width:1.15rem; height:1.15rem; cursor:pointer; accent-color:#16a34a;">
+                                <span>Etkin (Yayında)</span>
                             </label>
-                            <button type="button" onclick="deleteWatermarkCard(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">
+                            <!-- Tekli Sabitleme Tiki -->
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:bold; color:${isPinned ? '#86198f' : '#475569'}; font-size:0.92rem; background:${isPinned ? '#fae8ff' : '#f1f5f9'}; padding:5px 12px; border-radius:6px; border:1.5px solid ${isPinned ? '#d946ef' : '#cbd5e1'};" title="İşaretlendiğinde diğer tüm kartlar durur ve sadece bu kart video üzerinde sürekli sabit kalır">
+                                <input type="checkbox" class="wm-card-pinned" ${isPinned ? 'checked' : ''} onchange="onPinCardChange(${idx}, this.checked)" style="width:1.15rem; height:1.15rem; cursor:pointer; accent-color:#d946ef;">
+                                <span>${isPinned ? '📌 SABİTLENDİ' : '📌 TV\'de Sabitle'}</span>
+                            </label>
+                            <button type="button" onclick="deleteWatermarkCard(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem;">
                                 🗑️ Sil
                             </button>
                         </div>
                     </div>
 
-                    <div>
-                        <input type="text" class="wm-card-desc" value="${c.desc || ''}" placeholder="Kart Açıklaması (İsteğe bağlı)" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; font-size:0.9rem; color:#475569;">
-                    </div>
-
+                    <!-- Görsel ve Yükleme Satırı -->
                     <div style="display:flex; align-items:center; gap:16px; background:#f8fafc; padding:10px; border-radius:8px; border:1px dashed #cbd5e1;">
-                        <div style="width:140px; height:75px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                        <div style="width:140px; height:75px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
                             <img class="wm-card-img-preview" src="${c.image || '/static/uploads/logo.png'}" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="this.src='/static/uploads/logo.png'">
                         </div>
                         <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
                             <div style="display:flex; align-items:center; gap:10px;">
-                                <label style="background:#2563eb; color:white; padding:6px 14px; border-radius:6px; font-size:0.88rem; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-                                    📁 Fotoğraf / GIF Seç & Yükle
+                                <label style="background:#2563eb; color:white; padding:6px 14px; border-radius:6px; font-size:0.85rem; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                                    📁 Fotoğraf / Görsel Seç & Yükle
                                     <input type="file" accept="image/*" style="display:none;" onchange="uploadWatermarkImage(this, ${idx})">
                                 </label>
                                 <span class="wm-upload-status" style="font-size:0.85rem; color:#64748b;"></span>
                             </div>
-                            <input type="text" class="wm-card-image-url" value="${c.image || ''}" placeholder="Görsel URL (Örn: /static/img/watermarks/card_0_logo.png)" style="padding:4px 8px; border-radius:4px; border:1px solid #e2e8f0; font-size:0.82rem; color:#64748b; width:100%;">
+                            <input type="text" class="wm-card-image-url" value="${c.image || ''}" placeholder="Görsel URL (Örn: /static/img/watermarks/card_0_logo.png)" style="padding:5px 8px; border-radius:4px; border:1px solid #e2e8f0; font-size:0.82rem; color:#64748b; width:100%;" oninput="updateCardImgPreview(this, ${idx})">
+                        </div>
+                    </div>
+
+                    <!-- Açıklama Metni (İsteğe Bağlı) -->
+                    <div>
+                        <input type="text" class="wm-card-desc" value="${(c.desc || '').replace(/"/g, '&quot;')}" placeholder="Açıklama / Tebrik Metni (İsteğe bağlı)" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; font-size:0.88rem; color:#475569; box-sizing:border-box;">
+                    </div>
+
+                    <!-- Süre ve Efekt Satırı -->
+                    <div style="display:flex; align-items:center; gap:16px; background:#f1f5f9; padding:8px 12px; border-radius:6px; border:1px solid #e2e8f0; flex-wrap:wrap;">
+                        <!-- Özel Süre Girişi (Öncelikli) -->
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span style="font-weight:bold; color:#334155; font-size:0.88rem;">⏱️ Bu Karta Özel Süre:</span>
+                            <input type="number" class="wm-card-duration" value="${c.duration_sec || ''}" placeholder="Genel (${document.getElementById('watermark_duration')?.value || 12} sn)" min="3" max="300" style="width:115px; padding:5px 8px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:bold; font-size:0.88rem; color:#1e293b; background:#fff;" title="Boş bırakılırsa genel varsayılan süre kullanılır. Sayı girilirse bu karta özel öncelikli süre geçerli olur.">
+                            <span style="font-size:0.82rem; color:#64748b; font-weight:600;">sn</span>
+                        </div>
+
+                        <!-- Tek Seçimli Efekt Dropdown Menüsü -->
+                        <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:240px;">
+                            <span style="font-weight:bold; color:#334155; font-size:0.88rem;">✨ Ekran Efekti:</span>
+                            <select class="wm-card-effect" style="padding:6px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:0.88rem; color:#1e293b; background:#ffffff; cursor:pointer; flex:1; max-width:400px;">
+                                <option value="none" ${currentEffect === 'none' ? 'selected' : ''}>🚫 Efekt Yok</option>
+                                <option value="balloons" ${currentEffect === 'balloons' ? 'selected' : ''}>🎈 Uçuşan Renkli Balonlar (Doğum Günü / Tebrik)</option>
+                                <option value="fireworks" ${currentEffect === 'fireworks' ? 'selected' : ''}>🎆 Patlayan Havai Fişekler (Kutlama)</option>
+                                <option value="confetti" ${currentEffect === 'confetti' ? 'selected' : ''}>🎊 Dökülen Renkli Konfetiler (Parti)</option>
+                                <option value="all_celebration" ${currentEffect === 'all_celebration' ? 'selected' : ''}>🎉 Karışık Kutlama (Balon + Konfeti + Fişek)</option>
+                            </select>
                         </div>
                     </div>
                 `;
                 container.appendChild(cardDiv);
             });
+        }
+
+        function onPinCardChange(targetIdx, isChecked) {
+            syncWatermarkCardInputs();
+            currentWatermarkCards.forEach((c, idx) => {
+                c.is_pinned = (idx === targetIdx && isChecked);
+            });
+            renderWatermarkCards(currentWatermarkCards);
+        }
+
+        function updateCardImgPreview(input, idx) {
+            const cardEls = document.querySelectorAll('.wm-setting-card');
+            if (cardEls[idx]) {
+                const preview = cardEls[idx].querySelector('.wm-card-img-preview');
+                if (preview) preview.src = input.value.trim() || '/static/uploads/logo.png';
+            }
         }
 
         function moveWatermarkCard(idx, dir) {
@@ -681,26 +709,69 @@
             renderWatermarkCards(currentWatermarkCards);
         }
 
+        function refreshTvPreview() {
+            const iframe = document.getElementById('tv_live_preview_iframe');
+            if (iframe) {
+                iframe.src = '/tv?_t=' + Date.now();
+            }
+        }
+
         function syncWatermarkCardInputs() {
             const cardEls = document.querySelectorAll('.wm-setting-card');
+            let foundPinned = false;
             cardEls.forEach((card, idx) => {
-                if (currentWatermarkCards[idx]) {
-                    currentWatermarkCards[idx].title = card.querySelector('.wm-card-title').value;
-                    currentWatermarkCards[idx].desc = card.querySelector('.wm-card-desc').value;
-                    currentWatermarkCards[idx].image = card.querySelector('.wm-card-image-url').value;
-                    currentWatermarkCards[idx].enabled = card.querySelector('.wm-card-enabled').checked;
+                if (currentWatermarkCards && currentWatermarkCards[idx]) {
+                    const titleEl = card.querySelector('.wm-card-title');
+                    const descEl = card.querySelector('.wm-card-desc');
+                    const imgEl = card.querySelector('.wm-card-image-url');
+                    const enEl = card.querySelector('.wm-card-enabled');
+                    const pinEl = card.querySelector('.wm-card-pinned');
+                    const effSelect = card.querySelector('.wm-card-effect');
+                    const durEl = card.querySelector('.wm-card-duration');
+
+                    if (titleEl) currentWatermarkCards[idx].title = titleEl.value;
+                    if (descEl) currentWatermarkCards[idx].desc = descEl.value;
+                    if (imgEl) currentWatermarkCards[idx].image = imgEl.value;
+                    if (enEl) currentWatermarkCards[idx].enabled = enEl.checked;
+                    
+                    if (pinEl && pinEl.checked && !foundPinned) {
+                        currentWatermarkCards[idx].is_pinned = true;
+                        foundPinned = true;
+                    } else {
+                        currentWatermarkCards[idx].is_pinned = false;
+                    }
+
+                    const durVal = durEl ? parseInt(durEl.value) : null;
+                    currentWatermarkCards[idx].duration_sec = (durVal && durVal >= 2) ? durVal : null;
+
+                    const effVal = effSelect ? effSelect.value : 'none';
+                    currentWatermarkCards[idx].effect = effVal;
+                    currentWatermarkCards[idx].effects = {
+                        balloons: (effVal === 'balloons' || effVal === 'all_celebration'),
+                        fireworks: (effVal === 'fireworks' || effVal === 'all_celebration'),
+                        confetti: (effVal === 'confetti' || effVal === 'all_celebration')
+                    };
                 }
             });
         }
 
         function addWatermarkCard() {
             syncWatermarkCardInputs();
-            currentWatermarkCards.push({
+            if (!currentWatermarkCards) currentWatermarkCards = [];
+            currentWatermarkCards.unshift({
                 id: `wm-card-${Date.now()}`,
-                title: `Yeni Filigran Kartı ${currentWatermarkCards.length + 1}`,
-                desc: 'Tanıtım veya kampanya açıklaması',
-                image: '/static/uploads/logo.png',
-                enabled: true
+                title: `🎂 Yeni Kutlama / Filigran Kartı ${currentWatermarkCards.length + 1}`,
+                desc: 'Tebrik veya kampanya açıklaması',
+                image: '/static/img/watermarks/card_0_logo.png',
+                enabled: true,
+                is_pinned: false,
+                duration_sec: null,
+                effect: 'balloons',
+                effects: {
+                    balloons: true,
+                    fireworks: false,
+                    confetti: false
+                }
             });
             renderWatermarkCards(currentWatermarkCards);
         }
@@ -755,14 +826,27 @@
                 end_time: row.querySelector('.m-end').value
             })).filter(m => m.text.trim() !== '');
 
-            // Collect dynamic watermark cards
-            const wmCards = Array.from(document.querySelectorAll('.wm-setting-card')).map((card, idx) => ({
-                id: currentWatermarkCards[idx]?.id || `wm-card-${idx}`,
-                title: card.querySelector('.wm-card-title').value.trim(),
-                desc: card.querySelector('.wm-card-desc').value.trim(),
-                image: card.querySelector('.wm-card-image-url').value.trim(),
-                enabled: card.querySelector('.wm-card-enabled').checked
-            })).filter(c => c.image !== '');
+            // Collect dynamic watermark cards with custom duration & effect
+            const wmCards = Array.from(document.querySelectorAll('.wm-setting-card')).map((card, idx) => {
+                const effVal = card.querySelector('.wm-card-effect') ? card.querySelector('.wm-card-effect').value : 'none';
+                const durEl = card.querySelector('.wm-card-duration');
+                const durVal = durEl ? parseInt(durEl.value) : null;
+                return {
+                    id: currentWatermarkCards[idx]?.id || `wm-card-${idx}`,
+                    title: card.querySelector('.wm-card-title').value.trim(),
+                    desc: card.querySelector('.wm-card-desc').value.trim(),
+                    image: card.querySelector('.wm-card-image-url').value.trim(),
+                    enabled: card.querySelector('.wm-card-enabled').checked,
+                    is_pinned: card.querySelector('.wm-card-pinned') ? card.querySelector('.wm-card-pinned').checked : false,
+                    duration_sec: (durVal && durVal >= 2) ? durVal : null,
+                    effect: effVal,
+                    effects: {
+                        balloons: (effVal === 'balloons' || effVal === 'all_celebration'),
+                        fireworks: (effVal === 'fireworks' || effVal === 'all_celebration'),
+                        confetti: (effVal === 'confetti' || effVal === 'all_celebration')
+                    }
+                };
+            }).filter(c => c.image !== '');
 
             const data = {
                 logo_url: document.getElementById('logo_url').value,
@@ -772,30 +856,22 @@
                 local_videos: localVideos,
                 local_audio: localAudio,
                 audio_priority: document.getElementById('audio_priority').value,
-                ticker_text_enabled: document.getElementById('ticker_text_enabled').checked,
-                ticker_currency_enabled: document.getElementById('ticker_currency_enabled').checked,
-                ticker_rss_enabled: document.getElementById('ticker_rss_enabled').checked,
-                ticker_effect: document.getElementById('ticker_effect').value,
-                ticker_speed: parseFloat(document.getElementById('ticker_speed').value) || 4.5,
-                ticker_slide_duration: parseInt(document.getElementById('ticker_slide_duration').value) || 8,
-                rss_turkey_archaeo_enabled: document.getElementById('rss_turkey_archaeo_enabled').checked,
-                rss_ds_arts_en_enabled: document.getElementById('rss_ds_arts_en_enabled').checked,
-                rss_aa_life_en_enabled: document.getElementById('rss_aa_life_en_enabled').checked,
-                rss_turkey_exp_en_enabled: document.getElementById('rss_turkey_exp_en_enabled').checked,
-                rss_goodnews_en_enabled: document.getElementById('rss_goodnews_en_enabled').checked,
-                rss_custom_enabled: document.getElementById('rss_custom_enabled').checked,
-                rss_refresh_mins: parseInt(document.getElementById('rss_refresh_mins').value) || 60,
-                rss_url: document.getElementById('rss_url').value,
-                promo_text: document.getElementById('promo_text').value,
-                qr_code: document.getElementById('qr_code').value,
-                qr_text: document.getElementById('qr_text').value,
+                ticker_text_enabled: document.getElementById('ticker_text_enabled') ? document.getElementById('ticker_text_enabled').checked : true,
+                ticker_currency_enabled: document.getElementById('ticker_currency_enabled') ? document.getElementById('ticker_currency_enabled').checked : true,
+                ticker_rss_enabled: document.getElementById('ticker_rss_enabled') ? document.getElementById('ticker_rss_enabled').checked : true,
+                ticker_effect: document.getElementById('ticker_effect') ? document.getElementById('ticker_effect').value : 'marquee',
+                ticker_speed: document.getElementById('ticker_speed') ? (parseFloat(document.getElementById('ticker_speed').value) || 4.5) : 4.5,
+                ticker_slide_duration: document.getElementById('ticker_slide_duration') ? (parseInt(document.getElementById('ticker_slide_duration').value) || 8) : 8,
+                promo_text: document.getElementById('promo_text') ? document.getElementById('promo_text').value : '',
+                qr_code: document.getElementById('qr_code') ? document.getElementById('qr_code').value : '',
+                qr_text: document.getElementById('qr_text') ? document.getElementById('qr_text').value : '',
                 widgets: {
-                    weather: document.getElementById('w_weather').checked,
-                    clock: document.getElementById('w_clock').checked
+                    weather: document.getElementById('w_weather') ? document.getElementById('w_weather').checked : true,
+                    clock: document.getElementById('w_clock') ? document.getElementById('w_clock').checked : true
                 },
                 watermark_cycle: {
-                    interval_sec: parseInt(document.getElementById('wm_interval_sec').value) || 90,
-                    duration_sec: parseInt(document.getElementById('wm_duration_sec').value) || 12,
+                    interval_sec: document.getElementById('wm_interval_sec') ? (parseInt(document.getElementById('wm_interval_sec').value) || 90) : 90,
+                    duration_sec: document.getElementById('wm_duration_sec') ? (parseInt(document.getElementById('wm_duration_sec').value) || 12) : 12,
                     cards: wmCards
                 },
                 messages: messages
@@ -847,6 +923,7 @@
                                 </span>
                             </div>
                             <div style="font-size:0.82rem; color:#64748b;">
+                                <b>Cihaz ID:</b> <code style="background:#e2e8f0; padding:1px 5px; border-radius:3px; font-weight:bold; color:#0f172a;">${c.client_id}</code><br>
                                 <b>IP:</b> ${c.ip} • <b>Ad:</b> ${c.name}
                             </div>
                             <div style="display:flex; gap:6px; margin-top:4px;">
@@ -866,6 +943,16 @@
                 listEl.innerHTML = html;
             } catch(e) {
                 console.error("Cihaz listesi hatası:", e);
+            }
+        }
+
+        async function cleanOfflineClients() {
+            try {
+                const res = await fetch('/api/tv/clients/clean', { method: 'POST' });
+                const data = await res.json();
+                fetchClients();
+            } catch(e) {
+                console.error("Clean error:", e);
             }
         }
 
@@ -1051,129 +1138,9 @@
         // ==========================================
         // CELEBRATION / BIRTHDAY ADMIN MANAGEMENT
         // ==========================================
-        async function loadCelebrationSettings() {
-            try {
-                const res = await fetch('/api/tv/celebration');
-                const data = await res.json();
-                if (!data) return;
-
-                const activeCheck = document.getElementById('celeb_active');
-                const titleInput = document.getElementById('celeb_title');
-                const subInput = document.getElementById('celeb_subtitle');
-                const urlInput = document.getElementById('celeb_image_url');
-                const ballCheck = document.getElementById('celeb_eff_balloons');
-                const fireCheck = document.getElementById('celeb_eff_fireworks');
-                const confCheck = document.getElementById('celeb_eff_confetti');
-
-                if (activeCheck) activeCheck.checked = !!data.active;
-                if (titleInput) titleInput.value = data.title || '';
-                if (subInput) subInput.value = data.subtitle || '';
-                if (urlInput) urlInput.value = data.image_url || '';
-
-                if (data.effects) {
-                    if (ballCheck) ballCheck.checked = data.effects.balloons !== false;
-                    if (fireCheck) fireCheck.checked = data.effects.fireworks !== false;
-                    if (confCheck) confCheck.checked = data.effects.confetti !== false;
-                }
-                updateCelebrationPreview();
-            } catch(e) {
-                console.error("Celebration load error:", e);
-            }
-        }
-
-        function updateCelebrationPreview() {
-            const url = document.getElementById('celeb_image_url') ? document.getElementById('celeb_image_url').value.trim() : '';
-            const previewImg = document.getElementById('celeb_img_preview');
-            const noImgTxt = document.getElementById('celeb_no_img_txt');
-            if (url && previewImg) {
-                previewImg.src = url;
-                previewImg.style.display = 'block';
-                if (noImgTxt) noImgTxt.style.display = 'none';
-            } else {
-                if (previewImg) previewImg.style.display = 'none';
-                if (noImgTxt) noImgTxt.style.display = 'block';
-            }
-        }
-
-        async function uploadCelebrationPhoto(input) {
-            if (!input.files || !input.files[0]) return;
-            const file = input.files[0];
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                const res = await fetch('/api/tv/watermark/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.success && data.url) {
-                    document.getElementById('celeb_image_url').value = data.url;
-                    updateCelebrationPreview();
-                    alert("✅ Fotoğraf başarıyla yüklendi!");
-                } else {
-                    alert("❌ Yükleme başarısız: " + (data.error || 'Bilinmeyen hata'));
-                }
-            } catch(e) {
-                alert("❌ Yükleme sırasında hata oluştu.");
-            }
-        }
-
-        function clearCelebrationPhoto() {
-            document.getElementById('celeb_image_url').value = '';
-            updateCelebrationPreview();
-        }
-
-        async function onCelebrationToggleChange(isActive) {
-            if (isActive) {
-                if (!confirm("📌 Doğum günü / kutlama modunu TV'de sabitleyip canlı yayına vermek istiyor musunuz?")) {
-                    document.getElementById('celeb_active').checked = false;
-                    return;
-                }
-            }
-            await saveCelebrationSettings(true);
-        }
-
-        async function saveCelebrationSettings(silent = false) {
-            const payload = {
-                active: document.getElementById('celeb_active') ? document.getElementById('celeb_active').checked : false,
-                title: document.getElementById('celeb_title') ? document.getElementById('celeb_title').value.trim() : '',
-                subtitle: document.getElementById('celeb_subtitle') ? document.getElementById('celeb_subtitle').value.trim() : '',
-                image_url: document.getElementById('celeb_image_url') ? document.getElementById('celeb_image_url').value.trim() : '',
-                effects: {
-                    balloons: document.getElementById('celeb_eff_balloons') ? document.getElementById('celeb_eff_balloons').checked : true,
-                    fireworks: document.getElementById('celeb_eff_fireworks') ? document.getElementById('celeb_eff_fireworks').checked : true,
-                    confetti: document.getElementById('celeb_eff_confetti') ? document.getElementById('celeb_eff_confetti').checked : true
-                }
-            };
-
-            try {
-                const res = await fetch('/api/tv/celebration/save', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                if (data.success) {
-                    if (!silent) {
-                        const statusTxt = payload.active ? "SABİTLENDİ & YAYINDA! 🎉" : "Kaydedildi (Mod Kapalı).";
-                        alert(`✅ Kutlama ayarları ${statusTxt}`);
-                    }
-                    fetch('/api/tv/push', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({action: 'reload', client_id: 'all'})
-                    });
-                }
-            } catch(e) {
-                if (!silent) alert("❌ Kayıt sırasında hata oluştu.");
-            }
-        }
-
         loadSettings();
         fetchClients();
         loadTvFactsAdmin();
-        loadCelebrationSettings();
         setInterval(fetchClients, 4000);
     </script>
 </body>

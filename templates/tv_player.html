@@ -565,50 +565,7 @@
             <div id="ml-dl-badge" style="position:absolute; bottom:12px; right:12px; background:rgba(15,23,42,0.88); border:1px solid rgba(56,189,248,0.5); color:#38bdf8; font-size:0.85rem; font-weight:700; padding:4px 10px; border-radius:6px; z-index:40; display:none; box-shadow:0 2px 8px rgba(0,0,0,0.3); letter-spacing:0.3px;"></div>
             <!-- High-Definition Graphic Watermark Container (Enlarged) -->
             <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.6s ease; z-index: 50; pointer-events: none; width: 62vw; aspect-ratio: 1000 / 520; max-height: 86%; border-radius: 1.8vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
-                
-                <!-- Card 0: Brand & Web -->
-                <div id="wm-card-logo" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_0_logo.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
-                </div>
-
-                <!-- Card 1: Social Media -->
-                <div id="wm-card-social" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_1_social.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
-                </div>
-
-                <!-- Card 2: Support University Students -->
-                <div id="wm-card-students" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_2_students.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
-                </div>
-
-                <!-- Card 3: Stray Animals Support -->
-                <div id="wm-card-animals" class="wm-card" style="padding:0; background:transparent; border:none; box-shadow:none;">
-                    <img src="/static/img/watermarks/card_3_animals.png" style="width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;">
-                </div>
-
-                <!-- Card 4: Dedicated Birthday & Celebration Card (Pinned Overlay) -->
-                <div id="wm-card-celebration" class="wm-card" style="padding:0; background:radial-gradient(ellipse at center, rgba(30,27,75,0.95) 0%, rgba(15,23,42,0.98) 100%); border:3px solid #E879F9; box-shadow:0 0 45px rgba(217,70,239,0.5); border-radius:1.8vw; width:100%; height:100%; display:none; align-items:center; justify-content:center; box-sizing:border-box; overflow:hidden; position:relative;">
-                    <div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; padding:2.2vw; box-sizing:border-box; gap:2.2vw;">
-                        <!-- Celebration Photo with Glowing Border -->
-                        <div id="celeb-img-box" style="width:15vw; height:15vw; border-radius:50%; border:3.5px solid #F472B6; box-shadow:0 0 25px rgba(244,114,182,0.7); overflow:hidden; flex-shrink:0; background:#0F172A; display:flex; align-items:center; justify-content:center;">
-                            <img id="celeb-img" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
-                            <span id="celeb-cake-icon" style="font-size:5.5vw;">🎂</span>
-                        </div>
-                        <!-- Celebration Texts -->
-                        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; text-align:left;">
-                            <div style="font-size:1.1vw; font-weight:800; color:#F472B6; letter-spacing:2px; text-transform:uppercase; margin-bottom:0.4vw; display:flex; align-items:center; gap:0.5vw;">
-                                <span>🎉</span><span>FIRINNA KUTLAMA</span><span>🎉</span>
-                            </div>
-                            <div id="celeb-title-txt" style="font-size:2.4vw; font-weight:900; color:#FFFFFF; line-height:1.2; text-shadow:0 2px 10px rgba(0,0,0,0.7); margin-bottom:0.6vw;">
-                                İyi ki Doğdun!
-                            </div>
-                            <div id="celeb-sub-txt" style="font-size:1.4vw; font-weight:700; color:#E2E8F0; line-height:1.35; text-shadow:0 1px 4px rgba(0,0,0,0.5);">
-                                Nice mutlu, sağlıklı ve neşeli yaşlara! 🎈
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <!-- Dinamik Filigran ve Kutlama Kartları JS ile Yüklenecek -->
             </div>
         </div>
 
@@ -1078,85 +1035,166 @@
         }
         startMasterBeatScheduler();
 
-        // Dynamic Multi-Card Watermark Carousel
+        // ==========================================
+        // DYNAMIC WATERMARK & CELEBRATION ENGINE (STICK-OPTIMIZED)
+        // ==========================================
         let wmSettings = {
-            interval_sec: 90,
-            duration_sec: 12,
-            logo_enabled: true,
-            social_enabled: true,
-            students_enabled: true,
-            animals_enabled: true
+            interval_sec: 30,
+            duration_sec: 12
         };
+        let dynamicWatermarkCards = [];
+        let activePinnedCard = null;
         let wmCardIndex = 0;
-        let wmIntervalId = null;
-        let wmHideTimeoutId = null;
+        let wmLoopTimeout = null;
+        let lastAppliedWmCardsHash = '';
 
-        function getActiveWatermarkCards() {
-            const list = [];
-            if (wmSettings.logo_enabled !== false) list.push('wm-card-logo');
-            if (wmSettings.social_enabled !== false) list.push('wm-card-social');
-            if (wmSettings.students_enabled !== false) list.push('wm-card-students');
-            if (wmSettings.animals_enabled !== false) list.push('wm-card-animals');
-            return list;
-        }
-
-        function triggerWatermarkCycle() {
-            if (celebrationActive) {
-                // If celebration mode is pinned, keep celebration card fixed on screen
-                const container = document.getElementById('ml-watermark-container');
-                if (container) container.style.opacity = '1';
-                const card = document.getElementById('wm-card-celebration');
-                if (card) card.style.display = 'flex';
-                return;
-            }
-
+        function updateWatermarkCardsFromSettings(wmSettingsData) {
             const container = document.getElementById('ml-watermark-container');
             if (!container) return;
 
-            const activeCards = getActiveWatermarkCards();
-            if (activeCards.length === 0) return;
-
-            const targetCardId = activeCards[wmCardIndex % activeCards.length];
-            wmCardIndex++;
-
-            if (wmHideTimeoutId) {
-                clearTimeout(wmHideTimeoutId);
-                wmHideTimeoutId = null;
+            if (wmSettingsData) {
+                wmSettings.interval_sec = Math.max(5, parseInt(wmSettingsData.interval_sec) || 30);
+                wmSettings.duration_sec = Math.max(3, parseInt(wmSettingsData.duration_sec) || 12);
             }
 
-            document.querySelectorAll('.wm-card').forEach(c => c.classList.remove('active'));
-            const cardEl = document.getElementById(targetCardId);
-            if (cardEl) cardEl.classList.add('active');
+            const cards = (wmSettingsData && wmSettingsData.cards && wmSettingsData.cards.length > 0) ? wmSettingsData.cards : [
+                { id: 'wm-card-0', title: '1. Fırınna Logo & Slogan', image: '/static/img/watermarks/card_0_logo.png', enabled: true, is_pinned: false, effects: {balloons:false, fireworks:false, confetti:false} },
+                { id: 'wm-card-1', title: '2. Follow Us on Social Media', image: '/static/img/watermarks/card_1_social.png', enabled: true, is_pinned: false, effects: {balloons:false, fireworks:false, confetti:false} },
+                { id: 'wm-card-2', title: '3. Fırınna Supports Students', image: '/static/img/watermarks/card_2_students.png', enabled: true, is_pinned: false, effects: {balloons:false, fireworks:false, confetti:false} },
+                { id: 'wm-card-3', title: '4. Fırınna Cares for Stray Animals', image: '/static/img/watermarks/card_3_animals.png', enabled: true, is_pinned: false, effects: {balloons:false, fireworks:false, confetti:false} }
+            ];
 
+            const currentCardsHash = JSON.stringify(cards) + '_' + wmSettings.interval_sec + '_' + wmSettings.duration_sec;
+            if (currentCardsHash === lastAppliedWmCardsHash) {
+                // No change in configuration, do not interrupt current state
+                return;
+            }
+            lastAppliedWmCardsHash = currentCardsHash;
+
+            dynamicWatermarkCards = cards.filter(c => c.enabled !== false && c.image);
+            activePinnedCard = dynamicWatermarkCards.find(c => c.is_pinned === true || c.is_pinned === 'true');
+
+            // Render cards in container
+            let html = '';
+            dynamicWatermarkCards.forEach((c, idx) => {
+                const isThisPinned = (activePinnedCard && activePinnedCard.id === c.id);
+                html += `
+                    <div id="dyn-wm-card-${idx}" class="wm-card ${isThisPinned ? 'active' : ''}" style="position:absolute; inset:0; width:100%; height:100%; display:${isThisPinned ? 'flex' : 'none'}; align-items:center; justify-content:center; opacity:${isThisPinned ? '1' : '0'}; transition:opacity 0.8s ease; pointer-events:none; padding:0; background:transparent; border:none; box-shadow:none;">
+                        <img src="${c.image}" style="max-width:100%; max-height:100%; width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;" onerror="this.style.display='none'">
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            if (wmLoopTimeout) {
+                clearTimeout(wmLoopTimeout);
+                wmLoopTimeout = null;
+            }
+
+            if (activePinnedCard) {
+                console.log("[WATERMARK] Pinned mode active:", activePinnedCard.title);
+                container.style.display = 'block';
+                container.style.opacity = '1';
+                const eff = activePinnedCard.effects || {};
+                if (eff.balloons || eff.fireworks || eff.confetti) {
+                    startCelebrationAnimation(eff);
+                } else {
+                    stopCelebrationAnimation();
+                }
+            } else {
+                console.log("[WATERMARK] Normal sequential cycle starting with " + dynamicWatermarkCards.length + " cards");
+                stopCelebrationAnimation();
+                container.style.opacity = '0';
+                wmCardIndex = 0;
+                // Start first cycle after 2.5 seconds
+                wmLoopTimeout = setTimeout(runNextWatermarkCycle, 2500);
+            }
+        }
+
+        function runNextWatermarkCycle() {
+            if (activePinnedCard) return; // In pinned mode, no cycling
+
+            const container = document.getElementById('ml-watermark-container');
+            if (!container || !dynamicWatermarkCards || dynamicWatermarkCards.length === 0) {
+                // Retry after 5s if empty
+                wmLoopTimeout = setTimeout(runNextWatermarkCycle, 5000);
+                return;
+            }
+
+            const curIdx = wmCardIndex % dynamicWatermarkCards.length;
+            const currentCard = dynamicWatermarkCards[curIdx];
+            wmCardIndex++;
+
+            // Hide all other cards
+            document.querySelectorAll('.wm-card').forEach(c => {
+                c.classList.remove('active');
+                c.style.opacity = '0';
+                c.style.display = 'none';
+            });
+
+            // Show selected card
+            const cardEl = document.getElementById(`dyn-wm-card-${curIdx}`);
+            if (cardEl) {
+                cardEl.style.display = 'flex';
+                void cardEl.offsetWidth; // Force layout reflow for clean fade-in
+                cardEl.classList.add('active');
+                cardEl.style.opacity = '1';
+            }
+
+            container.style.display = 'block';
             container.style.opacity = '1';
 
-            const durationMs = Math.max(3, parseInt(wmSettings.duration_sec) || 12) * 1000;
-            wmHideTimeoutId = setTimeout(() => {
-                if (celebrationActive) return;
+            // Play effects if configured for this card
+            const eff = currentCard.effects || {};
+            if (eff.balloons || eff.fireworks || eff.confetti) {
+                startCelebrationAnimation(eff);
+            } else {
+                stopCelebrationAnimation();
+            }
+
+            // Duration: Use custom per-card duration if specified and > 0, otherwise fallback to global default duration
+            const cardCustomDuration = parseInt(currentCard.duration_sec);
+            const defaultDuration = Math.max(3, parseInt(wmSettings.duration_sec) || 12);
+            const durationMs = (cardCustomDuration && cardCustomDuration >= 2 ? cardCustomDuration : defaultDuration) * 1000;
+
+            // Interval: how long until the NEXT watermark appears AFTER this one hides
+            const intervalMs = Math.max(5, parseInt(wmSettings.interval_sec) || 30) * 1000;
+
+            wmLoopTimeout = setTimeout(() => {
+                if (activePinnedCard) return;
+                // Fade out current card
                 container.style.opacity = '0';
+                if (cardEl) cardEl.style.opacity = '0';
+                stopCelebrationAnimation();
+
+                // Wait 800ms for fade out transition to complete, then schedule next card
                 setTimeout(() => {
-                    if (celebrationActive) return;
-                    document.querySelectorAll('.wm-card').forEach(c => c.classList.remove('active'));
-                }, 600);
+                    if (activePinnedCard) return;
+                    if (cardEl) {
+                        cardEl.classList.remove('active');
+                        cardEl.style.display = 'none';
+                    }
+                    // Wait intervalMs before showing next watermark card
+                    wmLoopTimeout = setTimeout(runNextWatermarkCycle, intervalMs);
+                }, 800);
             }, durationMs);
         }
 
         // ==========================================
-        // CELEBRATION & BIRTHDAY PINNED MODE ENGINE
+        // CELEBRATION & BIRTHDAY EFFECTS (STICK OPTIMIZED - 0% CPU LAG)
         // ==========================================
-        let celebrationActive = false;
-        let celebrationData = null;
         let celebCanvas = null;
         let celebCtx = null;
         let celebAnimId = null;
         let celebBalloons = [];
         let celebFireworks = [];
         let celebConfetti = [];
+        let activeEffects = { balloons: false, fireworks: false, confetti: false };
 
         function initCelebrationCanvas() {
             celebCanvas = document.getElementById('celebration-canvas');
             if (!celebCanvas) return;
-            celebCtx = celebCanvas.getContext('2d');
+            celebCtx = celebCanvas.getContext('2d', { alpha: true });
             resizeCelebrationCanvas();
             window.addEventListener('resize', resizeCelebrationCanvas);
         }
@@ -1167,209 +1205,172 @@
             celebCanvas.height = window.innerHeight;
         }
 
-        function applyCelebrationState(data) {
-            celebrationData = data;
-            const card = document.getElementById('wm-card-celebration');
-            const container = document.getElementById('ml-watermark-container');
-            const canvas = document.getElementById('celebration-canvas');
+        function startCelebrationAnimation(effects = {}) {
+            activeEffects = {
+                balloons: !!effects.balloons,
+                fireworks: !!effects.fireworks,
+                confetti: !!effects.confetti
+            };
 
-            if (data && data.active) {
-                celebrationActive = true;
-                if (canvas) canvas.style.display = 'block';
-
-                // Populate Card
-                const imgEl = document.getElementById('celeb-img');
-                const iconEl = document.getElementById('celeb-cake-icon');
-                const titleEl = document.getElementById('celeb-title-txt');
-                const subEl = document.getElementById('celeb-sub-txt');
-
-                if (titleEl) titleEl.textContent = data.title || 'İyi ki Doğdun!';
-                if (subEl) subEl.textContent = data.subtitle || 'Nice Mutlu Yıllara! 🎂🎉';
-
-                if (data.image_url && data.image_url.trim() !== '') {
-                    if (imgEl) { imgEl.src = data.image_url; imgEl.style.display = 'block'; }
-                    if (iconEl) iconEl.style.display = 'none';
-                } else {
-                    if (imgEl) imgEl.style.display = 'none';
-                    if (iconEl) iconEl.style.display = 'block';
-                }
-
-                // Pin Card in Watermark Container
-                if (card) card.style.display = 'flex';
-                document.querySelectorAll('.wm-card').forEach(c => {
-                    if (c.id !== 'wm-card-celebration') c.classList.remove('active');
-                });
-                if (container) {
-                    container.style.opacity = '1';
-                }
-
-                startCelebrationAnimation();
-            } else {
-                celebrationActive = false;
-                if (canvas) canvas.style.display = 'none';
-                if (card) card.style.display = 'none';
+            if (!activeEffects.balloons && !activeEffects.fireworks && !activeEffects.confetti) {
                 stopCelebrationAnimation();
+                return;
             }
-        }
 
-        function startCelebrationAnimation() {
             if (!celebCanvas) initCelebrationCanvas();
+            if (celebCanvas) celebCanvas.style.display = 'block';
             if (celebAnimId) cancelAnimationFrame(celebAnimId);
 
             const W = celebCanvas ? (celebCanvas.width || window.innerWidth) : window.innerWidth;
             const H = celebCanvas ? (celebCanvas.height || window.innerHeight) : window.innerHeight;
 
-            const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4', '#E11D48'];
+            const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4'];
 
-            // Initialize Balloons
+            // 1. Lightweight Balloons (max 10)
             celebBalloons = [];
-            for (let i = 0; i < 22; i++) {
-                celebBalloons.push({
-                    x: Math.random() * W,
-                    y: H + Math.random() * H * 0.8,
-                    r: 22 + Math.random() * 18,
-                    speed: 1.2 + Math.random() * 1.8,
-                    swaySpeed: 0.02 + Math.random() * 0.03,
-                    swayOffset: Math.random() * Math.PI * 2,
-                    swayAmount: 25 + Math.random() * 35,
-                    color: colors[Math.floor(Math.random() * colors.length)]
-                });
+            if (activeEffects.balloons) {
+                for (let i = 0; i < 10; i++) {
+                    celebBalloons.push({
+                        x: Math.random() * W,
+                        y: H + Math.random() * H * 0.7,
+                        r: 24 + Math.random() * 16,
+                        speed: 1.0 + Math.random() * 1.5,
+                        swaySpeed: 0.02 + Math.random() * 0.02,
+                        swayOffset: Math.random() * Math.PI * 2,
+                        swayAmount: 20 + Math.random() * 25,
+                        color: colors[i % colors.length]
+                    });
+                }
             }
 
-            // Initialize Confetti
+            // 2. Lightweight Confetti (max 28 pieces)
             celebConfetti = [];
-            for (let i = 0; i < 60; i++) {
-                celebConfetti.push({
-                    x: Math.random() * W,
-                    y: Math.random() * H - H,
-                    w: 8 + Math.random() * 8,
-                    h: 5 + Math.random() * 6,
-                    speedY: 2 + Math.random() * 3,
-                    speedX: (Math.random() - 0.5) * 2,
-                    rot: Math.random() * 360,
-                    rotSpeed: (Math.random() - 0.5) * 6,
-                    color: colors[Math.floor(Math.random() * colors.length)]
-                });
+            if (activeEffects.confetti) {
+                for (let i = 0; i < 28; i++) {
+                    celebConfetti.push({
+                        x: Math.random() * W,
+                        y: Math.random() * H - H,
+                        w: 9 + Math.random() * 6,
+                        h: 6 + Math.random() * 5,
+                        speedY: 2.0 + Math.random() * 2.5,
+                        speedX: (Math.random() - 0.5) * 1.5,
+                        rot: Math.random() * 360,
+                        rotSpeed: (Math.random() - 0.5) * 4,
+                        color: colors[i % colors.length]
+                    });
+                }
             }
 
             celebFireworks = [];
             let lastFireworkTime = Date.now();
 
             function spawnFirework() {
-                const targetX = W * 0.15 + Math.random() * W * 0.7;
-                const targetY = H * 0.12 + Math.random() * H * 0.35;
+                if (!activeEffects.fireworks) return;
+                const targetX = W * 0.2 + Math.random() * W * 0.6;
+                const targetY = H * 0.15 + Math.random() * H * 0.3;
                 const color = colors[Math.floor(Math.random() * colors.length)];
-                const count = 40;
+                const count = 22;
                 for (let i = 0; i < count; i++) {
-                    const angle = (Math.PI * 2 / count) * i + (Math.random() * 0.2);
-                    const speed = 2.5 + Math.random() * 5.0;
+                    const angle = (Math.PI * 2 / count) * i;
+                    const speed = 2.0 + Math.random() * 3.5;
                     celebFireworks.push({
                         x: targetX,
                         y: targetY,
                         vx: Math.cos(angle) * speed,
                         vy: Math.sin(angle) * speed,
                         color: color,
-                        alpha: 1,
-                        size: 3 + Math.random() * 2.5,
-                        decay: 0.015 + Math.random() * 0.015
+                        alpha: 1.0,
+                        size: 3.5,
+                        decay: 0.025
                     });
                 }
             }
 
             function loop() {
-                if (!celebrationActive || !celebCtx) return;
-
+                if (!celebCtx || !celebCanvas) return;
                 celebCtx.clearRect(0, 0, celebCanvas.width, celebCanvas.height);
                 const time = Date.now();
 
-                // 1. Draw & Update Balloons
-                celebBalloons.forEach(b => {
-                    b.y -= b.speed;
-                    const swayX = b.x + Math.sin(time * b.swaySpeed + b.swayOffset) * b.swayAmount;
-                    if (b.y < -b.r * 2) {
-                        b.y = H + 40;
-                        b.x = Math.random() * W;
-                    }
+                // 1. Balloons
+                if (activeEffects.balloons) {
+                    celebBalloons.forEach(b => {
+                        b.y -= b.speed;
+                        const swayX = b.x + Math.sin(time * b.swaySpeed + b.swayOffset) * b.swayAmount;
+                        if (b.y < -b.r * 2) {
+                            b.y = H + 30;
+                            b.x = Math.random() * W;
+                        }
 
-                    // String
-                    celebCtx.beginPath();
-                    celebCtx.moveTo(swayX, b.y + b.r);
-                    celebCtx.quadraticCurveTo(swayX + Math.sin(time*0.03)*10, b.y + b.r + 25, swayX, b.y + b.r + 50);
-                    celebCtx.strokeStyle = 'rgba(255,255,255,0.6)';
-                    celebCtx.lineWidth = 1.5;
-                    celebCtx.stroke();
+                        // String
+                        celebCtx.beginPath();
+                        celebCtx.moveTo(swayX, b.y + b.r);
+                        celebCtx.lineTo(swayX, b.y + b.r + 35);
+                        celebCtx.strokeStyle = 'rgba(255,255,255,0.7)';
+                        celebCtx.lineWidth = 1.5;
+                        celebCtx.stroke();
 
-                    // Balloon Body
-                    celebCtx.beginPath();
-                    celebCtx.ellipse(swayX, b.y, b.r * 0.85, b.r, 0, 0, Math.PI * 2);
-                    celebCtx.fillStyle = b.color;
-                    celebCtx.shadowColor = b.color;
-                    celebCtx.shadowBlur = 10;
-                    celebCtx.fill();
-                    celebCtx.shadowBlur = 0;
+                        // Balloon Body
+                        celebCtx.beginPath();
+                        celebCtx.ellipse(swayX, b.y, b.r * 0.85, b.r, 0, 0, Math.PI * 2);
+                        celebCtx.fillStyle = b.color;
+                        celebCtx.fill();
 
-                    // Knot
-                    celebCtx.beginPath();
-                    celebCtx.moveTo(swayX - 4, b.y + b.r + 2);
-                    celebCtx.lineTo(swayX + 4, b.y + b.r + 2);
-                    celebCtx.lineTo(swayX, b.y + b.r - 2);
-                    celebCtx.fillStyle = b.color;
-                    celebCtx.fill();
-
-                    // Highlight
-                    celebCtx.beginPath();
-                    celebCtx.ellipse(swayX - b.r*0.3, b.y - b.r*0.35, b.r*0.2, b.r*0.35, Math.PI / 4, 0, Math.PI * 2);
-                    celebCtx.fillStyle = 'rgba(255,255,255,0.45)';
-                    celebCtx.fill();
-                });
-
-                // 2. Spawn & Update Fireworks
-                if (time - lastFireworkTime > 1200) {
-                    spawnFirework();
-                    lastFireworkTime = time;
+                        // Highlight
+                        celebCtx.beginPath();
+                        celebCtx.ellipse(swayX - b.r * 0.3, b.y - b.r * 0.35, b.r * 0.2, b.r * 0.35, Math.PI / 4, 0, Math.PI * 2);
+                        celebCtx.fillStyle = 'rgba(255,255,255,0.4)';
+                        celebCtx.fill();
+                    });
                 }
 
-                for (let i = celebFireworks.length - 1; i >= 0; i--) {
-                    const p = celebFireworks[i];
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.vy += 0.06; // gravity
-                    p.vx *= 0.98;
-                    p.alpha -= p.decay;
-
-                    if (p.alpha <= 0) {
-                        celebFireworks.splice(i, 1);
-                        continue;
+                // 2. Fireworks
+                if (activeEffects.fireworks) {
+                    if (time - lastFireworkTime > 2200) {
+                        spawnFirework();
+                        lastFireworkTime = time;
                     }
 
-                    celebCtx.save();
-                    celebCtx.globalAlpha = p.alpha;
-                    celebCtx.fillStyle = p.color;
-                    celebCtx.shadowColor = p.color;
-                    celebCtx.shadowBlur = 8;
-                    celebCtx.beginPath();
-                    celebCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    celebCtx.fill();
-                    celebCtx.restore();
+                    for (let i = celebFireworks.length - 1; i >= 0; i--) {
+                        const p = celebFireworks[i];
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.05;
+                        p.vx *= 0.98;
+                        p.alpha -= p.decay;
+
+                        if (p.alpha <= 0) {
+                            celebFireworks.splice(i, 1);
+                            continue;
+                        }
+
+                        celebCtx.globalAlpha = p.alpha;
+                        celebCtx.fillStyle = p.color;
+                        celebCtx.beginPath();
+                        celebCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        celebCtx.fill();
+                    }
+                    celebCtx.globalAlpha = 1.0;
                 }
 
-                // 3. Draw & Update Confetti
-                celebConfetti.forEach(c => {
-                    c.y += c.speedY;
-                    c.x += c.speedX;
-                    c.rot += c.rotSpeed;
-                    if (c.y > H + 20) {
-                        c.y = -20;
-                        c.x = Math.random() * W;
-                    }
+                // 3. Confetti
+                if (activeEffects.confetti) {
+                    celebConfetti.forEach(c => {
+                        c.y += c.speedY;
+                        c.x += c.speedX;
+                        c.rot += c.rotSpeed;
+                        if (c.y > H + 15) {
+                            c.y = -15;
+                            c.x = Math.random() * W;
+                        }
 
-                    celebCtx.save();
-                    celebCtx.translate(c.x, c.y);
-                    celebCtx.rotate((c.rot * Math.PI) / 180);
-                    celebCtx.fillStyle = c.color;
-                    celebCtx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
-                    celebCtx.restore();
-                });
+                        celebCtx.save();
+                        celebCtx.translate(c.x, c.y);
+                        celebCtx.rotate((c.rot * Math.PI) / 180);
+                        celebCtx.fillStyle = c.color;
+                        celebCtx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+                        celebCtx.restore();
+                    });
+                }
 
                 celebAnimId = requestAnimationFrame(loop);
             }
@@ -1378,19 +1379,17 @@
         }
 
         function stopCelebrationAnimation() {
-            if (celebAnimId) cancelAnimationFrame(celebAnimId);
+            if (celebAnimId) {
+                cancelAnimationFrame(celebAnimId);
+                celebAnimId = null;
+            }
+            if (celebCanvas) {
+                celebCanvas.style.display = 'none';
+            }
             if (celebCtx && celebCanvas) {
                 celebCtx.clearRect(0, 0, celebCanvas.width, celebCanvas.height);
             }
         }
-
-        function startWatermarkScheduler() {
-            if (wmIntervalId) clearInterval(wmIntervalId);
-            const intervalMs = Math.max(10, parseInt(wmSettings.interval_sec) || 90) * 1000;
-            wmIntervalId = setInterval(triggerWatermarkCycle, intervalMs);
-        }
-        setTimeout(triggerWatermarkCycle, 15000);
-        startWatermarkScheduler();
 
         async function fetchCurrencies() {
             try {
@@ -1577,12 +1576,36 @@
             } catch(e) {}
         }
 
-        let lastPushTimestamp = -1;
-        let myClientId = localStorage.getItem('firinna_tv_client_id');
-        if (!myClientId) {
-            myClientId = 'tv_' + Math.random().toString(36).substring(2, 9);
-            localStorage.setItem('firinna_tv_client_id', myClientId);
+        function getStableDeviceFingerprint() {
+            try {
+                // Collect stable hardware, display, and browser environment traits
+                const parts = [
+                    navigator.userAgent || '',
+                    (window.screen ? window.screen.width + 'x' + window.screen.height : '1920x1080'),
+                    (window.screen ? window.screen.colorDepth : 24),
+                    navigator.hardwareConcurrency || 4,
+                    navigator.language || 'tr',
+                    (typeof Intl !== 'undefined' && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Europe/Istanbul',
+                    navigator.platform || ''
+                ];
+                const raw = parts.join('###');
+                
+                // Fast 32-bit FNV-1a deterministic hash
+                let hash = 0x811c9dc5;
+                for (let i = 0; i < raw.length; i++) {
+                    hash ^= raw.charCodeAt(i);
+                    hash = (hash * 0x01000193) >>> 0;
+                }
+                const hex = ('00000000' + hash.toString(16)).slice(-8);
+                return 'tv_' + hex;
+            } catch(e) {
+                return 'tv_dev_main';
+            }
         }
+
+        let lastPushTimestamp = -1;
+        const myClientId = getStableDeviceFingerprint();
+        try { localStorage.setItem('firinna_tv_client_id', myClientId); } catch(e) {}
 
         async function fetchSettings() {
             try {
@@ -1635,42 +1658,34 @@
         }
 
         function applySettings(data) {
-            const layout = data.layout || 'modern_grid';
-            document.body.className = `layout-${layout}`;
-            
-            if(data.logo_url) {
-                document.getElementById('ml-logo').src = data.logo_url;
-                document.getElementById('ml-logo').style.display = 'block';
-                document.getElementById('logo-overlay').src = data.logo_url;
-                document.getElementById('logo-sidebar').src = data.logo_url;
-            }
-
-            isTickerTextEnabled = (data.ticker_text_enabled !== false);
-            isTickerCurrencyEnabled = (data.ticker_currency_enabled !== false);
-            isTickerRssEnabled = (data.ticker_rss_enabled !== false);
-            currentTickerEffect = data.ticker_effect || 'marquee';
-            marqueeSpeed = (data.ticker_speed !== undefined) ? parseFloat(data.ticker_speed) : 4.5;
-            tickerSlideDurationSec = parseInt(data.ticker_slide_duration) || 8;
-
-            if (data.rss_refresh_mins) {
-                startRssScheduler(data.rss_refresh_mins);
-            }
-            basePromoText = data.promo_text || "";
-            currentMessages = data.messages || [];
-            updateTickerText();
-
-            // Apply Watermark Settings
-            if (data.watermark_cycle) {
-                const oldInterval = wmSettings.interval_sec;
-                wmSettings = Object.assign(wmSettings, data.watermark_cycle);
-                if (wmSettings.interval_sec !== oldInterval) {
-                    startWatermarkScheduler();
+            try {
+                const layout = data.layout || 'modern_grid';
+                document.body.className = `layout-${layout}`;
+                
+                if(data.logo_url) {
+                    const mlLogo = document.getElementById('ml-logo');
+                    if (mlLogo) { mlLogo.src = data.logo_url; mlLogo.style.display = 'block'; }
+                    const lOver = document.getElementById('logo-overlay');
+                    if (lOver) lOver.src = data.logo_url;
+                    const lSide = document.getElementById('logo-sidebar');
+                    if (lSide) lSide.src = data.logo_url;
                 }
-            }
 
-            // Apply Celebration / Birthday Pinned Mode
-            if (data.celebration !== undefined) {
-                applyCelebrationState(data.celebration);
+                isTickerTextEnabled = (data.ticker_text_enabled !== false);
+                isTickerCurrencyEnabled = (data.ticker_currency_enabled !== false);
+                isTickerRssEnabled = (data.ticker_rss_enabled !== false);
+                currentTickerEffect = data.ticker_effect || 'marquee';
+                marqueeSpeed = (data.ticker_speed !== undefined) ? parseFloat(data.ticker_speed) : 4.5;
+                tickerSlideDurationSec = parseInt(data.ticker_slide_duration) || 8;
+                basePromoText = data.promo_text || "";
+                currentMessages = data.messages || [];
+
+                // Apply Watermark Settings & Dynamic Cards (with Pin & Effects)
+                if (data.watermark_cycle) {
+                    updateWatermarkCardsFromSettings(data.watermark_cycle);
+                }
+            } catch(err) {
+                console.error("applySettings watermark error:", err);
             }
             
             if(currentMessages.length > 0) {

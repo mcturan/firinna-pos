@@ -13,10 +13,10 @@
     "qr_code": "",
     "qr_text": "",
     "celebration": {
-        "active": false,
-        "title": "İyi ki Doğdun!",
-        "subtitle": "Fırınna Ailesi Olarak Nice Mutlu Yıllara Dileriz! 🎂🎉",
-        "image_url": "",
+        "active": true,
+        "title": "🎂 İyi ki Doğdun zeynep! 🎉",
+        "subtitle": "Nice Mutlu Yıllara! 🎈",
+        "image_url": "/static/img/watermarks/wm_1787403357_firinnastudent.png",
         "effects": {
             "balloons": true,
             "fireworks": true,
@@ -33,7 +33,7 @@
     "ticker_currency_enabled": true,
     "ticker_rss_enabled": true,
     "ticker_effect": "slide_down",
-    "ticker_speed": 2.5,
+    "ticker_speed": 4.5,
     "ticker_slide_duration": 6,
     "rss_turkey_archaeo_enabled": true,
     "rss_ds_arts_en_enabled": true,
@@ -44,46 +44,88 @@
     "rss_refresh_mins": 15,
     "rss_url": "",
     "watermark_cycle": {
-        "interval_sec": 90,
+        "interval_sec": 30,
         "duration_sec": 12,
         "cards": [
+            {
+                "id": "wm-card-1787411203291",
+                "title": "🎂 Yeni Kutlama / Filigran Kartı 5",
+                "desc": "Tebrik veya kampanya açıklaması",
+                "image": "/static/img/watermarks/wm_1787411210_bayrak.gif",
+                "enabled": true,
+                "is_pinned": false,
+                "effect": "confetti",
+                "effects": {
+                    "balloons": false,
+                    "fireworks": false,
+                    "confetti": true
+                }
+            },
             {
                 "id": "wm-card-0",
                 "title": "1. Fırınna Logo & Slogan",
                 "desc": "Klasik büyük logo ve www.firinna.com filigranı",
                 "image": "/static/img/watermarks/card_0_logo.png",
-                "enabled": true
+                "enabled": true,
+                "is_pinned": false,
+                "effect": "none",
+                "effects": {
+                    "balloons": false,
+                    "fireworks": false,
+                    "confetti": false
+                }
             },
             {
                 "id": "wm-card-1",
                 "title": "2. Follow Us on Social Media",
                 "desc": "Instagram, TikTok, Google Maps ve Yandex Maps rozetleri",
                 "image": "/static/img/watermarks/card_1_social.png",
-                "enabled": true
+                "enabled": true,
+                "is_pinned": false,
+                "effect": "none",
+                "effects": {
+                    "balloons": false,
+                    "fireworks": false,
+                    "confetti": false
+                }
             },
             {
                 "id": "wm-card-2",
                 "title": "3. Fırınna Supports Students",
                 "desc": "Beyoğlu Öğrenciye projesi, ücretsiz yemek ve burs desteği",
                 "image": "/static/img/watermarks/card_2_students.png",
-                "enabled": true
+                "enabled": true,
+                "is_pinned": false,
+                "effect": "none",
+                "effects": {
+                    "balloons": false,
+                    "fireworks": false,
+                    "confetti": false
+                }
             },
             {
                 "id": "wm-card-3",
                 "title": "4. Fırınna Cares for Stray Animals",
                 "desc": "Sokak hayvanları mama, su ve yuva desteği",
                 "image": "/static/img/watermarks/card_3_animals.png",
-                "enabled": true
+                "enabled": true,
+                "is_pinned": false,
+                "effect": "none",
+                "effects": {
+                    "balloons": false,
+                    "fireworks": false,
+                    "confetti": false
+                }
             }
         ]
     },
     "last_push": {
-        "action": "reload",
-        "target": "unknown",
-        "timestamp": 1787403168054
+        "action": "clear_cache",
+        "target": "all",
+        "timestamp": 1787411847306
     },
-    "last_ping": "2026-08-22T15:55:00.066326",
-    "version": 1787400036235,
+    "last_ping": "2026-08-22T18:28:45.099497",
+    "version": 1787411818194,
     "did_you_know": [
         {
             "id": "dyk_1",
