@@ -1,17 +1,17 @@
 {
-    "today": 13,
-    "month": 265,
-    "total": 265,
-    "menu": 7,
+    "today": 16,
+    "month": 268,
+    "total": 268,
+    "menu": 8,
     "actions": 27,
     "last_date": "2026-08-22",
     "devices": {
         "💻 Masaüstü": 178,
-        "📱 Mobil": 87
+        "📱 Mobil": 90
     },
     "browsers": {
-        "Google Chrome": 221,
-        "Apple Safari": 23,
+        "Google Chrome": 222,
+        "Apple Safari": 25,
         "Microsoft Edge": 17,
         "Diğer Tarayıcı": 4
     },
@@ -26,10 +26,100 @@
         "Direkt Giriş": 24,
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 7,
-        "🌐 Diğer Web Sitesi": 98,
-        "🔗 Doğrudan (Direct)": 83
+        "🌐 Diğer Web Sitesi": 99,
+        "🔗 Doğrudan (Direct)": 85
     },
     "recent_visitors": [
+        {
+            "id": "log_1787427361431",
+            "time": "22 Ağustos 22:36",
+            "iso_date": "2026-08-22",
+            "raw_time": "2026-08-22 22:36:01",
+            "ip": "66.249.66.37",
+            "country": "📍 Pryor / United States",
+            "location": "📍 Pryor / United States",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
+        {
+            "id": "log_1787420549716",
+            "time": "22 Ağustos 20:42",
+            "iso_date": "2026-08-22",
+            "raw_time": "2026-08-22 20:42:29",
+            "ip": "176.237.1.136",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Apple iOS)",
+            "browser": "Apple Safari",
+            "action": "⏱️ Sitede Kalma (22s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%19",
+            "time_spent": "22 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787420549601",
+            "time": "22 Ağustos 20:42",
+            "iso_date": "2026-08-22",
+            "raw_time": "2026-08-22 20:42:29",
+            "ip": "176.237.1.136",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Apple iOS)",
+            "browser": "Apple Safari",
+            "action": "📄 PDF Menü İndirme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%19",
+            "time_spent": "22 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787420527565",
+            "time": "22 Ağustos 20:42",
+            "iso_date": "2026-08-22",
+            "raw_time": "2026-08-22 20:42:07",
+            "ip": "176.237.1.136",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🌐 Diğer Web Sitesi",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Apple iOS)",
+            "browser": "Apple Safari",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787420521119",
+            "time": "22 Ağustos 20:42",
+            "iso_date": "2026-08-22",
+            "raw_time": "2026-08-22 20:42:01",
+            "ip": "176.237.1.136",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Apple iOS)",
+            "browser": "Apple Safari",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ TR"
+        },
         {
             "id": "log_1787418144110",
             "time": "22 Ağustos 20:02",
@@ -10360,20 +10450,20 @@
             "type": "🔄 Tekrar Gelen Misafir"
         }
     ],
-    "repeat_visitors": 206,
-    "new_visitors": 59,
+    "repeat_visitors": 207,
+    "new_visitors": 61,
     "os": {
         "Linux": 154,
         "Windows PC": 13,
-        "Apple iOS": 19,
-        "Android OS": 68,
+        "Apple iOS": 21,
+        "Android OS": 69,
         "Diğer Sistem": 6,
         "Apple macOS": 5
     },
     "peak_hours": {
         "14:00 - 17:00 (İkindi Kahve/Tatlı)": 65,
         "17:00 - 20:00 (Akşam Yemeği)": 77,
-        "20:00 - 23:00 (Gece Keyfi)": 59,
+        "20:00 - 23:00 (Gece Keyfi)": 62,
         "23:00 - 08:00 (Gece / Erken)": 28,
         "08:00 - 11:00 (Sabah Kahvaltı)": 1,
         "11:00 - 14:00 (Öğle Brunch)": 35
@@ -10384,13 +10474,13 @@
         "📍 Kartal / Türkiye": 112,
         "📍 Prineville / United States": 1,
         "📍 Kansas City / United States": 1,
-        "📍 Istanbul / Türkiye": 16,
+        "📍 Istanbul / Türkiye": 18,
         "📍 Şişli / Turkey": 15,
         "📍 Ashburn / United States": 2,
         "📍 Mountain View / United States": 7,
         "📍 Madrid / Spain": 1,
         "📍 San Jose / United States": 1,
-        "📍 Pryor / United States": 10,
+        "📍 Pryor / United States": 11,
         "📍 Minkler / United States": 1,
         "📍 Baku / Azerbaijan": 1,
         "📍 Sterling / United States": 1,
@@ -10408,16 +10498,16 @@
     "traffic_sources": {
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 7,
-        "🌐 Diğer Web Sitesi": 98,
-        "🔗 Doğrudan (Direct)": 83
+        "🌐 Diğer Web Sitesi": 99,
+        "🔗 Doğrudan (Direct)": 85
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 188
+        "🌐 Dışarıdan İnceleyen": 191
     },
     "lang_comparisons": {
-        "TR ➔ TR": 89,
-        "EN ➔ TR": 39,
+        "TR ➔ TR": 91,
+        "EN ➔ TR": 40,
         "EN ➔ EN": 16,
         "TR ➔ ES": 8,
         "TR ➔ RU": 3,
