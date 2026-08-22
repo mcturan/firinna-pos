@@ -149,8 +149,6 @@
                         <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin-top: 0.5rem;">
                             <button class="btn" onclick="openMergeModal()" style="background:#718096;color:white;" title="Siparişleri Birleştir">⊕ Birleştir</button>
                         </div>
-
-                        </div>
                     </div>
                 </div>
             </div>
@@ -964,6 +962,7 @@
             
             categoriesBar.innerHTML = categories.map((cat, index) => 
                 `<button class="category-btn ${index === 0 ? 'active' : ''}" 
+                         data-cat-id="${cat.id}"
                          style="background: ${cat.color}" 
                          onclick="selectCategory(${cat.id}, event)">${cat.name}</button>`
             ).join('');
@@ -972,8 +971,13 @@
         }
 
         async function selectCategory(categoryId, event) {
-            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-            if (event) event.target.classList.add('active');
+            document.querySelectorAll('#categoriesBar .category-btn').forEach(btn => {
+                if (btn.getAttribute('data-cat-id') == categoryId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
             
             const products = await fetch(`/api/products?category_id=${categoryId}`).then(r => r.json());
             allProducts = products;
@@ -1904,6 +1908,7 @@
             
             categoriesBar.innerHTML = categories.map((cat, index) => 
                 `<button class="category-btn ${index === 0 ? 'active' : ''}" 
+                         data-past-cat-id="${cat.id}"
                          style="background: ${cat.color}" 
                          onclick="selectPastCategory(${cat.id}, event)">${cat.name}</button>`
             ).join('');
@@ -1914,10 +1919,13 @@
         }
 
         async function selectPastCategory(categoryId, event) {
-            if (event) {
-                document.querySelectorAll('#pastCategoriesBar .category-btn').forEach(btn => btn.classList.remove('active'));
-                event.target.classList.add('active');
-            }
+            document.querySelectorAll('#pastCategoriesBar .category-btn').forEach(btn => {
+                if (btn.getAttribute('data-past-cat-id') == categoryId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
             
             const products = await fetch(`/api/products?category_id=${categoryId}`).then(r => r.json());
             displayPastProducts(products);

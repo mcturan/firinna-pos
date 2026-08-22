@@ -125,7 +125,7 @@ def get_db():
 # KATEGORI İŞLEMLERİ
 def get_categories():
     conn = get_db()
-    categories = conn.execute('SELECT * FROM categories ORDER BY name').fetchall()
+    categories = conn.execute('SELECT * FROM categories ORDER BY sort_order, id').fetchall()
     conn.close()
     return [dict(cat) for cat in categories]
 

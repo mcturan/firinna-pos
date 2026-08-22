@@ -44,8 +44,8 @@
     "rss_refresh_mins": 15,
     "rss_url": "",
     "watermark_cycle": {
-        "interval_sec": 30,
-        "duration_sec": 12,
+        "interval_sec": 60,
+        "duration_sec": 15,
         "cards": [
             {
                 "id": "wm-card-1787411203291",
@@ -54,6 +54,7 @@
                 "image": "/static/img/watermarks/wm_1787411210_bayrak.gif",
                 "enabled": true,
                 "is_pinned": false,
+                "duration_sec": null,
                 "effect": "confetti",
                 "effects": {
                     "balloons": false,
@@ -68,6 +69,7 @@
                 "image": "/static/img/watermarks/card_0_logo.png",
                 "enabled": true,
                 "is_pinned": false,
+                "duration_sec": null,
                 "effect": "none",
                 "effects": {
                     "balloons": false,
@@ -82,6 +84,7 @@
                 "image": "/static/img/watermarks/card_1_social.png",
                 "enabled": true,
                 "is_pinned": false,
+                "duration_sec": null,
                 "effect": "none",
                 "effects": {
                     "balloons": false,
@@ -96,6 +99,7 @@
                 "image": "/static/img/watermarks/card_2_students.png",
                 "enabled": true,
                 "is_pinned": false,
+                "duration_sec": null,
                 "effect": "none",
                 "effects": {
                     "balloons": false,
@@ -110,6 +114,7 @@
                 "image": "/static/img/watermarks/card_3_animals.png",
                 "enabled": true,
                 "is_pinned": false,
+                "duration_sec": null,
                 "effect": "none",
                 "effects": {
                     "balloons": false,
@@ -122,10 +127,10 @@
     "last_push": {
         "action": "clear_cache",
         "target": "all",
-        "timestamp": 1787411847306
+        "timestamp": 1787412936266
     },
-    "last_ping": "2026-08-22T18:28:45.099497",
-    "version": 1787411818194,
+    "last_ping": "2026-08-22T18:42:24.481496",
+    "version": 1787412836295,
     "did_you_know": [
         {
             "id": "dyk_1",
