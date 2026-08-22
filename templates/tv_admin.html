@@ -272,7 +272,26 @@
                         <option value="60" selected>1 Saatte Bir (En Fazla)</option>
                     </select>
                 </div>
-                <small style="color:#15803d; display:block; margin-top:4px;">Seçtiğiniz tüm kaynaklardan canlı başlıklar otomatik olarak toplanıp ekranda akıcı şekilde döndürülür.</small>
+                <small style="color:#15803d; display:block; margin-top:4px;">Seçtiğiniz tüm kaynaklardan canlı başlıklar otomatik olarak toplanıp tarihe göre kronolojik olarak sıralanır.</small>
+            </div>
+
+            <!-- Live 20 News Stream Table / Preview -->
+            <div style="margin-bottom: 1.5rem; background:#ffffff; border-radius:10px; border:1.5px solid #cbd5e1; padding:16px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <h4 style="margin:0; font-size:1.05rem; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                            📡 Yayındaki En Son 20 Haber (Canlı Akış & Tarihler)
+                            <span id="rss_news_count_badge" style="background:#e0f2fe; color:#0369a1; font-size:0.78rem; padding:2px 8px; border-radius:10px; font-weight:bold;">20 Haber</span>
+                        </h4>
+                        <small id="rss_last_updated_text" style="color:#64748b; font-size:0.8rem;">Son güncelleme: Yükleniyor...</small>
+                    </div>
+                    <button type="button" onclick="fetchRssNewsPreview(true)" id="btn_refresh_rss" style="background:#0284c7; color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.85rem;">
+                        🔄 Haberleri Şimdi Yenile
+                    </button>
+                </div>
+                <div id="rss_news_preview_list" style="max-height:360px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc; padding:8px;">
+                    <div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9rem;">Haberler yükleniyor...</div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -830,8 +849,75 @@
             }
         }
 
+        async function fetchRssNewsPreview(force = false) {
+            const listEl = document.getElementById('rss_news_preview_list');
+            const countBadge = document.getElementById('rss_news_count_badge');
+            const updatedText = document.getElementById('rss_last_updated_text');
+            const btnRefresh = document.getElementById('btn_refresh_rss');
+
+            if (!listEl) return;
+            if (force && btnRefresh) {
+                btnRefresh.textContent = "⏳ Yenileniyor...";
+                btnRefresh.disabled = true;
+            }
+
+            try {
+                const url = force ? '/api/tv/rss?force=1' : '/api/tv/rss';
+                const res = await fetch(url);
+                const data = await res.json();
+                const items = data.items || [];
+
+                if (countBadge) countBadge.textContent = `${items.length} Canlı Haber`;
+                if (updatedText && data.last_updated) {
+                    updatedText.textContent = `Son güncelleme: ${data.last_updated}`;
+                }
+
+                if (items.length === 0) {
+                    listEl.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9rem;">
+                        Seçili kaynaklardan haber bulunamadı veya RSS kapalı.
+                    </div>`;
+                    return;
+                }
+
+                let html = '';
+                items.forEach((it, idx) => {
+                    html += `
+                        <div style="display:flex; align-items:center; gap:12px; padding:8px 10px; margin-bottom:6px; background:#ffffff; border-radius:6px; border:1px solid #e2e8f0; font-size:0.88rem;">
+                            <span style="font-weight:bold; color:#64748b; font-size:0.85rem; width:22px; text-align:right; flex-shrink:0;">${idx+1}.</span>
+                            <span style="background:#f1f5f9; color:#334155; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px; border:1px solid #cbd5e1; white-space:nowrap; flex-shrink:0;">
+                                ${it.source}
+                            </span>
+                            <span style="flex:1; color:#0f172a; font-weight:600; line-height:1.35;">
+                                ${it.title}
+                            </span>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0; text-align:right;">
+                                <span style="font-size:0.75rem; font-weight:700; color:#059669; background:#dcfce7; padding:2px 6px; border-radius:4px;">
+                                    🟢 ${it.time_ago}
+                                </span>
+                                <span style="font-size:0.72rem; color:#94a3b8;">
+                                    ${it.pub_date}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+                listEl.innerHTML = html;
+            } catch(e) {
+                console.error("RSS önizleme hatası:", e);
+                listEl.innerHTML = `<div style="text-align:center; padding:15px; color:#dc2626; font-size:0.85rem;">
+                    Haber akışı yüklenemedi. Lütfen internet bağlantısını kontrol edin.
+                </div>`;
+            } finally {
+                if (btnRefresh) {
+                    btnRefresh.textContent = "🔄 Haberleri Şimdi Yenile";
+                    btnRefresh.disabled = false;
+                }
+            }
+        }
+
         loadSettings();
         fetchClients();
+        fetchRssNewsPreview();
         setInterval(fetchClients, 4000);
     </script>
 </body>

@@ -3650,14 +3650,14 @@ def api_tv_rates():
 
     return jsonify(rates_data)
 
-_rss_cache = {"key": "", "time": 0, "titles": []}
+_rss_cache = {"key": "", "time": 0, "titles": [], "items": [], "last_updated": ""}
 
 PRESET_FEEDS = {
-    "turkey_archaeo": ("🏛️ Türkiye Arkeoloji, Antik Kentler & Tarih (EN)", "https://news.google.com/rss/search?q=when:7d+turkey+archaeology+OR+arkeoloji+OR+excavation+OR+heritage+OR+unesco&hl=en-US&gl=US&ceid=US:en"),
-    "ds_arts_en": ("🎨 Daily Sabah (Kültür, Sanat & Yaşam - EN)", "https://www.dailysabah.com/rssFeed/arts"),
-    "aa_life_en": ("📜 Anadolu Agency (Kültürel Miras & Yaşam - EN)", "https://www.aa.com.tr/en/rss/default?cat=life"),
-    "turkey_exp_en": ("☕ İstanbul & Türkiye Güncel Etkinlikler (EN)", "https://news.google.com/rss/search?q=when:48h+Istanbul+OR+Turkey+culture+OR+arts+OR+events+OR+tourism+OR+heritage&hl=en-US&gl=US&ceid=US:en"),
-    "goodnews_en": ("🌱 Good News Network (Pozitif Dünya Hikayeleri - EN)", "https://www.goodnewsnetwork.org/feed/")
+    "turkey_archaeo": ("🏛️ Tarih & Arkeoloji", "https://news.google.com/rss/search?q=when:7d+turkey+archaeology+OR+arkeoloji+OR+excavation+OR+heritage+OR+unesco&hl=en-US&gl=US&ceid=US:en"),
+    "ds_arts_en": ("🎨 Daily Sabah Kültür", "https://www.dailysabah.com/rssFeed/arts"),
+    "aa_life_en": ("📜 Anadolu Agency Yaşam", "https://www.aa.com.tr/en/rss/default?cat=life"),
+    "turkey_exp_en": ("☕ İstanbul & Kültür", "https://news.google.com/rss/search?q=when:48h+Istanbul+OR+Turkey+culture+OR+arts+OR+events+OR+tourism+OR+heritage&hl=en-US&gl=US&ceid=US:en"),
+    "goodnews_en": ("🌱 Good News Network", "https://www.goodnewsnetwork.org/feed/")
 }
 
 # Unwanted disaster / crime / war words to maintain pleasant bakery ambience
@@ -3667,47 +3667,59 @@ NEGATIVE_KEYWORDS = [
     'sanctions', 'suicide', 'tragedy', 'casualty', 'disaster', 'crash', 'arrest',
     'gaza', 'israel', 'syria', 'iran', 'palestinian', 'court', 'jail', 'prison',
     'savaş', 'ölü', 'ölüm', 'saldırı', 'bomba', 'patlama', 'cinayet', 'çatışma',
-    'kaza', 'facia', 'ceset', 'gözaltı', 'tutuklama', 'rehin', 'yaralı', 'operasyon'
+    'kaza', 'facia', 'ceset', 'gözaltı', 'tutuklama', 'rehin', 'yaralı', 'operasyon',
+    'netanyahu', 'dictator', 'antisemitic'
 ]
 
 @app.route('/api/tv/rss', methods=['GET'])
 def api_tv_rss():
     global _rss_cache
     import time
+    import email.utils
+    import xml.etree.ElementTree as ET
+    from datetime import datetime
+    
     settings = get_tv_settings()
+    force_refresh = request.args.get('force') == '1'
     
     # Enabled sources
     enabled_sources = []
-    
-    # Presets (100% English Turkey culture & positive developments)
     if settings.get('rss_turkey_archaeo_enabled', True):
-        enabled_sources.append(('TurkeyArchaeo', PRESET_FEEDS['turkey_archaeo'][1]))
+        enabled_sources.append(('turkey_archaeo', PRESET_FEEDS['turkey_archaeo'][0], PRESET_FEEDS['turkey_archaeo'][1]))
     if settings.get('rss_ds_arts_en_enabled', True):
-        enabled_sources.append(('DSArts', PRESET_FEEDS['ds_arts_en'][1]))
+        enabled_sources.append(('ds_arts_en', PRESET_FEEDS['ds_arts_en'][0], PRESET_FEEDS['ds_arts_en'][1]))
     if settings.get('rss_aa_life_en_enabled', True):
-        enabled_sources.append(('AALife', PRESET_FEEDS['aa_life_en'][1]))
+        enabled_sources.append(('aa_life_en', PRESET_FEEDS['aa_life_en'][0], PRESET_FEEDS['aa_life_en'][1]))
     if settings.get('rss_turkey_exp_en_enabled', True):
-        enabled_sources.append(('TurkeyExp', PRESET_FEEDS['turkey_exp_en'][1]))
+        enabled_sources.append(('turkey_exp_en', PRESET_FEEDS['turkey_exp_en'][0], PRESET_FEEDS['turkey_exp_en'][1]))
     if settings.get('rss_goodnews_en_enabled', True):
-        enabled_sources.append(('GoodNews', PRESET_FEEDS['goodnews_en'][1]))
+        enabled_sources.append(('goodnews_en', PRESET_FEEDS['goodnews_en'][0], PRESET_FEEDS['goodnews_en'][1]))
         
     custom_url = settings.get('rss_url', '').strip()
     if custom_url and settings.get('rss_custom_enabled', False):
-        enabled_sources.append(('Custom', custom_url))
+        enabled_sources.append(('custom', '🔗 Özel Kaynak', custom_url))
         
     if not enabled_sources:
-        return jsonify({"titles": [], "enabled": False})
+        return jsonify({"titles": [], "items": [], "count": 0, "enabled": False})
         
     cache_key = "_".join([s[0] for s in enabled_sources]) + "_" + custom_url
     now = time.time()
-    if _rss_cache["key"] == cache_key and (now - _rss_cache["time"] < 120) and _rss_cache["titles"]:
-        return jsonify({"titles": _rss_cache["titles"], "enabled": True})
+    
+    # Cache duration: 120 seconds unless force refreshed
+    if not force_refresh and _rss_cache.get("key") == cache_key and (now - _rss_cache.get("time", 0) < 120) and _rss_cache.get("items"):
+        return jsonify({
+            "titles": _rss_cache["titles"],
+            "items": _rss_cache["items"],
+            "count": len(_rss_cache["items"]),
+            "last_updated": _rss_cache.get("last_updated", ""),
+            "enabled": True
+        })
         
-    all_titles = []
-    for label, feed_url in enabled_sources:
+    raw_items = []
+    for key_id, label, feed_url in enabled_sources:
         try:
             req = urllib.request.Request(feed_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
-            with urllib.request.urlopen(req, timeout=5) as resp:
+            with urllib.request.urlopen(req, timeout=6) as resp:
                 content = resp.read()
                 
             if b'<html' in content.lower() or b'<!doctype' in content.lower() or feed_url.endswith('.html'):
@@ -3716,37 +3728,122 @@ def api_tv_rss():
                 for a in soup.find_all('a'):
                     txt = a.get_text().strip()
                     if txt and len(txt) > 20 and not txt.startswith(('Feed Informer', 'Widgets', 'Privacy', 'Terms')):
-                        # Filter out negative / tragedy / war keywords
                         if not any(bad in txt.lower() for bad in NEGATIVE_KEYWORDS):
-                            if txt not in all_titles:
-                                all_titles.append(txt)
+                            raw_items.append({
+                                'title': txt,
+                                'source': label,
+                                'source_id': key_id,
+                                'pub_date': '',
+                                'ts': now - 3600  # Fallback to 1h ago if HTML widget doesn't have timestamps
+                            })
             else:
-                import xml.etree.ElementTree as ET
                 root = ET.fromstring(content)
-                for item in root.findall('.//item')[:12]:
+                # Standard RSS items
+                for item in root.findall('.//item'):
                     t = item.find('title')
-                    if t is not None and t.text:
-                        clean_t = t.text.strip()
-                        # Filter out negative / tragedy / war keywords
-                        if not any(bad in clean_t.lower() for bad in NEGATIVE_KEYWORDS):
-                            if clean_t not in all_titles:
-                                all_titles.append(clean_t)
-                if len(all_titles) < 5:
-                    for item in root.findall('.//{http://www.w3.org/2005/Atom}entry')[:12]:
+                    d = item.find('pubDate')
+                    title = t.text.strip() if t is not None and t.text else ''
+                    date_str = d.text.strip() if d is not None and d.text else ''
+                    ts = 0
+                    if date_str:
+                        try:
+                            dt = email.utils.parsedate_to_datetime(date_str)
+                            ts = dt.timestamp()
+                        except Exception:
+                            pass
+                    if title and len(title) > 10:
+                        if not any(bad in title.lower() for bad in NEGATIVE_KEYWORDS):
+                            raw_items.append({
+                                'title': title,
+                                'source': label,
+                                'source_id': key_id,
+                                'pub_date': date_str,
+                                'ts': ts or (now - 7200)
+                            })
+                # Atom entries fallback
+                if len(raw_items) < 5:
+                    for item in root.findall('.//{http://www.w3.org/2005/Atom}entry'):
                         t = item.find('{http://www.w3.org/2005/Atom}title')
-                        if t is not None and t.text:
-                            clean_t = t.text.strip()
-                            if not any(bad in clean_t.lower() for bad in NEGATIVE_KEYWORDS):
-                                if clean_t not in all_titles:
-                                    all_titles.append(clean_t)
+                        d = item.find('{http://www.w3.org/2005/Atom}updated') or item.find('{http://www.w3.org/2005/Atom}published')
+                        title = t.text.strip() if t is not None and t.text else ''
+                        date_str = d.text.strip() if d is not None and d.text else ''
+                        ts = 0
+                        if date_str:
+                            try:
+                                dt = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+                                ts = dt.timestamp()
+                            except Exception:
+                                pass
+                        if title and len(title) > 10:
+                            if not any(bad in title.lower() for bad in NEGATIVE_KEYWORDS):
+                                raw_items.append({
+                                    'title': title,
+                                    'source': label,
+                                    'source_id': key_id,
+                                    'pub_date': date_str,
+                                    'ts': ts or (now - 7200)
+                                })
         except Exception as e:
             print(f"[RSS ERROR] Failed to fetch {label} ({feed_url}): {e}")
             
-    if all_titles:
-        _rss_cache = {"key": cache_key, "time": now, "titles": all_titles[:35]}
-        return jsonify({"titles": all_titles[:35], "enabled": True})
-    else:
-        return jsonify({"titles": _rss_cache.get("titles", []), "enabled": True})
+    # Deduplicate by title
+    unique_items = []
+    seen_titles = set()
+    for it in raw_items:
+        clean = it['title'].strip().lower()
+        if clean not in seen_titles:
+            seen_titles.add(clean)
+            unique_items.append(it)
+            
+    # Sort chronologically by publication timestamp (newest first)
+    unique_items.sort(key=lambda x: x['ts'], reverse=True)
+    
+    # Strictly take top 20 latest news items (discard all older ones)
+    top20_items = unique_items[:20]
+    
+    # Format publication time and relative time
+    formatted_items = []
+    for it in top20_items:
+        ts = it['ts']
+        diff = int(now - ts) if ts else 0
+        if diff < 60:
+            time_ago = 'Az önce'
+        elif diff < 3600:
+            time_ago = f'{diff // 60} dk önce'
+        elif diff < 86400:
+            time_ago = f'{diff // 3600} saat önce'
+        else:
+            time_ago = f'{diff // 86400} gün önce'
+            
+        date_formatted = datetime.fromtimestamp(ts).strftime('%d.%m.%Y %H:%M') if ts else 'Belirtilmemiş'
+        
+        formatted_items.append({
+            'title': it['title'],
+            'source': it['source'],
+            'source_id': it['source_id'],
+            'pub_date': date_formatted,
+            'time_ago': time_ago,
+            'ts': ts
+        })
+        
+    titles_20 = [it['title'] for it in formatted_items]
+    last_updated_str = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
+    
+    _rss_cache = {
+        "key": cache_key,
+        "time": now,
+        "titles": titles_20,
+        "items": formatted_items,
+        "last_updated": last_updated_str
+    }
+    
+    return jsonify({
+        "titles": titles_20,
+        "items": formatted_items,
+        "count": len(formatted_items),
+        "last_updated": last_updated_str,
+        "enabled": True
+    })
 
 @app.route('/api/tv/products', methods=['GET'])
 def get_tv_products():
