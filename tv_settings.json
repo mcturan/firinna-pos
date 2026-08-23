@@ -125,11 +125,11 @@
         ]
     },
     "last_push": {
-        "action": "clear_cache",
+        "action": "reload",
         "target": "all",
-        "timestamp": 1787502730856
+        "timestamp": 1787502849090
     },
-    "last_ping": "2026-08-23T19:33:50.937445",
+    "last_ping": "2026-08-23T19:38:01.683416",
     "version": 1787502730856,
     "did_you_know": [
         {

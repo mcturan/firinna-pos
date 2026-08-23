@@ -20,11 +20,21 @@
             -webkit-font-smoothing: antialiased;
         }
         
-        html.native-video-active, html.native-video-active body {
+        html.native-video-active, 
+        html.native-video-active body, 
+        html.native-video-active #modern-layout, 
+        html.native-video-active #ml-main-video {
             background: transparent !important;
+            background-color: transparent !important;
         }
 
-        /* Hide all default WebView / Chromium circular play overlays and controls */
+        /* Completely suppress all default WebView / Chromium circular play overlays and controls */
+        *::-webkit-media-controls,
+        *::-webkit-media-controls-enclosure,
+        *::-webkit-media-controls-panel,
+        *::-webkit-media-controls-play-button,
+        *::-webkit-media-controls-start-playback-button,
+        *::-webkit-media-controls-overlay-play-button,
         video::-webkit-media-controls-overlay-play-button,
         video::-webkit-media-controls-start-playback-button,
         video::-webkit-media-controls,
@@ -829,8 +839,14 @@
             if (!rawVideo) rawVideo = "/static/tv_media/videos/1.mp4";
             let fileName = rawVideo.includes("/") ? rawVideo.split("/").pop() : rawVideo;
             
-            // 1. Android TV APK Bridge Notification (optional hardware helper)
+            // 1. Android TV APK Hardware Native Player (Mi Stick)
             if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
+                console.log("[AndroidTV] Native player activated for:", fileName);
+                document.documentElement.classList.add('native-video-active');
+                if (vidEl) {
+                    vidEl.pause();
+                    vidEl.style.display = "none";
+                }
                 try {
                     const videoBox = document.getElementById('ml-main-video');
                     if (videoBox && window.AndroidTV.setVideoBounds) {
@@ -843,10 +859,13 @@
                         );
                     }
                     window.AndroidTV.playNativeVideo(fileName);
-                } catch(e) {}
+                } catch(e) {
+                    console.error("[AndroidTV] Native player error:", e);
+                }
+                return;
             }
 
-            // 2. Universal HTML5 Video Player (Zero Black Screen, Direct HTTP streaming)
+            // 2. Web & Desktop HTML5 Video Player (Preview & Desktop Screens)
             document.documentElement.classList.remove('native-video-active');
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
