@@ -3468,7 +3468,7 @@ def get_tv_settings():
         "logo_url": db.get_setting('logo_url', ''),
         "layout": "modern_grid",
         "video_playlist": "",
-        "local_videos": ["/static/tv_media/videos/1.mp4", "/static/tv_media/videos/bayrak.mp4"],
+        "local_videos": ["/static/tv_media/videos/1.mp4"],
         "local_audio": [],
         "media_source": "local",
         "audio_priority": "video",

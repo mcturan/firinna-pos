@@ -804,16 +804,21 @@
         window.playNextNativeVideo = function() {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             currentLocalVideoIndex = (currentLocalVideoIndex + 1) % activeList.length;
-            playLocalVideo(currentLocalVideoIndex);
+            console.log("[VIDEO LOOP] Next video index:", currentLocalVideoIndex, "Target:", activeList[currentLocalVideoIndex]);
+            
+            // Give 250ms for Android MediaPlayer or HTML5 hardware decoder pipeline to cleanly release before starting next/same video
+            setTimeout(() => {
+                playLocalVideo(currentLocalVideoIndex);
+            }, 250);
         };
 
         window.onNativeVideoEnded = function() {
-            console.log("[AndroidTV] Native video ended callback received. Looping...");
+            console.log("[AndroidTV] Native video ended callback received. Advancing...");
             window.playNextNativeVideo();
         };
 
         window.onVideoEnded = function() {
-            console.log("[AndroidTV] onVideoEnded callback received. Looping...");
+            console.log("[AndroidTV] onVideoEnded callback received. Advancing...");
             window.playNextNativeVideo();
         };
 
