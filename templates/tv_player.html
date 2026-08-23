@@ -829,12 +829,8 @@
             if (!rawVideo) rawVideo = "/static/tv_media/videos/1.mp4";
             let fileName = rawVideo.includes("/") ? rawVideo.split("/").pop() : rawVideo;
             
-            // 1. Android TV APK - Hardware Native Playback
+            // 1. Android TV APK Bridge Notification (optional hardware helper)
             if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
-                console.log("[AndroidTV] Triggering native video player for:", fileName);
-                vidEl.pause();
-                vidEl.style.display = "none";
-                document.documentElement.classList.add('native-video-active');
                 try {
                     const videoBox = document.getElementById('ml-main-video');
                     if (videoBox && window.AndroidTV.setVideoBounds) {
@@ -846,12 +842,11 @@
                             Math.round(rect.height)
                         );
                     }
+                    window.AndroidTV.playNativeVideo(fileName);
                 } catch(e) {}
-                window.AndroidTV.playNativeVideo(fileName);
-                return;
             }
 
-            // 2. Web & Mobile HTML5 Single Video Player (Preview & Screens)
+            // 2. Universal HTML5 Video Player (Zero Black Screen, Direct HTTP streaming)
             document.documentElement.classList.remove('native-video-active');
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
@@ -2093,8 +2088,8 @@
         }
 
         function applySettings(data) {
+            const layout = data.layout || 'modern_grid';
             try {
-                const layout = data.layout || 'modern_grid';
                 document.body.className = `layout-${layout}`;
                 
                 if(data.logo_url) {
@@ -2173,13 +2168,8 @@
                 }
             } else if (currentMediaSource === 'local') {
                 document.getElementById('ytplayer').style.display = 'none';
-                if (window.AndroidTV) {
-                    vidEl.style.display = 'none';
-                    document.documentElement.classList.add('native-video-active');
-                } else {
-                    vidEl.style.display = 'block';
-                    document.documentElement.classList.remove('native-video-active');
-                }
+                vidEl.style.display = 'block';
+                document.documentElement.classList.remove('native-video-active');
                 
                 let newLocalVideos = data.local_videos || [];
                 const oldListStr = JSON.stringify(localVideoList);
