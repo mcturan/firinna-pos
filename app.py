@@ -4085,15 +4085,15 @@ def api_delete_tv_media():
 
 @app.route('/tv-admin')
 def tv_admin():
-    return render_template('tv_admin.html')
+    return render_template('tv_admin.html', settings=get_tv_settings())
 
 @app.route('/tv-player')
 def tv_player():
-    return render_template('tv_player.html')
+    return render_template('tv_player.html', settings=get_tv_settings())
 
 @app.route('/tv')
 def tv_redirect():
-    return redirect('/tv-player')
+    return render_template('tv_player.html', settings=get_tv_settings())
 
 
 

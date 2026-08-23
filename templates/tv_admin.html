@@ -714,6 +714,8 @@
                     if (!localVideos.includes(newUrl)) localVideos.push(newUrl);
                 }
                 fetchLocalMedia();
+                saveSettings(false);
+                setTimeout(refreshTvPreview, 500);
             } catch(e) {
                 alert("Yükleme başarısız oldu.");
             }
@@ -1402,6 +1404,7 @@
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({action: 'reload', client_id: 'all'})
                     });
+                    setTimeout(refreshTvPreview, 500);
                 } else {
                     if (showAlert) alert("❌ Kaydedilemedi: " + (data.error || 'Bilinmeyen hata'));
                 }
@@ -1487,6 +1490,7 @@
                 });
                 alert(`⚡ Komut iletildi! Hedef: ${targetText}`);
                 setTimeout(fetchClients, 1000);
+                setTimeout(refreshTvPreview, 500);
             } catch(e) {
                 alert("Push sinyali gönderilemedi.");
             }
