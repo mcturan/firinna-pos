@@ -791,6 +791,11 @@
             playLocalVideo(currentLocalVideoIndex);
         };
 
+        window.onNativeVideoEnded = function() {
+            console.log("[AndroidTV] Native video ended callback received. Looping...");
+            window.playNextNativeVideo();
+        };
+
         function checkAndBufferTargetVideo() {
             const badge = document.getElementById('ml-dl-badge');
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : [];
@@ -867,8 +872,10 @@
                     // Seamlessly switch video player to ready video
                     isPlayingFallback = false;
                     vidEl.src = blobUrl;
+                    try { vidEl.currentTime = 0; } catch(e){}
                     vidEl.play().catch(e => {
                         vidEl.src = targetUrl;
+                        try { vidEl.currentTime = 0; } catch(err){}
                         vidEl.play().catch(()=>{});
                     });
 
@@ -936,11 +943,17 @@
                 vidEl.src = srcUrl;
             }
 
+            // Explicitly rewind to 0 so loop restarts from beginning
+            try {
+                vidEl.currentTime = 0;
+            } catch(e) {}
+
             const playPromise = vidEl.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
                     console.log("Autoplay retry with muted...", err);
                     vidEl.muted = true;
+                    try { vidEl.currentTime = 0; } catch(e){}
                     vidEl.play().catch(e => {
                         console.error("Play error:", e);
                     });
@@ -948,12 +961,35 @@
             }
 
             vidEl.onended = () => {
+                console.log("[HTML5 Video] onended event -> advancing / repeating...");
                 window.playNextNativeVideo();
             };
             vidEl.onerror = (e) => { 
-                console.log("Video source load error, retrying...", e);
+                console.log("[HTML5 Video] error event -> advancing to next in 1.5s...", e);
+                setTimeout(() => {
+                    window.playNextNativeVideo();
+                }, 1500);
             };
         }
+
+        // WATCHDOG: Detects stalled, frozen or black-screen ended videos on Mi TV Stick
+        setInterval(() => {
+            if (isAfterHoursActive || currentMediaSource !== 'local' || window.AndroidTV) return;
+            if (vidEl && vidEl.style.display !== 'none') {
+                // If video is marked as ended, or paused while at duration, or currentTime stopped advancing
+                if (vidEl.ended || (vidEl.paused && vidEl.currentTime > 0 && Math.abs(vidEl.currentTime - vidEl.duration) < 1.5)) {
+                    console.warn("[VIDEO WATCHDOG] Video stopped at end without looping. Restarting video...");
+                    window.playNextNativeVideo();
+                } else if (vidEl.paused) {
+                    console.warn("[VIDEO WATCHDOG] Video paused unexpectedly. Forcing play...");
+                    vidEl.muted = true;
+                    try { vidEl.currentTime = 0; } catch(e){}
+                    vidEl.play().catch(() => {
+                        window.playNextNativeVideo();
+                    });
+                }
+            }
+        }, 3500);
 
         function playLocalAudio(aIndex) {
             if(localAudioList.length === 0) return;

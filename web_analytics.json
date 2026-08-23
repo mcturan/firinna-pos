@@ -1,16 +1,16 @@
 {
-    "today": 3,
-    "month": 271,
-    "total": 271,
+    "today": 4,
+    "month": 272,
+    "total": 272,
     "menu": 8,
     "actions": 27,
     "last_date": "2026-08-23",
     "devices": {
         "💻 Masaüstü": 181,
-        "📱 Mobil": 90
+        "📱 Mobil": 91
     },
     "browsers": {
-        "Google Chrome": 225,
+        "Google Chrome": 226,
         "Apple Safari": 25,
         "Microsoft Edge": 17,
         "Diğer Tarayıcı": 4
@@ -27,9 +27,45 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 7,
         "🌐 Diğer Web Sitesi": 99,
-        "🔗 Doğrudan (Direct)": 88
+        "🔗 Doğrudan (Direct)": 89
     },
     "recent_visitors": [
+        {
+            "id": "log_1787469239537",
+            "time": "23 Ağustos 10:13",
+            "iso_date": "2026-08-23",
+            "raw_time": "2026-08-23 10:13:59",
+            "ip": "85.105.158.49",
+            "country": "📍 Istanbul / Türkiye",
+            "location": "📍 Istanbul / Türkiye",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "⏱️ Sitede Kalma (24s)",
+            "type": "🔄 Tekrar Gelen Misafir",
+            "scroll_depth": "%62",
+            "time_spent": "24 sn",
+            "lang_compare": "TR ➔ TR"
+        },
+        {
+            "id": "log_1787469215097",
+            "time": "23 Ağustos 10:13",
+            "iso_date": "2026-08-23",
+            "raw_time": "2026-08-23 10:13:35",
+            "ip": "81.215.219.106",
+            "country": "📍 Ümraniye / Turkey",
+            "location": "📍 Ümraniye / Turkey",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "📱 Mobil (Android OS)",
+            "browser": "Google Chrome",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "TR ➔ TR"
+        },
         {
             "id": "log_1787454438107",
             "time": "23 Ağustos 06:07",
@@ -10523,12 +10559,12 @@
         }
     ],
     "repeat_visitors": 208,
-    "new_visitors": 63,
+    "new_visitors": 64,
     "os": {
         "Linux": 155,
         "Windows PC": 15,
         "Apple iOS": 21,
-        "Android OS": 69,
+        "Android OS": 70,
         "Diğer Sistem": 6,
         "Apple macOS": 5
     },
@@ -10537,7 +10573,7 @@
         "17:00 - 20:00 (Akşam Yemeği)": 77,
         "20:00 - 23:00 (Gece Keyfi)": 62,
         "23:00 - 08:00 (Gece / Erken)": 31,
-        "08:00 - 11:00 (Sabah Kahvaltı)": 1,
+        "08:00 - 11:00 (Sabah Kahvaltı)": 2,
         "11:00 - 14:00 (Öğle Brunch)": 35
     },
     "map_clicks": 1,
@@ -10566,20 +10602,21 @@
         "📍 Toronto / Canada": 2,
         "📍 Frankfurt am Main / Germany": 4,
         "📍 Sousse / Tunisia": 1,
-        "📍 Vaduz / Liechtenstein": 1
+        "📍 Vaduz / Liechtenstein": 1,
+        "📍 Ümraniye / Turkey": 1
     },
     "traffic_sources": {
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 7,
         "🌐 Diğer Web Sitesi": 99,
-        "🔗 Doğrudan (Direct)": 88
+        "🔗 Doğrudan (Direct)": 89
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 194
+        "🌐 Dışarıdan İnceleyen": 195
     },
     "lang_comparisons": {
-        "TR ➔ TR": 92,
+        "TR ➔ TR": 93,
         "EN ➔ TR": 42,
         "EN ➔ EN": 16,
         "TR ➔ ES": 8,
@@ -10599,4 +10636,4 @@
         "ZH ➔ ZH": 2,
         "FR ➔ TR": 1
     }
-}
+}}
