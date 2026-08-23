@@ -21,7 +21,20 @@
         }
         
         html.native-video-active, html.native-video-active body {
-            background: #0B0F19 !important;
+            background: transparent !important;
+        }
+
+        /* Hide all default WebView / Chromium circular play overlays and controls */
+        video::-webkit-media-controls-overlay-play-button,
+        video::-webkit-media-controls-start-playback-button,
+        video::-webkit-media-controls,
+        video::-webkit-media-controls-panel,
+        video::-webkit-media-controls-play-button {
+            display: none !important;
+            -webkit-appearance: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
 
         /* Legacy Layout (Default & Sidebar) */
@@ -767,8 +780,13 @@
             currentMediaSource = sourceType;
             if(sourceType === 'local') {
                 document.getElementById('ytplayer').style.display = 'none';
-                document.getElementById('local-video').style.display = 'block';
-                document.documentElement.classList.remove('native-video-active');
+                if (!window.AndroidTV) {
+                    vidEl.style.display = 'block';
+                    document.documentElement.classList.remove('native-video-active');
+                } else {
+                    vidEl.style.display = 'none';
+                    document.documentElement.classList.add('native-video-active');
+                }
                 if(player && player.pauseVideo) player.pauseVideo();
             } else {
                 document.documentElement.classList.remove('native-video-active');
@@ -794,6 +812,11 @@
             window.playNextNativeVideo();
         };
 
+        window.onVideoEnded = function() {
+            console.log("[AndroidTV] onVideoEnded callback received. Looping...");
+            window.playNextNativeVideo();
+        };
+
         function playLocalVideo(vIndex) {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             currentLocalVideoIndex = vIndex % activeList.length;
@@ -803,6 +826,10 @@
             
             // 1. Android TV APK - Hardware Native Playback
             if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
+                console.log("[AndroidTV] Triggering native video player for:", fileName);
+                vidEl.pause();
+                vidEl.style.display = "none";
+                document.documentElement.classList.add('native-video-active');
                 try {
                     const videoBox = document.getElementById('ml-main-video');
                     if (videoBox && window.AndroidTV.setVideoBounds) {
@@ -816,14 +843,17 @@
                     }
                 } catch(e) {}
                 window.AndroidTV.playNativeVideo(fileName);
+                return;
             }
 
             // 2. Web & Mobile HTML5 Single Video Player
+            document.documentElement.classList.remove('native-video-active');
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             
             vidEl.style.display = "block";
             vidEl.muted = true;
+            vidEl.defaultMuted = true;
             
             const currentSrc = vidEl.getAttribute('src') || vidEl.src || '';
             const isSameSrc = currentSrc.endsWith(srcUrl) || currentSrc === srcUrl;
@@ -843,6 +873,7 @@
                 playPromise.catch(err => {
                     console.log("[VIDEO] Autoplay retry with muted...", err);
                     vidEl.muted = true;
+                    vidEl.defaultMuted = true;
                     try { vidEl.currentTime = 0; } catch(e){}
                     vidEl.play().catch(e => {
                         console.error("[VIDEO] Play error:", e);
@@ -2091,8 +2122,13 @@
                 }
             } else if (currentMediaSource === 'local') {
                 document.getElementById('ytplayer').style.display = 'none';
-                vidEl.style.display = 'block';
-                document.documentElement.classList.remove('native-video-active');
+                if (window.AndroidTV) {
+                    vidEl.style.display = 'none';
+                    document.documentElement.classList.add('native-video-active');
+                } else {
+                    vidEl.style.display = 'block';
+                    document.documentElement.classList.remove('native-video-active');
+                }
                 
                 let newLocalVideos = data.local_videos || [];
                 const oldListStr = JSON.stringify(localVideoList);
@@ -2101,7 +2137,7 @@
                 localVideoList = newLocalVideos;
                 
                 // If custom videos just arrived while fallback was playing, or list changed, immediately switch
-                if (oldListStr !== newListStr || isPlayingFallback || vidEl.paused) {
+                if (oldListStr !== newListStr || isPlayingFallback || (!window.AndroidTV && vidEl.paused && vidEl.readyState > 0)) {
                     playLocalVideo(0);
                 }
             }

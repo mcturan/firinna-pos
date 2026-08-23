@@ -54,11 +54,11 @@
                 "enabled": true,
                 "is_pinned": false,
                 "duration_sec": null,
-                "effect": "confetti",
+                "effect": "none",
                 "effects": {
                     "balloons": false,
                     "fireworks": false,
-                    "confetti": true
+                    "confetti": false
                 }
             },
             {
@@ -125,11 +125,11 @@
     },
     "last_push": {
         "action": "clear_cache",
-        "target": "tv_26b1e944",
-        "timestamp": 1787487176289
+        "target": "all",
+        "timestamp": 1787491350994
     },
-    "last_ping": "2026-08-23T16:18:58.509304",
-    "version": 1787412836295,
+    "last_ping": "2026-08-23T17:36:25.655853",
+    "version": 1787491350994,
     "did_you_know": [
         {
             "id": "dyk_1",
@@ -577,49 +577,53 @@
         "enabled": true,
         "force_active": false,
         "auto_schedule": true,
-        "start_time": "23:00",
+        "start_time": "21:00",
         "end_time": "08:00",
-        "opening_days": "Her Gün",
         "media_type": "video",
         "video_url": "/static/tv_media/videos/1.mp4",
         "image_url": "/static/uploads/logo.png",
-        "qr_link": "https://firinna.com",
         "cycle_duration": 7,
+        "qr_link": "https://firinna.com",
         "messages": [
             {
                 "lang": "tr",
                 "flag": "🇹🇷",
+                "tag": "🇹🇷 TÜRKÇE",
                 "title": "Şu Anda Hizmet Vermemekteyiz",
                 "text": "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:00'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
-                "opening_badge": "☀️ Açılış: Sabah 08:00 (Her Gün)"
+                "badge": "☀️ Açılış: Sabah 08:00 (Her Gün)"
             },
             {
                 "lang": "en",
                 "flag": "🇬🇧",
+                "tag": "🇬🇧 ENGLISH",
                 "title": "We Are Currently Closed",
                 "text": "Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 08:00 with fresh bakery and warm hospitality.",
-                "opening_badge": "☀️ Opening: 08:00 AM (Daily)"
+                "badge": "☀️ Opening: 08:00 AM (Daily)"
             },
             {
                 "lang": "ru",
                 "flag": "🇷🇺",
+                "tag": "🇷🇺 РУССКИЙ",
                 "title": "В настоящее время мы закрыты",
                 "text": "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 08:00 со свежей выпечкой и горячим чаем.",
-                "opening_badge": "☀️ Открытие: 08:00 (Ежедневно)"
+                "badge": "☀️ Открытие: 08:00 (Ежедневно)"
             },
             {
                 "lang": "ar",
                 "flag": "🇸🇦",
+                "tag": "🇸🇦 العربية",
                 "title": "نحن مغلقون حالياً",
                 "text": "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 08:00 صباحاً مع أشهى المخبوزات الطازجة.",
-                "opening_badge": "☀️ الافتتاح: 08:00 صباحاً (يومياً)"
+                "badge": "☀️ الافتتاح: 08:00 صباحاً (يومياً)"
             },
             {
                 "lang": "es",
                 "flag": "🇪🇸",
+                "tag": "🇪🇸 ESPAÑOL",
                 "title": "Actualmente estamos cerrados",
                 "text": "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 08:00 con nuestros deliciosos productos de panadería.",
-                "opening_badge": "☀️ Apertura: 08:00 (Todos los días)"
+                "badge": "☀️ Apertura: 08:00 (Todos los días)"
             }
         ]
     }
