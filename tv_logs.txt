@@ -1,5 +1,5 @@
-[2026-08-22 21:18:10]
-Gece 03:00 otomatik yeniden başlatma: 342 dk sonra
+[2026-08-23 04:16:24]
+Gece 03:00 otomatik yeniden başlatma: 1363 dk sonra
 Boot sequence started.
 LAN failed, trying WAN: http://84.17.86.208:5000
 Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
@@ -8,8 +8,8 @@ Settings fetched successfully.
 Video already exists: 1.mp4
 Video already exists: bayrak.mp4
 [JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 589
-[JS] [WATERMARK] Normal sequential cycle starting with 5 cards -- From line 1148
-[JS] Settings fetch error: ReferenceError: layout is not defined -- From line 1734
-[JS] Settings fetch error: ReferenceError: layout is not defined -- From line 1734
+[JS] [WATERMARK] Normal sequential cycle starting with 5 cards -- From line 1495
+[JS] Settings fetch error: ReferenceError: layout is not defined -- From line 2081
+[JS] Settings fetch error: ReferenceError: layout is not defined -- From line 2081
 
 [AUTO LOG DUMP AFTER 10s]
