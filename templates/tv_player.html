@@ -610,7 +610,7 @@
         
         <div id="ml-main-video" class="grid-box" style="background: #000000 !important; backdrop-filter: none !important; position:relative;">
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
-            <video id="local-video" src="{{ (settings.local_videos[0]) if settings and settings.local_videos and settings.local_videos|length > 0 else '/static/tv_media/videos/1.mp4' }}" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted playsinline webkit-playsinline></video>
+            <video id="local-video" src="{{ (settings.playlist_videos[0]) if settings and settings.playlist_videos and settings.playlist_videos|length > 0 else ((settings.local_videos[0]) if settings and settings.local_videos and settings.local_videos|length > 0 else '/static/tv_media/videos/bayrak.mp4') }}" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
             <!-- Faint percentage download indicator in corner (%0 - %100) -->
             <div id="ml-dl-badge" style="position:absolute; bottom:10px; right:14px; background:rgba(0,0,0,0.35); color:rgba(255,255,255,0.5); font-size:0.95rem; font-weight:600; font-family:monospace; padding:3px 8px; border-radius:6px; z-index:45; display:none; pointer-events:none; backdrop-filter:blur(2px); transition:opacity 0.5s ease;">%0</div>
@@ -748,7 +748,7 @@
         var ytReady = false;
         var isPlayerInitialized = false;
         
-        var localVideoList = {{ (settings.local_videos | tojson) if settings and settings.local_videos else '[]' }};
+        var localVideoList = {{ (settings.playlist_videos | tojson) if settings and settings.playlist_videos else ((settings.local_videos | tojson) if settings and settings.local_videos else '[]') }};
         var localAudioList = [];
         var currentLocalVideoIndex = 0;
         var currentLocalAudioIndex = 0;
@@ -808,7 +808,7 @@
             }
         }
 
-        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/1.mp4"];
+        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/1.mp4"];
         var isPlayingFallback = false;
         var currentlyPlayingSrc = "";
         var bufferedVideoBlobs = {};
@@ -2175,7 +2175,7 @@
                 vidEl.style.display = 'block';
                 document.documentElement.classList.remove('native-video-active');
                 
-                let newLocalVideos = data.local_videos || [];
+                let newLocalVideos = (data.playlist_videos && data.playlist_videos.length > 0) ? data.playlist_videos : (data.local_videos || []);
                 const oldListStr = JSON.stringify(localVideoList);
                 const newListStr = JSON.stringify(newLocalVideos);
                 

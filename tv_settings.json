@@ -2,9 +2,15 @@
     "logo_url": "/static/uploads/logo.png",
     "layout": "modern_grid",
     "video_playlist": "",
-    "local_videos": [
-        "/static/tv_media/videos/gypsy.mp4",
+    "playlist_videos": [
         "/static/tv_media/videos/istanbul.mp4"
+    ],
+    "local_videos": [
+        "/static/tv_media/videos/istanbul.mp4",
+        "/static/tv_media/videos/gypsy.mp4",
+        "/static/tv_media/videos/bayrak.mp4",
+        "/static/tv_media/videos/1.mp4",
+        "/static/tv_media/videos/2.mp4"
     ],
     "local_audio": [],
     "media_source": "local",
@@ -125,12 +131,12 @@
         ]
     },
     "last_push": {
-        "action": "reload",
+        "action": "clear_cache",
         "target": "all",
-        "timestamp": 1787503112313
+        "timestamp": 1787504521838
     },
-    "last_ping": "2026-08-23T19:44:02.463694",
-    "version": 1787502730856,
+    "last_ping": "2026-08-23T20:09:35.048228",
+    "version": 1787504521838,
     "did_you_know": [
         {
             "id": "dyk_1",

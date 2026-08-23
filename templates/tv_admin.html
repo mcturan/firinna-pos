@@ -645,15 +645,19 @@
             allVideos.forEach((v, index) => {
                 const isEnabled = localVideos.includes(v);
                 const filename = v.split('/').pop();
+                const isProtected = (filename.toLowerCase() === 'bayrak.mp4' || filename.toLowerCase() === '1.mp4');
+                const deleteBtnHtml = isProtected 
+                    ? `<span style="font-size:0.75rem; color:#059669; background:#dcfce7; padding:2px 6px; border-radius:4px; font-weight:bold;" title="Sistem Fallback Videosu (Silinemez)">🛡️ Fallback</span>`
+                    : `<button onclick="deleteVideo('${v}')" style="padding:2px 5px; color:red;" title="Sil">🗑️</button>`;
                 
                 html += `<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; background:#f7fafc; padding:0.5rem; border-radius:4px; border:1px solid #e2e8f0;">
-                    <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="toggleVideo('${v}', this.checked)" title="Aktif/Pasif">
+                    <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="toggleVideo('${v}', this.checked)" title="Oynatma Listesine Ekle/Çıkar">
                     <span style="flex:1; font-weight:${isEnabled ? 'bold' : 'normal'}; color:${isEnabled ? '#2d3748' : '#a0aec0'}">
-                        🎬 ${filename}
+                        🎬 ${filename} ${!isEnabled ? '<span style="font-size:0.75rem; color:#94a3b8;">(Listede değil, diskte saklı)</span>' : ''}
                     </span>
                     <button onclick="moveVideo('${v}', -1)" style="padding:2px 5px;" title="Yukarı">⬆️</button>
                     <button onclick="moveVideo('${v}', 1)" style="padding:2px 5px;" title="Aşağı">⬇️</button>
-                    <button onclick="deleteVideo('${v}')" style="padding:2px 5px; color:red;" title="Sil">🗑️</button>
+                    ${deleteBtnHtml}
                 </div>`;
             });
             document.getElementById('local_videos_list').innerHTML = html;
@@ -765,7 +769,7 @@
                 setVal('logo_url', data.logo_url || '');
                 setVal('media_source', data.media_source || 'local');
                 setVal('video_playlist', data.video_playlist || '');
-                localVideos = (data.local_videos && data.local_videos.length > 0) ? data.local_videos : ['/static/tv_media/videos/1.mp4'];
+                localVideos = (data.playlist_videos && data.playlist_videos.length > 0) ? data.playlist_videos : ((data.local_videos && data.local_videos.length > 0) ? data.local_videos : ['/static/tv_media/videos/istanbul.mp4']);
                 localAudio = data.local_audio || [];
                 setVal('audio_priority', data.audio_priority || 'video');
                 setChecked('ticker_text_enabled', data.ticker_text_enabled !== false);
@@ -1143,6 +1147,7 @@
                 layout: 'modern_grid',
                 media_source: document.getElementById('media_source').value,
                 video_playlist: document.getElementById('video_playlist').value,
+                playlist_videos: localVideos,
                 local_videos: localVideos,
                 local_audio: localAudio,
                 audio_priority: document.getElementById('audio_priority').value,

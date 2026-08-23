@@ -1,11 +1,11 @@
-[2026-08-23 17:25:40]
-Gece 03:00 otomatik yeniden başlatma: 574 dk sonra
+[2026-08-23 19:49:57]
+Gece 03:00 otomatik yeniden başlatma: 430 dk sonra
 Boot sequence started.
 Connected to LAN: http://192.168.1.10:5000
 Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
 App is up to date.
 Settings fetched successfully.
-Deleting old video: bayrak.mp4
-Video already exists: 1.mp4
+Deleting old video: 1.mp4
+Downloading video: gypsy.mp4
 
-[AUTO LOG DUMP AFTER 10s]
+[AUTO LOG DUMP AFTER 10s]Downloading video: istanbul.mp4
