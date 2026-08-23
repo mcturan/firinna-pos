@@ -675,34 +675,18 @@
 
             </div>
 
-            <!-- EN ALT BAR: TAŞMAYAN, ORTALANMIŞ VE DİLLERLE SENKRONİZE DEĞİŞEN DİJİTAL MENÜ (CSS Grid) -->
-            <div style="display:grid; grid-template-columns:1.35fr 1fr 1.35fr; align-items:center; width:100%; max-width:100%; box-sizing:border-box; background:rgba(15,23,42,0.92); backdrop-filter:blur(16px); border:1.5px solid rgba(255,255,255,0.15); padding:1vh 2.2vw; border-radius:1.4vw; box-shadow:0 10px 35px rgba(0,0,0,0.6); overflow:hidden;">
+            <!-- EN ALT BAR: SOLDA BÜYÜTÜLMÜŞ LİNK, SAĞDA TEK SATIR BÜYÜTÜLMÜŞ 12 DİL BAYRAĞI -->
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:100%; box-sizing:border-box; background:rgba(15,23,42,0.92); backdrop-filter:blur(16px); border:1.5px solid rgba(255,255,255,0.15); padding:1.2vh 3vw; border-radius:1.5vw; box-shadow:0 10px 35px rgba(0,0,0,0.6); overflow:hidden;">
                 
-                <!-- Sol: QR Kod & Dillerle Senkronize Değişen Açıklama -->
-                <div style="display:flex; align-items:center; gap:1.1vw; overflow:hidden;">
-                    <div style="width:4.4vw; height:4.4vw; background:#FFFFFF; border-radius:0.7vw; padding:0.3vw; box-sizing:border-box; flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 15px rgba(0,0,0,0.4);">
-                        <img id="ah-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Ffirinna.com" style="width:100%; height:100%; object-fit:contain;" alt="QR">
-                    </div>
-                    <div id="ah-bottom-text-box" style="display:flex; flex-direction:column; overflow:hidden; transition:opacity 0.4s ease;">
-                        <span id="ah-bottom-menu-title" style="font-size:1.25vw; font-weight:800; color:#FFFFFF; letter-spacing:0.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📖 12 Dilde Dijital Menü</span>
-                        <span id="ah-bottom-menu-sub" style="font-size:0.85vw; color:#94A3B8; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Kameranızla okutun veya ziyaret edin</span>
-                    </div>
+                <!-- Sol: Sola Yaslanmış & Büyütülmüş Web Sitesi Linki -->
+                <div style="display:flex; align-items:baseline; gap:0.8vw;">
+                    <span style="font-size:1.6vw; font-weight:700; color:#94A3B8;">visit</span>
+                    <span style="font-size:2.6vw; font-weight:800; color:#34D399; letter-spacing:1px; text-shadow:0 2px 14px rgba(52,211,153,0.45);">www.firinna.com</span>
                 </div>
 
-                <!-- Orta: KUSURSUZ ORTALANMIŞ Web Sitesi Linki -->
-                <div style="display:flex; align-items:center; justify-content:center; gap:0.5vw; text-align:center;">
-                    <span style="font-size:1.2vw; font-weight:700; color:#94A3B8;">visit</span>
-                    <span style="font-size:1.9vw; font-weight:800; color:#34D399; letter-spacing:0.5px; text-shadow:0 2px 10px rgba(52,211,153,0.4);">www.firinna.com</span>
-                </div>
-
-                <!-- Sağ: SAĞA HİZALANMIŞ 12 Dil Bayrakları (2 Satır) -->
-                <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:0.2vw;">
-                    <div style="display:flex; gap:0.5vw; font-size:1.35vw; line-height:1;">
-                        <span>🇹🇷</span><span>🇬🇧</span><span>🇩🇪</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
-                    </div>
-                    <div style="display:flex; gap:0.5vw; font-size:1.35vw; line-height:1;">
-                        <span>🇷🇺</span><span>🇺🇦</span><span>🇨🇳</span><span>🇮🇳</span><span>🇸🇦</span><span>🇮🇷</span>
-                    </div>
+                <!-- Sağ: Sağa Hizalanmış & Tek Satır Halinde Büyütülmüş 12 Dil Bayrağı -->
+                <div style="display:flex; align-items:center; gap:0.8vw; font-size:2.2vw; line-height:1;">
+                    <span>🇹🇷</span><span>🇬🇧</span><span>🇩🇪</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span><span>🇷🇺</span><span>🇺🇦</span><span>🇨🇳</span><span>🇮🇳</span><span>🇸🇦</span><span>🇮🇷</span>
                 </div>
 
             </div>
@@ -1241,15 +1225,11 @@
             ahLangIndex = (ahLangIndex + 1) % msgs.length;
             
             const box = document.getElementById('ah-lang-box');
-            const bottomBox = document.getElementById('ah-bottom-text-box');
-
             if (box) box.style.opacity = '0';
-            if (bottomBox) bottomBox.style.opacity = '0';
 
             setTimeout(() => {
                 renderAfterHoursCurrentLang();
                 if (box) box.style.opacity = '1';
-                if (bottomBox) bottomBox.style.opacity = '1';
             }, 300);
         }
 
@@ -1273,23 +1253,6 @@
                     box.setAttribute('dir', 'rtl');
                 } else {
                     box.setAttribute('dir', 'ltr');
-                }
-            }
-
-            // Synchronize Bottom Menu Bar Text with same language
-            const menuTrans = bottomMenuTranslations[langKey] || bottomMenuTranslations.tr;
-            const bTitle = document.getElementById('ah-bottom-menu-title');
-            const bSub = document.getElementById('ah-bottom-menu-sub');
-            const bottomBox = document.getElementById('ah-bottom-text-box');
-
-            if (bTitle) bTitle.textContent = menuTrans.title;
-            if (bSub) bSub.textContent = menuTrans.sub;
-
-            if (bottomBox) {
-                if (langKey === 'ar') {
-                    bottomBox.setAttribute('dir', 'rtl');
-                } else {
-                    bottomBox.setAttribute('dir', 'ltr');
                 }
             }
         }
