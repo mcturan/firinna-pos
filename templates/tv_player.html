@@ -811,15 +811,15 @@
         const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/1.mp4"];
         var isPlayingFallback = false;
         var currentlyPlayingSrc = "";
+        var bufferedVideoBlobs = {};
+        var isDownloadingVideo = false;
+        var currentlyDownloadingUrl = null;
 
         window.playNextNativeVideo = function() {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             currentLocalVideoIndex = (currentLocalVideoIndex + 1) % activeList.length;
             console.log("[VIDEO LOOP] Next video index:", currentLocalVideoIndex, "Target:", activeList[currentLocalVideoIndex]);
-            
-            setTimeout(() => {
-                playLocalVideo(currentLocalVideoIndex);
-            }, 250);
+            playLocalVideo(currentLocalVideoIndex);
         };
 
         window.onNativeVideoEnded = function() {
@@ -837,57 +837,84 @@
             currentLocalVideoIndex = vIndex % activeList.length;
             let rawVideo = activeList[currentLocalVideoIndex];
             if (!rawVideo) rawVideo = "/static/tv_media/videos/1.mp4";
-            let fileName = rawVideo.includes("/") ? rawVideo.split("/").pop() : rawVideo;
             
-            // 1. Android TV APK Hardware Native Player (Mi Stick)
-            if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
-                console.log("[AndroidTV] Native player activated for:", fileName);
-                document.documentElement.classList.add('native-video-active');
-                if (vidEl) {
-                    vidEl.pause();
-                    vidEl.style.display = "none";
-                }
-                try {
-                    const videoBox = document.getElementById('ml-main-video');
-                    if (videoBox && window.AndroidTV.setVideoBounds) {
-                        const rect = videoBox.getBoundingClientRect();
-                        window.AndroidTV.setVideoBounds(
-                            Math.round(rect.left),
-                            Math.round(rect.top),
-                            Math.round(rect.width),
-                            Math.round(rect.height)
-                        );
-                    }
-                    window.AndroidTV.playNativeVideo(fileName);
-                } catch(e) {
-                    console.error("[AndroidTV] Native player error:", e);
-                }
-                return;
-            }
-
-            // 2. Web & Desktop HTML5 Video Player (Preview & Desktop Screens)
-            document.documentElement.classList.remove('native-video-active');
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
 
+            // 1. If already downloaded in memory as Blob, play immediately
+            if (bufferedVideoBlobs[srcUrl]) {
+                playBlobDirectly(bufferedVideoBlobs[srcUrl], srcUrl);
+                return;
+            }
+
+            // 2. Start background download with faint % indicator
+            const badge = document.getElementById('ml-dl-badge');
+            if (badge) {
+                badge.style.display = 'block';
+                badge.style.opacity = '0.6';
+                badge.textContent = '%0';
+            }
+
+            if (isDownloadingVideo && currentlyDownloadingUrl === srcUrl) return;
+            isDownloadingVideo = true;
+            currentlyDownloadingUrl = srcUrl;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', srcUrl, true);
+            xhr.responseType = 'blob';
+
+            xhr.onprogress = function(e) {
+                if (e.lengthComputable && e.total > 0) {
+                    const pct = Math.min(99, Math.round((e.loaded / e.total) * 100));
+                    if (badge) {
+                        badge.style.display = 'block';
+                        badge.textContent = `%${pct}`;
+                    }
+                }
+            };
+
+            xhr.onload = function() {
+                isDownloadingVideo = false;
+                if (xhr.status === 200) {
+                    const blob = xhr.response;
+                    const blobUrl = URL.createObjectURL(blob);
+                    bufferedVideoBlobs[srcUrl] = blobUrl;
+                    
+                    if (badge) {
+                        badge.textContent = '%100';
+                        setTimeout(() => { if (badge) badge.style.display = 'none'; }, 1200);
+                    }
+
+                    // Seamlessly switch to newly downloaded video
+                    playBlobDirectly(blobUrl, srcUrl);
+                } else {
+                    if (badge) badge.style.display = 'none';
+                    playBlobDirectly(srcUrl, srcUrl);
+                }
+            };
+
+            xhr.onerror = function() {
+                isDownloadingVideo = false;
+                if (badge) badge.style.display = 'none';
+                playBlobDirectly(srcUrl, srcUrl);
+            };
+
+            xhr.send();
+        }
+
+        function playBlobDirectly(srcToPlay, origUrl) {
+            document.documentElement.classList.remove('native-video-active');
             vidEl.style.display = "block";
             vidEl.muted = true;
             vidEl.defaultMuted = true;
 
-            const badge = document.getElementById('ml-dl-badge');
-            if (badge) {
-                badge.style.display = 'block';
-                badge.style.opacity = '0.55';
-                badge.textContent = '%0';
-            }
-
             const currentSrc = vidEl.getAttribute('src') || vidEl.src || '';
-            const isSameSrc = currentSrc.endsWith(srcUrl) || currentSrc === srcUrl;
+            const isSameSrc = currentSrc === srcToPlay || currentSrc.endsWith(origUrl);
 
             if (!isSameSrc || vidEl.currentTime >= (vidEl.duration || 1) - 0.5) {
-                currentlyPlayingSrc = srcUrl;
-                vidEl.setAttribute('src', srcUrl);
-                vidEl.src = srcUrl;
+                currentlyPlayingSrc = srcToPlay;
+                vidEl.setAttribute('src', srcToPlay);
+                vidEl.src = srcToPlay;
                 try { vidEl.currentTime = 0; } catch(e) {}
                 vidEl.load();
             }
@@ -907,50 +934,8 @@
         }
 
         if (vidEl) {
-            vidEl.onprogress = () => {
-                const badge = document.getElementById('ml-dl-badge');
-                if (!badge) return;
-                try {
-                    if (vidEl.buffered && vidEl.buffered.length > 0 && vidEl.duration) {
-                        const bufferedEnd = vidEl.buffered.end(vidEl.buffered.length - 1);
-                        const pct = Math.min(100, Math.round((bufferedEnd / vidEl.duration) * 100));
-                        badge.textContent = `%${pct}`;
-                        if (pct >= 100) {
-                            setTimeout(() => {
-                                if (badge) badge.style.display = 'none';
-                            }, 1200);
-                        } else {
-                            badge.style.display = 'block';
-                            badge.style.opacity = '0.55';
-                        }
-                    }
-                } catch(e) {}
-            };
-
-            vidEl.oncanplay = () => {
-                const badge = document.getElementById('ml-dl-badge');
-                if (badge) {
-                    badge.textContent = '%100';
-                    setTimeout(() => {
-                        if (badge) badge.style.display = 'none';
-                    }, 1200);
-                }
-            };
-
-            vidEl.onplaying = () => {
-                const badge = document.getElementById('ml-dl-badge');
-                if (badge && vidEl.buffered && vidEl.buffered.length > 0 && vidEl.duration) {
-                    const bufferedEnd = vidEl.buffered.end(vidEl.buffered.length - 1);
-                    const pct = Math.min(100, Math.round((bufferedEnd / vidEl.duration) * 100));
-                    badge.textContent = `%${pct}`;
-                    if (pct >= 100) {
-                        setTimeout(() => { if (badge) badge.style.display = 'none'; }, 1000);
-                    }
-                }
-            };
-
             vidEl.onended = () => {
-                console.log("[HTML5 Video] onended event -> restarting / playing next...");
+                console.log("[HTML5 Video] onended event -> restarting / advancing...");
                 window.playNextNativeVideo();
             };
 
