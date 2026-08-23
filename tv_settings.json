@@ -3,8 +3,7 @@
     "layout": "modern_grid",
     "video_playlist": "",
     "local_videos": [
-        "/static/tv_media/videos/1.mp4",
-        "/static/tv_media/videos/bayrak.mp4"
+        "/static/tv_media/videos/1.mp4"
     ],
     "local_audio": [],
     "media_source": "local",
@@ -125,11 +124,11 @@
         ]
     },
     "last_push": {
-        "action": "reload",
+        "action": "clear_cache",
         "target": "tv_26b1e944",
-        "timestamp": 1787482721980
+        "timestamp": 1787487176289
     },
-    "last_ping": "2026-08-23T14:02:16.487012",
+    "last_ping": "2026-08-23T16:18:58.509304",
     "version": 1787412836295,
     "did_you_know": [
         {

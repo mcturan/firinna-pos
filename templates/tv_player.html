@@ -587,7 +587,7 @@
         
         <div id="ml-main-video" class="grid-box" style="background: #000000 !important; backdrop-filter: none !important; position:relative;">
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
-            <video id="local-video" src="/static/tv_media/videos/1.mp4" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted loop playsinline webkit-playsinline></video>
+            <video id="local-video" src="/static/tv_media/videos/1.mp4" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
             <!-- Small live download progress & speed badge -->
             <div id="ml-dl-badge" style="position:absolute; bottom:12px; right:12px; background:rgba(15,23,42,0.88); border:1px solid rgba(56,189,248,0.5); color:#38bdf8; font-size:0.85rem; font-weight:700; padding:4px 10px; border-radius:6px; z-index:40; display:none; box-shadow:0 2px 8px rgba(0,0,0,0.3); letter-spacing:0.3px;"></div>
@@ -780,10 +780,8 @@
             }
         }
 
-        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/1.mp4", "/static/tv_media/videos/bayrak.mp4"];
+        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/1.mp4"];
         var isPlayingFallback = false;
-        var targetVideoReady = false;
-        var isDownloadingTarget = false;
 
         window.playNextNativeVideo = function() {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
@@ -796,125 +794,15 @@
             window.playNextNativeVideo();
         };
 
-        function checkAndBufferTargetVideo() {
-            const badge = document.getElementById('ml-dl-badge');
-            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : [];
-            let targetVideo = activeList.find(v => !v.includes('bayrak.mp4')) || activeList[0];
-            if (!targetVideo) {
-                if (badge) badge.style.display = 'none';
-                return;
-            }
-
-            let fileName = targetVideo.includes("/") ? targetVideo.split("/").pop() : targetVideo;
-
-            // If already playing target or on AndroidTV native playback, never show badge
-            if (window.AndroidTV || (vidEl && vidEl.src && vidEl.src.includes(fileName) && !vidEl.paused)) {
-                if (badge) badge.style.display = 'none';
-                return;
-            }
-
-            // Only buffer in background if fallback bayrak.mp4 is actively playing
-            if (!isPlayingFallback) {
-                if (badge) badge.style.display = 'none';
-                return;
-            }
-
-            let targetUrl = targetVideo.startsWith("/static/") ? targetVideo : "/static/tv_media/videos/" + targetVideo;
-
-            if (isDownloadingTarget) return;
-            isDownloadingTarget = true;
-
-            let lastLoaded = 0;
-            let lastTime = Date.now();
-
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', targetUrl, true);
-            xhr.responseType = 'blob';
-
-            xhr.onprogress = function(e) {
-                if (e.lengthComputable && isPlayingFallback) {
-                    const pct = Math.round((e.loaded / e.total) * 100);
-                    const now = Date.now();
-                    const timeDiffSec = (now - lastTime) / 1000;
-                    let speedStr = "";
-
-                    if (timeDiffSec >= 0.5) {
-                        const bytesDiff = e.loaded - lastLoaded;
-                        const speedBps = bytesDiff / Math.max(0.1, timeDiffSec);
-                        if (speedBps > 1024 * 1024) {
-                            speedStr = ` • ${(speedBps / (1024 * 1024)).toFixed(1)} MB/s`;
-                        } else {
-                            speedStr = ` • ${(speedBps / 1024).toFixed(0)} KB/s`;
-                        }
-                        lastLoaded = e.loaded;
-                        lastTime = now;
-                    }
-
-                    if (badge) {
-                        badge.style.display = 'block';
-                        badge.innerHTML = `📥 <b>${fileName}</b>: %${pct}${speedStr}`;
-                    }
-                }
-            };
-
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    isDownloadingTarget = false;
-                    targetVideoReady = true;
-                    const blobUrl = URL.createObjectURL(xhr.response);
-
-                    if (badge) {
-                        badge.style.display = 'block';
-                        badge.innerHTML = `✅ <b>${fileName}</b> hazır!`;
-                        setTimeout(() => { if (badge) badge.style.display = 'none'; }, 2000);
-                    }
-
-                    // Seamlessly switch video player to ready video
-                    isPlayingFallback = false;
-                    vidEl.src = blobUrl;
-                    try { vidEl.currentTime = 0; } catch(e){}
-                    vidEl.play().catch(e => {
-                        vidEl.src = targetUrl;
-                        try { vidEl.currentTime = 0; } catch(err){}
-                        vidEl.play().catch(()=>{});
-                    });
-
-                    if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
-                        window.AndroidTV.playNativeVideo(fileName);
-                    }
-                } else {
-                    isDownloadingTarget = false;
-                    if (badge) badge.style.display = 'none';
-                }
-            };
-
-            xhr.onerror = function() {
-                isDownloadingTarget = false;
-                if (badge) badge.style.display = 'none';
-            };
-
-            xhr.send();
-        }
-
-        // Start checking target video download immediately and every 5 minutes
-        setTimeout(checkAndBufferTargetVideo, 2500);
-        setInterval(checkAndBufferTargetVideo, 300000);
-
         function playLocalVideo(vIndex) {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             currentLocalVideoIndex = vIndex % activeList.length;
             let rawVideo = activeList[currentLocalVideoIndex];
-            if (!rawVideo) return;
+            if (!rawVideo) rawVideo = "/static/tv_media/videos/1.mp4";
             let fileName = rawVideo.includes("/") ? rawVideo.split("/").pop() : rawVideo;
             
             // 1. Android TV APK - Hardware Native Playback
             if (window.AndroidTV && window.AndroidTV.playNativeVideo) {
-                if (vidEl) {
-                    vidEl.pause();
-                    vidEl.style.display = "none";
-                    vidEl.removeAttribute('src');
-                }
-                document.documentElement.classList.add('native-video-active');
                 try {
                     const videoBox = document.getElementById('ml-main-video');
                     if (videoBox && window.AndroidTV.setVideoBounds) {
@@ -928,7 +816,6 @@
                     }
                 } catch(e) {}
                 window.AndroidTV.playNativeVideo(fileName);
-                return;
             }
 
             // 2. Web & Mobile HTML5 Single Video Player
@@ -938,12 +825,15 @@
             vidEl.style.display = "block";
             vidEl.muted = true;
             
-            if (vidEl.getAttribute('src') !== srcUrl) {
+            const currentSrc = vidEl.getAttribute('src') || vidEl.src || '';
+            const isSameSrc = currentSrc.endsWith(srcUrl) || currentSrc === srcUrl;
+
+            if (!isSameSrc) {
                 vidEl.setAttribute('src', srcUrl);
                 vidEl.src = srcUrl;
             }
 
-            // Explicitly rewind to 0 so loop restarts from beginning
+            // Always reset currentTime to 0 so when video repeats / loops it starts cleanly from beginning
             try {
                 vidEl.currentTime = 0;
             } catch(e) {}
@@ -951,34 +841,37 @@
             const playPromise = vidEl.play();
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
-                    console.log("Autoplay retry with muted...", err);
+                    console.log("[VIDEO] Autoplay retry with muted...", err);
                     vidEl.muted = true;
                     try { vidEl.currentTime = 0; } catch(e){}
                     vidEl.play().catch(e => {
-                        console.error("Play error:", e);
+                        console.error("[VIDEO] Play error:", e);
                     });
                 });
             }
+        }
 
+        if (vidEl) {
             vidEl.onended = () => {
-                console.log("[HTML5 Video] onended event -> advancing / repeating...");
+                console.log("[HTML5 Video] onended event -> restarting / playing next...");
                 window.playNextNativeVideo();
             };
+
             vidEl.onerror = (e) => { 
-                console.log("[HTML5 Video] error event -> advancing to next in 1.5s...", e);
+                console.warn("[HTML5 Video] error event -> retrying next in 1s...", e);
                 setTimeout(() => {
                     window.playNextNativeVideo();
-                }, 1500);
+                }, 1000);
             };
         }
 
         // WATCHDOG: Detects stalled, frozen or black-screen ended videos on Mi TV Stick
         setInterval(() => {
-            if (isAfterHoursActive || currentMediaSource !== 'local' || window.AndroidTV) return;
+            if (isAfterHoursActive || currentMediaSource !== 'local') return;
             if (vidEl && vidEl.style.display !== 'none') {
-                // If video is marked as ended, or paused while at duration, or currentTime stopped advancing
-                if (vidEl.ended || (vidEl.paused && vidEl.currentTime > 0 && Math.abs(vidEl.currentTime - vidEl.duration) < 1.5)) {
-                    console.warn("[VIDEO WATCHDOG] Video stopped at end without looping. Restarting video...");
+                // If video is marked as ended, or paused while near duration, restart it
+                if (vidEl.ended || (vidEl.paused && vidEl.currentTime > 0 && Math.abs(vidEl.currentTime - vidEl.duration) < 2.0)) {
+                    console.warn("[VIDEO WATCHDOG] Video reached end and remained stopped. Restarting...");
                     window.playNextNativeVideo();
                 } else if (vidEl.paused) {
                     console.warn("[VIDEO WATCHDOG] Video paused unexpectedly. Forcing play...");
@@ -989,7 +882,7 @@
                     });
                 }
             }
-        }, 3500);
+        }, 3000);
 
         function playLocalAudio(aIndex) {
             if(localAudioList.length === 0) return;

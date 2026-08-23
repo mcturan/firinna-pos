@@ -45,7 +45,18 @@ def allowed_file(filename):
 
 @app.after_request
 def add_no_cache_headers(response):
-    if request.path.startswith('/api/web/analytics') or 'admin' in request.path or 'yonetim' in request.path or 'tv' in request.path:
+    if request.path.startswith('/static/tv_media/'):
+        response.headers['Cache-Control'] = 'public, max-age=86400'
+        response.headers['Accept-Ranges'] = 'bytes'
+        if 'Pragma' in response.headers:
+            del response.headers['Pragma']
+        if 'Expires' in response.headers:
+            del response.headers['Expires']
+        return response
+    if request.path.startswith('/static/'):
+        response.headers['Cache-Control'] = 'public, max-age=3600'
+        return response
+    if request.path.startswith('/api/web/analytics') or 'admin' in request.path or 'yonetim' in request.path or request.path.startswith('/api/tv') or request.path == '/tv':
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
@@ -4085,11 +4096,6 @@ def tv_redirect():
     return redirect('/tv-player')
 
 
-@app.after_request
-def add_cache_headers(response):
-    if '/static/tv_media/' in request.path:
-        response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
-    return response
 
 if __name__ == '__main__':
     db.init_db()
