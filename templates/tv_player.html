@@ -800,9 +800,7 @@
 
         const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/1.mp4"];
         var isPlayingFallback = false;
-        var bufferedVideoBlobs = {};
-        var isDownloadingVideo = false;
-        var currentlyDownloadingUrl = null;
+        var currentlyPlayingSrc = "";
 
         window.playNextNativeVideo = function() {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
@@ -853,89 +851,32 @@
                 return;
             }
 
-            // 2. Web & Mobile HTML5 Player with Background Buffer
+            // 2. Web & Mobile HTML5 Single Video Player (Preview & Screens)
+            document.documentElement.classList.remove('native-video-active');
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
 
-            // If already downloaded to Blob, play immediately
-            if (bufferedVideoBlobs[srcUrl]) {
-                playVideoImmediately(bufferedVideoBlobs[srcUrl], srcUrl);
-                return;
-            }
-
-            // Start background download with faint % indicator
-            startBackgroundDownload(srcUrl, () => {
-                playVideoImmediately(bufferedVideoBlobs[srcUrl] || srcUrl, srcUrl);
-            });
-
-            // Start playing directly via HTTP range stream without waiting if not yet loaded
-            playVideoImmediately(srcUrl, srcUrl);
-        }
-
-        function startBackgroundDownload(targetUrl, onComplete) {
-            if (isDownloadingVideo && currentlyDownloadingUrl === targetUrl) return;
-            isDownloadingVideo = true;
-            currentlyDownloadingUrl = targetUrl;
-
-            const badge = document.getElementById('ml-dl-badge');
-            if (badge) {
-                badge.style.display = 'block';
-                badge.style.opacity = '0.5';
-                badge.textContent = '%0';
-            }
-
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', targetUrl, true);
-            xhr.responseType = 'blob';
-
-            xhr.onprogress = function(e) {
-                if (e.lengthComputable && e.total > 0) {
-                    const pct = Math.min(99, Math.round((e.loaded / e.total) * 100));
-                    if (badge) {
-                        badge.style.display = 'block';
-                        badge.textContent = `%${pct}`;
-                    }
-                }
-            };
-
-            xhr.onload = function() {
-                isDownloadingVideo = false;
-                if (xhr.status === 200) {
-                    const blobUrl = URL.createObjectURL(xhr.response);
-                    bufferedVideoBlobs[targetUrl] = blobUrl;
-                    if (badge) {
-                        badge.textContent = '%100';
-                        setTimeout(() => { if (badge) badge.style.display = 'none'; }, 1200);
-                    }
-                    if (onComplete) onComplete();
-                } else {
-                    if (badge) badge.style.display = 'none';
-                }
-            };
-
-            xhr.onerror = function() {
-                isDownloadingVideo = false;
-                if (badge) badge.style.display = 'none';
-            };
-
-            xhr.send();
-        }
-
-        function playVideoImmediately(playableSrc, origUrl) {
-            document.documentElement.classList.remove('native-video-active');
             vidEl.style.display = "block";
             vidEl.muted = true;
             vidEl.defaultMuted = true;
 
-            const currentSrc = vidEl.getAttribute('src') || vidEl.src || '';
-            const isSameSrc = currentSrc === playableSrc || currentSrc.endsWith(origUrl);
-
-            if (!isSameSrc) {
-                vidEl.setAttribute('src', playableSrc);
-                vidEl.src = playableSrc;
+            const badge = document.getElementById('ml-dl-badge');
+            if (badge) {
+                badge.style.display = 'block';
+                badge.style.opacity = '0.55';
+                badge.textContent = '%0';
             }
 
-            try { vidEl.currentTime = 0; } catch(e) {}
+            const currentSrc = vidEl.getAttribute('src') || vidEl.src || '';
+            const isSameSrc = currentSrc.endsWith(srcUrl) || currentSrc === srcUrl;
+
+            if (!isSameSrc || vidEl.currentTime >= (vidEl.duration || 1) - 0.5) {
+                currentlyPlayingSrc = srcUrl;
+                vidEl.setAttribute('src', srcUrl);
+                vidEl.src = srcUrl;
+                try { vidEl.currentTime = 0; } catch(e) {}
+                vidEl.load();
+            }
 
             const playPromise = vidEl.play();
             if (playPromise !== undefined) {
@@ -952,6 +893,48 @@
         }
 
         if (vidEl) {
+            vidEl.onprogress = () => {
+                const badge = document.getElementById('ml-dl-badge');
+                if (!badge) return;
+                try {
+                    if (vidEl.buffered && vidEl.buffered.length > 0 && vidEl.duration) {
+                        const bufferedEnd = vidEl.buffered.end(vidEl.buffered.length - 1);
+                        const pct = Math.min(100, Math.round((bufferedEnd / vidEl.duration) * 100));
+                        badge.textContent = `%${pct}`;
+                        if (pct >= 100) {
+                            setTimeout(() => {
+                                if (badge) badge.style.display = 'none';
+                            }, 1200);
+                        } else {
+                            badge.style.display = 'block';
+                            badge.style.opacity = '0.55';
+                        }
+                    }
+                } catch(e) {}
+            };
+
+            vidEl.oncanplay = () => {
+                const badge = document.getElementById('ml-dl-badge');
+                if (badge) {
+                    badge.textContent = '%100';
+                    setTimeout(() => {
+                        if (badge) badge.style.display = 'none';
+                    }, 1200);
+                }
+            };
+
+            vidEl.onplaying = () => {
+                const badge = document.getElementById('ml-dl-badge');
+                if (badge && vidEl.buffered && vidEl.buffered.length > 0 && vidEl.duration) {
+                    const bufferedEnd = vidEl.buffered.end(vidEl.buffered.length - 1);
+                    const pct = Math.min(100, Math.round((bufferedEnd / vidEl.duration) * 100));
+                    badge.textContent = `%${pct}`;
+                    if (pct >= 100) {
+                        setTimeout(() => { if (badge) badge.style.display = 'none'; }, 1000);
+                    }
+                }
+            };
+
             vidEl.onended = () => {
                 console.log("[HTML5 Video] onended event -> restarting / playing next...");
                 window.playNextNativeVideo();
@@ -2205,7 +2188,8 @@
                 localVideoList = newLocalVideos;
                 
                 // If custom videos just arrived while fallback was playing, or list changed, immediately switch
-                if (oldListStr !== newListStr || isPlayingFallback || (!window.AndroidTV && vidEl.paused && vidEl.readyState > 0)) {
+                if (oldListStr !== newListStr || isPlayingFallback) {
+                    isPlayingFallback = false;
                     playLocalVideo(0);
                 }
             }
