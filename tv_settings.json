@@ -3,14 +3,17 @@
     "layout": "modern_grid",
     "video_playlist": "",
     "playlist_videos": [
-        "/static/tv_media/videos/istanbul.mp4"
+        "/static/tv_media/videos/bayrak.mp4",
+        "/static/tv_media/videos/gypsy.mp4",
+        "/static/tv_media/videos/istanbul.mp4",
+        "/static/tv_media/videos/1.mp4"
     ],
     "local_videos": [
-        "/static/tv_media/videos/istanbul.mp4",
         "/static/tv_media/videos/gypsy.mp4",
-        "/static/tv_media/videos/bayrak.mp4",
+        "/static/tv_media/videos/istanbul.mp4",
         "/static/tv_media/videos/1.mp4",
-        "/static/tv_media/videos/2.mp4"
+        "/static/tv_media/videos/2.mp4",
+        "/static/tv_media/videos/bayrak.mp4"
     ],
     "local_audio": [],
     "media_source": "local",
@@ -133,10 +136,10 @@
     "last_push": {
         "action": "clear_cache",
         "target": "all",
-        "timestamp": 1787504521838
+        "timestamp": 1787507861658
     },
-    "last_ping": "2026-08-23T20:09:35.048228",
-    "version": 1787504521838,
+    "last_ping": "2026-08-24T02:09:57.493950",
+    "version": 1787507861658,
     "did_you_know": [
         {
             "id": "dyk_1",
@@ -584,8 +587,8 @@
         "enabled": true,
         "force_active": false,
         "auto_schedule": true,
-        "start_time": "21:00",
-        "end_time": "08:00",
+        "start_time": "20:30",
+        "end_time": "11:00",
         "media_type": "video",
         "video_url": "/static/tv_media/videos/1.mp4",
         "image_url": "/static/uploads/logo.png",

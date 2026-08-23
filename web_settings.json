@@ -7,7 +7,7 @@
         "Pazartesi": {
             "open": "11:00",
             "close": "19:15",
-            "active": true
+            "active": false
         },
         "Salı": {
             "open": "11:00",
