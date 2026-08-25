@@ -1,25 +1,3 @@
-[2026-08-25 15:04:08] [tv_26b1e944]
-[15:04:03] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
-[2026-08-25 15:04:10] [tv_210497a4]
-[15:04:05] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
-[2026-08-25 15:04:23] [tv_26b1e944]
-[15:04:18] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
-[2026-08-25 15:04:25] [tv_210497a4]
-[15:04:20] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
-[2026-08-25 15:04:38] [tv_26b1e944]
-[15:04:33] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
-[2026-08-25 15:04:40] [tv_210497a4]
-[15:04:35] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
-[2026-08-25 15:04:53] [tv_26b1e944]
-[15:04:48] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
-[2026-08-25 15:04:55] [tv_210497a4]
-[15:04:50] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
-[2026-08-25 15:05:08] [tv_26b1e944]
-[15:05:03] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
-[2026-08-25 15:05:10] [tv_210497a4]
-[15:05:05] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
-[2026-08-25 15:05:23] [tv_26b1e944]
-[15:05:18] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
 [2026-08-25 15:05:25] [tv_210497a4]
 [15:05:20] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
 [2026-08-25 15:05:38] [tv_26b1e944]
@@ -498,3 +476,25 @@
 [15:20:51] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
 [2026-08-25 15:21:09] [tv_26b1e944]
 [15:21:04] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
+[2026-08-25 15:21:26] [tv_210497a4]
+[15:21:21] [NETWORK HEALTH] Connection ping failed, waiting for network... Failed to fetch
+[2026-08-25 15:21:39] [tv_26b1e944]
+[15:21:34] [NETWORK HEALTH] Server connection RESTORED to ONLINE!
+[15:21:34] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
+[2026-08-25 15:21:41] [tv_210497a4]
+[15:21:36] [NETWORK HEALTH] Server connection RESTORED to ONLINE!
+[15:21:36] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
+[2026-08-25 15:21:56] [tv_210497a4]
+[15:21:51] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
+[2026-08-25 15:22:11] [tv_210497a4]
+[15:22:06] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
+[2026-08-25 15:22:26] [tv_210497a4]
+[15:22:21] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
+[2026-08-25 15:22:41] [tv_210497a4]
+[15:22:36] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
+[2026-08-25 15:22:56] [tv_210497a4]
+[15:22:51] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
+[2026-08-25 15:23:11] [tv_210497a4]
+[15:23:06] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
+[2026-08-25 15:23:26] [tv_210497a4]
+[15:23:21] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4
