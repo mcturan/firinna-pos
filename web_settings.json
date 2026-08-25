@@ -7,11 +7,11 @@
         "Pazartesi": {
             "open": "11:00",
             "close": "19:15",
-            "active": false
+            "active": true
         },
         "Salı": {
             "open": "11:00",
-            "close": "19:15",
+            "close": "21:00",
             "active": true
         },
         "Çarşamba": {
@@ -31,12 +31,12 @@
         },
         "Cumartesi": {
             "open": "11:00",
-            "close": "20:30",
+            "close": "21:00",
             "active": true
         },
         "Pazar": {
             "open": "11:00",
-            "close": "20:30",
+            "close": "21:00",
             "active": true
         }
     },

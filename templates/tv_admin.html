@@ -362,29 +362,38 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
                     <div>
                         <label style="font-weight:bold; color:#166534; display:flex; align-items:center; gap:8px; margin-bottom:4px; font-size:1.15rem;">
-                            💡 Türkiye & İstanbul Kültür/Tarih Bilgileri (30 Adet)
-                            <span id="facts_count_badge" style="background:#dcfce7; color:#15803d; font-size:0.82rem; padding:2px 10px; border-radius:12px; font-weight:bold; border:1px solid #86efac;">30 Bilgi</span>
+                            💡 Türkiye & İstanbul Kültür/Tarih Bilgileri
+                            <span id="facts_count_badge" style="background:#dcfce7; color:#15803d; font-size:0.82rem; padding:2px 10px; border-radius:12px; font-weight:bold; border:1px solid #86efac;">0 Bilgi</span>
                         </label>
-                        <small style="color:#15803d; display:block;">Ekranın altındaki geniş bantta dönecek İngilizce ve Rusça kültürel gezi ve tarih notları.</small>
+                        <small style="color:#15803d; display:block;">Ekranın altındaki geniş bantta sırayla 4 dilde (İngilizce, İspanyolca, Rusça, Arapça) dönecek Atatürk, Cumhuriyet ve gezi rehberi notları.</small>
                     </div>
-                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <!-- Excel/CSV İçe / Dışa Aktarma -->
+                        <a href="/api/tv/facts/export?format=csv" class="btn" style="background:#059669; color:white; text-decoration:none; padding:7px 12px; border-radius:6px; font-weight:bold; font-size:0.82rem; display:inline-flex; align-items:center; gap:4px;" title="Excel ve Tablolar için CSV olarak İndir">
+                            📥 Excel/CSV İndir
+                        </a>
+                        <button type="button" onclick="document.getElementById('facts_import_file').click()" style="background:#0d9488; color:white; border:none; padding:7px 12px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.82rem; display:inline-flex; align-items:center; gap:4px;" title="Excel (CSV) veya JSON Dosyasından Yükle">
+                            📤 İçe Aktar
+                        </button>
+                        <input type="file" id="facts_import_file" accept=".csv,.json" style="display:none;" onchange="importFactsFile(this)">
+
                         <!-- Bilgi Döngü Süresi Seçimi -->
-                        <div style="display:flex; align-items:center; gap:6px; background:#ffffff; padding:5px 10px; border-radius:6px; border:1.5px solid #86efac;">
-                            <label style="font-weight:bold; color:#166534; font-size:0.88rem; margin-bottom:0; white-space:nowrap;">⏱️ Döngü Hızı:</label>
-                            <select id="facts_cycle_speed" style="padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; font-weight:bold; color:#15803d; font-size:0.88rem; background:#f8fafc;">
-                                <option value="4">4 Saniye (Çok Hızlı)</option>
-                                <option value="6">6 Saniye (Hızlı)</option>
-                                <option value="8" selected>8 Saniye (Standart & Önerilen)</option>
-                                <option value="10">10 Saniye (Dengeli)</option>
-                                <option value="12">12 Saniye (Geniş Okuma)</option>
-                                <option value="15">15 Saniye (Yavaş)</option>
+                        <div style="display:flex; align-items:center; gap:6px; background:#ffffff; padding:4px 8px; border-radius:6px; border:1.5px solid #86efac;">
+                            <label style="font-weight:bold; color:#166534; font-size:0.82rem; margin-bottom:0; white-space:nowrap;">⏱️ Hız:</label>
+                            <select id="facts_cycle_speed" style="padding:3px 6px; border-radius:4px; border:1px solid #cbd5e1; font-weight:bold; color:#15803d; font-size:0.82rem; background:#f8fafc;">
+                                <option value="4">4 Saniye</option>
+                                <option value="6">6 Saniye</option>
+                                <option value="8" selected>8 Saniye</option>
+                                <option value="10">10 Saniye</option>
+                                <option value="12">12 Saniye</option>
+                                <option value="15">15 Saniye</option>
                             </select>
                         </div>
-                        <button type="button" onclick="addNewFact()" style="background:#16a34a; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem; display:inline-flex; align-items:center; gap:4px;">
-                            ➕ Yeni Bilgi Ekle
+                        <button type="button" onclick="addNewFact()" style="background:#16a34a; color:white; border:none; padding:7px 12px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.82rem; display:inline-flex; align-items:center; gap:4px;">
+                            ➕ Yeni Bilgi
                         </button>
-                        <button type="button" onclick="saveFactsToServer()" style="background:#0284c7; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.85rem; display:inline-flex; align-items:center; gap:4px;">
-                            💾 Bilgileri Kaydet
+                        <button type="button" onclick="saveFactsToServer()" style="background:#0284c7; color:white; border:none; padding:7px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.82rem; display:inline-flex; align-items:center; gap:4px;">
+                            💾 Kaydet
                         </button>
                     </div>
                 </div>
@@ -1792,6 +1801,40 @@
             } catch(e) {
                 alert("❌ Kayıt sırasında hata oluştu.");
             }
+        }
+
+        async function importFactsFile(input) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            const isAppend = confirm(`Seçilen dosya: "${file.name}"\n\nMevcut ${globalFactsList.length} bilginin ÜZERİNE EKLEMEK mi istiyorsunuz?\n\n[Tamam]: Üzerine Ekle (Append)\n[İptal]: Tüm Listeyi Bu Dosyayla Değiştir (Replace)`);
+            const mode = isAppend ? 'append' : 'replace';
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('mode', mode);
+
+            try {
+                const res = await fetch('/api/tv/facts/import', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`✅ ${data.message} (Toplam: ${data.count} bilgi)`);
+                    input.value = '';
+                    await loadTvFactsAdmin();
+                    fetch('/api/tv/push', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({action: 'reload', client_id: 'all'})
+                    });
+                } else {
+                    alert("❌ İçe aktarılamadı: " + (data.error || 'Bilinmeyen hata'));
+                }
+            } catch(e) {
+                alert("❌ İçe aktarma sırasında sunucu hatası oluştu.");
+            }
+            input.value = '';
         }
 
         // ==========================================

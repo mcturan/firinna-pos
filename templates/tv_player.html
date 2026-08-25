@@ -2245,9 +2245,17 @@
                 });
             }
 
-            // 2. Curated 30 Quadrilingual (EN, ES, RU, AR) Turkey & Istanbul Cultural Facts + Custom User Entries
+            // 2. Randomized Quadrilingual (EN, ES, RU, AR) Turkey & Istanbul Cultural Facts
+            // Shuffle facts array so order is random, but keep all language slides of each fact together
             if (liveFacts.length > 0) {
-                liveFacts.forEach(f => {
+                // Fisher-Yates shuffle on facts list
+                const shuffledFacts = [...liveFacts];
+                for (let i = shuffledFacts.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledFacts[i], shuffledFacts[j]] = [shuffledFacts[j], shuffledFacts[i]];
+                }
+
+                shuffledFacts.forEach(f => {
                     const icon = f.icon || '🏛️';
                     const customColor = f.color || '#0F172A';
 
