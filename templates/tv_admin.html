@@ -595,14 +595,32 @@
         </div>
 
         <div id="qr" class="tv-pane card">
-            <h3 style="margin-top:0;">QR Kod ve Hava Durumu</h3>
+            <h3 style="margin-top:0; color:#1e293b;">⚙️ QR Kod, Widgetlar & Cihaz Otomasyonu</h3>
             <div class="form-group">
                 <label>QR Kod Yönlendirme Linki</label>
                 <input type="text" id="qr_code" placeholder="https://firinna.com/menu">
             </div>
-            <div class="form-group" style="display:flex; gap:1.5rem; margin-top:1rem;">
+            <div class="form-group" style="display:flex; gap:1.5rem; margin-top:1rem; padding-bottom:1rem; border-bottom:1px solid #e2e8f0;">
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="w_weather" checked> 🌤️ Hava Durumu Göster</label>
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="w_clock" checked> 🕒 Saat Göster</label>
+            </div>
+
+            <!-- Auto Scheduled Hardware Reboot for Mi Stick -->
+            <div style="margin-top:1.2rem; background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <div>
+                        <strong style="color:#0f172a; font-size:0.95rem;">🔌 Otomatik Gece Cihaz Yeniden Başlatma (Mi TV Stick)</strong>
+                        <p style="color:#64748b; font-size:0.83rem; margin:2px 0 0 0;">Cihazın bellek şişmesini ve yavaşlamasını önlemek için belirlenen saatte donanımsal olarak kapatılıp açılır.</p>
+                    </div>
+                    <label class="switch" style="cursor:pointer;">
+                        <input type="checkbox" id="auto_reboot_enabled">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
+                    <label style="font-weight:700; font-size:0.88rem; color:#334155;">Yeniden Başlatma Saati:</label>
+                    <input type="time" id="auto_reboot_time" value="04:30" style="padding:6px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:0.95rem; color:#0f172a;">
+                </div>
             </div>
         </div>
 
@@ -839,6 +857,8 @@
                 setVal('qr_text', data.qr_text || '');
                 setChecked('w_weather', data.widgets?.weather);
                 setChecked('w_clock', data.widgets?.clock);
+                setChecked('auto_reboot_enabled', !!data.auto_reboot?.enabled);
+                setVal('auto_reboot_time', data.auto_reboot?.time || '04:30');
 
                 // Filigran Döngüsü Ayarları
                 const wm = data.watermark_cycle || {};
@@ -1223,6 +1243,10 @@
                 widgets: {
                     weather: document.getElementById('w_weather') ? document.getElementById('w_weather').checked : true,
                     clock: document.getElementById('w_clock') ? document.getElementById('w_clock').checked : true
+                },
+                auto_reboot: {
+                    enabled: document.getElementById('auto_reboot_enabled') ? document.getElementById('auto_reboot_enabled').checked : false,
+                    time: document.getElementById('auto_reboot_time') ? document.getElementById('auto_reboot_time').value : '04:30'
                 },
                 watermark_cycle: {
                     interval_sec: document.getElementById('wm_interval_sec') ? (parseInt(document.getElementById('wm_interval_sec').value) || 90) : 90,

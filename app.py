@@ -3676,6 +3676,55 @@ def api_tv_push():
     save_tv_settings(current)
     return jsonify({"success": True, "pushed": current['last_push']})
 
+# ==============================================================
+# AUTO SCHEDULED HARDWARE REBOOT BACKGROUND WORKER (Mi TV Stick)
+# ==============================================================
+_last_auto_reboot_date = ""
+
+def _auto_reboot_worker():
+    global _last_auto_reboot_date
+    import subprocess
+    import shutil
+    while True:
+        try:
+            time.sleep(30)
+            settings = get_tv_settings()
+            auto_reb = settings.get('auto_reboot') or {}
+            if not auto_reb.get('enabled'):
+                continue
+                
+            scheduled_time = auto_reb.get('time', '04:30').strip()
+            now = datetime.now()
+            current_hm = now.strftime('%H:%M')
+            today_str = now.strftime('%Y-%m-%d')
+            
+            if current_hm == scheduled_time and _last_auto_reboot_date != today_str:
+                _last_auto_reboot_date = today_str
+                # Find connected Android TV client IP
+                adb_bin = shutil.which('adb') or '/usr/bin/adb'
+                if not os.path.exists(adb_bin):
+                    continue
+                    
+                target_ips = set()
+                for cid, info in list(_tv_clients.items()):
+                    ip = info.get('ip', '')
+                    dev = info.get('device_type', '')
+                    if ip and not ip.startswith('127.') and ('Android' in dev or 'TV' in dev):
+                        target_ips.add(ip)
+                        
+                for tip in target_ips:
+                    try:
+                        target_addr = f"{tip}:5555" if ':' not in tip else tip
+                        subprocess.run([adb_bin, 'connect', target_addr], capture_output=True, text=True, timeout=6)
+                        subprocess.run([adb_bin, '-s', target_addr, 'shell', 'reboot'], capture_output=True, text=True, timeout=5)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
+_reb_thread = threading.Thread(target=_auto_reboot_worker, daemon=True)
+_reb_thread.start()
+
 @app.route('/api/tv/device/reboot', methods=['POST'])
 def api_tv_device_reboot():
     data = request.json or {}

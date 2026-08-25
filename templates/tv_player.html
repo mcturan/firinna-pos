@@ -2355,8 +2355,19 @@
         async function fetchProducts() {
             try {
                 const res = await fetch('/api/tv/products');
-                webProducts = await res.json();
-                
+                if (res.ok) {
+                    webProducts = await res.json();
+                    try { localStorage.setItem('firinna_cached_products', JSON.stringify(webProducts)); } catch(e) {}
+                }
+            } catch(e) {
+                // Offline fallback: Load from localStorage
+                try {
+                    const cached = localStorage.getItem('firinna_cached_products');
+                    if (cached) webProducts = JSON.parse(cached);
+                } catch(err) {}
+            }
+
+            if (webProducts && webProducts.length > 0) {
                 let html = "";
                 webProducts.forEach((p, idx) => {
                     let imgUrl = (p.image_url && p.image_url.trim() !== "") ? p.image_url : null;
@@ -2372,8 +2383,9 @@
                         </div>
                     `;
                 });
-                document.getElementById('product-carousel').innerHTML = html;
-            } catch(e) {}
+                const pCar = document.getElementById('product-carousel');
+                if (pCar) pCar.innerHTML = html;
+            }
         }
 
         function getStableDeviceFingerprint() {
@@ -2419,10 +2431,13 @@
                 }).catch(e=>{});
 
                 const res = await fetch('/api/tv/settings?_t=' + Date.now());
-                if (!res.ok) return;
+                if (!res.ok) throw new Error('Settings HTTP ' + res.status);
                 const text = await res.text();
-                if (!text || text.trim().startsWith('<')) return;
+                if (!text || text.trim().startsWith('<')) throw new Error('Invalid JSON response');
                 const data = JSON.parse(text);
+
+                // Save to localStorage for instant offline recovery
+                try { localStorage.setItem('firinna_cached_settings', text); } catch(e) {}
 
                 // Check for instant push signal (from admin panel)
                 if (data.last_push && data.last_push.timestamp) {
@@ -2455,7 +2470,20 @@
                     lastSettingsStr = dataStr;
                     applySettings(data);
                 }
-            } catch (e) { console.log("Settings fetch error:", e); }
+            } catch (e) { 
+                console.log("[OFFLINE/RECOVERY] Settings fetch error:", e);
+                // Fallback: If memory has no settings yet, apply from localStorage
+                if (!lastSettingsStr) {
+                    try {
+                        const cached = localStorage.getItem('firinna_cached_settings');
+                        if (cached) {
+                            const data = JSON.parse(cached);
+                            lastSettingsStr = cached;
+                            applySettings(data);
+                        }
+                    } catch(err) {}
+                }
+            }
         }
 
         function applySettings(data) {
@@ -2563,13 +2591,22 @@
             tvLog(`[APP BOOT] Firinna TV Player starting... Client: ${myClientId}`);
             flushTvLogsToServer(true);
 
-            await fetchProducts();
-            await fetchSettings();
-            await syncAllPlaylistVideosInBackground();
+            // 1. First try loading cached offline settings & products immediately
+            try {
+                const cachedSet = localStorage.getItem('firinna_cached_settings');
+                if (cachedSet) applySettings(JSON.parse(cachedSet));
+            } catch(e) {}
 
+            // 2. Start playing local cached video immediately
             if (currentMediaSource === 'local') {
                 playLocalVideo(0);
             }
+
+            // 3. Connect to server in background to sync newest data
+            fetchProducts().catch(e=>{});
+            fetchSettings().then(() => {
+                syncAllPlaylistVideosInBackground().catch(e=>{});
+            }).catch(e=>{});
         }
 
         initAppOnStartup();
