@@ -9,10 +9,10 @@
         "/static/tv_media/videos/1.mp4"
     ],
     "local_videos": [
-        "/static/tv_media/videos/gypsy.mp4",
-        "/static/tv_media/videos/istanbul.mp4",
         "/static/tv_media/videos/1.mp4",
-        "/static/tv_media/videos/bayrak.mp4"
+        "/static/tv_media/videos/bayrak.mp4",
+        "/static/tv_media/videos/gypsy.mp4",
+        "/static/tv_media/videos/istanbul.mp4"
     ],
     "local_audio": [],
     "media_source": "local",
@@ -134,8 +134,8 @@
     },
     "last_push": {
         "action": "reload",
-        "target": "all",
-        "timestamp": 1787655360260
+        "target": "tv_26b1e944",
+        "timestamp": 1787660190369
     },
     "last_ping": "2026-08-25T14:20:26.563111",
     "version": 1787653730791,

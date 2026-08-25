@@ -3685,10 +3685,10 @@ def api_tv_device_reboot():
         return jsonify({"success": False, "error": "Geçerli bir yerel cihaz IP'si bulunamadı."})
         
     import subprocess
+    import shutil
     try:
-        # Check if adb is installed
-        chk = subprocess.run(['which', 'adb'], capture_output=True, text=True)
-        if chk.returncode != 0:
+        adb_bin = shutil.which('adb') or '/usr/bin/adb'
+        if not os.path.exists(adb_bin):
             return jsonify({
                 "success": False, 
                 "error": "Sunucuda ADB kurulu değil. Lütfen terminalde: sudo apt update && sudo apt install -y adb çalıştırın."
@@ -3696,10 +3696,10 @@ def api_tv_device_reboot():
             
         # Connect to Mi Stick via TCP/IP port 5555
         target_addr = f"{target_ip}:5555" if ':' not in target_ip else target_ip
-        conn = subprocess.run(['adb', 'connect', target_addr], capture_output=True, text=True, timeout=6)
+        subprocess.run([adb_bin, 'connect', target_addr], capture_output=True, text=True, timeout=8)
         
         # Send reboot command
-        reb = subprocess.run(['adb', '-s', target_addr, 'reboot'], capture_output=True, text=True, timeout=6)
+        reb = subprocess.run([adb_bin, '-s', target_addr, 'reboot'], capture_output=True, text=True, timeout=8)
         
         if reb.returncode == 0:
             return jsonify({"success": True, "message": f"Mi Stick ({target_addr}) donanımsal olarak baştan başlatılıyor..."})
