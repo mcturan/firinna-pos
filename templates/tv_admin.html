@@ -467,28 +467,37 @@
             <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:1.5rem;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
                     <label style="display:flex; align-items:center; gap:8px; font-size:0.95rem; font-weight:bold; color:#1e293b; cursor:pointer;">
-                        <input type="checkbox" id="ah_auto_schedule" style="width:1.2rem; height:1.2rem;" checked>
-                        <span>⏰ Otomatik Saat Takvimi (Belirlenen saatlerde otomatik açılır)</span>
+                        <input type="checkbox" id="ah_auto_schedule" style="width:1.2rem; height:1.2rem;" checked onchange="onAutoScheduleChange(this.checked)">
+                        <span>⏰ Otomatik Mod (Web Çalışma Saatleri + POS Durumu)</span>
                     </label>
-                    <button type="button" onclick="fetchWebOpeningHours()" style="background:#059669; color:white; border:none; padding:5px 12px; border-radius:6px; font-size:0.82rem; font-weight:bold; cursor:pointer;">
-                        🔄 Fırınna Web Saatlerini Uygula (23:00 - 08:30)
-                    </button>
+                </div>
+                <div id="ah_auto_info" style="background:#ecfdf5; border:1px solid #86efac; border-radius:8px; padding:10px 14px; margin-bottom:12px;">
+                    <span style="font-size:0.85rem; color:#065f46;">
+                        ✅ <strong>Otomatik Mod Açık:</strong> TV, web sitesindeki çalışma saatlerini ve POS durumunu kullanır. Masada müşteri varken TV kapalı moduna <strong>geçmez</strong>.
+                    </span>
+                </div>
+                <div id="ah_manual_info" style="background:#fef3c7; border:1px solid #fbbf24; border-radius:8px; padding:10px 14px; margin-bottom:12px; display:none;">
+                    <span style="font-size:0.85rem; color:#78350f;">
+                        ⚠️ <strong>Manuel Mod:</strong> TV, aşağıda ayarlanan sabit başlangıç/bitiş saatlerine göre kapalı moduna geçer. POS durumu dikkate alınmaz.
+                    </span>
                 </div>
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
-                    <div>
-                        <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">
-                            🌙 Başlangıç Saati (Kapanış):
-                        </label>
-                        <input type="time" id="ah_start_time" value="23:00" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:1rem; color:#0f172a;">
-                        <small style="color:#64748b;">Örnek: 23:00 (Bu saatten sonra mesai dışı ekranı devreye girer)</small>
-                    </div>
-                    <div>
-                        <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">
-                            ☀️ Bitiş Saati (Sabah Açılış):
-                        </label>
-                        <input type="time" id="ah_end_time" value="08:30" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:1rem; color:#0f172a;">
-                        <small style="color:#64748b;">Örnek: 08:30 (Bu saatte normal tabela ekranına döner)</small>
+                <div id="ah_manual_times" style="display:none; opacity:0.5;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                        <div>
+                            <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">
+                                🌙 Başlangıç Saati (Kapanış):
+                            </label>
+                            <input type="time" id="ah_start_time" value="23:00" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:1rem; color:#0f172a;">
+                            <small style="color:#64748b;">Örnek: 23:00 (Bu saatten sonra mesai dışı ekranı devreye girer)</small>
+                        </div>
+                        <div>
+                            <label style="font-weight:700; color:#334155; font-size:0.88rem; display:block; margin-bottom:4px;">
+                                ☀️ Bitiş Saati (Sabah Açılış):
+                            </label>
+                            <input type="time" id="ah_end_time" value="08:30" style="width:100%; padding:8px 12px; border-radius:6px; border:1.5px solid #cbd5e1; font-weight:700; font-size:1rem; color:#0f172a;">
+                            <small style="color:#64748b;">Örnek: 08:30 (Bu saatte normal tabela ekranına döner)</small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -548,7 +557,7 @@
                         <strong style="color:#0f172a; font-size:0.92rem;">Türkçe:</strong>
                         <input type="text" id="ah_title_tr" value="Şu Anda Hizmet Vermemekteyiz" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
                     </div>
-                    <textarea id="ah_text_tr" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:00'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.</textarea>
+                    <textarea id="ah_text_tr" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Değerli misafirlerimiz, şu anda kapalıyız. Sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.</textarea>
                     <input type="text" id="ah_badge_tr" value="☀️ Açılış: Sabah 08:00 (Her Gün)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
                 </div>
 
@@ -559,7 +568,7 @@
                         <strong style="color:#0f172a; font-size:0.92rem;">English:</strong>
                         <input type="text" id="ah_title_en" value="We Are Currently Closed" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
                     </div>
-                    <textarea id="ah_text_en" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 08:00 with fresh bakery and warm hospitality.</textarea>
+                    <textarea id="ah_text_en" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Dear guests, we are currently closed. We look forward to welcoming you with fresh artisan bakery and warm hospitality.</textarea>
                     <input type="text" id="ah_badge_en" value="☀️ Opening: 08:00 AM (Daily)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
                 </div>
 
@@ -570,7 +579,7 @@
                         <strong style="color:#0f172a; font-size:0.92rem;">Русский:</strong>
                         <input type="text" id="ah_title_ru" value="В настоящее время мы закрыты" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
                     </div>
-                    <textarea id="ah_text_ru" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 08:00 со свежей выпечкой и горячим чаем.</textarea>
+                    <textarea id="ah_text_ru" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас со свежей выпечкой и горячим чаем.</textarea>
                     <input type="text" id="ah_badge_ru" value="☀️ Открытие: 08:00 (Ежедневно)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
                 </div>
 
@@ -581,7 +590,7 @@
                         <strong style="color:#0f172a; font-size:0.92rem;">العربية:</strong>
                         <input type="text" id="ah_title_ar" value="نحن مغلقون حالياً" dir="rtl" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700; text-align:right;">
                     </div>
-                    <textarea id="ah_text_ar" rows="2" dir="rtl" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; text-align:right; box-sizing:border-box;">ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 08:00 صباحاً مع أشهى المخبوزات الطازجة.</textarea>
+                    <textarea id="ah_text_ar" rows="2" dir="rtl" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; text-align:right; box-sizing:border-box;">ضيوفنا الأعزاء، نحن حالياً مغلقون. يسعدنا استقبالكم مع أشهى المخبوزات الطازجة والضيافة الدافئة.</textarea>
                     <input type="text" id="ah_badge_ar" value="☀️ الافتتاح: 08:00 صباحاً (يومياً)" dir="rtl" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; text-align:right; box-sizing:border-box;">
                 </div>
 
@@ -592,8 +601,29 @@
                         <strong style="color:#0f172a; font-size:0.92rem;">Español:</strong>
                         <input type="text" id="ah_title_es" value="Actualmente estamos cerrados" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
                     </div>
-                    <textarea id="ah_text_es" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 08:00 con nuestros deliciosos productos de panadería.</textarea>
+                    <textarea id="ah_text_es" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Estimados clientes, actualmente estamos cerrados. Estaremos encantados de recibirles con nuestros deliciosos productos de panadería artesanal.</textarea>
                     <input type="text" id="ah_badge_es" value="☀️ Apertura: 08:00 (Todos los días)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
+                </div>
+                <!-- 🇬🇷 Yunanca (EL) -->
+                <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        <span style="font-size:1.2rem;">🇬🇷</span>
+                        <strong style="color:#0f172a; font-size:0.92rem;">Ελληνικά:</strong>
+                        <input type="text" id="ah_title_el" value="Αυτή τη στιγμή είμαστε κλειστά" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
+                    </div>
+                    <textarea id="ah_text_el" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Αγαπητοί επισκέπτες, είμαστε κλειστά. Ανυπομονούμε να σας καλωσορίσουμε με φρέσκα αρτοσκευάσματα και ζεστή φιλοξενία.</textarea>
+                    <input type="text" id="ah_badge_el" value="☀️ Άνοιγμα: 08:00 (Καθημερινά)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
+                </div>
+
+                <!-- 🇯🇵 Japonca (JA) -->
+                <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        <span style="font-size:1.2rem;">🇯🇵</span>
+                        <strong style="color:#0f172a; font-size:0.92rem;">日本語:</strong>
+                        <input type="text" id="ah_title_ja" value="現在閉店しています" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
+                    </div>
+                    <textarea id="ah_text_ja" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">お客様各位、現在閉店しております。焼き立てのパンと温かいおもてなしで皆様をお迎えできることを楽しみにしております。</textarea>
+                    <input type="text" id="ah_badge_ja" value="☀️ 開店: 08:00 (毎日)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
                 </div>
 
                 <div style="margin-top:10px;">
@@ -891,6 +921,7 @@
                 onAfterHoursEnabledChange(isAhEnabled, false);
                 setChecked('ah_force_active', !!ah.force_active);
                 setChecked('ah_auto_schedule', ah.auto_schedule !== false);
+                onAutoScheduleChange(ah.auto_schedule !== false);
                 setVal('ah_start_time', ah.start_time || '23:00');
                 setVal('ah_end_time', ah.end_time || '08:00');
                 setVal('ah_media_type', ah.media_type || 'video');
@@ -905,26 +936,35 @@
                 const ruMsg = msgs.find(m => m.lang === 'ru') || {};
                 const arMsg = msgs.find(m => m.lang === 'ar') || {};
                 const esMsg = msgs.find(m => m.lang === 'es') || {};
+                const elMsg = msgs.find(m => m.lang === 'el') || {};
+                const jaMsg = msgs.find(m => m.lang === 'ja') || {};
 
                 setVal('ah_title_tr', trMsg.title || 'Şu Anda Hizmet Vermemekteyiz');
-                setVal('ah_text_tr', trMsg.text || 'Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:00\'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.');
+                setVal('ah_text_tr', trMsg.text || 'Değerli misafirlerimiz, şu anda kapalıyız. Sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.');
                 setVal('ah_badge_tr', trMsg.badge || trMsg.opening_badge || '☀️ Açılış: Sabah 08:00 (Her Gün)');
 
                 setVal('ah_title_en', enMsg.title || 'We Are Currently Closed');
-                setVal('ah_text_en', enMsg.text || 'Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 08:00 with fresh bakery and warm hospitality.');
+                setVal('ah_text_en', enMsg.text || 'Dear guests, we are currently closed. We look forward to welcoming you with fresh artisan bakery and warm hospitality.');
                 setVal('ah_badge_en', enMsg.badge || enMsg.opening_badge || '☀️ Opening: 08:00 AM (Daily)');
 
                 setVal('ah_title_ru', ruMsg.title || 'В настоящее время мы закрыты');
-                setVal('ah_text_ru', ruMsg.text || 'Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 08:00 со свежей выпечкой и горячим чаем.');
+                setVal('ah_text_ru', ruMsg.text || 'Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас со свежей выпечкой и горячим чаем.');
                 setVal('ah_badge_ru', ruMsg.badge || ruMsg.opening_badge || '☀️ Открытие: 08:00 (Ежедневно)');
 
                 setVal('ah_title_ar', arMsg.title || 'نحن مغلقون حالياً');
-                setVal('ah_text_ar', arMsg.text || 'ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 08:00 صباحاً مع أشهى المخبوزات الطازجة.');
+                setVal('ah_text_ar', arMsg.text || 'ضيوفنا الأعزاء، نحن حالياً مغلقون. يسعدنا استقبالكم مع أشهى المخبوزات الطازجة والضيافة الدافئة.');
                 setVal('ah_badge_ar', arMsg.badge || arMsg.opening_badge || '☀️ الافتتاح: 08:00 صباحاً (يومياً)');
 
                 setVal('ah_title_es', esMsg.title || 'Actualmente estamos cerrados');
-                setVal('ah_text_es', esMsg.text || 'Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 08:00 con nuestros deliciosos productos de panadería.');
+                setVal('ah_text_es', esMsg.text || 'Estimados clientes, actualmente estamos cerrados. Estaremos encantados de recibirles con nuestros deliciosos productos de panadería artesanal.');
                 setVal('ah_badge_es', esMsg.badge || esMsg.opening_badge || '☀️ Apertura: 08:00 (Todos los días)');
+                setVal('ah_title_el', elMsg.title || 'Αυτή τη στιγμή είμαστε κλειστά');
+                setVal('ah_text_el', elMsg.text || 'Αγαπητοί επισκέπτες, είμαστε κλειστά. Ανυπομονούμε να σας καλωσορίσουμε με φρέσκα αρτοσκευάσματα και ζεστή φιλοξενία.');
+                setVal('ah_badge_el', elMsg.badge || elMsg.opening_badge || '☀️ Άνοιγμα: 08:00 (Καθημερινά)');
+
+                setVal('ah_title_ja', jaMsg.title || '現在閉店しています');
+                setVal('ah_text_ja', jaMsg.text || 'お客様各位、現在閉店しております。焼き立てのパンと温かいおもてなしで皆様をお迎えできることを楽しみにしております。');
+                setVal('ah_badge_ja', jaMsg.badge || jaMsg.opening_badge || '☀️ 開店: 08:00 (毎日)');
 
                 onAfterHoursMediaTypeChange();
 
@@ -1419,6 +1459,18 @@
             } catch(e) {
                 statusEl.textContent = "❌ Sunucu hatası";
                 statusEl.style.color = "#dc2626";
+            }
+        }
+
+        function onAutoScheduleChange(isAuto) {
+            const autoInfo = document.getElementById('ah_auto_info');
+            const manualInfo = document.getElementById('ah_manual_info');
+            const manualTimes = document.getElementById('ah_manual_times');
+            if (autoInfo) autoInfo.style.display = isAuto ? 'block' : 'none';
+            if (manualInfo) manualInfo.style.display = isAuto ? 'none' : 'block';
+            if (manualTimes) {
+                manualTimes.style.display = isAuto ? 'none' : 'block';
+                manualTimes.style.opacity = isAuto ? '0.5' : '1';
             }
         }
 
