@@ -493,7 +493,7 @@
         <!-- Box 1: Logo, Domain & 12 Dil Bayrakları (Center) -->
         <div id="ml-logo-box" class="grid-box" style="justify-content:center;">
             <div id="ml-logo-center-wrap">
-                <img id="ml-logo" src="/static/uploads/logo.png" alt="Logo">
+                <img id="ml-logo" src="/static/uploads/logo.png" data-original-src="/static/uploads/logo.png" alt="Logo" onerror="handleMediaImageError(this, '/static/uploads/logo.png')">
                 <div id="ml-logo-domain" style="display:flex; align-items:center; justify-content:center; gap:0.4vw;">
                     <span style="font-size:1.25vw; font-weight:700; color:#64748b; letter-spacing:0.5px;">visit</span>
                     <span style="color:#2D6A4F; font-weight:800; font-size:1.65vw; letter-spacing:1px;">www.firinna.com</span>
@@ -662,7 +662,7 @@
                     <!-- Logo: Kibar Beyaz Kapsüllü, Konumu Sabit (Aşağıdaki yazılar değiştikçe yeri oynamaz) -->
                     <div style="flex-shrink:0; width:100%; height:12vh; display:flex; align-items:center; justify-content:center; margin-bottom:1.5vh;">
                         <div style="background:#FFFFFF; padding:0.8vh 2.5vw; border-radius:1.2vw; box-shadow:0 8px 25px rgba(0,0,0,0.4); display:inline-flex; align-items:center; justify-content:center;">
-                            <img id="ah-logo" src="/static/uploads/logo.png" style="max-height:8.5vh; max-width:24vw; object-fit:contain;" alt="Fırınna">
+                            <img id="ah-logo" src="/static/uploads/logo.png" data-original-src="/static/uploads/logo.png" style="max-height:8.5vh; max-width:24vw; object-fit:contain;" alt="Fırınna" onerror="handleMediaImageError(this, '/static/uploads/logo.png')">
                         </div>
                     </div>
 
@@ -685,7 +685,7 @@
                 <div id="ah-right-card" style="flex:1; height:100%; background:rgba(15,23,42,0.94); backdrop-filter:blur(22px); border:2.5px solid rgba(245,158,11,0.5); border-radius:2vw; padding:2vh 2vw; box-sizing:border-box; display:flex; flex-direction:column; justify-content:space-between; align-items:center; box-shadow:0 25px 75px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.2); overflow:hidden;">
                     <!-- Büyük ve Ferah Ürün Görseli -->
                     <div style="flex:1; min-height:0; width:100%; border-radius:1.5vw; overflow:hidden; background:#0f172a; box-shadow:0 12px 35px rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center;">
-                        <img id="ah-prod-img" src="/static/uploads/logo.png" style="width:100%; height:100%; object-fit:cover; transition:opacity 0.4s ease;" alt="Lezzet">
+                        <img id="ah-prod-img" src="/static/uploads/logo.png" data-original-src="/static/uploads/logo.png" style="width:100%; height:100%; object-fit:cover; transition:opacity 0.4s ease;" alt="Lezzet" onerror="handleMediaImageError(this, '/static/uploads/logo.png')">
                     </div>
 
                     <!-- SADECE ÜRÜNÜN ADI (Büyük, Kalın & Lüks Tipografi) -->
@@ -817,6 +817,128 @@
         var activeVideoXhr = null;
         var videoLoad2MinTimeout = null;
 
+        // ==============================================================
+        // NETWORK & MEDIA HEALTH RETRY MANAGER (Self-Healing Subsystem)
+        // ==============================================================
+        let isNetworkServerHealthy = true;
+        const failedImageRegistry = new Map(); // url -> { element, url, retryCount, lastAttempt }
+        const failedVideoRegistry = new Set(); // set of failed video URLs
+
+        function handleMediaImageError(imgEl, originalUrl) {
+            if (!imgEl) return;
+            const src = originalUrl || imgEl.getAttribute('data-original-src') || imgEl.src;
+            if (!src) return;
+
+            imgEl.setAttribute('data-original-src', src);
+            imgEl.style.display = 'none';
+
+            failedImageRegistry.set(src, {
+                element: imgEl,
+                url: src,
+                retryCount: (failedImageRegistry.get(src)?.retryCount || 0) + 1,
+                lastAttempt: Date.now()
+            });
+
+            console.warn(`[MEDIA HEALTH] Image error recorded for retry: ${src}`);
+        }
+
+        function registerFailedVideo(videoUrl) {
+            if (!videoUrl) return;
+            failedVideoRegistry.add(videoUrl);
+            console.warn(`[MEDIA HEALTH] Video error recorded for retry: ${videoUrl}`);
+        }
+
+        async function retryFailedImages() {
+            if (failedImageRegistry.size === 0) return;
+            console.log(`[MEDIA HEALTH] Checking & retrying ${failedImageRegistry.size} failed image(s)...`);
+
+            for (const [url, item] of Array.from(failedImageRegistry.entries())) {
+                const cacheBuster = (url.includes('?') ? '&' : '?') + '_r=' + Date.now();
+                const testUrl = url + cacheBuster;
+
+                const imgTester = new Image();
+                imgTester.onload = function() {
+                    console.log(`[MEDIA HEALTH] Image recovered successfully: ${url}`);
+                    if (item.element) {
+                        item.element.src = testUrl;
+                        item.element.style.display = '';
+                    }
+                    document.querySelectorAll(`img[data-original-src="${url}"]`).forEach(img => {
+                        img.src = testUrl;
+                        img.style.display = '';
+                    });
+                    failedImageRegistry.delete(url);
+                };
+                imgTester.onerror = function() {
+                    item.retryCount++;
+                    item.lastAttempt = Date.now();
+                };
+                imgTester.src = testUrl;
+            }
+        }
+
+        function retryFailedVideos() {
+            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            const currentTargetUrl = activeList[currentLocalVideoIndex % activeList.length];
+
+            if (currentTargetUrl && !currentTargetUrl.endsWith('/bayrak.mp4')) {
+                let fullUrl = currentTargetUrl.startsWith("/static/") ? currentTargetUrl : "/static/tv_media/videos/" + currentTargetUrl;
+                
+                if (!bufferedVideoBlobs[fullUrl] && !isDownloadingVideo) {
+                    console.log(`[MEDIA HEALTH] Network connected -> Resuming/retrying video download: ${fullUrl}`);
+                    playLocalVideo(currentLocalVideoIndex);
+                }
+            }
+
+            for (const vidUrl of Array.from(failedVideoRegistry)) {
+                if (bufferedVideoBlobs[vidUrl]) {
+                    failedVideoRegistry.delete(vidUrl);
+                }
+            }
+        }
+
+        async function checkNetworkAndServerHealth() {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                const pingRes = await fetch('/api/tv/ping?_hc=' + Date.now(), {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ client_id: (typeof myClientId !== 'undefined' ? myClientId : 'tv_health') }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (pingRes.ok) {
+                    if (!isNetworkServerHealthy) {
+                        console.log("[NETWORK HEALTH] Server connection RESTORED to healthy state!");
+                    }
+                    isNetworkServerHealthy = true;
+
+                    if (typeof webProducts !== 'undefined' && (!webProducts || webProducts.length === 0)) {
+                        if (typeof fetchProducts === 'function') fetchProducts();
+                    }
+
+                    retryFailedImages();
+                    retryFailedVideos();
+                } else {
+                    isNetworkServerHealthy = false;
+                }
+            } catch (err) {
+                isNetworkServerHealthy = false;
+                console.warn("[NETWORK HEALTH] Connection check failed, waiting for network...", err.message || err);
+            }
+        }
+
+        // Periodic health check every 15s
+        setInterval(checkNetworkAndServerHealth, 15000);
+
+        // Immediate reaction to browser online event
+        window.addEventListener('online', () => {
+            console.log("[NETWORK] Online event triggered. Running health check & retrying media...");
+            checkNetworkAndServerHealth();
+        });
+
         window.playNextNativeVideo = function() {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             currentLocalVideoIndex = (currentLocalVideoIndex + 1) % activeList.length;
@@ -915,6 +1037,7 @@
                     const blob = xhr.response;
                     const blobUrl = URL.createObjectURL(blob);
                     bufferedVideoBlobs[srcUrl] = blobUrl;
+                    failedVideoRegistry.delete(srcUrl);
                     
                     if (badge) {
                         badge.textContent = `🎬 ${filename} %100`;
@@ -929,6 +1052,7 @@
                     playBlobDirectly(blobUrl, srcUrl);
                 } else {
                     console.warn("[TV VIDEO] Download HTTP error: " + xhr.status);
+                    registerFailedVideo(srcUrl);
                     if (badge) badge.style.display = 'none';
                     isPlayingFallback = true;
                     playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
@@ -939,6 +1063,7 @@
                 isDownloadingVideo = false;
                 currentlyDownloadingUrl = null;
                 activeVideoXhr = null;
+                registerFailedVideo(srcUrl);
                 if (videoLoad2MinTimeout) {
                     clearTimeout(videoLoad2MinTimeout);
                     videoLoad2MinTimeout = null;
@@ -1530,7 +1655,7 @@
                 const isThisPinned = (activePinnedCard && activePinnedCard.id === c.id);
                 html += `
                     <div id="dyn-wm-card-${idx}" class="wm-card ${isThisPinned ? 'active' : ''}" style="position:absolute; inset:0; width:100%; height:100%; display:${isThisPinned ? 'flex' : 'none'}; align-items:center; justify-content:center; opacity:${isThisPinned ? '1' : '0'}; transition:opacity 0.8s ease; pointer-events:none; padding:0; background:transparent; border:none; box-shadow:none;">
-                        <img src="${c.image}" style="max-width:100%; max-height:100%; width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;" onerror="this.style.display='none'">
+                        <img src="${c.image}" data-original-src="${c.image}" style="max-width:100%; max-height:100%; width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;" onerror="handleMediaImageError(this, '${c.image}')">
                     </div>
                 `;
             });
@@ -2048,7 +2173,7 @@
                     html += `
                         <div class="product-slide ${idx===0?'active':''}">
                             <div class="prod-img-box">
-                                ${imgSrc ? `<img src="${imgSrc}" class="prod-img" onerror="this.onerror=null; this.style.display='none';">` : ''}
+                                ${imgSrc ? `<img src="${imgSrc}" data-original-src="${imgSrc}" class="prod-img" onerror="handleMediaImageError(this, '${imgSrc}')">` : ''}
                             </div>
                             <div class="prod-info">
                                 <div class="prod-title">${p.title}</div>
@@ -2184,7 +2309,7 @@
                 currentMessages.forEach((m, idx) => {
                     if (m.image) {
                         mHtml += `<div class="msg-slide ${idx===0?'active':''}" style="flex-direction:row; gap:1.5vw;">
-                                    <img src="${m.image}" style="max-height:80%; max-width:40%; border-radius:0.5vw; object-fit:cover;" onerror="this.style.display='none'">
+                                    <img src="${m.image}" data-original-src="${m.image}" style="max-height:80%; max-width:40%; border-radius:0.5vw; object-fit:cover;" onerror="handleMediaImageError(this, '${m.image}')">
                                     <div>${m.text}</div>
                                   </div>`;
                     } else {
