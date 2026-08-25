@@ -808,17 +808,237 @@
             }
         }
 
+        // ==============================================================
+        // 1. REAL-TIME REMOTE LOGGER (Reports to /api/tv/upload_logs)
+        // ==============================================================
+        const _tvLogBuffer = [];
+        var _lastLogFlush = 0;
+
+        function tvLog(...args) {
+            const time = new Date().toLocaleTimeString('en-GB', {hour12:false});
+            const msg = args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+            const formatted = `[${time}] ${msg}`;
+            console.log(formatted);
+            _tvLogBuffer.push(formatted);
+            if (_tvLogBuffer.length > 250) _tvLogBuffer.shift();
+        }
+
+        async function flushTvLogsToServer(force = false) {
+            if (_tvLogBuffer.length === 0) return;
+            if (!force && _tvLogBuffer.length < 3 && (Date.now() - _lastLogFlush < 5000)) return;
+            _lastLogFlush = Date.now();
+            const logsToSend = _tvLogBuffer.splice(0, _tvLogBuffer.length).join('\n');
+            try {
+                fetch('/api/tv/upload_logs', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        client_id: (typeof myClientId !== 'undefined' ? myClientId : 'tv_device'),
+                        logs: logsToSend
+                    })
+                }).catch(()=>{});
+            } catch(e){}
+        }
+        setInterval(() => flushTvLogsToServer(false), 5000);
+
+        // ==============================================================
+        // 2. PERSISTENT LOCAL CACHE STORAGE (Preserves videos on disk across boots)
+        // ==============================================================
+        const TV_CACHE_NAME = 'firinna-tv-media-cache-v2';
+        var bufferedVideoBlobs = {}; // url -> objectUrl
         const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4"];
         var isPlayingFallback = false;
         var currentlyPlayingSrc = "";
-        var bufferedVideoBlobs = {};
+
+        async function getPersistentMediaCache() {
+            if ('caches' in window) {
+                try { return await caches.open(TV_CACHE_NAME); } catch(e){}
+            }
+            return null;
+        }
+
+        async function checkAndLoadPersistentVideo(videoUrl) {
+            if (!videoUrl) return null;
+            if (bufferedVideoBlobs[videoUrl]) return bufferedVideoBlobs[videoUrl];
+            const cache = await getPersistentMediaCache();
+            if (!cache) return null;
+            try {
+                const match = await cache.match(videoUrl);
+                if (match) {
+                    const blob = await match.blob();
+                    if (blob && blob.size > 1000) {
+                        const blobUrl = URL.createObjectURL(blob);
+                        bufferedVideoBlobs[videoUrl] = blobUrl;
+                        const filename = videoUrl.split('/').pop();
+                        tvLog(`[CACHE STORAGE HIT] ${filename} (${(blob.size/(1024*1024)).toFixed(1)} MB) loaded from persistent disk cache!`);
+                        return blobUrl;
+                    }
+                }
+            } catch(err) {
+                tvLog(`[CACHE READ ERROR] ${videoUrl}:`, err);
+            }
+            return null;
+        }
+
+        async function saveVideoToPersistentCache(videoUrl, blob) {
+            const cache = await getPersistentMediaCache();
+            if (!cache || !blob) return;
+            try {
+                const response = new Response(blob, {
+                    headers: { 'Content-Type': 'video/mp4', 'Content-Length': blob.size }
+                });
+                await cache.put(videoUrl, response);
+                const filename = videoUrl.split('/').pop();
+                tvLog(`[CACHE STORAGE SAVED] ${filename} (${(blob.size/(1024*1024)).toFixed(1)} MB) permanently saved to local disk cache!`);
+            } catch(err) {
+                tvLog(`[CACHE WRITE ERROR] ${videoUrl}:`, err);
+            }
+        }
+
+        // ==============================================================
+        // 3. INDEPENDENT SEQUENTIAL BACKGROUND DOWNLOAD QUEUE
+        // (Runs independently and is NEVER aborted by video onended loops!)
+        // ==============================================================
         var isDownloadingVideo = false;
         var currentlyDownloadingUrl = null;
         var activeVideoXhr = null;
-        var videoLoad2MinTimeout = null;
+        var videoDownloadQueue = [];
+
+        async function queueVideoForBackgroundDownload(videoUrl) {
+            if (!videoUrl || videoUrl.endsWith('/bayrak.mp4')) return;
+            let fullUrl = videoUrl.startsWith("/static/") ? videoUrl : "/static/tv_media/videos/" + videoUrl;
+            
+            // Check if already in memory or disk cache
+            const cachedBlobUrl = await checkAndLoadPersistentVideo(fullUrl);
+            if (cachedBlobUrl) return;
+
+            if (!videoDownloadQueue.includes(fullUrl) && currentlyDownloadingUrl !== fullUrl) {
+                videoDownloadQueue.push(fullUrl);
+                const filename = fullUrl.split('/').pop();
+                tvLog(`[SYNC QUEUE] Queued for background download: ${filename} (Queue depth: ${videoDownloadQueue.length})`);
+                processBackgroundDownloadQueue();
+            }
+        }
+
+        async function processBackgroundDownloadQueue() {
+            if (isDownloadingVideo || videoDownloadQueue.length === 0) return;
+            const targetUrl = videoDownloadQueue.shift();
+            
+            // Re-verify if already cached
+            const cachedBlobUrl = await checkAndLoadPersistentVideo(targetUrl);
+            if (cachedBlobUrl) {
+                processBackgroundDownloadQueue();
+                return;
+            }
+
+            const filename = targetUrl.split('/').pop();
+            const badge = document.getElementById('ml-dl-badge');
+            if (badge) {
+                badge.style.display = 'block';
+                badge.style.opacity = '0.85';
+                badge.textContent = `🎬 ${filename} %0`;
+            }
+
+            isDownloadingVideo = true;
+            currentlyDownloadingUrl = targetUrl;
+            tvLog(`[DOWNLOAD START] Starting non-interruptible background download: ${filename}`);
+            flushTvLogsToServer(true);
+
+            const xhr = new XMLHttpRequest();
+            activeVideoXhr = xhr;
+            xhr.open('GET', targetUrl, true);
+            xhr.responseType = 'blob';
+
+            let lastLoggedPct = -1;
+            xhr.onprogress = function(e) {
+                if (e.lengthComputable && e.total > 0) {
+                    const pct = Math.min(99, Math.round((e.loaded / e.total) * 100));
+                    if (badge) {
+                        badge.style.display = 'block';
+                        badge.textContent = `🎬 ${filename} %${pct}`;
+                    }
+                    if (pct % 25 === 0 && pct !== lastLoggedPct) {
+                        lastLoggedPct = pct;
+                        tvLog(`[DOWNLOAD PROGRESS] ${filename}: %${pct} (${(e.loaded/(1024*1024)).toFixed(1)}MB / ${(e.total/(1024*1024)).toFixed(1)}MB)`);
+                    }
+                }
+            };
+
+            xhr.onload = async function() {
+                isDownloadingVideo = false;
+                currentlyDownloadingUrl = null;
+                activeVideoXhr = null;
+
+                if (xhr.status === 200) {
+                    const blob = xhr.response;
+                    const blobUrl = URL.createObjectURL(blob);
+                    bufferedVideoBlobs[targetUrl] = blobUrl;
+                    failedVideoRegistry.delete(targetUrl);
+
+                    // Persist to disk cache so it never needs downloading again
+                    await saveVideoToPersistentCache(targetUrl, blob);
+
+                    tvLog(`[DOWNLOAD FINISHED] ${filename} (%100) saved to persistent disk cache!`);
+                    flushTvLogsToServer(true);
+
+                    if (badge) {
+                        badge.textContent = `🎬 ${filename} %100`;
+                        setTimeout(() => {
+                            if (!isDownloadingVideo && badge) badge.style.display = 'none';
+                        }, 1500);
+                    }
+
+                    // If currently on fallback (or waiting for this video), seamlessly switch!
+                    let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+                    let curTarget = activeList[currentLocalVideoIndex % activeList.length] || '';
+                    if (!curTarget.startsWith("/static/")) curTarget = "/static/tv_media/videos/" + curTarget;
+                    
+                    if (curTarget === targetUrl || isPlayingFallback) {
+                        tvLog(`[AUTO SWITCH] Seamlessly switching to newly ready video: ${filename}`);
+                        isPlayingFallback = false;
+                        playBlobDirectly(blobUrl, targetUrl);
+                    }
+                } else {
+                    tvLog(`[DOWNLOAD HTTP ERROR] ${filename} returned HTTP ${xhr.status}`);
+                    registerFailedVideo(targetUrl);
+                    if (badge) badge.style.display = 'none';
+                }
+
+                // Process next in queue
+                setTimeout(processBackgroundDownloadQueue, 500);
+            };
+
+            xhr.onerror = function(e) {
+                isDownloadingVideo = false;
+                currentlyDownloadingUrl = null;
+                activeVideoXhr = null;
+                registerFailedVideo(targetUrl);
+                tvLog(`[DOWNLOAD NETWORK ERROR] Network failure downloading ${filename}`);
+                if (badge) badge.style.display = 'none';
+                flushTvLogsToServer(true);
+                // Retry next after 3 seconds
+                setTimeout(processBackgroundDownloadQueue, 3000);
+            };
+
+            xhr.send();
+        }
+
+        async function syncAllPlaylistVideosInBackground() {
+            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            tvLog(`[SYNC] Checking disk cache for playlist: ${activeList.map(v => v.split('/').pop()).join(', ')}`);
+            for (const vUrl of activeList) {
+                let full = vUrl.startsWith("/static/") ? vUrl : "/static/tv_media/videos/" + vUrl;
+                if (!full.endsWith('/bayrak.mp4')) {
+                    const cached = await checkAndLoadPersistentVideo(full);
+                    if (!cached) {
+                        queueVideoForBackgroundDownload(full);
+                    }
+                }
+            }
+        }
 
         // ==============================================================
-        // NETWORK & MEDIA HEALTH RETRY MANAGER (Self-Healing Subsystem)
+        // 4. NETWORK & MEDIA HEALTH RETRY MANAGER (Self-Healing)
         // ==============================================================
         let isNetworkServerHealthy = true;
         const failedImageRegistry = new Map(); // url -> { element, url, retryCount, lastAttempt }
@@ -839,18 +1059,18 @@
                 lastAttempt: Date.now()
             });
 
-            console.warn(`[MEDIA HEALTH] Image error recorded for retry: ${src}`);
+            tvLog(`[MEDIA HEALTH] Image error registered for retry: ${src}`);
         }
 
         function registerFailedVideo(videoUrl) {
             if (!videoUrl) return;
             failedVideoRegistry.add(videoUrl);
-            console.warn(`[MEDIA HEALTH] Video error recorded for retry: ${videoUrl}`);
+            tvLog(`[MEDIA HEALTH] Video error registered for retry: ${videoUrl}`);
         }
 
         async function retryFailedImages() {
             if (failedImageRegistry.size === 0) return;
-            console.log(`[MEDIA HEALTH] Checking & retrying ${failedImageRegistry.size} failed image(s)...`);
+            tvLog(`[MEDIA HEALTH] Retrying ${failedImageRegistry.size} failed image(s)...`);
 
             for (const [url, item] of Array.from(failedImageRegistry.entries())) {
                 const cacheBuster = (url.includes('?') ? '&' : '?') + '_r=' + Date.now();
@@ -858,7 +1078,7 @@
 
                 const imgTester = new Image();
                 imgTester.onload = function() {
-                    console.log(`[MEDIA HEALTH] Image recovered successfully: ${url}`);
+                    tvLog(`[MEDIA HEALTH] Image recovered successfully: ${url}`);
                     if (item.element) {
                         item.element.src = testUrl;
                         item.element.style.display = '';
@@ -878,23 +1098,7 @@
         }
 
         function retryFailedVideos() {
-            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
-            const currentTargetUrl = activeList[currentLocalVideoIndex % activeList.length];
-
-            if (currentTargetUrl && !currentTargetUrl.endsWith('/bayrak.mp4')) {
-                let fullUrl = currentTargetUrl.startsWith("/static/") ? currentTargetUrl : "/static/tv_media/videos/" + currentTargetUrl;
-                
-                if (!bufferedVideoBlobs[fullUrl] && !isDownloadingVideo) {
-                    console.log(`[MEDIA HEALTH] Network connected -> Resuming/retrying video download: ${fullUrl}`);
-                    playLocalVideo(currentLocalVideoIndex);
-                }
-            }
-
-            for (const vidUrl of Array.from(failedVideoRegistry)) {
-                if (bufferedVideoBlobs[vidUrl]) {
-                    failedVideoRegistry.delete(vidUrl);
-                }
-            }
+            syncAllPlaylistVideosInBackground();
         }
 
         async function checkNetworkAndServerHealth() {
@@ -911,7 +1115,7 @@
 
                 if (pingRes.ok) {
                     if (!isNetworkServerHealthy) {
-                        console.log("[NETWORK HEALTH] Server connection RESTORED to healthy state!");
+                        tvLog("[NETWORK HEALTH] Server connection RESTORED to ONLINE!");
                     }
                     isNetworkServerHealthy = true;
 
@@ -926,37 +1130,38 @@
                 }
             } catch (err) {
                 isNetworkServerHealthy = false;
-                console.warn("[NETWORK HEALTH] Connection check failed, waiting for network...", err.message || err);
+                tvLog("[NETWORK HEALTH] Connection ping failed, waiting for network...", err.message || err);
             }
         }
 
-        // Periodic health check every 15s
         setInterval(checkNetworkAndServerHealth, 15000);
-
-        // Immediate reaction to browser online event
         window.addEventListener('online', () => {
-            console.log("[NETWORK] Online event triggered. Running health check & retrying media...");
+            tvLog("[NETWORK] Online event detected. Running health check & retrying media...");
             checkNetworkAndServerHealth();
         });
 
+        // ==============================================================
+        // 5. PLAYBACK LOOP (Does NOT abort active background downloads!)
+        // ==============================================================
         window.playNextNativeVideo = function() {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             currentLocalVideoIndex = (currentLocalVideoIndex + 1) % activeList.length;
-            console.log("[VIDEO LOOP] Next video index:", currentLocalVideoIndex, "Target:", activeList[currentLocalVideoIndex]);
+            const targetName = (activeList[currentLocalVideoIndex] || '').split('/').pop();
+            tvLog(`[VIDEO LOOP] Next video -> index ${currentLocalVideoIndex} (${targetName})`);
             playLocalVideo(currentLocalVideoIndex);
         };
 
         window.onNativeVideoEnded = function() {
-            console.log("[AndroidTV] Native video ended callback received. Advancing...");
+            tvLog("[AndroidTV] Native video ended callback received.");
             window.playNextNativeVideo();
         };
 
         window.onVideoEnded = function() {
-            console.log("[AndroidTV] onVideoEnded callback received. Advancing...");
+            tvLog("[AndroidTV] onVideoEnded callback received.");
             window.playNextNativeVideo();
         };
 
-        function playLocalVideo(vIndex) {
+        async function playLocalVideo(vIndex) {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             currentLocalVideoIndex = vIndex % activeList.length;
             let rawVideo = activeList[currentLocalVideoIndex];
@@ -965,116 +1170,36 @@
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             const filename = srcUrl.split('/').pop();
-            const badge = document.getElementById('ml-dl-badge');
 
-            // 1. If already downloaded in memory as Blob, play immediately
-            if (bufferedVideoBlobs[srcUrl]) {
-                if (videoLoad2MinTimeout) { clearTimeout(videoLoad2MinTimeout); videoLoad2MinTimeout = null; }
-                if (badge) badge.style.display = 'none';
+            // 1. Check memory or persistent disk cache
+            let blobUrl = bufferedVideoBlobs[srcUrl];
+            if (!blobUrl) {
+                blobUrl = await checkAndLoadPersistentVideo(srcUrl);
+            }
+
+            if (blobUrl) {
                 isPlayingFallback = false;
-                playBlobDirectly(bufferedVideoBlobs[srcUrl], srcUrl);
+                tvLog(`[PLAYBACK] Playing ready cached video: ${filename}`);
+                playBlobDirectly(blobUrl, srcUrl);
                 return;
             }
 
-            // 2. If it is the permanent core fallback (bayrak.mp4)
+            // 2. Pure fallback video
             if (srcUrl.endsWith('/bayrak.mp4')) {
-                if (videoLoad2MinTimeout) { clearTimeout(videoLoad2MinTimeout); videoLoad2MinTimeout = null; }
-                if (badge) badge.style.display = 'none';
                 isPlayingFallback = true;
+                tvLog(`[PLAYBACK] Playing core fallback: bayrak.mp4`);
                 playBlobDirectly(srcUrl, srcUrl);
                 return;
             }
 
-            // 3. Custom selected video: start loading, show small bottom-right % indicator with video name
-            if (badge) {
-                badge.style.display = 'block';
-                badge.style.opacity = '0.75';
-                badge.textContent = `🎬 ${filename} %0`;
-            }
+            // 3. Custom video is downloading in background:
+            // Ensure queued in background sync
+            queueVideoForBackgroundDownload(srcUrl);
 
-            // If loading takes > 2 minutes (120 seconds), open screen with fallback bayrak.mp4 while continuing background load
-            if (videoLoad2MinTimeout) clearTimeout(videoLoad2MinTimeout);
-            videoLoad2MinTimeout = setTimeout(() => {
-                console.log("[TV VIDEO TIMEOUT] Loading " + filename + " exceeded 2 minutes. Opening screen with fallback bayrak.mp4 while download finishes in background...");
-                isPlayingFallback = true;
-                playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
-            }, 120000); // 2 minutes (120s)
-
-            if (isDownloadingVideo && currentlyDownloadingUrl === srcUrl) return;
-
-            if (activeVideoXhr && currentlyDownloadingUrl !== srcUrl) {
-                try { activeVideoXhr.abort(); } catch(e){}
-            }
-
-            isDownloadingVideo = true;
-            currentlyDownloadingUrl = srcUrl;
-
-            const xhr = new XMLHttpRequest();
-            activeVideoXhr = xhr;
-            xhr.open('GET', srcUrl, true);
-            xhr.responseType = 'blob';
-
-            xhr.onprogress = function(e) {
-                if (e.lengthComputable && e.total > 0) {
-                    const pct = Math.min(99, Math.round((e.loaded / e.total) * 100));
-                    if (badge) {
-                        badge.style.display = 'block';
-                        badge.textContent = `🎬 ${filename} %${pct}`;
-                    }
-                }
-            };
-
-            xhr.onload = function() {
-                isDownloadingVideo = false;
-                currentlyDownloadingUrl = null;
-                activeVideoXhr = null;
-                if (videoLoad2MinTimeout) {
-                    clearTimeout(videoLoad2MinTimeout);
-                    videoLoad2MinTimeout = null;
-                }
-
-                if (xhr.status === 200) {
-                    const blob = xhr.response;
-                    const blobUrl = URL.createObjectURL(blob);
-                    bufferedVideoBlobs[srcUrl] = blobUrl;
-                    failedVideoRegistry.delete(srcUrl);
-                    
-                    if (badge) {
-                        badge.textContent = `🎬 ${filename} %100`;
-                        setTimeout(() => {
-                            if (!isDownloadingVideo && badge) badge.style.display = 'none';
-                        }, 1500);
-                    }
-
-                    // Seamlessly switch to the newly ready custom video
-                    console.log("[TV VIDEO READY] Video " + filename + " loaded! Seamlessly switching to custom video.");
-                    isPlayingFallback = false;
-                    playBlobDirectly(blobUrl, srcUrl);
-                } else {
-                    console.warn("[TV VIDEO] Download HTTP error: " + xhr.status);
-                    registerFailedVideo(srcUrl);
-                    if (badge) badge.style.display = 'none';
-                    isPlayingFallback = true;
-                    playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
-                }
-            };
-
-            xhr.onerror = function() {
-                isDownloadingVideo = false;
-                currentlyDownloadingUrl = null;
-                activeVideoXhr = null;
-                registerFailedVideo(srcUrl);
-                if (videoLoad2MinTimeout) {
-                    clearTimeout(videoLoad2MinTimeout);
-                    videoLoad2MinTimeout = null;
-                }
-                if (badge) badge.style.display = 'none';
-                console.warn("[TV VIDEO] Network error loading " + filename + " -> Playing fallback bayrak.mp4");
-                isPlayingFallback = true;
-                playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
-            };
-
-            xhr.send();
+            // While waiting for download, play fallback bayrak.mp4 so screen is NEVER blank or interrupted
+            isPlayingFallback = true;
+            tvLog(`[PLAYBACK WAIT] ${filename} is downloading in background -> Playing fallback bayrak.mp4 in meantime`);
+            playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
         }
 
         function playBlobDirectly(srcToPlay, origUrl) {
@@ -2356,22 +2481,35 @@
                 
                 localVideoList = newLocalVideos;
                 
-                // If custom videos just arrived while fallback was playing, or list changed, immediately switch
-                if (oldListStr !== newListStr || isPlayingFallback) {
-                    isPlayingFallback = false;
+                if (oldListStr !== newListStr) {
+                    tvLog(`[SETTINGS] Playlist updated with ${newLocalVideos.length} video(s). Triggering background disk sync...`);
+                    syncAllPlaylistVideosInBackground();
                     playLocalVideo(0);
                 }
             }
         }
 
-        fetchProducts();
-        fetchSettings();
+        async function initAppOnStartup() {
+            tvLog(`[APP BOOT] Firinna TV Player starting... Client: ${myClientId}`);
+            flushTvLogsToServer(true);
+
+            await fetchProducts();
+            await fetchSettings();
+            await syncAllPlaylistVideosInBackground();
+
+            if (currentMediaSource === 'local') {
+                playLocalVideo(0);
+            }
+        }
+
+        initAppOnStartup();
         setInterval(fetchSettings, 5000); 
 
         // Auto-Reload / Restart every 5 hours (5 * 60 * 60 * 1000 ms) to keep memory clean and auto-fetch updates
         const AUTO_RELOAD_MS = 5 * 60 * 60 * 1000;
         setTimeout(() => {
-            console.log("[AUTO-RELOAD] 5 hours reached, reloading TV player application...");
+            tvLog("[AUTO-RELOAD] 5 hours reached, reloading TV player application...");
+            flushTvLogsToServer(true);
             window.location.reload(true);
         }, AUTO_RELOAD_MS); 
 

@@ -1,18 +1,2 @@
-[2026-08-25 11:11:16]
-Gece 03:00 otomatik yeniden başlatma: 948 dk sonra
-Boot sequence started.
-Connected to LAN: http://192.168.1.10:5000
-Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
-App is up to date.
-Settings fetched successfully.
-Video already exists: gypsy.mp4
-Video already exists: istanbul.mp4
-Video already exists: 1.mp4
-Video already exists: 2.mp4
-Video already exists: bayrak.mp4
-[JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 612
-[JS] [WATERMARK] Normal sequential cycle starting with 5 cards -- From line 1505
-[JS] [HTML5 Video] onended event -> restarting / advancing... -- From line 938
-[JS] [VIDEO LOOP] Next video index: 1 Target: /static/tv_media/videos/gypsy.mp4 -- From line 821
-
-[AUTO LOG DUMP AFTER 10s]
+[2026-08-25 13:55:07]
+[13:55:02] [SYNC] Checking disk cache for playlist: bayrak.mp4, gypsy.mp4, istanbul.mp4, 1.mp4

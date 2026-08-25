@@ -98,39 +98,49 @@ def download_tv_apk(filename=None):
 @app.route('/api/tv/upload_logs', methods=['POST'])
 def upload_logs():
     try:
-        # Support both form and multipart/json uploads
-        logs = request.form.get('logs', '') or (request.json or {}).get('logs', '')
+        data = request.json if request.is_json else request.form
+        logs = (data.get('logs', '') if data else '') or ''
+        client_id = (data.get('client_id', '') if data else '') or 'tv'
         now = datetime.now()
         timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
         today_str = now.strftime('%Y-%m-%d')
         
-        # 1. Write latest logs to server
-        with open('/opt/firinna-pos/tv_logs.txt', 'w', encoding='utf-8') as f:
-            f.write(f"[{timestamp}]\n{logs}")
-        
-        # 2. Store in 7-day rolling daily directory
-        logs_dir = '/opt/firinna-pos/tv_logs'
-        os.makedirs(logs_dir, exist_ok=True)
-        daily_file = os.path.join(logs_dir, f"tv_log_{today_str}.txt")
-        with open(daily_file, 'a', encoding='utf-8') as f:
-            f.write(f"\n{'='*60}\n[SESSION: {timestamp}]\n{logs}\n")
-        
-        # Purge files older than 7 days
-        from datetime import timedelta
-        cutoff = now - timedelta(days=7)
-        for fname in os.listdir(logs_dir):
-            if fname.startswith("tv_log_") and fname.endswith(".txt"):
+        if logs and logs.strip():
+            log_entry = f"[{timestamp}] [{client_id}]\n{logs.strip()}\n"
+            logs_file = '/opt/firinna-pos/tv_logs.txt'
+            
+            existing_lines = []
+            if os.path.exists(logs_file):
                 try:
-                    fdate_str = fname.replace("tv_log_", "").replace(".txt", "")
-                    fdate = datetime.strptime(fdate_str, '%Y-%m-%d')
-                    if fdate < cutoff:
-                        os.remove(os.path.join(logs_dir, fname))
+                    with open(logs_file, 'r', encoding='utf-8', errors='ignore') as f:
+                        existing_lines = f.readlines()
                 except:
                     pass
-
+            
+            new_lines = (existing_lines + [log_entry])[-500:]
+            with open(logs_file, 'w', encoding='utf-8') as f:
+                f.writelines(new_lines)
+            
+            logs_dir = '/opt/firinna-pos/tv_logs'
+            os.makedirs(logs_dir, exist_ok=True)
+            daily_file = os.path.join(logs_dir, f"tv_log_{today_str}.txt")
+            with open(daily_file, 'a', encoding='utf-8') as f:
+                f.write(log_entry)
+        
         return jsonify({"status": "success"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/tv/logs', methods=['GET'])
+def api_get_tv_logs():
+    try:
+        content = ""
+        if os.path.exists('/opt/firinna-pos/tv_logs.txt'):
+            with open('/opt/firinna-pos/tv_logs.txt', 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+        return jsonify({"success": True, "logs": content})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/version')
 def api_version():

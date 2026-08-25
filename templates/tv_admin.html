@@ -90,6 +90,7 @@
             <button class="tv-tab" onclick="switchTab('mesajlar', this)">💡 Kültür Notları & Alt Bant</button>
             <button class="tv-tab" onclick="switchTab('mesaidisi', this)">⏳ Mesai Dışı (Kapanış)</button>
             <button class="tv-tab" onclick="switchTab('qr', this)">⚙️ QR & Ekstralar</button>
+            <button class="tv-tab" onclick="switchTab('logs', this)">📋 Canlı TV Logları</button>
         </div>
 
         <div id="genel" class="tv-pane active card">
@@ -603,10 +604,18 @@
                 <label>QR Kod Altı Yazısı</label>
                 <input type="text" id="qr_text" placeholder="Menü için okutun">
             </div>
-            <div class="form-group" style="display:flex; gap:1.5rem; margin-top:2rem;">
-                <label style="display:flex; align-items:center; gap:.5rem;"><input type="checkbox" id="w_weather"> Hava Durumu Göster</label>
-                <label style="display:flex; align-items:center; gap:.5rem;"><input type="checkbox" id="w_clock"> Dijital Saat Göster</label>
+        <div id="logs" class="tv-pane card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h3 style="margin:0; color:#1e293b;">📋 TV Cihazı Canlı İşlem & İndirme Logları</h3>
+                    <p style="color:#64748b; font-size:0.85rem; margin:4px 0 0 0;">Mi TV Stick ve tarayıcı ekranının indirme durumunu, disk önbellek kayıtlarını ve anlık durumunu buradan canlı izleyebilirsiniz.</p>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-primary" onclick="loadTvLogs()" style="padding:6px 14px; font-size:0.88rem; cursor:pointer;">🔄 Logları Yenile</button>
+                    <button class="btn" onclick="clearTvLogs()" style="padding:6px 14px; font-size:0.88rem; background:#ef4444; color:#fff; border:none; border-radius:6px; cursor:pointer;">🗑️ Temizle</button>
+                </div>
             </div>
+            <pre id="tv_live_logs" style="background:#0f172a; color:#38bdf8; padding:16px; border-radius:8px; font-family:'Courier New', monospace; font-size:0.85rem; height:450px; overflow-y:auto; white-space:pre-wrap; border:1.5px solid #1e293b; line-height:1.45;">Loglar yükleniyor...</pre>
         </div>
 
         <button class="btn-save" onclick="saveSettings()">💾 Ayarları Kaydet ve Ekrana Gönder</button>
@@ -626,6 +635,34 @@
             }
             const pane = document.getElementById(tabId);
             if (pane) pane.classList.add('active');
+            if (tabId === 'logs') loadTvLogs();
+        }
+
+        async function loadTvLogs() {
+            try {
+                const res = await fetch('/api/tv/logs?_t=' + Date.now());
+                const data = await res.json();
+                const el = document.getElementById('tv_live_logs');
+                if (el) {
+                    el.textContent = data.logs || "Henüz kaydedilmiş log bulunamadı.";
+                    el.scrollTop = el.scrollHeight;
+                }
+            } catch(e) {
+                const el = document.getElementById('tv_live_logs');
+                if (el) el.textContent = "Loglar alınamadı: " + e;
+            }
+        }
+
+        async function clearTvLogs() {
+            if (!confirm("TV loglarını temizlemek istediğinize emin misiniz?")) return;
+            try {
+                await fetch('/api/tv/upload_logs', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ logs: "[LOGS CLEARED BY ADMIN]", client_id: "admin" })
+                });
+                loadTvLogs();
+            } catch(e){}
         }
 
         function toggleSource() {
