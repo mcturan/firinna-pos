@@ -612,8 +612,8 @@
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
             <video id="local-video" src="{{ (settings.playlist_videos[0]) if settings and settings.playlist_videos and settings.playlist_videos|length > 0 else ((settings.local_videos[0]) if settings and settings.local_videos and settings.local_videos|length > 0 else '/static/tv_media/videos/bayrak.mp4') }}" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
-            <!-- Faint percentage download indicator in corner (%0 - %100) -->
-            <div id="ml-dl-badge" style="position:absolute; bottom:10px; right:14px; background:rgba(0,0,0,0.35); color:rgba(255,255,255,0.5); font-size:0.95rem; font-weight:600; font-family:monospace; padding:3px 8px; border-radius:6px; z-index:45; display:none; pointer-events:none; backdrop-filter:blur(2px); transition:opacity 0.5s ease;">%0</div>
+            <!-- Discrete percentage download indicator in bottom right corner with video name (%0 - %100) -->
+            <div id="ml-dl-badge" style="position:absolute; bottom:8px; right:10px; background:rgba(0,0,0,0.45); color:rgba(255,255,255,0.75); font-size:0.72rem; font-weight:500; font-family:monospace, system-ui, -apple-system, sans-serif; padding:2px 6px; border-radius:4px; z-index:45; display:none; pointer-events:none; backdrop-filter:blur(2px); transition:opacity 0.4s ease; border:1px solid rgba(255,255,255,0.15);"></div>
             <!-- High-Definition Graphic Watermark Container (Enlarged) -->
             <div id="ml-watermark-container" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); opacity:0; transition: opacity 0.6s ease; z-index: 50; pointer-events: none; width: 62vw; aspect-ratio: 1000 / 520; max-height: 86%; border-radius: 1.8vw; box-sizing: border-box; overflow: hidden; background: transparent; border: none; box-shadow: none;">
                 <!-- Dinamik Filigran ve Kutlama Kartları JS ile Yüklenecek -->
@@ -808,12 +808,14 @@
             }
         }
 
-        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/1.mp4"];
+        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4"];
         var isPlayingFallback = false;
         var currentlyPlayingSrc = "";
         var bufferedVideoBlobs = {};
         var isDownloadingVideo = false;
         var currentlyDownloadingUrl = null;
+        var activeVideoXhr = null;
+        var videoLoad2MinTimeout = null;
 
         window.playNextNativeVideo = function() {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
@@ -836,30 +838,57 @@
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             currentLocalVideoIndex = vIndex % activeList.length;
             let rawVideo = activeList[currentLocalVideoIndex];
-            if (!rawVideo) rawVideo = "/static/tv_media/videos/1.mp4";
+            if (!rawVideo) rawVideo = "/static/tv_media/videos/bayrak.mp4";
             
             let srcUrl = rawVideo;
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
+            const filename = srcUrl.split('/').pop();
+            const badge = document.getElementById('ml-dl-badge');
 
             // 1. If already downloaded in memory as Blob, play immediately
             if (bufferedVideoBlobs[srcUrl]) {
+                if (videoLoad2MinTimeout) { clearTimeout(videoLoad2MinTimeout); videoLoad2MinTimeout = null; }
+                if (badge) badge.style.display = 'none';
+                isPlayingFallback = false;
                 playBlobDirectly(bufferedVideoBlobs[srcUrl], srcUrl);
                 return;
             }
 
-            // 2. Start background download with faint % indicator
-            const badge = document.getElementById('ml-dl-badge');
-            if (badge) {
-                badge.style.display = 'block';
-                badge.style.opacity = '0.6';
-                badge.textContent = '%0';
+            // 2. If it is the permanent core fallback (bayrak.mp4)
+            if (srcUrl.endsWith('/bayrak.mp4')) {
+                if (videoLoad2MinTimeout) { clearTimeout(videoLoad2MinTimeout); videoLoad2MinTimeout = null; }
+                if (badge) badge.style.display = 'none';
+                isPlayingFallback = true;
+                playBlobDirectly(srcUrl, srcUrl);
+                return;
             }
 
+            // 3. Custom selected video: start loading, show small bottom-right % indicator with video name
+            if (badge) {
+                badge.style.display = 'block';
+                badge.style.opacity = '0.75';
+                badge.textContent = `🎬 ${filename} %0`;
+            }
+
+            // If loading takes > 2 minutes (120 seconds), open screen with fallback bayrak.mp4 while continuing background load
+            if (videoLoad2MinTimeout) clearTimeout(videoLoad2MinTimeout);
+            videoLoad2MinTimeout = setTimeout(() => {
+                console.log("[TV VIDEO TIMEOUT] Loading " + filename + " exceeded 2 minutes. Opening screen with fallback bayrak.mp4 while download finishes in background...");
+                isPlayingFallback = true;
+                playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
+            }, 120000); // 2 minutes (120s)
+
             if (isDownloadingVideo && currentlyDownloadingUrl === srcUrl) return;
+
+            if (activeVideoXhr && currentlyDownloadingUrl !== srcUrl) {
+                try { activeVideoXhr.abort(); } catch(e){}
+            }
+
             isDownloadingVideo = true;
             currentlyDownloadingUrl = srcUrl;
 
             const xhr = new XMLHttpRequest();
+            activeVideoXhr = xhr;
             xhr.open('GET', srcUrl, true);
             xhr.responseType = 'blob';
 
@@ -868,35 +897,56 @@
                     const pct = Math.min(99, Math.round((e.loaded / e.total) * 100));
                     if (badge) {
                         badge.style.display = 'block';
-                        badge.textContent = `%${pct}`;
+                        badge.textContent = `🎬 ${filename} %${pct}`;
                     }
                 }
             };
 
             xhr.onload = function() {
                 isDownloadingVideo = false;
+                currentlyDownloadingUrl = null;
+                activeVideoXhr = null;
+                if (videoLoad2MinTimeout) {
+                    clearTimeout(videoLoad2MinTimeout);
+                    videoLoad2MinTimeout = null;
+                }
+
                 if (xhr.status === 200) {
                     const blob = xhr.response;
                     const blobUrl = URL.createObjectURL(blob);
                     bufferedVideoBlobs[srcUrl] = blobUrl;
                     
                     if (badge) {
-                        badge.textContent = '%100';
-                        setTimeout(() => { if (badge) badge.style.display = 'none'; }, 1200);
+                        badge.textContent = `🎬 ${filename} %100`;
+                        setTimeout(() => {
+                            if (!isDownloadingVideo && badge) badge.style.display = 'none';
+                        }, 1500);
                     }
 
-                    // Seamlessly switch to newly downloaded video
+                    // Seamlessly switch to the newly ready custom video
+                    console.log("[TV VIDEO READY] Video " + filename + " loaded! Seamlessly switching to custom video.");
+                    isPlayingFallback = false;
                     playBlobDirectly(blobUrl, srcUrl);
                 } else {
+                    console.warn("[TV VIDEO] Download HTTP error: " + xhr.status);
                     if (badge) badge.style.display = 'none';
-                    playBlobDirectly(srcUrl, srcUrl);
+                    isPlayingFallback = true;
+                    playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
                 }
             };
 
             xhr.onerror = function() {
                 isDownloadingVideo = false;
+                currentlyDownloadingUrl = null;
+                activeVideoXhr = null;
+                if (videoLoad2MinTimeout) {
+                    clearTimeout(videoLoad2MinTimeout);
+                    videoLoad2MinTimeout = null;
+                }
                 if (badge) badge.style.display = 'none';
-                playBlobDirectly(srcUrl, srcUrl);
+                console.warn("[TV VIDEO] Network error loading " + filename + " -> Playing fallback bayrak.mp4");
+                isPlayingFallback = true;
+                playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
             };
 
             xhr.send();

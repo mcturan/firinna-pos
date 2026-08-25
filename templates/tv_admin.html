@@ -420,6 +420,25 @@
                 </button>
             </div>
 
+            <!-- 🔘 MESAİ DIŞI MODU ANA AÇMA / KAPAMA (DISABLE) KONTROLÜ -->
+            <div style="background:#eff6ff; border:1.5px solid #3b82f6; border-radius:10px; padding:16px; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+                <div>
+                    <strong style="color:#1e40af; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                        🌙 Mesai Dışı Modu Ana Durumu:
+                        <span id="ah_status_badge" style="font-size:0.75rem; padding:2px 8px; border-radius:12px; font-weight:800; background:#dcfce7; color:#15803d;">AKTİF</span>
+                    </strong>
+                    <span style="font-size:0.85rem; color:#475569; display:block; margin-top:4px;">
+                        Mesai dışı modunu istediğiniz an tek tıkla devre dışı bırakabilir (Disable) veya aktif edebilirsiniz. Devre dışı bırakıldığında TV'de mesai dışı ekranı kesinlikle açılmaz.
+                    </span>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <label style="display:flex; align-items:center; gap:10px; background:#ffffff; border:1.5px solid #2563eb; padding:8px 16px; border-radius:8px; font-weight:800; color:#1e40af; cursor:pointer; user-select:none;">
+                        <input type="checkbox" id="ah_enabled" style="width:1.35rem; height:1.35rem; cursor:pointer;" onchange="onAfterHoursEnabledChange(this.checked)" checked>
+                        <span id="ah_enabled_label">Mesai Dışı Modu Açık (Etkin)</span>
+                    </label>
+                </div>
+            </div>
+
             <!-- ⚡ CANLI TEST & MANUEL GEÇİŞ KUTUSU -->
             <div style="background:#fef3c7; border:1.5px solid #f59e0b; border-radius:10px; padding:16px; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
                 <div>
@@ -645,7 +664,7 @@
             allVideos.forEach((v, index) => {
                 const isEnabled = localVideos.includes(v);
                 const filename = v.split('/').pop();
-                const isProtected = (filename.toLowerCase() === 'bayrak.mp4' || filename.toLowerCase() === '1.mp4');
+                const isProtected = (filename.toLowerCase() === 'bayrak.mp4');
                 const deleteBtnHtml = isProtected 
                     ? `<span style="font-size:0.75rem; color:#059669; background:#dcfce7; padding:2px 6px; border-radius:4px; font-weight:bold;" title="Sistem Fallback Videosu (Silinemez)">🛡️ Fallback</span>`
                     : `<button onclick="deleteVideo('${v}')" style="padding:2px 5px; color:red;" title="Sil">🗑️</button>`;
@@ -800,6 +819,9 @@
 
                 // Mesai Dışı (After-Hours / Kapanış) Ayarları
                 const ah = data.after_hours || data.night_mode || {};
+                const isAhEnabled = (ah.enabled !== false);
+                setChecked('ah_enabled', isAhEnabled);
+                onAfterHoursEnabledChange(isAhEnabled, false);
                 setChecked('ah_force_active', !!ah.force_active);
                 setChecked('ah_auto_schedule', ah.auto_schedule !== false);
                 setVal('ah_start_time', ah.start_time || '23:00');
@@ -1170,7 +1192,7 @@
                     cards: wmCards
                 },
                 after_hours: {
-                    enabled: true,
+                    enabled: document.getElementById('ah_enabled') ? document.getElementById('ah_enabled').checked : true,
                     force_active: document.getElementById('ah_force_active') ? document.getElementById('ah_force_active').checked : false,
                     auto_schedule: document.getElementById('ah_auto_schedule') ? document.getElementById('ah_auto_schedule').checked : true,
                     start_time: document.getElementById('ah_start_time') ? document.getElementById('ah_start_time').value : '23:00',
@@ -1329,6 +1351,23 @@
             }
         }
 
+        async function onAfterHoursEnabledChange(enabled, autoSave = true) {
+            const badge = document.getElementById('ah_status_badge');
+            const label = document.getElementById('ah_enabled_label');
+            if (badge) {
+                badge.textContent = enabled ? 'AKTİF' : 'DEVRE DIŞI';
+                badge.style.background = enabled ? '#dcfce7' : '#fee2e2';
+                badge.style.color = enabled ? '#15803d' : '#dc2626';
+            }
+            if (label) {
+                label.textContent = enabled ? 'Mesai Dışı Modu Açık (Etkin)' : 'Mesai Dışı Modu Devre Dışı (KAPALI)';
+            }
+            if (autoSave) {
+                await saveAfterHoursToServer(false);
+                console.log(enabled ? "🌙 Mesai Dışı Modu ETKİNLEŞTİRİLDİ!" : "🛑 Mesai Dışı Modu DEVRE DIŞI BIRAKILDI (Tüm ekranlar normal modda)!");
+            }
+        }
+
         async function toggleAfterHoursInstantTest(isActive) {
             await saveAfterHoursToServer(false);
             console.log(isActive ? "⏳ TV anında Mesai Dışı Moduna geçirildi!" : "☀️ TV normal tabela moduna döndürüldü.");
@@ -1339,7 +1378,7 @@
             const mUrl = document.getElementById('ah_media_url').value.trim();
 
             const ahData = {
-                enabled: true,
+                enabled: document.getElementById('ah_enabled') ? document.getElementById('ah_enabled').checked : true,
                 force_active: document.getElementById('ah_force_active').checked,
                 auto_schedule: document.getElementById('ah_auto_schedule').checked,
                 start_time: document.getElementById('ah_start_time').value || '23:00',

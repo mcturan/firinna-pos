@@ -3464,14 +3464,13 @@ def get_tv_settings():
                     if 'playlist_videos' not in data:
                         data['playlist_videos'] = data.get('local_videos', [])
                     
-                    # Ensure all physical video files + bayrak.mp4 + 1.mp4 are in local_videos so Android TV APK never deletes unselected videos
+                    # Ensure all physical video files + bayrak.mp4 are in local_videos
                     v_dir = os.path.join(TV_MEDIA_FOLDER, 'videos')
                     server_videos = []
                     if os.path.exists(v_dir):
                         server_videos = [f"/static/tv_media/videos/{v}" for v in os.listdir(v_dir) if v.endswith(('.mp4', '.webm', '.ogg'))]
                     all_sync_videos = list(dict.fromkeys(server_videos + [
-                        "/static/tv_media/videos/bayrak.mp4",
-                        "/static/tv_media/videos/1.mp4"
+                        "/static/tv_media/videos/bayrak.mp4"
                     ]))
                     data['local_videos'] = all_sync_videos
                     return data
@@ -3482,7 +3481,7 @@ def get_tv_settings():
         "layout": "modern_grid",
         "video_playlist": "",
         "playlist_videos": ["/static/tv_media/videos/istanbul.mp4"],
-        "local_videos": ["/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/1.mp4"],
+        "local_videos": ["/static/tv_media/videos/bayrak.mp4"],
         "local_audio": [],
         "media_source": "local",
         "audio_priority": "video",
@@ -3525,14 +3524,13 @@ def api_tv_settings():
             
         current.update(data)
         
-        # Keep local_videos filled with all available server videos so APK never deletes unselected videos or bayrak.mp4
+        # Keep local_videos filled with all available server videos + bayrak.mp4
         v_dir = os.path.join(TV_MEDIA_FOLDER, 'videos')
         server_videos = []
         if os.path.exists(v_dir):
             server_videos = [f"/static/tv_media/videos/{v}" for v in os.listdir(v_dir) if v.endswith(('.mp4', '.webm', '.ogg'))]
         all_sync_videos = list(dict.fromkeys(server_videos + [
-            "/static/tv_media/videos/bayrak.mp4",
-            "/static/tv_media/videos/1.mp4"
+            "/static/tv_media/videos/bayrak.mp4"
         ]))
         current['local_videos'] = all_sync_videos
         
@@ -4104,8 +4102,8 @@ def api_delete_tv_media():
     type_ = data.get('type', 'video')
     if filename:
         from werkzeug.utils import secure_filename
-        # Protect core fallback videos from deletion
-        if filename.lower() in ['bayrak.mp4', '1.mp4']:
+        # Protect core fallback video (bayrak.mp4) from deletion
+        if filename.lower() == 'bayrak.mp4':
             return jsonify({"success": False, "error": f"{filename} sistemin kalıcı ana fallback videosudur ve silinemez."}), 400
             
         folder = 'videos' if type_ == 'video' else 'audio'
