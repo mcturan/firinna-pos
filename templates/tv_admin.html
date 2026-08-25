@@ -600,10 +600,12 @@
                 <label>QR Kod Yönlendirme Linki</label>
                 <input type="text" id="qr_code" placeholder="https://firinna.com/menu">
             </div>
-            <div class="form-group">
-                <label>QR Kod Altı Yazısı</label>
-                <input type="text" id="qr_text" placeholder="Menü için okutun">
+            <div class="form-group" style="display:flex; gap:1.5rem; margin-top:1rem;">
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="w_weather" checked> 🌤️ Hava Durumu Göster</label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="w_clock" checked> 🕒 Saat Göster</label>
             </div>
+        </div>
+
         <div id="logs" class="tv-pane card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
                 <div>
@@ -656,10 +658,9 @@
         async function clearTvLogs() {
             if (!confirm("TV loglarını temizlemek istediğinize emin misiniz?")) return;
             try {
-                await fetch('/api/tv/upload_logs', {
+                await fetch('/api/tv/clear_logs', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ logs: "[LOGS CLEARED BY ADMIN]", client_id: "admin" })
+                    headers: {'Content-Type': 'application/json'}
                 });
                 loadTvLogs();
             } catch(e){}

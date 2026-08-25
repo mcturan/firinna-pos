@@ -95,6 +95,11 @@ def download_tv_apk(filename=None):
     response.headers['Accept-Ranges'] = 'none'
     return response
 
+import threading
+
+_tv_log_lock = threading.Lock()
+_tv_settings_lock = threading.Lock()
+
 @app.route('/api/tv/upload_logs', methods=['POST'])
 def upload_logs():
     try:
@@ -109,27 +114,41 @@ def upload_logs():
             log_entry = f"[{timestamp}] [{client_id}]\n{logs.strip()}\n"
             logs_file = '/opt/firinna-pos/tv_logs.txt'
             
-            existing_lines = []
-            if os.path.exists(logs_file):
-                try:
-                    with open(logs_file, 'r', encoding='utf-8', errors='ignore') as f:
-                        existing_lines = f.readlines()
-                except:
-                    pass
-            
-            new_lines = (existing_lines + [log_entry])[-500:]
-            with open(logs_file, 'w', encoding='utf-8') as f:
-                f.writelines(new_lines)
-            
-            logs_dir = '/opt/firinna-pos/tv_logs'
-            os.makedirs(logs_dir, exist_ok=True)
-            daily_file = os.path.join(logs_dir, f"tv_log_{today_str}.txt")
-            with open(daily_file, 'a', encoding='utf-8') as f:
-                f.write(log_entry)
+            with _tv_log_lock:
+                existing_lines = []
+                if os.path.exists(logs_file):
+                    try:
+                        with open(logs_file, 'r', encoding='utf-8', errors='ignore') as f:
+                            existing_lines = f.readlines()
+                    except:
+                        pass
+                
+                # Split incoming multi-line string to individual lines for consistent truncation
+                entry_lines = [l + '\n' for l in log_entry.strip().split('\n')]
+                new_lines = (existing_lines + entry_lines)[-500:]
+                with open(logs_file, 'w', encoding='utf-8') as f:
+                    f.writelines(new_lines)
+                
+                logs_dir = '/opt/firinna-pos/tv_logs'
+                os.makedirs(logs_dir, exist_ok=True)
+                daily_file = os.path.join(logs_dir, f"tv_log_{today_str}.txt")
+                with open(daily_file, 'a', encoding='utf-8') as f:
+                    f.write(log_entry)
         
         return jsonify({"status": "success"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/tv/clear_logs', methods=['POST'])
+def api_clear_tv_logs():
+    try:
+        logs_file = '/opt/firinna-pos/tv_logs.txt'
+        with _tv_log_lock:
+            with open(logs_file, 'w', encoding='utf-8') as f:
+                f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] [admin]\n[LOGS CLEARED BY ADMIN]\n")
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/tv/logs', methods=['GET'])
 def api_get_tv_logs():
@@ -3454,7 +3473,9 @@ def serve_web_static(filename):
 import os
 import json
 from datetime import datetime
+import threading
 
+_tv_settings_lock = threading.Lock()
 TV_SETTINGS_FILE = os.path.join(os.path.dirname(__file__), 'tv_settings.json')
 TV_MEDIA_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'tv_media')
 os.makedirs(os.path.join(TV_MEDIA_FOLDER, 'videos'), exist_ok=True)
@@ -3464,61 +3485,63 @@ import tempfile
 import time
 
 def get_tv_settings():
-    if os.path.exists(TV_SETTINGS_FILE):
-        for _ in range(3):
-            try:
-                with open(TV_SETTINGS_FILE, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    if not data.get('logo_url'):
-                        data['logo_url'] = db.get_setting('logo_url', '')
-                    if 'playlist_videos' not in data:
-                        data['playlist_videos'] = data.get('local_videos', [])
-                    
-                    # Ensure all physical video files + bayrak.mp4 are in local_videos
-                    v_dir = os.path.join(TV_MEDIA_FOLDER, 'videos')
-                    server_videos = []
-                    if os.path.exists(v_dir):
-                        server_videos = [f"/static/tv_media/videos/{v}" for v in os.listdir(v_dir) if v.endswith(('.mp4', '.webm', '.ogg'))]
-                    all_sync_videos = list(dict.fromkeys(server_videos + [
-                        "/static/tv_media/videos/bayrak.mp4"
-                    ]))
-                    data['local_videos'] = all_sync_videos
-                    return data
-            except Exception:
-                time.sleep(0.05)
-    return {
-        "logo_url": db.get_setting('logo_url', ''),
-        "layout": "modern_grid",
-        "video_playlist": "",
-        "playlist_videos": ["/static/tv_media/videos/istanbul.mp4"],
-        "local_videos": ["/static/tv_media/videos/bayrak.mp4"],
-        "local_audio": [],
-        "media_source": "local",
-        "audio_priority": "video",
-        "ticker_text_enabled": True,
-        "ticker_currency_enabled": True,
-        "ticker_rss_enabled": True,
-        "promo_text": "",
-        "qr_code": "",
-        "qr_text": "",
-        "celebration": {
-            "active": False,
-            "title": "İyi ki Doğdun!",
-            "subtitle": "Fırınna Ailesi Olarak Nice Mutlu Yıllara Dileriz! 🎂🎉",
-            "image_url": "",
-            "effects": {"balloons": True, "fireworks": True, "confetti": True}
-        },
-        "widgets": {"weather": True, "clock": True},
-        "messages": [],
-        "last_ping": None
-    }
+    with _tv_settings_lock:
+        if os.path.exists(TV_SETTINGS_FILE):
+            for _ in range(3):
+                try:
+                    with open(TV_SETTINGS_FILE, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        if not data.get('logo_url'):
+                            data['logo_url'] = db.get_setting('logo_url', '')
+                        if 'playlist_videos' not in data:
+                            data['playlist_videos'] = data.get('local_videos', [])
+                        
+                        # Ensure all physical video files + bayrak.mp4 are in local_videos
+                        v_dir = os.path.join(TV_MEDIA_FOLDER, 'videos')
+                        server_videos = []
+                        if os.path.exists(v_dir):
+                            server_videos = [f"/static/tv_media/videos/{v}" for v in sorted(os.listdir(v_dir)) if v.endswith(('.mp4', '.webm', '.ogg'))]
+                        all_sync_videos = list(dict.fromkeys(server_videos + [
+                            "/static/tv_media/videos/bayrak.mp4"
+                        ]))
+                        data['local_videos'] = all_sync_videos
+                        return data
+                except Exception:
+                    time.sleep(0.05)
+        return {
+            "logo_url": db.get_setting('logo_url', ''),
+            "layout": "modern_grid",
+            "video_playlist": "",
+            "playlist_videos": ["/static/tv_media/videos/istanbul.mp4"],
+            "local_videos": ["/static/tv_media/videos/bayrak.mp4"],
+            "local_audio": [],
+            "media_source": "local",
+            "audio_priority": "video",
+            "ticker_text_enabled": True,
+            "ticker_currency_enabled": True,
+            "ticker_rss_enabled": True,
+            "promo_text": "",
+            "qr_code": "",
+            "qr_text": "",
+            "celebration": {
+                "active": False,
+                "title": "İyi ki Doğdun!",
+                "subtitle": "Fırınna Ailesi Olarak Nice Mutlu Yıllara Dileriz! 🎂🎉",
+                "image_url": "",
+                "effects": {"balloons": True, "fireworks": True, "confetti": True}
+            },
+            "widgets": {"weather": True, "clock": True},
+            "messages": [],
+            "last_ping": None
+        }
 
 def save_tv_settings(data):
-    dir_name = os.path.dirname(TV_SETTINGS_FILE) or '.'
-    with tempfile.NamedTemporaryFile('w', dir=dir_name, delete=False, encoding='utf-8') as tf:
-        json.dump(data, tf, ensure_ascii=False, indent=4)
-        temp_name = tf.name
-    os.replace(temp_name, TV_SETTINGS_FILE)
+    with _tv_settings_lock:
+        dir_name = os.path.dirname(TV_SETTINGS_FILE) or '.'
+        with tempfile.NamedTemporaryFile('w', dir=dir_name, delete=False, encoding='utf-8') as tf:
+            json.dump(data, tf, ensure_ascii=False, indent=4)
+            temp_name = tf.name
+        os.replace(temp_name, TV_SETTINGS_FILE)
 
 @app.route('/api/tv/settings', methods=['GET', 'POST'])
 def api_tv_settings():
@@ -3538,7 +3561,7 @@ def api_tv_settings():
         v_dir = os.path.join(TV_MEDIA_FOLDER, 'videos')
         server_videos = []
         if os.path.exists(v_dir):
-            server_videos = [f"/static/tv_media/videos/{v}" for v in os.listdir(v_dir) if v.endswith(('.mp4', '.webm', '.ogg'))]
+            server_videos = [f"/static/tv_media/videos/{v}" for v in sorted(os.listdir(v_dir)) if v.endswith(('.mp4', '.webm', '.ogg'))]
         all_sync_videos = list(dict.fromkeys(server_videos + [
             "/static/tv_media/videos/bayrak.mp4"
         ]))
@@ -3604,9 +3627,6 @@ def api_tv_ping():
         'last_ping_ts': time.time()
     }
     
-    current = get_tv_settings()
-    current['last_ping'] = datetime.now().isoformat()
-    save_tv_settings(current)
     return jsonify({"success": True, "client_id": client_id})
 
 @app.route('/api/tv/clients', methods=['GET'])
@@ -4108,16 +4128,23 @@ def api_upload_tv_media():
 @app.route('/api/tv/media/delete', methods=['POST'])
 def api_delete_tv_media():
     data = request.json
-    filename = data.get('filename')
+    raw_filename = data.get('filename', '')
     type_ = data.get('type', 'video')
-    if filename:
+    if raw_filename:
         from werkzeug.utils import secure_filename
+        filename = secure_filename(raw_filename)
+        if not filename:
+            return jsonify({"success": False, "error": "Geçersiz dosya adı."}), 400
         # Protect core fallback video (bayrak.mp4) from deletion
         if filename.lower() == 'bayrak.mp4':
             return jsonify({"success": False, "error": f"{filename} sistemin kalıcı ana fallback videosudur ve silinemez."}), 400
             
         folder = 'videos' if type_ == 'video' else 'audio'
         filepath = os.path.join(TV_MEDIA_FOLDER, folder, filename)
+        # Verify resolved path is within TV_MEDIA_FOLDER
+        real_path = os.path.realpath(filepath)
+        if not real_path.startswith(os.path.realpath(TV_MEDIA_FOLDER)):
+            return jsonify({"success": False, "error": "Geçersiz dosya yolu."}), 400
         if os.path.exists(filepath):
             os.remove(filepath)
             return jsonify({"success": True})

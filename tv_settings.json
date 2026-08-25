@@ -12,7 +12,6 @@
         "/static/tv_media/videos/gypsy.mp4",
         "/static/tv_media/videos/istanbul.mp4",
         "/static/tv_media/videos/1.mp4",
-        "/static/tv_media/videos/2.mp4",
         "/static/tv_media/videos/bayrak.mp4"
     ],
     "local_audio": [],
@@ -134,11 +133,11 @@
         ]
     },
     "last_push": {
-        "action": "clear_cache",
+        "action": "reload",
         "target": "all",
-        "timestamp": 1787653730791
+        "timestamp": 1787655360260
     },
-    "last_ping": "2026-08-25T13:55:20.632971",
+    "last_ping": "2026-08-25T14:20:26.563111",
     "version": 1787653730791,
     "did_you_know": [
         {

@@ -827,17 +827,24 @@
             if (_tvLogBuffer.length === 0) return;
             if (!force && _tvLogBuffer.length < 3 && (Date.now() - _lastLogFlush < 5000)) return;
             _lastLogFlush = Date.now();
-            const logsToSend = _tvLogBuffer.splice(0, _tvLogBuffer.length).join('\n');
+            const logsToSendArray = _tvLogBuffer.splice(0, _tvLogBuffer.length);
+            const logsToSend = logsToSendArray.join('\n');
             try {
-                fetch('/api/tv/upload_logs', {
+                const res = await fetch('/api/tv/upload_logs', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         client_id: (typeof myClientId !== 'undefined' ? myClientId : 'tv_device'),
                         logs: logsToSend
                     })
-                }).catch(()=>{});
-            } catch(e){}
+                });
+                if (!res.ok) {
+                    // Put back unsent logs if buffer isn't full
+                    _tvLogBuffer = logsToSendArray.concat(_tvLogBuffer).slice(-250);
+                }
+            } catch(e){
+                _tvLogBuffer = logsToSendArray.concat(_tvLogBuffer).slice(-250);
+            }
         }
         setInterval(() => flushTvLogsToServer(false), 5000);
 
@@ -867,6 +874,8 @@
                 if (match) {
                     const blob = await match.blob();
                     if (blob && blob.size > 1000) {
+                        // Revoke old blob URL if exists to prevent memory leaks
+                        if (bufferedVideoBlobs[videoUrl]) URL.revokeObjectURL(bufferedVideoBlobs[videoUrl]);
                         const blobUrl = URL.createObjectURL(blob);
                         bufferedVideoBlobs[videoUrl] = blobUrl;
                         const filename = videoUrl.split('/').pop();
@@ -971,6 +980,8 @@
 
                 if (xhr.status === 200) {
                     const blob = xhr.response;
+                    // Revoke old blob URL if exists to prevent memory leaks
+                    if (bufferedVideoBlobs[targetUrl]) URL.revokeObjectURL(bufferedVideoBlobs[targetUrl]);
                     const blobUrl = URL.createObjectURL(blob);
                     bufferedVideoBlobs[targetUrl] = blobUrl;
                     failedVideoRegistry.delete(targetUrl);
@@ -1295,7 +1306,7 @@
                     embedUrl = `https://www.youtube.com/embed/videoseries?list=${pId}&autoplay=1&mute=1&loop=1&controls=0&rel=0&showinfo=0&modestbranding=1`;
                 }
                 
-                ytIframe.src = embedUrl;
+                document.getElementById('ytplayer').src = embedUrl;
                 isYtInit = true;
             }
         }
@@ -2369,7 +2380,8 @@
                                 if ('caches' in window) {
                                     try {
                                         const names = await caches.keys();
-                                        await Promise.all(names.map(name => caches.delete(name)));
+                                        // Preserve persistent video cache (TV_CACHE_NAME) during clear_cache
+                                        await Promise.all(names.filter(n => n !== TV_CACHE_NAME).map(name => caches.delete(name)));
                                     } catch(err) {}
                                 }
                                 sessionStorage.clear();
@@ -2442,10 +2454,13 @@
                     }
                 });
                 if(data.messages && data.messages.length > 0) {
-                    document.getElementById('ml-left-bottom').style.display = 'flex';
-                    document.getElementById('message-carousel').innerHTML = mHtml;
+                    const mlLeftBottom = document.getElementById('ml-left-bottom');
+                    const msgCarousel = document.getElementById('message-carousel');
+                    if (mlLeftBottom) mlLeftBottom.style.display = 'flex';
+                    if (msgCarousel) msgCarousel.innerHTML = mHtml;
                 } else {
-                    document.getElementById('ml-left-bottom').style.display = 'none';
+                    const mlLeftBottom = document.getElementById('ml-left-bottom');
+                    if (mlLeftBottom) mlLeftBottom.style.display = 'none';
                 }
             }
 
