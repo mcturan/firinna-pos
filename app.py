@@ -3579,7 +3579,23 @@ def api_tv_settings():
     return jsonify(get_tv_settings())
 
 # In-memory TV clients registry: { client_id: { ip, device_type, user_agent, last_ping, name } }
+import json, os
+
+_TV_CLIENTS_DB = '/opt/firinna-pos/tv_clients.json'
 _tv_clients = {}
+try:
+    if os.path.exists(_TV_CLIENTS_DB):
+        with open(_TV_CLIENTS_DB, 'r') as f:
+            _tv_clients = json.load(f)
+except:
+    pass
+
+def save_tv_clients():
+    try:
+        with open(_TV_CLIENTS_DB, 'w') as f:
+            json.dump(_tv_clients, f)
+    except:
+        pass
 
 @app.route('/api/tv/ping', methods=['GET', 'POST'])
 def api_tv_ping():
