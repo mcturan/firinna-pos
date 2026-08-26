@@ -3,8 +3,8 @@
     "layout": "modern_grid",
     "video_playlist": "",
     "playlist_videos": [
-        "/static/tv_media/videos/istanbul.mp4",
         "/static/tv_media/videos/1.mp4",
+        "/static/tv_media/videos/istanbul.mp4",
         "/static/tv_media/videos/bayrak.mp4"
     ],
     "local_videos": [
@@ -133,10 +133,10 @@
     "last_push": {
         "action": "clear_cache",
         "target": "all",
-        "timestamp": 1787748613478
+        "timestamp": 1787766538980
     },
     "last_ping": "2026-08-25T14:20:26.563111",
-    "version": 1787748613478,
+    "version": 1787766538980,
     "did_you_know": [
         {
             "id": "dyk_1",
