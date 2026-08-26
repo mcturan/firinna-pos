@@ -991,15 +991,35 @@
             }
         }
 
+        window.streamOnlyVideos = {};
+
         async function processBackgroundDownloadQueue() {
             if (isDownloadingVideo || videoDownloadQueue.length === 0) return;
             const targetUrl = videoDownloadQueue.shift();
+            const filename = targetUrl.split('/').pop();
             
             // Re-verify if already cached
             const cachedBlobUrl = await checkAndLoadPersistentVideo(targetUrl);
             if (cachedBlobUrl) {
                 processBackgroundDownloadQueue();
                 return;
+            }
+            
+            // SAFETY MECHANISM: Check file size before downloading to prevent RAM OOM Crash
+            try {
+                const headRes = await fetch(targetUrl, { method: 'HEAD' });
+                const size = headRes.headers.get('content-length');
+                if (size) {
+                    const sizeMB = (parseInt(size) / (1024 * 1024)).toFixed(1);
+                    if (parseInt(size) > 150 * 1024 * 1024) { // 150 MB LIMIT
+                        tvLog(`[SAFETY GUARD] ${filename} is ${sizeMB}MB (>150MB). Skipping cache to prevent RAM crash. Marked for direct streaming.`);
+                        window.streamOnlyVideos[targetUrl] = true;
+                        processBackgroundDownloadQueue();
+                        return;
+                    }
+                }
+            } catch(e) {
+                tvLog(`[SAFETY GUARD] Could not verify size for ${filename}, proceeding with caution.`);
             }
 
             const filename = targetUrl.split('/').pop();
@@ -1244,7 +1264,15 @@
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             const filename = srcUrl.split('/').pop();
 
-            // 1. Check memory or persistent disk cache
+            // 1. Safety Check: If marked as stream-only (due to large size), stream directly
+            if (window.streamOnlyVideos && window.streamOnlyVideos[srcUrl]) {
+                isPlayingFallback = false;
+                tvLog(`[PLAYBACK STREAM] File too large for RAM cache. Streaming directly: ${filename}`);
+                playBlobDirectly(srcUrl, srcUrl);
+                return;
+            }
+
+            // 2. Check memory or persistent disk cache
             let blobUrl = bufferedVideoBlobs[srcUrl];
             if (!blobUrl) {
                 blobUrl = await checkAndLoadPersistentVideo(srcUrl);
@@ -1257,7 +1285,7 @@
                 return;
             }
 
-            // 2. Pure fallback video
+            // 3. Pure fallback video
             if (srcUrl.endsWith('/bayrak.mp4')) {
                 isPlayingFallback = true;
                 tvLog(`[PLAYBACK] Playing core fallback: bayrak.mp4`);
@@ -1265,13 +1293,11 @@
                 return;
             }
 
-            // 3. Custom video is downloading in background:
-            // Ensure queued in background sync
+            // 4. Custom video is downloading in background:
             queueVideoForBackgroundDownload(srcUrl);
 
-            // While waiting for download, play fallback bayrak.mp4 so screen is NEVER blank or interrupted
             isPlayingFallback = true;
-            tvLog(`[PLAYBACK WAIT] ${filename} is downloading in background -> Playing fallback bayrak.mp4 in meantime`);
+            tvLog(`[PLAYBACK WAIT] ${filename} is downloading... Playing fallback in meantime`);
             playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
         }
 

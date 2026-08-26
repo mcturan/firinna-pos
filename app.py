@@ -3632,24 +3632,42 @@ def api_tv_ping():
 @app.route('/api/tv/clients', methods=['GET'])
 def api_tv_clients():
     now_ts = time.time()
-    # Purge entries older than 30 minutes
+    import subprocess
+    import platform
+    
+    # We will temporarily keep known IPs forever so we can reboot them, 
+    # instead of purging them after 30 mins, let's keep them up to 48 hours.
     for cid, info in list(_tv_clients.items()):
-        if (now_ts - info.get('last_ping_ts', 0)) > 1800:
+        if (now_ts - info.get('last_ping_ts', 0)) > 48 * 3600:
             del _tv_clients[cid]
 
     active_list = []
     for cid, info in list(_tv_clients.items()):
         is_online = (now_ts - info.get('last_ping_ts', 0)) < 45
+        ip = info.get('ip')
+        
+        # Ping the device to see if it's alive on network
+        is_device_on = False
+        if ip and ip != '127.0.0.1':
+            try:
+                param = '-n' if platform.system().lower()=='windows' else '-c'
+                ping_cmd = ['ping', param, '1', '-W', '1', ip]
+                res = subprocess.run(ping_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                is_device_on = (res.returncode == 0)
+            except:
+                pass
+
         active_list.append({
             'client_id': cid,
-            'ip': info.get('ip'),
+            'ip': ip,
             'device_type': info.get('device_type'),
             'name': info.get('name'),
             'last_ping': info.get('last_ping'),
             'is_online': is_online,
+            'is_device_on': is_device_on,
+            'needs_attention': is_device_on and not is_online,
             'seconds_ago': int(now_ts - info.get('last_ping_ts', 0))
         })
-    # Sort online first, then by most recent ping
     active_list.sort(key=lambda x: (not x['is_online'], x['seconds_ago']))
     return jsonify({"clients": active_list})
 
