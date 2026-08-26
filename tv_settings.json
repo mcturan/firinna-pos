@@ -133,9 +133,9 @@
         ]
     },
     "last_push": {
-        "action": "reload",
-        "target": "all",
-        "timestamp": 1787680952980
+        "action": "clear_cache",
+        "target": "tv_4becc92c",
+        "timestamp": 1787692620248
     },
     "last_ping": "2026-08-25T14:20:26.563111",
     "version": 1787680764482,
