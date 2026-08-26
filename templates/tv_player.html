@@ -995,8 +995,8 @@
             if (isDownloadingVideo || videoDownloadQueue.length === 0) return;
             const targetUrl = videoDownloadQueue.shift();
             
-            // Re-verify if already cached
-            const cachedBlobUrl = await checkAndLoadPersistentVideo(targetUrl);
+            // Re-verify if already cached (do not load into RAM yet)
+            const cachedBlobUrl = await checkAndLoadPersistentVideo(targetUrl, false);
             if (cachedBlobUrl) {
                 processBackgroundDownloadQueue();
                 return;
@@ -1246,13 +1246,21 @@
 
 
 
-            // 2. Check memory or persistent disk cache
-            let blobUrl = bufferedVideoBlobs[srcUrl];
-            if (!blobUrl) {
-                blobUrl = await checkAndLoadPersistentVideo(srcUrl);
+            // 2. Free up memory by revoking previous video blob if it's not the same
+            for (let url in bufferedVideoBlobs) {
+                if (url !== srcUrl) {
+                    URL.revokeObjectURL(bufferedVideoBlobs[url]);
+                    delete bufferedVideoBlobs[url];
+                }
             }
 
-            if (blobUrl) {
+            // Check memory or persistent disk cache
+            let blobUrl = bufferedVideoBlobs[srcUrl];
+            if (!blobUrl) {
+                blobUrl = await checkAndLoadPersistentVideo(srcUrl, true);
+            }
+
+            if (blobUrl && blobUrl !== "exists_not_loaded") {
                 isPlayingFallback = false;
                 tvLog(`[PLAYBACK] Playing ready cached video: ${filename}`);
                 playBlobDirectly(blobUrl, srcUrl);
