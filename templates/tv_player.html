@@ -561,7 +561,7 @@
                     <span style="color:#2D6A4F; font-weight:800; font-size:1.65vw; letter-spacing:1px;">www.firinna.com</span>
                 </div>
                 <div id="ml-logo-flags" style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.35vw; opacity:0; transition:opacity 0.5s ease; will-change:opacity; transform:translateZ(0);">
-                    <div style="font-size:0.75vw; font-weight:800; color:#2D6A4F; letter-spacing:0.8px; margin-bottom:0.1vw;">🌐 visit www.firinna.com (14 Languages)</div>
+                    <div style="font-size:0.75vw; font-weight:800; color:#2D6A4F; letter-spacing:0.8px; margin-bottom:0.1vw;">🌐 visit www.firinna.com (12 Languages)</div>
                     <div style="display:flex; align-items:center; justify-content:center; gap:0.65vw; font-size:1.65vw; line-height:1;">
                         <span title="Türkçe">🇹🇷</span>
                         <span title="English">🇬🇧</span>
@@ -569,12 +569,10 @@
                         <span title="Español">🇪🇸</span>
                         <span title="Français">🇫🇷</span>
                         <span title="Italiano">🇮🇹</span>
-                        <span title="Русский">🇷🇺</span>
                     </div>
                     <div style="display:flex; align-items:center; justify-content:center; gap:0.65vw; font-size:1.65vw; line-height:1;">
+                        <span title="Русский">🇷🇺</span>
                         <span title="Українська">🇺🇦</span>
-                        <span title="Ελληνικά">🇬🇷</span>
-                        <span title="日本語">🇯🇵</span>
                         <span title="中文">🇨🇳</span>
                         <span title="हिन्दी">🇮🇳</span>
                         <span title="العربية">🇸🇦</span>
@@ -771,7 +769,7 @@
 
                 <!-- Sağ: Sağa Hizalanmış & Tek Satır Halinde Büyütülmüş 12 Dil Bayrağı -->
                 <div style="display:flex; align-items:center; gap:0.8vw; font-size:2.2vw; line-height:1;">
-                    <span>🇹🇷</span><span>🇬🇧</span><span>🇩🇪</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span><span>🇷🇺</span><span>🇺🇦</span><span>🇬🇷</span><span>🇯🇵</span><span>🇨🇳</span><span>🇮🇳</span><span>🇸🇦</span><span>🇮🇷</span>
+                    <span>🇹🇷</span><span>🇬🇧</span><span>🇩🇪</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span><span>🇷🇺</span><span>🇺🇦</span><span>🇨🇳</span><span>🇮🇳</span><span>🇸🇦</span><span>🇮🇷</span>
                 </div>
 
             </div>
@@ -995,8 +993,8 @@
             if (isDownloadingVideo || videoDownloadQueue.length === 0) return;
             const targetUrl = videoDownloadQueue.shift();
             
-            // Re-verify if already cached (do not load into RAM yet)
-            const cachedBlobUrl = await checkAndLoadPersistentVideo(targetUrl, false);
+            // Re-verify if already cached
+            const cachedBlobUrl = await checkAndLoadPersistentVideo(targetUrl);
             if (cachedBlobUrl) {
                 processBackgroundDownloadQueue();
                 return;
@@ -1012,6 +1010,21 @@
 
             isDownloadingVideo = true;
             currentlyDownloadingUrl = targetUrl;
+            
+            try {
+                const headRes = await fetch(targetUrl, { method: 'HEAD' });
+                const size = parseInt(headRes.headers.get('content-length') || '0', 10);
+                if (size > 100 * 1024 * 1024) { // > 100MB
+                    tvLog(`[DOWNLOAD ABORT] ${filename} is too large (${(size/(1024*1024)).toFixed(1)} MB). Skipping cache to prevent crash.`);
+                    isDownloadingVideo = false;
+                    currentlyDownloadingUrl = null;
+                    if (badge) badge.style.display = 'none';
+                    // process next
+                    setTimeout(processBackgroundDownloadQueue, 1000);
+                    return;
+                }
+            } catch(e) {}
+
             tvLog(`[DOWNLOAD START] Starting non-interruptible background download: ${filename}`);
             flushTvLogsToServer(true);
 
@@ -1244,30 +1257,20 @@
             if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
             const filename = srcUrl.split('/').pop();
 
-
-
-            // 2. Free up memory by revoking previous video blob if it's not the same
-            for (let url in bufferedVideoBlobs) {
-                if (url !== srcUrl) {
-                    URL.revokeObjectURL(bufferedVideoBlobs[url]);
-                    delete bufferedVideoBlobs[url];
-                }
-            }
-
-            // Check memory or persistent disk cache
+            // 1. Check memory or persistent disk cache
             let blobUrl = bufferedVideoBlobs[srcUrl];
             if (!blobUrl) {
-                blobUrl = await checkAndLoadPersistentVideo(srcUrl, true);
+                blobUrl = await checkAndLoadPersistentVideo(srcUrl);
             }
 
-            if (blobUrl && blobUrl !== "exists_not_loaded") {
+            if (blobUrl) {
                 isPlayingFallback = false;
                 tvLog(`[PLAYBACK] Playing ready cached video: ${filename}`);
                 playBlobDirectly(blobUrl, srcUrl);
                 return;
             }
 
-            // 3. Pure fallback video
+            // 2. Pure fallback video
             if (srcUrl.endsWith('/bayrak.mp4')) {
                 isPlayingFallback = true;
                 tvLog(`[PLAYBACK] Playing core fallback: bayrak.mp4`);
@@ -1275,14 +1278,15 @@
                 return;
             }
 
-            // 4. Custom video is downloading in background:
+            // 3. Instead of waiting for download and playing fallback forever for huge files,
+            // we will play it directly from the URL. We still queue it for caching if possible.
+            isPlayingFallback = false;
+            tvLog(`[PLAYBACK STREAM] ${filename} not in cache yet. Streaming directly from server...`);
+            playBlobDirectly(srcUrl, srcUrl);
+            
+            // Still queue for background download (will fail gracefully if too big or quota exceeded)
             queueVideoForBackgroundDownload(srcUrl);
-
-            isPlayingFallback = true;
-            tvLog(`[PLAYBACK WAIT] ${filename} is downloading... Playing fallback in meantime`);
-            playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
         }
-
         function playBlobDirectly(srcToPlay, origUrl) {
             document.documentElement.classList.remove('native-video-active');
             vidEl.style.display = "block";
@@ -1507,8 +1511,6 @@
         const ruDayNames = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
         const arDayNames = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
         const esDayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-        const elDayNames = ["Κυριακή", "Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο"];
-        const jaDayNames = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
 
         /**
          * Finds the next day+time when the store is open, based on daily_hours from web settings.
@@ -1671,11 +1673,11 @@
         }
 
         const bottomMenuTranslations = {
-            tr: { title: "📖 14 Dilde Dijital Menü", sub: "Kameranızla okutun veya web sitemizi ziyaret edin" },
-            en: { title: "📖 Digital Menu in 14 Languages", sub: "Scan with your camera or visit our website" },
-            ru: { title: "📖 Цифровое меню на 14 языках", sub: "Отсканируйте камерой или посетите сайт" },
-            ar: { title: "📖 قائمة رقمية بـ 14 لغة", sub: "امسح بالكاميرا أو قم بزيارة موقعنا" },
-            es: { title: "📖 Menú Digital en 14 Idiomas", sub: "Escanea con la cámara o visita nuestra web" }
+            tr: { title: "📖 12 Dilde Dijital Menü", sub: "Kameranızla okutun veya web sitemizi ziyaret edin" },
+            en: { title: "📖 Digital Menu in 12 Languages", sub: "Scan with your camera or visit our website" },
+            ru: { title: "📖 Цифровое меню на 12 языках", sub: "Отсканируйте камерой или посетите сайт" },
+            ar: { title: "📖 قائمة رقمية بـ 12 لغة", sub: "امسح بالكاميرا أو قم بزيارة موقعنا" },
+            es: { title: "📖 Menú Digital en 12 Idiomas", sub: "Escanea con la cámara o visita nuestra web" }
         };
 
         /**
@@ -1694,8 +1696,6 @@
                 if (lang === 'ru') return `☀️ Открытие: в ${fallbackTime}`;
                 if (lang === 'ar') return `☀️ الافتتاح: الساعة ${fallbackTime} صباحاً`;
                 if (lang === 'es') return `☀️ Apertura: a las ${fallbackTime}`;
-                if (lang === 'el') return `☀️ Άνοιγμα: στις ${fallbackTime}`;
-                if (lang === 'ja') return `☀️ 開店: ${fallbackTime}`;
                 return `☀️ Açılış: ${fallbackTime}`;
             }
 
@@ -1719,14 +1719,6 @@
                 if (daysAhead === 0) return `☀️ Apertura: Hoy a las ${openTime}`;
                 if (daysAhead === 1) return `☀️ Apertura: Mañana a las ${openTime}`;
                 return `☀️ Apertura: ${esDayNames[dayIdx]} a las ${openTime}`;
-            } else if (lang === 'el') {
-                if (daysAhead === 0) return `☀️ Άνοιγμα: Σήμερα στις ${openTime}`;
-                if (daysAhead === 1) return `☀️ Άνοιγμα: Αύριο στις ${openTime}`;
-                return `☀️ Άνοιγμα: ${elDayNames[dayIdx]} στις ${openTime}`;
-            } else if (lang === 'ja') {
-                if (daysAhead === 0) return `☀️ 開店: 本日 ${openTime}`;
-                if (daysAhead === 1) return `☀️ 開店: 明日 ${openTime}`;
-                return `☀️ 開店: ${jaDayNames[dayIdx]} ${openTime}`;
             } else {
                 // Turkish default
                 if (daysAhead === 0) return `☀️ Açılış: Bugün Saat ${openTime}`;
