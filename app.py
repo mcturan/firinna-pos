@@ -3643,7 +3643,7 @@ def api_tv_clients():
 
     active_list = []
     for cid, info in list(_tv_clients.items()):
-        is_online = (now_ts - info.get('last_ping_ts', 0)) < 45
+        is_online = (now_ts - info.get('last_ping_ts', 0)) < 15
         ip = info.get('ip')
         
         # Ping the device to see if it's alive on network
