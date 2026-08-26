@@ -1011,51 +1011,51 @@
             isDownloadingVideo = true;
             currentlyDownloadingUrl = targetUrl;
 
-            tvLog(`[DOWNLOAD START] Streaming directly to cache: ${filename}`);
+            tvLog(`[DOWNLOAD START] Fetching ${filename} to local storage`);
             flushTvLogsToServer(true);
 
             try {
                 const response = await fetch(targetUrl);
                 if (!response.ok) throw new Error("HTTP error " + response.status);
 
+                let blob;
                 const cache = await getPersistentMediaCache();
-                if (!cache) throw new Error("Cache API not available");
-
-                // Stream response directly to cache
-                await cache.put(targetUrl, response);
-                
-                // Read from cache to verify and get blob URL
-                const match = await cache.match(targetUrl);
-                if (match) {
-                    const blob = await match.blob();
-                    if (bufferedVideoBlobs[targetUrl]) URL.revokeObjectURL(bufferedVideoBlobs[targetUrl]);
-                    const blobUrl = URL.createObjectURL(blob);
-                    bufferedVideoBlobs[targetUrl] = blobUrl;
-                    failedVideoRegistry.delete(targetUrl);
-
-                    tvLog(`[DOWNLOAD FINISHED] ${filename} saved to persistent disk cache!`);
-                    flushTvLogsToServer(true);
-
-                    if (badge) {
-                        badge.textContent = `🎬 ${filename} %100`;
-                        setTimeout(() => {
-                            if (!isDownloadingVideo && badge) badge.style.display = 'none';
-                        }, 1500);
-                    }
-
-                    // Seamlessly switch if needed
-                    let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
-                    let curTarget = activeList[currentLocalVideoIndex % activeList.length] || '';
-                    if (!curTarget.startsWith("/static/")) curTarget = "/static/tv_media/videos/" + curTarget;
-                    
-                    if (curTarget === targetUrl || isPlayingFallback) {
-                        tvLog(`[AUTO SWITCH] Seamlessly switching to newly ready video: ${filename}`);
-                        isPlayingFallback = false;
-                        playBlobDirectly(blobUrl, targetUrl);
-                    }
+                if (cache) {
+                    await cache.put(targetUrl, response);
+                    const match = await cache.match(targetUrl);
+                    if (!match) throw new Error("Cache match failed");
+                    blob = await match.blob();
                 } else {
-                    throw new Error("Failed to read from cache");
+                    tvLog(`[CACHE WARNING] Cache API unavailable (HTTP). Buffering to memory...`);
+                    blob = await response.blob();
                 }
+                
+                if (bufferedVideoBlobs[targetUrl]) URL.revokeObjectURL(bufferedVideoBlobs[targetUrl]);
+                const blobUrl = URL.createObjectURL(blob);
+                bufferedVideoBlobs[targetUrl] = blobUrl;
+                failedVideoRegistry.delete(targetUrl);
+
+                tvLog(`[DOWNLOAD FINISHED] ${filename} saved to device cache!`);
+                flushTvLogsToServer(true);
+
+                if (badge) {
+                    badge.textContent = `🎬 ${filename} %100`;
+                    setTimeout(() => {
+                        if (!isDownloadingVideo && badge) badge.style.display = 'none';
+                    }, 1500);
+                }
+
+                // Seamlessly switch if needed
+                let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+                let curTarget = activeList[currentLocalVideoIndex % activeList.length] || '';
+                if (!curTarget.startsWith("/static/")) curTarget = "/static/tv_media/videos/" + curTarget;
+                
+                if (curTarget === targetUrl || isPlayingFallback) {
+                    tvLog(`[AUTO SWITCH] Seamlessly switching to newly ready video: ${filename}`);
+                    isPlayingFallback = false;
+                    playBlobDirectly(blobUrl, targetUrl);
+                }
+                
                 setTimeout(processBackgroundDownloadQueue, 500);
             } catch (err) {
                 registerFailedVideo(targetUrl);
