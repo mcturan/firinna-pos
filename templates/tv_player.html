@@ -1016,6 +1016,29 @@
                 badge.textContent = `🎬 ${filename} %0`;
             }
 
+            // SIZE CHECK: skip blob download for files >50MB, stream directly instead
+            const MAX_BLOB_SIZE = 50 * 1024 * 1024;
+            try {
+                const headResp = await fetch(targetUrl, { method: 'HEAD' });
+                const contentLength = parseInt(headResp.headers.get('Content-Length') || '0');
+                if (contentLength > MAX_BLOB_SIZE) {
+                    const sizeMb = (contentLength/1024/1024).toFixed(0);
+                    tvLog('[STREAM ONLY] ' + filename + ' is ' + sizeMb + 'MB > 50MB — streaming directly, skipping blob download');
+                    isDownloadingVideo = false;
+                    currentlyDownloadingUrl = null;
+                    if (badge) badge.style.display = 'none';
+                    bufferedVideoBlobs[targetUrl] = targetUrl;
+                    if (isPlayingFallback) {
+                        isPlayingFallback = false;
+                        playBlobDirectly(targetUrl, targetUrl);
+                    }
+                    setTimeout(processBackgroundDownloadQueue, 500);
+                    return;
+                }
+            } catch(headErr) {
+                tvLog('[HEAD ERROR] ' + filename + ': ' + (headErr.message || headErr));
+            }
+
             isDownloadingVideo = true;
             currentlyDownloadingUrl = targetUrl;
             tvLog(`[DOWNLOAD START] Starting non-interruptible background download: ${filename}`);
@@ -1095,8 +1118,8 @@
                 tvLog(`[DOWNLOAD NETWORK ERROR] Network failure downloading ${filename}`);
                 if (badge) badge.style.display = 'none';
                 flushTvLogsToServer(true);
-                // Retry next after 3 seconds
-                setTimeout(processBackgroundDownloadQueue, 3000);
+                // Retry after 15 seconds to avoid flooding on persistent errors
+                setTimeout(processBackgroundDownloadQueue, 15000);
             };
 
             xhr.send();
@@ -1271,14 +1294,13 @@
                 return;
             }
 
-            // 3. Custom video is downloading in background:
-            // Ensure queued in background sync
-            queueVideoForBackgroundDownload(srcUrl);
-
-            // While waiting for download, play fallback bayrak.mp4 so screen is NEVER blank or interrupted
-            isPlayingFallback = true;
-            tvLog(`[PLAYBACK WAIT] ${filename} is downloading in background -> Playing fallback bayrak.mp4 in meantime`);
-            playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
+            // 3. Video not in cache — decide: stream directly or download in background
+            // Large files (>50MB equivalent, i.e. 1.mp4 ~356MB) are streamed directly via Nginx
+            // to avoid XHR blob quota issues on Mi TV Stick WebView.
+            // Small files are queued for background download and cached.
+            isPlayingFallback = false;
+            tvLog(`[PLAYBACK STREAM] ${filename} not cached -> streaming directly via Nginx`);
+            playBlobDirectly(srcUrl, srcUrl);
         }
         function playBlobDirectly(srcToPlay, origUrl) {
             document.documentElement.classList.remove('native-video-active');
