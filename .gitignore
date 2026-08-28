@@ -54,3 +54,4 @@ static/tv_media/audio/*
 !static/tv_media/audio/.gitkeep
 tv_logs/
 *.apk
+tv_logs.txt
