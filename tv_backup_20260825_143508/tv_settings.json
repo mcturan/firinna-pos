@@ -9,10 +9,10 @@
         "/static/tv_media/videos/1.mp4"
     ],
     "local_videos": [
-        "/static/tv_media/videos/1.mp4",
-        "/static/tv_media/videos/bayrak.mp4",
         "/static/tv_media/videos/gypsy.mp4",
-        "/static/tv_media/videos/istanbul.mp4"
+        "/static/tv_media/videos/istanbul.mp4",
+        "/static/tv_media/videos/1.mp4",
+        "/static/tv_media/videos/bayrak.mp4"
     ],
     "local_audio": [],
     "media_source": "local",
@@ -133,12 +133,12 @@
         ]
     },
     "last_push": {
-        "action": "clear_cache",
+        "action": "reload",
         "target": "all",
-        "timestamp": 1787670677758
+        "timestamp": 1787655360260
     },
     "last_ping": "2026-08-25T14:20:26.563111",
-    "version": 1787670677758,
+    "version": 1787653730791,
     "did_you_know": [
         {
             "id": "dyk_1",
@@ -529,275 +529,15 @@
             "title_ar": "كرم الضيافة التركية والكولونيا",
             "text_ar": "تقديم كولونيا الليمون التقليدية والحلوى للضيوف رمز أصيل لكرم الضيافة والترحيب التركي العريق.",
             "enabled": true
-        },
-        {
-            "id": "dyk_ataturk_1",
-            "icon": "🇹🇷",
-            "title_en": "Mustafa Kemal Atatürk",
-            "text_en": "Mustafa Kemal Atatürk (1881–1938) was the visionary founder and first President of the Republic of Turkey, revered globally as a brilliant military strategist, modernizer, and champion of secular democracy.",
-            "title_es": "Mustafa Kemal Atatürk",
-            "text_es": "Mustafa Kemal Atatürk (1881–1938) fue el visionario fundador y primer presidente de la República de Turquía, admirado mundialmente como estratega militar y reformador moderno.",
-            "title_ru": "Мустафа Кемаль Ататюрк",
-            "text_ru": "Мустафа Кемаль Ататюрк (1881–1938) — великий основатель и первый президент Турецкой Республики, всемирно признанный реформатор, выдающийся полководец и создатель современного светского государства.",
-            "title_ar": "مصطفى كمال أتاتورك",
-            "text_ar": "مصطفى كمال أتاتورك (1881–1938) هو القائد المؤسس وأول رئيس للجمهورية التركية، ويحظى بتقدير عالمي كقائد عسكري واستراتيجي ومصلح تاريخي.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_ataturk_2",
-            "icon": "🕊️",
-            "title_en": "Peace at Home, Peace in the World",
-            "text_en": "Atatürk's legendary guiding principle, \"Peace at home, peace in the world\", remains the philosophical foundation of modern Turkish foreign diplomacy and international brotherhood.",
-            "title_es": "Paz en Casa, Paz en el Mundo",
-            "text_es": "El legendario principio de Atatürk, \"Paz en el hogar, paz en el mundo\", sigue siendo el pilar de la diplomacia y fraternidad internacional de Turquía.",
-            "title_ru": "Мир в доме, мир во всем мире",
-            "text_ru": "Легендарный девиз Ататюрка «Мир в стране — мир во всем мире» остается фундаментальной основой турецкой внешней политики и глобального гуманизма.",
-            "title_ar": "سلام في الوطن، سلام في العالم",
-            "text_ar": "مبدأ أتاتورك التاريخي الخالد \"سلام في الوطن، سلام في العالم\" يمثل الركيزة الأساسية للسياسة الخارجية للجمهورية التركية والدبلوماسية الإنسانية.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_ataturk_3",
-            "icon": "🇹🇷",
-            "title_en": "The Turkish Republic (1923)",
-            "text_en": "Proclaimed on October 29, 1923, the Republic of Turkey replaced centuries of imperial monarchy with people's sovereignty, modern civil laws, and rapid socioeconomic enlightenment.",
-            "title_es": "La República de Turquía (1923)",
-            "text_es": "Proclamada el 29 de octubre de 1923, la República de Turquía estableció la soberanía popular, leyes civiles modernas y una profunda transformación social.",
-            "title_ru": "Турецкая Республика (1923)",
-            "text_ru": "Основанная 29 октября 1923 года Турецкая Республика провозгласила верховенство народной воли, светское право и масштабную модернизацию всех сфер жизни.",
-            "title_ar": "إعلان الجمهورية التركية (1923)",
-            "text_ar": "تأسست الجمهورية التركية في 29 أكتوبر 1923 على أسس السيادة الشعبية والقوانين المدنية الحديثة والنهضة الشاملة.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_ataturk_4",
-            "icon": "⚖️",
-            "title_en": "Women's Rights & Universal Suffrage",
-            "text_en": "In 1934, Turkey became one of the first countries in the world to grant women full political rights to vote and be elected, years ahead of many European nations including France and Switzerland.",
-            "title_es": "Derechos de la Mujer y Sufragio",
-            "text_es": "En 1934, Turquía otorgó a las mujeres plenos derechos de voto y elección, años antes que muchas naciones europeas como Francia y Suiza.",
-            "title_ru": "Избирательные права женщин (1934)",
-            "text_ru": "В 1934 году Турция одной из первых в мире предоставила женщинам полные избирательные права, опередив Францию, Италию и Швейцарию.",
-            "title_ar": "حقوق المرأة والانتخاب (1934)",
-            "text_ar": "في عام 1934، منحت تركيا المرأة حق الانتخاب والترشح الكامل، لتسبق بذلك العديد من الدول الأوروبية مثل فرنسا وسويسرا.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_ataturk_5",
-            "icon": "📚",
-            "title_en": "The Alphabet & Education Revolution",
-            "text_en": "In 1928, Atatürk introduced the Latin-based Turkish alphabet and mobilized nationwide \"National Schools\" (Millet Mektepleri), boosting national literacy at unprecedented speed.",
-            "title_es": "Revolución del Alfabeto y Educación",
-            "text_es": "En 1928, Atatürk adoptó el alfabeto turco basado en el latino y lanzó las Escuelas de la Nación, impulsando la alfabetización masiva en tiempo récord.",
-            "title_ru": "Реформа алфавита и просвещение (1928)",
-            "text_ru": "В 1928 году была введена турецкая латиница и созданы «Народные школы», что вызвало беспрецедентный скачок грамотности и культуры по всей стране.",
-            "title_ar": "ثورة الحروف والتعليم (1928)",
-            "text_ar": "في عام 1928، اعتمدت تركيا الحروف اللاتينية وأطلقت مدارس الشعب لتعليم القراءة والكتابة، مما أحدث طفرة تعليمية كبرى.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_turk_history_1",
-            "icon": "🏹",
-            "title_en": "Thousands of Years of Turkic Heritage",
-            "text_en": "The epic history of the Turks spans over 4,000 years, traversing Central Asia to the Mediterranean, establishing 16 great empires including the Hunnic, Göktürk, Seljuk, and Ottoman civilizations.",
-            "title_es": "Milenios de Historia Túrquica",
-            "text_es": "La historia de los pueblos túrquicos abarca más de 4.000 años, desde las estepas de Asia Central hasta el Mediterráneo, fundando 16 grandes imperios históricos.",
-            "title_ru": "Тысячелетняя история тюрков",
-            "text_ru": "История тюркских народов насчитывает свыше 4000 лет от Центральной Азии до Средиземноморья, дав миру 16 великих империй, включая Гуннов, Гёктюрков и Сельджуков.",
-            "title_ar": "تاريخ الشعب التركي عبر آلاف السنين",
-            "text_ar": "يمتد تاريخ الشعوب التركية لأكثر من 4000 عام من آسيا الوسطى إلى البحر الأبيض المتوسط، مؤسساً 16 إمبراطورية تاريخية عظمى.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_turk_history_2",
-            "icon": "📜",
-            "title_en": "The Orkhon Inscriptions (8th Century)",
-            "text_en": "Erected in the 8th century by the Göktürks, the Orkhon Inscriptions in the Orkhon Valley are the earliest known written records of the Old Turkic language, celebrating statehood and wisdom.",
-            "title_es": "Las Inscripciones de Orkhon (Siglo VIII)",
-            "text_es": "Erigidas en el siglo VIII por los Göktürks, las inscripciones de Orkhon son los monumentos escritos más antiguos de la lengua túrquica antigua.",
-            "title_ru": "Орхонские надписи (VIII век)",
-            "text_ru": "Орхонские памятники рунической письменности Тюркского каганата VIII века — древнейшие письменные свидетельства тюркской культуры и государственности.",
-            "title_ar": "نقوش أورخون التاريخية (القرن الثامن)",
-            "text_ar": "تعود نقوش أورخون للقرن الثامن الميلادي في عهد الغوكتورك، وتعد أقدم النصوص المكتوبة باللغة التركية القديمة.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_turk_history_3",
-            "icon": "⚔️",
-            "title_en": "Battle of Malazgirt (1071)",
-            "text_en": "Under Sultan Alparslan, the Great Seljuk victory at Malazgirt in 1071 opened the gates of Anatolia to the Turks, creating a lasting bridge of arts, architecture, and tolerance between East and West.",
-            "title_es": "Batalla de Manzikert (1071)",
-            "text_es": "En 1071, la victoria de los selyúcidas bajo el sultán Alp Arslan en Manzikert abrió las puertas de Anatolia a la cultura y civilización túrquica.",
-            "title_ru": "Битва при Манцикерте (1071)",
-            "text_ru": "Победа сельджукского султана Альп-Арслана в 1071 году открыла Анатолию для тюркской цивилизации, объединившей Восток и Запад.",
-            "title_ar": "معركة ملاذكرد الخالدة (1071)",
-            "text_ar": "حققت الدولة السلجوقية بقيادة السلطان ألب أرسلان انتصاراً تاريخياً في ملاذكرد عام 1071، مما فتح أبواب الأناضول للحضارة التركية.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_turk_world_1",
-            "icon": "🌍",
-            "title_en": "The Modern Turkic World",
-            "text_en": "Today, the Turkic world unites over 200 million people across Turkey, Azerbaijan, Kazakhstan, Uzbekistan, Kyrgyzstan, Turkmenistan, and Northern Cyprus, fostering economic and cultural partnership.",
-            "title_es": "El Mundo Túrquico Moderno",
-            "text_es": "Hoy, el mundo túrquico une a más de 200 millones de personas en Turquía, Azerbaiyán, Kazajistán, Uzbekistán, Kirguistán y Turkmenistán en fraternidad cultural.",
-            "title_ru": "Тюркский мир сегодня",
-            "text_ru": "Сегодня тюркский мир объединяет более 200 миллионов человек в Турции, Азербайджане, Казахстане, Узбекистане, Кыргызстане и Туркменистане в духе дружбы и сотрудничества.",
-            "title_ar": "العالم التركي المشترك",
-            "text_ar": "يجمع العالم التركي اليوم أكثر من 200 مليون نسمة في تركيا وأذربيجان وكازاخستان وأوزبكستان وقرغيزستان وتركمانستان بروابط ثقافية وتاريخية وثيقة.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_1",
-            "icon": "🏰",
-            "title_en": "Dolmabahçe Palace",
-            "text_en": "Located directly on the Bosphorus shoreline in Beşiktaş, Dolmabahçe Palace was built in 1856 and features the world's largest Bohemian crystal chandelier, weighing 4.5 tons.",
-            "title_es": "Palacio de Dolmabahçe",
-            "text_es": "Situado a orillas del Bósforo, el Palacio de Dolmabahçe (1856) deslumbra con su arquitectura neobarroca y la lámpara de cristal de Bohemia más grande del mundo.",
-            "title_ru": "Дворец Долмабахче",
-            "text_ru": "Построенный в 1856 году на берегу Босфора дворец Долмабахче поражает роскошью необарокко и знаменитой 4,5-тонной хрустальной люстрой из Богемии.",
-            "title_ar": "قصر دولمة بهجة",
-            "text_ar": "يقع قصر دولمة بهجة على ضفاف البوسفور مباشرة، وبُني عام 1856 ويضم أضخم ثريا من الكريستال البوهيمي في العالم بوزن 4.5 طن.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_2",
-            "icon": "🌅",
-            "title_en": "Maiden's Tower (Kız Kulesi)",
-            "text_en": "Set on a small islet in the Bosphorus off Üsküdar, the iconic 2,500-year-old Maiden's Tower is surrounded by romantic legends of kings, prophecies, and eternal love.",
-            "title_es": "Torre de la Doncella (Kız Kulesi)",
-            "text_es": "Ubicada en un islote frente a Üsküdar, la legendaria Torre de la Doncella de 2.500 años de antigüedad es uno de los símbolos más poéticos de Estambul.",
-            "title_ru": "Девичья башня (Кыз Кулеси)",
-            "text_ru": "Расположенная на островке у берегов Ускюдара Девичья башня с 2500-летней историей является романтическим символом пролива Босфор.",
-            "title_ar": "برج الفتاة (كز كوليسي)",
-            "text_ar": "يقع برج الفتاة على جزيرة صغيرة في مدخل مضيق البوسفور، ويحمل تاريخاً يمتد لأكثر من 2500 عام محاطاً بالأساطير والرومانسية.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_3",
-            "icon": "🛍️",
-            "title_en": "Istiklal Street & Historic Tram",
-            "text_en": "Stretching from Taksim Square to Tunnel, Istiklal Avenue is a vibrant 1.4-km pedestrian boulevard famed for 19th-century architecture, cafes, and its iconic red nostalgic tram.",
-            "title_es": "Avenida Istiklal y Tranvía Histórico",
-            "text_es": "La avenida Istiklal es una vibrante calle peatonal de 1,4 km famosa por sus edificios del siglo XIX, pasajes comerciales y el nostálgico tranvía rojo.",
-            "title_ru": "Улица Истикляль и красный трамвай",
-            "text_ru": "Пешеходная улица Истикляль в Бейоглу протяженностью 1,4 км славится архитектурой XIX века, оживленной атмосферой и знаменитым красным историческим трамваем.",
-            "title_ar": "شارع الاستقلال والترام التراثي",
-            "text_ar": "يمتد شارع الاستقلال في بيوغلو بطول 1.4 كم ويعد القلب النابض للمدينة بعمارته الأوروبية الكلاسيكية والترام الأحمر التاريخي الشهير.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_4",
-            "icon": "🕌",
-            "title_en": "Süleymaniye Mosque",
-            "text_en": "Masterpiece of the genius imperial architect Mimar Sinan, the 16th-century Süleymaniye Mosque sits atop Istanbul's third hill, boasting breathtaking panoramic views of the Golden Horn.",
-            "title_es": "Mezquita de Süleymaniye",
-            "text_es": "Obra maestra del genial arquitecto Mimar Sinan, la Mezquita de Süleymaniye domina la colina histórica con vistas panorámicas al Cuerno de Oro.",
-            "title_ru": "Мечеть Сулеймание",
-            "text_ru": "Шедевр великого архитектора Мимара Синана XVI века — мечеть Сулеймание — величественно возвышается над Золотым Рогом, поражая совершенством акустики и гармонии.",
-            "title_ar": "جامع السليمانية",
-            "text_ar": "تحفة المعماري العثماني الشهير معمار سنان، بني في القرن السادس عشر ويتربع على التلة الثالثة بإطلالة ساحرة على القرن الذهبي.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_5",
-            "icon": "⛵",
-            "title_en": "Ortaköy Mosque & Bosphorus Bridge",
-            "text_en": "The Neo-Baroque Ortaköy Mosque sits right on the water under the suspension Bosphorus Bridge, creating one of the world's most photographed postcard scenes.",
-            "title_es": "Mezquita de Ortaköy y Puente del Bósforo",
-            "text_es": "Ubicada a orillas del mar bajo el Puente del Bósforo, la Mezquita de Ortaköy de estilo neobarroco ofrece una de las postales más fotografiadas del mundo.",
-            "title_ru": "Мечеть Ортакёй и Босфорский мост",
-            "text_ru": "Необарочная мечеть Ортакёй, стоящая прямо у кромки воды под грандиозным Босфорским мостом, создает один из самых живописных открыточных видов планеты.",
-            "title_ar": "جامع أورتاكوي وجسر البوسفور",
-            "text_ar": "يتميز جامع أورتاكوي بعمارته الباروكية الرائعة على ضفاف الماء مباشرة تحت جسر البوسفور، مشكلاً أشهر بطاقة بريدية لإسطنبول.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_6",
-            "icon": "🌲",
-            "title_en": "Gülhane Park & Historic Walls",
-            "text_en": "Once the outer imperial gardens of Topkapı Palace, Gülhane Park is a lush oasis filled with centuries-old plane trees, tulip gardens, and views of the Marmara Sea.",
-            "title_es": "Parque Gülhane",
-            "text_es": "Antiguos jardines exteriores del Palacio de Topkapı, el Parque Gülhane es un oasis verde con plátanos centenarios, tulipanes y vistas al Mar de Mármara.",
-            "title_ru": "Парк Гюльхане",
-            "text_ru": "Парк Гюльхане, некогда служивший внешним садом дворца Топкапы, сегодня является тенистым оазисом вековых платанов и весенних тюльпанов.",
-            "title_ar": "حديقة غلخانة التاريخية",
-            "text_ar": "كانت قديماً جزءاً من الحدائق الخارجية لقصر طوب قابي، وتعد اليوم واحة طبيعية خضراء مليئة بأشجار الدلب العتيقة وأزهار التوليب.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_7",
-            "icon": "⛵",
-            "title_en": "Princes' Islands (Adalar)",
-            "text_en": "A peaceful archipelago in the Sea of Marmara, the Princes' Islands (Büyükada, Heybeliada) are motor-vehicle-free retreats known for Victorian wooden mansions and pine forests.",
-            "title_es": "Islas de los Príncipes (Adalar)",
-            "text_es": "Un archipiélago libre de coches en el Mar de Mármara, famoso por sus históricas mansiones de madera victorianas y fragantes bosques de pinos.",
-            "title_ru": "Принцевы острова (Адалар)",
-            "text_ru": "Архипелаг в Мраморном море без автомобильного движения, знаменитый деревянными особняками XIX века, сосновыми рощами и безмятежной атмосферой.",
-            "title_ar": "جزر الأميرات (أدالار)",
-            "text_ar": "أرخبيل ساحر في بحر مرمرة خالٍ تماماً من السيارات، يشتهر بقصوره الخشبية التاريخية وغابات الصنوبر العطرة.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_8",
-            "icon": "☕",
-            "title_en": "Pierre Loti Hill & Golden Horn",
-            "text_en": "Named after the French novelist Pierre Loti, this picturesque hilltop in Eyüpsultan offers traditional Turkish coffee overlooking the entire historic Golden Horn estuary.",
-            "title_es": "Colina Pierre Loti y Cuerno de Oro",
-            "text_es": "Nombrada en honor al novelista francés Pierre Loti, esta colina en Eyüpsultan ofrece café turco tradicional con vistas panorámicas inolvidables al Cuerno de Oro.",
-            "title_ru": "Холм Пьера Лоти и Золотой Рог",
-            "text_ru": "Названный в честь французского писателя холм Пьер Лоти в Эюпе предлагает чашку турецкого кофе с потрясающим видом на весь залив Золотой Рог.",
-            "title_ar": "تلة بيير لوتي والقرن الذهبي",
-            "text_ar": "سميت باسم الكاتب الفرنسي بيير لوتي، وتوفر إطلالة بانورامية رائعة لتناول القهوة التركية مع مشهد ساحر للقرن الذهبي.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_9",
-            "icon": "🌺",
-            "title_en": "Çamlıca Hill & Panoramic Bosphorus",
-            "text_en": "Rising on the Asian side of Istanbul, Çamlıca Hill provides the highest viewpoint over the entire metropolis, Bosphorus bridges, and historical peninsula skyline.",
-            "title_es": "Colina de Çamlıca",
-            "text_es": "En el lado asiático de Estambul, la colina de Çamlıca ofrece la vista más alta y completa de la metrópoli, los puentes y la península histórica.",
-            "title_ru": "Холм Чамлыджа",
-            "text_ru": "Расположенный на азиатской стороне Стамбула холм Чамлыджа — самая высокая точка города с захватывающим обзором Босфора и европейской части.",
-            "title_ar": "تلة تشامليجا (تلة العرائس)",
-            "text_ar": "تقع في الجانب الآسيوي من إسطنبول، وتعد أعلى قمة تطل على كافة مضايق وجسور ومعالم المدينة التاريخية.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_10",
-            "icon": "🏰",
-            "title_en": "Rumeli Fortress (Rumeli Hisarı)",
-            "text_en": "Built in just four months in 1452 by Sultan Mehmed II, Rumeli Fortress stands at the narrowest point of the Bosphorus as a marvel of medieval military engineering.",
-            "title_es": "Fortaleza de Rumeli (Rumeli Hisarı)",
-            "text_es": "Construida en solo cuatro meses en 1452 por el sultán Mehmed II, la Fortaleza de Rumeli custodia el punto más estrecho del estrecho del Bósforo.",
-            "title_ru": "Крепость Румелихисар",
-            "text_ru": "Построенная султаном Мехмедом Завоевателем всего за 4 месяца в 1452 году, крепость Румелихисар в самом узком месте Босфора поражает мощью башен.",
-            "title_ar": "قلعة روملي حصار",
-            "text_ar": "بناها السلطان محمد الفاتح في 4 أشهر فقط عام 1452 عند أضيق نقطة في البوسفور كمعجزة للهندسة العسكرية التاريخية.",
-            "enabled": true
-        },
-        {
-            "id": "dyk_istanbul_dest_11",
-            "icon": "🐠",
-            "title_en": "Karaköy & Galata Waterfront",
-            "text_en": "Home to Fırınna Cafe, the historic Karaköy waterfront blends centuries-old maritime docks, artisan bakeries, vibrant art galleries, and scenic seaside promenades.",
-            "title_es": "Paseo Marítimo de Karaköy y Gálata",
-            "text_es": "El barrio de Karaköy, donde se encuentra Fırınna Cafe, combina muelles históricos, panaderías artesanales, galerías de arte y paseos frente al mar.",
-            "title_ru": "Набережная Каракёй и Галата",
-            "text_ru": "Исторический район Каракёй, где расположено кафе Fırınna, гармонично сочетает морские причалы, крафтовые пекарни, галереи и атмосферные улочки.",
-            "title_ar": "واجهة كاراكوي وغالاتا البحرية",
-            "text_ar": "موطن مقهى ومخبز Fırınna، حيث يلتقي عبق الموانئ القديمة مع المقاهي العصرية والمعارض الفنية على الواجهة البحرية الساحرة.",
-            "enabled": true
         }
     ],
     "ticker_mode": "facts",
     "night_mode": {
-        "enabled": true,
+        "enabled": false,
         "force_active": false,
         "auto_schedule": true,
-        "start_time": "21:00",
-        "end_time": "11:00",
+        "start_time": "23:00",
+        "end_time": "08:30",
         "media_type": "video",
         "video_url": "/static/tv_media/videos/1.mp4",
         "image_url": "/static/uploads/logo.png",
@@ -809,7 +549,7 @@
                 "flag": "🇹🇷",
                 "tag": "🇹🇷 TÜRKÇE",
                 "title": "Şu Anda Hizmet Vermemekteyiz",
-                "text": "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 11:00'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
+                "text": "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:00'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
                 "badge": "☀️ Açılış: Sabah 08:00 (Her Gün)"
             },
             {
@@ -817,7 +557,7 @@
                 "flag": "🇬🇧",
                 "tag": "🇬🇧 ENGLISH",
                 "title": "We Are Currently Closed",
-                "text": "Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 11:00 with fresh bakery and warm hospitality.",
+                "text": "Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 08:00 with fresh bakery and warm hospitality.",
                 "badge": "☀️ Opening: 08:00 AM (Daily)"
             },
             {
@@ -825,7 +565,7 @@
                 "flag": "🇷🇺",
                 "tag": "🇷🇺 РУССКИЙ",
                 "title": "В настоящее время мы закрыты",
-                "text": "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 11:00 со свежей выпечкой и горячим чаем.",
+                "text": "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 08:00 со свежей выпечкой и горячим чаем.",
                 "badge": "☀️ Открытие: 08:00 (Ежедневно)"
             },
             {
@@ -833,7 +573,7 @@
                 "flag": "🇸🇦",
                 "tag": "🇸🇦 العربية",
                 "title": "نحن مغلقون حالياً",
-                "text": "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 11:00 صباحاً مع أشهى المخبوزات الطازجة.",
+                "text": "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 08:00 صباحاً مع أشهى المخبوزات الطازجة.",
                 "badge": "☀️ الافتتاح: 08:00 صباحاً (يومياً)"
             },
             {
@@ -841,17 +581,17 @@
                 "flag": "🇪🇸",
                 "tag": "🇪🇸 ESPAÑOL",
                 "title": "Actualmente estamos cerrados",
-                "text": "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 11:00 con nuestros deliciosos productos de panadería.",
+                "text": "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 08:00 con nuestros deliciosos productos de panadería.",
                 "badge": "☀️ Apertura: 08:00 (Todos los días)"
             }
         ]
     },
     "after_hours": {
-        "enabled": true,
+        "enabled": false,
         "force_active": false,
         "auto_schedule": true,
-        "start_time": "21:00",
-        "end_time": "11:00",
+        "start_time": "23:00",
+        "end_time": "08:30",
         "media_type": "video",
         "video_url": "/static/tv_media/videos/1.mp4",
         "image_url": "/static/uploads/logo.png",
@@ -899,9 +639,5 @@
                 "badge": "☀️ Apertura: 08:00 (Todos los días)"
             }
         ]
-    },
-    "auto_reboot": {
-        "enabled": false,
-        "time": "08:30"
     }
 }

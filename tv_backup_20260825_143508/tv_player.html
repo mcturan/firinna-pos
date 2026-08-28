@@ -63,17 +63,16 @@
             grid-template-columns: 28vw 1fr;
             grid-template-rows: 10vh 1fr 14.5vh;
             gap: 1.2vh 1.2vw;
-            background: radial-gradient(circle at 10% 10%, #0d1527 0%, #070a13 100%);
+            background: #0B0F19;
             overflow: hidden;
         }
         body.layout-modern_grid #modern-layout { display: grid; }
         body.layout-modern_grid #legacy-overlay, body.layout-modern_grid #sidebar { display: none; }
         
         .grid-box { 
-            background: #FFFFFF; 
-            border-radius: 1vw; 
-            border: 1px solid rgba(226, 232, 240, 0.85); 
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 4px 10px -2px rgba(0, 0, 0, 0.15);
+            background: #121826; 
+            border-radius: 0.8vw; 
+            border: 1.5px solid #253046; 
             overflow: hidden; 
             contain: layout paint;
             transform: translateZ(0);
@@ -90,20 +89,19 @@
             align-items: center; 
             justify-content: flex-start;
             background: #FFFFFF; 
-            border-radius: 1vw; 
+            border-radius: 0.8vw; 
             position: relative; 
             overflow: hidden; 
-            border: 1px solid rgba(226, 232, 240, 0.85); 
-            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.2);
+            border: 1.5px solid #E2E8F0; 
         }
         
         #ml-support-flag {
             width: 3.4vw;
             height: 2.2vw;
-            border-radius: 0.4vw;
+            border-radius: 0.3vw;
             overflow: hidden;
             flex-shrink: 0;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
             border: 1px solid #E2E8F0;
             background: #E30A17;
             display: flex;
@@ -126,8 +124,8 @@
             justify-content: center;
             pointer-events: none;
         }
-        #ml-logo { max-width: 72%; max-height: 7.5vh; object-fit: contain; position: absolute; opacity: 1; transition: opacity 0.5s ease, transform 0.5s ease; will-change: opacity, transform; transform: translateZ(0); }
-        #ml-logo-domain { position: absolute; font-size: 1.8vw; font-weight: 800; color: #2D6A4F; text-align: center; letter-spacing: 1.5px; opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease; will-change: opacity, transform; transform: translateZ(0); }
+        #ml-logo { max-width: 72%; max-height: 7.5vh; object-fit: contain; position: absolute; opacity: 1; transition: opacity 0.5s ease; will-change: opacity; transform: translateZ(0); }
+        #ml-logo-domain { position: absolute; font-size: 1.8vw; font-weight: 800; color: #2D6A4F; text-align: center; letter-spacing: 1.5px; opacity: 0; transition: opacity 0.5s ease; will-change: opacity; transform: translateZ(0); }
         
         /* Top Middle & Right Container (Split grid inside grid-column 2: 1.15fr 1fr gives ample room for clock & weather) */
         #ml-top-right-wrapper {
@@ -142,9 +140,8 @@
         /* Top Center: Rotating Clock/Date and Weather Forecast (Crisp Pure White) */
         #ml-center-box {
             background: #FFFFFF;
-            border-radius: 1vw;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.2);
+            border-radius: 0.8vw;
+            border: 1.5px solid #E2E8F0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -157,9 +154,8 @@
         /* Top Right: Rotating Social Media & Review Us on Maps (Crisp Pure White) */
         #ml-review-box {
             background: #FFFFFF;
-            border-radius: 1vw;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.2);
+            border-radius: 0.8vw;
+            border: 1.5px solid #E2E8F0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -177,71 +173,48 @@
             justify-content: center;
             padding: 0 0.8vw;
             opacity: 0;
-            transform: translateY(3px) translateZ(0);
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.5s ease;
             pointer-events: none;
             box-sizing: border-box;
             white-space: nowrap;
+            transform: translateZ(0);
         }
         .top-layer.active {
             opacity: 1;
-            transform: translateY(0) translateZ(0);
             pointer-events: auto;
         }
 
         .social-pill {
             display: inline-flex;
             align-items: center;
-            gap: 0.5vw;
-            padding: 0.4vw 1.0vw;
+            gap: 0.35vw;
+            padding: 0.25vw 0.65vw;
             background: #F8FAFC;
             border: 1.5px solid #E2E8F0;
-            border-radius: 0.6vw;
-            font-size: 1.25vw;
-            font-weight: 800;
+            border-radius: 0.45vw;
+            font-size: 1.05vw;
+            font-weight: 700;
             color: #1E293B;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-            transition: transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .social-pill svg {
-            width: 1.5vw;
-            height: 1.5vw;
+            width: 1.2vw;
+            height: 1.2vw;
             flex-shrink: 0;
         }
 
-        #ml-left-top { 
-            grid-column: 1; 
-            grid-row: 2; 
-            background: #FFFFFF; 
-            border-radius: 1vw; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            position: relative; 
-            border: 1px solid rgba(226, 232, 240, 0.85); 
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
-        }
+        #ml-left-top { grid-column: 1; grid-row: 2; background: #FFFFFF; border-radius: 0.8vw; display: flex; flex-direction: column; overflow: hidden; position: relative; border: 1.5px solid #E2E8F0; }
         
-        #ml-main-video { 
-            grid-column: 2; 
-            grid-row: 2; 
-            position: relative; 
-            border-radius: 1vw; 
-            overflow: hidden; 
-            background: #000000; 
-            border: 1px solid rgba(226, 232, 240, 0.3); 
-            box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.4);
-        }
+        #ml-main-video { grid-column: 2; grid-row: 2; position: relative; border-radius: 0.8vw; overflow: hidden; background: #000000; border: 1.5px solid #E2E8F0; }
         
         /* BOTTOM ROW: Full Width RSS News Feed */
         #ml-rss-box {
             grid-column: 1 / 3;
             grid-row: 3;
             background: #FFFFFF;
-            border-radius: 1vw;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
+            border-radius: 0.8vw;
+            border: 1.5px solid #E2E8F0;
             display: flex;
             align-items: center;
             position: relative;
@@ -276,7 +249,7 @@
             will-change: transform;
         }
 
-        /* Ticker Card Effects - Clean GPU-accelerated opacity & slide */
+        /* Ticker Card Effects - Clean GPU-accelerated opacity fade */
         .ticker-card {
             position: absolute;
             top: 0;
@@ -295,8 +268,8 @@
             opacity: 0;
             pointer-events: none;
             z-index: 1;
-            transform: translateY(4px) translateZ(0);
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateZ(0);
+            transition: opacity 0.5s ease;
         }
 
         .tcard-text {
@@ -316,7 +289,6 @@
         /* Active Card State */
         .ticker-card.active {
             opacity: 1 !important;
-            transform: translateY(0) translateZ(0) !important;
             z-index: 5 !important;
             pointer-events: auto !important;
         }
@@ -346,24 +318,19 @@
             display: flex; 
             flex-direction: column; 
             opacity: 0; 
-            transform: scale(0.985);
-            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
+            transition: opacity 0.6s ease; 
             background: #FFFFFF; 
             border-radius: 1vw; 
             overflow: hidden; 
-            will-change: opacity, transform; 
+            will-change: opacity; 
         }
-        .product-slide.active { 
-            opacity: 1; 
-            transform: scale(1);
-            z-index: 5; 
-        }
+        .product-slide.active { opacity: 1; z-index: 5; }
         .prod-img-box {
             width: 100%;
-            height: 84%;
+            height: 85%;
             overflow: hidden;
             position: relative;
-            background: radial-gradient(circle at 50% 50%, #FFFFFF 60%, #F8FAFC 100%);
+            background: #FAFAFA;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -372,42 +339,13 @@
             width: 100%; 
             height: 100%; 
             object-fit: contain; 
-            padding: 0.8vw;
+            padding: 0.4vw;
             box-sizing: border-box;
             transform: translateZ(0);
             backface-visibility: hidden;
-            transition: transform 6s ease;
         }
-        .product-slide.active .prod-img {
-            transform: scale(1.02) translateZ(0);
-        }
-        .prod-info { 
-            height: 16%; 
-            padding: 0.4vw 1.2vw; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%); 
-            color: #0F172A; 
-            z-index: 2; 
-            border-top: 1px solid rgba(226, 232, 240, 0.8); 
-            overflow: hidden; 
-            box-sizing: border-box; 
-        }
-        .prod-title { 
-            font-size: 1.55vw; 
-            font-weight: 800; 
-            color: #0F172A; 
-            text-align: center; 
-            margin: 0; 
-            line-height: 1.2; 
-            letter-spacing: -0.2px; 
-            display: -webkit-box; 
-            -webkit-line-clamp: 2; 
-            -webkit-box-orient: vertical; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-        }
+        .prod-info { height: 15%; padding: 0.5vw 1vw; display: flex; align-items: center; justify-content: center; background: #FFFFFF; color: #1A202C; z-index: 2; border-top: 1.5px solid #E2E8F0; overflow: hidden; box-sizing: border-box; }
+        .prod-title { font-size: 1.5vw; font-weight: 800; color: #1A202C; text-align: center; margin: 0; line-height: 1.2; letter-spacing: 0.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
         .prod-desc, .prod-tags { display: none; }
 
         /* Video Native Control Fixes for Mobile & Hardware Acceleration */
@@ -610,21 +548,22 @@
             <!-- Box 3: Right (Layer 0: Forex | Layer 1: Crypto | Layer 2: Social Media | Layer 3: Support Maps) -->
             <div id="ml-review-box" class="grid-box">
                 <!-- Layer 0: Forex (USD/TRY & EUR/TRY) -->
-                <div id="ml-review-layer-0" class="top-layer active" style="font-size:1.65vw; font-weight:800; color:#1E293B; gap:1.0vw;">
+                <div id="ml-review-layer-0" class="top-layer active" style="font-size:1.3vw; font-weight:700; color:#1E293B; gap:0.8vw;">
                     <span style="color:#059669;">💵 USD: <b id="val-usd" style="color:#0F172A;">-- ₺</b></span>
                     <span style="color:#CBD5E1;">•</span>
                     <span style="color:#2563EB;">💶 EUR: <b id="val-eur" style="color:#0F172A;">-- ₺</b></span>
                 </div>
 
                 <!-- Layer 1: Crypto (BTC & ETH) -->
-                <div id="ml-review-layer-1" class="top-layer" style="font-size:1.65vw; font-weight:800; color:#1E293B; gap:1.0vw;">
+                <div id="ml-review-layer-1" class="top-layer" style="font-size:1.3vw; font-weight:700; color:#1E293B; gap:0.8vw;">
                     <span style="color:#D97706;">₿ BTC: <b id="val-btc" style="color:#0F172A;">-- $</b></span>
                     <span style="color:#CBD5E1;">•</span>
                     <span style="color:#7C3AED;">Ξ ETH: <b id="val-eth" style="color:#0F172A;">-- $</b></span>
                 </div>
 
-                <!-- Layer 2: Social Media (Instagram & TikTok) - Clean pills without prefix -->
-                <div id="ml-review-layer-2" class="top-layer" style="justify-content:center; gap:1.2vw;">
+                <!-- Layer 2: Follow / Share (Instagram & TikTok) -->
+                <div id="ml-review-layer-2" class="top-layer" style="justify-content:center; gap:0.8vw;">
+                    <span style="font-size:1.15vw; font-weight:800; color:#2D6A4F; letter-spacing:0.4px;">📸 FOLLOW:</span>
                     <!-- Instagram Official Logo Pill -->
                     <div class="social-pill">
                         <svg viewBox="0 0 24 24" fill="none">
@@ -642,7 +581,8 @@
                 </div>
 
                 <!-- Layer 3: Support Us (Google Maps & Yandex Maps) -->
-                <div id="ml-review-layer-3" class="top-layer" style="justify-content:center; gap:1.2vw;">
+                <div id="ml-review-layer-3" class="top-layer" style="justify-content:center; gap:0.8vw;">
+                    <span style="font-size:1.15vw; font-weight:800; color:#2D6A4F; letter-spacing:0.4px;">⭐ SUPPORT:</span>
                     <!-- Google Maps Official Logo Pill -->
                     <div class="social-pill">
                         <svg viewBox="0 0 24 24">
@@ -732,9 +672,9 @@
                             Şu Anda Hizmet Vermemekteyiz
                         </h1>
                         <p id="ah-text" style="margin:0; font-size:1.75vw; line-height:1.45; font-weight:600; color:#E2E8F0; max-width:96%;">
-                            Değerli misafirlerimiz, şu anda kapalıyız. Sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.
+                            Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:30'da sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.
                         </p>
-                        <div id="ah-badge" style="display:inline-flex; align-items:center; gap:1.2vw; background:rgba(16,185,129,0.25); border:3px solid #10B981; color:#34D399; padding:2.2vh 4vw; border-radius:1.8vw; font-size:2.8vw; font-weight:900; box-shadow:0 10px 40px rgba(16,185,129,0.45); letter-spacing:0.5px; text-shadow:0 2px 12px rgba(16,185,129,0.4);">
+                        <div id="ah-badge" style="display:inline-flex; align-items:center; gap:0.8vw; background:rgba(16,185,129,0.22); border:2px solid #10B981; color:#34D399; padding:0.9vh 2.6vw; border-radius:1.2vw; font-size:1.6vw; font-weight:800; box-shadow:0 6px 20px rgba(16,185,129,0.35);">
                             ☀️ Açılış: Sabah 08:30
                         </div>
                     </div>
@@ -1010,21 +950,6 @@
 
             isDownloadingVideo = true;
             currentlyDownloadingUrl = targetUrl;
-            
-            try {
-                const headRes = await fetch(targetUrl, { method: 'HEAD' });
-                const size = parseInt(headRes.headers.get('content-length') || '0', 10);
-                if (size > 100 * 1024 * 1024) { // > 100MB
-                    tvLog(`[DOWNLOAD ABORT] ${filename} is too large (${(size/(1024*1024)).toFixed(1)} MB). Skipping cache to prevent crash.`);
-                    isDownloadingVideo = false;
-                    currentlyDownloadingUrl = null;
-                    if (badge) badge.style.display = 'none';
-                    // process next
-                    setTimeout(processBackgroundDownloadQueue, 1000);
-                    return;
-                }
-            } catch(e) {}
-
             tvLog(`[DOWNLOAD START] Starting non-interruptible background download: ${filename}`);
             flushTvLogsToServer(true);
 
@@ -1278,15 +1203,16 @@
                 return;
             }
 
-            // 3. Instead of waiting for download and playing fallback forever for huge files,
-            // we will play it directly from the URL. We still queue it for caching if possible.
-            isPlayingFallback = false;
-            tvLog(`[PLAYBACK STREAM] ${filename} not in cache yet. Streaming directly from server...`);
-            playBlobDirectly(srcUrl, srcUrl);
-            
-            // Still queue for background download (will fail gracefully if too big or quota exceeded)
+            // 3. Custom video is downloading in background:
+            // Ensure queued in background sync
             queueVideoForBackgroundDownload(srcUrl);
+
+            // While waiting for download, play fallback bayrak.mp4 so screen is NEVER blank or interrupted
+            isPlayingFallback = true;
+            tvLog(`[PLAYBACK WAIT] ${filename} is downloading in background -> Playing fallback bayrak.mp4 in meantime`);
+            playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
         }
+
         function playBlobDirectly(srcToPlay, origUrl) {
             document.documentElement.classList.remove('native-video-active');
             vidEl.style.display = "block";
@@ -1412,6 +1338,7 @@
             checkAfterHoursSchedule();
         }
 
+        // ==========================================
         // MESAİ DIŞI (AFTER-HOURS / CLOSED MODE) ENGINE
         // ==========================================
         let afterHoursSettings = {
@@ -1430,44 +1357,39 @@
                     lang: "tr",
                     flag: "🇹🇷",
                     title: "Şu Anda Hizmet Vermemekteyiz",
-                    text: "Değerli misafirlerimiz, şu anda kapalıyız. Sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
+                    text: "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:30'da sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
                     badge: "☀️ Açılış: Sabah 08:30"
                 },
                 {
                     lang: "en",
                     flag: "🇬🇧",
                     title: "We Are Currently Closed",
-                    text: "Dear guests, we are currently closed. We look forward to welcoming you with fresh artisan bakery and warm hospitality.",
+                    text: "Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 08:30 with fresh artisan bakery and warm hospitality.",
                     badge: "☀️ Opening: 08:30 AM"
                 },
                 {
                     lang: "ru",
                     flag: "🇷🇺",
                     title: "В настоящее время мы закрыты",
-                    text: "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас со свежей выпечкой и горячим чаем.",
+                    text: "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 08:30 со свежей выпечкой и горячим чаем.",
                     badge: "☀️ Открытие: в 08:30"
                 },
                 {
                     lang: "ar",
                     flag: "🇸🇦",
                     title: "نحن مغلقون حالياً",
-                    text: "ضيوفنا الأعزاء، نحن حالياً مغلقون. يسعدنا استقبالكم مع أشهى المخبوزات الطازجة والضيافة الدافئة.",
+                    text: "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 08:30 صباحاً مع أشهى المخبوزات الطازجة.",
                     badge: "☀️ الافتتاح: الساعة 08:30 صباحاً"
                 },
                 {
                     lang: "es",
                     flag: "🇪🇸",
                     title: "Actualmente estamos cerrados",
-                    text: "Estimados clientes, actualmente estamos cerrados. Estaremos encantados de recibirles con nuestros deliciosos productos de panadería artesanal.",
+                    text: "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 08:30 con nuestros deliciosos productos de panadería.",
                     badge: "☀️ Apertura: a las 08:30"
                 }
             ]
         };
-
-        // Working hours fetched from web settings (daily_hours)
-        let webDailyHours = null;
-        // Live store open/closed status from /api/web/status (considers POS open tables!)
-        let webStoreIsOpen = null; // null = not yet fetched, true/false = live status
 
         let isAfterHoursActive = false;
         let ahLangIndex = 0;
@@ -1475,117 +1397,23 @@
         let ahProductIndex = 0;
         let ahProductTimer = null;
 
-        // Fetch live store status from the web status API
-        // This considers: daily hours + open tables (POS) + manual overrides
-        async function fetchWebStoreStatus() {
-            try {
-                const res = await fetch('/api/web/status?_t=' + Date.now());
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.hours) {
-                        webDailyHours = data.hours;
-                        try { localStorage.setItem('firinna_daily_hours', JSON.stringify(webDailyHours)); } catch(e) {}
-                    }
-                    if (typeof data.is_open === 'boolean') {
-                        webStoreIsOpen = data.is_open;
-                        try { localStorage.setItem('firinna_store_is_open', JSON.stringify(webStoreIsOpen)); } catch(e) {}
-                    }
-                }
-            } catch(e) {
-                // Fallback to cached
-                try {
-                    const cachedHours = localStorage.getItem('firinna_daily_hours');
-                    if (cachedHours && !webDailyHours) webDailyHours = JSON.parse(cachedHours);
-                    const cachedStatus = localStorage.getItem('firinna_store_is_open');
-                    if (cachedStatus !== null && webStoreIsOpen === null) webStoreIsOpen = JSON.parse(cachedStatus);
-                } catch(err) {}
-            }
-        }
-        // Fetch on load and every 30 seconds (frequent to catch POS table changes quickly)
-        fetchWebStoreStatus();
-        setInterval(fetchWebStoreStatus, 30 * 1000);
-
-        // Turkish day names in JS weekday order (0=Pazar, 1=Pazartesi, ...)
-        const trDayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
-        const enDayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        const ruDayNames = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
-        const arDayNames = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-        const esDayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
-        /**
-         * Finds the next day+time when the store is open, based on daily_hours from web settings.
-         * Returns { dayIndex (JS 0=Sun), dayNameTr, openTime, daysAhead }
-         * daysAhead: 0 = today (later hours), 1 = tomorrow, etc.
-         */
-        function getNextOpenSlot() {
-            if (!webDailyHours) return null;
-
-            const now = new Date();
-            const currentHM = now.getHours() * 60 + now.getMinutes();
-
-            // Check up to 7 days ahead (today + 6)
-            for (let offset = 0; offset < 7; offset++) {
-                const checkDate = new Date(now);
-                checkDate.setDate(checkDate.getDate() + offset);
-                const jsDay = checkDate.getDay(); // 0=Sun ... 6=Sat
-                const trDay = trDayNames[jsDay];
-                const cfg = webDailyHours[trDay];
-
-                if (!cfg || !cfg.active) continue;
-
-                const [oh, om] = (cfg.open || '08:00').split(':').map(Number);
-                const openMinutes = oh * 60 + om;
-
-                // If today, only valid if opening time is still in the future
-                if (offset === 0 && currentHM >= openMinutes) continue;
-
-                return {
-                    dayIndex: jsDay,
-                    dayNameTr: trDay,
-                    openTime: cfg.open || '08:00',
-                    daysAhead: offset
-                };
-            }
-            return null; // All days closed (shouldn't happen)
-        }
-
-        /**
-         * Determines if the TV should show the after-hours (closed) screen.
-         * 
-         * AUTO mode (auto_schedule=true):
-         *   Uses the live /api/web/status is_open field. This is POS-aware:
-         *   - If customers are still seated (open tables), store stays "open" → TV stays normal
-         *   - Respects daily hours, manual overrides, and POS state
-         *
-         * MANUAL mode (auto_schedule=false):
-         *   Uses the admin-configured start_time / end_time (e.g. 23:00 → 08:30)
-         */
         function isAfterHoursNow() {
             if (!afterHoursSettings || !afterHoursSettings.enabled) return false;
             if (afterHoursSettings.force_active) return true; // Manual test override!
+            if (!afterHoursSettings.auto_schedule) return false;
 
-            if (afterHoursSettings.auto_schedule) {
-                // AUTO MODE: Use live web store status (POS-aware)
-                // If webStoreIsOpen is null (not yet fetched), don't activate after-hours
-                if (webStoreIsOpen === null) return false;
-                // Store is open (possibly because of open tables) → TV stays normal
-                // Store is closed → TV shows after-hours
-                return !webStoreIsOpen;
+            const now = new Date();
+            const curMinutes = now.getHours() * 60 + now.getMinutes();
+
+            const [sh, sm] = (afterHoursSettings.start_time || '23:00').split(':').map(Number);
+            const [eh, em] = (afterHoursSettings.end_time || '08:00').split(':').map(Number);
+            const startMinutes = (sh || 23) * 60 + (sm || 0);
+            const endMinutes = (eh || 8) * 60 + (em || 0);
+
+            if (startMinutes > endMinutes) {
+                return curMinutes >= startMinutes || curMinutes < endMinutes;
             } else {
-                // MANUAL MODE: Use admin-configured start/end times
-                const now = new Date();
-                const curMinutes = now.getHours() * 60 + now.getMinutes();
-
-                const [sh, sm] = (afterHoursSettings.start_time || '23:00').split(':').map(Number);
-                const [eh, em] = (afterHoursSettings.end_time || '08:00').split(':').map(Number);
-                const startMinutes = (sh || 23) * 60 + (sm || 0);
-                const endMinutes = (eh || 8) * 60 + (em || 0);
-
-                if (startMinutes > endMinutes) {
-                    return curMinutes >= startMinutes || curMinutes < endMinutes;
-                } else {
-                    return curMinutes >= startMinutes && curMinutes < endMinutes;
-                }
+                return curMinutes >= startMinutes && curMinutes < endMinutes;
             }
         }
 
@@ -1680,50 +1508,35 @@
             es: { title: "📖 Menú Digital en 12 Idiomas", sub: "Escanea con la cámara o visita nuestra web" }
         };
 
-        /**
-         * Generates the dynamic opening badge text based on next open day/time from web settings.
-         * Shows the actual next open day and time (e.g., "Wednesday 11:00" if tomorrow is closed).
-         */
         function getDynamicOpeningBadge(lang) {
-            const slot = getNextOpenSlot();
+            const now = new Date();
+            const hour = now.getHours();
+            const openTime = afterHoursSettings.end_time || '08:00';
 
-            // Fallback to simple end_time if no web hours available
-            const fallbackTime = afterHoursSettings.end_time || '08:00';
-
-            if (!slot) {
-                // No web hours data, use simple fallback
-                if (lang === 'en') return `☀️ Opening: ${fallbackTime} AM`;
-                if (lang === 'ru') return `☀️ Открытие: в ${fallbackTime}`;
-                if (lang === 'ar') return `☀️ الافتتاح: الساعة ${fallbackTime} صباحاً`;
-                if (lang === 'es') return `☀️ Apertura: a las ${fallbackTime}`;
-                return `☀️ Açılış: ${fallbackTime}`;
-            }
-
-            const openTime = slot.openTime;
-            const daysAhead = slot.daysAhead;
-            const dayIdx = slot.dayIndex;
+            const isTodayEarly = (hour >= 0 && hour < 8);
+            const isTomorrowLate = (hour >= 23);
 
             if (lang === 'en') {
-                if (daysAhead === 0) return `☀️ Opening: Today at ${openTime}`;
-                if (daysAhead === 1) return `☀️ Opening: Tomorrow at ${openTime}`;
-                return `☀️ Opening: ${enDayNames[dayIdx]} at ${openTime}`;
+                if (isTodayEarly) return `☀️ Opening: Today at ${openTime} AM`;
+                if (isTomorrowLate) return `☀️ Opening: Tomorrow at ${openTime} AM`;
+                return `☀️ Opening: ${openTime} AM`;
             } else if (lang === 'ru') {
-                if (daysAhead === 0) return `☀️ Открытие: Сегодня в ${openTime}`;
-                if (daysAhead === 1) return `☀️ Открытие: Завтра в ${openTime}`;
-                return `☀️ Открытие: ${ruDayNames[dayIdx]} в ${openTime}`;
+                if (isTodayEarly) return `☀️ Открытие: Сегодня в ${openTime}`;
+                if (isTomorrowLate) return `☀️ Открытие: Завтра в ${openTime}`;
+                return `☀️ Открытие: в ${openTime}`;
             } else if (lang === 'ar') {
-                if (daysAhead === 0) return `☀️ الافتتاح: اليوم الساعة ${openTime}`;
-                if (daysAhead === 1) return `☀️ الافتتاح: غداً الساعة ${openTime}`;
-                return `☀️ الافتتاح: ${arDayNames[dayIdx]} الساعة ${openTime}`;
+                if (isTodayEarly) return `☀️ الافتتاح: اليوم الساعة ${openTime} صباحاً`;
+                if (isTomorrowLate) return `☀️ الافتتاح: غداً الساعة ${openTime} صباحاً`;
+                return `☀️ الافتتاح: الساعة ${openTime} صباحاً`;
             } else if (lang === 'es') {
-                if (daysAhead === 0) return `☀️ Apertura: Hoy a las ${openTime}`;
-                if (daysAhead === 1) return `☀️ Apertura: Mañana a las ${openTime}`;
-                return `☀️ Apertura: ${esDayNames[dayIdx]} a las ${openTime}`;
+                if (isTodayEarly) return `☀️ Apertura: Hoy a las ${openTime}`;
+                if (isTomorrowLate) return `☀️ Apertura: Mañana a las ${openTime}`;
+                return `☀️ Apertura: a las ${openTime}`;
             } else {
                 // Turkish default
-                if (daysAhead === 0) return `☀️ Açılış: Bugün Saat ${openTime}`;
-                if (daysAhead === 1) return `☀️ Açılış: Yarın Saat ${openTime}`;
-                return `☀️ Açılış: ${trDayNames[dayIdx]} Saat ${openTime}`;
+                if (isTodayEarly) return `☀️ Açılış: Bugün Sabah ${openTime}`;
+                if (isTomorrowLate) return `☀️ Açılış: Yarın Sabah ${openTime}`;
+                return `☀️ Açılış: Sabah ${openTime}`;
             }
         }
 
@@ -1816,22 +1629,27 @@
                     const currentTemp = data.current ? Math.round(data.current.temperature_2m) : null;
                     const humidity = data.current ? data.current.relative_humidity_2m : null;
                     const currentIcon = data.current ? (wCodeMap[data.current.weathercode] || '🌤️') : '🌤️';
+
                     const d0Max = Math.round(data.daily.temperature_2m_max[0]);
                     const d0Min = Math.round(data.daily.temperature_2m_min[0]);
+                    const d0Icon = wCodeMap[data.daily.weathercode[0]] || '🌤️';
 
                     document.getElementById('ml-weather').innerHTML = `
-                        <div style="display:flex; align-items:center; gap:0.5vw;">
-                            <span style="font-size:1.6vw; line-height:1;">${currentIcon}</span>
-                            <span style="color:#0F172A; font-weight:800; font-size:1.75vw; letter-spacing:0.5px;">${currentTemp !== null ? currentTemp : d0Max}°C</span>
+                        <div style="display:flex; align-items:center; gap:0.35vw;">
+                            <span style="color:#DC2626; font-weight:800; font-size:1.25vw;">Now:</span>
+                            <span style="font-size:1.3vw;">${currentIcon}</span>
+                            <span style="color:#0F172A; font-weight:800; font-size:1.35vw;">${currentTemp !== null ? currentTemp : d0Max}°C</span>
                         </div>
-                        <span style="color:#CBD5E1; font-weight:300; margin:0 0.7vw; font-size:1.4vw;">|</span>
-                        <div style="display:flex; align-items:center; gap:0.4vw;">
-                            <span style="font-size:1.35vw; line-height:1;">💧</span>
-                            <span style="color:#0284C7; font-weight:800; font-size:1.5vw;">%${humidity !== null ? humidity : '--'}</span>
+                        <span style="color:#CBD5E1; font-weight:300; margin:0 0.8vw;">|</span>
+                        <div style="display:flex; align-items:center; gap:0.35vw;">
+                            <span style="font-size:1.25vw;">💧</span>
+                            <span style="color:#0284C7; font-weight:800; font-size:1.3vw;">%${humidity !== null ? humidity : '--'}</span>
                         </div>
-                        <span style="color:#CBD5E1; font-weight:300; margin:0 0.7vw; font-size:1.4vw;">|</span>
-                        <div style="display:flex; align-items:center; gap:0.4vw;">
-                            <span style="color:#64748B; font-weight:800; font-size:1.45vw;">${d0Min}° / ${d0Max}°C</span>
+                        <span style="color:#CBD5E1; font-weight:300; margin:0 0.8vw;">|</span>
+                        <div style="display:flex; align-items:center; gap:0.35vw;">
+                            <span style="color:#2D6A4F; font-weight:800; font-size:1.25vw;">Today:</span>
+                            <span style="font-size:1.3vw;">${d0Icon}</span>
+                            <span style="color:#0F172A; font-weight:800; font-size:1.3vw;">${d0Max}° / ${d0Min}°C</span>
                         </div>
                     `;
                 }
@@ -2372,17 +2190,9 @@
                 });
             }
 
-            // 2. Randomized Quadrilingual (EN, ES, RU, AR) Turkey & Istanbul Cultural Facts
-            // Shuffle facts array so order is random, but keep all language slides of each fact together
+            // 2. Curated 30 Quadrilingual (EN, ES, RU, AR) Turkey & Istanbul Cultural Facts + Custom User Entries
             if (liveFacts.length > 0) {
-                // Fisher-Yates shuffle on facts list
-                const shuffledFacts = [...liveFacts];
-                for (let i = shuffledFacts.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffledFacts[i], shuffledFacts[j]] = [shuffledFacts[j], shuffledFacts[i]];
-                }
-
-                shuffledFacts.forEach(f => {
+                liveFacts.forEach(f => {
                     const icon = f.icon || '🏛️';
                     const customColor = f.color || '#0F172A';
 
@@ -2490,19 +2300,8 @@
         async function fetchProducts() {
             try {
                 const res = await fetch('/api/tv/products');
-                if (res.ok) {
-                    webProducts = await res.json();
-                    try { localStorage.setItem('firinna_cached_products', JSON.stringify(webProducts)); } catch(e) {}
-                }
-            } catch(e) {
-                // Offline fallback: Load from localStorage
-                try {
-                    const cached = localStorage.getItem('firinna_cached_products');
-                    if (cached) webProducts = JSON.parse(cached);
-                } catch(err) {}
-            }
-
-            if (webProducts && webProducts.length > 0) {
+                webProducts = await res.json();
+                
                 let html = "";
                 webProducts.forEach((p, idx) => {
                     let imgUrl = (p.image_url && p.image_url.trim() !== "") ? p.image_url : null;
@@ -2518,9 +2317,8 @@
                         </div>
                     `;
                 });
-                const pCar = document.getElementById('product-carousel');
-                if (pCar) pCar.innerHTML = html;
-            }
+                document.getElementById('product-carousel').innerHTML = html;
+            } catch(e) {}
         }
 
         function getStableDeviceFingerprint() {
@@ -2566,13 +2364,10 @@
                 }).catch(e=>{});
 
                 const res = await fetch('/api/tv/settings?_t=' + Date.now());
-                if (!res.ok) throw new Error('Settings HTTP ' + res.status);
+                if (!res.ok) return;
                 const text = await res.text();
-                if (!text || text.trim().startsWith('<')) throw new Error('Invalid JSON response');
+                if (!text || text.trim().startsWith('<')) return;
                 const data = JSON.parse(text);
-
-                // Save to localStorage for instant offline recovery
-                try { localStorage.setItem('firinna_cached_settings', text); } catch(e) {}
 
                 // Check for instant push signal (from admin panel)
                 if (data.last_push && data.last_push.timestamp) {
@@ -2605,20 +2400,7 @@
                     lastSettingsStr = dataStr;
                     applySettings(data);
                 }
-            } catch (e) { 
-                console.log("[OFFLINE/RECOVERY] Settings fetch error:", e);
-                // Fallback: If memory has no settings yet, apply from localStorage
-                if (!lastSettingsStr) {
-                    try {
-                        const cached = localStorage.getItem('firinna_cached_settings');
-                        if (cached) {
-                            const data = JSON.parse(cached);
-                            lastSettingsStr = cached;
-                            applySettings(data);
-                        }
-                    } catch(err) {}
-                }
-            }
+            } catch (e) { console.log("Settings fetch error:", e); }
         }
 
         function applySettings(data) {
@@ -2726,22 +2508,13 @@
             tvLog(`[APP BOOT] Firinna TV Player starting... Client: ${myClientId}`);
             flushTvLogsToServer(true);
 
-            // 1. First try loading cached offline settings & products immediately
-            try {
-                const cachedSet = localStorage.getItem('firinna_cached_settings');
-                if (cachedSet) applySettings(JSON.parse(cachedSet));
-            } catch(e) {}
+            await fetchProducts();
+            await fetchSettings();
+            await syncAllPlaylistVideosInBackground();
 
-            // 2. Start playing local cached video immediately
             if (currentMediaSource === 'local') {
                 playLocalVideo(0);
             }
-
-            // 3. Connect to server in background to sync newest data
-            fetchProducts().catch(e=>{});
-            fetchSettings().then(() => {
-                syncAllPlaylistVideosInBackground().catch(e=>{});
-            }).catch(e=>{});
         }
 
         initAppOnStartup();

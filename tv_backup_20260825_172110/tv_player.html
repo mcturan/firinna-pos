@@ -732,9 +732,9 @@
                             Şu Anda Hizmet Vermemekteyiz
                         </h1>
                         <p id="ah-text" style="margin:0; font-size:1.75vw; line-height:1.45; font-weight:600; color:#E2E8F0; max-width:96%;">
-                            Değerli misafirlerimiz, şu anda kapalıyız. Sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.
+                            Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:30'da sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.
                         </p>
-                        <div id="ah-badge" style="display:inline-flex; align-items:center; gap:1.2vw; background:rgba(16,185,129,0.25); border:3px solid #10B981; color:#34D399; padding:2.2vh 4vw; border-radius:1.8vw; font-size:2.8vw; font-weight:900; box-shadow:0 10px 40px rgba(16,185,129,0.45); letter-spacing:0.5px; text-shadow:0 2px 12px rgba(16,185,129,0.4);">
+                        <div id="ah-badge" style="display:inline-flex; align-items:center; gap:0.8vw; background:rgba(16,185,129,0.22); border:2px solid #10B981; color:#34D399; padding:0.9vh 2.6vw; border-radius:1.2vw; font-size:1.6vw; font-weight:800; box-shadow:0 6px 20px rgba(16,185,129,0.35);">
                             ☀️ Açılış: Sabah 08:30
                         </div>
                     </div>
@@ -1010,21 +1010,6 @@
 
             isDownloadingVideo = true;
             currentlyDownloadingUrl = targetUrl;
-            
-            try {
-                const headRes = await fetch(targetUrl, { method: 'HEAD' });
-                const size = parseInt(headRes.headers.get('content-length') || '0', 10);
-                if (size > 100 * 1024 * 1024) { // > 100MB
-                    tvLog(`[DOWNLOAD ABORT] ${filename} is too large (${(size/(1024*1024)).toFixed(1)} MB). Skipping cache to prevent crash.`);
-                    isDownloadingVideo = false;
-                    currentlyDownloadingUrl = null;
-                    if (badge) badge.style.display = 'none';
-                    // process next
-                    setTimeout(processBackgroundDownloadQueue, 1000);
-                    return;
-                }
-            } catch(e) {}
-
             tvLog(`[DOWNLOAD START] Starting non-interruptible background download: ${filename}`);
             flushTvLogsToServer(true);
 
@@ -1278,15 +1263,16 @@
                 return;
             }
 
-            // 3. Instead of waiting for download and playing fallback forever for huge files,
-            // we will play it directly from the URL. We still queue it for caching if possible.
-            isPlayingFallback = false;
-            tvLog(`[PLAYBACK STREAM] ${filename} not in cache yet. Streaming directly from server...`);
-            playBlobDirectly(srcUrl, srcUrl);
-            
-            // Still queue for background download (will fail gracefully if too big or quota exceeded)
+            // 3. Custom video is downloading in background:
+            // Ensure queued in background sync
             queueVideoForBackgroundDownload(srcUrl);
+
+            // While waiting for download, play fallback bayrak.mp4 so screen is NEVER blank or interrupted
+            isPlayingFallback = true;
+            tvLog(`[PLAYBACK WAIT] ${filename} is downloading in background -> Playing fallback bayrak.mp4 in meantime`);
+            playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
         }
+
         function playBlobDirectly(srcToPlay, origUrl) {
             document.documentElement.classList.remove('native-video-active');
             vidEl.style.display = "block";
@@ -1412,6 +1398,7 @@
             checkAfterHoursSchedule();
         }
 
+        // ==========================================
         // MESAİ DIŞI (AFTER-HOURS / CLOSED MODE) ENGINE
         // ==========================================
         let afterHoursSettings = {
@@ -1430,44 +1417,39 @@
                     lang: "tr",
                     flag: "🇹🇷",
                     title: "Şu Anda Hizmet Vermemekteyiz",
-                    text: "Değerli misafirlerimiz, şu anda kapalıyız. Sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
+                    text: "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 08:30'da sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
                     badge: "☀️ Açılış: Sabah 08:30"
                 },
                 {
                     lang: "en",
                     flag: "🇬🇧",
                     title: "We Are Currently Closed",
-                    text: "Dear guests, we are currently closed. We look forward to welcoming you with fresh artisan bakery and warm hospitality.",
+                    text: "Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 08:30 with fresh artisan bakery and warm hospitality.",
                     badge: "☀️ Opening: 08:30 AM"
                 },
                 {
                     lang: "ru",
                     flag: "🇷🇺",
                     title: "В настоящее время мы закрыты",
-                    text: "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас со свежей выпечкой и горячим чаем.",
+                    text: "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 08:30 со свежей выпечкой и горячим чаем.",
                     badge: "☀️ Открытие: в 08:30"
                 },
                 {
                     lang: "ar",
                     flag: "🇸🇦",
                     title: "نحن مغلقون حالياً",
-                    text: "ضيوفنا الأعزاء، نحن حالياً مغلقون. يسعدنا استقبالكم مع أشهى المخبوزات الطازجة والضيافة الدافئة.",
+                    text: "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 08:30 صباحاً مع أشهى المخبوزات الطازجة.",
                     badge: "☀️ الافتتاح: الساعة 08:30 صباحاً"
                 },
                 {
                     lang: "es",
                     flag: "🇪🇸",
                     title: "Actualmente estamos cerrados",
-                    text: "Estimados clientes, actualmente estamos cerrados. Estaremos encantados de recibirles con nuestros deliciosos productos de panadería artesanal.",
+                    text: "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 08:30 con nuestros deliciosos productos de panadería.",
                     badge: "☀️ Apertura: a las 08:30"
                 }
             ]
         };
-
-        // Working hours fetched from web settings (daily_hours)
-        let webDailyHours = null;
-        // Live store open/closed status from /api/web/status (considers POS open tables!)
-        let webStoreIsOpen = null; // null = not yet fetched, true/false = live status
 
         let isAfterHoursActive = false;
         let ahLangIndex = 0;
@@ -1475,117 +1457,23 @@
         let ahProductIndex = 0;
         let ahProductTimer = null;
 
-        // Fetch live store status from the web status API
-        // This considers: daily hours + open tables (POS) + manual overrides
-        async function fetchWebStoreStatus() {
-            try {
-                const res = await fetch('/api/web/status?_t=' + Date.now());
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.hours) {
-                        webDailyHours = data.hours;
-                        try { localStorage.setItem('firinna_daily_hours', JSON.stringify(webDailyHours)); } catch(e) {}
-                    }
-                    if (typeof data.is_open === 'boolean') {
-                        webStoreIsOpen = data.is_open;
-                        try { localStorage.setItem('firinna_store_is_open', JSON.stringify(webStoreIsOpen)); } catch(e) {}
-                    }
-                }
-            } catch(e) {
-                // Fallback to cached
-                try {
-                    const cachedHours = localStorage.getItem('firinna_daily_hours');
-                    if (cachedHours && !webDailyHours) webDailyHours = JSON.parse(cachedHours);
-                    const cachedStatus = localStorage.getItem('firinna_store_is_open');
-                    if (cachedStatus !== null && webStoreIsOpen === null) webStoreIsOpen = JSON.parse(cachedStatus);
-                } catch(err) {}
-            }
-        }
-        // Fetch on load and every 30 seconds (frequent to catch POS table changes quickly)
-        fetchWebStoreStatus();
-        setInterval(fetchWebStoreStatus, 30 * 1000);
-
-        // Turkish day names in JS weekday order (0=Pazar, 1=Pazartesi, ...)
-        const trDayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
-        const enDayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        const ruDayNames = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
-        const arDayNames = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-        const esDayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
-        /**
-         * Finds the next day+time when the store is open, based on daily_hours from web settings.
-         * Returns { dayIndex (JS 0=Sun), dayNameTr, openTime, daysAhead }
-         * daysAhead: 0 = today (later hours), 1 = tomorrow, etc.
-         */
-        function getNextOpenSlot() {
-            if (!webDailyHours) return null;
-
-            const now = new Date();
-            const currentHM = now.getHours() * 60 + now.getMinutes();
-
-            // Check up to 7 days ahead (today + 6)
-            for (let offset = 0; offset < 7; offset++) {
-                const checkDate = new Date(now);
-                checkDate.setDate(checkDate.getDate() + offset);
-                const jsDay = checkDate.getDay(); // 0=Sun ... 6=Sat
-                const trDay = trDayNames[jsDay];
-                const cfg = webDailyHours[trDay];
-
-                if (!cfg || !cfg.active) continue;
-
-                const [oh, om] = (cfg.open || '08:00').split(':').map(Number);
-                const openMinutes = oh * 60 + om;
-
-                // If today, only valid if opening time is still in the future
-                if (offset === 0 && currentHM >= openMinutes) continue;
-
-                return {
-                    dayIndex: jsDay,
-                    dayNameTr: trDay,
-                    openTime: cfg.open || '08:00',
-                    daysAhead: offset
-                };
-            }
-            return null; // All days closed (shouldn't happen)
-        }
-
-        /**
-         * Determines if the TV should show the after-hours (closed) screen.
-         * 
-         * AUTO mode (auto_schedule=true):
-         *   Uses the live /api/web/status is_open field. This is POS-aware:
-         *   - If customers are still seated (open tables), store stays "open" → TV stays normal
-         *   - Respects daily hours, manual overrides, and POS state
-         *
-         * MANUAL mode (auto_schedule=false):
-         *   Uses the admin-configured start_time / end_time (e.g. 23:00 → 08:30)
-         */
         function isAfterHoursNow() {
             if (!afterHoursSettings || !afterHoursSettings.enabled) return false;
             if (afterHoursSettings.force_active) return true; // Manual test override!
+            if (!afterHoursSettings.auto_schedule) return false;
 
-            if (afterHoursSettings.auto_schedule) {
-                // AUTO MODE: Use live web store status (POS-aware)
-                // If webStoreIsOpen is null (not yet fetched), don't activate after-hours
-                if (webStoreIsOpen === null) return false;
-                // Store is open (possibly because of open tables) → TV stays normal
-                // Store is closed → TV shows after-hours
-                return !webStoreIsOpen;
+            const now = new Date();
+            const curMinutes = now.getHours() * 60 + now.getMinutes();
+
+            const [sh, sm] = (afterHoursSettings.start_time || '23:00').split(':').map(Number);
+            const [eh, em] = (afterHoursSettings.end_time || '08:00').split(':').map(Number);
+            const startMinutes = (sh || 23) * 60 + (sm || 0);
+            const endMinutes = (eh || 8) * 60 + (em || 0);
+
+            if (startMinutes > endMinutes) {
+                return curMinutes >= startMinutes || curMinutes < endMinutes;
             } else {
-                // MANUAL MODE: Use admin-configured start/end times
-                const now = new Date();
-                const curMinutes = now.getHours() * 60 + now.getMinutes();
-
-                const [sh, sm] = (afterHoursSettings.start_time || '23:00').split(':').map(Number);
-                const [eh, em] = (afterHoursSettings.end_time || '08:00').split(':').map(Number);
-                const startMinutes = (sh || 23) * 60 + (sm || 0);
-                const endMinutes = (eh || 8) * 60 + (em || 0);
-
-                if (startMinutes > endMinutes) {
-                    return curMinutes >= startMinutes || curMinutes < endMinutes;
-                } else {
-                    return curMinutes >= startMinutes && curMinutes < endMinutes;
-                }
+                return curMinutes >= startMinutes && curMinutes < endMinutes;
             }
         }
 
@@ -1680,50 +1568,35 @@
             es: { title: "📖 Menú Digital en 12 Idiomas", sub: "Escanea con la cámara o visita nuestra web" }
         };
 
-        /**
-         * Generates the dynamic opening badge text based on next open day/time from web settings.
-         * Shows the actual next open day and time (e.g., "Wednesday 11:00" if tomorrow is closed).
-         */
         function getDynamicOpeningBadge(lang) {
-            const slot = getNextOpenSlot();
+            const now = new Date();
+            const hour = now.getHours();
+            const openTime = afterHoursSettings.end_time || '08:00';
 
-            // Fallback to simple end_time if no web hours available
-            const fallbackTime = afterHoursSettings.end_time || '08:00';
-
-            if (!slot) {
-                // No web hours data, use simple fallback
-                if (lang === 'en') return `☀️ Opening: ${fallbackTime} AM`;
-                if (lang === 'ru') return `☀️ Открытие: в ${fallbackTime}`;
-                if (lang === 'ar') return `☀️ الافتتاح: الساعة ${fallbackTime} صباحاً`;
-                if (lang === 'es') return `☀️ Apertura: a las ${fallbackTime}`;
-                return `☀️ Açılış: ${fallbackTime}`;
-            }
-
-            const openTime = slot.openTime;
-            const daysAhead = slot.daysAhead;
-            const dayIdx = slot.dayIndex;
+            const isTodayEarly = (hour >= 0 && hour < 8);
+            const isTomorrowLate = (hour >= 23);
 
             if (lang === 'en') {
-                if (daysAhead === 0) return `☀️ Opening: Today at ${openTime}`;
-                if (daysAhead === 1) return `☀️ Opening: Tomorrow at ${openTime}`;
-                return `☀️ Opening: ${enDayNames[dayIdx]} at ${openTime}`;
+                if (isTodayEarly) return `☀️ Opening: Today at ${openTime} AM`;
+                if (isTomorrowLate) return `☀️ Opening: Tomorrow at ${openTime} AM`;
+                return `☀️ Opening: ${openTime} AM`;
             } else if (lang === 'ru') {
-                if (daysAhead === 0) return `☀️ Открытие: Сегодня в ${openTime}`;
-                if (daysAhead === 1) return `☀️ Открытие: Завтра в ${openTime}`;
-                return `☀️ Открытие: ${ruDayNames[dayIdx]} в ${openTime}`;
+                if (isTodayEarly) return `☀️ Открытие: Сегодня в ${openTime}`;
+                if (isTomorrowLate) return `☀️ Открытие: Завтра в ${openTime}`;
+                return `☀️ Открытие: в ${openTime}`;
             } else if (lang === 'ar') {
-                if (daysAhead === 0) return `☀️ الافتتاح: اليوم الساعة ${openTime}`;
-                if (daysAhead === 1) return `☀️ الافتتاح: غداً الساعة ${openTime}`;
-                return `☀️ الافتتاح: ${arDayNames[dayIdx]} الساعة ${openTime}`;
+                if (isTodayEarly) return `☀️ الافتتاح: اليوم الساعة ${openTime} صباحاً`;
+                if (isTomorrowLate) return `☀️ الافتتاح: غداً الساعة ${openTime} صباحاً`;
+                return `☀️ الافتتاح: الساعة ${openTime} صباحاً`;
             } else if (lang === 'es') {
-                if (daysAhead === 0) return `☀️ Apertura: Hoy a las ${openTime}`;
-                if (daysAhead === 1) return `☀️ Apertura: Mañana a las ${openTime}`;
-                return `☀️ Apertura: ${esDayNames[dayIdx]} a las ${openTime}`;
+                if (isTodayEarly) return `☀️ Apertura: Hoy a las ${openTime}`;
+                if (isTomorrowLate) return `☀️ Apertura: Mañana a las ${openTime}`;
+                return `☀️ Apertura: a las ${openTime}`;
             } else {
                 // Turkish default
-                if (daysAhead === 0) return `☀️ Açılış: Bugün Saat ${openTime}`;
-                if (daysAhead === 1) return `☀️ Açılış: Yarın Saat ${openTime}`;
-                return `☀️ Açılış: ${trDayNames[dayIdx]} Saat ${openTime}`;
+                if (isTodayEarly) return `☀️ Açılış: Bugün Sabah ${openTime}`;
+                if (isTomorrowLate) return `☀️ Açılış: Yarın Sabah ${openTime}`;
+                return `☀️ Açılış: Sabah ${openTime}`;
             }
         }
 
@@ -2372,17 +2245,9 @@
                 });
             }
 
-            // 2. Randomized Quadrilingual (EN, ES, RU, AR) Turkey & Istanbul Cultural Facts
-            // Shuffle facts array so order is random, but keep all language slides of each fact together
+            // 2. Curated 30 Quadrilingual (EN, ES, RU, AR) Turkey & Istanbul Cultural Facts + Custom User Entries
             if (liveFacts.length > 0) {
-                // Fisher-Yates shuffle on facts list
-                const shuffledFacts = [...liveFacts];
-                for (let i = shuffledFacts.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffledFacts[i], shuffledFacts[j]] = [shuffledFacts[j], shuffledFacts[i]];
-                }
-
-                shuffledFacts.forEach(f => {
+                liveFacts.forEach(f => {
                     const icon = f.icon || '🏛️';
                     const customColor = f.color || '#0F172A';
 
@@ -2490,19 +2355,8 @@
         async function fetchProducts() {
             try {
                 const res = await fetch('/api/tv/products');
-                if (res.ok) {
-                    webProducts = await res.json();
-                    try { localStorage.setItem('firinna_cached_products', JSON.stringify(webProducts)); } catch(e) {}
-                }
-            } catch(e) {
-                // Offline fallback: Load from localStorage
-                try {
-                    const cached = localStorage.getItem('firinna_cached_products');
-                    if (cached) webProducts = JSON.parse(cached);
-                } catch(err) {}
-            }
-
-            if (webProducts && webProducts.length > 0) {
+                webProducts = await res.json();
+                
                 let html = "";
                 webProducts.forEach((p, idx) => {
                     let imgUrl = (p.image_url && p.image_url.trim() !== "") ? p.image_url : null;
@@ -2518,9 +2372,8 @@
                         </div>
                     `;
                 });
-                const pCar = document.getElementById('product-carousel');
-                if (pCar) pCar.innerHTML = html;
-            }
+                document.getElementById('product-carousel').innerHTML = html;
+            } catch(e) {}
         }
 
         function getStableDeviceFingerprint() {
@@ -2566,13 +2419,10 @@
                 }).catch(e=>{});
 
                 const res = await fetch('/api/tv/settings?_t=' + Date.now());
-                if (!res.ok) throw new Error('Settings HTTP ' + res.status);
+                if (!res.ok) return;
                 const text = await res.text();
-                if (!text || text.trim().startsWith('<')) throw new Error('Invalid JSON response');
+                if (!text || text.trim().startsWith('<')) return;
                 const data = JSON.parse(text);
-
-                // Save to localStorage for instant offline recovery
-                try { localStorage.setItem('firinna_cached_settings', text); } catch(e) {}
 
                 // Check for instant push signal (from admin panel)
                 if (data.last_push && data.last_push.timestamp) {
@@ -2605,20 +2455,7 @@
                     lastSettingsStr = dataStr;
                     applySettings(data);
                 }
-            } catch (e) { 
-                console.log("[OFFLINE/RECOVERY] Settings fetch error:", e);
-                // Fallback: If memory has no settings yet, apply from localStorage
-                if (!lastSettingsStr) {
-                    try {
-                        const cached = localStorage.getItem('firinna_cached_settings');
-                        if (cached) {
-                            const data = JSON.parse(cached);
-                            lastSettingsStr = cached;
-                            applySettings(data);
-                        }
-                    } catch(err) {}
-                }
-            }
+            } catch (e) { console.log("Settings fetch error:", e); }
         }
 
         function applySettings(data) {
@@ -2726,22 +2563,13 @@
             tvLog(`[APP BOOT] Firinna TV Player starting... Client: ${myClientId}`);
             flushTvLogsToServer(true);
 
-            // 1. First try loading cached offline settings & products immediately
-            try {
-                const cachedSet = localStorage.getItem('firinna_cached_settings');
-                if (cachedSet) applySettings(JSON.parse(cachedSet));
-            } catch(e) {}
+            await fetchProducts();
+            await fetchSettings();
+            await syncAllPlaylistVideosInBackground();
 
-            // 2. Start playing local cached video immediately
             if (currentMediaSource === 'local') {
                 playLocalVideo(0);
             }
-
-            // 3. Connect to server in background to sync newest data
-            fetchProducts().catch(e=>{});
-            fetchSettings().then(() => {
-                syncAllPlaylistVideosInBackground().catch(e=>{});
-            }).catch(e=>{});
         }
 
         initAppOnStartup();
