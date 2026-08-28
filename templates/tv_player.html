@@ -855,6 +855,62 @@
         var isPlayingFallback = false;
         var currentlyPlayingSrc = "";
 
+        
+        // ==========================================
+        // INDEXEDDB PERSISTENT STORAGE FOR HTTP
+        // ==========================================
+        const IDB_NAME = 'firinna_media_store';
+        const IDB_VERSION = 1;
+        let dbPromise = null;
+
+        function initIDB() {
+            if (!dbPromise) {
+                dbPromise = new Promise((resolve, reject) => {
+                    const request = indexedDB.open(IDB_NAME, IDB_VERSION);
+                    request.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('videos')) {
+                            db.createObjectStore('videos');
+                        }
+                    };
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+            return dbPromise;
+        }
+
+        async function saveToIDB(url, blob) {
+            try {
+                const db = await initIDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('videos', 'readwrite');
+                    const store = tx.objectStore('videos');
+                    store.put(blob, url);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => reject(tx.error);
+                });
+            } catch(e) {
+                console.error("IDB Save Error:", e);
+                return false;
+            }
+        }
+
+        async function loadFromIDB(url) {
+            try {
+                const db = await initIDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('videos', 'readonly');
+                    const store = tx.objectStore('videos');
+                    const request = store.get(url);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            } catch(e) {
+                return null;
+            }
+        }
+
         async function getPersistentMediaCache() {
             if ('caches' in window) {
                 try { return await caches.open(TV_CACHE_NAME); } catch(e){}
@@ -865,6 +921,17 @@
         async function checkAndLoadPersistentVideo(videoUrl) {
             if (!videoUrl) return null;
             if (bufferedVideoBlobs[videoUrl]) return bufferedVideoBlobs[videoUrl];
+            
+            // Try IndexedDB first (Works on HTTP)
+            const idbBlob = await loadFromIDB(videoUrl);
+            if (idbBlob) {
+                if (bufferedVideoBlobs[videoUrl]) URL.revokeObjectURL(bufferedVideoBlobs[videoUrl]);
+                const blobUrl = URL.createObjectURL(idbBlob);
+                bufferedVideoBlobs[videoUrl] = blobUrl;
+                return blobUrl;
+            }
+
+            // Fallback to Cache API if available (HTTPS only)
             const cache = await getPersistentMediaCache();
             if (!cache) return null;
             try {
@@ -872,22 +939,25 @@
                 if (match) {
                     const blob = await match.blob();
                     if (blob && blob.size > 1000) {
-                        // Revoke old blob URL if exists to prevent memory leaks
                         if (bufferedVideoBlobs[videoUrl]) URL.revokeObjectURL(bufferedVideoBlobs[videoUrl]);
                         const blobUrl = URL.createObjectURL(blob);
                         bufferedVideoBlobs[videoUrl] = blobUrl;
-                        const filename = videoUrl.split('/').pop();
-                        tvLog(`[CACHE STORAGE HIT] ${filename} (${(blob.size/(1024*1024)).toFixed(1)} MB) loaded from persistent disk cache!`);
                         return blobUrl;
                     }
                 }
-            } catch(err) {
-                tvLog(`[CACHE READ ERROR] ${videoUrl}:`, err);
-            }
+            } catch(e) {}
             return null;
         }
 
         async function saveVideoToPersistentCache(videoUrl, blob) {
+            // Save to IndexedDB (Works on HTTP)
+            const idbSuccess = await saveToIDB(videoUrl, blob);
+            if (idbSuccess) {
+                const filename = videoUrl.split('/').pop();
+                tvLog(`[CACHE IDB SAVED] ${filename} (${(blob.size/(1024*1024)).toFixed(1)} MB) saved to IndexedDB disk storage!`);
+            }
+
+            // Fallback to Cache API if available
             const cache = await getPersistentMediaCache();
             if (!cache || !blob) return;
             try {
@@ -948,66 +1018,90 @@
 
             isDownloadingVideo = true;
             currentlyDownloadingUrl = targetUrl;
-
-            tvLog(`[DOWNLOAD START] Fetching ${filename} to local storage`);
+            tvLog(`[DOWNLOAD START] Starting non-interruptible background download: ${filename}`);
             flushTvLogsToServer(true);
 
-            try {
-                const response = await fetch(targetUrl);
-                if (!response.ok) throw new Error("HTTP error " + response.status);
+            const xhr = new XMLHttpRequest();
+            activeVideoXhr = xhr;
+            xhr.open('GET', targetUrl, true);
+            xhr.responseType = 'blob';
 
-                let blobUrl;
-                const cache = await getPersistentMediaCache();
-                if (cache) {
-                    await cache.put(targetUrl, response);
-                    const match = await cache.match(targetUrl);
-                    if (!match) throw new Error("Cache match failed");
-                    const blob = await match.blob();
-                    if (bufferedVideoBlobs[targetUrl]) URL.revokeObjectURL(bufferedVideoBlobs[targetUrl]);
-                    blobUrl = URL.createObjectURL(blob);
-                } else {
-                    tvLog(`[CACHE WARNING] Cache API unavailable (HTTP). Buffering ${filename} entirely to memory...`);
-                    const blob = await response.blob();
-                    if (bufferedVideoBlobs[targetUrl]) URL.revokeObjectURL(bufferedVideoBlobs[targetUrl]);
-                    blobUrl = URL.createObjectURL(blob);
+            let lastLoggedPct = -1;
+            xhr.onprogress = function(e) {
+                if (e.lengthComputable && e.total > 0) {
+                    const pct = Math.min(99, Math.round((e.loaded / e.total) * 100));
+                    if (badge) {
+                        badge.style.display = 'block';
+                        badge.textContent = `🎬 ${filename} %${pct}`;
+                    }
+                    if (pct % 25 === 0 && pct !== lastLoggedPct) {
+                        lastLoggedPct = pct;
+                        tvLog(`[DOWNLOAD PROGRESS] ${filename}: %${pct} (${(e.loaded/(1024*1024)).toFixed(1)}MB / ${(e.total/(1024*1024)).toFixed(1)}MB)`);
+                    }
                 }
-                
-                bufferedVideoBlobs[targetUrl] = blobUrl;
-                failedVideoRegistry.delete(targetUrl);
+            };
 
-                tvLog(`[DOWNLOAD FINISHED] ${filename} ready!`);
-                flushTvLogsToServer(true);
-
-                if (badge) {
-                    badge.textContent = `🎬 ${filename} %100`;
-                    setTimeout(() => {
-                        if (!isDownloadingVideo && badge) badge.style.display = 'none';
-                    }, 1500);
-                }
-
-                // Seamlessly switch if needed
-                let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
-                let curTarget = activeList[currentLocalVideoIndex % activeList.length] || '';
-                if (!curTarget.startsWith("/static/")) curTarget = "/static/tv_media/videos/" + curTarget;
-                
-                if (curTarget === targetUrl || isPlayingFallback) {
-                    tvLog(`[AUTO SWITCH] Seamlessly switching to newly ready video: ${filename}`);
-                    isPlayingFallback = false;
-                    playBlobDirectly(blobUrl, targetUrl);
-                }
-                
-                setTimeout(processBackgroundDownloadQueue, 500);
-            } catch (err) {
-                registerFailedVideo(targetUrl);
-                tvLog(`[DOWNLOAD ERROR] Error caching ${filename}: ${err.message}`);
-                if (badge) badge.style.display = 'none';
-                flushTvLogsToServer(true);
-                setTimeout(processBackgroundDownloadQueue, 3000);
-            } finally {
+            xhr.onload = async function() {
                 isDownloadingVideo = false;
                 currentlyDownloadingUrl = null;
-            }
+                activeVideoXhr = null;
+
+                if (xhr.status === 200) {
+                    const blob = xhr.response;
+                    // Revoke old blob URL if exists to prevent memory leaks
+                    if (bufferedVideoBlobs[targetUrl]) URL.revokeObjectURL(bufferedVideoBlobs[targetUrl]);
+                    const blobUrl = URL.createObjectURL(blob);
+                    bufferedVideoBlobs[targetUrl] = blobUrl;
+                    failedVideoRegistry.delete(targetUrl);
+
+                    // Persist to disk cache so it never needs downloading again
+                    await saveVideoToPersistentCache(targetUrl, blob);
+
+                    tvLog(`[DOWNLOAD FINISHED] ${filename} (%100) saved to persistent disk cache!`);
+                    flushTvLogsToServer(true);
+
+                    if (badge) {
+                        badge.textContent = `🎬 ${filename} %100`;
+                        setTimeout(() => {
+                            if (!isDownloadingVideo && badge) badge.style.display = 'none';
+                        }, 1500);
+                    }
+
+                    // If currently on fallback (or waiting for this video), seamlessly switch!
+                    let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+                    let curTarget = activeList[currentLocalVideoIndex % activeList.length] || '';
+                    if (!curTarget.startsWith("/static/")) curTarget = "/static/tv_media/videos/" + curTarget;
+                    
+                    if (curTarget === targetUrl || isPlayingFallback) {
+                        tvLog(`[AUTO SWITCH] Seamlessly switching to newly ready video: ${filename}`);
+                        isPlayingFallback = false;
+                        playBlobDirectly(blobUrl, targetUrl);
+                    }
+                } else {
+                    tvLog(`[DOWNLOAD HTTP ERROR] ${filename} returned HTTP ${xhr.status}`);
+                    registerFailedVideo(targetUrl);
+                    if (badge) badge.style.display = 'none';
+                }
+
+                // Process next in queue
+                setTimeout(processBackgroundDownloadQueue, 500);
+            };
+
+            xhr.onerror = function(e) {
+                isDownloadingVideo = false;
+                currentlyDownloadingUrl = null;
+                activeVideoXhr = null;
+                registerFailedVideo(targetUrl);
+                tvLog(`[DOWNLOAD NETWORK ERROR] Network failure downloading ${filename}`);
+                if (badge) badge.style.display = 'none';
+                flushTvLogsToServer(true);
+                // Retry next after 3 seconds
+                setTimeout(processBackgroundDownloadQueue, 3000);
+            };
+
+            xhr.send();
         }
+
         async function syncAllPlaylistVideosInBackground() {
             let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
             tvLog(`[SYNC] Checking disk cache for playlist: ${activeList.map(v => v.split('/').pop()).join(', ')}`);

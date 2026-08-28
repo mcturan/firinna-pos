@@ -43,9 +43,10 @@
     "google_review_url": "https://g.page/r/CYCTLUWSsIhDEBM/review",
     "group_event_text": "Normal saatler harici grup rezervasyonu ve özel mini organizasyonlar için doğrudan WhatsApp'tan iletişime geçebilirsiniz.",
     "instagram": "https://instagram.com/firinnacafe",
-    "manual_status": "auto",
+    "manual_status": "open",
     "phone": "905456301214",
     "tripadvisor_review_url": "",
     "work_hours": "11:00 - 19:15",
-    "yandex_review_url": "https://yandex.com.tr/maps/org/firinna/37863615675/reviews/?add-review=true"
+    "yandex_review_url": "https://yandex.com.tr/maps/org/firinna/37863615675/reviews/?add-review=true",
+    "manual_status_time": 1787903353.712305
 }
