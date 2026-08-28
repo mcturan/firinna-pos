@@ -198,7 +198,7 @@
                         <span style="font-size: 2rem; display: block; margin-bottom: 8px;">📂</span>
                         <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Klasör Olarak Yükle (Tüm Albüm)</strong>
                         <small style="color: #64748b; display: block; margin-bottom: 12px;">Alt klasörleriyle birlikte tüm albümleri tek tıkla yükler</small>
-                        <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(this.files)">
+                        <input type="file" id="folderInput" webkitdirectory="" directory="" multiple="" style="display: none;">
                         <button type="button" class="btn-action btn-green" onclick="document.getElementById('folderInput').click()">
                             📁 Bilgisayardan Klasör Seç...
                         </button>
@@ -208,7 +208,7 @@
                         <span style="font-size: 2rem; display: block; margin-bottom: 8px;">🎵</span>
                         <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Tekli / Çoklu Dosya Yükle</strong>
                         <small style="color: #64748b; display: block; margin-bottom: 12px;">Seçilen hedef klasörün içine yeni parçalar ekler</small>
-                        <input type="file" id="filesInput" multiple accept="audio/*" style="display: none;" onchange="handleFolderSelect(this.files)">
+                        <input type="file" id="filesInput" multiple="" accept=".mp3,.m4a,.aac,.flac,.wav,.ogg,audio/*" style="display: none;">
                         <button type="button" class="btn-action btn-blue" onclick="document.getElementById('filesInput').click()">
                             🎶 Dosyaları Seç...
                         </button>
@@ -1025,6 +1025,24 @@
 
             loadLibrary();
         }
+
+        // Attach direct input event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const fInp = document.getElementById('folderInput');
+            const filesInp = document.getElementById('filesInput');
+            if (fInp) {
+                fInp.addEventListener('change', function(e) {
+                    console.log("[FOLDER UPLOAD] Selected files count:", this.files ? this.files.length : 0);
+                    handleFolderSelect(this.files);
+                });
+            }
+            if (filesInp) {
+                filesInp.addEventListener('change', function(e) {
+                    console.log("[FILES UPLOAD] Selected files count:", this.files ? this.files.length : 0);
+                    handleFolderSelect(this.files);
+                });
+            }
+        });
 
         webAud.onended = () => {
             radioControl('next');
