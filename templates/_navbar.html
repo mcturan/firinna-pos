@@ -63,11 +63,160 @@
                 <a href="/backup"   {% if request.path == '/backup'   %}class="active"{% endif %}>Yedek</a>
                 <a href="/settings" {% if request.path == '/settings' %}class="active"{% endif %}>Ayarlar</a>
                 <hr>
+                <a href="/radio"    {% if request.path == '/radio'    %}class="active"{% endif %}>📻 Radyo & Müzik</a>
                 <a href="/tv-admin" {% if request.path == '/tv-admin' %}class="active"{% endif %}>Dijital Tabela (TV)</a>
             </div>
         </div>
     </div>
 </nav>
+
+<!-- Fırınna POS Global Mini Radyo / Müzik Kontrol Çubuğu -->
+<div id="globalNavRadioBar" style="background:#0f172a; border-bottom:1px solid #334155; color:white; padding:0.35rem 1.25rem; display:flex; align-items:center; justify-content:space-between; font-size:0.84rem; flex-wrap:wrap; gap:0.5rem; z-index:100; position:relative;">
+    <div style="display:flex; align-items:center; gap:0.6rem; min-width:200px;">
+        <span style="font-size:1.1rem;" id="navRadioIcon">📻</span>
+        <a href="/radio" style="color:#f8fafc; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:6px;" title="Radyo & Müzik Yönetimini Aç">
+            <span id="navRadioTitle" style="max-width:260px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Power FM</span>
+            <span id="navRadioModeBadge" style="background:#334155; color:#94a3b8; font-size:0.7rem; padding:1px 6px; border-radius:4px;">🔁 Sıralı</span>
+        </a>
+    </div>
+
+    <!-- Oynatma Kontrolleri -->
+    <div style="display:flex; align-items:center; gap:0.4rem;">
+        <button onclick="navRadioControl('prev')" style="background:transparent; border:none; color:#cbd5e1; cursor:pointer; font-size:0.9rem; padding:2px 6px;" title="Önceki">⏮</button>
+        <button onclick="navRadioTogglePlay()" id="navRadioPlayBtn" style="background:#2d6a4f; color:white; border:none; border-radius:6px; padding:3px 10px; font-size:0.8rem; font-weight:700; cursor:pointer;">▶ Çal</button>
+        <button onclick="navRadioControl('next')" style="background:transparent; border:none; color:#cbd5e1; cursor:pointer; font-size:0.9rem; padding:2px 6px;" title="Sonraki">⏭</button>
+    </div>
+
+    <!-- Web Ses ve TV Senkron Kontrolü -->
+    <div style="display:flex; align-items:center; gap:0.8rem;">
+        <div style="display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.08); padding:2px 8px; border-radius:12px;">
+            <button onclick="navToggleWebMute()" id="navWebMuteBtn" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:0.95rem; padding:0;" title="Web Sesini Aç/Kapa">🔇</button>
+            <input type="range" id="navWebVolSlider" min="0" max="100" value="0" oninput="navSetWebVolume(this.value)" style="width:55px; height:4px; cursor:pointer;">
+            <span id="navWebVolLabel" style="font-size:0.72rem; color:#94a3b8; width:25px;">%0</span>
+        </div>
+        <a href="/radio" style="color:#38bdf8; text-decoration:none; font-weight:700; font-size:0.78rem; display:flex; align-items:center; gap:3px;">
+            Yönetim ⚙️
+        </a>
+    </div>
+</div>
+
+<audio id="globalNavbarAudio" preload="none"></audio>
+
+<script>
+(function initGlobalRadioNavbar() {
+    var navAud = document.getElementById('globalNavbarAudio');
+    var navVol = localStorage.getItem('firinna_web_volume') !== null ? parseInt(localStorage.getItem('firinna_web_volume')) : 0;
+    var navMuted = localStorage.getItem('firinna_web_muted') === 'true' || navVol === 0;
+
+    function applyNavVol() {
+        if (!navAud) return;
+        var slider = document.getElementById('navWebVolSlider');
+        var label = document.getElementById('navWebVolLabel');
+        var btn = document.getElementById('navWebMuteBtn');
+        if (navMuted || navVol === 0) {
+            navAud.volume = 0;
+            if (slider) slider.value = 0;
+            if (label) label.textContent = '%0';
+            if (btn) btn.textContent = '🔇';
+        } else {
+            navAud.volume = navVol / 100;
+            if (slider) slider.value = navVol;
+            if (label) label.textContent = '%' + navVol;
+            if (btn) btn.textContent = '🔊';
+        }
+    }
+
+    window.navSetWebVolume = function(val) {
+        navVol = parseInt(val);
+        localStorage.setItem('firinna_web_volume', navVol);
+        navMuted = (navVol === 0);
+        localStorage.setItem('firinna_web_muted', navMuted ? 'true' : 'false');
+        applyNavVol();
+    };
+
+    window.navToggleWebMute = function() {
+        if (navMuted) {
+            navMuted = false;
+            navVol = (navVol === 0 ? 50 : navVol);
+        } else {
+            navMuted = true;
+        }
+        localStorage.setItem('firinna_web_muted', navMuted ? 'true' : 'false');
+        localStorage.setItem('firinna_web_volume', navVol);
+        applyNavVol();
+    };
+
+    var currentRadioState = {};
+
+    window.syncNavRadio = async function() {
+        try {
+            var r = await fetch('/api/radio/status');
+            var st = await r.json();
+            currentRadioState = st;
+            
+            var titleEl = document.getElementById('navRadioTitle');
+            var btnEl = document.getElementById('navRadioPlayBtn');
+            var badgeEl = document.getElementById('navRadioModeBadge');
+            
+            if (titleEl) titleEl.textContent = st.current_title || 'Hazır';
+            if (btnEl) {
+                if (st.is_playing) {
+                    btnEl.textContent = '⏸ Durdur';
+                    btnEl.style.background = '#2563eb';
+                } else {
+                    btnEl.textContent = '▶ Çal';
+                    btnEl.style.background = '#2d6a4f';
+                }
+            }
+            if (badgeEl) {
+                badgeEl.textContent = st.mode === 'shuffle' ? '🔀 Karışık' : '🔁 Sıralı';
+            }
+
+            // Sync Web Audio Element (only if not on /radio page, which has its own player)
+            if (window.location.pathname !== '/radio') {
+                if (st.is_playing && st.current_url) {
+                    if (navAud.src !== st.current_url && !navAud.src.endsWith(st.current_url)) {
+                        navAud.src = st.current_url;
+                        navAud.load();
+                    }
+                    if (navAud.paused) {
+                        navAud.play().catch(function(e){});
+                    }
+                } else {
+                    if (!navAud.paused) navAud.pause();
+                }
+            }
+        } catch(e){}
+    };
+
+    window.navRadioTogglePlay = function() {
+        var act = currentRadioState.is_playing ? 'pause' : 'play';
+        fetch('/api/radio/control', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({action: act})
+        }).then(function(){ syncNavRadio(); });
+    };
+
+    window.navRadioControl = function(act) {
+        fetch('/api/radio/control', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({action: act})
+        }).then(function(){ syncNavRadio(); });
+    };
+
+    if (navAud) {
+        navAud.onended = function() {
+            window.navRadioControl('next');
+        };
+    }
+
+    applyNavVol();
+    syncNavRadio();
+    setInterval(syncNavRadio, 5000);
+})();
+</script>
 
 <div class="alert-panel" id="alertPanel">
     <div class="alert-panel-header">

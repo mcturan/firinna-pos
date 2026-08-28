@@ -2755,27 +2755,59 @@
             window.location.reload(true);
         }, AUTO_RELOAD_MS); 
 
-        document.body.addEventListener('click', () => {
-            if(currentMediaSource === 'local') {
-                if(localVideoList.length > 0) {
-                    vidEl.muted = true;
-                    vidEl.play().catch(e=>{});
+        // ==========================================
+        // 📻 MERKEZİ RADYO & MÜZİK ÇALAR TV SENKRONİZASYONU
+        // ==========================================
+        let currentRadioState = null;
+
+        async function syncTvRadioStream() {
+            try {
+                const res = await fetch('/api/radio/status');
+                const state = await res.json();
+                currentRadioState = state;
+
+                const audEl = document.getElementById('local-audio');
+                const recordPlayer = document.getElementById('record-player');
+
+                if (state.is_playing && state.tv_audio_enabled !== false && state.current_url) {
+                    // Update audio element source if changed
+                    if (audEl.src !== state.current_url && !audEl.src.endsWith(state.current_url)) {
+                        audEl.src = state.current_url;
+                        audEl.load();
+                    }
+                    if (audEl.paused) {
+                        audEl.play().catch(e => console.log("TV audio autoplay waiting for user gesture / ready:", e));
+                    }
+                    if (recordPlayer) {
+                        recordPlayer.style.display = 'block';
+                        recordPlayer.classList.add('spinning');
+                    }
+                } else {
+                    // Paused or TV audio disabled
+                    if (!audEl.paused) {
+                        audEl.pause();
+                    }
+                    if (recordPlayer) {
+                        recordPlayer.style.display = 'none';
+                        recordPlayer.classList.remove('spinning');
+                    }
                 }
-                if(currentAudioPriority === 'music' && localAudioList.length > 0) audEl.play().catch(e=>{});
-            } else if (currentMediaSource === 'youtube') {
-                if(player && player.playVideo) player.playVideo();
-                if (currentAudioPriority === 'video' && player && player.unMute) player.unMute();
+            } catch (e) {
+                // Ignore network glitch
             }
-        });
-        document.body.addEventListener('touchstart', () => {
-            if(currentMediaSource === 'local') {
-                if(localVideoList.length > 0) {
-                    vidEl.muted = true;
-                    vidEl.play().catch(e=>{});
-                }
-                if(currentAudioPriority === 'music' && localAudioList.length > 0) audEl.play().catch(e=>{});
-            }
-        }, {passive: true});
+        }
+
+        audEl.onended = () => {
+            // Tell server to advance next track in central queue
+            fetch('/api/radio/control', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'next' })
+            }).then(() => syncTvRadioStream()).catch(e=>{});
+        };
+
+        syncTvRadioStream();
+        setInterval(syncTvRadioStream, 4000);
     </script>
 </body>
 </html>

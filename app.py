@@ -4356,6 +4356,430 @@ def tv_player():
 def tv_redirect():
     return render_template('tv_player.html', settings=get_tv_settings())
 
+# ==============================================================================
+# 📻 RADYO & MERKEZİ MÜZİK ÇALAR SİSTEMİ (WEB & TV SENKRON)
+# ==============================================================================
+MUSIC_LIBRARY_DIR = '/home/turan/firinna_music_library'
+RADIO_DATA_FILE = os.path.join(os.path.dirname(__file__), 'radio_settings.json')
+os.makedirs(MUSIC_LIBRARY_DIR, exist_ok=True)
+
+_radio_lock = threading.Lock()
+
+DEFAULT_RADIO_STATIONS = [
+    # 🇹🇷 Türkiye
+    {"id": "tr_powerfm", "name": "Power FM", "country": "TR", "country_name": "Türkiye", "genre": "Pop / Hit", "url": "https://listen.powerapp.com.tr/powerfm/mpeg/icecast.audio", "logo": "🇹🇷"},
+    {"id": "tr_kralpop", "name": "Kral Pop", "country": "TR", "country_name": "Türkiye", "genre": "Türkçe Pop", "url": "https://kralpopwmp.radyotvonline.net/", "logo": "🇹🇷"},
+    {"id": "tr_slowturk", "name": "Slow Türk", "country": "TR", "country_name": "Türkiye", "genre": "Türkçe Slow", "url": "https://radyo.duhnet.tv/slowturk", "logo": "🇹🇷"},
+    {"id": "tr_joyfm", "name": "Joy FM", "country": "TR", "country_name": "Türkiye", "genre": "Yabancı Slow / Easy", "url": "https://listen.powerapp.com.tr/joyfm/mpeg/icecast.audio", "logo": "🇹🇷"},
+    {"id": "tr_voyage", "name": "Radyo Voyage", "country": "TR", "country_name": "Türkiye", "genre": "Ambient / Chillout / World", "url": "https://voyagewmp.radyotvonline.net/", "logo": "🇹🇷"},
+    {"id": "tr_joyturk_akustik", "name": "JoyTürk Akustik", "country": "TR", "country_name": "Türkiye", "genre": "Türkçe Akustik", "url": "https://listen.powerapp.com.tr/joyturkakustik/mpeg/icecast.audio", "logo": "🇹🇷"},
+    {"id": "tr_palnostalji", "name": "Pal Nostalji", "country": "TR", "country_name": "Türkiye", "genre": "Türkçe 70-80-90'lar", "url": "https://shoutcast.radyogrubu.com/palnostalji/stream", "logo": "🇹🇷"},
+    {"id": "tr_virgin", "name": "Virgin Radio TR", "country": "TR", "country_name": "Türkiye", "genre": "Hit / RnB", "url": "https://listen.powerapp.com.tr/virginradioturkiye/mpeg/icecast.audio", "logo": "🇹🇷"},
+    {"id": "tr_powerturk", "name": "Power Türk", "country": "TR", "country_name": "Türkiye", "genre": "Türkçe Pop", "url": "https://listen.powerapp.com.tr/powerturk/mpeg/icecast.audio", "logo": "🇹🇷"},
+    {"id": "tr_trtfm", "name": "TRT FM", "country": "TR", "country_name": "Türkiye", "genre": "Karma / Klasik", "url": "https://rad-trt.live.ercdn.net/trtfm/playlist.m3u8", "logo": "🇹🇷"},
+
+    # 🇺🇦 Ukrayna
+    {"id": "ua_hitfm", "name": "Hit FM Ukraine", "country": "UA", "country_name": "Ukrayna", "genre": "Pop / Dance", "url": "https://online.hitfm.ua/HitFM_HD", "logo": "🇺🇦"},
+    {"id": "ua_roks", "name": "Radio ROKS", "country": "UA", "country_name": "Ukrayna", "genre": "Classic Rock", "url": "https://online.radioroks.ua/RadioROKS_HD", "logo": "🇺🇦"},
+    {"id": "ua_relax", "name": "Radio Relax Ukraine", "country": "UA", "country_name": "Ukrayna", "genre": "Lounge / Relax", "url": "https://online.radiorelax.ua/RadioRelax_HD", "logo": "🇺🇦"},
+    {"id": "ua_kissfm", "name": "Kiss FM Ukraine", "country": "UA", "country_name": "Ukrayna", "genre": "EDM / Dance", "url": "https://online.kissfm.ua/KissFM_HD", "logo": "🇺🇦"},
+    {"id": "ua_loungefm", "name": "Lounge FM Kyiv", "country": "UA", "country_name": "Ukrayna", "genre": "Chillout / Deep Lounge", "url": "https://cast.radiogroup.com.ua/loungefm", "logo": "🇺🇦"},
+
+    # 🇪🇺 Avrupa
+    {"id": "eu_swissjazz", "name": "Radio Swiss Jazz", "country": "EU", "country_name": "İsviçre / Avrupa", "genre": "Jazz / Soul / Blues", "url": "https://stream.srg-ssr.ch/m/rsj/mp3_128", "logo": "🇨🇭"},
+    {"id": "eu_swissclassic", "name": "Radio Swiss Classic", "country": "EU", "country_name": "İsviçre / Avrupa", "genre": "Classical Music", "url": "https://stream.srg-ssr.ch/m/rsc_de/mp3_128", "logo": "🇨🇭"},
+    {"id": "eu_ibiza", "name": "Ibiza Global Radio", "country": "EU", "country_name": "İspanya / Ibiza", "genre": "Deep House / Electronic", "url": "https://listenssl.ibizaglobalradio.com:8024/ibizaglobalradio.mp3", "logo": "🇪🇸"},
+    {"id": "eu_fip", "name": "FIP Radio Paris", "country": "EU", "country_name": "Fransa", "genre": "Eclectic / World / Jazz", "url": "https://icecast.radiofrance.fr/fip-midfi.mp3", "logo": "🇫🇷"},
+    {"id": "eu_nostalgie", "name": "Nostalgie France", "country": "EU", "country_name": "Fransa", "genre": "Oldies 60-70-80s", "url": "https://scdn.nrjaudio.fm/adwz1/fr/30601/mp3_128.mp3", "logo": "🇫🇷"},
+    {"id": "eu_paradise", "name": "Radio Paradise (Main Mix)", "country": "EU", "country_name": "Global / US", "genre": "Acoustic / Rock / World", "url": "https://stream.radioparadise.com/mp3-128", "logo": "🌴"},
+    {"id": "eu_paradise_mellow", "name": "Radio Paradise (Mellow Mix)", "country": "EU", "country_name": "Global / US", "genre": "Mellow / Chillout", "url": "https://stream.radioparadise.com/mellow-128", "logo": "🌿"},
+
+    # 🇺🇸 ABD
+    {"id": "us_somafm_groove", "name": "SomaFM: Groove Salad", "country": "US", "country_name": "ABD", "genre": "Downtempo / Ambient", "url": "https://ice1.somafm.com/groovesalad-128-mp3", "logo": "🇺🇸"},
+    {"id": "us_somafm_secret", "name": "SomaFM: Secret Agent", "country": "US", "country_name": "ABD", "genre": "Spy / Lounge / Surf", "url": "https://ice1.somafm.com/secretagent-128-mp3", "logo": "🇺🇸"},
+    {"id": "us_181_chill", "name": "181.fm Chilled Out", "country": "US", "country_name": "ABD", "genre": "Lounge / Smooth Chill", "url": "https://listen.181fm.com/181-chilled_128k.mp3", "logo": "🇺🇸"},
+    {"id": "us_181_acoustic", "name": "181.fm The Breeze (Acoustic)", "country": "US", "country_name": "ABD", "genre": "Acoustic Soft Rock", "url": "https://listen.181fm.com/181-breeze_128k.mp3", "logo": "🇺🇸"},
+    {"id": "us_kexp", "name": "KEXP 90.3 FM Seattle", "country": "US", "country_name": "ABD", "genre": "Indie / Alternative", "url": "https://kexp.streamguys1.com/kexp128.mp3", "logo": "🇺🇸"},
+
+    # 🌍 Afrika
+    {"id": "af_afrobeat", "name": "Afrobeat Radio", "country": "AF", "country_name": "Afrika / Global", "genre": "Afrobeats / African Pop", "url": "https://streams.radiomast.io/afrobeat-radio", "logo": "🌍"},
+    {"id": "af_capitalfm", "name": "Capital FM Kenya", "country": "AF", "country_name": "Kenya", "genre": "Hit / Urban Africa", "url": "https://icecast2.capitalfm.co.ke/capitalfm", "logo": "🇰🇪"},
+    {"id": "af_kayafm", "name": "Kaya 95.9 FM South Africa", "country": "AF", "country_name": "Güney Afrika", "genre": "Soul / Jazz / R&B", "url": "https://edge.iono.fm/xice/kayafm_live.mp3", "logo": "🇿🇦"}
+]
+
+def load_radio_data():
+    with _radio_lock:
+        if os.path.exists(RADIO_DATA_FILE):
+            try:
+                with open(RADIO_DATA_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    if 'stations' not in data or not data['stations']:
+                        data['stations'] = DEFAULT_RADIO_STATIONS
+                    if 'custom_stations' not in data:
+                        data['custom_stations'] = []
+                    if 'playlists' not in data:
+                        data['playlists'] = []
+                    if 'state' not in data:
+                        data['state'] = {
+                            "is_playing": False,
+                            "mode": "sequential", # "sequential" or "shuffle"
+                            "source_type": "station", # "station", "playlist", "folder"
+                            "current_title": "Hazır",
+                            "current_url": "",
+                            "current_item_id": "",
+                            "queue": [],
+                            "queue_index": 0,
+                            "tv_audio_enabled": True,
+                            "updated_at": int(time.time())
+                        }
+                    return data
+            except Exception:
+                pass
+        # Default fresh state
+        return {
+            "stations": DEFAULT_RADIO_STATIONS,
+            "custom_stations": [],
+            "playlists": [],
+            "state": {
+                "is_playing": False,
+                "mode": "sequential",
+                "source_type": "station",
+                "current_title": "Power FM",
+                "current_url": "https://listen.powerapp.com.tr/powerfm/mpeg/icecast.audio",
+                "current_item_id": "tr_powerfm",
+                "queue": [],
+                "queue_index": 0,
+                "tv_audio_enabled": True,
+                "updated_at": int(time.time())
+            }
+        }
+
+def save_radio_data(data):
+    with _radio_lock:
+        dir_name = os.path.dirname(RADIO_DATA_FILE) or '.'
+        with tempfile.NamedTemporaryFile('w', dir=dir_name, delete=False, encoding='utf-8') as tf:
+            json.dump(data, tf, ensure_ascii=False, indent=2)
+            temp_name = tf.name
+        os.replace(temp_name, RADIO_DATA_FILE)
+
+AUDIO_EXTENSIONS = ('.mp3', '.m4a', '.aac', '.flac', '.wav', '.ogg')
+
+def scan_music_library():
+    """Recursively scans /home/turan/firinna_music_library and groups files by directories"""
+    root_path = os.path.realpath(MUSIC_LIBRARY_DIR)
+    folders_dict = {}
+    all_tracks = []
+    
+    if not os.path.exists(root_path):
+        os.makedirs(root_path, exist_ok=True)
+        return {"folders": [], "all_tracks": [], "total_tracks": 0}
+
+    for root, dirs, files in os.walk(root_path):
+        dirs.sort()
+        rel_dir = os.path.relpath(root, root_path)
+        folder_display_name = "Ana Müzik Klasörü" if rel_dir == "." else rel_dir.replace(os.path.sep, " / ")
+        
+        folder_tracks = []
+        for file in sorted(files):
+            if file.lower().endswith(AUDIO_EXTENSIONS):
+                rel_file_path = os.path.relpath(os.path.join(root, file), root_path)
+                track_title = os.path.splitext(file)[0].replace('_', ' ')
+                track_info = {
+                    "filename": file,
+                    "rel_path": rel_file_path.replace('\\', '/'),
+                    "title": track_title,
+                    "folder": folder_display_name,
+                    "stream_url": f"/api/radio/stream/{urllib.parse.quote(rel_file_path.replace(os.path.sep, '/'))}"
+                }
+                folder_tracks.append(track_info)
+                all_tracks.append(track_info)
+
+        if folder_tracks:
+            folders_dict[rel_dir] = {
+                "folder_key": rel_dir.replace('\\', '/'),
+                "name": folder_display_name,
+                "count": len(folder_tracks),
+                "tracks": folder_tracks
+            }
+
+    folders_list = list(folders_dict.values())
+    return {
+        "folders": folders_list,
+        "all_tracks": all_tracks,
+        "total_tracks": len(all_tracks)
+    }
+
+@app.route('/radio')
+def radio_page():
+    return render_template('radio_admin.html')
+
+@app.route('/api/radio/status', methods=['GET'])
+def api_radio_status():
+    data = load_radio_data()
+    return jsonify(data.get('state', {}))
+
+@app.route('/api/radio/control', methods=['POST'])
+def api_radio_control():
+    req = request.json or {}
+    data = load_radio_data()
+    state = data.get('state', {})
+    
+    action = req.get('action') # 'play', 'pause', 'play_station', 'play_track', 'play_queue', 'next', 'prev', 'toggle_mode', 'toggle_tv_audio'
+    
+    if action == 'play':
+        state['is_playing'] = True
+    elif action == 'pause':
+        state['is_playing'] = False
+    elif action == 'toggle_mode':
+        current_mode = state.get('mode', 'sequential')
+        state['mode'] = 'shuffle' if current_mode == 'sequential' else 'sequential'
+    elif action == 'toggle_tv_audio':
+        state['tv_audio_enabled'] = not state.get('tv_audio_enabled', True)
+    elif action == 'play_station':
+        st_id = req.get('station_id')
+        all_st = data.get('stations', []) + data.get('custom_stations', [])
+        st = next((s for s in all_st if s.get('id') == st_id), None)
+        if st:
+            state['is_playing'] = True
+            state['source_type'] = 'station'
+            state['current_title'] = st.get('name')
+            state['current_url'] = st.get('url')
+            state['current_item_id'] = st.get('id')
+            state['queue'] = [st]
+            state['queue_index'] = 0
+    elif action == 'play_queue':
+        # items: list of tracks or stations, start_index: int
+        items = req.get('items', [])
+        start_idx = req.get('start_index', 0)
+        source_type = req.get('source_type', 'folder')
+        title_prefix = req.get('title_prefix', '')
+        
+        if items:
+            state['is_playing'] = True
+            state['source_type'] = source_type
+            state['queue'] = items
+            
+            mode = state.get('mode', 'sequential')
+            if mode == 'shuffle' and len(items) > 1:
+                import random
+                # keep chosen one first if specified
+                chosen = items[start_idx] if 0 <= start_idx < len(items) else items[0]
+                rest = [it for it in items if it != chosen]
+                random.shuffle(rest)
+                state['queue'] = [chosen] + rest
+                state['queue_index'] = 0
+            else:
+                state['queue_index'] = max(0, min(start_idx, len(items) - 1))
+                
+            cur = state['queue'][state['queue_index']]
+            state['current_title'] = cur.get('title') or cur.get('name') or "Müzik"
+            if title_prefix:
+                state['current_title'] = f"{title_prefix} - {state['current_title']}"
+            state['current_url'] = cur.get('stream_url') or cur.get('url') or ""
+            state['current_item_id'] = cur.get('rel_path') or cur.get('id') or ""
+    elif action == 'next':
+        queue = state.get('queue', [])
+        if queue:
+            idx = state.get('queue_index', 0)
+            mode = state.get('mode', 'sequential')
+            if mode == 'shuffle' and len(queue) > 1:
+                import random
+                next_idx = random.randint(0, len(queue) - 1)
+            else:
+                next_idx = (idx + 1) % len(queue)
+            state['queue_index'] = next_idx
+            cur = queue[next_idx]
+            state['current_title'] = cur.get('title') or cur.get('name') or "Müzik"
+            state['current_url'] = cur.get('stream_url') or cur.get('url') or ""
+            state['current_item_id'] = cur.get('rel_path') or cur.get('id') or ""
+            state['is_playing'] = True
+    elif action == 'prev':
+        queue = state.get('queue', [])
+        if queue:
+            idx = state.get('queue_index', 0)
+            prev_idx = (idx - 1 + len(queue)) % len(queue)
+            state['queue_index'] = prev_idx
+            cur = queue[prev_idx]
+            state['current_title'] = cur.get('title') or cur.get('name') or "Müzik"
+            state['current_url'] = cur.get('stream_url') or cur.get('url') or ""
+            state['current_item_id'] = cur.get('rel_path') or cur.get('id') or ""
+            state['is_playing'] = True
+
+    state['updated_at'] = int(time.time())
+    data['state'] = state
+    save_radio_data(data)
+    return jsonify({"success": True, "state": state})
+
+@app.route('/api/radio/stations', methods=['GET', 'POST'])
+def api_radio_stations():
+    data = load_radio_data()
+    if request.method == 'POST':
+        req = request.json or {}
+        action = req.get('action', 'add')
+        custom = data.get('custom_stations', [])
+        if action == 'add':
+            name = req.get('name', '').strip()
+            url = req.get('url', '').strip()
+            genre = req.get('genre', 'Genel').strip()
+            country = req.get('country', 'Özel').strip()
+            if not name or not url:
+                return jsonify({"success": False, "error": "İstasyon adı ve URL zorunludur"}), 400
+            new_st = {
+                "id": f"custom_{int(time.time()*1000)}",
+                "name": name,
+                "country": "CUSTOM",
+                "country_name": country,
+                "genre": genre,
+                "url": url,
+                "logo": "📻",
+                "is_custom": True
+            }
+            custom.append(new_st)
+            data['custom_stations'] = custom
+            save_radio_data(data)
+            return jsonify({"success": True, "station": new_st})
+        elif action == 'delete':
+            st_id = req.get('station_id')
+            data['custom_stations'] = [s for s in custom if s.get('id') != st_id]
+            save_radio_data(data)
+            return jsonify({"success": True})
+
+    return jsonify({
+        "stations": data.get('stations', DEFAULT_RADIO_STATIONS),
+        "custom_stations": data.get('custom_stations', [])
+    })
+
+@app.route('/api/radio/library', methods=['GET'])
+def api_radio_library():
+    return jsonify(scan_music_library())
+
+@app.route('/api/radio/upload', methods=['POST'])
+def api_radio_upload():
+    """Accepts individual audio files or entire folder trees via relative paths"""
+    files = request.files.getlist('files') or request.files.getlist('file')
+    if not files or len(files) == 0:
+        return jsonify({"success": False, "error": "Yüklenecek dosya seçilmedi"}), 400
+
+    from werkzeug.utils import secure_filename
+    saved_count = 0
+    errors = []
+
+    for file_storage in files:
+        if not file_storage or file_storage.filename == '':
+            continue
+            
+        raw_rel_path = file_storage.filename # e.g. "90s Rock/Scorpions/WindOfChange.mp3"
+        # Sanitize each path component
+        path_parts = [p for p in raw_rel_path.replace('\\', '/').split('/') if p and p not in ('.', '..')]
+        if not path_parts:
+            continue
+            
+        safe_parts = [secure_filename(part) for part in path_parts]
+        target_filename = safe_parts[-1]
+        
+        if not target_filename.lower().endswith(AUDIO_EXTENSIONS):
+            continue
+            
+        target_dir = os.path.join(MUSIC_LIBRARY_DIR, *safe_parts[:-1]) if len(safe_parts) > 1 else MUSIC_LIBRARY_DIR
+        os.makedirs(target_dir, exist_ok=True)
+        
+        full_dest = os.path.join(target_dir, target_filename)
+        try:
+            file_storage.save(full_dest)
+            saved_count += 1
+        except Exception as e:
+            errors.append(f"{raw_rel_path}: {str(e)}")
+
+    return jsonify({
+        "success": True,
+        "saved_count": saved_count,
+        "errors": errors,
+        "library": scan_music_library()
+    })
+
+@app.route('/api/radio/delete_file', methods=['POST'])
+def api_radio_delete_file():
+    req = request.json or {}
+    rel_path = req.get('rel_path', '')
+    if not rel_path:
+        return jsonify({"success": False, "error": "Dosya yolu belirtilmedi"}), 400
+    
+    full_path = os.path.realpath(os.path.join(MUSIC_LIBRARY_DIR, rel_path))
+    if not full_path.startswith(os.path.realpath(MUSIC_LIBRARY_DIR)):
+        return jsonify({"success": False, "error": "Geçersiz dosya konumu"}), 400
+        
+    if os.path.exists(full_path):
+        try:
+            if os.path.isfile(full_path):
+                os.remove(full_path)
+            elif os.path.isdir(full_path):
+                import shutil
+                shutil.rmtree(full_path)
+            return jsonify({"success": True})
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 500
+            
+    return jsonify({"success": False, "error": "Dosya bulunamadı"}), 404
+
+@app.route('/api/radio/playlists', methods=['GET', 'POST'])
+def api_radio_playlists():
+    data = load_radio_data()
+    playlists = data.get('playlists', [])
+    
+    if request.method == 'POST':
+        req = request.json or {}
+        action = req.get('action', 'save')
+        
+        if action == 'save':
+            pl_id = req.get('id') or f"pl_{int(time.time()*1000)}"
+            name = req.get('name', 'Yeni Liste').strip()
+            items = req.get('items', []) # list of track objects or stations
+            
+            existing = next((p for p in playlists if p.get('id') == pl_id), None)
+            if existing:
+                existing['name'] = name
+                existing['items'] = items
+                existing['count'] = len(items)
+                existing['updated_at'] = int(time.time())
+            else:
+                playlists.append({
+                    "id": pl_id,
+                    "name": name,
+                    "items": items,
+                    "count": len(items),
+                    "created_at": int(time.time()),
+                    "updated_at": int(time.time())
+                })
+            data['playlists'] = playlists
+            save_radio_data(data)
+            return jsonify({"success": True, "playlists": playlists})
+            
+        elif action == 'delete':
+            pl_id = req.get('id')
+            data['playlists'] = [p for p in playlists if p.get('id') != pl_id]
+            save_radio_data(data)
+            return jsonify({"success": True, "playlists": data['playlists']})
+
+    return jsonify({"playlists": playlists})
+
+@app.route('/api/radio/stream/<path:filename>')
+def api_radio_stream(filename):
+    """Secure range-supporting audio streaming from outside project directory"""
+    safe_path = os.path.realpath(os.path.join(MUSIC_LIBRARY_DIR, filename))
+    if not safe_path.startswith(os.path.realpath(MUSIC_LIBRARY_DIR)):
+        from flask import abort
+        abort(403)
+    if not os.path.isfile(safe_path):
+        from flask import abort
+        abort(404)
+        
+    directory = os.path.dirname(safe_path)
+    file_name = os.path.basename(safe_path)
+    resp = make_response(send_from_directory(directory, file_name))
+    resp.headers['Accept-Ranges'] = 'bytes'
+    resp.headers['Cache-Control'] = 'public, max-age=86400'
+    return resp
+
 
 
 if __name__ == '__main__':
