@@ -673,12 +673,12 @@
             <video id="local-video" src="{{ (settings.playlist_videos[0]) if settings and settings.playlist_videos and settings.playlist_videos|length > 0 else ((settings.local_videos[0]) if settings and settings.local_videos and settings.local_videos|length > 0 else '/static/tv_media/videos/bayrak.mp4') }}" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
 
-            <!-- 📻 Canlı Çalan Radyo / Şarkı Göstergesi (TV Sağ Üst) -->
-            <div id="ml-radio-now-playing" style="display:none; position:absolute; top:12px; right:12px; background:rgba(15,23,42,0.88); backdrop-filter:blur(10px); border:1.5px solid rgba(255,255,255,0.25); border-radius:30px; padding:6px 14px; color:#FFFFFF; z-index:45; align-items:center; gap:8px; box-shadow:0 6px 20px rgba(0,0,0,0.5); font-family:'Plus Jakarta Sans', sans-serif; transition:all 0.3s ease;">
-                <span style="font-size:1.2rem; animation:pulse 2s infinite;" id="ml-radio-icon">📻</span>
-                <div style="display:flex; flex-direction:column; max-width:260px;">
-                    <span style="font-size:0.65rem; color:#38BDF8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">CANLI YAYIN</span>
-                    <span id="ml-radio-title" style="font-size:0.88rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#F8FAFC;">Power FM</span>
+            <!-- 📻 Canlı Çalan Radyo / Şarkı Göstergesi (Daha zarif ve küçük) -->
+            <div id="ml-radio-now-playing" style="display:none; position:absolute; top:8px; right:8px; background:rgba(15,23,42,0.82); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.2); border-radius:20px; padding:3px 10px; color:#FFFFFF; z-index:45; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.4); font-family:'Plus Jakarta Sans', sans-serif; transition:all 0.3s ease;">
+                <span style="font-size:0.9rem;" id="ml-radio-icon">📻</span>
+                <div style="display:flex; flex-direction:column; max-width:180px;">
+                    <span style="font-size:0.55rem; color:#38BDF8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; line-height:1;">CANLI YAYIN</span>
+                    <span id="ml-radio-title" style="font-size:0.75rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#F8FAFC; line-height:1.2;">Power FM</span>
                 </div>
             </div>
 
@@ -2769,6 +2769,31 @@
         // 📻 MERKEZİ RADYO & MÜZİK ÇALAR TV SENKRONİZASYONU
         // ==========================================
         let currentRadioState = null;
+        let isAudioUnlocked = false;
+
+        // Unlock Web Audio & HTML5 Audio on TV Stick (Handles Bluetooth & WebView autoplay restrictions)
+        function unlockAudioEngine() {
+            if (isAudioUnlocked) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    const ctx = new AudioContext();
+                    ctx.resume().then(() => {
+                        isAudioUnlocked = true;
+                        console.log("[AUDIO] AudioContext resumed successfully.");
+                    }).catch(e=>{});
+                }
+            } catch(e){}
+            const audEl = document.getElementById('local-audio');
+            if (audEl) {
+                audEl.muted = false;
+                audEl.volume = 1.0;
+            }
+        }
+
+        ['click', 'touchstart', 'keydown', 'DOMContentLoaded', 'load'].forEach(ev => {
+            window.addEventListener(ev, unlockAudioEngine, { passive: true, once: true });
+        });
 
         async function syncTvRadioStream() {
             try {
@@ -2789,13 +2814,26 @@
                 }
 
                 if (state.is_playing && state.tv_audio_enabled !== false && state.current_url) {
+                    // Make sure audio element is unmuted and volume is 100%
+                    if (audEl) {
+                        audEl.muted = false;
+                        audEl.volume = 1.0;
+                    }
+
                     // Update audio element source if changed
                     if (audEl.src !== state.current_url && !audEl.src.endsWith(state.current_url)) {
                         audEl.src = state.current_url;
                         audEl.load();
                     }
+                    
                     if (audEl.paused) {
-                        audEl.play().catch(e => console.log("TV audio autoplay waiting for gesture / ready:", e));
+                        const p = audEl.play();
+                        if (p !== undefined) {
+                            p.catch(e => {
+                                console.log("[RADIO AUTOPLAY] Retrying audio play with user trigger...", e);
+                                unlockAudioEngine();
+                            });
+                        }
                     }
 
                     // Show now-playing pill on TV screen
@@ -2806,7 +2844,7 @@
                     }
                 } else {
                     // Paused or TV audio disabled
-                    if (!audEl.paused) {
+                    if (audEl && !audEl.paused) {
                         audEl.pause();
                     }
                     if (badgeEl) {
@@ -2827,8 +2865,13 @@
             }).then(() => syncTvRadioStream()).catch(e=>{});
         };
 
+        audEl.onerror = (e) => {
+            console.warn("[RADIO AUDIO] Stream error event:", e);
+            setTimeout(syncTvRadioStream, 2000);
+        };
+
         syncTvRadioStream();
-        setInterval(syncTvRadioStream, 4000);
+        setInterval(syncTvRadioStream, 3500);
     </script>
 </body>
 </html>
