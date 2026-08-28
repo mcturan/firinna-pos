@@ -7,7 +7,7 @@
     <style>
         body { font-family: sans-serif; text-align: center; padding: 50px 20px; background: #f8fafc; margin: 0; }
         input { padding: 10px; font-size: 16px; width: 80%; max-width: 300px; border-radius: 8px; border: 2px solid #ccc; margin-bottom: 20px; }
-        button { padding: 12px 24px; font-size: 16px; border-radius: 8px; border: none; background: #2d6a4f; color: white; cursor: pointer; font-weight: bold; }
+        button { padding: 12px 24px; font-size: 16px; border-radius: 8px; border: none; background: #2d6a4f; color: white; cursor: pointer; font-weight: bold; margin: 5px; }
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2d6a4f; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; z-index: 9999; }
         #splash h1 { font-size: 3rem; margin: 0; letter-spacing: 2px; }
         #splash p { margin: 5px 0 0; opacity: 0.8; font-size: 1.1rem; }
@@ -22,19 +22,21 @@
     <div id="setup" style="display:none; padding-top: 30px;">
         <h2 style="color:#2d6a4f;">Sunucu Ayarları</h2>
         <p style="margin-bottom:5px;">Lokal IP (WiFi, Restoran İçi)</p>
-        <input type="text" id="ipInput" placeholder="Örn: 192.168.1.100" />
+        <input type="text" id="ipInput" placeholder="Örn: 192.168.1.2" value="192.168.1.2" />
         <p style="margin-bottom:5px;">Uzak IP (Hücresel/WAN)</p>
-        <input type="text" id="wanInput" placeholder="Örn: 84.17.86.208" />
+        <input type="text" id="wanInput" placeholder="Örn: 84.17.86.208" value="84.17.86.208" />
         <br>
         <button onclick="saveAndGo()">Kaydet ve Başla</button>
     </div>
     
     <script>
+        if (localStorage.getItem("app_v2_reset") !== "true") {
+            localStorage.removeItem("server_ip");
+            localStorage.setItem("app_v2_reset", "true");
+        }
         const splashStart = Date.now();
         const MIN_SPLASH_TIME = 500;
-
-        const APP_VERSION = "1.5.5";
-
+        const APP_VERSION = "2.0.1";
         function doRedirect(url) {
             if(url.indexOf('app_version=') === -1) {
                 url += (url.indexOf('?') === -1 ? '?' : '&') + 'app_version=' + APP_VERSION;
@@ -45,7 +47,6 @@
                 window.location.replace(url);
             }, remaining);
         }
-
         function saveAndGo() {
             var ip = document.getElementById('ipInput').value.trim();
             var wan = document.getElementById('wanInput').value.trim();
@@ -55,23 +56,17 @@
                 doRedirect("http://" + ip + ":5000/?mode=garson");
             }
         }
-        
         var savedIp = localStorage.getItem("server_ip");
         var savedWan = localStorage.getItem("wan_ip") || "84.17.86.208";
-
         if (savedIp) {
             var lanUrl = "http://" + savedIp + ":5000";
             var wanUrl = "http://" + savedWan + ":5000";
-            
-            // 1.5 saniye içinde LAN yanıt vermezse WAN'a geç
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 1500);
-            
             fetch(lanUrl + "/api/mobile_version?_=" + Date.now(), { signal: controller.signal })
                 .then(r => r.json())
                 .then(data => {
                     clearTimeout(timeoutId);
-                    // Sunucuya LAN'dan erişildi
                     doRedirect(lanUrl + "/?mode=garson");
                 })
                 .catch(err => {
