@@ -16,13 +16,13 @@
 <body>
     <div id="splash">
         <h1>FIRINNA TV</h1>
-        <p>Bağlanıyor...</p>
+        <p id="splash-msg">Bağlanıyor...</p>
     </div>
 
     <div id="setup" style="display:none; padding-top: 50px;">
         <h2 style="color:#2d6a4f;">Sunucu IP Adresi</h2>
         <p>POS bilgisayarının IP adresini giriniz (Örn: 192.168.1.100)</p>
-        <input type="text" id="ipInput" placeholder="192.168.1.100" />
+        <input type="text" id="ipInput" placeholder="192.168.1.2" value="192.168.1.2" />
         <br>
         <button onclick="saveAndGo()">Kaydet ve Başla</button>
     </div>
@@ -30,44 +30,65 @@
     <script>
         const splashStart = Date.now();
         const MIN_SPLASH_TIME = 1500;
+        const APP_VERSION = "2.0.0";
+
+        function setSplashMsg(msg) {
+            var el = document.getElementById('splash-msg');
+            if (el) el.textContent = msg;
+        }
 
         function doRedirect(url) {
             const elapsed = Date.now() - splashStart;
             const remaining = Math.max(0, MIN_SPLASH_TIME - elapsed);
-            setTimeout(() => {
+            setTimeout(function() {
                 window.location.replace(url);
             }, remaining);
         }
 
         function saveAndGo() {
             var ip = document.getElementById('ipInput').value.trim();
-            if(ip) {
+            if (ip) {
                 localStorage.setItem("server_ip", ip);
                 window.location.replace("http://" + ip + ":5000/tv-player");
             }
         }
-        
+
         var savedIp = localStorage.getItem("server_ip");
-        const APP_VERSION = "1.0.0"; // TV App initial version
 
         if (savedIp) {
             var serverUrl = "http://" + savedIp + ":5000";
-            // Check for general API to see if reachable
-            fetch(serverUrl + "/api/mobile_version")
-                .then(r => r.json())
-                .then(data => {
-                    // We can use same update logic, or a separate tv_version api. Let's just launch it.
-                    doRedirect(serverUrl + "/tv-player");
+            var controller = new AbortController();
+            var timeoutId = setTimeout(function() { controller.abort(); }, 5000);
+
+            setSplashMsg("Sunucuya bağlanılıyor...");
+
+            fetch(serverUrl + "/api/mobile_version", { signal: controller.signal })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    clearTimeout(timeoutId);
+
+                    var serverTvVersion = parseFloat(data.tv_version || "0");
+                    var myVersion = parseFloat(APP_VERSION);
+
+                    if (serverTvVersion > myVersion) {
+                        // Yeni versiyon var — APK'yı indir
+                        setSplashMsg("Güncelleme indiriliyor (" + data.tv_version + ")...");
+                        setTimeout(function() {
+                            window.location.href = serverUrl + (data.tv_apk_url || "/download_tv_apk");
+                        }, 800);
+                    } else {
+                        // Güncel — TV player'a git
+                        doRedirect(serverUrl + "/tv-player");
+                    }
                 })
-                .catch(err => {
-                    console.error("Sunucuya ulaşılamadı:", err);
-                    document.getElementById('splash').innerHTML = `
-                        <h1 style="color:#e53e3e">BAĞLANTI HATASI</h1>
-                        <p>Sunucuya bağlanılamadı. Kasa bilgisayarı açık mı?</p>
-                        <p style="color:#888; font-size:14px; margin-top:20px;">IP: ${savedIp}</p>
-                        <button onclick="localStorage.removeItem('server_ip'); location.reload();" style="margin-top:20px; background:#444;">IP Sıfırla</button>
-                        <button onclick="location.reload()" style="margin-top:20px; margin-left:10px;">Tekrar Dene</button>
-                    `;
+                .catch(function(err) {
+                    clearTimeout(timeoutId);
+                    document.getElementById('splash').innerHTML =
+                        '<h1 style="color:#e53e3e">BAĞLANTI HATASI</h1>' +
+                        '<p>Sunucuya bağlanılamadı.<br>POS bilgisayarı açık mı?</p>' +
+                        '<p style="color:#888; font-size:14px; margin-top:20px;">IP: ' + savedIp + '</p>' +
+                        '<button onclick="localStorage.removeItem(\'server_ip\'); location.reload();" style="margin-top:20px; background:#444;">IP Sıfırla</button>' +
+                        '<button onclick="location.reload()" style="margin-top:20px; margin-left:10px;">Tekrar Dene</button>';
                 });
         } else {
             document.getElementById('splash').style.display = 'none';
