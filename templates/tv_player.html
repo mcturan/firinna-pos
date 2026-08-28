@@ -672,6 +672,16 @@
             <iframe id="ytplayer" style="display:none; width:100%; height:100%; border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
             <video id="local-video" src="{{ (settings.playlist_videos[0]) if settings and settings.playlist_videos and settings.playlist_videos|length > 0 else ((settings.local_videos[0]) if settings and settings.local_videos and settings.local_videos|length > 0 else '/static/tv_media/videos/bayrak.mp4') }}" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
+
+            <!-- 📻 Canlı Çalan Radyo / Şarkı Göstergesi (TV Sağ Üst) -->
+            <div id="ml-radio-now-playing" style="display:none; position:absolute; top:12px; right:12px; background:rgba(15,23,42,0.88); backdrop-filter:blur(10px); border:1.5px solid rgba(255,255,255,0.25); border-radius:30px; padding:6px 14px; color:#FFFFFF; z-index:45; align-items:center; gap:8px; box-shadow:0 6px 20px rgba(0,0,0,0.5); font-family:'Plus Jakarta Sans', sans-serif; transition:all 0.3s ease;">
+                <span style="font-size:1.2rem; animation:pulse 2s infinite;" id="ml-radio-icon">📻</span>
+                <div style="display:flex; flex-direction:column; max-width:260px;">
+                    <span style="font-size:0.65rem; color:#38BDF8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">CANLI YAYIN</span>
+                    <span id="ml-radio-title" style="font-size:0.88rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#F8FAFC;">Power FM</span>
+                </div>
+            </div>
+
             <!-- Discrete percentage download indicator in bottom right corner with video name (%0 - %100) -->
             <div id="ml-dl-badge" style="position:absolute; bottom:8px; right:10px; background:rgba(0,0,0,0.45); color:rgba(255,255,255,0.75); font-size:0.72rem; font-weight:500; font-family:monospace, system-ui, -apple-system, sans-serif; padding:2px 6px; border-radius:4px; z-index:45; display:none; pointer-events:none; backdrop-filter:blur(2px); transition:opacity 0.4s ease; border:1px solid rgba(255,255,255,0.15);"></div>
             <!-- High-Definition Graphic Watermark Container (Enlarged) -->
@@ -2767,7 +2777,16 @@
                 currentRadioState = state;
 
                 const audEl = document.getElementById('local-audio');
-                const recordPlayer = document.getElementById('record-player');
+                const vidEl = document.getElementById('local-video');
+                const badgeEl = document.getElementById('ml-radio-now-playing');
+                const titleEl = document.getElementById('ml-radio-title');
+                const iconEl = document.getElementById('ml-radio-icon');
+
+                // TV'de video sesi daima sessiz (muted) kalır, radyo sesi öne geçer
+                if (vidEl) {
+                    vidEl.muted = true;
+                    vidEl.defaultMuted = true;
+                }
 
                 if (state.is_playing && state.tv_audio_enabled !== false && state.current_url) {
                     // Update audio element source if changed
@@ -2776,20 +2795,22 @@
                         audEl.load();
                     }
                     if (audEl.paused) {
-                        audEl.play().catch(e => console.log("TV audio autoplay waiting for user gesture / ready:", e));
+                        audEl.play().catch(e => console.log("TV audio autoplay waiting for gesture / ready:", e));
                     }
-                    if (recordPlayer) {
-                        recordPlayer.style.display = 'block';
-                        recordPlayer.classList.add('spinning');
+
+                    // Show now-playing pill on TV screen
+                    if (badgeEl && titleEl) {
+                        titleEl.textContent = state.current_title || 'Canlı Müzik';
+                        if (iconEl) iconEl.textContent = state.source_type === 'station' ? '📻' : '🎵';
+                        badgeEl.style.display = 'inline-flex';
                     }
                 } else {
                     // Paused or TV audio disabled
                     if (!audEl.paused) {
                         audEl.pause();
                     }
-                    if (recordPlayer) {
-                        recordPlayer.style.display = 'none';
-                        recordPlayer.classList.remove('spinning');
+                    if (badgeEl) {
+                        badgeEl.style.display = 'none';
                     }
                 }
             } catch (e) {
