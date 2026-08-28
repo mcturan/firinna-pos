@@ -177,10 +177,26 @@
                     Bilgisayarınızdaki bir müzik klasörünü seçtiğinizde, içindeki tüm alt klasörler ve şarkılar yapısı bozulmadan sunucuya yüklenir.
                 </p>
 
+                <!-- Hedef Klasör Seçimi -->
+                <div style="background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 12px 16px; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <strong style="color: #1e293b; font-size: 0.9rem;">📍 Yüklenecek Hedef Klasör:</strong>
+                        <div style="color: #64748b; font-size: 0.8rem; margin-top: 2px;">Şarkıların ekleneceği mevcut bir klasörü seçebilir veya yeni klasör oluşturabilirsiniz.</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <select id="targetFolderSelect" style="padding: 0.45rem 0.8rem; border-radius: 6px; border: 1.5px solid #cbd5e1; font-weight: 600; color: #1e293b; background: white; font-size: 0.88rem;">
+                            <option value="">📂 Ana Dizin / Kendi Klasör Yapısı</option>
+                        </select>
+                        <button type="button" class="btn-action btn-gray" onclick="createNewFolderPrompt()" style="font-size: 0.82rem;">
+                            ➕ Yeni Klasör Aç
+                        </button>
+                    </div>
+                </div>
+
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1.5rem;">
                     <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 1.25rem; text-align: center;">
                         <span style="font-size: 2rem; display: block; margin-bottom: 8px;">📂</span>
-                        <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Klasör Olarak Yükle (Tavsiye)</strong>
+                        <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Klasör Olarak Yükle (Tüm Albüm)</strong>
                         <small style="color: #64748b; display: block; margin-bottom: 12px;">Alt klasörleriyle birlikte tüm albümleri tek tıkla yükler</small>
                         <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(this.files)">
                         <button type="button" class="btn-action btn-green" onclick="document.getElementById('folderInput').click()">
@@ -191,7 +207,7 @@
                     <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 1.25rem; text-align: center;">
                         <span style="font-size: 2rem; display: block; margin-bottom: 8px;">🎵</span>
                         <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Tekli / Çoklu Dosya Yükle</strong>
-                        <small style="color: #64748b; display: block; margin-bottom: 12px;">Belirli .mp3, .m4a veya .flac şarkılarını yükler</small>
+                        <small style="color: #64748b; display: block; margin-bottom: 12px;">Seçilen hedef klasörün içine yeni parçalar ekler</small>
                         <input type="file" id="filesInput" multiple accept="audio/*" style="display: none;" onchange="handleFolderSelect(this.files)">
                         <button type="button" class="btn-action btn-blue" onclick="document.getElementById('filesInput').click()">
                             🎶 Dosyaları Seç...
@@ -592,9 +608,45 @@
                 const data = await res.json();
                 allLibraryData = data;
                 renderLibrary();
+                updateTargetFolderDropdown();
             } catch (e) {
                 console.error(e);
             }
+        }
+
+        function updateTargetFolderDropdown() {
+            const sel = document.getElementById('targetFolderSelect');
+            if (!sel) return;
+            const curVal = sel.value;
+            let opts = '<option value="">📂 Ana Dizin / Dosya Kendi Yapısı</option>';
+            if (allLibraryData.folders) {
+                allLibraryData.folders.forEach(f => {
+                    opts += `<option value="${f.folder_key}">${f.name}</option>`;
+                });
+            }
+            sel.innerHTML = opts;
+            if (curVal) sel.value = curVal;
+        }
+
+        function createNewFolderPrompt() {
+            const name = prompt('Oluşturmak istediğiniz yeni klasör adını giriniz: (Örn: Nostalji Akustik)');
+            if (name && name.trim()) {
+                const cleanName = name.trim().replace(/[\\/:*?"<>|]/g, '_');
+                const sel = document.getElementById('targetFolderSelect');
+                const opt = document.createElement('option');
+                opt.value = cleanName;
+                opt.textContent = `📁 ${cleanName} (Yeni)`;
+                opt.selected = true;
+                sel.appendChild(opt);
+                showToast(`"${cleanName}" klasörü seçildi. Şimdi müzikleri seçip yükleyebilirsiniz.`);
+            }
+        }
+
+        function quickUploadToFolder(folderKey) {
+            switchRadioTab('tab-upload', document.querySelectorAll('.radio-tab')[3]);
+            const sel = document.getElementById('targetFolderSelect');
+            if (sel) sel.value = folderKey;
+            showToast(`Hedef klasör seçildi: ${folderKey}. Şimdi dosyaları seçiniz.`);
         }
 
         function renderLibrary() {
@@ -623,10 +675,13 @@
                                 </div>
                             </div>
                             <div style="display: flex; gap: 6px; align-items: center;">
-                                <button type="button" class="btn-action btn-green" onclick="event.stopPropagation(); playFolder('${folder.folder_key}')" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">
-                                    ▶ Klasörü Çal
+                                <button type="button" class="btn-action btn-blue" onclick="event.stopPropagation(); quickUploadToFolder('${folder.folder_key}')" style="padding: 0.35rem 0.7rem; font-size: 0.8rem;" title="Bu Klasöre Yeni Şarkı Ekle">
+                                    ➕ Şarkı Ekle
                                 </button>
-                                <button type="button" class="btn-action btn-gray" onclick="event.stopPropagation(); deleteFolder('${folder.folder_key}')" style="padding: 0.35rem 0.6rem; color: #ef4444;" title="Klasörü Sil">
+                                <button type="button" class="btn-action btn-green" onclick="event.stopPropagation(); playFolder('${folder.folder_key}')" style="padding: 0.35rem 0.8rem; font-size: 0.82rem;">
+                                    ▶ Çal
+                                </button>
+                                <button type="button" class="btn-action btn-gray" onclick="event.stopPropagation(); deleteFolder('${folder.folder_key}')" style="padding: 0.35rem 0.6rem; color: #ef4444;" title="Klasörü ve İçindekileri Sil">
                                     🗑️
                                 </button>
                                 <span id="arrow-f-${fIdx}" style="font-size: 0.8rem; color: #94a3b8; transition: transform 0.2s;">▼</span>
@@ -643,7 +698,7 @@
                                             <span style="flex: 1;">${track.title}</span>
                                         </div>
                                         <div style="display: flex; align-items: center; gap: 6px;">
-                                            <button onclick="deleteFile('${track.rel_path}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.85rem;" title="Şarkıyı Sil">🗑️</button>
+                                            <button onclick="event.stopPropagation(); deleteFile('${track.rel_path}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.9rem; padding: 2px 6px;" title="Bu Şarkıyı Sil">🗑️ Sil</button>
                                         </div>
                                     </div>
                                 `;
@@ -908,13 +963,18 @@
             const BATCH_SIZE = 5; // Upload 5 files at a time to prevent server timeout
             let uploadedCount = 0;
             let failedCount = 0;
+            const targetFolder = document.getElementById('targetFolderSelect') ? document.getElementById('targetFolderSelect').value : '';
 
             for (let i = 0; i < audioFiles.length; i += BATCH_SIZE) {
                 const chunk = audioFiles.slice(i, i + BATCH_SIZE);
                 const formData = new FormData();
+                if (targetFolder) formData.append('target_folder', targetFolder);
 
                 chunk.forEach(file => {
-                    const relPath = file.webkitRelativePath || file.name;
+                    let relPath = file.webkitRelativePath || file.name;
+                    if (targetFolder && (!file.webkitRelativePath || !file.webkitRelativePath.includes('/'))) {
+                        relPath = targetFolder + '/' + file.name;
+                    }
                     formData.append('files', file, relPath);
                 });
 
