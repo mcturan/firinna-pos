@@ -1,9 +1,3 @@
-[11:23:57] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:23:57] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:24:04] [tv_26b1e944]
-[11:24:03] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:24:03] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:24:09] [tv_26b1e944]
 [11:24:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
 [11:24:06] [VIDEO LOOP] Next video -> index 0 (1.mp4)
 [11:24:06] [PLAYBACK] Playing ready cached video: 1.mp4
@@ -498,3 +492,9 @@
 [2026-08-28 11:49:59] [tv_26b1e944]
 [11:49:58] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
 [11:49:58] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:50:09] [tv_26b1e944]
+[11:50:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:50:04] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:50:04] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:50:07] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:50:07] [PLAYBACK] Playing ready cached video: 1.mp4
