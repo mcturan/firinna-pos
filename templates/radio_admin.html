@@ -960,7 +960,7 @@
             progressBox.style.display = 'block';
             logBox.innerHTML = '';
 
-            const BATCH_SIZE = 5; // Upload 5 files at a time to prevent server timeout
+            const BATCH_SIZE = 3; // Upload in smaller 3-file chunks for maximum stability
             let uploadedCount = 0;
             let failedCount = 0;
             const targetFolder = document.getElementById('targetFolderSelect') ? document.getElementById('targetFolderSelect').value : '';
@@ -968,15 +968,17 @@
             for (let i = 0; i < audioFiles.length; i += BATCH_SIZE) {
                 const chunk = audioFiles.slice(i, i + BATCH_SIZE);
                 const formData = new FormData();
+                const paths = [];
+
                 if (targetFolder) formData.append('target_folder', targetFolder);
 
                 chunk.forEach(file => {
-                    let relPath = file.webkitRelativePath || file.name;
-                    if (targetFolder && (!file.webkitRelativePath || !file.webkitRelativePath.includes('/'))) {
-                        relPath = targetFolder + '/' + file.name;
-                    }
-                    formData.append('files', file, relPath);
+                    const rel = file.webkitRelativePath || file.name;
+                    paths.push(rel);
+                    formData.append('files', file);
                 });
+
+                formData.append('paths', JSON.stringify(paths));
 
                 statusText.textContent = `Yükleniyor: ${uploadedCount} / ${audioFiles.length} parça...`;
                 const progressPct = Math.round((uploadedCount / audioFiles.length) * 100);
@@ -992,16 +994,21 @@
                     if (d.success) {
                         uploadedCount += (d.saved_count || chunk.length);
                         const pLog = document.createElement('div');
-                        pLog.textContent = `✓ ${chunk.map(c => c.name).join(', ')}`;
+                        pLog.textContent = `✓ Yüklendi (${chunk.length} parça): ${chunk.map(c => c.name).join(', ')}`;
                         pLog.style.color = '#16a34a';
+                        pLog.style.marginBottom = '2px';
                         logBox.prepend(pLog);
                     } else {
                         failedCount += chunk.length;
+                        const errLog = document.createElement('div');
+                        errLog.textContent = `✗ Sunucu Hatası: ${d.error || 'Yüklenemedi'}`;
+                        errLog.style.color = '#ef4444';
+                        logBox.prepend(errLog);
                     }
                 } catch (e) {
                     failedCount += chunk.length;
                     const errLog = document.createElement('div');
-                    errLog.textContent = `✗ Hata: ${chunk.map(c => c.name).join(', ')}`;
+                    errLog.textContent = `✗ Ağ Hatası: ${chunk.map(c => c.name).join(', ')}`;
                     errLog.style.color = '#ef4444';
                     logBox.prepend(errLog);
                 }
@@ -1009,8 +1016,13 @@
 
             progressBar.style.width = '100%';
             percentText.textContent = '%100';
-            statusText.textContent = `✅ Tamamlandı! Toplam ${uploadedCount} müzik başarıyla yüklendi. ${failedCount > 0 ? `(${failedCount} dosya başarısız)` : ''}`;
+            statusText.textContent = `✅ Tamamlandı! ${uploadedCount} müzik başarıyla yüklendi. ${failedCount > 0 ? `(${failedCount} dosya başarısız)` : ''}`;
             showToast(`${uploadedCount} müzik dosyası yüklendi!`);
+            
+            // Reset file input values
+            if (document.getElementById('folderInput')) document.getElementById('folderInput').value = '';
+            if (document.getElementById('filesInput')) document.getElementById('filesInput').value = '';
+
             loadLibrary();
         }
 

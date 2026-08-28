@@ -4665,27 +4665,45 @@ def api_radio_upload():
     if not files or len(files) == 0:
         return jsonify({"success": False, "error": "Yüklenecek dosya seçilmedi"}), 400
 
-    from werkzeug.utils import secure_filename
+    target_folder_param = request.form.get('target_folder', '').strip()
+    paths_param_raw = request.form.get('paths', '[]')
+    try:
+        paths_list = json.loads(paths_param_raw)
+    except Exception:
+        paths_list = []
+
     saved_count = 0
     errors = []
 
-    for file_storage in files:
+    for idx, file_storage in enumerate(files):
         if not file_storage or file_storage.filename == '':
             continue
             
-        raw_rel_path = file_storage.filename # e.g. "90s Rock/Scorpions/WindOfChange.mp3"
-        # Sanitize each path component
-        path_parts = [p for p in raw_rel_path.replace('\\', '/').split('/') if p and p not in ('.', '..')]
+        # Get relative path either from paths list or filename
+        raw_rel_path = paths_list[idx] if idx < len(paths_list) else file_storage.filename
+        
+        # If user specified target_folder and path is single file
+        if target_folder_param and ('/' not in raw_rel_path.replace('\\', '/')):
+            raw_rel_path = f"{target_folder_param}/{raw_rel_path}"
+
+        path_parts = [p.strip() for p in raw_rel_path.replace('\\', '/').split('/') if p.strip() and p not in ('.', '..')]
         if not path_parts:
             continue
             
-        safe_parts = [secure_filename(part) for part in path_parts]
-        target_filename = safe_parts[-1]
-        
+        # Keep clean directory names and filename
+        clean_parts = []
+        for part in path_parts:
+            # Replace risky characters while preserving Turkish chars and spaces
+            cleaned = "".join(c for c in part if c not in '/\\:*?"<>|').strip()
+            if not cleaned:
+                cleaned = "unnamed"
+            clean_parts.append(cleaned)
+
+        target_filename = clean_parts[-1]
         if not target_filename.lower().endswith(AUDIO_EXTENSIONS):
             continue
             
-        target_dir = os.path.join(MUSIC_LIBRARY_DIR, *safe_parts[:-1]) if len(safe_parts) > 1 else MUSIC_LIBRARY_DIR
+        target_dir = os.path.join(MUSIC_LIBRARY_DIR, *clean_parts[:-1]) if len(clean_parts) > 1 else MUSIC_LIBRARY_DIR
         os.makedirs(target_dir, exist_ok=True)
         
         full_dest = os.path.join(target_dir, target_filename)
