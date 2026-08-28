@@ -37,6 +37,9 @@
         .track-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 6px; font-size: 0.88rem; }
         .track-item:hover { background: #f8fafc; }
         .track-item.playing { background: #f0fdf4; font-weight: 700; color: #166534; }
+        .station-card.station-error { border-color: #fca5a5; background: #fff1f2; }
+        .spin-icon { display: inline-block; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -443,6 +446,9 @@
             renderStations();
         }
 
+        // Playback Status Tracking: 'idle', 'buffering', 'playing', 'error'
+        let stationPlayStates = {}; // { [station_id]: 'buffering' | 'playing' | 'error' | 'idle' }
+
         function renderStations() {
             const grid = document.getElementById('stationsGrid');
             let filtered = allStations;
@@ -458,18 +464,32 @@
             let html = '';
             filtered.forEach(st => {
                 const isCur = currentStatus.is_playing && currentStatus.current_item_id === st.id;
+                const pState = stationPlayStates[st.id] || (isCur ? 'playing' : 'idle');
+
+                let statusBadge = '';
+                if (pState === 'buffering') {
+                    statusBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; color:#f59e0b; background:#fef3c7; padding:2px 8px; border-radius:12px; font-weight:700;"><span class="spin-icon">⏳</span> Bağlanıyor...</span>`;
+                } else if (pState === 'error') {
+                    statusBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; color:#ef4444; background:#fee2e2; padding:2px 8px; border-radius:12px; font-weight:700;">❌ Yayın Yok / Hata</span>`;
+                } else if (pState === 'playing' && isCur) {
+                    statusBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; color:#16a34a; background:#dcfce7; padding:2px 8px; border-radius:12px; font-weight:700;">🔊 Çalıyor</span>`;
+                }
+
                 html += `
-                    <div class="station-card ${isCur ? 'playing' : ''}" data-station-id="${st.id}" onclick="playStation('${st.id}')">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 1.6rem;">${st.logo || '📻'}</span>
-                            <div>
-                                <strong style="color: #1e293b; display: block; font-size: 0.95rem;">${st.name}</strong>
-                                <small style="color: #64748b; font-size: 0.8rem;">${st.genre} • ${st.country_name || st.country}</small>
+                    <div class="station-card ${isCur ? 'playing' : ''} ${pState === 'error' ? 'station-error' : ''}" data-station-id="${st.id}" onclick="playStation('${st.id}')">
+                        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                            <span style="font-size: 1.6rem; flex-shrink: 0;">${st.logo || '📻'}</span>
+                            <div style="min-width: 0; flex: 1;">
+                                <strong style="color: #1e293b; display: block; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${st.name}</strong>
+                                <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                                    <small style="color: #64748b; font-size: 0.78rem;">${st.genre} • ${st.country_name || st.country}</small>
+                                </div>
+                                ${statusBadge ? `<div style="margin-top: 4px;">${statusBadge}</div>` : ''}
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
+                        <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: 8px;">
                             ${st.is_custom ? `<button onclick="event.stopPropagation(); deleteCustomStation('${st.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:1rem;" title="Sil">🗑️</button>` : ''}
-                            <span style="font-size: 1.2rem; color: #2d6a4f;">▶</span>
+                            <span style="font-size: 1.2rem; color: ${pState === 'error' ? '#ef4444' : '#2d6a4f'};">${pState === 'error' ? '⚠️' : (isCur ? '⏸' : '▶')}</span>
                         </div>
                     </div>
                 `;
@@ -478,6 +498,45 @@
         }
 
         function playStation(stId) {
+            stationPlayStates[stId] = 'buffering';
+            renderStations();
+
+            // Test audio stream probe
+            const st = allStations.find(s => s.id === stId);
+            if (st && st.url) {
+                const probeAud = new Audio();
+                probeAud.src = st.url;
+                probeAud.volume = 0.01;
+                
+                const probeTimer = setTimeout(() => {
+                    stationPlayStates[stId] = 'error';
+                    renderStations();
+                    probeAud.src = '';
+                }, 9000);
+
+                probeAud.onplaying = () => {
+                    clearTimeout(probeTimer);
+                    stationPlayStates[stId] = 'playing';
+                    renderStations();
+                    probeAud.src = '';
+                };
+
+                probeAud.oncanplay = () => {
+                    clearTimeout(probeTimer);
+                    stationPlayStates[stId] = 'playing';
+                    renderStations();
+                };
+
+                probeAud.onerror = () => {
+                    clearTimeout(probeTimer);
+                    stationPlayStates[stId] = 'error';
+                    renderStations();
+                    showToast('Radyo akışına bağlanılamadı veya yayın kapalı', 'error');
+                };
+
+                probeAud.play().catch(e => {});
+            }
+
             radioControl('play_station', { station_id: stId });
         }
 
@@ -598,13 +657,13 @@
 
         function toggleFolderTracks(fIdx) {
             const el = document.getElementById(`tracks-f-${fIdx}`);
-            const arr = document.getElementById(`arrow-f-${fIdx}`);
+            const arrow = document.getElementById(`arrow-f-${fIdx}`);
             if (el.style.display === 'none') {
                 el.style.display = 'block';
-                arr.style.transform = 'rotate(180deg)';
+                if (arrow) arrow.textContent = '▲';
             } else {
                 el.style.display = 'none';
-                arr.style.transform = 'rotate(0deg)';
+                if (arrow) arrow.textContent = '▼';
             }
         }
 
@@ -620,12 +679,12 @@
             }
         }
 
-        function playTrackFromFolder(folderKey, trackIdx) {
+        function playTrackFromFolder(folderKey, tIdx) {
             const folder = allLibraryData.folders.find(f => f.folder_key === folderKey);
-            if (folder && folder.tracks.length > 0) {
+            if (folder && folder.tracks.length > tIdx) {
                 radioControl('play_queue', {
                     items: folder.tracks,
-                    start_index: trackIdx,
+                    start_index: tIdx,
                     source_type: 'folder',
                     title_prefix: folder.name
                 });
@@ -637,7 +696,7 @@
                 radioControl('play_queue', {
                     items: allLibraryData.all_tracks,
                     start_index: 0,
-                    source_type: 'library',
+                    source_type: 'folder',
                     title_prefix: 'Tüm Kütüphane'
                 });
             } else {
@@ -646,12 +705,12 @@
         }
 
         async function deleteFolder(folderKey) {
-            if (!confirm(`"${folderKey}" klasörünü ve içindeki tüm müzikleri silmek istediğinize emin misiniz?`)) return;
+            if (!confirm(`"${folderKey}" klasörünü ve içindeki tüm şarkıları silmek istediğinize emin misiniz?`)) return;
             try {
                 const res = await fetch('/api/radio/delete_file', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ rel_path: folderKey })
+                    body: JSON.stringify({ rel_path: folderKey, is_folder: true })
                 });
                 const d = await res.json();
                 if (d.success) {
@@ -817,6 +876,9 @@
             } catch (e) {}
         }
 
+        // ==========================================
+        // 🚀 PARÇALI & GÜVENLİ KLASÖR YÜKLEYİCİ (Batch Uploader)
+        // ==========================================
         async function handleFolderSelect(files) {
             if (!files || files.length === 0) return;
 
@@ -826,62 +888,70 @@
             const percentText = document.getElementById('uploadPercentageText');
             const logBox = document.getElementById('uploadLog');
 
-            progressBox.style.display = 'block';
-            logBox.innerHTML = '';
-            statusText.textContent = `${files.length} dosya taranıyor ve yüklemeye hazırlanıyor...`;
-            progressBar.style.width = '5%';
-            percentText.textContent = '%5';
-
-            const formData = new FormData();
-            let audioCount = 0;
-
+            // Filter audio files
+            const audioFiles = [];
             for (let i = 0; i < files.length; i++) {
                 const f = files[i];
-                const relPath = f.webkitRelativePath || f.name;
                 if (f.name.match(/\.(mp3|m4a|aac|flac|wav|ogg)$/i)) {
-                    formData.append('files', f, relPath);
-                    audioCount++;
+                    audioFiles.push(f);
                 }
             }
 
-            if (audioCount === 0) {
-                statusText.textContent = 'Seçilen klasörde desteklenen ses dosyası (.mp3 vb.) bulunamadı.';
-                progressBar.style.width = '0%';
-                percentText.textContent = '%0';
+            if (audioFiles.length === 0) {
+                alert('Seçilen klasörde veya dosyalar arasında geçerli ses dosyası (.mp3, .m4a vb.) bulunamadı.');
                 return;
             }
 
-            statusText.textContent = `${audioCount} adet müzik dosyası sunucuya aktarılıyor...`;
+            progressBox.style.display = 'block';
+            logBox.innerHTML = '';
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/api/radio/upload', true);
+            const BATCH_SIZE = 5; // Upload 5 files at a time to prevent server timeout
+            let uploadedCount = 0;
+            let failedCount = 0;
 
-            xhr.upload.onprogress = function(e) {
-                if (e.lengthComputable) {
-                    const percent = Math.round((e.loaded / e.total) * 100);
-                    progressBar.style.width = percent + '%';
-                    percentText.textContent = '%' + percent;
+            for (let i = 0; i < audioFiles.length; i += BATCH_SIZE) {
+                const chunk = audioFiles.slice(i, i + BATCH_SIZE);
+                const formData = new FormData();
+
+                chunk.forEach(file => {
+                    const relPath = file.webkitRelativePath || file.name;
+                    formData.append('files', file, relPath);
+                });
+
+                statusText.textContent = `Yükleniyor: ${uploadedCount} / ${audioFiles.length} parça...`;
+                const progressPct = Math.round((uploadedCount / audioFiles.length) * 100);
+                progressBar.style.width = progressPct + '%';
+                percentText.textContent = '%' + progressPct;
+
+                try {
+                    const res = await fetch('/api/radio/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const d = await res.json();
+                    if (d.success) {
+                        uploadedCount += (d.saved_count || chunk.length);
+                        const pLog = document.createElement('div');
+                        pLog.textContent = `✓ ${chunk.map(c => c.name).join(', ')}`;
+                        pLog.style.color = '#16a34a';
+                        logBox.prepend(pLog);
+                    } else {
+                        failedCount += chunk.length;
+                    }
+                } catch (e) {
+                    failedCount += chunk.length;
+                    const errLog = document.createElement('div');
+                    errLog.textContent = `✗ Hata: ${chunk.map(c => c.name).join(', ')}`;
+                    errLog.style.color = '#ef4444';
+                    logBox.prepend(errLog);
                 }
-            };
+            }
 
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    const res = JSON.parse(xhr.responseText);
-                    progressBar.style.width = '100%';
-                    percentText.textContent = '%100';
-                    statusText.textContent = `✅ Başarılı! ${res.saved_count} müzik dosyası yüklendi.`;
-                    showToast(`${res.saved_count} parça yüklendi!`);
-                    loadLibrary();
-                } else {
-                    statusText.textContent = '❌ Yükleme sırasında bir hata oluştu.';
-                }
-            };
-
-            xhr.onerror = function() {
-                statusText.textContent = '❌ Ağ bağlantısı hatası.';
-            };
-
-            xhr.send(formData);
+            progressBar.style.width = '100%';
+            percentText.textContent = '%100';
+            statusText.textContent = `✅ Tamamlandı! Toplam ${uploadedCount} müzik başarıyla yüklendi. ${failedCount > 0 ? `(${failedCount} dosya başarısız)` : ''}`;
+            showToast(`${uploadedCount} müzik dosyası yüklendi!`);
+            loadLibrary();
         }
 
         webAud.onended = () => {

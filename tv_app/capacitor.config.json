@@ -3,6 +3,7 @@
   "appName": "Fırınna Garson",
   "webDir": "www",
   "server": {
+    "androidScheme": "http",
     "allowNavigation": ["*"],
     "cleartext": true
   }

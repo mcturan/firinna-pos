@@ -45,6 +45,11 @@ def allowed_file(filename):
 
 @app.after_request
 def add_no_cache_headers(response):
+    # Allow Android WebView & local app origins (CORS)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+
     if request.path.startswith('/static/tv_media/'):
         response.headers['Cache-Control'] = 'public, max-age=86400'
         response.headers['Accept-Ranges'] = 'bytes'
