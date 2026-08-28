@@ -1,429 +1,3 @@
-[10:54:03] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:04:34] [tv]
-Gece 03:00 otomatik yeniden başlatma: 955 dk sonra
-Boot sequence started.
-Connected to LAN: http://192.168.1.10:5000
-Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
-App is up to date.
-Settings fetched successfully.
-Video already exists: 1.mp4
-Video already exists: bayrak.mp4
-Video already exists: istanbul.mp4
-[2026-08-28 11:04:41] [tv]
-Gece 03:00 otomatik yeniden başlatma: 955 dk sonra
-Boot sequence started.
-Connected to LAN: http://192.168.1.10:5000
-Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
-App is up to date.
-Settings fetched successfully.
-Video already exists: 1.mp4
-Video already exists: bayrak.mp4
-Video already exists: istanbul.mp4
-
-[AUTO LOG DUMP AFTER 10s]
-[2026-08-28 11:05:38] [tv_210497a4]
-[11:05:38] [APP BOOT] Firinna TV Player starting... Client: tv_210497a4
-[2026-08-28 11:05:44] [tv_210497a4]
-[11:05:39] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:05:39] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:05:58] [tv_210497a4]
-[11:05:53] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:06:13] [tv_210497a4]
-[11:06:08] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:06:28] [tv_210497a4]
-[11:06:23] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:06:43] [tv_210497a4]
-[11:06:38] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:06:56] [tv]
-Gece 03:00 otomatik yeniden başlatma: 953 dk sonra
-Boot sequence started.
-Connected to LAN: http://192.168.1.10:5000
-Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
-App is up to date.
-Settings fetched successfully.
-Video already exists: 1.mp4
-Video already exists: bayrak.mp4
-Video already exists: istanbul.mp4
-[2026-08-28 11:06:58] [tv_210497a4]
-[11:06:53] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:07:03] [tv]
-Gece 03:00 otomatik yeniden başlatma: 953 dk sonra
-Boot sequence started.
-Connected to LAN: http://192.168.1.10:5000
-Version check response: {"apk_url":"/download_apk","tv_apk_url":"/static/Firinna-TV-1.1.32.apk","tv_version":"1.1.32","version":"1.5.5"}
-App is up to date.
-Settings fetched successfully.
-Video already exists: 1.mp4
-Video already exists: bayrak.mp4
-Video already exists: istanbul.mp4
-[JS] Allow attribute will take precedence over 'allowfullscreen'. -- From line 610
-
-[AUTO LOG DUMP AFTER 10s]
-[2026-08-28 11:07:04] [tv_26b1e944]
-[11:07:04] [APP BOOT] Firinna TV Player starting... Client: tv_26b1e944
-[2026-08-28 11:07:09] [tv_26b1e944]
-[11:07:08] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:07:08] [PLAYBACK WAIT] 1.mp4 is downloading in background -> Playing fallback bayrak.mp4 in meantime
-[11:07:09] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
-[11:07:09] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
-[11:07:09] [DOWNLOAD START] Starting non-interruptible background download: 1.mp4
-[2026-08-28 11:07:09] [tv_26b1e944]
-[11:07:09] [DOWNLOAD START] Starting non-interruptible background download: 1.mp4
-[2026-08-28 11:07:13] [tv_210497a4]
-[11:07:08] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:07:14] [tv_26b1e944]
-[11:07:09] [SYNC QUEUE] Queued for background download: istanbul.mp4 (Queue depth: 1)
-[2026-08-28 11:07:15] [tv_26b1e944]
-[11:07:15] [CACHE IDB SAVED] 1.mp4 (8.0 MB) saved to IndexedDB disk storage!
-[11:07:15] [DOWNLOAD FINISHED] 1.mp4 (%100) saved to persistent disk cache!
-[2026-08-28 11:07:16] [tv_26b1e944]
-[11:07:15] [AUTO SWITCH] Seamlessly switching to newly ready video: 1.mp4
-[11:07:17] [CACHE IDB SAVED] 1.mp4 (8.0 MB) saved to IndexedDB disk storage!
-[11:07:17] [DOWNLOAD FINISHED] 1.mp4 (%100) saved to persistent disk cache!
-[2026-08-28 11:07:17] [tv_26b1e944]
-[11:07:17] [AUTO SWITCH] Seamlessly switching to newly ready video: 1.mp4
-[11:07:17] [DOWNLOAD START] Starting non-interruptible background download: istanbul.mp4
-[2026-08-28 11:07:18] [tv_26b1e944]
-[11:07:18] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:07:18] [PLAYBACK WAIT] istanbul.mp4 is downloading in background -> Playing fallback bayrak.mp4 in meantime
-[11:07:18] [SYNC QUEUE] Queued for background download: istanbul.mp4 (Queue depth: 1)
-[11:07:19] [CACHE IDB SAVED] istanbul.mp4 (0.9 MB) saved to IndexedDB disk storage!
-[11:07:19] [DOWNLOAD FINISHED] istanbul.mp4 (%100) saved to persistent disk cache!
-[2026-08-28 11:07:24] [tv_26b1e944]
-[11:07:19] [AUTO SWITCH] Seamlessly switching to newly ready video: istanbul.mp4
-[11:07:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:07:28] [tv_210497a4]
-[11:07:23] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:07:29] [tv_26b1e944]
-[11:07:28] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:07:28] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:07:39] [tv_26b1e944]
-[11:07:31] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:07:31] [PLAYBACK] Playing ready cached video: 1.mp4
-[11:07:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:07:43] [tv_210497a4]
-[11:07:38] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:07:54] [tv_26b1e944]
-[11:07:50] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:07:58] [tv_210497a4]
-[11:07:53] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:08:09] [tv_26b1e944]
-[11:08:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:08:13] [tv_210497a4]
-[11:08:08] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:08:24] [tv_26b1e944]
-[11:08:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:08:28] [tv_210497a4]
-[11:08:23] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:08:39] [tv_26b1e944]
-[11:08:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:08:34] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:08:34] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:08:43] [tv_210497a4]
-[11:08:38] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:08:44] [tv_26b1e944]
-[11:08:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:08:41] [PLAYBACK] Playing core fallback: bayrak.mp4
-[11:08:43] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:08:43] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:08:54] [tv_26b1e944]
-[11:08:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:08:58] [tv_210497a4]
-[11:08:53] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:09:09] [tv_26b1e944]
-[11:09:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:09:13] [tv_210497a4]
-[11:09:08] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:09:24] [tv_26b1e944]
-[11:09:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:09:28] [tv_210497a4]
-[11:09:23] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:09:39] [tv_26b1e944]
-[11:09:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:09:43] [tv_210497a4]
-[11:09:38] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:09:49] [tv_26b1e944]
-[11:09:45] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:09:45] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:09:54] [tv_26b1e944]
-[11:09:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:09:51] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:09:51] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:09:58] [tv_210497a4]
-[11:09:53] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:09:59] [tv_26b1e944]
-[11:09:54] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:09:54] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:10:04] [tv_210497a4]
-[11:10:00] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:10:00] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:10:09] [tv_26b1e944]
-[11:10:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:10:14] [tv_210497a4]
-[11:10:09] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:10:12] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:10:12] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:10:24] [tv_26b1e944]
-[11:10:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:10:24] [tv_210497a4]
-[11:10:17] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:10:17] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:10:34] [tv_210497a4]
-[11:10:24] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:10:33] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:10:33] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:10:39] [tv_26b1e944]
-[11:10:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:10:44] [tv_210497a4]
-[11:10:39] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:10:49] [tv_210497a4]
-[11:10:48] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:10:48] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:10:54] [tv_26b1e944]
-[11:10:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:10:54] [tv_210497a4]
-[11:10:53] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:10:53] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:11:04] [tv_26b1e944]
-[11:10:56] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:10:56] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[11:11:03] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:11:03] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:11:09] [tv_26b1e944]
-[11:11:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:11:05] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:11:05] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:11:24] [tv_26b1e944]
-[11:11:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:11:39] [tv_26b1e944]
-[11:11:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:11:40] [tv_210497a4]
-[11:10:54] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:11:54] [tv_26b1e944]
-[11:11:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:12:09] [tv_26b1e944]
-[11:12:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:12:07] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:12:07] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:12:14] [tv_26b1e944]
-[11:12:13] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:12:13] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:12:19] [tv_26b1e944]
-[11:12:16] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:12:16] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:12:24] [tv_26b1e944]
-[11:12:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:12:39] [tv_26b1e944]
-[11:12:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:12:40] [tv_210497a4]
-[11:11:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:11:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[11:11:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:12:54] [tv_26b1e944]
-[11:12:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:13:09] [tv_26b1e944]
-[11:13:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:13:19] [tv_26b1e944]
-[11:13:18] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:13:18] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:13:24] [tv_26b1e944]
-[11:13:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:13:29] [tv_26b1e944]
-[11:13:24] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:13:24] [PLAYBACK] Playing core fallback: bayrak.mp4
-[11:13:27] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:13:27] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:13:39] [tv_26b1e944]
-[11:13:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:13:40] [tv_210497a4]
-[11:12:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:12:40] [PLAYBACK] Playing core fallback: bayrak.mp4
-[11:12:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:13:54] [tv_26b1e944]
-[11:13:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:14:09] [tv_26b1e944]
-[11:14:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:14:24] [tv_26b1e944]
-[11:14:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:14:34] [tv_26b1e944]
-[11:14:29] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:14:29] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:14:39] [tv_26b1e944]
-[11:14:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:14:35] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:14:35] [PLAYBACK] Playing core fallback: bayrak.mp4
-[11:14:38] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:14:38] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:14:40] [tv_210497a4]
-[11:13:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:13:40] [PLAYBACK] Playing ready cached video: 1.mp4
-[11:13:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:14:54] [tv_26b1e944]
-[11:14:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:15:09] [tv_26b1e944]
-[11:15:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:15:24] [tv_26b1e944]
-[11:15:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:15:39] [tv_26b1e944]
-[11:15:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:15:40] [tv_210497a4]
-[11:14:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:14:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[11:14:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:15:44] [tv_26b1e944]
-[11:15:41] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:15:41] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:15:49] [tv_26b1e944]
-[11:15:47] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:15:47] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:15:54] [tv_26b1e944]
-[11:15:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:15:50] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:15:50] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:16:09] [tv_26b1e944]
-[11:16:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:16:24] [tv_26b1e944]
-[11:16:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:16:39] [tv_26b1e944]
-[11:16:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:16:40] [tv_210497a4]
-[11:15:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:15:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:15:40] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:16:54] [tv_26b1e944]
-[11:16:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:16:52] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:16:52] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:16:59] [tv_26b1e944]
-[11:16:58] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:16:58] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:17:04] [tv_26b1e944]
-[11:17:00] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:17:00] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:17:09] [tv_26b1e944]
-[11:17:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:17:24] [tv_26b1e944]
-[11:17:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:17:39] [tv_26b1e944]
-[11:17:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:17:40] [tv_210497a4]
-[11:16:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:16:40] [PLAYBACK] Playing ready cached video: 1.mp4
-[11:16:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:17:54] [tv_26b1e944]
-[11:17:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:18:04] [tv_26b1e944]
-[11:18:03] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:18:03] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:18:09] [tv_26b1e944]
-[11:18:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:18:14] [tv_26b1e944]
-[11:18:09] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:18:09] [PLAYBACK] Playing core fallback: bayrak.mp4
-[11:18:11] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:18:11] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:18:24] [tv_26b1e944]
-[11:18:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:18:39] [tv_26b1e944]
-[11:18:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:18:40] [tv_210497a4]
-[11:17:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:17:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[11:17:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:18:54] [tv_26b1e944]
-[11:18:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:19:09] [tv_26b1e944]
-[11:19:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:19:19] [tv_26b1e944]
-[11:19:14] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:19:14] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:19:24] [tv_26b1e944]
-[11:19:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:19:20] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:19:20] [PLAYBACK] Playing core fallback: bayrak.mp4
-[11:19:22] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:19:22] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:19:39] [tv_26b1e944]
-[11:19:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:19:40] [tv_210497a4]
-[11:18:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:18:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:18:40] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:19:54] [tv_26b1e944]
-[11:19:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:20:09] [tv_26b1e944]
-[11:20:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:20:24] [tv_26b1e944]
-[11:20:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:20:29] [tv_26b1e944]
-[11:20:24] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:20:24] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:20:34] [tv_26b1e944]
-[11:20:31] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:20:31] [PLAYBACK] Playing core fallback: bayrak.mp4
-[11:20:33] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:20:33] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:20:39] [tv_26b1e944]
-[11:20:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:20:40] [tv_210497a4]
-[11:19:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:19:40] [PLAYBACK] Playing ready cached video: 1.mp4
-[11:19:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:20:54] [tv_26b1e944]
-[11:20:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:21:09] [tv_26b1e944]
-[11:21:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:21:24] [tv_26b1e944]
-[11:21:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:21:39] [tv_26b1e944]
-[11:21:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:21:35] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:21:35] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:21:40] [tv_210497a4]
-[11:20:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:20:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[11:20:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:21:44] [tv_26b1e944]
-[11:21:41] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:21:41] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:21:49] [tv_26b1e944]
-[11:21:44] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:21:44] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:21:54] [tv_26b1e944]
-[11:21:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:22:09] [tv_26b1e944]
-[11:22:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:22:24] [tv_26b1e944]
-[11:22:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:22:39] [tv_26b1e944]
-[11:22:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:22:40] [tv_210497a4]
-[11:21:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:21:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:21:41] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:22:49] [tv_26b1e944]
-[11:22:46] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
-[11:22:46] [PLAYBACK] Playing ready cached video: istanbul.mp4
-[2026-08-28 11:22:54] [tv_26b1e944]
-[11:22:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[11:22:52] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
-[11:22:52] [PLAYBACK] Playing core fallback: bayrak.mp4
-[2026-08-28 11:22:59] [tv_26b1e944]
-[11:22:55] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:22:55] [PLAYBACK] Playing ready cached video: 1.mp4
-[2026-08-28 11:23:09] [tv_26b1e944]
-[11:23:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:23:24] [tv_26b1e944]
-[11:23:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:23:39] [tv_26b1e944]
-[11:23:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:23:40] [tv_210497a4]
-[11:22:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
-[11:22:40] [PLAYBACK] Playing ready cached video: 1.mp4
-[11:22:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:23:54] [tv_26b1e944]
-[11:23:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
-[2026-08-28 11:23:59] [tv_26b1e944]
 [11:23:57] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
 [11:23:57] [PLAYBACK] Playing ready cached video: istanbul.mp4
 [2026-08-28 11:24:04] [tv_26b1e944]
@@ -498,3 +72,429 @@ Video already exists: istanbul.mp4
 [11:26:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
 [11:26:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
 [11:26:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:27:54] [tv_26b1e944]
+[11:27:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:28:09] [tv_26b1e944]
+[11:28:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:28:24] [tv_26b1e944]
+[11:28:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:28:39] [tv_26b1e944]
+[11:28:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:28:40] [tv_210497a4]
+[11:27:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:27:40] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:27:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:28:44] [tv_26b1e944]
+[11:28:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:28:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:28:49] [tv_26b1e944]
+[11:28:47] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:28:47] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:28:54] [tv_26b1e944]
+[11:28:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:28:49] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:28:49] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:29:09] [tv_26b1e944]
+[11:29:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:29:24] [tv_26b1e944]
+[11:29:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:29:39] [tv_26b1e944]
+[11:29:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:29:40] [tv_210497a4]
+[11:28:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:28:40] [PLAYBACK] Playing ready cached video: 1.mp4
+[11:28:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:29:54] [tv_26b1e944]
+[11:29:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:29:51] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:29:51] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:30:04] [tv_26b1e944]
+[11:29:58] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:29:58] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:30:00] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:30:00] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:30:09] [tv_26b1e944]
+[11:30:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:30:24] [tv_26b1e944]
+[11:30:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:30:39] [tv_26b1e944]
+[11:30:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:30:40] [tv_210497a4]
+[11:29:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:29:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[11:29:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:30:54] [tv_26b1e944]
+[11:30:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:31:04] [tv_26b1e944]
+[11:31:03] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:31:03] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:31:09] [tv_26b1e944]
+[11:31:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:31:09] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:31:09] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:31:19] [tv_26b1e944]
+[11:31:11] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:31:11] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:31:24] [tv_26b1e944]
+[11:31:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:31:39] [tv_26b1e944]
+[11:31:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:31:40] [tv_210497a4]
+[11:30:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:30:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:30:40] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:31:54] [tv_26b1e944]
+[11:31:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:32:09] [tv_26b1e944]
+[11:32:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:32:19] [tv_26b1e944]
+[11:32:14] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:32:14] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:32:24] [tv_26b1e944]
+[11:32:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:32:20] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:32:20] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:32:22] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:32:22] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:32:39] [tv_26b1e944]
+[11:32:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:32:40] [tv_210497a4]
+[11:31:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:31:40] [PLAYBACK] Playing ready cached video: 1.mp4
+[11:31:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:32:54] [tv_26b1e944]
+[11:32:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:33:09] [tv_26b1e944]
+[11:33:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:33:24] [tv_26b1e944]
+[11:33:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:33:29] [tv_26b1e944]
+[11:33:24] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:33:24] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:33:34] [tv_26b1e944]
+[11:33:30] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:33:30] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:33:33] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:33:33] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:33:39] [tv_26b1e944]
+[11:33:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:33:40] [tv_210497a4]
+[11:32:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:32:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[11:32:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:33:54] [tv_26b1e944]
+[11:33:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:34:09] [tv_26b1e944]
+[11:34:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:34:24] [tv_26b1e944]
+[11:34:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:34:39] [tv_26b1e944]
+[11:34:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:34:35] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:34:35] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:34:40] [tv_210497a4]
+[11:33:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:33:40] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:33:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:34:44] [tv_26b1e944]
+[11:34:41] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:34:41] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:34:44] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:34:44] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:34:54] [tv_26b1e944]
+[11:34:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:35:09] [tv_26b1e944]
+[11:35:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:35:24] [tv_26b1e944]
+[11:35:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:35:39] [tv_26b1e944]
+[11:35:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:35:40] [tv_210497a4]
+[11:34:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:34:40] [PLAYBACK] Playing ready cached video: 1.mp4
+[11:34:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:35:49] [tv_26b1e944]
+[11:35:46] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:35:46] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:35:54] [tv_26b1e944]
+[11:35:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:35:52] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:35:52] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:35:59] [tv_26b1e944]
+[11:35:55] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:35:55] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:36:09] [tv_26b1e944]
+[11:36:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:36:24] [tv_26b1e944]
+[11:36:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:36:39] [tv_26b1e944]
+[11:36:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:36:40] [tv_210497a4]
+[11:35:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:35:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[11:35:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:36:54] [tv_26b1e944]
+[11:36:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:36:59] [tv_26b1e944]
+[11:36:57] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:36:57] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:37:04] [tv_26b1e944]
+[11:37:03] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:37:03] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:37:09] [tv_26b1e944]
+[11:37:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:37:05] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:37:05] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:37:24] [tv_26b1e944]
+[11:37:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:37:39] [tv_26b1e944]
+[11:37:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:37:40] [tv_210497a4]
+[11:36:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:36:40] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:36:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:37:54] [tv_26b1e944]
+[11:37:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:38:09] [tv_26b1e944]
+[11:38:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:38:08] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:38:08] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:38:19] [tv_26b1e944]
+[11:38:14] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:38:14] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:38:17] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:38:17] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:38:24] [tv_26b1e944]
+[11:38:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:38:39] [tv_26b1e944]
+[11:38:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:38:40] [tv_210497a4]
+[11:37:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:37:40] [PLAYBACK] Playing ready cached video: 1.mp4
+[11:37:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:38:54] [tv_26b1e944]
+[11:38:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:39:09] [tv_26b1e944]
+[11:39:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:39:24] [tv_26b1e944]
+[11:39:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:39:19] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:39:19] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:39:29] [tv_26b1e944]
+[11:39:25] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:39:25] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:39:28] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:39:28] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:39:39] [tv_26b1e944]
+[11:39:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:39:40] [tv_210497a4]
+[11:38:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:38:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[11:38:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:39:54] [tv_26b1e944]
+[11:39:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:40:09] [tv_26b1e944]
+[11:40:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:40:24] [tv_26b1e944]
+[11:40:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:40:34] [tv_26b1e944]
+[11:40:30] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:40:30] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:40:39] [tv_26b1e944]
+[11:40:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:40:37] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:40:37] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:40:40] [tv_210497a4]
+[11:39:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:39:40] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:39:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:40:44] [tv_26b1e944]
+[11:40:39] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:40:39] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:40:54] [tv_26b1e944]
+[11:40:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:41:09] [tv_26b1e944]
+[11:41:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:41:24] [tv_26b1e944]
+[11:41:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:41:39] [tv_26b1e944]
+[11:41:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:41:40] [tv_210497a4]
+[11:40:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:40:40] [PLAYBACK] Playing ready cached video: 1.mp4
+[11:40:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:41:44] [tv_26b1e944]
+[11:41:41] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:41:41] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:41:49] [tv_26b1e944]
+[11:41:48] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:41:48] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:41:54] [tv_26b1e944]
+[11:41:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:41:50] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:41:50] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:42:09] [tv_26b1e944]
+[11:42:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:42:24] [tv_26b1e944]
+[11:42:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:42:39] [tv_26b1e944]
+[11:42:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:42:40] [tv_210497a4]
+[11:41:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:41:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[11:41:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:42:54] [tv_26b1e944]
+[11:42:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:42:52] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:42:52] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:43:04] [tv_26b1e944]
+[11:42:58] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:42:58] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:43:01] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:43:01] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:43:09] [tv_26b1e944]
+[11:43:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:43:13] [tv_210497a4]
+[11:42:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:42:40] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:42:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:43:19] [tv_210497a4]
+[11:43:14] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:43:17] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:43:17] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:43:24] [tv_26b1e944]
+[11:43:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:43:29] [tv_210497a4]
+[11:43:24] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:43:34] [tv_210497a4]
+[11:43:33] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:43:33] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:43:39] [tv_26b1e944]
+[11:43:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:43:44] [tv_210497a4]
+[11:43:39] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:43:49] [tv_210497a4]
+[11:43:45] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:43:45] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:43:54] [tv_26b1e944]
+[11:43:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:43:54] [tv_210497a4]
+[11:43:50] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:43:50] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:43:59] [tv_210497a4]
+[11:43:54] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:44:04] [tv_26b1e944]
+[11:44:03] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:44:03] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:44:09] [tv_26b1e944]
+[11:44:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:44:09] [tv_210497a4]
+[11:44:03] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:44:03] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:44:14] [tv_26b1e944]
+[11:44:09] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:44:09] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:44:12] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:44:12] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:44:24] [tv_26b1e944]
+[11:44:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:44:39] [tv_26b1e944]
+[11:44:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:44:40] [tv_210497a4]
+[11:44:09] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:44:54] [tv_26b1e944]
+[11:44:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:45:09] [tv_26b1e944]
+[11:45:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:45:19] [tv_26b1e944]
+[11:45:14] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:45:14] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:45:24] [tv_26b1e944]
+[11:45:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:45:21] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:45:21] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:45:23] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:45:23] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:45:39] [tv_26b1e944]
+[11:45:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:45:40] [tv_210497a4]
+[11:44:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:44:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:44:40] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:45:54] [tv_26b1e944]
+[11:45:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:46:09] [tv_26b1e944]
+[11:46:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:46:24] [tv_26b1e944]
+[11:46:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:46:29] [tv_26b1e944]
+[11:46:25] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:46:25] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:46:34] [tv_26b1e944]
+[11:46:31] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:46:31] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:46:39] [tv_26b1e944]
+[11:46:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:46:34] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:46:34] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:46:40] [tv_210497a4]
+[11:45:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:45:40] [PLAYBACK] Playing ready cached video: 1.mp4
+[11:45:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:46:54] [tv_26b1e944]
+[11:46:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:47:09] [tv_26b1e944]
+[11:47:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:47:24] [tv_26b1e944]
+[11:47:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:47:39] [tv_26b1e944]
+[11:47:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:47:36] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:47:36] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:47:40] [tv_210497a4]
+[11:46:40] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:46:40] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[11:46:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:47:44] [tv_26b1e944]
+[11:47:42] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:47:42] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:47:49] [tv_26b1e944]
+[11:47:45] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:47:45] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:47:54] [tv_26b1e944]
+[11:47:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:48:09] [tv_26b1e944]
+[11:48:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:48:24] [tv_26b1e944]
+[11:48:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:48:39] [tv_26b1e944]
+[11:48:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:48:40] [tv_210497a4]
+[11:47:40] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:47:40] [PLAYBACK] Playing core fallback: bayrak.mp4
+[11:47:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:48:49] [tv_26b1e944]
+[11:48:47] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:48:47] [PLAYBACK] Playing ready cached video: istanbul.mp4
+[2026-08-28 11:48:54] [tv_26b1e944]
+[11:48:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[11:48:53] [VIDEO LOOP] Next video -> index 2 (bayrak.mp4)
+[11:48:53] [PLAYBACK] Playing core fallback: bayrak.mp4
+[2026-08-28 11:48:59] [tv_26b1e944]
+[11:48:56] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:48:56] [PLAYBACK] Playing ready cached video: 1.mp4
+[2026-08-28 11:49:09] [tv_26b1e944]
+[11:49:04] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:49:24] [tv_26b1e944]
+[11:49:19] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:49:39] [tv_26b1e944]
+[11:49:34] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:49:40] [tv_210497a4]
+[11:48:40] [VIDEO LOOP] Next video -> index 0 (1.mp4)
+[11:48:40] [PLAYBACK] Playing ready cached video: 1.mp4
+[11:48:40] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:49:54] [tv_26b1e944]
+[11:49:49] [SYNC] Checking disk cache for playlist: 1.mp4, istanbul.mp4, bayrak.mp4
+[2026-08-28 11:49:59] [tv_26b1e944]
+[11:49:58] [VIDEO LOOP] Next video -> index 1 (istanbul.mp4)
+[11:49:58] [PLAYBACK] Playing ready cached video: istanbul.mp4
