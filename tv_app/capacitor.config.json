@@ -1,9 +1,13 @@
 {
   "appId": "com.firinna.tv",
-  "appName": "Fırınna Garson",
+  "appName": "Firinna TV",
   "webDir": "www",
+  "bundledWebRuntime": false,
   "server": {
-    "allowNavigation": ["*"],
-    "cleartext": true
+    "cleartext": true,
+    "androidScheme": "http",
+    "allowNavigation": [
+      "*"
+    ]
   }
 }
