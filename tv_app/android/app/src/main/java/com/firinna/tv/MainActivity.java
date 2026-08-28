@@ -1,4 +1,4 @@
-package com.firinna.posmobile;
+package com.firinna.tv;
 
 import com.getcapacitor.BridgeActivity;
 
