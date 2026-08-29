@@ -1,19 +1,19 @@
 {
-    "today": 8,
-    "month": 252,
-    "total": 252,
+    "today": 1,
+    "month": 253,
+    "total": 253,
     "menu": 6,
     "actions": 27,
-    "last_date": "2026-08-21",
+    "last_date": "2026-08-29",
     "devices": {
-        "💻 Masaüstü": 176,
+        "💻 Masaüstü": 177,
         "📱 Mobil": 76
     },
     "browsers": {
         "Google Chrome": 213,
         "Apple Safari": 18,
         "Microsoft Edge": 17,
-        "Diğer Tarayıcı": 4
+        "Diğer Tarayıcı": 5
     },
     "countries": {
         "🇹🇷 Türkiye": 58,
@@ -27,9 +27,27 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 94,
-        "🔗 Doğrudan (Direct)": 76
+        "🔗 Doğrudan (Direct)": 77
     },
     "recent_visitors": [
+        {
+            "id": "log_1787975993891",
+            "time": "29 Ağustos 06:59",
+            "iso_date": "2026-08-29",
+            "raw_time": "2026-08-29 06:59:53",
+            "ip": "202.8.43.201",
+            "country": "📍 Sterling / United States",
+            "location": "📍 Sterling / United States",
+            "traffic_source": "🔗 Doğrudan (Direct)",
+            "store_mode": "🌐 Dışarıdan İnceleyen",
+            "device": "💻 Masaüstü (Diğer Sistem)",
+            "browser": "Diğer Tarayıcı",
+            "action": "👁️ Sayfa Görüntüleme",
+            "type": "✨ Yeni Ziyaretçi",
+            "scroll_depth": "%0",
+            "time_spent": "0 sn",
+            "lang_compare": "EN ➔ TR"
+        },
         {
             "id": "log_1787304073439",
             "time": "21 Ağustos 12:21",
@@ -9857,20 +9875,20 @@
         }
     ],
     "repeat_visitors": 200,
-    "new_visitors": 52,
+    "new_visitors": 53,
     "os": {
         "Linux": 152,
         "Windows PC": 13,
         "Apple iOS": 14,
         "Android OS": 62,
-        "Diğer Sistem": 6,
+        "Diğer Sistem": 7,
         "Apple macOS": 5
     },
     "peak_hours": {
         "14:00 - 17:00 (İkindi Kahve/Tatlı)": 60,
         "17:00 - 20:00 (Akşam Yemeği)": 72,
         "20:00 - 23:00 (Gece Keyfi)": 58,
-        "23:00 - 08:00 (Gece / Erken)": 28,
+        "23:00 - 08:00 (Gece / Erken)": 29,
         "08:00 - 11:00 (Sabah Kahvaltı)": 1,
         "11:00 - 14:00 (Öğle Brunch)": 33
     },
@@ -9889,7 +9907,7 @@
         "📍 Pryor / United States": 7,
         "📍 Minkler / United States": 1,
         "📍 Baku / Azerbaijan": 1,
-        "📍 Sterling / United States": 1,
+        "📍 Sterling / United States": 2,
         "📍 Kütahya / Türkiye": 2,
         "📍 Silver Spring / United States": 2,
         "📍 Berkeley / United States": 2,
@@ -9904,15 +9922,15 @@
         "📲 Masa QR Kodu (Dükkan İçi)": 1,
         "🔍 Google Arama (SEO)": 5,
         "🌐 Diğer Web Sitesi": 94,
-        "🔗 Doğrudan (Direct)": 76
+        "🔗 Doğrudan (Direct)": 77
     },
     "store_modes": {
         "🏪 Masada Oturan Müşteri": 1,
-        "🌐 Dışarıdan İnceleyen": 175
+        "🌐 Dışarıdan İnceleyen": 176
     },
     "lang_comparisons": {
         "TR ➔ TR": 84,
-        "EN ➔ TR": 36,
+        "EN ➔ TR": 37,
         "EN ➔ EN": 16,
         "TR ➔ ES": 8,
         "TR ➔ RU": 3,

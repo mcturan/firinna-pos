@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>Fırınna TV (Dijital Tabela)</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px 20px; background: #000; color: #fff; margin: 0; }
+        input { padding: 10px; font-size: 16px; width: 80%; max-width: 300px; border-radius: 8px; border: 2px solid #555; margin-bottom: 20px; background: #222; color: white;}
+        button { padding: 12px 24px; font-size: 16px; border-radius: 8px; border: none; background: #2d6a4f; color: white; cursor: pointer; font-weight: bold; }
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; z-index: 9999; }
+        #splash h1 { font-size: 3rem; margin: 0; letter-spacing: 2px; color: #2d6a4f; }
+        #splash p { margin: 5px 0 0; opacity: 0.8; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+    <div id="splash">
+        <h1>FIRINNA TV</h1>
+        <p id="splash-msg">Bağlanıyor...</p>
+    </div>
+
+    <div id="setup" style="display:none; padding-top: 50px;">
+        <h2 style="color:#2d6a4f;">Sunucu IP Adresi</h2>
+        <p>POS bilgisayarının IP adresini giriniz (Örn: 192.168.1.100)</p>
+        <input type="text" id="ipInput" placeholder="192.168.1.2" value="192.168.1.2" />
+        <br>
+        <button onclick="saveAndGo()">Kaydet ve Başla</button>
+    </div>
+    
+    <script>
+        const splashStart = Date.now();
+        const MIN_SPLASH_TIME = 1500;
+        const APP_VERSION = "2.0.1";
+        let retryCount = 0;
+        const MAX_RETRIES = 60; // 60 deneme (yaklaşık 3 dakika)
+
+        function setSplashMsg(msg) {
+            var el = document.getElementById('splash-msg');
+            if (el) el.textContent = msg;
+        }
+
+        function doRedirect(url) {
+            const elapsed = Date.now() - splashStart;
+            const remaining = Math.max(0, MIN_SPLASH_TIME - elapsed);
+            setTimeout(function() {
+                window.location.replace(url);
+            }, remaining);
+        }
+
+        function saveAndGo() {
+            var ip = document.getElementById('ipInput').value.trim();
+            if (ip) {
+                localStorage.setItem("server_ip", ip);
+                window.location.replace("http://" + ip + ":5000/tv-player");
+            }
+        }
+
+        function showError(savedIp) {
+            document.getElementById('splash').innerHTML =
+                '<h1 style="color:#e53e3e">BAĞLANTI HATASI</h1>' +
+                '<p>Sunucuya uzun süre bağlanılamadı.<br>Wi-Fi bağlı mı? POS açık mı?</p>' +
+                '<p style="color:#888; font-size:14px; margin-top:20px;">Deneme: ' + retryCount + ' | IP: ' + savedIp + '</p>' +
+                '<button onclick="localStorage.removeItem(\'server_ip\'); location.reload();" style="margin-top:20px; background:#444;">IP Sıfırla</button>' +
+                '<button onclick="location.reload()" style="margin-top:20px; margin-left:10px;">Tekrar Dene</button>';
+        }
+
+        function tryConnect() {
+            var savedIp = localStorage.getItem("server_ip");
+            if (!savedIp) {
+                document.getElementById('splash').style.display = 'none';
+                document.getElementById('setup').style.display = 'block';
+                return;
+            }
+
+            var serverUrl = "http://" + savedIp + ":5000";
+            var controller = new AbortController();
+            var timeoutId = setTimeout(function() { controller.abort(); }, 4000);
+
+            retryCount++;
+            if (retryCount > 1) {
+                setSplashMsg("Sunucu bekleniyor... (" + retryCount + ")");
+            } else {
+                setSplashMsg("Sunucuya bağlanılıyor...");
+            }
+
+            fetch(serverUrl + "/api/mobile_version", { signal: controller.signal })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    clearTimeout(timeoutId);
+                    
+                    var serverTvVersion = parseFloat(data.tv_version || "0");
+                    var myVersion = parseFloat(APP_VERSION);
+
+                    if (serverTvVersion > myVersion) {
+                        setSplashMsg("Güncelleme indiriliyor (" + data.tv_version + ")...");
+                        setTimeout(function() {
+                            window.location.href = serverUrl + (data.tv_apk_url || "/download_tv_apk");
+                        }, 800);
+                    } else {
+                        doRedirect(serverUrl + "/tv-player");
+                    }
+                })
+                .catch(function(err) {
+                    clearTimeout(timeoutId);
+                    console.log("Baglanti hatasi (deneme " + retryCount + "): " + err.message);
+                    
+                    if (retryCount < MAX_RETRIES) {
+                        // 3 saniye sonra tekrar dene
+                        setTimeout(tryConnect, 3000);
+                    } else {
+                        // Max limite ulaşıldı, pes et
+                        showError(savedIp);
+                    }
+                });
+        }
+
+        // Başlat
+        tryConnect();
+    </script>
+</body>
+</html>

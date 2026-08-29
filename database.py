@@ -347,7 +347,7 @@ def get_table_order(table_id):
     order_dict = dict(order)
     items = conn.execute('''
         SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.price, 
-               oi.is_complimentary, oi.kitchen_notes, oi.created_at, oi.part_no,
+               oi.is_complimentary, oi.kitchen_notes, oi.created_at,
                COALESCE(oi.product_name, p.name) as product_name
         FROM order_items oi
         LEFT JOIN products p ON oi.product_id = p.id
@@ -362,10 +362,9 @@ def create_order(table_id, created_at=None):
     """Yeni sipariş oluştur"""
     conn = get_db()
     c = conn.cursor()
-    if created_at:
-        c.execute('INSERT INTO orders (table_id, created_at) VALUES (?, ?)', (table_id, created_at))
-    else:
-        c.execute('INSERT INTO orders (table_id) VALUES (?)', (table_id,))
+    if not created_at:
+        created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    c.execute('INSERT INTO orders (table_id, created_at) VALUES (?, ?)', (table_id, created_at))
     order_id = c.lastrowid
     conn.commit()
     conn.close()
@@ -409,11 +408,12 @@ def check_and_delete_temp_table(conn, order_id):
 def close_order(order_id):
     """Siparişi kapat (ödeme al)"""
     conn = get_db()
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     conn.execute('''
         UPDATE orders 
-        SET status = 'closed', closed_at = CURRENT_TIMESTAMP 
+        SET status = 'closed', closed_at = ? 
         WHERE id = ?
-    ''', (order_id,))
+    ''', (now_str, order_id))
     check_and_delete_temp_table(conn, order_id)
     conn.commit()
     conn.close()
@@ -898,6 +898,15 @@ def create_past_order(table_id, created_at, closed_at, items, payment_cash=0, pa
     """Geçmiş tarihli kapalı sipariş oluştur"""
     conn = get_db()
     
+    if created_at:
+        created_at = created_at.replace('T', ' ').strip()
+        if len(created_at) == 16:
+            created_at += ':00'
+    if closed_at:
+        closed_at = closed_at.replace('T', ' ').strip()
+        if len(closed_at) == 16:
+            closed_at += ':00'
+
     cursor = conn.execute('''
         INSERT INTO orders (table_id, status, total, created_at, closed_at, 
                            payment_cash, payment_card, discount_type, discount_value, 
@@ -2082,7 +2091,8 @@ def transfer_order_items(source_order_id, target_table_id, items_to_move):
         target_order_id = dst_order['id']
     else:
         # Yoksa yeni sipariş oluştur
-        c.execute("INSERT INTO orders (table_id, status) VALUES (?, 'open')", (target_table_id,))
+        now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        c.execute("INSERT INTO orders (table_id, status, created_at) VALUES (?, 'open', ?)", (target_table_id, now_str))
         target_order_id = c.lastrowid
         
     # 3. Ürünleri taşı

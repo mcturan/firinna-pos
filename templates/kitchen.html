@@ -57,16 +57,31 @@
 <div id="kdsGrid" class="kds-grid"></div>
 
 <script>
+function parseTimestamp(created_at) {
+    if (!created_at) return Date.now();
+    const clean = created_at.replace(' ', 'T');
+    if (clean.endsWith('Z')) {
+        return new Date(clean).getTime();
+    }
+    const [dPart, tPart] = clean.split('T');
+    if (dPart && tPart) {
+        const [y, m, d] = dPart.split('-').map(Number);
+        const [hr, min, sec] = tPart.split(':').map(Number);
+        return new Date(y, m - 1, d, hr || 0, min || 0, sec || 0).getTime();
+    }
+    return new Date(clean).getTime();
+}
+
 function elapsedStr(created_at) {
-    const ts = created_at.includes('T') ? created_at : created_at.replace(' ','T') + 'Z';
-    const diff = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
+    if (!created_at) return '0s';
+    const diff = Math.floor((Date.now() - parseTimestamp(created_at)) / 1000);
     if (diff < 0) return '0s';
     const m = Math.floor(diff / 60), s = diff % 60;
     return m > 0 ? m + 'dk ' + s + 's' : s + 's';
 }
 function isUrgent(created_at) {
-    const ts = created_at.includes('T') ? created_at : created_at.replace(' ','T') + 'Z';
-    return (Date.now() - new Date(ts).getTime()) > 15 * 60 * 1000;
+    if (!created_at) return false;
+    return (Date.now() - parseTimestamp(created_at)) > 15 * 60 * 1000;
 }
 
 let _orders = [];

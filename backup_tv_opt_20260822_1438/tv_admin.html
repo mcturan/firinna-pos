@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dijital Tabela Yönetimi</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .tv-tabs { display:flex; gap:.5rem; border-bottom:2px solid #e2e8f0; margin-bottom:1.5rem; flex-wrap: wrap; }
+        .tv-tab { padding:.75rem 1.2rem; border:none; background:none; font-size:.9rem; font-weight:600; color:#718096; cursor:pointer; border-bottom:3px solid transparent; }
+        .tv-tab.active { color:#2d6a4f; border-bottom-color:#2d6a4f; }
+        .tv-pane { display:none; }
+        .tv-pane.active { display:block; }
+        .form-group { margin-bottom:1.25rem; }
+        .form-group label { display:block; margin-bottom:.5rem; font-weight:600; color:#4a5568; }
+        .form-group input[type="text"], .form-group select, .form-group textarea, .form-group input[type="file"] { width:100%; padding:.65rem; border:2px solid #e2e8f0; border-radius:8px; font-family:inherit;}
+        .form-group input[type="time"] { padding:.65rem; border:2px solid #e2e8f0; border-radius:8px; }
+        .btn-save { background:#2d6a4f; color:white; border:none; padding:.75rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem; margin-top: 1rem; width:100%;}
+        .btn-save:hover { background:#1b4332; }
+        .card { background:white; padding:1.5rem; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.05); margin-bottom:1.5rem; }
+        .flex-row { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;}
+        .media-list { max-height: 150px; overflow-y: auto; background: #f7fafc; padding: 1rem; border-radius: 8px; font-size: 0.85rem; border: 1px solid #e2e8f0;}
+    </style>
+</head>
+<body>
+    {% include '_navbar.html' %}
+    <div class="container" style="max-width: 900px;">
+        <h1>📺 Dijital Tabela Yönetimi</h1>
+        <!-- Connected Screens & Devices Monitor -->
+        <div style="margin-bottom: 1.5rem; background:#ffffff; border-radius:12px; border:1.5px solid #e2e8f0; padding:1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                <div>
+                    <h3 style="margin:0; font-size:1.15rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                        📶 Bağlı Cihazlar ve Ekranlar
+                        <span id="client_count_badge" style="background:#dcfce7; color:#15803d; font-size:0.8rem; padding:2px 8px; border-radius:12px; font-weight:bold;">0 Aktif</span>
+                    </h3>
+                    <small style="color:#64748b;">Sisteme canlı bağlı TV'ler, tabletler ve telefonlar</small>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <button type="button" onclick="pushInstantUpdate('sync', 'all')" style="background:#2563eb; color:white; border:none; padding:0.5rem 1rem; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.88rem;">
+                        ⚡ Tümüne Push Et
+                    </button>
+                    <button type="button" onclick="pushInstantUpdate('reload', 'all')" style="background:#dc2626; color:white; border:none; padding:0.5rem 1rem; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.88rem;">
+                        🔄 Tümünü Restart Et
+                    </button>
+                    <a href="/static/Firinna-TV-1.1.32.apk?v=12" class="btn-save" style="width:auto; margin-top:0; padding:0.45rem 0.9rem; background:#38a169; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; font-size:0.88rem;" download="Firinna-TV-1.1.32.apk">
+                        <i class="fas fa-download"></i> TV APK İndir
+                    </a>
+                </div>
+            </div>
+
+            <div id="connected_clients_list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:10px;">
+                <div style="color:#94a3b8; font-size:0.9rem; padding:10px; background:#f8fafc; border-radius:6px; text-align:center;">
+                    Bağlı cihazlar taranıyor...
+                </div>
+            </div>
+        </div>
+        
+        <div class="tv-tabs">
+            <button class="tv-tab active" onclick="switchTab('genel', this)">Genel & Logo</button>
+            <button class="tv-tab" onclick="switchTab('medya', this)">Video & Müzik (PC / YouTube)</button>
+            <button class="tv-tab" onclick="switchTab('filigran', this)">🎨 Filigran Döngüsü</button>
+            <button class="tv-tab" onclick="switchTab('mesajlar', this)">📰 Canlı Haberler & Mesajlar</button>
+            <button class="tv-tab" onclick="switchTab('qr', this)">QR & Araçlar</button>
+        </div>
+
+        <div id="genel" class="tv-pane active card">
+            <h3 style="margin-top:0;">Genel Ayarlar ve Logo</h3>
+            <div class="form-group">
+                <label>Logo URL (PNG tavsiye edilir)</label>
+                <input type="text" id="logo_url" placeholder="/static/uploads/logo.png veya http://...">
+            </div>
+            <div class="form-group" style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0;">
+                <label style="color:#166534; font-weight:bold; font-size:1.05rem;">📐 Ekran Düzeni: Modern 3-Bölge Tabela</label>
+                <p style="font-size:0.88rem; color:#64748b; margin-top:4px; margin-bottom:0;">
+                    Üstte Logo/Bayrak, Saat/Hava ve Sosyal Medya; Ortada Menü ve Ana Video; Altta Canlı Kurlar ve Haber Akışı aktiftir.
+                </p>
+            </div>
+        </div>
+
+        <div id="medya" class="tv-pane card">
+            <h3 style="margin-top:0;">Video ve Müzik Kaynağı</h3>
+            <div class="form-group">
+                <label>Kaynak Seçimi</label>
+                <select id="media_source" onchange="toggleSource()">
+                    <option value="youtube">İnternetten (YouTube)</option>
+                    <option value="local">Bu PC'den (Kendi Videolarım & Müziklerim)</option>
+                </select>
+            </div>
+
+            <div id="source_youtube">
+                <div class="form-group">
+                    <label>YouTube Video veya Playlist ID</label>
+                    <input type="text" id="video_playlist" placeholder="Örn: PLa12345... veya videoId">
+                    <small style="color:#718096">YouTube linkindeki 'list=' veya 'v=' sonrasındaki kısımdır.</small>
+                </div>
+            </div>
+
+            <div id="source_local" style="display:none;">
+                <div style="display:flex; gap:1rem;">
+                    <div class="form-group" style="flex:1">
+                        <label>Bilgisayardan Video Yükle (.mp4)</label>
+                        <input type="file" id="upload_video" accept="video/mp4,video/webm">
+                        <button onclick="uploadMedia('video')" style="margin-top:5px; padding:5px 10px;">Yükle</button>
+                    </div>
+                    <div class="form-group" style="flex:1">
+                        <label>Bilgisayardan Müzik Yükle (.mp3)</label>
+                        <input type="file" id="upload_audio" accept="audio/mpeg,audio/wav">
+                        <button onclick="uploadMedia('audio')" style="margin-top:5px; padding:5px 10px;">Yükle</button>
+                    </div>
+                </div>
+                <div style="display:flex; gap:1rem;">
+                    <div style="flex:1">
+                        <strong>Yüklü Videolar (Sırayla Çalar):</strong>
+                        <div id="local_videos_list" class="media-list">Yok</div>
+                    </div>
+                    <div style="flex:1">
+                        <strong>Yüklü Müzikler (Sırayla Çalar):</strong>
+                        <div id="local_audio_list" class="media-list">Yok</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label>Ses Önceliği (Videoların sesi çıksın mı?)</label>
+                <select id="audio_priority">
+                    <option value="video">Videoların Sesi Çıksın</option>
+                    <option value="music">Videolar Sessiz Olsun (Sadece Müzik Çalsın)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="filigran" class="tv-pane card">
+            <h3 style="margin-top:0;">🎨 Filigran Döngüsü & Özel Kartlar</h3>
+            <p style="font-size:0.88rem; color:#718096; margin-bottom:1.5rem;">
+                Videonun üzerinde periyodik olarak beliren kurumsal filigran ve sosyal sorumluluk tanıtım kartları.
+            </p>
+
+            <div class="form-group" style="background:#f8fafc; padding:16px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:1.5rem; display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                <div>
+                    <label style="font-weight:bold; color:#1a202c; display:block; margin-bottom:6px;">⏱️ Döngü Aralığı (Saniyede bir)</label>
+                    <input type="number" id="wm_interval_sec" value="90" min="10" max="600" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
+                    <small style="color:#718096;">Varsayılan: 90 saniye</small>
+                </div>
+                <div>
+                    <label style="font-weight:bold; color:#1a202c; display:block; margin-bottom:6px;">⏳ Ekranda Kalma Süresi (Saniye)</label>
+                    <input type="number" id="wm_duration_sec" value="10" min="3" max="60" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
+                    <small style="color:#718096;">Varsayılan: 10 saniye</small>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h4 style="margin:0; color:#2d3748;">Filigran Kartları Listesi</h4>
+                <button type="button" onclick="addWatermarkCard()" style="background:#059669; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                    ➕ Yeni Filigran Kartı Ekle
+                </button>
+            </div>
+
+            <div id="watermark_cards_container" style="display:flex; flex-direction:column; gap:14px;">
+                <!-- Dinamik Kartlar JS ile Yüklenecek -->
+            </div>
+        </div>
+
+        <div id="mesajlar" class="tv-pane card">
+            <h3 style="margin-top:0;">Kayan Yazılar & Ürün Tanıtımları</h3>
+            <div class="form-group" style="background:#f8fafc; padding:16px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:1.5rem; display:flex; flex-direction:column; gap:12px;">
+                <label style="display:flex; align-items:center; gap:0.75rem; font-size:0.95rem; font-weight:bold; color:#1a202c; cursor:pointer; margin-bottom:0;">
+                    <input type="checkbox" id="ticker_text_enabled" style="width:1.2rem; height:1.2rem; cursor:pointer;" checked>
+                    📢 Duyuru & Mesaj Kayan Yazısını Göster
+                </label>
+                <label style="display:flex; align-items:center; gap:0.75rem; font-size:0.95rem; font-weight:bold; color:#1a202c; cursor:pointer; margin-bottom:0;">
+                    <input type="checkbox" id="ticker_currency_enabled" style="width:1.2rem; height:1.2rem; cursor:pointer;" checked>
+                    💱 Canlı Döviz & Kripto Kurlarını Göster (TCMB USD/TL, EUR/TL, EUR/USD, BTC/USDT, ETH/USDT)
+                </label>
+                <label style="display:flex; align-items:center; gap:0.75rem; font-size:0.95rem; font-weight:bold; color:#1a202c; cursor:pointer; margin-bottom:0;">
+                    <input type="checkbox" id="ticker_rss_enabled" style="width:1.2rem; height:1.2rem; cursor:pointer;" checked>
+                    📰 Canlı RSS Haber Akışını Göster
+                </label>
+                <small style="color:#718096; margin-top:2px;">* Her üçü de kapatılırsa alt bant gizlenir ve sayfa/video alanı otomatik olarak ekranın en altına genişler.</small>
+            </div>
+
+            <!-- Alt Bant Efekt ve Hız Ayarı -->
+            <div class="form-group" style="background:#eff6ff; padding:16px; border-radius:8px; border:1px solid #bfdbfe; margin-bottom:1.5rem;">
+                <label style="font-weight:bold; color:#1e40af; display:block; margin-bottom:12px; font-size:1.05rem;">
+                    ⚡ Alt Bant Geçiş Efekti ve Hız Ayarları
+                </label>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:10px;">
+                    <div>
+                        <label style="font-weight:600; color:#1e3a8a; font-size:0.92rem; display:block; margin-bottom:6px;">
+                            🎬 Geçiş Efekti:
+                        </label>
+                        <select id="ticker_effect" style="width:100%; padding:9px 12px; border-radius:6px; border:1.5px solid #93c5fd; font-size:0.95rem; font-weight:600; background:#ffffff; color:#1e293b;" onchange="onTickerEffectChange()">
+                            <option value="marquee">➡️ Sürekli Kayan Yazı (Yatay Akış)</option>
+                            <option value="fade">✨ Fade In / Out (Belirip Kaybolan)</option>
+                            <option value="slide_up">⬆️ Aşağıdan Yukarı Kayan (Slide Up)</option>
+                            <option value="slide_down">⬇️ Yukarıdan Aşağı Kayan (Slide Down)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="font-weight:600; color:#1e3a8a; font-size:0.92rem; display:block; margin-bottom:6px;" id="lbl_ticker_speed">
+                            🚀 Kayan Yazı Hızı:
+                        </label>
+                        <!-- Marquee Hız Seçimi -->
+                        <div id="container_marquee_speed">
+                            <select id="ticker_speed" style="width:100%; padding:9px 12px; border-radius:6px; border:1.5px solid #93c5fd; font-size:0.95rem; font-weight:600; background:#ffffff; color:#1e293b;">
+                                <option value="1.5">1 - Yavaş (1.5 px/frame)</option>
+                                <option value="2.5">2 - Normal (2.5 px/frame)</option>
+                                <option value="3.5">3 - Akıcı / Orta (3.5 px/frame)</option>
+                                <option value="4.5" selected>4 - Hızlı (4.5 px/frame - TV İçin Tavsiye)</option>
+                                <option value="6.0">5 - Çok Hızlı (6.0 px/frame)</option>
+                                <option value="8.0">6 - Ekstra Hızlı (8.0 px/frame)</option>
+                            </select>
+                        </div>
+                        <!-- Fade/Slide Süre Seçimi -->
+                        <div id="container_slide_duration" style="display:none;">
+                            <select id="ticker_slide_duration" style="width:100%; padding:9px 12px; border-radius:6px; border:1.5px solid #93c5fd; font-size:0.95rem; font-weight:600; background:#ffffff; color:#1e293b;">
+                                <option value="4">4 Saniye (Hızlı)</option>
+                                <option value="6">6 Saniye</option>
+                                <option value="8" selected>8 Saniye (Tavsiye)</option>
+                                <option value="10">10 Saniye</option>
+                                <option value="15">15 Saniye (Yavaş)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <small style="color:#1d4ed8; display:block; margin-top:4px;">
+                    💡 TV ekranınızda haberlerin ve duyuruların akış stilini ve hızını buradan belirleyebilirsiniz.
+                </small>
+            </div>
+
+            <div class="form-group" style="background:#f0fdf4; padding:16px; border-radius:8px; border:1px solid #bbf7d0; margin-bottom:1.5rem;">
+                <label style="font-weight:bold; color:#166534; display:block; margin-bottom:10px; font-size:1.05rem;">📰 Canlı Haber Kaynakları (Türkiye & İstanbul Kültür, Arkeoloji & Yaşam - İngilizce)</label>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
+                        <input type="checkbox" id="rss_turkey_archaeo_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>🏛️ Türkiye Arkeoloji, Antik Kentler & Tarih (EN)</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
+                        <input type="checkbox" id="rss_ds_arts_en_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>🎨 Daily Sabah (Kültür, Sanat & Yaşam - EN)</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
+                        <input type="checkbox" id="rss_aa_life_en_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>📜 Anadolu Agency (Kültürel Miras & Yaşam - EN)</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
+                        <input type="checkbox" id="rss_turkey_exp_en_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>☕ İstanbul & Türkiye Güncel Etkinlikler (EN)</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#14532d; cursor:pointer;">
+                        <input type="checkbox" id="rss_goodnews_en_enabled" checked style="width:1.15rem; height:1.15rem;">
+                        <span>🌱 Good News Network (Pozitif Dünya Hikayeleri - EN)</span>
+                    </label>
+                </div>
+
+                <hr style="border:0; border-top:1px solid #bbf7d0; margin:10px 0;">
+
+                <label style="display:flex; align-items:center; gap:8px; font-weight:bold; color:#166534; cursor:pointer; margin-bottom:6px;">
+                    <input type="checkbox" id="rss_custom_enabled" checked style="width:1.15rem; height:1.15rem;">
+                    <span>🔗 Özel RSS / HTML Widget Kaynağı:</span>
+                </label>
+                <input type="text" id="rss_url" placeholder="Örn: http://feed.informer.com/widgets/LXPXCGW6AL.html" style="width:100%; padding:10px; border-radius:6px; border:1px solid #86efac; font-size:0.95rem; margin-bottom:10px;">
+                
+                <div style="margin-top:10px; display:flex; align-items:center; gap:12px;">
+                    <label style="font-weight:600; color:#14532d; font-size:0.95rem; margin-bottom:0;">⏱️ Haberleri Yenileme Sıklığı:</label>
+                    <select id="rss_refresh_mins" style="padding:6px 12px; border-radius:6px; border:1px solid #86efac; font-size:0.95rem; font-weight:bold; color:#14532d; background:#ffffff;">
+                        <option value="15">15 Dakikada Bir</option>
+                        <option value="30">30 Dakikada Bir</option>
+                        <option value="45">45 Dakikada Bir</option>
+                        <option value="60" selected>1 Saatte Bir (En Fazla)</option>
+                    </select>
+                </div>
+                <small style="color:#15803d; display:block; margin-top:4px;">Seçtiğiniz tüm kaynaklardan canlı başlıklar otomatik olarak toplanıp tarihe göre kronolojik olarak sıralanır.</small>
+            </div>
+
+            <!-- Live 20 News Stream Table / Preview -->
+            <div style="margin-bottom: 1.5rem; background:#ffffff; border-radius:10px; border:1.5px solid #cbd5e1; padding:16px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <h4 style="margin:0; font-size:1.05rem; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                            📡 Yayındaki En Son 20 Haber (Canlı Akış & Tarihler)
+                            <span id="rss_news_count_badge" style="background:#e0f2fe; color:#0369a1; font-size:0.78rem; padding:2px 8px; border-radius:10px; font-weight:bold;">20 Haber</span>
+                        </h4>
+                        <small id="rss_last_updated_text" style="color:#64748b; font-size:0.8rem;">Son güncelleme: Yükleniyor...</small>
+                    </div>
+                    <button type="button" onclick="fetchRssNewsPreview(true)" id="btn_refresh_rss" style="background:#0284c7; color:white; border:none; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:0.85rem;">
+                        🔄 Haberleri Şimdi Yenile
+                    </button>
+                </div>
+                <div id="rss_news_preview_list" style="max-height:360px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc; padding:8px;">
+                    <div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9rem;">Haberler yükleniyor...</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Sürekli Akan Özel Yazı / Duyuru (Ekranın altından geçer)</label>
+                <textarea id="promo_text" rows="3" placeholder="Bugüne özel fırından yeni çıkan simitlerimizi denediniz mi?"></textarea>
+            </div>
+            <hr style="margin:2rem 0; border:1px solid #e2e8f0;">
+            <h3 style="margin-top:0;">Zamanlanmış Mesajlar</h3>
+            <p style="font-size:0.85rem; color:#718096; margin-bottom:1rem;">Sadece belirttiğiniz saatler arasında kayan yazıda gösterilecek mesajlar.</p>
+            <div id="messages_container"></div>
+            <button onclick="addMessage()" style="margin-top:1rem;padding:.5rem 1rem; background:#edf2f7; border:none; border-radius:6px; cursor:pointer; font-weight:600;">+ Yeni Mesaj Ekle</button>
+        </div>
+
+        <div id="qr" class="tv-pane card">
+            <h3 style="margin-top:0;">QR Kod ve Hava Durumu</h3>
+            <div class="form-group">
+                <label>QR Kod Yönlendirme Linki</label>
+                <input type="text" id="qr_code" placeholder="https://firinna.com/menu">
+            </div>
+            <div class="form-group">
+                <label>QR Kod Altı Yazısı</label>
+                <input type="text" id="qr_text" placeholder="Menü için okutun">
+            </div>
+            <div class="form-group" style="display:flex; gap:1.5rem; margin-top:2rem;">
+                <label style="display:flex; align-items:center; gap:.5rem;"><input type="checkbox" id="w_weather"> Hava Durumu Göster</label>
+                <label style="display:flex; align-items:center; gap:.5rem;"><input type="checkbox" id="w_clock"> Dijital Saat Göster</label>
+            </div>
+        </div>
+
+        <button class="btn-save" onclick="saveSettings()">💾 Ayarları Kaydet ve Ekrana Gönder</button>
+    </div>
+
+    <script>
+        let localVideos = [];
+        let localAudio = [];
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tv-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tv-pane').forEach(p => p.classList.remove('active'));
+            if (btn) {
+                btn.classList.add('active');
+            } else if (window.event && window.event.target) {
+                window.event.target.classList.add('active');
+            }
+            const pane = document.getElementById(tabId);
+            if (pane) pane.classList.add('active');
+        }
+
+        function toggleSource() {
+            const v = document.getElementById('media_source').value;
+            if(v === 'youtube') {
+                document.getElementById('source_youtube').style.display = 'block';
+                document.getElementById('source_local').style.display = 'none';
+            } else {
+                document.getElementById('source_youtube').style.display = 'none';
+                document.getElementById('source_local').style.display = 'block';
+                fetchLocalMedia();
+            }
+        }
+
+        let serverVideosList = [];
+
+        async function fetchLocalMedia() {
+            const res = await fetch('/api/tv/media');
+            const data = await res.json();
+            serverVideosList = data.videos;
+            localAudio = data.audio;
+            document.getElementById('local_audio_list').innerHTML = localAudio.map(a => a.split('/').pop()).join('<br>') || 'Yok';
+            renderVideoList();
+        }
+
+        function renderVideoList() {
+            // Keep existing localVideos order, filter out ones not on server
+            localVideos = localVideos.filter(v => serverVideosList.includes(v));
+            // Find disabled ones (on server but not in localVideos)
+            const disabledVideos = serverVideosList.filter(v => !localVideos.includes(v));
+            
+            const allVideos = [...localVideos, ...disabledVideos];
+            
+            let html = '';
+            if (allVideos.length === 0) html = 'Yok';
+            allVideos.forEach((v, index) => {
+                const isEnabled = localVideos.includes(v);
+                const filename = v.split('/').pop();
+                const isCorePermanent = (filename.toLowerCase() === 'bayrak.mp4');
+                
+                html += `<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; background:${isCorePermanent ? '#f0fdf4' : '#f7fafc'}; padding:0.5rem; border-radius:4px; border:1px solid ${isCorePermanent ? '#bbf7d0' : '#e2e8f0'};">
+                    <input type="checkbox" ${isEnabled || isCorePermanent ? 'checked' : ''} ${isCorePermanent ? 'disabled' : ''} onchange="toggleVideo('${v}', this.checked)" title="${isCorePermanent ? 'Kalıcı Başlangıç Videosu (Devre Dışı Bırakılamaz)' : 'Aktif/Pasif'}">
+                    <span style="flex:1; font-weight:${isEnabled || isCorePermanent ? 'bold' : 'normal'}; color:${isCorePermanent ? '#15803d' : (isEnabled ? '#2d3748' : '#a0aec0')}">
+                        ${isCorePermanent ? '⭐ ' : ''}${filename} ${isCorePermanent ? '<small style="color:#16a34a; font-weight:normal;">(Kalıcı Açılış / Yedek)</small>' : ''}
+                    </span>
+                    <button onclick="moveVideo('${v}', -1)" style="padding:2px 5px;" title="Yukarı">⬆️</button>
+                    <button onclick="moveVideo('${v}', 1)" style="padding:2px 5px;" title="Aşağı">⬇️</button>
+                    ${!isCorePermanent ? `<button onclick="deleteVideo('${v}')" style="padding:2px 5px; color:red;" title="Sil">🗑️</button>` : `<span style="font-size:0.8rem; color:#94a3b8; padding:0 4px;" title="Kalıcı video silinemez">🔒</span>`}
+                </div>`;
+            });
+            document.getElementById('local_videos_list').innerHTML = html;
+        }
+
+        function toggleVideo(url, checked) {
+            if (checked) {
+                if (!localVideos.includes(url)) localVideos.push(url);
+            } else {
+                localVideos = localVideos.filter(v => v !== url);
+            }
+            renderVideoList();
+        }
+
+        function moveVideo(url, dir) {
+            const index = localVideos.indexOf(url);
+            if (index === -1) return; // disabled videos cannot be moved
+            const newIndex = index + dir;
+            if (newIndex < 0 || newIndex >= localVideos.length) return;
+            const temp = localVideos[index];
+            localVideos[index] = localVideos[newIndex];
+            localVideos[newIndex] = temp;
+            renderVideoList();
+        }
+
+        async function deleteVideo(url) {
+            if(!confirm("Bu videoyu tamamen silmek istediğinize emin misiniz?")) return;
+            const filename = url.split('/').pop();
+            try {
+                await fetch('/api/tv/media/delete', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({filename: filename, type: 'video'})
+                });
+                localVideos = localVideos.filter(v => v !== url);
+                fetchLocalMedia();
+            } catch(e) {
+                alert("Silinemedi!");
+            }
+        }
+
+        async function uploadMedia(type) {
+            const input = document.getElementById('upload_' + type);
+            if(!input.files[0]) return alert("Lütfen dosya seçin");
+            const fd = new FormData();
+            fd.append('file', input.files[0]);
+            fd.append('type', type);
+            const btn = event.target;
+            btn.textContent = "Yükleniyor...";
+            try {
+                await fetch('/api/tv/media/upload', { method: 'POST', body: fd });
+                alert("Başarıyla yüklendi!");
+                input.value = "";
+                
+                // Add new video to enabled list automatically
+                if (type === 'video') {
+                    const newUrl = '/static/tv_media/videos/' + input.files[0].name;
+                    if (!localVideos.includes(newUrl)) localVideos.push(newUrl);
+                }
+                fetchLocalMedia();
+            } catch(e) {
+                alert("Yükleme başarısız oldu.");
+            }
+            btn.textContent = "Yükle";
+        }
+
+        function addMessage(text='', start='', end='') {
+            const container = document.getElementById('messages_container');
+            const id = Date.now() + Math.random().toString().substr(2, 5);
+            const html = `
+                <div class="flex-row message-row" id="msg-${id}" style="margin-bottom:1rem; align-items:end; background:#f7fafc; padding:1rem; border-radius:8px; flex-wrap:wrap;">
+                    <div style="flex:2; min-width:200px;"><label style="font-size:0.8rem">Mesaj İçeriği</label><input type="text" class="m-text" value="${text}"></div>
+                    <div style="flex:1; min-width:150px;"><label style="font-size:0.8rem">Görsel URL (İsteğe bağlı)</label><input type="text" class="m-image" placeholder="/static/uploads/... veya https://..." value=""></div>
+                    <div><label style="font-size:0.8rem">Başlangıç</label><input type="time" class="m-start" value="${start}"></div>
+                    <div><label style="font-size:0.8rem">Bitiş</label><input type="time" class="m-end" value="${end}"></div>
+                    <button onclick="document.getElementById('msg-${id}').remove()" style="padding:.65rem; background:#fee2e2; color:#9b2c2c; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">Sil</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function onTickerEffectChange() {
+            const effect = document.getElementById('ticker_effect').value;
+            const marqueeBox = document.getElementById('container_marquee_speed');
+            const slideBox = document.getElementById('container_slide_duration');
+            const lblSpeed = document.getElementById('lbl_ticker_speed');
+
+            if (effect === 'marquee') {
+                marqueeBox.style.display = 'block';
+                slideBox.style.display = 'none';
+                lblSpeed.textContent = '🚀 Kayan Yazı Hızı:';
+            } else {
+                marqueeBox.style.display = 'none';
+                slideBox.style.display = 'block';
+                lblSpeed.textContent = '⏱️ Ekranda Kalma Süresi:';
+            }
+        }
+
+        async function loadSettings() {
+            try {
+                const res = await fetch('/api/tv/settings');
+                const data = await res.json();
+                
+                document.getElementById('logo_url').value = data.logo_url || '';
+                document.getElementById('media_source').value = data.media_source || 'youtube';
+                document.getElementById('video_playlist').value = data.video_playlist || '';
+                localVideos = (data.local_videos && data.local_videos.length > 0) ? data.local_videos : ['/static/tv_media/videos/2.mp4'];
+                localAudio = data.local_audio || [];
+                document.getElementById('audio_priority').value = data.audio_priority || 'video';
+                document.getElementById('ticker_text_enabled').checked = (data.ticker_text_enabled !== false);
+                document.getElementById('ticker_currency_enabled').checked = (data.ticker_currency_enabled !== false);
+                document.getElementById('ticker_rss_enabled').checked = (data.ticker_rss_enabled !== false);
+                document.getElementById('ticker_effect').value = data.ticker_effect || 'marquee';
+                document.getElementById('ticker_speed').value = (data.ticker_speed !== undefined) ? String(data.ticker_speed) : '4.5';
+                document.getElementById('ticker_slide_duration').value = data.ticker_slide_duration || 8;
+                onTickerEffectChange();
+
+                document.getElementById('rss_turkey_archaeo_enabled').checked = (data.rss_turkey_archaeo_enabled !== false);
+                document.getElementById('rss_ds_arts_en_enabled').checked = (data.rss_ds_arts_en_enabled !== false);
+                document.getElementById('rss_aa_life_en_enabled').checked = (data.rss_aa_life_en_enabled !== false);
+                document.getElementById('rss_turkey_exp_en_enabled').checked = (data.rss_turkey_exp_en_enabled !== false);
+                document.getElementById('rss_goodnews_en_enabled').checked = (data.rss_goodnews_en_enabled !== false);
+                document.getElementById('rss_custom_enabled').checked = !!data.rss_custom_enabled;
+                document.getElementById('rss_refresh_mins').value = data.rss_refresh_mins || 60;
+                document.getElementById('rss_url').value = data.rss_url || '';
+                document.getElementById('promo_text').value = data.promo_text || '';
+                
+                document.getElementById('qr_code').value = data.qr_code || '';
+                document.getElementById('qr_text').value = data.qr_text || '';
+                document.getElementById('w_weather').checked = data.widgets?.weather;
+                document.getElementById('w_clock').checked = data.widgets?.clock;
+
+                // Filigran Döngüsü Ayarları
+                const wm = data.watermark_cycle || {};
+                document.getElementById('wm_interval_sec').value = wm.interval_sec || 90;
+                document.getElementById('wm_duration_sec').value = wm.duration_sec || 12;
+                
+                const defaultCards = [
+                    { id: 'wm-card-0', title: '1. Fırınna Logo & Slogan', desc: 'Klasik büyük logo ve www.firinna.com filigranı', image: '/static/img/watermarks/card_0_logo.png', enabled: true },
+                    { id: 'wm-card-1', title: '2. Follow Us on Social Media', desc: 'Instagram, TikTok, Google Maps ve Yandex Maps rozetleri', image: '/static/img/watermarks/card_1_social.png', enabled: true },
+                    { id: 'wm-card-2', title: '3. Fırınna Supports Students', desc: 'Beyoğlu Öğrenciye projesi, ücretsiz yemek ve burs desteği', image: '/static/img/watermarks/card_2_students.png', enabled: true },
+                    { id: 'wm-card-3', title: '4. Fırınna Cares for Stray Animals', desc: 'Sokak hayvanları mama, su ve yuva desteği', image: '/static/img/watermarks/card_3_animals.png', enabled: true }
+                ];
+
+                // Render Watermark Cards
+                renderWatermarkCards((wm.cards && wm.cards.length > 0) ? wm.cards : defaultCards);
+
+                document.getElementById('messages_container').innerHTML = '';
+                (data.messages || []).forEach(m => {
+                    addMessage(m.text, m.start_time, m.end_time);
+                    const rows = document.querySelectorAll('.message-row');
+                    const lastRow = rows[rows.length-1];
+                    lastRow.querySelector('.m-image').value = m.image || '';
+                });
+
+                toggleSource();
+
+                if (data.last_ping) {
+                    const diff = (new Date() - new Date(data.last_ping)) / 1000;
+                    const pStatus = document.getElementById('pingStatus');
+                    if (diff < 40) {
+                        pStatus.textContent = '🟢 Çevrimiçi (Ekran Açık)';
+                        pStatus.style.color = '#047857';
+                    } else {
+                        pStatus.textContent = `🔴 Çevrimdışı (Son görülme: ${Math.floor(diff/60)} dk önce)`;
+                        pStatus.style.color = '#dc2626';
+                    }
+                }
+            } catch(e) {
+                console.error("Ayar yükleme hatası", e);
+            }
+        }
+
+        let currentWatermarkCards = [];
+
+        function renderWatermarkCards(cards) {
+            currentWatermarkCards = cards;
+            const container = document.getElementById('watermark_cards_container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            currentWatermarkCards.forEach((c, idx) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'wm-setting-card';
+                cardDiv.style.cssText = "border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; background:#ffffff; display:flex; flex-direction:column; gap:12px; position:relative;";
+                cardDiv.innerHTML = `
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                        <div style="display:flex; align-items:center; gap:10px; flex:1;">
+                            <span style="font-size:1.5rem;">🖼️</span>
+                            <input type="text" class="wm-card-title" value="${c.title || ''}" placeholder="Kart Başlığı" style="font-weight:bold; font-size:1rem; color:#1a202c; width:55%; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1;">
+                            <button type="button" onclick="moveWatermarkCard(${idx}, -1)" style="padding:4px 8px; border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; cursor:pointer;" title="Yukarı Taşı">⬆️</button>
+                            <button type="button" onclick="moveWatermarkCard(${idx}, 1)" style="padding:4px 8px; border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; cursor:pointer;" title="Aşağı Taşı">⬇️</button>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:14px;">
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:bold; color:#2d6a4f; font-size:0.95rem;">
+                                <input type="checkbox" class="wm-card-enabled" ${c.enabled !== false ? 'checked' : ''} style="width:1.2rem; height:1.2rem; cursor:pointer;">
+                                <span>Aktif</span>
+                            </label>
+                            <button type="button" onclick="deleteWatermarkCard(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">
+                                🗑️ Sil
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <input type="text" class="wm-card-desc" value="${c.desc || ''}" placeholder="Kart Açıklaması (İsteğe bağlı)" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; font-size:0.9rem; color:#475569;">
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:16px; background:#f8fafc; padding:10px; border-radius:8px; border:1px dashed #cbd5e1;">
+                        <div style="width:140px; height:75px; background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                            <img class="wm-card-img-preview" src="${c.image || '/static/uploads/logo.png'}" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="this.src='/static/uploads/logo.png'">
+                        </div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <label style="background:#2563eb; color:white; padding:6px 14px; border-radius:6px; font-size:0.88rem; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                                    📁 Fotoğraf / GIF Seç & Yükle
+                                    <input type="file" accept="image/*" style="display:none;" onchange="uploadWatermarkImage(this, ${idx})">
+                                </label>
+                                <span class="wm-upload-status" style="font-size:0.85rem; color:#64748b;"></span>
+                            </div>
+                            <input type="text" class="wm-card-image-url" value="${c.image || ''}" placeholder="Görsel URL (Örn: /static/img/watermarks/card_0_logo.png)" style="padding:4px 8px; border-radius:4px; border:1px solid #e2e8f0; font-size:0.82rem; color:#64748b; width:100%;">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(cardDiv);
+            });
+        }
+
+        function moveWatermarkCard(idx, dir) {
+            syncWatermarkCardInputs();
+            const newIdx = idx + dir;
+            if (newIdx < 0 || newIdx >= currentWatermarkCards.length) return;
+            const temp = currentWatermarkCards[idx];
+            currentWatermarkCards[idx] = currentWatermarkCards[newIdx];
+            currentWatermarkCards[newIdx] = temp;
+            renderWatermarkCards(currentWatermarkCards);
+        }
+
+        function syncWatermarkCardInputs() {
+            const cardEls = document.querySelectorAll('.wm-setting-card');
+            cardEls.forEach((card, idx) => {
+                if (currentWatermarkCards[idx]) {
+                    currentWatermarkCards[idx].title = card.querySelector('.wm-card-title').value;
+                    currentWatermarkCards[idx].desc = card.querySelector('.wm-card-desc').value;
+                    currentWatermarkCards[idx].image = card.querySelector('.wm-card-image-url').value;
+                    currentWatermarkCards[idx].enabled = card.querySelector('.wm-card-enabled').checked;
+                }
+            });
+        }
+
+        function addWatermarkCard() {
+            syncWatermarkCardInputs();
+            currentWatermarkCards.push({
+                id: `wm-card-${Date.now()}`,
+                title: `Yeni Filigran Kartı ${currentWatermarkCards.length + 1}`,
+                desc: 'Tanıtım veya kampanya açıklaması',
+                image: '/static/uploads/logo.png',
+                enabled: true
+            });
+            renderWatermarkCards(currentWatermarkCards);
+        }
+
+        function deleteWatermarkCard(idx) {
+            if (confirm('Bu filigran kartını silmek istediğinize emin misiniz?')) {
+                syncWatermarkCardInputs();
+                currentWatermarkCards.splice(idx, 1);
+                renderWatermarkCards(currentWatermarkCards);
+            }
+        }
+
+        async function uploadWatermarkImage(input, idx) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            const cardEl = document.querySelectorAll('.wm-setting-card')[idx];
+            const statusEl = cardEl.querySelector('.wm-upload-status');
+            const previewEl = cardEl.querySelector('.wm-card-img-preview');
+            const urlInput = cardEl.querySelector('.wm-card-image-url');
+
+            statusEl.textContent = "⏳ Yükleniyor...";
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('/api/tv/watermark/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    statusEl.textContent = "✅ Yüklendi!";
+                    statusEl.style.color = "#059669";
+                    previewEl.src = data.url;
+                    urlInput.value = data.url;
+                    currentWatermarkCards[idx].image = data.url;
+                } else {
+                    statusEl.textContent = "❌ Hata: " + (data.error || 'Yüklenemedi');
+                    statusEl.style.color = "#dc2626";
+                }
+            } catch(e) {
+                statusEl.textContent = "❌ Sunucu hatası";
+                statusEl.style.color = "#dc2626";
+            }
+        }
+
+        async function saveSettings() {
+            const messages = Array.from(document.querySelectorAll('.message-row')).map(row => ({
+                text: row.querySelector('.m-text').value,
+                image: row.querySelector('.m-image').value,
+                start_time: row.querySelector('.m-start').value,
+                end_time: row.querySelector('.m-end').value
+            })).filter(m => m.text.trim() !== '');
+
+            // Collect dynamic watermark cards
+            const wmCards = Array.from(document.querySelectorAll('.wm-setting-card')).map((card, idx) => ({
+                id: currentWatermarkCards[idx]?.id || `wm-card-${idx}`,
+                title: card.querySelector('.wm-card-title').value.trim(),
+                desc: card.querySelector('.wm-card-desc').value.trim(),
+                image: card.querySelector('.wm-card-image-url').value.trim(),
+                enabled: card.querySelector('.wm-card-enabled').checked
+            })).filter(c => c.image !== '');
+
+            const data = {
+                logo_url: document.getElementById('logo_url').value,
+                layout: 'modern_grid',
+                media_source: document.getElementById('media_source').value,
+                video_playlist: document.getElementById('video_playlist').value,
+                local_videos: localVideos,
+                local_audio: localAudio,
+                audio_priority: document.getElementById('audio_priority').value,
+                ticker_text_enabled: document.getElementById('ticker_text_enabled').checked,
+                ticker_currency_enabled: document.getElementById('ticker_currency_enabled').checked,
+                ticker_rss_enabled: document.getElementById('ticker_rss_enabled').checked,
+                ticker_effect: document.getElementById('ticker_effect').value,
+                ticker_speed: parseFloat(document.getElementById('ticker_speed').value) || 4.5,
+                ticker_slide_duration: parseInt(document.getElementById('ticker_slide_duration').value) || 8,
+                rss_turkey_archaeo_enabled: document.getElementById('rss_turkey_archaeo_enabled').checked,
+                rss_ds_arts_en_enabled: document.getElementById('rss_ds_arts_en_enabled').checked,
+                rss_aa_life_en_enabled: document.getElementById('rss_aa_life_en_enabled').checked,
+                rss_turkey_exp_en_enabled: document.getElementById('rss_turkey_exp_en_enabled').checked,
+                rss_goodnews_en_enabled: document.getElementById('rss_goodnews_en_enabled').checked,
+                rss_custom_enabled: document.getElementById('rss_custom_enabled').checked,
+                rss_refresh_mins: parseInt(document.getElementById('rss_refresh_mins').value) || 60,
+                rss_url: document.getElementById('rss_url').value,
+                promo_text: document.getElementById('promo_text').value,
+                qr_code: document.getElementById('qr_code').value,
+                qr_text: document.getElementById('qr_text').value,
+                widgets: {
+                    weather: document.getElementById('w_weather').checked,
+                    clock: document.getElementById('w_clock').checked
+                },
+                watermark_cycle: {
+                    interval_sec: parseInt(document.getElementById('wm_interval_sec').value) || 90,
+                    duration_sec: parseInt(document.getElementById('wm_duration_sec').value) || 12,
+                    cards: wmCards
+                },
+                messages: messages
+            };
+
+            const btn = document.querySelector('.btn-save');
+            btn.textContent = "⏳ Kaydediliyor & Ekrana Gönderiliyor...";
+            try {
+                await fetch('/api/tv/settings', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                alert('✅ Ayarlar kaydedildi ve TV ekranına anında iletildi!');
+            } catch(e) {
+                alert("Hata oluştu.");
+            }
+            btn.textContent = "💾 Ayarları Kaydet ve Ekrana Gönder";
+        }
+
+        async function fetchClients() {
+            try {
+                const res = await fetch('/api/tv/clients');
+                const data = await res.json();
+                const clients = data.clients || [];
+                
+                const badge = document.getElementById('client_count_badge');
+                const activeCount = clients.filter(c => c.is_online).length;
+                badge.textContent = `${activeCount} Aktif Ekran`;
+                badge.style.background = activeCount > 0 ? '#dcfce7' : '#fee2e2';
+                badge.style.color = activeCount > 0 ? '#15803d' : '#dc2626';
+
+                const listEl = document.getElementById('connected_clients_list');
+                if (clients.length === 0) {
+                    listEl.innerHTML = `<div style="color:#94a3b8; font-size:0.9rem; padding:12px; background:#f8fafc; border-radius:6px; text-align:center; grid-column:1/-1;">
+                        Henüz bağlı ekran bulunamadı. <a href="/tv-player" target="_blank" style="color:#2563eb; font-weight:bold;">Ekranı Başlat</a>
+                    </div>`;
+                    return;
+                }
+
+                let html = '';
+                clients.forEach(c => {
+                    html += `
+                        <div style="background:${c.is_online ? '#f0fdf4' : '#f8fafc'}; border:1.5px solid ${c.is_online ? '#86efac' : '#e2e8f0'}; border-radius:8px; padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:bold; font-size:0.95rem; color:#1e293b;">${c.device_type}</span>
+                                <span style="font-size:0.78rem; font-weight:bold; color:${c.is_online ? '#15803d' : '#94a3b8'};">
+                                    ${c.is_online ? '🟢 Canlı' : `⚪ ${Math.floor(c.seconds_ago/60)}dk önce`}
+                                </span>
+                            </div>
+                            <div style="font-size:0.82rem; color:#64748b;">
+                                <b>IP:</b> ${c.ip} • <b>Ad:</b> ${c.name}
+                            </div>
+                            <div style="display:flex; gap:6px; margin-top:4px;">
+                                <button type="button" onclick="pushInstantUpdate('reload', '${c.client_id}')" style="flex:1; background:#dc2626; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.78rem; font-weight:bold; cursor:pointer;" title="Uygulamayı Yeniden Başlat">
+                                    🔄 Uygulama
+                                </button>
+                                <button type="button" onclick="pushInstantUpdate('clear_cache', '${c.client_id}')" style="flex:1; background:#ea580c; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.78rem; font-weight:bold; cursor:pointer;" title="Önbelleği Sil ve Yeniden Başlat">
+                                    🧹 Cache Sil
+                                </button>
+                                <button type="button" onclick="rebootDeviceHardware('${c.ip}')" style="flex:1; background:#475569; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.78rem; font-weight:bold; cursor:pointer;" title="Cihazı Komple Kapatıp Aç (Donanımsal Reboot)">
+                                    🔌 Cihaz Reboot
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                listEl.innerHTML = html;
+            } catch(e) {
+                console.error("Cihaz listesi hatası:", e);
+            }
+        }
+
+        async function pushInstantUpdate(action='reload', target='all') {
+            const targetText = target === 'all' ? 'Tüm bağlı ekranlar' : `Seçili cihaz (${target})`;
+            const actionText = action === 'clear_cache' ? 'önbelleği (cache) silinip sıfırdan' : (action === 'reload' ? 'kapatılıp' : 'ayarları');
+            
+            if (!confirm(`${targetText} ${actionText} güncellensin mi?`)) return;
+            try {
+                await fetch('/api/tv/push', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({action: action, client_id: target})
+                });
+                alert(`⚡ Komut iletildi! Hedef: ${targetText}`);
+                setTimeout(fetchClients, 1000);
+            } catch(e) {
+                alert("Push sinyali gönderilemedi.");
+            }
+        }
+
+        async function rebootDeviceHardware(ip) {
+            if (!confirm(`⚠️ DİKKAT: ${ip} IP adresli cihaz donanımsal olarak kapatılıp baştan açılacak (Android Reboot). Onaylıyor musunuz?`)) return;
+            try {
+                const res = await fetch('/api/tv/device/reboot', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ip: ip})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("✅ " + data.message);
+                } else {
+                    alert("❌ " + data.error);
+                }
+            } catch(e) {
+                alert("Yeniden başlatma isteği gönderilemedi.");
+            }
+        }
+
+        async function fetchRssNewsPreview(force = false) {
+            const listEl = document.getElementById('rss_news_preview_list');
+            const countBadge = document.getElementById('rss_news_count_badge');
+            const updatedText = document.getElementById('rss_last_updated_text');
+            const btnRefresh = document.getElementById('btn_refresh_rss');
+
+            if (!listEl) return;
+            if (force && btnRefresh) {
+                btnRefresh.textContent = "⏳ Yenileniyor...";
+                btnRefresh.disabled = true;
+            }
+
+            try {
+                const url = force ? '/api/tv/rss?force=1' : '/api/tv/rss';
+                const res = await fetch(url);
+                const data = await res.json();
+                const items = data.items || [];
+
+                if (countBadge) countBadge.textContent = `${items.length} Canlı Haber`;
+                if (updatedText && data.last_updated) {
+                    updatedText.textContent = `Son güncelleme: ${data.last_updated}`;
+                }
+
+                if (items.length === 0) {
+                    listEl.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9rem;">
+                        Seçili kaynaklardan haber bulunamadı veya RSS kapalı.
+                    </div>`;
+                    return;
+                }
+
+                let html = '';
+                items.forEach((it, idx) => {
+                    html += `
+                        <div style="display:flex; align-items:center; gap:12px; padding:8px 10px; margin-bottom:6px; background:#ffffff; border-radius:6px; border:1px solid #e2e8f0; font-size:0.88rem;">
+                            <span style="font-weight:bold; color:#64748b; font-size:0.85rem; width:22px; text-align:right; flex-shrink:0;">${idx+1}.</span>
+                            <span style="background:#f1f5f9; color:#334155; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px; border:1px solid #cbd5e1; white-space:nowrap; flex-shrink:0;">
+                                ${it.source}
+                            </span>
+                            <span style="flex:1; color:#0f172a; font-weight:600; line-height:1.35;">
+                                ${it.title}
+                            </span>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0; text-align:right;">
+                                <span style="font-size:0.75rem; font-weight:700; color:#059669; background:#dcfce7; padding:2px 6px; border-radius:4px;">
+                                    🟢 ${it.time_ago}
+                                </span>
+                                <span style="font-size:0.72rem; color:#94a3b8;">
+                                    ${it.pub_date}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+                listEl.innerHTML = html;
+            } catch(e) {
+                console.error("RSS önizleme hatası:", e);
+                listEl.innerHTML = `<div style="text-align:center; padding:15px; color:#dc2626; font-size:0.85rem;">
+                    Haber akışı yüklenemedi. Lütfen internet bağlantısını kontrol edin.
+                </div>`;
+            } finally {
+                if (btnRefresh) {
+                    btnRefresh.textContent = "🔄 Haberleri Şimdi Yenile";
+                    btnRefresh.disabled = false;
+                }
+            }
+        }
+
+        loadSettings();
+        fetchClients();
+        fetchRssNewsPreview();
+        setInterval(fetchClients, 4000);
+    </script>
+</body>
+</html>

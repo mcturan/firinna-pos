@@ -7,13 +7,19 @@ import json
 import subprocess
 import threading
 import time
+import fcntl
+import signal
 from datetime import datetime
 import urllib.request
+import re
 import xml.etree.ElementTree as ET
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
+
+from spotify_integration import spotify_bp
+app.register_blueprint(spotify_bp)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.jinja_env.auto_reload = True
 
@@ -233,7 +239,7 @@ def tables_page():
 
 @app.route('/kasa')
 def kasa_page():
-    return redirect('/hesap')
+    return render_template('kasa.html')
 
 @app.route('/stok')
 def stok_page():
@@ -1706,22 +1712,38 @@ def api_reclose_order(order_id):
     """Düzenlenen siparişi yeniden kapat"""
     d = request.json or {}
     conn = db.get_db()
+    existing = conn.execute('SELECT created_at, closed_at FROM orders WHERE id = ?', (order_id,)).fetchone()
+    if not existing:
+        conn.close()
+        return jsonify({'error': 'Sipariş bulunamadı'}), 404
+
     # Toplam yeniden hesapla
     total = conn.execute('''
         SELECT COALESCE(SUM(CASE WHEN is_complimentary=0 THEN quantity*price ELSE 0 END),0) as t
         FROM order_items WHERE order_id=?
     ''', (order_id,)).fetchone()['t']
-    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    conn.execute('''UPDATE orders SET status='closed', total=?, closed_at=?,
+
+    custom_dt = d.get('closed_at') or d.get('date') or d.get('created_at')
+    if custom_dt:
+        dt_str = str(custom_dt).replace('T', ' ').strip()
+        if len(dt_str) == 16:
+            dt_str += ':00'
+        target_closed_at = dt_str
+        target_created_at = dt_str
+    else:
+        target_closed_at = existing['closed_at'] or existing['created_at'] or datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        target_created_at = existing['created_at'] or target_closed_at
+
+    conn.execute('''UPDATE orders SET status='closed', total=?, closed_at=?, created_at=?,
         payment_cash=?, payment_card=?, tip_amount=?, tip_method=?
         WHERE id=?''',
-        (total, now_str, d.get('payment_cash',0), d.get('payment_card',0), d.get('tip_amount',0), d.get('tip_method', 'cash'), order_id))
+        (total, target_closed_at, target_created_at, d.get('payment_cash',0), d.get('payment_card',0), d.get('tip_amount',0), d.get('tip_method', 'cash'), order_id))
     conn.execute('DELETE FROM transactions WHERE related_order_id = ?', (order_id,))
     db.record_order_transaction(
         conn, order_id,
         d.get('payment_cash',0), d.get('payment_card',0),
         d.get('tip_amount',0), d.get('tip_method', 'cash'),
-        now_str
+        target_closed_at
     )
     conn.commit()
     conn.close()
@@ -1783,11 +1805,11 @@ def api_hesap_overview():
 
 @app.route('/muhasebe')
 def page_muhasebe():
-    return redirect('/hesap')
+    return render_template('muhasebe.html')
 
 @app.route('/reports')
 def page_reports_redirect():
-    return redirect('/hesap')
+    return render_template('reports.html')
 
 @app.route('/api/muhasebe')
 def api_muhasebe():
@@ -3596,7 +3618,12 @@ def api_tv_ping():
         pass
     
     user_agent = request.headers.get('User-Agent', '')
-    ip_addr = request.remote_addr
+    # Get real client IP when behind Nginx reverse proxy
+    ip_addr = request.headers.get('X-Forwarded-For', request.headers.get('X-Real-IP', request.remote_addr))
+    if ip_addr and ',' in ip_addr:
+        ip_addr = ip_addr.split(',')[0].strip()
+    if not ip_addr:
+        ip_addr = request.remote_addr
 
     # Auto-detect device type if not provided
     ua_lower = user_agent.lower()
@@ -4371,45 +4398,24 @@ os.makedirs(MUSIC_LIBRARY_DIR, exist_ok=True)
 _radio_lock = threading.Lock()
 
 DEFAULT_RADIO_STATIONS = [
-    # 🇹🇷 Türkiye
     {"id": "tr_powerfm", "name": "Power FM", "country": "TR", "country_name": "Türkiye", "genre": "Pop / Hit", "url": "https://listen.powerapp.com.tr/powerfm/mpeg/icecast.audio", "logo": "🇹🇷"},
-    {"id": "tr_kralpop", "name": "Kral Pop", "country": "TR", "country_name": "Türkiye", "genre": "Türkçe Pop", "url": "https://kralpopwmp.radyotvonline.net/", "logo": "🇹🇷"},
     {"id": "tr_slowturk", "name": "Slow Türk", "country": "TR", "country_name": "Türkiye", "genre": "Türkçe Slow", "url": "https://radyo.duhnet.tv/slowturk", "logo": "🇹🇷"},
-    {"id": "tr_joyfm", "name": "Joy FM", "country": "TR", "country_name": "Türkiye", "genre": "Yabancı Slow / Easy", "url": "https://listen.powerapp.com.tr/joyfm/mpeg/icecast.audio", "logo": "🇹🇷"},
-    {"id": "tr_voyage", "name": "Radyo Voyage", "country": "TR", "country_name": "Türkiye", "genre": "Ambient / Chillout / World", "url": "https://voyagewmp.radyotvonline.net/", "logo": "🇹🇷"},
-    {"id": "tr_joyturk_akustik", "name": "JoyTürk Akustik", "country": "TR", "country_name": "Türkiye", "genre": "Türkçe Akustik", "url": "https://listen.powerapp.com.tr/joyturkakustik/mpeg/icecast.audio", "logo": "🇹🇷"},
-    {"id": "tr_palnostalji", "name": "Pal Nostalji", "country": "TR", "country_name": "Türkiye", "genre": "Türkçe 70-80-90'lar", "url": "https://shoutcast.radyogrubu.com/palnostalji/stream", "logo": "🇹🇷"},
-    {"id": "tr_virgin", "name": "Virgin Radio TR", "country": "TR", "country_name": "Türkiye", "genre": "Hit / RnB", "url": "https://listen.powerapp.com.tr/virginradioturkiye/mpeg/icecast.audio", "logo": "🇹🇷"},
     {"id": "tr_powerturk", "name": "Power Türk", "country": "TR", "country_name": "Türkiye", "genre": "Türkçe Pop", "url": "https://listen.powerapp.com.tr/powerturk/mpeg/icecast.audio", "logo": "🇹🇷"},
-    {"id": "tr_trtfm", "name": "TRT FM", "country": "TR", "country_name": "Türkiye", "genre": "Karma / Klasik", "url": "https://rad-trt.live.ercdn.net/trtfm/playlist.m3u8", "logo": "🇹🇷"},
-
-    # 🇺🇦 Ukrayna
     {"id": "ua_hitfm", "name": "Hit FM Ukraine", "country": "UA", "country_name": "Ukrayna", "genre": "Pop / Dance", "url": "https://online.hitfm.ua/HitFM_HD", "logo": "🇺🇦"},
     {"id": "ua_roks", "name": "Radio ROKS", "country": "UA", "country_name": "Ukrayna", "genre": "Classic Rock", "url": "https://online.radioroks.ua/RadioROKS_HD", "logo": "🇺🇦"},
     {"id": "ua_relax", "name": "Radio Relax Ukraine", "country": "UA", "country_name": "Ukrayna", "genre": "Lounge / Relax", "url": "https://online.radiorelax.ua/RadioRelax_HD", "logo": "🇺🇦"},
     {"id": "ua_kissfm", "name": "Kiss FM Ukraine", "country": "UA", "country_name": "Ukrayna", "genre": "EDM / Dance", "url": "https://online.kissfm.ua/KissFM_HD", "logo": "🇺🇦"},
-    {"id": "ua_loungefm", "name": "Lounge FM Kyiv", "country": "UA", "country_name": "Ukrayna", "genre": "Chillout / Deep Lounge", "url": "https://cast.radiogroup.com.ua/loungefm", "logo": "🇺🇦"},
-
-    # 🇪🇺 Avrupa
     {"id": "eu_swissjazz", "name": "Radio Swiss Jazz", "country": "EU", "country_name": "İsviçre / Avrupa", "genre": "Jazz / Soul / Blues", "url": "https://stream.srg-ssr.ch/m/rsj/mp3_128", "logo": "🇨🇭"},
     {"id": "eu_swissclassic", "name": "Radio Swiss Classic", "country": "EU", "country_name": "İsviçre / Avrupa", "genre": "Classical Music", "url": "https://stream.srg-ssr.ch/m/rsc_de/mp3_128", "logo": "🇨🇭"},
     {"id": "eu_ibiza", "name": "Ibiza Global Radio", "country": "EU", "country_name": "İspanya / Ibiza", "genre": "Deep House / Electronic", "url": "https://listenssl.ibizaglobalradio.com:8024/ibizaglobalradio.mp3", "logo": "🇪🇸"},
     {"id": "eu_fip", "name": "FIP Radio Paris", "country": "EU", "country_name": "Fransa", "genre": "Eclectic / World / Jazz", "url": "https://icecast.radiofrance.fr/fip-midfi.mp3", "logo": "🇫🇷"},
-    {"id": "eu_nostalgie", "name": "Nostalgie France", "country": "EU", "country_name": "Fransa", "genre": "Oldies 60-70-80s", "url": "https://scdn.nrjaudio.fm/adwz1/fr/30601/mp3_128.mp3", "logo": "🇫🇷"},
     {"id": "eu_paradise", "name": "Radio Paradise (Main Mix)", "country": "EU", "country_name": "Global / US", "genre": "Acoustic / Rock / World", "url": "https://stream.radioparadise.com/mp3-128", "logo": "🌴"},
     {"id": "eu_paradise_mellow", "name": "Radio Paradise (Mellow Mix)", "country": "EU", "country_name": "Global / US", "genre": "Mellow / Chillout", "url": "https://stream.radioparadise.com/mellow-128", "logo": "🌿"},
-
-    # 🇺🇸 ABD
     {"id": "us_somafm_groove", "name": "SomaFM: Groove Salad", "country": "US", "country_name": "ABD", "genre": "Downtempo / Ambient", "url": "https://ice1.somafm.com/groovesalad-128-mp3", "logo": "🇺🇸"},
     {"id": "us_somafm_secret", "name": "SomaFM: Secret Agent", "country": "US", "country_name": "ABD", "genre": "Spy / Lounge / Surf", "url": "https://ice1.somafm.com/secretagent-128-mp3", "logo": "🇺🇸"},
     {"id": "us_181_chill", "name": "181.fm Chilled Out", "country": "US", "country_name": "ABD", "genre": "Lounge / Smooth Chill", "url": "https://listen.181fm.com/181-chilled_128k.mp3", "logo": "🇺🇸"},
     {"id": "us_181_acoustic", "name": "181.fm The Breeze (Acoustic)", "country": "US", "country_name": "ABD", "genre": "Acoustic Soft Rock", "url": "https://listen.181fm.com/181-breeze_128k.mp3", "logo": "🇺🇸"},
     {"id": "us_kexp", "name": "KEXP 90.3 FM Seattle", "country": "US", "country_name": "ABD", "genre": "Indie / Alternative", "url": "https://kexp.streamguys1.com/kexp128.mp3", "logo": "🇺🇸"},
-
-    # 🌍 Afrika
-    {"id": "af_afrobeat", "name": "Afrobeat Radio", "country": "AF", "country_name": "Afrika / Global", "genre": "Afrobeats / African Pop", "url": "https://streams.radiomast.io/afrobeat-radio", "logo": "🌍"},
-    {"id": "af_capitalfm", "name": "Capital FM Kenya", "country": "AF", "country_name": "Kenya", "genre": "Hit / Urban Africa", "url": "https://icecast2.capitalfm.co.ke/capitalfm", "logo": "🇰🇪"},
-    {"id": "af_kayafm", "name": "Kaya 95.9 FM South Africa", "country": "AF", "country_name": "Güney Afrika", "genre": "Soul / Jazz / R&B", "url": "https://edge.iono.fm/xice/kayafm_live.mp3", "logo": "🇿🇦"}
 ]
 
 def load_radio_data():
@@ -4434,7 +4440,7 @@ def load_radio_data():
                             "current_item_id": "",
                             "queue": [],
                             "queue_index": 0,
-                            "tv_audio_enabled": True,
+                            "tv_audio_enabled": False,
                             "updated_at": int(time.time())
                         }
                     return data
@@ -4454,7 +4460,7 @@ def load_radio_data():
                 "current_item_id": "tr_powerfm",
                 "queue": [],
                 "queue_index": 0,
-                "tv_audio_enabled": True,
+                "tv_audio_enabled": False,
                 "updated_at": int(time.time())
             }
         }
@@ -4514,6 +4520,282 @@ def scan_music_library():
         "total_tracks": len(all_tracks)
     }
 
+_stream_meta_cache = {}
+_stream_meta_fetching = set()
+
+def _async_fetch_live_title(url):
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'Icy-MetaData': '1'})
+        with urllib.request.urlopen(req, timeout=3.0) as response:
+            headers = dict(response.info())
+            metaint_val = headers.get('icy-metaint')
+            if metaint_val:
+                metaint = int(metaint_val)
+                response.read(metaint)
+                raw_len = response.read(1)
+                if raw_len:
+                    metadata_len = raw_len[0] * 16 if isinstance(raw_len, bytes) else ord(raw_len) * 16
+                    if metadata_len > 0:
+                        metadata = response.read(metadata_len).decode('utf-8', errors='ignore')
+                        match = re.search(r"StreamTitle='([^']*)';", metadata)
+                        if match and match.group(1).strip():
+                            _stream_meta_cache[url] = (match.group(1).strip(), time.time())
+    except Exception:
+        pass
+    finally:
+        _stream_meta_fetching.discard(url)
+
+def get_live_stream_title_fast(url):
+    """Returns cached title instantly; triggers background fetch if cache expired or missing"""
+    if not url or not url.startswith('http'):
+        return None
+    now = time.time()
+    cached_title = None
+    if url in _stream_meta_cache:
+        title, ts = _stream_meta_cache[url]
+        if now - ts < 30: # 30 saniye geçerli önbellek
+            return title
+        cached_title = title
+
+    # Arka planda asenkron yenile (asla API'yi veya sarmayı bloklamaz)
+    if url not in _stream_meta_fetching:
+        _stream_meta_fetching.add(url)
+        threading.Thread(target=_async_fetch_live_title, args=(url,), daemon=True).start()
+
+    return cached_title
+
+def _get_audio_env():
+    env = dict(os.environ)
+    uid = 1000
+    try:
+        u = os.getuid()
+        if u != 0:
+            uid = u
+    except Exception:
+        pass
+    env['XDG_RUNTIME_DIR'] = f'/run/user/{uid}'
+    env['PULSE_SERVER'] = f'unix:/run/user/{uid}/pulse/native'
+    env['PATH'] = f"{env.get('PATH', '')}:/usr/bin:/usr/local/bin:/bin:/usr/sbin:/sbin"
+    return env
+
+def get_system_volume():
+    env = _get_audio_env()
+    for cmd in [
+        ['/usr/bin/amixer', '-c', '0', 'sget', 'PCM'],
+        ['amixer', '-c', '0', 'sget', 'PCM'],
+        ['/usr/bin/pactl', 'get-sink-volume', '@DEFAULT_SINK@'],
+        ['pactl', 'get-sink-volume', '@DEFAULT_SINK@'],
+        ['/usr/bin/amixer', 'get', 'Master'],
+        ['amixer', 'get', 'Master'],
+        ['/usr/bin/amixer', 'get', 'Headphone'],
+        ['amixer', 'get', 'Headphone']
+    ]:
+        try:
+            out = subprocess.check_output(cmd, env=env, stderr=subprocess.DEVNULL, universal_newlines=True)
+            m = re.search(r'(?:\[|\s)(\d+)%', out)
+            if m:
+                return int(m.group(1))
+        except Exception:
+            continue
+    return 80
+
+def set_system_volume(volume):
+    try:
+        vol = max(0, min(100, int(volume)))
+    except (ValueError, TypeError):
+        vol = 80
+    env = _get_audio_env()
+    
+    # Raspberry Pi ALSA card 0 PCM control
+    for amixer_bin in ['/usr/bin/amixer', 'amixer']:
+        try:
+            subprocess.run([amixer_bin, '-c', '0', 'sset', 'PCM', f'{vol}%', 'unmute'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
+        for ctrl in ['Master', 'Headphone', 'PCM', 'Speaker']:
+            try:
+                subprocess.run([amixer_bin, 'set', ctrl, f'{vol}%', 'unmute'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except Exception:
+                pass
+
+    for pactl_bin in ['/usr/bin/pactl', 'pactl']:
+        try:
+            subprocess.run([pactl_bin, 'set-sink-volume', '@DEFAULT_SINK@', f'{vol}%'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run([pactl_bin, 'set-sink-mute', '@DEFAULT_SINK@', '0' if vol > 0 else '1'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            try:
+                out = subprocess.check_output([pactl_bin, 'list', 'sink-inputs', 'short'], env=env, text=True, stderr=subprocess.DEVNULL)
+                for line in out.strip().splitlines():
+                    if line:
+                        input_id = line.split()[0]
+                        subprocess.run([pactl_bin, 'set-sink-input-volume', input_id, '100%'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        subprocess.run([pactl_bin, 'set-sink-input-mute', input_id, '0' if vol > 0 else '1'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except Exception:
+                pass
+            break
+        except Exception:
+            pass
+
+    return vol
+
+# ==================== LOCAL AUDIO PLAYBACK ENGINE (RPI HARDWARE AUX JACK) ====================
+PLAYER_PID_FILE = '/tmp/firinna_audio_player.pid'
+PLAYER_LOCK_FILE = '/tmp/firinna_audio_player.lock'
+MONITOR_LOCK_FILE = '/tmp/firinna_audio_monitor.lock'
+
+def _stop_all_audio_processes():
+    try:
+        if os.path.exists(PLAYER_PID_FILE):
+            with open(PLAYER_PID_FILE, 'r') as f:
+                pid_str = f.read().strip()
+                if pid_str.isdigit():
+                    pid = int(pid_str)
+                    try:
+                        os.kill(pid, signal.SIGTERM)
+                        time.sleep(0.05)
+                        if os.path.exists(f"/proc/{pid}"):
+                            os.kill(pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                    except Exception:
+                        pass
+            try:
+                os.remove(PLAYER_PID_FILE)
+            except Exception:
+                pass
+    except Exception:
+        pass
+    # Safety sweep: kill any leftover mpv with our signature
+    try:
+        subprocess.run(['pkill', '-9', '-f', 'mpv.*--ao=alsa'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(['pkill', '-9', '-f', 'cvlc.*--network-caching'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+
+def sync_local_audio_player():
+    try:
+        with open(PLAYER_LOCK_FILE, 'w') as lock_f:
+            fcntl.flock(lock_f, fcntl.LOCK_EX)
+            try:
+                data = load_radio_data()
+                state = data.get('state', {})
+                is_playing = state.get('is_playing', False)
+                current_url = state.get('current_url', '')
+
+                target_url = current_url
+                if target_url.startswith('/api/radio/stream/'):
+                    rel_file = urllib.parse.unquote(target_url.replace('/api/radio/stream/', ''))
+                    disk_path = os.path.realpath(os.path.join(MUSIC_LIBRARY_DIR, rel_file))
+                    if os.path.exists(disk_path):
+                        target_url = disk_path
+                    else:
+                        target_url = f"http://127.0.0.1:5000{target_url}"
+
+                # Always stop existing player first so NO duplicate sound is ever possible
+                _stop_all_audio_processes()
+
+                if is_playing and target_url:
+                    env = _get_audio_env()
+                    proc = None
+                    if os.path.exists('/usr/bin/mpv'):
+                        proc = subprocess.Popen(
+                            [
+                                '/usr/bin/mpv',
+                                '--no-video',
+                                '--ao=alsa',
+                                '--audio-device=alsa/default',
+                                '--cache=yes',
+                                '--demuxer-max-bytes=16M',
+                                '--demuxer-readahead-secs=20',
+                                '--audio-buffer=0.4',
+                                target_url
+                            ],
+                            env=env,
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL
+                        )
+                    elif os.path.exists('/usr/bin/cvlc'):
+                        proc = subprocess.Popen(
+                            ['/usr/bin/cvlc', '--no-video', '--network-caching=2000', target_url],
+                            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                        )
+                    elif os.path.exists('/usr/bin/ffplay'):
+                        proc = subprocess.Popen(
+                            ['/usr/bin/ffplay', '-nodisp', '-nostats', '-loglevel', 'quiet', target_url],
+                            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                        )
+                    
+                    if proc and proc.pid:
+                        with open(PLAYER_PID_FILE, 'w') as pf:
+                            pf.write(str(proc.pid))
+                        print(f"[Radio Engine] (PID {proc.pid}) Playing: {target_url}", flush=True)
+                else:
+                    print("[Radio Engine] Playback stopped.", flush=True)
+            finally:
+                fcntl.flock(lock_f, fcntl.LOCK_UN)
+    except Exception as e:
+        print(f"[Radio Engine] sync_local_audio_player error: {e}", flush=True)
+
+def _local_player_monitor_loop():
+    # Only ONE Gunicorn worker acquires this non-blocking lock to act as supervisor
+    lock_file = None
+    try:
+        lock_file = open(MONITOR_LOCK_FILE, 'w')
+        fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except (IOError, BlockingIOError):
+        return
+
+    print("[Radio Engine] Single supervisor monitor active.", flush=True)
+    while True:
+        try:
+            time.sleep(2)
+            data = load_radio_data()
+            state = data.get('state', {})
+            if state.get('is_playing') and state.get('source_type') in ('folder', 'playlist'):
+                pid = None
+                if os.path.exists(PLAYER_PID_FILE):
+                    try:
+                        with open(PLAYER_PID_FILE, 'r') as f:
+                            pid_str = f.read().strip()
+                            if pid_str.isdigit():
+                                pid = int(pid_str)
+                    except Exception:
+                        pass
+                
+                # If song process ended naturally, advance to next
+                if pid is not None and not os.path.exists(f"/proc/{pid}"):
+                    print(f"[Radio Engine] Track PID {pid} finished naturally, advancing...", flush=True)
+                    _advance_next_track()
+        except Exception:
+            pass
+
+def _advance_next_track():
+    try:
+        data = load_radio_data()
+        state = data.get('state', {})
+        queue = state.get('queue', [])
+        if queue:
+            idx = state.get('queue_index', 0)
+            mode = state.get('mode', 'sequential')
+            if mode == 'shuffle' and len(queue) > 1:
+                import random
+                next_idx = random.randint(0, len(queue) - 1)
+            else:
+                next_idx = (idx + 1) % len(queue)
+            state['queue_index'] = next_idx
+            cur = queue[next_idx]
+            state['current_title'] = cur.get('title') or cur.get('name') or "Müzik"
+            state['current_url'] = cur.get('stream_url') or cur.get('url') or ""
+            state['current_item_id'] = cur.get('rel_path') or cur.get('id') or ""
+            state['is_playing'] = True
+            state['updated_at'] = int(time.time())
+            data['state'] = state
+            save_radio_data(data)
+            sync_local_audio_player()
+    except Exception as e:
+        print(f"[Radio Engine] Advance track error: {e}", flush=True)
+
+threading.Thread(target=_local_player_monitor_loop, daemon=True).start()
+
 @app.route('/radio')
 def radio_page():
     return render_template('radio_admin.html')
@@ -4521,7 +4803,49 @@ def radio_page():
 @app.route('/api/radio/status', methods=['GET'])
 def api_radio_status():
     data = load_radio_data()
-    return jsonify(data.get('state', {}))
+    state = dict(data.get('state', {}))
+    state['volume'] = get_system_volume()
+    
+    if state.get('source_type') == 'spotify':
+        try:
+            from spotify_integration import get_valid_access_token
+            token = get_valid_access_token()
+            if token:
+                s_res = requests.get('https://api.spotify.com/v1/me/player', headers={'Authorization': f'Bearer {token}'}, timeout=1.5)
+                if s_res.status_code == 200 and s_res.text:
+                    s_data = s_res.json()
+                    if s_data.get('is_playing'):
+                        state['is_playing'] = True
+                        it = s_data.get('item') or {}
+                        artists = ", ".join([a.get('name') for a in it.get('artists', [])])
+                        track_name = it.get('name', 'Spotify Müzik')
+                        state['display_title'] = f"🟢 {track_name} - {artists}"
+                        state['current_title'] = f"{track_name} - {artists}"
+        except Exception:
+            pass
+    elif state.get('is_playing') and state.get('source_type') == 'station':
+        live_title = get_live_stream_title_fast(state.get('current_url'))
+        if live_title:
+            state['live_track_title'] = live_title
+            base_name = state.get('current_title', '').split(' - ')[0].split(' (')[0]
+            state['display_title'] = f"{base_name}: {live_title}"
+    return jsonify(state)
+
+@app.route('/api/radio/volume', methods=['GET', 'POST'])
+def api_radio_volume():
+    if request.method == 'POST':
+        req = request.json or {}
+        vol = req.get('volume', 80)
+        actual_vol = set_system_volume(vol)
+        data = load_radio_data()
+        state = data.get('state', {})
+        state['volume'] = actual_vol
+        state['updated_at'] = int(time.time())
+        data['state'] = state
+        save_radio_data(data)
+        return jsonify({"success": True, "volume": actual_vol})
+    else:
+        return jsonify({"volume": get_system_volume()})
 
 @app.route('/api/radio/control', methods=['POST'])
 def api_radio_control():
@@ -4535,6 +4859,10 @@ def api_radio_control():
         state['is_playing'] = True
     elif action == 'pause':
         state['is_playing'] = False
+    elif action == 'set_volume':
+        vol = req.get('volume', 80)
+        actual_vol = set_system_volume(vol)
+        state['volume'] = actual_vol
     elif action == 'toggle_mode':
         current_mode = state.get('mode', 'sequential')
         state['mode'] = 'shuffle' if current_mode == 'sequential' else 'sequential'
@@ -4553,7 +4881,6 @@ def api_radio_control():
             state['queue'] = [st]
             state['queue_index'] = 0
     elif action == 'play_queue':
-        # items: list of tracks or stations, start_index: int
         items = req.get('items', [])
         start_idx = req.get('start_index', 0)
         source_type = req.get('source_type', 'folder')
@@ -4567,7 +4894,6 @@ def api_radio_control():
             mode = state.get('mode', 'sequential')
             if mode == 'shuffle' and len(items) > 1:
                 import random
-                # keep chosen one first if specified
                 chosen = items[start_idx] if 0 <= start_idx < len(items) else items[0]
                 rest = [it for it in items if it != chosen]
                 random.shuffle(rest)
@@ -4613,6 +4939,7 @@ def api_radio_control():
     state['updated_at'] = int(time.time())
     data['state'] = state
     save_radio_data(data)
+    threading.Thread(target=sync_local_audio_player, daemon=True).start()
     return jsonify({"success": True, "state": state})
 
 @app.route('/api/radio/stations', methods=['GET', 'POST'])
@@ -4661,8 +4988,13 @@ def api_radio_library():
 @app.route('/api/radio/upload', methods=['POST'])
 def api_radio_upload():
     """Accepts individual audio files or entire folder trees via relative paths"""
+    print(f"[DEBUG] Request content_type: {request.content_type}")
+    print(f"[DEBUG] Request form keys: {list(request.form.keys())}")
+    print(f"[DEBUG] Request files keys: {list(request.files.keys())}")
+    
     files = request.files.getlist('files') or request.files.getlist('file')
     if not files or len(files) == 0:
+        print("[DEBUG] No files found in request.files")
         return jsonify({"success": False, "error": "Yüklenecek dosya seçilmedi"}), 400
 
     target_folder_param = request.form.get('target_folder', '').strip()

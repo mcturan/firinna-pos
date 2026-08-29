@@ -1,0 +1,1977 @@
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // Application Initialization Script
+        var player;
+        var currentVideoId = "";
+        var currentAudioPriority = "video";
+        var currentMediaSource = "local";
+        var ytReady = false;
+        var isPlayerInitialized = false;
+        
+        var localVideoList = {{ (settings.playlist_videos | tojson) if settings and settings.playlist_videos else ((settings.local_videos | tojson) if settings and settings.local_videos else '[]') }};
+        var localAudioList = [];
+        var currentLocalVideoIndex = 0;
+        var currentLocalAudioIndex = 0;
+
+        function onYouTubeIframeAPIReady() { ytReady = true; }
+
+        const vidEl = document.getElementById('local-video');
+        const audEl = document.getElementById('local-audio');
+        const recordPlayer = document.getElementById('record-player');
+
+        if (vidEl) {
+            vidEl.addEventListener('playing', () => {
+                const badge = document.getElementById('ml-dl-badge');
+                if (badge) badge.style.display = 'none';
+            });
+            vidEl.addEventListener('canplay', () => {
+                const badge = document.getElementById('ml-dl-badge');
+                if (badge) badge.style.display = 'none';
+            });
+            vidEl.addEventListener('loadeddata', () => {
+                const badge = document.getElementById('ml-dl-badge');
+                if (badge) badge.style.display = 'none';
+            });
+        }
+
+        audEl.onended = () => {
+            if(localAudioList.length > 0) {
+                currentLocalAudioIndex = (currentLocalAudioIndex + 1) % localAudioList.length;
+                audEl.src = localAudioList[currentLocalAudioIndex];
+                audEl.play().catch(e=>{});
+            }
+        };
+
+        audEl.onplay = () => { recordPlayer.style.display = 'block'; recordPlayer.classList.add('spinning'); };
+        audEl.onpause = () => { recordPlayer.style.display = 'none'; recordPlayer.classList.remove('spinning'); };
+
+        function switchSource(sourceType) {
+            console.log("Switching source to: " + sourceType + ", AndroidTV exists: " + (!!window.AndroidTV));
+            currentMediaSource = sourceType;
+            if(sourceType === 'local') {
+                document.getElementById('ytplayer').style.display = 'none';
+                if (!window.AndroidTV) {
+                    vidEl.style.display = 'block';
+                    document.documentElement.classList.remove('native-video-active');
+                } else {
+                    vidEl.style.display = 'none';
+                    document.documentElement.classList.add('native-video-active');
+                }
+                if(player && player.pauseVideo) player.pauseVideo();
+            } else {
+                document.documentElement.classList.remove('native-video-active');
+                document.getElementById('local-video').style.display = 'none';
+                if (window.AndroidTV && window.AndroidTV.stopNativeVideo) window.AndroidTV.stopNativeVideo();
+                document.getElementById('ytplayer').style.display = 'block';
+                if(vidEl) vidEl.pause();
+                if(player && player.playVideo) player.playVideo();
+            }
+        }
+
+        // ==============================================================
+        // 1. REAL-TIME REMOTE LOGGER (Reports to /api/tv/upload_logs)
+        // ==============================================================
+        const _tvLogBuffer = [];
+        var _lastLogFlush = 0;
+
+        function tvLog(...args) {
+            const time = new Date().toLocaleTimeString('en-GB', {hour12:false});
+            const msg = args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+            const formatted = `[${time}] ${msg}`;
+            console.log(formatted);
+            _tvLogBuffer.push(formatted);
+            if (_tvLogBuffer.length > 250) _tvLogBuffer.shift();
+        }
+
+        async function flushTvLogsToServer(force = false) {
+            if (_tvLogBuffer.length === 0) return;
+            if (!force && _tvLogBuffer.length < 3 && (Date.now() - _lastLogFlush < 5000)) return;
+            _lastLogFlush = Date.now();
+            const logsToSendArray = _tvLogBuffer.splice(0, _tvLogBuffer.length);
+            const logsToSend = logsToSendArray.join('\n');
+            try {
+                const res = await fetch('/api/tv/upload_logs', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        client_id: (typeof myClientId !== 'undefined' ? myClientId : 'tv_device'),
+                        logs: logsToSend
+                    })
+                });
+                if (!res.ok) {
+                    // Put back unsent logs if buffer isn't full
+                    _tvLogBuffer = logsToSendArray.concat(_tvLogBuffer).slice(-250);
+                }
+            } catch(e){
+                _tvLogBuffer = logsToSendArray.concat(_tvLogBuffer).slice(-250);
+            }
+        }
+        setInterval(() => flushTvLogsToServer(false), 5000);
+
+        // ==============================================================
+        // 2. PERSISTENT LOCAL CACHE STORAGE (Preserves videos on disk across boots)
+        // ==============================================================
+        const TV_CACHE_NAME = 'firinna-tv-media-cache-v2';
+        var bufferedVideoBlobs = {}; // url -> objectUrl
+        const CORE_FALLBACK_VIDEOS = ["/static/tv_media/videos/bayrak.mp4"];
+        var isPlayingFallback = false;
+        var currentlyPlayingSrc = "";
+
+        async function getPersistentMediaCache() {
+            if ('caches' in window) {
+                try { return await caches.open(TV_CACHE_NAME); } catch(e){}
+            }
+            return null;
+        }
+
+        async function checkAndLoadPersistentVideo(videoUrl) {
+            if (!videoUrl) return null;
+            if (bufferedVideoBlobs[videoUrl]) return bufferedVideoBlobs[videoUrl];
+            const cache = await getPersistentMediaCache();
+            if (!cache) return null;
+            try {
+                const match = await cache.match(videoUrl);
+                if (match) {
+                    const blob = await match.blob();
+                    if (blob && blob.size > 1000) {
+                        // Revoke old blob URL if exists to prevent memory leaks
+                        if (bufferedVideoBlobs[videoUrl]) URL.revokeObjectURL(bufferedVideoBlobs[videoUrl]);
+                        const blobUrl = URL.createObjectURL(blob);
+                        bufferedVideoBlobs[videoUrl] = blobUrl;
+                        const filename = videoUrl.split('/').pop();
+                        tvLog(`[CACHE STORAGE HIT] ${filename} (${(blob.size/(1024*1024)).toFixed(1)} MB) loaded from persistent disk cache!`);
+                        return blobUrl;
+                    }
+                }
+            } catch(err) {
+                tvLog(`[CACHE READ ERROR] ${videoUrl}:`, err);
+            }
+            return null;
+        }
+
+        async function saveVideoToPersistentCache(videoUrl, blob) {
+            const cache = await getPersistentMediaCache();
+            if (!cache || !blob) return;
+            try {
+                const response = new Response(blob, {
+                    headers: { 'Content-Type': 'video/mp4', 'Content-Length': blob.size }
+                });
+                await cache.put(videoUrl, response);
+                const filename = videoUrl.split('/').pop();
+                tvLog(`[CACHE STORAGE SAVED] ${filename} (${(blob.size/(1024*1024)).toFixed(1)} MB) permanently saved to local disk cache!`);
+            } catch(err) {
+                tvLog(`[CACHE WRITE ERROR] ${videoUrl}:`, err);
+            }
+        }
+
+        // ==============================================================
+        // 3. INDEPENDENT SEQUENTIAL BACKGROUND DOWNLOAD QUEUE
+        // (Runs independently and is NEVER aborted by video onended loops!)
+        // ==============================================================
+        var isDownloadingVideo = false;
+        var currentlyDownloadingUrl = null;
+        var activeVideoXhr = null;
+        var videoDownloadQueue = [];
+
+        async function queueVideoForBackgroundDownload(videoUrl) {
+            if (!videoUrl || videoUrl.endsWith('/bayrak.mp4')) return;
+            let fullUrl = videoUrl.startsWith("/static/") ? videoUrl : "/static/tv_media/videos/" + videoUrl;
+            
+            // Check if already in memory or disk cache
+            const cachedBlobUrl = await checkAndLoadPersistentVideo(fullUrl);
+            if (cachedBlobUrl) return;
+
+            if (!videoDownloadQueue.includes(fullUrl) && currentlyDownloadingUrl !== fullUrl) {
+                videoDownloadQueue.push(fullUrl);
+                const filename = fullUrl.split('/').pop();
+                tvLog(`[SYNC QUEUE] Queued for background download: ${filename} (Queue depth: ${videoDownloadQueue.length})`);
+                processBackgroundDownloadQueue();
+            }
+        }
+
+        async function processBackgroundDownloadQueue() {
+            if (isDownloadingVideo || videoDownloadQueue.length === 0) return;
+            const targetUrl = videoDownloadQueue.shift();
+            
+            // Re-verify if already cached
+            const cachedBlobUrl = await checkAndLoadPersistentVideo(targetUrl);
+            if (cachedBlobUrl) {
+                processBackgroundDownloadQueue();
+                return;
+            }
+
+            const filename = targetUrl.split('/').pop();
+            const badge = document.getElementById('ml-dl-badge');
+            if (badge) {
+                badge.style.display = 'block';
+                badge.style.opacity = '0.85';
+                badge.textContent = `🎬 ${filename} %0`;
+            }
+
+            isDownloadingVideo = true;
+            currentlyDownloadingUrl = targetUrl;
+            tvLog(`[DOWNLOAD START] Starting non-interruptible background download: ${filename}`);
+            flushTvLogsToServer(true);
+
+            const xhr = new XMLHttpRequest();
+            activeVideoXhr = xhr;
+            xhr.open('GET', targetUrl, true);
+            xhr.responseType = 'blob';
+
+            let lastLoggedPct = -1;
+            xhr.onprogress = function(e) {
+                if (e.lengthComputable && e.total > 0) {
+                    const pct = Math.min(99, Math.round((e.loaded / e.total) * 100));
+                    if (badge) {
+                        badge.style.display = 'block';
+                        badge.textContent = `🎬 ${filename} %${pct}`;
+                    }
+                    if (pct % 25 === 0 && pct !== lastLoggedPct) {
+                        lastLoggedPct = pct;
+                        tvLog(`[DOWNLOAD PROGRESS] ${filename}: %${pct} (${(e.loaded/(1024*1024)).toFixed(1)}MB / ${(e.total/(1024*1024)).toFixed(1)}MB)`);
+                    }
+                }
+            };
+
+            xhr.onload = async function() {
+                isDownloadingVideo = false;
+                currentlyDownloadingUrl = null;
+                activeVideoXhr = null;
+
+                if (xhr.status === 200) {
+                    const blob = xhr.response;
+                    // Revoke old blob URL if exists to prevent memory leaks
+                    if (bufferedVideoBlobs[targetUrl]) URL.revokeObjectURL(bufferedVideoBlobs[targetUrl]);
+                    const blobUrl = URL.createObjectURL(blob);
+                    bufferedVideoBlobs[targetUrl] = blobUrl;
+                    failedVideoRegistry.delete(targetUrl);
+
+                    // Persist to disk cache so it never needs downloading again
+                    await saveVideoToPersistentCache(targetUrl, blob);
+
+                    tvLog(`[DOWNLOAD FINISHED] ${filename} (%100) saved to persistent disk cache!`);
+                    flushTvLogsToServer(true);
+
+                    if (badge) {
+                        badge.textContent = `🎬 ${filename} %100`;
+                        setTimeout(() => {
+                            if (!isDownloadingVideo && badge) badge.style.display = 'none';
+                        }, 1500);
+                    }
+
+                    // If currently on fallback (or waiting for this video), seamlessly switch!
+                    let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+                    let curTarget = activeList[currentLocalVideoIndex % activeList.length] || '';
+                    if (!curTarget.startsWith("/static/")) curTarget = "/static/tv_media/videos/" + curTarget;
+                    
+                    if (curTarget === targetUrl || isPlayingFallback) {
+                        tvLog(`[AUTO SWITCH] Seamlessly switching to newly ready video: ${filename}`);
+                        isPlayingFallback = false;
+                        playBlobDirectly(blobUrl, targetUrl);
+                    }
+                } else {
+                    tvLog(`[DOWNLOAD HTTP ERROR] ${filename} returned HTTP ${xhr.status}`);
+                    registerFailedVideo(targetUrl);
+                    if (badge) badge.style.display = 'none';
+                }
+
+                // Process next in queue
+                setTimeout(processBackgroundDownloadQueue, 500);
+            };
+
+            xhr.onerror = function(e) {
+                isDownloadingVideo = false;
+                currentlyDownloadingUrl = null;
+                activeVideoXhr = null;
+                registerFailedVideo(targetUrl);
+                tvLog(`[DOWNLOAD NETWORK ERROR] Network failure downloading ${filename}`);
+                if (badge) badge.style.display = 'none';
+                flushTvLogsToServer(true);
+                // Retry next after 3 seconds
+                setTimeout(processBackgroundDownloadQueue, 3000);
+            };
+
+            xhr.send();
+        }
+
+        async function syncAllPlaylistVideosInBackground() {
+            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            tvLog(`[SYNC] Checking disk cache for playlist: ${activeList.map(v => v.split('/').pop()).join(', ')}`);
+            for (const vUrl of activeList) {
+                let full = vUrl.startsWith("/static/") ? vUrl : "/static/tv_media/videos/" + vUrl;
+                if (!full.endsWith('/bayrak.mp4')) {
+                    const cached = await checkAndLoadPersistentVideo(full);
+                    if (!cached) {
+                        queueVideoForBackgroundDownload(full);
+                    }
+                }
+            }
+        }
+
+        // ==============================================================
+        // 4. NETWORK & MEDIA HEALTH RETRY MANAGER (Self-Healing)
+        // ==============================================================
+        let isNetworkServerHealthy = true;
+        const failedImageRegistry = new Map(); // url -> { element, url, retryCount, lastAttempt }
+        const failedVideoRegistry = new Set(); // set of failed video URLs
+
+        function handleMediaImageError(imgEl, originalUrl) {
+            if (!imgEl) return;
+            const src = originalUrl || imgEl.getAttribute('data-original-src') || imgEl.src;
+            if (!src) return;
+
+            imgEl.setAttribute('data-original-src', src);
+            imgEl.style.display = 'none';
+
+            failedImageRegistry.set(src, {
+                element: imgEl,
+                url: src,
+                retryCount: (failedImageRegistry.get(src)?.retryCount || 0) + 1,
+                lastAttempt: Date.now()
+            });
+
+            tvLog(`[MEDIA HEALTH] Image error registered for retry: ${src}`);
+        }
+
+        function registerFailedVideo(videoUrl) {
+            if (!videoUrl) return;
+            failedVideoRegistry.add(videoUrl);
+            tvLog(`[MEDIA HEALTH] Video error registered for retry: ${videoUrl}`);
+        }
+
+        async function retryFailedImages() {
+            if (failedImageRegistry.size === 0) return;
+            tvLog(`[MEDIA HEALTH] Retrying ${failedImageRegistry.size} failed image(s)...`);
+
+            for (const [url, item] of Array.from(failedImageRegistry.entries())) {
+                const cacheBuster = (url.includes('?') ? '&' : '?') + '_r=' + Date.now();
+                const testUrl = url + cacheBuster;
+
+                const imgTester = new Image();
+                imgTester.onload = function() {
+                    tvLog(`[MEDIA HEALTH] Image recovered successfully: ${url}`);
+                    if (item.element) {
+                        item.element.src = testUrl;
+                        item.element.style.display = '';
+                    }
+                    document.querySelectorAll(`img[data-original-src="${url}"]`).forEach(img => {
+                        img.src = testUrl;
+                        img.style.display = '';
+                    });
+                    failedImageRegistry.delete(url);
+                };
+                imgTester.onerror = function() {
+                    item.retryCount++;
+                    item.lastAttempt = Date.now();
+                };
+                imgTester.src = testUrl;
+            }
+        }
+
+        function retryFailedVideos() {
+            syncAllPlaylistVideosInBackground();
+        }
+
+        async function checkNetworkAndServerHealth() {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                const pingRes = await fetch('/api/tv/ping?_hc=' + Date.now(), {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ client_id: (typeof myClientId !== 'undefined' ? myClientId : 'tv_health') }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (pingRes.ok) {
+                    if (!isNetworkServerHealthy) {
+                        tvLog("[NETWORK HEALTH] Server connection RESTORED to ONLINE!");
+                    }
+                    isNetworkServerHealthy = true;
+
+                    if (typeof webProducts !== 'undefined' && (!webProducts || webProducts.length === 0)) {
+                        if (typeof fetchProducts === 'function') fetchProducts();
+                    }
+
+                    retryFailedImages();
+                    retryFailedVideos();
+                } else {
+                    isNetworkServerHealthy = false;
+                }
+            } catch (err) {
+                isNetworkServerHealthy = false;
+                tvLog("[NETWORK HEALTH] Connection ping failed, waiting for network...", err.message || err);
+            }
+        }
+
+        setInterval(checkNetworkAndServerHealth, 15000);
+        window.addEventListener('online', () => {
+            tvLog("[NETWORK] Online event detected. Running health check & retrying media...");
+            checkNetworkAndServerHealth();
+        });
+
+        // ==============================================================
+        // 5. PLAYBACK LOOP (Does NOT abort active background downloads!)
+        // ==============================================================
+        window.playNextNativeVideo = function() {
+            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            currentLocalVideoIndex = (currentLocalVideoIndex + 1) % activeList.length;
+            const targetName = (activeList[currentLocalVideoIndex] || '').split('/').pop();
+            tvLog(`[VIDEO LOOP] Next video -> index ${currentLocalVideoIndex} (${targetName})`);
+            playLocalVideo(currentLocalVideoIndex);
+        };
+
+        window.onNativeVideoEnded = function() {
+            tvLog("[AndroidTV] Native video ended callback received.");
+            window.playNextNativeVideo();
+        };
+
+        window.onVideoEnded = function() {
+            tvLog("[AndroidTV] onVideoEnded callback received.");
+            window.playNextNativeVideo();
+        };
+
+        async function playLocalVideo(vIndex) {
+            let activeList = (localVideoList && localVideoList.length > 0) ? localVideoList : CORE_FALLBACK_VIDEOS;
+            currentLocalVideoIndex = vIndex % activeList.length;
+            let rawVideo = activeList[currentLocalVideoIndex];
+            if (!rawVideo) rawVideo = "/static/tv_media/videos/bayrak.mp4";
+            
+            let srcUrl = rawVideo;
+            if (!srcUrl.startsWith("/static/")) { srcUrl = "/static/tv_media/videos/" + srcUrl; }
+            const filename = srcUrl.split('/').pop();
+
+
+
+            // 2. Check memory or persistent disk cache
+            let blobUrl = bufferedVideoBlobs[srcUrl];
+            if (!blobUrl) {
+                blobUrl = await checkAndLoadPersistentVideo(srcUrl);
+            }
+
+            if (blobUrl) {
+                isPlayingFallback = false;
+                tvLog(`[PLAYBACK] Playing ready cached video: ${filename}`);
+                playBlobDirectly(blobUrl, srcUrl);
+                return;
+            }
+
+            // 3. Pure fallback video
+            if (srcUrl.endsWith('/bayrak.mp4')) {
+                isPlayingFallback = true;
+                tvLog(`[PLAYBACK] Playing core fallback: bayrak.mp4`);
+                playBlobDirectly(srcUrl, srcUrl);
+                return;
+            }
+
+            // 4. Custom video is downloading in background:
+            queueVideoForBackgroundDownload(srcUrl);
+
+            isPlayingFallback = true;
+            tvLog(`[PLAYBACK WAIT] ${filename} is downloading... Playing fallback in meantime`);
+            playBlobDirectly("/static/tv_media/videos/bayrak.mp4", "/static/tv_media/videos/bayrak.mp4");
+        }
+
+        function playBlobDirectly(srcToPlay, origUrl) {
+            document.documentElement.classList.remove('native-video-active');
+            vidEl.style.display = "block";
+            vidEl.muted = true;
+            vidEl.defaultMuted = true;
+
+            const currentSrc = vidEl.getAttribute('src') || vidEl.src || '';
+            const isSameSrc = currentSrc === srcToPlay || currentSrc.endsWith(origUrl);
+
+            if (!isSameSrc || vidEl.currentTime >= (vidEl.duration || 1) - 0.5) {
+                currentlyPlayingSrc = srcToPlay;
+                vidEl.setAttribute('src', srcToPlay);
+                vidEl.src = srcToPlay;
+                try { vidEl.currentTime = 0; } catch(e) {}
+                vidEl.load();
+            }
+
+            const playPromise = vidEl.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    console.log("[VIDEO] Autoplay retry with muted...", err);
+                    vidEl.muted = true;
+                    vidEl.defaultMuted = true;
+                    try { vidEl.currentTime = 0; } catch(e){}
+                    vidEl.play().catch(e => {
+                        console.error("[VIDEO] Play error:", e);
+                    });
+                });
+            }
+        }
+
+        if (vidEl) {
+            vidEl.onended = () => {
+                console.log("[HTML5 Video] onended event -> restarting / advancing...");
+                window.playNextNativeVideo();
+            };
+
+            vidEl.onerror = (e) => { 
+                console.warn("[HTML5 Video] error event -> retrying next in 1s...", e);
+                setTimeout(() => {
+                    window.playNextNativeVideo();
+                }, 1000);
+            };
+        }
+
+        // WATCHDOG: Detects stalled, frozen or black-screen ended videos on Mi TV Stick
+        setInterval(() => {
+            if (isAfterHoursActive || currentMediaSource !== 'local') return;
+            if (vidEl && vidEl.style.display !== 'none') {
+                if (vidEl.ended || (vidEl.paused && vidEl.currentTime > 0 && Math.abs(vidEl.currentTime - vidEl.duration) < 2.0)) {
+                    console.warn("[VIDEO WATCHDOG] Video reached end and remained stopped. Restarting...");
+                    window.playNextNativeVideo();
+                } else if (vidEl.paused && vidEl.readyState > 0) {
+                    console.warn("[VIDEO WATCHDOG] Video paused unexpectedly. Forcing play...");
+                    vidEl.muted = true;
+                    try { vidEl.currentTime = 0; } catch(e){}
+                    vidEl.play().catch(() => {
+                        window.playNextNativeVideo();
+                    });
+                }
+            }
+        }, 3000);
+
+        function playLocalAudio(aIndex) {
+            if(localAudioList.length === 0) return;
+            currentLocalAudioIndex = aIndex % localAudioList.length;
+            const srcUrl = "/static/tv_media/audio/" + localAudioList[currentLocalAudioIndex];
+            audEl.src = srcUrl;
+            audEl.play().catch(e => {
+                console.log("Local audio play blocked:", e);
+            });
+            audEl.onended = () => {
+                playLocalAudio(currentLocalAudioIndex + 1);
+            };
+            audEl.onerror = () => {
+                setTimeout(() => playLocalAudio(currentLocalAudioIndex + 1), 2000);
+            };
+        }
+
+        let isYtInit = false;
+        function initOrUpdatePlayer(videoId, priority) {
+            if (!isYtInit) {
+                let vId = videoId;
+                if(vId.includes('v=')) vId = vId.split('v=')[1].split('&')[0];
+                else if(vId.includes('youtu.be/')) vId = vId.split('youtu.be/')[1].split('?')[0];
+                
+                let embedUrl = `https://www.youtube.com/embed/${vId}?autoplay=1&mute=1&loop=1&playlist=${vId}&controls=0&rel=0&showinfo=0&modestbranding=1`;
+                if(vId.startsWith('PL') || videoId.includes('list=')) {
+                    let pId = vId;
+                    if(videoId.includes('list=')) pId = videoId.split('list=')[1].split('&')[0];
+                    embedUrl = `https://www.youtube.com/embed/videoseries?list=${pId}&autoplay=1&mute=1&loop=1&controls=0&rel=0&showinfo=0&modestbranding=1`;
+                }
+                
+                document.getElementById('ytplayer').src = embedUrl;
+                isYtInit = true;
+            }
+        }
+    </script>
+    <script>
+        let lastSettingsStr = "";
+        let currentMessages = [];
+        let basePromoText = "";
+        let webProducts = [];
+        
+        let pIndex = 0;
+        let mIndex = 0;
+
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false});
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            
+            document.querySelectorAll('.clock-text').forEach(el => el.textContent = timeStr);
+            const clockEl = document.getElementById('ml-clock');
+            if (clockEl) clockEl.textContent = timeStr;
+            const dateEl = document.getElementById('ml-date');
+            if (dateEl) dateEl.textContent = `${day}.${month}.${year}`;
+
+            checkAfterHoursSchedule();
+        }
+
+        // MESAİ DIŞI (AFTER-HOURS / CLOSED MODE) ENGINE
+        // ==========================================
+        let afterHoursSettings = {
+            enabled: true,
+            force_active: false,
+            auto_schedule: true,
+            start_time: "23:00",
+            end_time: "08:30",
+            media_type: "video",
+            video_url: "/static/tv_media/videos/1.mp4",
+            image_url: "/static/uploads/logo_white_silhouette.png",
+            qr_link: "https://firinna.com",
+            cycle_duration: 7,
+            messages: [
+                {
+                    lang: "tr",
+                    flag: "🇹🇷",
+                    title: "Şu Anda Hizmet Vermemekteyiz",
+                    text: "Değerli misafirlerimiz, şu anda kapalıyız. Sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
+                    badge: "☀️ Açılış: Sabah 08:30"
+                },
+                {
+                    lang: "en",
+                    flag: "🇬🇧",
+                    title: "We Are Currently Closed",
+                    text: "Dear guests, we are currently closed. We look forward to welcoming you with fresh artisan bakery and warm hospitality.",
+                    badge: "☀️ Opening: 08:30 AM"
+                },
+                {
+                    lang: "ru",
+                    flag: "🇷🇺",
+                    title: "В настоящее время мы закрыты",
+                    text: "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас со свежей выпечкой и горячим чаем.",
+                    badge: "☀️ Открытие: в 08:30"
+                },
+                {
+                    lang: "ar",
+                    flag: "🇸🇦",
+                    title: "نحن مغلقون حالياً",
+                    text: "ضيوفنا الأعزاء، نحن حالياً مغلقون. يسعدنا استقبالكم مع أشهى المخبوزات الطازجة والضيافة الدافئة.",
+                    badge: "☀️ الافتتاح: الساعة 08:30 صباحاً"
+                },
+                {
+                    lang: "es",
+                    flag: "🇪🇸",
+                    title: "Actualmente estamos cerrados",
+                    text: "Estimados clientes, actualmente estamos cerrados. Estaremos encantados de recibirles con nuestros deliciosos productos de panadería artesanal.",
+                    badge: "☀️ Apertura: a las 08:30"
+                }
+            ]
+        };
+
+        // Working hours fetched from web settings (daily_hours)
+        let webDailyHours = null;
+        // Live store open/closed status from /api/web/status (considers POS open tables!)
+        let webStoreIsOpen = null; // null = not yet fetched, true/false = live status
+
+        let isAfterHoursActive = false;
+        let ahLangIndex = 0;
+        let ahLangTimer = null;
+        let ahProductIndex = 0;
+        let ahProductTimer = null;
+
+        // Fetch live store status from the web status API
+        // This considers: daily hours + open tables (POS) + manual overrides
+        async function fetchWebStoreStatus() {
+            try {
+                const res = await fetch('/api/web/status?_t=' + Date.now());
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.hours) {
+                        webDailyHours = data.hours;
+                        try { localStorage.setItem('firinna_daily_hours', JSON.stringify(webDailyHours)); } catch(e) {}
+                    }
+                    if (typeof data.is_open === 'boolean') {
+                        webStoreIsOpen = data.is_open;
+                        try { localStorage.setItem('firinna_store_is_open', JSON.stringify(webStoreIsOpen)); } catch(e) {}
+                    }
+                }
+            } catch(e) {
+                // Fallback to cached
+                try {
+                    const cachedHours = localStorage.getItem('firinna_daily_hours');
+                    if (cachedHours && !webDailyHours) webDailyHours = JSON.parse(cachedHours);
+                    const cachedStatus = localStorage.getItem('firinna_store_is_open');
+                    if (cachedStatus !== null && webStoreIsOpen === null) webStoreIsOpen = JSON.parse(cachedStatus);
+                } catch(err) {}
+            }
+        }
+        // Fetch on load and every 30 seconds (frequent to catch POS table changes quickly)
+        fetchWebStoreStatus();
+        setInterval(fetchWebStoreStatus, 30 * 1000);
+
+        // Turkish day names in JS weekday order (0=Pazar, 1=Pazartesi, ...)
+        const trDayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+        const enDayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const ruDayNames = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+        const arDayNames = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+        const esDayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+        const elDayNames = ["Κυριακή", "Δευτέρα", "Τρίτη", "Τετάρτη", "Πέμπτη", "Παρασκευή", "Σάββατο"];
+        const jaDayNames = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+
+        /**
+         * Finds the next day+time when the store is open, based on daily_hours from web settings.
+         * Returns { dayIndex (JS 0=Sun), dayNameTr, openTime, daysAhead }
+         * daysAhead: 0 = today (later hours), 1 = tomorrow, etc.
+         */
+        function getNextOpenSlot() {
+            if (!webDailyHours) return null;
+
+            const now = new Date();
+            const currentHM = now.getHours() * 60 + now.getMinutes();
+
+            // Check up to 7 days ahead (today + 6)
+            for (let offset = 0; offset < 7; offset++) {
+                const checkDate = new Date(now);
+                checkDate.setDate(checkDate.getDate() + offset);
+                const jsDay = checkDate.getDay(); // 0=Sun ... 6=Sat
+                const trDay = trDayNames[jsDay];
+                const cfg = webDailyHours[trDay];
+
+                if (!cfg || !cfg.active) continue;
+
+                const [oh, om] = (cfg.open || '08:00').split(':').map(Number);
+                const openMinutes = oh * 60 + om;
+
+                // If today, only valid if opening time is still in the future
+                if (offset === 0 && currentHM >= openMinutes) continue;
+
+                return {
+                    dayIndex: jsDay,
+                    dayNameTr: trDay,
+                    openTime: cfg.open || '08:00',
+                    daysAhead: offset
+                };
+            }
+            return null; // All days closed (shouldn't happen)
+        }
+
+        /**
+         * Determines if the TV should show the after-hours (closed) screen.
+         * 
+         * AUTO mode (auto_schedule=true):
+         *   Uses the live /api/web/status is_open field. This is POS-aware:
+         *   - If customers are still seated (open tables), store stays "open" → TV stays normal
+         *   - Respects daily hours, manual overrides, and POS state
+         *
+         * MANUAL mode (auto_schedule=false):
+         *   Uses the admin-configured start_time / end_time (e.g. 23:00 → 08:30)
+         */
+        function isAfterHoursNow() {
+            if (!afterHoursSettings || !afterHoursSettings.enabled) return false;
+            if (afterHoursSettings.force_active) return true; // Manual test override!
+
+            if (afterHoursSettings.auto_schedule) {
+                // AUTO MODE: Use live web store status (POS-aware)
+                // If webStoreIsOpen is null (not yet fetched), don't activate after-hours
+                if (webStoreIsOpen === null) return false;
+                // Store is open (possibly because of open tables) → TV stays normal
+                // Store is closed → TV shows after-hours
+                return !webStoreIsOpen;
+            } else {
+                // MANUAL MODE: Use admin-configured start/end times
+                const now = new Date();
+                const curMinutes = now.getHours() * 60 + now.getMinutes();
+
+                const [sh, sm] = (afterHoursSettings.start_time || '23:00').split(':').map(Number);
+                const [eh, em] = (afterHoursSettings.end_time || '08:00').split(':').map(Number);
+                const startMinutes = (sh || 23) * 60 + (sm || 0);
+                const endMinutes = (eh || 8) * 60 + (em || 0);
+
+                if (startMinutes > endMinutes) {
+                    return curMinutes >= startMinutes || curMinutes < endMinutes;
+                } else {
+                    return curMinutes >= startMinutes && curMinutes < endMinutes;
+                }
+            }
+        }
+
+        function updateAfterHoursTheme() {
+            const layout = document.getElementById('after-hours-layout');
+            const vignette = document.getElementById('ah-vignette');
+            if (!layout || !vignette) return;
+
+            const hour = new Date().getHours();
+            const isDay = (hour >= 6 && hour < 20); // Güneş doğuşu ve batışı aralığı (Gündüz vs Gece)
+
+            if (isDay) {
+                // Aydınlık / Sıcak Gündüz Teması (Morning Amber & Stone Oven Warmth)
+                layout.style.background = '#0b1120';
+                vignette.style.background = 'radial-gradient(circle at center, rgba(180,83,9,0.18) 0%, rgba(15,23,42,0.75) 60%, rgba(2,6,23,0.94) 100%), linear-gradient(180deg, rgba(30,41,59,0.85) 0%, rgba(245,158,11,0.08) 40%, rgba(15,23,42,0.92) 100%)';
+            } else {
+                // Sinematik Gece Teması (Deep Midnight Cinema Glow)
+                layout.style.background = '#070a13';
+                vignette.style.background = 'radial-gradient(circle at center, rgba(7,10,19,0.35) 0%, rgba(7,10,19,0.8) 75%, rgba(7,10,19,0.96) 100%), linear-gradient(180deg, rgba(7,10,19,0.85) 0%, rgba(7,10,19,0.2) 40%, rgba(7,10,19,0.92) 100%)';
+            }
+        }
+
+        function checkAfterHoursSchedule() {
+            const shouldBeClosed = isAfterHoursNow();
+            const ahLayout = document.getElementById('after-hours-layout');
+            const modernLayout = document.getElementById('modern-layout');
+            if (!ahLayout || !modernLayout) return;
+
+            if (shouldBeClosed) {
+                if (!isAfterHoursActive) {
+                    isAfterHoursActive = true;
+                    ahLayout.style.display = 'block';
+                    modernLayout.style.display = 'none';
+                    applyAfterHoursMedia();
+                    startAfterHoursRotators();
+                }
+                updateAfterHoursTheme();
+            } else {
+                if (isAfterHoursActive) {
+                    isAfterHoursActive = false;
+                    ahLayout.style.display = 'none';
+                    modernLayout.style.display = 'grid';
+                    const ahVid = document.getElementById('ah-video');
+                    if (ahVid) ahVid.pause();
+                    stopAfterHoursRotators();
+                }
+            }
+        }
+
+        function applyAfterHoursMedia() {
+            const ahVid = document.getElementById('ah-video');
+            const ahImg = document.getElementById('ah-image');
+            if (!ahVid || !ahImg) return;
+
+            if (afterHoursSettings.media_type === 'image' && afterHoursSettings.image_url) {
+                ahVid.style.display = 'none';
+                ahVid.pause();
+                ahImg.src = afterHoursSettings.image_url;
+                ahImg.style.display = 'block';
+            } else {
+                ahImg.style.display = 'none';
+                ahVid.style.display = 'block';
+                if (afterHoursSettings.video_url && ahVid.getAttribute('src') !== afterHoursSettings.video_url) {
+                    ahVid.src = afterHoursSettings.video_url;
+                }
+                ahVid.play().catch(e=>{});
+            }
+        }
+
+        function startAfterHoursRotators() {
+            renderAfterHoursCurrentLang();
+            renderAfterHoursSignatureProducts();
+
+            if (ahLangTimer) clearInterval(ahLangTimer);
+            if (ahProductTimer) clearInterval(ahProductTimer);
+
+            const duration = (parseInt(afterHoursSettings.cycle_duration) || 7) * 1000;
+            ahLangTimer = setInterval(rotateAfterHoursLang, duration);
+            ahProductTimer = setInterval(rotateAfterHoursProducts, 5000);
+        }
+
+        function stopAfterHoursRotators() {
+            if (ahLangTimer) clearInterval(ahLangTimer);
+            if (ahProductTimer) clearInterval(ahProductTimer);
+        }
+
+        const bottomMenuTranslations = {
+            tr: { title: "📖 14 Dilde Dijital Menü", sub: "Kameranızla okutun veya web sitemizi ziyaret edin" },
+            en: { title: "📖 Digital Menu in 14 Languages", sub: "Scan with your camera or visit our website" },
+            ru: { title: "📖 Цифровое меню на 14 языках", sub: "Отсканируйте камерой или посетите сайт" },
+            ar: { title: "📖 قائمة رقمية بـ 14 لغة", sub: "امسح بالكاميرا أو قم بزيارة موقعنا" },
+            es: { title: "📖 Menú Digital en 14 Idiomas", sub: "Escanea con la cámara o visita nuestra web" }
+        };
+
+        /**
+         * Generates the dynamic opening badge text based on next open day/time from web settings.
+         * Shows the actual next open day and time (e.g., "Wednesday 11:00" if tomorrow is closed).
+         */
+        function getDynamicOpeningBadge(lang) {
+            const slot = getNextOpenSlot();
+
+            // Fallback to simple end_time if no web hours available
+            const fallbackTime = afterHoursSettings.end_time || '08:00';
+
+            if (!slot) {
+                // No web hours data, use simple fallback
+                if (lang === 'en') return `☀️ Opening: ${fallbackTime} AM`;
+                if (lang === 'ru') return `☀️ Открытие: в ${fallbackTime}`;
+                if (lang === 'ar') return `☀️ الافتتاح: الساعة ${fallbackTime} صباحاً`;
+                if (lang === 'es') return `☀️ Apertura: a las ${fallbackTime}`;
+                if (lang === 'el') return `☀️ Άνοιγμα: στις ${fallbackTime}`;
+                if (lang === 'ja') return `☀️ 開店: ${fallbackTime}`;
+                return `☀️ Açılış: ${fallbackTime}`;
+            }
+
+            const openTime = slot.openTime;
+            const daysAhead = slot.daysAhead;
+            const dayIdx = slot.dayIndex;
+
+            if (lang === 'en') {
+                if (daysAhead === 0) return `☀️ Opening: Today at ${openTime}`;
+                if (daysAhead === 1) return `☀️ Opening: Tomorrow at ${openTime}`;
+                return `☀️ Opening: ${enDayNames[dayIdx]} at ${openTime}`;
+            } else if (lang === 'ru') {
+                if (daysAhead === 0) return `☀️ Открытие: Сегодня в ${openTime}`;
+                if (daysAhead === 1) return `☀️ Открытие: Завтра в ${openTime}`;
+                return `☀️ Открытие: ${ruDayNames[dayIdx]} в ${openTime}`;
+            } else if (lang === 'ar') {
+                if (daysAhead === 0) return `☀️ الافتتاح: اليوم الساعة ${openTime}`;
+                if (daysAhead === 1) return `☀️ الافتتاح: غداً الساعة ${openTime}`;
+                return `☀️ الافتتاح: ${arDayNames[dayIdx]} الساعة ${openTime}`;
+            } else if (lang === 'es') {
+                if (daysAhead === 0) return `☀️ Apertura: Hoy a las ${openTime}`;
+                if (daysAhead === 1) return `☀️ Apertura: Mañana a las ${openTime}`;
+                return `☀️ Apertura: ${esDayNames[dayIdx]} a las ${openTime}`;
+            } else if (lang === 'el') {
+                if (daysAhead === 0) return `☀️ Άνοιγμα: Σήμερα στις ${openTime}`;
+                if (daysAhead === 1) return `☀️ Άνοιγμα: Αύριο στις ${openTime}`;
+                return `☀️ Άνοιγμα: ${elDayNames[dayIdx]} στις ${openTime}`;
+            } else if (lang === 'ja') {
+                if (daysAhead === 0) return `☀️ 開店: 本日 ${openTime}`;
+                if (daysAhead === 1) return `☀️ 開店: 明日 ${openTime}`;
+                return `☀️ 開店: ${jaDayNames[dayIdx]} ${openTime}`;
+            } else {
+                // Turkish default
+                if (daysAhead === 0) return `☀️ Açılış: Bugün Saat ${openTime}`;
+                if (daysAhead === 1) return `☀️ Açılış: Yarın Saat ${openTime}`;
+                return `☀️ Açılış: ${trDayNames[dayIdx]} Saat ${openTime}`;
+            }
+        }
+
+        function rotateAfterHoursLang() {
+            const msgs = afterHoursSettings.messages || [];
+            if (msgs.length === 0) return;
+            ahLangIndex = (ahLangIndex + 1) % msgs.length;
+            
+            const box = document.getElementById('ah-lang-box');
+            if (box) box.style.opacity = '0';
+
+            setTimeout(() => {
+                renderAfterHoursCurrentLang();
+                if (box) box.style.opacity = '1';
+            }, 300);
+        }
+
+        function renderAfterHoursCurrentLang() {
+            const msgs = afterHoursSettings.messages || [];
+            if (msgs.length === 0) return;
+            const cur = msgs[ahLangIndex % msgs.length];
+            const langKey = cur.lang || 'tr';
+
+            const titleEl = document.getElementById('ah-title');
+            const textEl = document.getElementById('ah-text');
+            const badgeEl = document.getElementById('ah-badge');
+            const box = document.getElementById('ah-lang-box');
+
+            if (titleEl) titleEl.textContent = cur.title || '';
+            if (textEl) textEl.textContent = cur.text || '';
+            if (badgeEl) badgeEl.textContent = getDynamicOpeningBadge(langKey);
+
+            if (box) {
+                if (langKey === 'ar') {
+                    box.setAttribute('dir', 'rtl');
+                } else {
+                    box.setAttribute('dir', 'ltr');
+                }
+            }
+        }
+
+        function rotateAfterHoursProducts() {
+            if (!webProducts || webProducts.length === 0) return;
+            ahProductIndex = (ahProductIndex + 1) % webProducts.length;
+
+            const pImg = document.getElementById('ah-prod-img');
+            const pTitle = document.getElementById('ah-prod-title');
+
+            if (pImg) pImg.style.opacity = '0';
+            if (pTitle) pTitle.style.opacity = '0';
+
+            setTimeout(() => {
+                renderAfterHoursSignatureProducts();
+                if (pImg) pImg.style.opacity = '1';
+                if (pTitle) pTitle.style.opacity = '1';
+            }, 300);
+        }
+
+        function renderAfterHoursSignatureProducts() {
+            if (!webProducts || webProducts.length === 0) return;
+
+            const prod = webProducts[ahProductIndex % webProducts.length];
+            const pImg = document.getElementById('ah-prod-img');
+            const pTitle = document.getElementById('ah-prod-title');
+
+            if (prod) {
+                if (pImg) pImg.src = prod.image_url || '/static/uploads/logo.png';
+                if (pTitle) pTitle.textContent = prod.title || '';
+            }
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        const wCodeMap = {
+            0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️', 
+            45: '🌫️', 48: '🌫️', 51: '🌦️', 53: '🌦️', 55: '🌧️', 
+            61: '🌧️', 63: '🌧️', 65: '🌧️', 71: '🌨️', 73: '🌨️', 75: '❄️', 
+            80: '🌧️', 81: '⛈️', 82: '⛈️', 95: '🌩️', 96: '⛈️', 99: '⛈️'
+        };
+
+        const englishDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+        async function fetchWeather() {
+            try {
+                // Beyoğlu, Istanbul coordinates (41.0370, 28.9773)
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=41.0370&longitude=28.9773&current=temperature_2m,relative_humidity_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe%2FIstanbul&forecast_days=1");
+                const data = await res.json();
+                if(data && data.daily && data.daily.time && data.daily.time.length >= 1) {
+                    const currentTemp = data.current ? Math.round(data.current.temperature_2m) : null;
+                    const humidity = data.current ? data.current.relative_humidity_2m : null;
+                    const currentIcon = data.current ? (wCodeMap[data.current.weathercode] || '🌤️') : '🌤️';
+                    const d0Max = Math.round(data.daily.temperature_2m_max[0]);
+                    const d0Min = Math.round(data.daily.temperature_2m_min[0]);
+
+                    document.getElementById('ml-weather').innerHTML = `
+                        <div style="display:flex; align-items:center; gap:0.5vw;">
+                            <span style="font-size:1.6vw; line-height:1;">${currentIcon}</span>
+                            <span style="color:#0F172A; font-weight:800; font-size:1.75vw; letter-spacing:0.5px;">${currentTemp !== null ? currentTemp : d0Max}°C</span>
+                        </div>
+                        <span style="color:#CBD5E1; font-weight:300; margin:0 0.7vw; font-size:1.4vw;">|</span>
+                        <div style="display:flex; align-items:center; gap:0.4vw;">
+                            <span style="font-size:1.35vw; line-height:1;">💧</span>
+                            <span style="color:#0284C7; font-weight:800; font-size:1.5vw;">%${humidity !== null ? humidity : '--'}</span>
+                        </div>
+                        <span style="color:#CBD5E1; font-weight:300; margin:0 0.7vw; font-size:1.4vw;">|</span>
+                        <div style="display:flex; align-items:center; gap:0.4vw;">
+                            <span style="color:#64748B; font-weight:800; font-size:1.45vw;">${d0Min}° / ${d0Max}°C</span>
+                        </div>
+                    `;
+                }
+            } catch(e) {
+                console.error("Weather fetch error:", e);
+            }
+        }
+        fetchWeather();
+        setInterval(fetchWeather, 3600000);
+
+        // ==========================================
+        // SYNCHRONIZED MASTER BEAT CONTROLLER (Unified Cycle)
+        // ==========================================
+        let masterBeatCount = 0;
+        let masterBeatTimer = null;
+        let tickerCardItems = [];
+        let currentTickerCardIdx = 0;
+        let lastRenderedItemsKey = "";
+        let isTickerTextEnabled = true;
+        let isTickerCurrencyEnabled = true;
+        let isTickerRssEnabled = true;
+        let liveRssTitles = [];
+        let currentTickerEffect = 'fade'; // Default to ultra-smooth card fade
+
+        function executeMasterBeat() {
+            masterBeatCount++;
+
+            // 1. Sol-Üst (Logo, Domain & 12 Dil Bayrakları): 4-step rotation
+            const logoEl = document.getElementById('ml-logo');
+            const domainEl = document.getElementById('ml-logo-domain');
+            const flagsEl = document.getElementById('ml-logo-flags');
+            if (logoEl && domainEl) {
+                const step = masterBeatCount % 4;
+                logoEl.style.opacity = (step === 0 || step === 1) ? '1' : '0';
+                domainEl.style.opacity = (step === 2) ? '1' : '0';
+                if (flagsEl) flagsEl.style.opacity = (step === 3) ? '1' : '0';
+            }
+
+            // 2. Üst-Orta (Saat/Tarih & Hava Durumu): Synchronized alternate
+            const l0 = document.getElementById('ml-center-layer-0');
+            const l1 = document.getElementById('ml-center-layer-1');
+            if (l0 && l1) {
+                const showWeather = (masterBeatCount % 2 === 1);
+                l0.classList.toggle('active', !showWeather);
+                l1.classList.toggle('active', showWeather);
+            }
+
+            // 3. Sağ-Üst (Döviz, Kripto, Sosyal Medya, Support): 4-step rotation on each beat
+            const r0 = document.getElementById('ml-review-layer-0'); // Forex (USD & EUR)
+            const r1 = document.getElementById('ml-review-layer-1'); // Crypto (BTC & ETH)
+            const r2 = document.getElementById('ml-review-layer-2'); // Social Media (Instagram & TikTok)
+            const r3 = document.getElementById('ml-review-layer-3'); // Support (Maps)
+            const activeLayerIdx = masterBeatCount % 4;
+            if (r0) r0.classList.toggle('active', activeLayerIdx === 0);
+            if (r1) r1.classList.toggle('active', activeLayerIdx === 1);
+            if (r2) r2.classList.toggle('active', activeLayerIdx === 2);
+            if (r3) r3.classList.toggle('active', activeLayerIdx === 3);
+
+            // 4. Alt Bant (Kültür & Duyuru Notları): Rotate ticker card
+            if (tickerCardItems && tickerCardItems.length > 0) {
+                rotateTickerCard();
+            }
+        }
+
+        // Staggered Product Rotation (Offset by 4 seconds to eliminate GPU bottleneck on TV sticks)
+        function executeProductBeat() {
+            if (webProducts.length > 0) {
+                const slides = document.querySelectorAll('.product-slide');
+                if (slides.length > 0) {
+                    slides.forEach(s => s.classList.remove('active'));
+                    slides[pIndex % slides.length].classList.add('active');
+                    pIndex = (pIndex + 1) % slides.length;
+                }
+            }
+            if (currentMessages.length > 0) {
+                const msgSlides = document.querySelectorAll('.msg-slide');
+                if (msgSlides.length > 0) {
+                    msgSlides.forEach(s => s.classList.remove('active'));
+                    msgSlides[mIndex % msgSlides.length].classList.add('active');
+                    mIndex = (mIndex + 1) % msgSlides.length;
+                }
+            }
+        }
+
+        let productBeatTimer = null;
+        function startMasterBeatScheduler() {
+            if (masterBeatTimer) clearInterval(masterBeatTimer);
+            if (productBeatTimer) clearInterval(productBeatTimer);
+            masterBeatTimer = setInterval(executeMasterBeat, 8000);
+            setTimeout(() => {
+                executeProductBeat();
+                productBeatTimer = setInterval(executeProductBeat, 8000);
+            }, 4000); // 4-second stagger offset
+        }
+        startMasterBeatScheduler();
+
+        // ==========================================
+        // DYNAMIC WATERMARK & CELEBRATION ENGINE (STICK-OPTIMIZED)
+        // ==========================================
+        let wmSettings = {
+            interval_sec: 30,
+            duration_sec: 12
+        };
+        let dynamicWatermarkCards = [];
+        let activePinnedCard = null;
+        let wmCardIndex = 0;
+        let wmLoopTimeout = null;
+        let lastAppliedWmCardsHash = '';
+
+        function updateWatermarkCardsFromSettings(wmSettingsData) {
+            const container = document.getElementById('ml-watermark-container');
+            if (!container) return;
+
+            if (wmSettingsData) {
+                wmSettings.interval_sec = Math.max(5, parseInt(wmSettingsData.interval_sec) || 30);
+                wmSettings.duration_sec = Math.max(3, parseInt(wmSettingsData.duration_sec) || 12);
+            }
+
+            const cards = (wmSettingsData && wmSettingsData.cards && wmSettingsData.cards.length > 0) ? wmSettingsData.cards : [
+                { id: 'wm-card-0', title: '1. Fırınna Logo & Slogan', image: '/static/img/watermarks/card_0_logo.png', enabled: true, is_pinned: false, effects: {balloons:false, fireworks:false, confetti:false} },
+                { id: 'wm-card-1', title: '2. Follow Us on Social Media', image: '/static/img/watermarks/card_1_social.png', enabled: true, is_pinned: false, effects: {balloons:false, fireworks:false, confetti:false} },
+                { id: 'wm-card-2', title: '3. Fırınna Supports Students', image: '/static/img/watermarks/card_2_students.png', enabled: true, is_pinned: false, effects: {balloons:false, fireworks:false, confetti:false} },
+                { id: 'wm-card-3', title: '4. Fırınna Cares for Stray Animals', image: '/static/img/watermarks/card_3_animals.png', enabled: true, is_pinned: false, effects: {balloons:false, fireworks:false, confetti:false} }
+            ];
+
+            const currentCardsHash = JSON.stringify(cards) + '_' + wmSettings.interval_sec + '_' + wmSettings.duration_sec;
+            if (currentCardsHash === lastAppliedWmCardsHash) {
+                // No change in configuration, do not interrupt current state
+                return;
+            }
+            lastAppliedWmCardsHash = currentCardsHash;
+
+            dynamicWatermarkCards = cards.filter(c => c.enabled !== false && c.image);
+            activePinnedCard = dynamicWatermarkCards.find(c => c.is_pinned === true || c.is_pinned === 'true');
+
+            // Render cards in container
+            let html = '';
+            dynamicWatermarkCards.forEach((c, idx) => {
+                const isThisPinned = (activePinnedCard && activePinnedCard.id === c.id);
+                html += `
+                    <div id="dyn-wm-card-${idx}" class="wm-card ${isThisPinned ? 'active' : ''}" style="position:absolute; inset:0; width:100%; height:100%; display:${isThisPinned ? 'flex' : 'none'}; align-items:center; justify-content:center; opacity:${isThisPinned ? '1' : '0'}; transition:opacity 0.8s ease; pointer-events:none; padding:0; background:transparent; border:none; box-shadow:none;">
+                        <img src="${c.image}" data-original-src="${c.image}" style="max-width:100%; max-height:100%; width:100%; height:100%; object-fit:contain; display:block; border-radius:1.8vw;" onerror="handleMediaImageError(this, '${c.image}')">
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            if (wmLoopTimeout) {
+                clearTimeout(wmLoopTimeout);
+                wmLoopTimeout = null;
+            }
+
+            if (activePinnedCard) {
+                console.log("[WATERMARK] Pinned mode active:", activePinnedCard.title);
+                container.style.display = 'block';
+                container.style.opacity = '1';
+                const eff = activePinnedCard.effects || {};
+                if (eff.balloons || eff.fireworks || eff.confetti) {
+                    startCelebrationAnimation(eff);
+                } else {
+                    stopCelebrationAnimation();
+                }
+            } else {
+                console.log("[WATERMARK] Normal sequential cycle starting with " + dynamicWatermarkCards.length + " cards");
+                stopCelebrationAnimation();
+                container.style.opacity = '0';
+                wmCardIndex = 0;
+                // Start first cycle after 2.5 seconds
+                wmLoopTimeout = setTimeout(runNextWatermarkCycle, 2500);
+            }
+        }
+
+        function runNextWatermarkCycle() {
+            if (activePinnedCard) return; // In pinned mode, no cycling
+
+            const container = document.getElementById('ml-watermark-container');
+            if (!container || !dynamicWatermarkCards || dynamicWatermarkCards.length === 0) {
+                // Retry after 5s if empty
+                wmLoopTimeout = setTimeout(runNextWatermarkCycle, 5000);
+                return;
+            }
+
+            const curIdx = wmCardIndex % dynamicWatermarkCards.length;
+            const currentCard = dynamicWatermarkCards[curIdx];
+            wmCardIndex++;
+
+            // Hide all other cards
+            document.querySelectorAll('.wm-card').forEach(c => {
+                c.classList.remove('active');
+                c.style.opacity = '0';
+                c.style.display = 'none';
+            });
+
+            // Show selected card asynchronously with hardware V-SYNC
+            const cardEl = document.getElementById(`dyn-wm-card-${curIdx}`);
+            if (cardEl) {
+                cardEl.style.display = 'flex';
+                requestAnimationFrame(() => {
+                    cardEl.classList.add('active');
+                    cardEl.style.opacity = '1';
+                });
+            }
+
+            container.style.display = 'block';
+            container.style.opacity = '1';
+
+            // Play effects if configured for this card
+            const eff = currentCard.effects || {};
+            if (eff.balloons || eff.fireworks || eff.confetti) {
+                startCelebrationAnimation(eff);
+            } else {
+                stopCelebrationAnimation();
+            }
+
+            // Duration: Use custom per-card duration if specified and > 0, otherwise fallback to global default duration
+            const cardCustomDuration = parseInt(currentCard.duration_sec);
+            const defaultDuration = Math.max(3, parseInt(wmSettings.duration_sec) || 12);
+            const durationMs = (cardCustomDuration && cardCustomDuration >= 2 ? cardCustomDuration : defaultDuration) * 1000;
+
+            // Interval: how long until the NEXT watermark appears AFTER this one hides
+            const intervalMs = Math.max(5, parseInt(wmSettings.interval_sec) || 30) * 1000;
+
+            wmLoopTimeout = setTimeout(() => {
+                if (activePinnedCard) return;
+                // Fade out current card
+                container.style.opacity = '0';
+                if (cardEl) cardEl.style.opacity = '0';
+                stopCelebrationAnimation();
+
+                // Wait 800ms for fade out transition to complete, then schedule next card
+                setTimeout(() => {
+                    if (activePinnedCard) return;
+                    if (cardEl) {
+                        cardEl.classList.remove('active');
+                        cardEl.style.display = 'none';
+                    }
+                    // Wait intervalMs before showing next watermark card
+                    wmLoopTimeout = setTimeout(runNextWatermarkCycle, intervalMs);
+                }, 800);
+            }, durationMs);
+        }
+
+        // ==========================================
+        // CELEBRATION & BIRTHDAY EFFECTS (STICK OPTIMIZED - 0% CPU LAG)
+        // ==========================================
+        let celebCanvas = null;
+        let celebCtx = null;
+        let celebAnimId = null;
+        let celebBalloons = [];
+        let celebFireworks = [];
+        let celebConfetti = [];
+        let activeEffects = { balloons: false, fireworks: false, confetti: false };
+
+        function initCelebrationCanvas() {
+            celebCanvas = document.getElementById('celebration-canvas');
+            if (!celebCanvas) return;
+            celebCtx = celebCanvas.getContext('2d', { alpha: true });
+            resizeCelebrationCanvas();
+            window.addEventListener('resize', resizeCelebrationCanvas);
+        }
+
+        function resizeCelebrationCanvas() {
+            if (!celebCanvas) return;
+            celebCanvas.width = window.innerWidth;
+            celebCanvas.height = window.innerHeight;
+        }
+
+        function startCelebrationAnimation(effects = {}) {
+            activeEffects = {
+                balloons: !!effects.balloons,
+                fireworks: !!effects.fireworks,
+                confetti: !!effects.confetti
+            };
+
+            if (!activeEffects.balloons && !activeEffects.fireworks && !activeEffects.confetti) {
+                stopCelebrationAnimation();
+                return;
+            }
+
+            if (!celebCanvas) initCelebrationCanvas();
+            if (celebCanvas) celebCanvas.style.display = 'block';
+            if (celebAnimId) cancelAnimationFrame(celebAnimId);
+
+            const W = celebCanvas ? (celebCanvas.width || window.innerWidth) : window.innerWidth;
+            const H = celebCanvas ? (celebCanvas.height || window.innerHeight) : window.innerHeight;
+
+            const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4'];
+
+            // 1. Lightweight Balloons (max 10)
+            celebBalloons = [];
+            if (activeEffects.balloons) {
+                for (let i = 0; i < 10; i++) {
+                    celebBalloons.push({
+                        x: Math.random() * W,
+                        y: H + Math.random() * H * 0.7,
+                        r: 24 + Math.random() * 16,
+                        speed: 1.0 + Math.random() * 1.5,
+                        swaySpeed: 0.02 + Math.random() * 0.02,
+                        swayOffset: Math.random() * Math.PI * 2,
+                        swayAmount: 20 + Math.random() * 25,
+                        color: colors[i % colors.length]
+                    });
+                }
+            }
+
+            // 2. Lightweight Confetti (max 28 pieces)
+            celebConfetti = [];
+            if (activeEffects.confetti) {
+                for (let i = 0; i < 28; i++) {
+                    celebConfetti.push({
+                        x: Math.random() * W,
+                        y: Math.random() * H - H,
+                        w: 9 + Math.random() * 6,
+                        h: 6 + Math.random() * 5,
+                        speedY: 2.0 + Math.random() * 2.5,
+                        speedX: (Math.random() - 0.5) * 1.5,
+                        rot: Math.random() * 360,
+                        rotSpeed: (Math.random() - 0.5) * 4,
+                        color: colors[i % colors.length]
+                    });
+                }
+            }
+
+            celebFireworks = [];
+            let lastFireworkTime = Date.now();
+
+            function spawnFirework() {
+                if (!activeEffects.fireworks) return;
+                const targetX = W * 0.2 + Math.random() * W * 0.6;
+                const targetY = H * 0.15 + Math.random() * H * 0.3;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const count = 22;
+                for (let i = 0; i < count; i++) {
+                    const angle = (Math.PI * 2 / count) * i;
+                    const speed = 2.0 + Math.random() * 3.5;
+                    celebFireworks.push({
+                        x: targetX,
+                        y: targetY,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        color: color,
+                        alpha: 1.0,
+                        size: 3.5,
+                        decay: 0.025
+                    });
+                }
+            }
+
+            function loop() {
+                if (!celebCtx || !celebCanvas) return;
+                celebCtx.clearRect(0, 0, celebCanvas.width, celebCanvas.height);
+                const time = Date.now();
+
+                // 1. Balloons
+                if (activeEffects.balloons) {
+                    celebBalloons.forEach(b => {
+                        b.y -= b.speed;
+                        const swayX = b.x + Math.sin(time * b.swaySpeed + b.swayOffset) * b.swayAmount;
+                        if (b.y < -b.r * 2) {
+                            b.y = H + 30;
+                            b.x = Math.random() * W;
+                        }
+
+                        // String
+                        celebCtx.beginPath();
+                        celebCtx.moveTo(swayX, b.y + b.r);
+                        celebCtx.lineTo(swayX, b.y + b.r + 35);
+                        celebCtx.strokeStyle = 'rgba(255,255,255,0.7)';
+                        celebCtx.lineWidth = 1.5;
+                        celebCtx.stroke();
+
+                        // Balloon Body
+                        celebCtx.beginPath();
+                        celebCtx.ellipse(swayX, b.y, b.r * 0.85, b.r, 0, 0, Math.PI * 2);
+                        celebCtx.fillStyle = b.color;
+                        celebCtx.fill();
+
+                        // Highlight
+                        celebCtx.beginPath();
+                        celebCtx.ellipse(swayX - b.r * 0.3, b.y - b.r * 0.35, b.r * 0.2, b.r * 0.35, Math.PI / 4, 0, Math.PI * 2);
+                        celebCtx.fillStyle = 'rgba(255,255,255,0.4)';
+                        celebCtx.fill();
+                    });
+                }
+
+                // 2. Fireworks
+                if (activeEffects.fireworks) {
+                    if (time - lastFireworkTime > 2200) {
+                        spawnFirework();
+                        lastFireworkTime = time;
+                    }
+
+                    for (let i = celebFireworks.length - 1; i >= 0; i--) {
+                        const p = celebFireworks[i];
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.05;
+                        p.vx *= 0.98;
+                        p.alpha -= p.decay;
+
+                        if (p.alpha <= 0) {
+                            celebFireworks.splice(i, 1);
+                            continue;
+                        }
+
+                        celebCtx.globalAlpha = p.alpha;
+                        celebCtx.fillStyle = p.color;
+                        celebCtx.beginPath();
+                        celebCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        celebCtx.fill();
+                    }
+                    celebCtx.globalAlpha = 1.0;
+                }
+
+                // 3. Confetti
+                if (activeEffects.confetti) {
+                    celebConfetti.forEach(c => {
+                        c.y += c.speedY;
+                        c.x += c.speedX;
+                        c.rot += c.rotSpeed;
+                        if (c.y > H + 15) {
+                            c.y = -15;
+                            c.x = Math.random() * W;
+                        }
+
+                        celebCtx.save();
+                        celebCtx.translate(c.x, c.y);
+                        celebCtx.rotate((c.rot * Math.PI) / 180);
+                        celebCtx.fillStyle = c.color;
+                        celebCtx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+                        celebCtx.restore();
+                    });
+                }
+
+                celebAnimId = requestAnimationFrame(loop);
+            }
+
+            loop();
+        }
+
+        function stopCelebrationAnimation() {
+            if (celebAnimId) {
+                cancelAnimationFrame(celebAnimId);
+                celebAnimId = null;
+            }
+            if (celebCanvas) {
+                celebCanvas.style.display = 'none';
+            }
+            if (celebCtx && celebCanvas) {
+                celebCtx.clearRect(0, 0, celebCanvas.width, celebCanvas.height);
+            }
+        }
+
+        async function fetchCurrencies() {
+            try {
+                const res = await fetch("/api/tv/rates");
+                const data = await res.json();
+                if (data) {
+                    const usdBuy = data.usd_try ? data.usd_try.toFixed(2) : '--';
+                    const eurBuy = data.eur_try ? data.eur_try.toFixed(2) : '--';
+                    const btcUsdt = data.btc_usdt ? Number(data.btc_usdt).toLocaleString('en-US') : '--';
+                    const ethUsdt = data.eth_usdt ? Number(data.eth_usdt).toLocaleString('en-US') : '--';
+
+                    const valUsd = document.getElementById('val-usd');
+                    const valEur = document.getElementById('val-eur');
+                    const valBtc = document.getElementById('val-btc');
+                    const valEth = document.getElementById('val-eth');
+
+                    if (valUsd) valUsd.textContent = `${usdBuy} ₺`;
+                    if (valEur) valEur.textContent = `${eurBuy} ₺`;
+                    if (valBtc) valBtc.textContent = `$${btcUsdt}`;
+                    if (valEth) valEth.textContent = `$${ethUsdt}`;
+                }
+            } catch(e) {}
+        }
+        fetchCurrencies();
+        setInterval(fetchCurrencies, 300000); // 5 mins
+
+        let liveFacts = [];
+
+        async function fetchTvFacts() {
+            try {
+                const res = await fetch('/api/tv/facts');
+                const data = await res.json();
+                if (data && data.facts) {
+                    liveFacts = data.facts.filter(f => f.enabled !== false);
+                }
+                updateUnifiedMarquee();
+            } catch(e) {}
+        }
+        fetchTvFacts();
+        setInterval(fetchTvFacts, 60000); // 1 min sync
+
+        function rotateTickerCard() {
+            if (!tickerCardItems || tickerCardItems.length <= 1) return;
+            const oldIdx = currentTickerCardIdx;
+            currentTickerCardIdx = (currentTickerCardIdx + 1) % tickerCardItems.length;
+
+            const oldEl = document.getElementById(`tcard-${oldIdx}`);
+            const newEl = document.getElementById(`tcard-${currentTickerCardIdx}`);
+
+            if (oldEl) oldEl.classList.remove('active');
+            if (newEl) newEl.classList.add('active');
+        }
+
+        function updateUnifiedMarquee(force = false) {
+            const box = document.getElementById('ml-rss-box');
+            const marqueeEl = document.getElementById('ml-continuous-marquee');
+            if (!box || !marqueeEl) return;
+
+            let items = [];
+
+            // 1. Promo / Announcement Messages
+            let messageText = basePromoText;
+            const now = new Date();
+            const currentMin = now.getHours() * 60 + now.getMinutes();
+            currentMessages.forEach(msg => {
+                if(msg.start_time && msg.end_time) {
+                    const [sh, sm] = msg.start_time.split(':');
+                    const [eh, em] = msg.end_time.split(':');
+                    const startMin = parseInt(sh)*60 + parseInt(sm);
+                    const endMin = parseInt(eh)*60 + parseInt(em);
+                    if(currentMin >= startMin && currentMin <= endMin) {
+                        if(messageText) messageText += "  •  ";
+                        messageText += msg.text;
+                    }
+                }
+            });
+            if (isTickerTextEnabled && messageText && messageText.trim() !== '') {
+                items.push({
+                    icon: '📢',
+                    badge: 'DUYURU',
+                    badgeColor: '#B45309',
+                    badgeBg: '#FEF3C7',
+                    badgeBorder: '#FDE68A',
+                    title: '',
+                    text: messageText.trim()
+                });
+            }
+
+            // 2. Randomized Quadrilingual (EN, ES, RU, AR) Turkey & Istanbul Cultural Facts
+            // Shuffle facts array so order is random, but keep all language slides of each fact together
+            if (liveFacts.length > 0) {
+                // Fisher-Yates shuffle on facts list
+                const shuffledFacts = [...liveFacts];
+                for (let i = shuffledFacts.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledFacts[i], shuffledFacts[j]] = [shuffledFacts[j], shuffledFacts[i]];
+                }
+
+                shuffledFacts.forEach(f => {
+                    const icon = f.icon || '🏛️';
+                    const customColor = f.color || '#0F172A';
+
+                    // 1. English Version
+                    const titleEn = f.title_en || f.title || '';
+                    const textEn = f.text_en || f.text || '';
+                    if (textEn) {
+                        items.push({
+                            icon: icon,
+                            color: customColor,
+                            title: titleEn,
+                            text: textEn,
+                            lang: 'en'
+                        });
+                    }
+
+                    // 2. Spanish Version (Español)
+                    const titleEs = f.title_es || '';
+                    const textEs = f.text_es || '';
+                    if (textEs) {
+                        items.push({
+                            icon: icon,
+                            color: customColor,
+                            title: titleEs,
+                            text: textEs,
+                            lang: 'es'
+                        });
+                    }
+
+                    // 3. Russian Version (Русский)
+                    const titleRu = f.title_ru || '';
+                    const textRu = f.text_ru || '';
+                    if (textRu) {
+                        items.push({
+                            icon: icon,
+                            color: customColor,
+                            title: titleRu,
+                            text: textRu,
+                            lang: 'ru'
+                        });
+                    }
+
+                    // 4. Arabic Version (العربية)
+                    const titleAr = f.title_ar || '';
+                    const textAr = f.text_ar || '';
+                    if (textAr) {
+                        items.push({
+                            icon: icon,
+                            color: customColor,
+                            title: titleAr,
+                            text: textAr,
+                            lang: 'ar',
+                            dir: 'rtl'
+                        });
+                    }
+                });
+            }
+
+            // 3. Fallback Brand Text
+            if (items.length === 0) {
+                items.push({
+                    icon: '🥐',
+                    badge: 'FIRINNA',
+                    badgeColor: '#15803D',
+                    badgeBg: '#F0FDF4',
+                    badgeBorder: '#BBF7D0',
+                    color: '#0F172A',
+                    title: 'Artisan Bakery & Specialty Cafe',
+                    text: 'Galata ve Beyoğlu\'nun kalbinde taze fırın lezzetleri ve nitelikli kahve deneyimi.'
+                });
+            }
+
+            const currentKey = JSON.stringify(items);
+            if (!force && currentKey === lastRenderedItemsKey) {
+                return;
+            }
+            lastRenderedItemsKey = currentKey;
+            tickerCardItems = items;
+
+            let html = '';
+            items.forEach((it, idx) => {
+                const textColor = it.color || '#0F172A';
+                const isRtl = it.dir === 'rtl';
+                const badgeHtml = it.badge ? `
+                    <div style="display:inline-flex; align-items:center; gap:0.5vw; background:${it.badgeBg}; border:2px solid ${it.badgeBorder}; color:${it.badgeColor}; padding:0.35vw 0.85vw; border-radius:0.6vw; font-size:1.35vw; font-weight:800; margin-right:1.2vw; flex-shrink:0; white-space:nowrap; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+                        <span style="font-size:2.2vw; line-height:1;">${it.icon}</span>
+                        <span>${it.badge}</span>
+                    </div>` : `
+                    <div style="font-size:3.5vw; margin-right:1.2vw; flex-shrink:0; line-height:1; display:flex; align-items:center; justify-content:center; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+                        ${it.icon}
+                    </div>`;
+
+                const titleHtml = it.title ? `<span style="font-weight:800; margin-right:0.6vw; color:${textColor};">${it.title}:</span>` : '';
+                html += `<div class="ticker-card ${idx === 0 ? 'active' : ''}" id="tcard-${idx}" ${isRtl ? 'dir="rtl"' : ''}>
+                    ${badgeHtml}
+                    <div class="tcard-text" style="color:${textColor}; font-size:1.62vw; line-height:1.24; font-weight:700; ${isRtl ? 'text-align:right;' : ''}">
+                        ${titleHtml}${it.text}
+                    </div>
+                </div>`;
+            });
+            marqueeEl.innerHTML = html;
+            currentTickerCardIdx = 0;
+        } 
+
+        async function fetchProducts() {
+            try {
+                const res = await fetch('/api/tv/products');
+                if (res.ok) {
+                    webProducts = await res.json();
+                    try { localStorage.setItem('firinna_cached_products', JSON.stringify(webProducts)); } catch(e) {}
+                }
+            } catch(e) {
+                // Offline fallback: Load from localStorage
+                try {
+                    const cached = localStorage.getItem('firinna_cached_products');
+                    if (cached) webProducts = JSON.parse(cached);
+                } catch(err) {}
+            }
+
+            if (webProducts && webProducts.length > 0) {
+                let html = "";
+                webProducts.forEach((p, idx) => {
+                    let imgUrl = (p.image_url && p.image_url.trim() !== "") ? p.image_url : null;
+                    let imgSrc = imgUrl ? (imgUrl.startsWith('http') ? imgUrl : '/' + imgUrl) : '';
+                    html += `
+                        <div class="product-slide ${idx===0?'active':''}">
+                            <div class="prod-img-box">
+                                ${imgSrc ? `<img src="${imgSrc}" data-original-src="${imgSrc}" class="prod-img" onerror="handleMediaImageError(this, '${imgSrc}')">` : ''}
+                            </div>
+                            <div class="prod-info">
+                                <div class="prod-title">${p.title}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                const pCar = document.getElementById('product-carousel');
+                if (pCar) pCar.innerHTML = html;
+            }
+        }
+
+        function getStableDeviceFingerprint() {
+            try {
+                // Collect stable hardware, display, and browser environment traits
+                const parts = [
+                    navigator.userAgent || '',
+                    (window.screen ? window.screen.width + 'x' + window.screen.height : '1920x1080'),
+                    (window.screen ? window.screen.colorDepth : 24),
+                    navigator.hardwareConcurrency || 4,
+                    navigator.language || 'tr',
+                    (typeof Intl !== 'undefined' && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Europe/Istanbul',
+                    navigator.platform || ''
+                ];
+                const raw = parts.join('###');
+                
+                // Fast 32-bit FNV-1a deterministic hash
+                let hash = 0x811c9dc5;
+                for (let i = 0; i < raw.length; i++) {
+                    hash ^= raw.charCodeAt(i);
+                    hash = (hash * 0x01000193) >>> 0;
+                }
+                const hex = ('00000000' + hash.toString(16)).slice(-8);
+                return 'tv_' + hex;
+            } catch(e) {
+                return 'tv_dev_main';
+            }
+        }
+
+        let lastPushTimestamp = -1;
+        const myClientId = getStableDeviceFingerprint();
+        try { localStorage.setItem('firinna_tv_client_id', myClientId); } catch(e) {}
+
+        async function fetchSettings() {
+            try {
+                fetch('/api/tv/ping', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        client_id: myClientId,
+                        name: window.AndroidTV ? 'Salon Android TV' : (window.innerWidth < 768 ? 'Mobil Telefon' : 'Ana Ekran Tabela')
+                    })
+                }).catch(e=>{});
+
+                const res = await fetch('/api/tv/settings?_t=' + Date.now());
+                if (!res.ok) throw new Error('Settings HTTP ' + res.status);
+                const text = await res.text();
+                if (!text || text.trim().startsWith('<')) throw new Error('Invalid JSON response');
+                const data = JSON.parse(text);
+
+                // Save to localStorage for instant offline recovery
+                try { localStorage.setItem('firinna_cached_settings', text); } catch(e) {}
+
+                // Check for instant push signal (from admin panel)
+                if (data.last_push && data.last_push.timestamp) {
+                    const target = data.last_push.target || 'all';
+                    if (target === 'all' || target === myClientId) {
+                        if (lastPushTimestamp !== -1 && data.last_push.timestamp > lastPushTimestamp) {
+                            console.log("[PUSH] Targeted reload signal received (" + data.last_push.action + ") for target: " + target);
+                            
+                            if (data.last_push.action === 'clear_cache' || data.last_push.action === 'reload') {
+                                if ('caches' in window) {
+                                    try {
+                                        const names = await caches.keys();
+                                        // Preserve persistent video cache (TV_CACHE_NAME) during clear_cache
+                                        await Promise.all(names.filter(n => n !== TV_CACHE_NAME).map(name => caches.delete(name)));
+                                    } catch(err) {}
+                                }
+                                sessionStorage.clear();
+                            }
+
+                            // Reload completely with cache bust
+                            window.location.href = window.location.pathname + '?reload=' + Date.now();
+                            return;
+                        }
+                    }
+                    lastPushTimestamp = data.last_push.timestamp;
+                }
+
+                const dataStr = JSON.stringify(data);
+                if (dataStr !== lastSettingsStr) {
+                    lastSettingsStr = dataStr;
+                    applySettings(data);
+                }
+            } catch (e) { 
+                console.log("[OFFLINE/RECOVERY] Settings fetch error:", e);
+                // Fallback: If memory has no settings yet, apply from localStorage
+                if (!lastSettingsStr) {
+                    try {
+                        const cached = localStorage.getItem('firinna_cached_settings');
+                        if (cached) {
+                            const data = JSON.parse(cached);
+                            lastSettingsStr = cached;
+                            applySettings(data);
+                        }
+                    } catch(err) {}
+                }
+            }
+        }
+
+        function applySettings(data) {
+            const layout = data.layout || 'modern_grid';
+            try {
+                document.body.className = `layout-${layout}`;
+                
+                if(data.logo_url) {
+                    const mlLogo = document.getElementById('ml-logo');
+                    if (mlLogo) { mlLogo.src = data.logo_url; mlLogo.style.display = 'block'; }
+                    const lOver = document.getElementById('logo-overlay');
+                    if (lOver) lOver.src = data.logo_url;
+                    const lSide = document.getElementById('logo-sidebar');
+                    if (lSide) lSide.src = data.logo_url;
+                }
+
+                isTickerTextEnabled = (data.ticker_text_enabled !== false);
+                isTickerCurrencyEnabled = (data.ticker_currency_enabled !== false);
+                isTickerRssEnabled = (data.ticker_rss_enabled !== false);
+                currentTickerEffect = data.ticker_effect || 'marquee';
+                marqueeSpeed = (data.ticker_speed !== undefined) ? parseFloat(data.ticker_speed) : 4.5;
+                tickerSlideDurationSec = parseInt(data.ticker_slide_duration) || 8;
+                basePromoText = data.promo_text || "";
+                currentMessages = data.messages || [];
+
+                // Apply Watermark Settings & Dynamic Cards (with Pin & Effects)
+                if (data.watermark_cycle) {
+                    updateWatermarkCardsFromSettings(data.watermark_cycle);
+                }
+
+                // Apply After-Hours / Mesai Dışı Settings
+                const ahData = data.after_hours || data.night_mode;
+                if (ahData) {
+                    afterHoursSettings = Object.assign({}, afterHoursSettings, ahData);
+                    checkAfterHoursSchedule();
+                }
+            } catch(err) {
+                console.error("applySettings error:", err);
+            }
+            
+            if(currentMessages.length > 0) {
+                let mHtml = "";
+                currentMessages.forEach((m, idx) => {
+                    if (m.image) {
+                        mHtml += `<div class="msg-slide ${idx===0?'active':''}" style="flex-direction:row; gap:1.5vw;">
+                                    <img src="${m.image}" data-original-src="${m.image}" style="max-height:80%; max-width:40%; border-radius:0.5vw; object-fit:cover;" onerror="handleMediaImageError(this, '${m.image}')">
+                                    <div>${m.text}</div>
+                                  </div>`;
+                    } else {
+                        mHtml += `<div class="msg-slide ${idx===0?'active':''}">${m.text}</div>`;
+                    }
+                });
+                if(data.messages && data.messages.length > 0) {
+                    const mlLeftBottom = document.getElementById('ml-left-bottom');
+                    const msgCarousel = document.getElementById('message-carousel');
+                    if (mlLeftBottom) mlLeftBottom.style.display = 'flex';
+                    if (msgCarousel) msgCarousel.innerHTML = mHtml;
+                } else {
+                    const mlLeftBottom = document.getElementById('ml-left-bottom');
+                    if (mlLeftBottom) mlLeftBottom.style.display = 'none';
+                }
+            }
+
+            let widgetsHtml = "";
+            if (data.widgets && data.widgets.clock) widgetsHtml += `<div class="clock-widget clock-text">00:00</div>`;
+            if (data.qr_code) {
+                let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data.qr_code)}`;
+                widgetsHtml += `<div class="qr-box"><img src="${qrUrl}" alt="QR"><div class="qr-text">${data.qr_text || 'Okutun'}</div></div>`;
+            }
+            document.getElementById('widgets-sidebar').innerHTML = layout==='sidebar' ? widgetsHtml : '';
+            document.getElementById('widgets-overlay').innerHTML = layout==='default' ? widgetsHtml : '';
+            
+            updateClock();
+
+            currentMediaSource = data.media_source || 'youtube';
+            currentAudioPriority = data.audio_priority || 'video';
+
+            if (currentMediaSource === 'youtube') {
+                document.documentElement.classList.remove('native-video-active');
+                document.getElementById('local-video').style.display = 'none';
+                document.getElementById('ytplayer').style.display = 'block';
+                if (data.video_playlist) {
+                    initOrUpdatePlayer(data.video_playlist, data.audio_priority);
+                }
+            } else if (currentMediaSource === 'local') {
+                document.getElementById('ytplayer').style.display = 'none';
+                vidEl.style.display = 'block';
+                document.documentElement.classList.remove('native-video-active');
+                
+                let newLocalVideos = (data.playlist_videos && data.playlist_videos.length > 0) ? data.playlist_videos : (data.local_videos || []);
+                const oldListStr = JSON.stringify(localVideoList);
+                const newListStr = JSON.stringify(newLocalVideos);
+                
+                localVideoList = newLocalVideos;
+                
+                if (oldListStr !== newListStr) {
+                    tvLog(`[SETTINGS] Playlist updated with ${newLocalVideos.length} video(s). Triggering background disk sync...`);
+                    syncAllPlaylistVideosInBackground();
+                    playLocalVideo(0);
+                }
+            }
+        }
+
+        async function initAppOnStartup() {
+            tvLog(`[APP BOOT] Firinna TV Player starting... Client: ${myClientId}`);
+            flushTvLogsToServer(true);
+
+            // 1. First try loading cached offline settings & products immediately
+            try {
+                const cachedSet = localStorage.getItem('firinna_cached_settings');
+                if (cachedSet) applySettings(JSON.parse(cachedSet));
+            } catch(e) {}
+
+            // 2. Start playing local cached video immediately
+            if (currentMediaSource === 'local') {
+                playLocalVideo(0);
+            }
+
+            // 3. Connect to server in background to sync newest data
+            fetchProducts().catch(e=>{});
+            fetchSettings().then(() => {
+                syncAllPlaylistVideosInBackground().catch(e=>{});
+            }).catch(e=>{});
+        }
+
+        initAppOnStartup();
+        setInterval(fetchSettings, 5000); 
+
+        // Auto-Reload / Restart every 5 hours (5 * 60 * 60 * 1000 ms) to keep memory clean and auto-fetch updates
+        const AUTO_RELOAD_MS = 5 * 60 * 60 * 1000;
+        setTimeout(() => {
+            tvLog("[AUTO-RELOAD] 5 hours reached, reloading TV player application...");
+            flushTvLogsToServer(true);
+            window.location.reload(true);
+        }, AUTO_RELOAD_MS); 
+
+        document.body.addEventListener('click', () => {
+            if(currentMediaSource === 'local') {
+                if(localVideoList.length > 0) {
+                    vidEl.muted = true;
+                    vidEl.play().catch(e=>{});
+                }
+                if(currentAudioPriority === 'music' && localAudioList.length > 0) audEl.play().catch(e=>{});
+            } else if (currentMediaSource === 'youtube') {
+                if(player && player.playVideo) player.playVideo();
+                if (currentAudioPriority === 'video' && player && player.unMute) player.unMute();
+            }
+        });
+        document.body.addEventListener('touchstart', () => {
+            if(currentMediaSource === 'local') {
+                if(localVideoList.length > 0) {
+                    vidEl.muted = true;
+                    vidEl.play().catch(e=>{});
+                }
+                if(currentAudioPriority === 'music' && localAudioList.length > 0) audEl.play().catch(e=>{});
+            }
+        }, {passive: true});

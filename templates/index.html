@@ -18,7 +18,8 @@
     <div class="container">
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
             <div class="zone-tabs" id="zoneTabs" style="display:none; margin-bottom:0;"></div>
-            <div style="margin-left:auto; display:flex; align-items:center; gap:0.5rem;">
+            <div style="margin-left:auto; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+
                 <!-- Web Status Toggle -->
                 <div style="display:inline-flex; align-items:center; gap:0.4rem; padding:0.45rem 0.6rem; background:white; border:1.5px solid #cbd5e1; border-radius:10px; font-weight:700; color:#334155; font-size:0.84rem; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
                     <span style="font-size:1rem;">🌐</span>
@@ -561,10 +562,15 @@
                 <span class="close" onclick="closeEditOrderModal()">&times;</span>
             </div>
             <div style="padding:1.5rem;">
-                <div style="background:#f7fafc;border-radius:10px;padding:1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">
+                <div style="background:#f7fafc;border-radius:10px;padding:1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;">
                     <div>
                         <div id="editOrderInfo" style="font-weight:700;font-size:1rem;"></div>
-                        <div id="editOrderDate" style="font-size:.82rem;color:#718096;"></div>
+                        <div id="editOrderDate" style="font-size:.82rem;color:#718096;display:none;"></div>
+                        <div style="margin-top:.4rem;display:flex;align-items:center;gap:.4rem;">
+                            <label for="editOrderDatetime" style="font-size:.82rem;font-weight:700;color:#475569;">🕒 Tarih / Saat:</label>
+                            <input type="datetime-local" id="editOrderDatetime"
+                                style="padding:.35rem .6rem;border:1.5px solid #cbd5e1;border-radius:6px;font-size:.84rem;font-weight:600;color:#1e293b;">
+                        </div>
                     </div>
                     <div id="editOrderTotal" style="font-size:1.5rem;font-weight:800;color:#2d6a4f;"></div>
                 </div>
@@ -749,11 +755,42 @@
         let pastOrderCart = [];
         let pastOrderDiscount = { type: null, value: 0, reason: '' };
 
+        function formatDateTime(str) {
+            if (!str) return '—';
+            const cleanStr = str.replace('T', ' ').slice(0, 19);
+            const parts = cleanStr.split(' ');
+            if (parts.length === 2) {
+                const dParts = parts[0].split('-');
+                const tParts = parts[1].split(':');
+                if (dParts.length === 3 && tParts.length >= 2) {
+                    const [y, m, d] = dParts;
+                    const hr = tParts[0].padStart(2, '0');
+                    const min = tParts[1].padStart(2, '0');
+                    return `${d.padStart(2, '0')}.${m.padStart(2, '0')}.${y} ${hr}:${min}`;
+                }
+            }
+            return str;
+        }
+
+        function parseTimestamp(ts) {
+            if (!ts) return Date.now();
+            const clean = ts.replace(' ', 'T');
+            if (clean.endsWith('Z')) {
+                return new Date(clean).getTime();
+            }
+            const [dPart, tPart] = clean.split('T');
+            if (dPart && tPart) {
+                const [y, m, d] = dPart.split('-').map(Number);
+                const [hr, min, sec] = tPart.split(':').map(Number);
+                return new Date(y, m - 1, d, hr || 0, min || 0, sec || 0).getTime();
+            }
+            return new Date(clean).getTime();
+        }
+
         function calcDuration(startedAt) {
             if (!startedAt) return null;
-            // SQLite CURRENT_TIMESTAMP is UTC — append Z so JS parses correctly
-            const ts = startedAt.includes('Z') ? startedAt : startedAt.replace(' ', 'T') + 'Z';
-            const mins = Math.floor((Date.now() - new Date(ts).getTime()) / 60000);
+            const startTime = parseTimestamp(startedAt);
+            const mins = Math.floor((Date.now() - startTime) / 60000);
             if (mins < 0) return null;
             if (mins < 60) return { text: mins + ' dk', cls: mins < 45 ? 'dur-green' : 'dur-orange' };
             const h = Math.floor(mins / 60), m = mins % 60;
@@ -1592,7 +1629,7 @@
             const todayStr = new Date().toISOString().slice(0,10);
             return orders.map(order => {
                 const isToday = (order.closed_at||'').slice(0,10) === todayStr;
-                const dt = order.closed_at ? new Date(order.closed_at + (order.closed_at.includes('T') ? '' : 'Z')).toLocaleString('tr-TR') : '—';
+                const dt = formatDateTime(order.closed_at || order.created_at);
                 return `
                 <div style="border:1.5px solid #e2e8f0;border-radius:10px;padding:.75rem 1rem;margin-bottom:.6rem;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.02);">
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;">
@@ -1605,9 +1642,8 @@
                         <div style="text-align:right;flex-shrink:0;">
                             <div style="font-size:1.05rem;font-weight:800;color:#2d6a4f;">${fmtTL(order.total||0)}</div>
                             <div style="display:flex;gap:.35rem;margin-top:.4rem;justify-content:flex-end;">
-                                ${isToday
-                                    ? `<button onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.35rem .65rem;background:#e2e8f0;color:#1e293b;border:none;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;">✏️ Düzenle</button>`
-                                    : `<button onclick="viewOrderModal(${order.id})" title="Görüntüle" style="padding:.35rem .65rem;background:#667eea;color:white;border:none;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;">👁️ İncele</button>`}
+                                <button onclick="openEditOrderModal(${order.id})" title="Düzenle" style="padding:.35rem .65rem;background:#e2e8f0;color:#1e293b;border:none;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;">✏️ Düzenle</button>
+                                <button onclick="viewOrderModal(${order.id})" title="Görüntüle" style="padding:.35rem .65rem;background:#667eea;color:white;border:none;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;">👁️ İncele</button>
                                 <button onclick="printHistoryReceipt(${order.id})" title="Fiş Yazdır" style="padding:.35rem .65rem;background:#10b981;color:white;border:none;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;">🖨️ Fiş</button>
                                 <button onclick="deleteOrder(${order.id})" title="Sil" style="padding:.35rem .65rem;background:#fee2e2;color:#dc2626;border:none;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;">🗑️ Sil</button>
                             </div>
@@ -1737,9 +1773,7 @@
         async function viewOrderModal(orderId) {
             try {
                 const order = await fetch(`/api/orders/${orderId}`).then(r => r.json());
-                const dateStr = order.closed_at
-                    ? new Date(order.closed_at).toLocaleString('tr-TR')
-                    : (order.created_at ? new Date(order.created_at).toLocaleString('tr-TR') : '—');
+                const dateStr = formatDateTime(order.closed_at || order.created_at);
                 const items = (order.items || []).map(i => {
                     const total = i.is_complimentary ? 'İkram' : fmtTL(i.quantity * i.price);
                     return `<div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.84rem;">
@@ -1782,6 +1816,10 @@
                             <span>Toplam</span><span>${fmtTL(order.total||0)}</span>
                         </div>
                         ${payRows}
+                    </div>
+
+                    <div style="margin-top:1rem;display:flex;gap:.5rem;justify-content:flex-end;">
+                        <button onclick="document.getElementById('viewOrderModal').style.display='none'; openEditOrderModal(${order.id})" style="padding:.45rem .9rem;background:#2d6a4f;color:white;border:none;border-radius:6px;font-size:.84rem;font-weight:700;cursor:pointer;">✏️ Siparişi Düzenle</button>
                     </div>
                 `;
                 document.getElementById('viewOrderModal').style.display = 'block';
@@ -1828,8 +1866,18 @@
             // Tüm ürünleri yükle
             editOrderProductList = await fetch('/api/products').then(r=>r.json());
 
-            document.getElementById('editOrderInfo').textContent  = `${order.table_name} (${order.zone_name})`;
-            document.getElementById('editOrderDate').textContent  = new Date(order.closed_at).toLocaleString('tr-TR');
+            document.getElementById('editOrderInfo').textContent  = `${order.table_name || 'Masa'} (${order.zone_name || ''})`;
+            const orderDt = order.closed_at || order.created_at || '';
+            const dtInput = document.getElementById('editOrderDatetime');
+            if (dtInput) {
+                if (orderDt) {
+                    dtInput.value = orderDt.slice(0, 16).replace(' ', 'T');
+                } else {
+                    const now = new Date();
+                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                    dtInput.value = now.toISOString().slice(0, 16);
+                }
+            }
             document.getElementById('editCash').value = order.payment_cash || 0;
             document.getElementById('editCard').value = order.payment_card || 0;
             document.getElementById('editTip').value  = order.tip_amount   || 0;
@@ -1839,7 +1887,7 @@
             sel.innerHTML = '<option value="">Ürün seç...</option>' +
                 editOrderProductList.map(p=>`<option value="${p.id}" data-price="${p.price}">${p.name} — ${fmtTL(p.price)}</option>`).join('');
 
-            renderEditItems(order.items, order.total);
+            renderEditItems(order.items || [], order.total);
             document.getElementById('editOrderModal').style.display = 'block';
         }
 
@@ -1896,12 +1944,24 @@
             const cash = parseFloat(document.getElementById('editCash').value)||0;
             const card = parseFloat(document.getElementById('editCard').value)||0;
             const tip  = parseFloat(document.getElementById('editTip').value)||0;
+            const dtInput = document.getElementById('editOrderDatetime');
+            const closedAt = dtInput ? dtInput.value : null;
+
             await fetch(`/api/orders/${editOrderId}/reclose`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({payment_cash:cash, payment_card:card, tip_amount:tip})
+                body: JSON.stringify({
+                    payment_cash: cash,
+                    payment_card: card,
+                    tip_amount: tip,
+                    closed_at: closedAt
+                })
             });
+            showToast('Sipariş güncellendi', 'success');
             closeEditOrderModal();
             loadHistoryPanel();
+            if (document.getElementById('todayOrdersModal') && document.getElementById('todayOrdersModal').style.display === 'block') {
+                loadModalHistoryPanel();
+            }
         }
 
         function closeEditOrderModal() {

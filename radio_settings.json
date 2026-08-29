@@ -1,0 +1,292 @@
+{
+  "custom_stations": [],
+  "playlists": [
+    {
+      "id": "pl_1787931750672",
+      "name": "deseo",
+      "items": [
+        {
+          "filename": "01 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 164).mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/01 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 164).mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/01%20-%20DESEO%20%EF%BD%9C%20Spanish%20Soulful%20Chill%20%EF%BD%9C%20Mood%20Playlist%20%28vol.%20164%29.mp3",
+          "title": "01 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 164)"
+        },
+        {
+          "filename": "02 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 143).mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/02 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 143).mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/02%20-%20DESEO%20%EF%BD%9C%20Spanish%20Soulful%20Chill%20%EF%BD%9C%20Mood%20Playlist%20%28vol.%20143%29.mp3",
+          "title": "02 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 143)"
+        },
+        {
+          "filename": "03 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol.145).mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/03 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol.145).mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/03%20-%20DESEO%20%EF%BD%9C%20Spanish%20Soulful%20Chill%20%EF%BD%9C%20Mood%20Playlist%20%28vol.145%29.mp3",
+          "title": "03 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol.145)"
+        },
+        {
+          "filename": "04 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 144).mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/04 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 144).mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/04%20-%20DESEO%20%EF%BD%9C%20Spanish%20Soulful%20Chill%20%EF%BD%9C%20Mood%20Playlist%20%28vol.%20144%29.mp3",
+          "title": "04 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 144)"
+        },
+        {
+          "filename": "05 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.136).mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/05 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.136).mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/05%20-%20Spanish%20Chill%20Mood%20Music%20%F0%9F%8E%A7%20%E2%80%93%20Relaxing%20Playlist%20%28vol.136%29.mp3",
+          "title": "05 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.136)"
+        },
+        {
+          "filename": "06 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.131).mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/06 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.131).mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/06%20-%20Spanish%20Chill%20Mood%20Music%20%F0%9F%8E%A7%20%E2%80%93%20Relaxing%20Playlist%20%28vol.131%29.mp3",
+          "title": "06 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.131)"
+        },
+        {
+          "filename": "07 - Chill & Relax Playlist 2026 🎧 – Spanish Chill Mood.mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/07 - Chill & Relax Playlist 2026 🎧 – Spanish Chill Mood.mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/07%20-%20Chill%20%26%20Relax%20Playlist%202026%20%F0%9F%8E%A7%20%E2%80%93%20Spanish%20Chill%20Mood.mp3",
+          "title": "07 - Chill & Relax Playlist 2026 🎧 – Spanish Chill Mood"
+        },
+        {
+          "filename": "08 - Spanish Chillout Misic ｜ Vocal House, Nu Disco, Chillout Mix ｜ Relaxing Playlist (vol. 101).mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/08 - Spanish Chillout Misic ｜ Vocal House, Nu Disco, Chillout Mix ｜ Relaxing Playlist (vol. 101).mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/08%20-%20Spanish%20Chillout%20Misic%20%EF%BD%9C%20Vocal%20House%2C%20Nu%20Disco%2C%20Chillout%20Mix%20%EF%BD%9C%20Relaxing%20Playlist%20%28vol.%20101%29.mp3",
+          "title": "08 - Spanish Chillout Misic ｜ Vocal House, Nu Disco, Chillout Mix ｜ Relaxing Playlist (vol. 101)"
+        },
+        {
+          "filename": "09 - Spanish Chill Playlist 2026 🎧 ｜ Relaxing Music for Study & Work.mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/09 - Spanish Chill Playlist 2026 🎧 ｜ Relaxing Music for Study & Work.mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/09%20-%20Spanish%20Chill%20Playlist%202026%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Music%20for%20Study%20%26%20Work.mp3",
+          "title": "09 - Spanish Chill Playlist 2026 🎧 ｜ Relaxing Music for Study & Work"
+        },
+        {
+          "filename": "10 - Spanish Chill Music 🎧 ｜ Relaxing Playlist for Study & Work.mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/10 - Spanish Chill Music 🎧 ｜ Relaxing Playlist for Study & Work.mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/10%20-%20Spanish%20Chill%20Music%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist%20for%20Study%20%26%20Work.mp3",
+          "title": "10 - Spanish Chill Music 🎧 ｜ Relaxing Playlist for Study & Work"
+        },
+        {
+          "filename": "11 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/11 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/11%20-%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+          "title": "11 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO"
+        },
+        {
+          "filename": "12 - Spanish Chill Mood Music 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/12 - Spanish Chill Mood Music 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/12%20-%20Spanish%20Chill%20Mood%20Music%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+          "title": "12 - Spanish Chill Mood Music 🎧 ｜ Relaxing Playlist ｜ DESEO"
+        },
+        {
+          "filename": "13 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+          "folder": "SPANISH / DESEO",
+          "rel_path": "SPANISH/DESEO/13 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+          "stream_url": "/api/radio/stream/SPANISH/DESEO/13%20-%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+          "title": "13 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO"
+        }
+      ],
+      "count": 13,
+      "created_at": 1787931750,
+      "updated_at": 1787931750
+    }
+  ],
+  "state": {
+    "is_playing": true,
+    "mode": "shuffle",
+    "source_type": "spotify",
+    "current_title": "Nashe Radio Ukraine",
+    "current_url": "https://online.nasheradio.ua/NasheRadio_HD",
+    "current_item_id": "ua_nashe",
+    "queue": [
+      {
+        "id": "ua_nashe",
+        "name": "Nashe Radio Ukraine",
+        "country": "UA",
+        "country_name": "Ukrayna",
+        "genre": "Ukrainian Pop & Folk",
+        "url": "https://online.nasheradio.ua/NasheRadio_HD",
+        "logo": "🇺🇦"
+      }
+    ],
+    "queue_index": 0,
+    "tv_audio_enabled": true,
+    "updated_at": 1788018978,
+    "volume": 73
+  },
+  "stations": [
+    {
+      "id": "tr_powergold",
+      "name": "Power Gold (70-80-90 Nostalji)",
+      "country": "TR",
+      "country_name": "Türkiye",
+      "genre": "70s-80s-90s Nostalji",
+      "url": "https://listen.powerapp.com.tr/powergold/mpeg/icecast.audio",
+      "logo": "📻"
+    },
+    {
+      "id": "tr_superfm",
+      "name": "Süper FM (Türkçe Pop & 90lar)",
+      "country": "TR",
+      "country_name": "Türkiye",
+      "genre": "Türkçe Pop / Hit",
+      "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/SUPER_FM.mp3",
+      "logo": "🇹🇷"
+    },
+    {
+      "id": "tr_powerlove",
+      "name": "Power Love (Slow / Romantik)",
+      "country": "TR",
+      "country_name": "Türkiye",
+      "genre": "Slow & Aşk Şarkıları",
+      "url": "https://listen.powerapp.com.tr/powerlove/mpeg/icecast.audio",
+      "logo": "❤️"
+    },
+    {
+      "id": "tr_powerturk",
+      "name": "Power Türk",
+      "country": "TR",
+      "country_name": "Türkiye",
+      "genre": "Türkçe Pop",
+      "url": "https://listen.powerapp.com.tr/powerturk/mpeg/icecast.audio",
+      "logo": "🇹🇷"
+    },
+    {
+      "id": "tr_slowturk",
+      "name": "Slow Türk",
+      "country": "TR",
+      "country_name": "Türkiye",
+      "genre": "Türkçe Slow",
+      "url": "https://radyo.duhnet.tv/slowturk",
+      "logo": "🇹🇷"
+    },
+    {
+      "id": "tr_joyfm",
+      "name": "Joy FM (Slow & Easy)",
+      "country": "TR",
+      "country_name": "Türkiye",
+      "genre": "Slow / Lounge",
+      "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/JOY_FM.mp3",
+      "logo": "☕"
+    },
+    {
+      "id": "en_181_80s",
+      "name": "181.fm Awesome 80s",
+      "country": "US",
+      "country_name": "ABD / Global",
+      "genre": "80s Hits / Retro Pop",
+      "url": "https://listen.181fm.com/181-awesome80s_128k.mp3",
+      "logo": "🎸"
+    },
+    {
+      "id": "en_181_90s",
+      "name": "181.fm Star 90s",
+      "country": "US",
+      "country_name": "ABD / Global",
+      "genre": "90s Pop & Alternative",
+      "url": "https://listen.181fm.com/181-star90s_128k.mp3",
+      "logo": "🌟"
+    },
+    {
+      "id": "en_heart_80s",
+      "name": "Heart 80s UK",
+      "country": "EU",
+      "country_name": "İngiltere",
+      "genre": "Non-Stop 80s",
+      "url": "https://media-ssl.musicradio.com/Heart80s",
+      "logo": "🇬🇧"
+    },
+    {
+      "id": "en_smooth_uk",
+      "name": "Smooth Radio UK",
+      "country": "EU",
+      "country_name": "İngiltere",
+      "genre": "Classic Relax / Soul",
+      "url": "https://media-ssl.musicradio.com/SmoothUK",
+      "logo": "🇬🇧"
+    },
+    {
+      "id": "en_181_oldies",
+      "name": "181.fm Good Time Oldies (60s-70s)",
+      "country": "US",
+      "country_name": "ABD / Global",
+      "genre": "60s-70s Classic Hits",
+      "url": "https://listen.181fm.com/181-goodtime_128k.mp3",
+      "logo": "🕺"
+    },
+    {
+      "id": "eu_swissjazz",
+      "name": "Radio Swiss Jazz",
+      "country": "EU",
+      "country_name": "İsviçre / Avrupa",
+      "genre": "Jazz / Soul / Blues",
+      "url": "https://stream.srg-ssr.ch/m/rsj/mp3_128",
+      "logo": "🇨🇭"
+    },
+    {
+      "id": "eu_ibiza",
+      "name": "Ibiza Global Radio",
+      "country": "EU",
+      "country_name": "İspanya / Ibiza",
+      "genre": "Deep House / Electronic",
+      "url": "https://listenssl.ibizaglobalradio.com:8024/ibizaglobalradio.mp3",
+      "logo": "🇪🇸"
+    },
+    {
+      "id": "ua_hitfm",
+      "name": "Hit FM Ukraine",
+      "country": "UA",
+      "country_name": "Ukrayna",
+      "genre": "Pop / Dance",
+      "url": "https://online.hitfm.ua/HitFM_HD",
+      "logo": "🇺🇦"
+    },
+    {
+      "id": "ua_roks",
+      "name": "Radio ROKS Ukraine",
+      "country": "UA",
+      "country_name": "Ukrayna",
+      "genre": "Classic Rock / 80s Rock",
+      "url": "https://online.radioroks.ua/RadioROKS_HD",
+      "logo": "🎸"
+    },
+    {
+      "id": "ua_relax",
+      "name": "Radio Relax Ukraine",
+      "country": "UA",
+      "country_name": "Ukrayna",
+      "genre": "Lounge / Relaxing Music",
+      "url": "https://online.radiorelax.ua/RadioRelax_HD",
+      "logo": "🇺🇦"
+    },
+    {
+      "id": "ua_nashe",
+      "name": "Nashe Radio Ukraine",
+      "country": "UA",
+      "country_name": "Ukrayna",
+      "genre": "Ukrainian Pop & Folk",
+      "url": "https://online.nasheradio.ua/NasheRadio_HD",
+      "logo": "🇺🇦"
+    },
+    {
+      "id": "ua_kissfm",
+      "name": "Kiss FM Ukraine",
+      "country": "UA",
+      "country_name": "Ukrayna",
+      "genre": "EDM / Dance",
+      "url": "https://online.kissfm.ua/KissFM_HD",
+      "logo": "🇺🇦"
+    }
+  ]
+}

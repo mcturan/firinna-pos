@@ -87,13 +87,22 @@
                     <button class="btn-action btn-gray" onclick="togglePlayMode()" id="playModeBtn" style="padding: 0.45rem 0.8rem;" title="Çalma Modu">🔁 Sıralı</button>
                 </div>
 
-                <!-- Web Yerel Ses Kontrolü (Varsayılan Sessiz) -->
-                <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.25); padding: 6px 12px; border-radius: 20px;">
-                    <button onclick="toggleWebMute()" id="btnWebMute" style="background:none; border:none; color:white; cursor:pointer; font-size:1.1rem;" title="Web Sesini Aç / Kapa">🔇</button>
-                    <input type="range" id="webVolumeSlider" min="0" max="100" value="0" oninput="setWebVolume(this.value)" style="width: 80px; cursor: pointer;">
-                    <span id="webVolumeLabel" style="font-size: 0.78rem; color: #cbd5e1; width: 35px;">%0 (Sessiz)</span>
+                <!-- Ses Seviyesi Kontrolü (Raspberry Pi Donanımsal Ses) -->
+                <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px;">
+                    <button id="btnMuteToggle" onclick="toggleMute()" style="background: none; border: none; font-size: 1.15rem; cursor: pointer; color: white; padding: 0; display: flex; align-items: center;" title="Sesi Kapat / Aç">🔊</button>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="100" oninput="onVolumeInput(this.value)" onchange="onVolumeChange(this.value)" style="width: 110px; accent-color: #10b981; cursor: pointer;">
+                    <span id="volumePercentText" style="font-size: 0.85rem; font-weight: 700; color: #a7f3d0; min-width: 42px;">%100</span>
+                </div>
+
+                <!-- Spotify Control -->
+                <div id="spotifyControlPanel" style="display: flex; align-items: center; gap: 8px; background: rgba(30,215,96,0.15); border: 1px solid rgba(30,215,96,0.3); padding: 6px 12px; border-radius: 20px;">
+                    <span style="color:#1DB954; font-weight:700; font-size:0.85rem;">Spotify</span>
+                    <button id="btnSpotifyAuth" onclick="window.location.href='/api/spotify/login'" class="btn-action" style="background:#1DB954; color:white; padding:0.3rem 0.8rem; font-size:0.75rem; border-radius:15px; border:none;">Giriş Yap</button>
+                    <span id="spotifyStatusText" style="display:none; color:#a7f3d0; font-size:0.75rem; margin-left:4px;">Bağlı ✅</span>
                 </div>
             </div>
+
+
         </div>
 
         <!-- Sekmeler -->
@@ -102,6 +111,7 @@
             <button class="radio-tab" onclick="switchRadioTab('tab-library', this)">📁 Klasör & Müzik Kütüphanesi</button>
             <button class="radio-tab" onclick="switchRadioTab('tab-playlists', this)">📑 Çalma Listeleri (Playlists)</button>
             <button class="radio-tab" onclick="switchRadioTab('tab-upload', this)">📤 Klasör & Dosya Yükle</button>
+            <button class="radio-tab" id="tabBtnSpotify" onclick="switchRadioTab('tab-spotify', this)" style="color:#1DB954; font-weight:800;">🟢 Spotify</button>
         </div>
 
         <!-- TAB 1: ONLİNE RADYOLAR -->
@@ -281,8 +291,75 @@
         </div>
     </div>
 
-    <!-- Web Audio Player Nesnesi (Varsayılan Muted/0 ses) -->
-    <audio id="webAudioElement" preload="none"></audio>
+
+        <!-- TAB 5: SPOTIFY -->
+        <div id="tab-spotify" class="tab-pane">
+            <div id="spotifyNotConnectedView" class="radio-card" style="padding: 2.5rem; text-align: center; max-width: 600px; margin: 0 auto; display: none;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🟢</div>
+                <h2 style="color: #1DB954; font-weight: 800; font-size: 1.8rem; margin-bottom: 0.5rem;">Spotify Bağlantısı</h2>
+                <p style="color: #64748b; font-size: 1rem; line-height: 1.5; margin-bottom: 1.5rem;">
+                    Spotify hesabınızı bağlayarak tüm çalma listelerinizi, şarkılarınızı ve albümlerinizi doğrudan bu web ekranından Raspberry Pi AUX ses kablosu üzerinden çalabilirsiniz.
+                </p>
+                <a href="/api/spotify/login" class="btn-action" style="background: #1DB954; color: white; padding: 0.8rem 2rem; font-size: 1.1rem; border-radius: 30px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                    🟢 Spotify ile Giriş Yap & Bağla
+                </a>
+            </div>
+
+            <div id="spotifyConnectedView" style="display: none;">
+                <!-- Spotify Üst Kontrol & Arama -->
+                <div class="radio-card" style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 250px;">
+                        <input type="text" id="spotifySearchInput" placeholder="🔍 Spotify'da şarkı veya liste ara..." onkeydown="if(event.key==='Enter') searchSpotify()" style="flex: 1; padding: 0.6rem 1rem; border: 1.5px solid #cbd5e1; border-radius: 20px; font-size: 0.9rem;">
+                        <button class="btn-action btn-green" onclick="searchSpotify()" style="border-radius: 20px; padding: 0.6rem 1.2rem;">Ara</button>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span id="spotifyActiveDeviceBadge" style="font-size: 0.82rem; background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 12px; font-weight: 700;">
+                            🔊 Çıkış: Firinna (Raspberry Pi)
+                        </span>
+                        <button class="btn-action btn-gray" onclick="loadSpotifyPlaylists()" style="font-size: 0.82rem;">🔄 Yenile</button>
+                    </div>
+                </div>
+
+                <!-- Arama Sonuçları -->
+                <div id="spotifySearchResultsBox" style="display: none; margin-bottom: 1.25rem;">
+                    <div class="radio-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="margin: 0; color: #1e293b;">🔍 Arama Sonuçları</h4>
+                            <button class="btn-action btn-gray" onclick="document.getElementById('spotifySearchResultsBox').style.display='none'" style="font-size: 0.75rem; padding: 2px 8px;">Kapat ✖</button>
+                        </div>
+                        <div id="spotifySearchResultsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px;"></div>
+                    </div>
+                </div>
+
+                <!-- Çalma Listeleri Başlığı & Grid -->
+                <div class="radio-card">
+                    <h3 style="margin: 0 0 1rem 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                        <span>📑</span> Spotify Çalma Listelerim
+                    </h3>
+                    <div id="spotifyPlaylistsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;">
+                        <div style="text-align: center; color: #94a3b8; padding: 2rem; grid-column: 1/-1;">Çalma listeleri yükleniyor...</div>
+                    </div>
+                </div>
+
+                <!-- Liste Şarkıları Detay Kutusu -->
+                <div id="spotifyPlaylistDetailBox" style="display: none; margin-top: 1.25rem;">
+                    <div class="radio-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <h3 id="spotifyDetailTitle" style="margin: 0; color: #1e293b;">Liste Şarkıları</h3>
+                                <small id="spotifyDetailSub" style="color: #64748b;"></small>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-action btn-green" id="btnPlayFullSpotifyPlaylist">▶ Bu Listeyi Çal</button>
+                                <button class="btn-action btn-gray" onclick="document.getElementById('spotifyPlaylistDetailBox').style.display='none'">Kapat ✖</button>
+                            </div>
+                        </div>
+                        <div id="spotifyDetailTracksList" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         let allStations = [];
@@ -290,50 +367,6 @@
         let allPlaylists = [];
         let currentCountryFilter = 'ALL';
         let currentStatus = { is_playing: false, mode: 'sequential', current_title: '', current_url: '', tv_audio_enabled: true };
-
-        const webAud = document.getElementById('webAudioElement');
-
-        let webVolume = localStorage.getItem('firinna_web_volume') !== null ? parseInt(localStorage.getItem('firinna_web_volume')) : 0;
-        let isWebMuted = localStorage.getItem('firinna_web_muted') === 'true' || webVolume === 0;
-
-        function applyWebAudioSettings() {
-            if (isWebMuted || webVolume === 0) {
-                webAud.volume = 0;
-                document.getElementById('webVolumeSlider').value = 0;
-                document.getElementById('webVolumeLabel').textContent = '%0 (Sessiz)';
-                document.getElementById('btnWebMute').textContent = '🔇';
-            } else {
-                webAud.volume = webVolume / 100;
-                document.getElementById('webVolumeSlider').value = webVolume;
-                document.getElementById('webVolumeLabel').textContent = `%${webVolume}`;
-                document.getElementById('btnWebMute').textContent = '🔊';
-            }
-        }
-
-        function setWebVolume(val) {
-            webVolume = parseInt(val);
-            localStorage.setItem('firinna_web_volume', webVolume);
-            if (webVolume > 0) {
-                isWebMuted = false;
-                localStorage.setItem('firinna_web_muted', 'false');
-            } else {
-                isWebMuted = true;
-                localStorage.setItem('firinna_web_muted', 'true');
-            }
-            applyWebAudioSettings();
-        }
-
-        function toggleWebMute() {
-            if (isWebMuted) {
-                isWebMuted = false;
-                webVolume = webVolume === 0 ? 50 : webVolume;
-            } else {
-                isWebMuted = true;
-            }
-            localStorage.setItem('firinna_web_muted', isWebMuted);
-            localStorage.setItem('firinna_web_volume', webVolume);
-            applyWebAudioSettings();
-        }
 
         function switchRadioTab(tabId, el) {
             document.querySelectorAll('.radio-tab').forEach(t => t.classList.remove('active'));
@@ -348,14 +381,14 @@
                 const data = await res.json();
                 currentStatus = data;
                 updateStatusUI(data);
-                syncWebAudio(data);
             } catch (e) {
                 console.error('Status fetch error', e);
             }
         }
 
         function updateStatusUI(data) {
-            document.getElementById('nowPlayingTitle').textContent = data.current_title || 'Hazır / Durduruldu';
+            document.getElementById('nowPlayingTitle').textContent = data.display_title || data.current_title || 'Hazır / Durduruldu';
+            
             const playBtn = document.getElementById('mainPlayBtn');
             if (data.is_playing) {
                 playBtn.innerHTML = '⏸ Durdur';
@@ -393,21 +426,67 @@
                     card.classList.remove('playing');
                 }
             });
+
+            if (data.volume !== undefined && !isDraggingVolume) {
+                const volSlider = document.getElementById('volumeSlider');
+                const volText = document.getElementById('volumePercentText');
+                const muteBtn = document.getElementById('btnMuteToggle');
+                if (volSlider) volSlider.value = data.volume;
+                if (volText) volText.textContent = `%${data.volume}`;
+                if (muteBtn) muteBtn.textContent = data.volume > 0 ? (data.volume > 50 ? '🔊' : '🔉') : '🔇';
+            }
         }
 
-        function syncWebAudio(data) {
-            if (data.is_playing && data.current_url) {
-                if (webAud.src !== data.current_url && !webAud.src.endsWith(data.current_url)) {
-                    webAud.src = data.current_url;
-                    webAud.load();
-                }
-                if (webAud.paused) {
-                    webAud.play().catch(e => console.log('Web audio autoplay muted/blocked', e));
-                }
+        let isDraggingVolume = false;
+        let volumeDebounceTimer = null;
+        let lastNonZeroVolume = 80;
+
+        function onVolumeInput(val) {
+            isDraggingVolume = true;
+            const vol = parseInt(val, 10);
+            const volText = document.getElementById('volumePercentText');
+            if (volText) volText.textContent = `%${vol}`;
+            const muteBtn = document.getElementById('btnMuteToggle');
+            if (muteBtn) muteBtn.textContent = vol > 0 ? (vol > 50 ? '🔊' : '🔉') : '🔇';
+            
+            clearTimeout(volumeDebounceTimer);
+            volumeDebounceTimer = setTimeout(() => {
+                sendVolumeToServer(vol);
+            }, 60);
+        }
+
+        function onVolumeChange(val) {
+            const vol = parseInt(val, 10);
+            sendVolumeToServer(vol);
+            setTimeout(() => { isDraggingVolume = false; }, 400);
+        }
+
+        async function sendVolumeToServer(vol) {
+            try {
+                await fetch('/api/radio/volume', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ volume: vol })
+                });
+            } catch (e) {
+                console.error('Volume change error', e);
+            }
+        }
+
+        function toggleMute() {
+            const volSlider = document.getElementById('volumeSlider');
+            if (!volSlider) return;
+            let current = parseInt(volSlider.value, 10);
+            if (current > 0) {
+                lastNonZeroVolume = current;
+                volSlider.value = 0;
+                onVolumeInput(0);
+                onVolumeChange(0);
             } else {
-                if (!webAud.paused) {
-                    webAud.pause();
-                }
+                let restore = lastNonZeroVolume > 0 ? lastNonZeroVolume : 80;
+                volSlider.value = restore;
+                onVolumeInput(restore);
+                onVolumeChange(restore);
             }
         }
 
@@ -421,7 +500,6 @@
                 const d = await res.json();
                 if (d.success) {
                     updateStatusUI(d.state);
-                    syncWebAudio(d.state);
                 }
             } catch (e) {
                 showToast('İşlem gerçekleştirilemedi', 'error');
@@ -517,43 +595,14 @@
             stationPlayStates[stId] = 'buffering';
             renderStations();
 
-            // Test audio stream probe
-            const st = allStations.find(s => s.id === stId);
-            if (st && st.url) {
-                const probeAud = new Audio();
-                probeAud.src = st.url;
-                probeAud.volume = 0.01;
-                
-                const probeTimer = setTimeout(() => {
-                    stationPlayStates[stId] = 'error';
-                    renderStations();
-                    probeAud.src = '';
-                }, 9000);
-
-                probeAud.onplaying = () => {
-                    clearTimeout(probeTimer);
-                    stationPlayStates[stId] = 'playing';
-                    renderStations();
-                    probeAud.src = '';
-                };
-
-                probeAud.oncanplay = () => {
-                    clearTimeout(probeTimer);
-                    stationPlayStates[stId] = 'playing';
-                    renderStations();
-                };
-
-                probeAud.onerror = () => {
-                    clearTimeout(probeTimer);
-                    stationPlayStates[stId] = 'error';
-                    renderStations();
-                    showToast('Radyo akışına bağlanılamadı veya yayın kapalı', 'error');
-                };
-
-                probeAud.play().catch(e => {});
-            }
-
+            // Sadece TV'ye çalma komutu gönderiyoruz, yerel tarayıcı testini (probe) kaldırdık
             radioControl('play_station', { station_id: stId });
+            
+            // 3 saniye sonra "çalıyor" durumuna çekiyoruz (TV'nin bağlandığını varsayarak)
+            setTimeout(() => {
+                stationPlayStates[stId] = 'playing';
+                renderStations();
+            }, 3000);
         }
 
         function openAddStationModal() { document.getElementById('modalAddStation').style.display = 'flex'; }
@@ -960,7 +1009,7 @@
             progressBox.style.display = 'block';
             logBox.innerHTML = '';
 
-            const BATCH_SIZE = 3; // Upload in smaller 3-file chunks for maximum stability
+            const BATCH_SIZE = 1; // Upload in smaller 3-file chunks for maximum stability
             let uploadedCount = 0;
             let failedCount = 0;
             const targetFolder = document.getElementById('targetFolderSelect') ? document.getElementById('targetFolderSelect').value : '';
@@ -975,7 +1024,7 @@
                 chunk.forEach(file => {
                     const rel = file.webkitRelativePath || file.name;
                     paths.push(rel);
-                    formData.append('files', file);
+                    formData.append('files', file, file.name);
                 });
 
                 formData.append('paths', JSON.stringify(paths));
@@ -986,10 +1035,41 @@
                 percentText.textContent = '%' + progressPct;
 
                 try {
-                    const res = await fetch('/api/radio/upload', {
-                        method: 'POST',
-                        body: formData
+                    const res = await new Promise((resolve) => {
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('POST', '/api/radio/upload', true);
+                        
+                        xhr.upload.onprogress = function(e) {
+                            if (e.lengthComputable) {
+                                const chunkPct = Math.round((e.loaded / e.total) * 100);
+                                statusText.textContent = `Yükleniyor: ${uploadedCount} / ${audioFiles.length} parça... (Bu grup: %${chunkPct})`;
+                            }
+                        };
+
+                        xhr.onload = function() {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                try {
+                                    resolve({ok: true, json: () => Promise.resolve(JSON.parse(xhr.responseText))});
+                                } catch(err) {
+                                    resolve({ok: false, text: () => Promise.resolve(xhr.responseText)});
+                                }
+                            } else {
+                                resolve({ok: false, text: () => Promise.resolve(xhr.responseText)});
+                            }
+                        };
+                        
+                        xhr.onerror = () => resolve({ok: false, text: () => Promise.resolve("Ağ Hatası (Network Error)")});
+                        xhr.send(formData);
                     });
+                    
+                    if (!res.ok) {
+                        const errText = await res.text();
+                        console.error('Batch upload error:', errText);
+                        alert('Yükleme sırasında hata oluştu. Sunucu yanıtı: ' + errText);
+                        failedCount += chunk.length;
+                        break; 
+                    }
+                    
                     const d = await res.json();
                     if (d.success) {
                         uploadedCount += (d.saved_count || chunk.length);
@@ -1044,11 +1124,230 @@
             }
         });
 
-        webAud.onended = () => {
-            radioControl('next');
-        };
+        // Spotify Integration JS
+        async function checkSpotifyAuthStatus() {
+            try {
+                const res = await fetch('/api/spotify/status');
+                const data = await res.json();
+                const authBtn = document.getElementById('btnSpotifyAuth');
+                const statusTxt = document.getElementById('spotifyStatusText');
+                const notConn = document.getElementById('spotifyNotConnectedView');
+                const conn = document.getElementById('spotifyConnectedView');
 
-        applyWebAudioSettings();
+                if (data.connected) {
+                    if (authBtn) authBtn.style.display = 'none';
+                    if (statusTxt) statusTxt.style.display = 'inline';
+                    if (notConn) notConn.style.display = 'none';
+                    if (conn) conn.style.display = 'block';
+                    loadSpotifyPlaylists();
+                } else {
+                    if (authBtn) authBtn.style.display = 'inline-block';
+                    if (statusTxt) statusTxt.style.display = 'none';
+                    if (notConn) notConn.style.display = 'block';
+                    if (conn) conn.style.display = 'none';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        let currentSpotifyPlaylists = [];
+        async function loadSpotifyPlaylists() {
+            const grid = document.getElementById('spotifyPlaylistsGrid');
+            if (!grid) return;
+            try {
+                const res = await fetch('/api/spotify/playlists');
+                const data = await res.json();
+                if (data.success && data.playlists) {
+                    currentSpotifyPlaylists = data.playlists;
+                    renderSpotifyPlaylists(data.playlists);
+                } else {
+                    grid.innerHTML = `
+                        <div style="text-align:center; padding:2rem; grid-column:1/-1;">
+                            <p style="color:#64748b; font-size:1rem; margin-bottom:1rem;">Çalma listelerinizi web arayüzünde görebilmek için Spotify izinlerini onaylayın:</p>
+                            <a href="/api/spotify/login" class="btn-action" style="background:#1DB954; color:white; padding:0.6rem 1.5rem; border-radius:20px; text-decoration:none; display:inline-block; font-weight:700;">
+                                🟢 Spotify Hesabını Bağla / İzinleri Onayla
+                            </a>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                grid.innerHTML = '<div style="text-align:center; color:#ef4444; padding:2rem; grid-column:1/-1;">Bağlantı hatası</div>';
+            }
+        }
+
+        function renderSpotifyPlaylists(playlists) {
+            const grid = document.getElementById('spotifyPlaylistsGrid');
+            if (!playlists || playlists.length === 0) {
+                grid.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:2rem; grid-column:1/-1;">Spotify hesabınızda çalma listesi bulunamadı.</div>';
+                return;
+            }
+
+            let html = '';
+            playlists.forEach(pl => {
+                const imgUrl = pl.images && pl.images.length > 0 ? pl.images[0].url : '';
+                const count = pl.items && typeof pl.items.total === 'number' ? pl.items.total : (pl.tracks && typeof pl.tracks.total === 'number' ? pl.tracks.total : (pl.total_tracks || ''));
+                const countLabel = count !== '' ? `${count} şarkı` : 'Çalma Listesi';
+                html += `
+                    <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:10px; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column;" class="folder-item" onclick="openSpotifyPlaylistDetail('${pl.id}', '${escapeHtml(pl.name)}', '${pl.uri}', '${imgUrl}', '${countLabel}')">
+                        <div style="width:100%; aspect-ratio:1/1; background:#0f172a; border-radius:8px; overflow:hidden; margin-bottom:8px; display:flex; align-items:center; justify-content:center;">
+                            ${imgUrl ? `<img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover;">` : `<span style="font-size:2.5rem;">🎵</span>`}
+                        </div>
+                        <strong style="color:#1e293b; font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${pl.name}">${pl.name}</strong>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                            <small style="color:#64748b; font-size:0.75rem;">${countLabel}</small>
+                            <button class="btn-action btn-green" onclick="event.stopPropagation(); playSpotifyContext('${pl.uri}', '${escapeHtml(pl.name)}')" style="padding:0.3rem 0.6rem; font-size:0.75rem; border-radius:14px;" title="Direkt Çal">▶ Çal</button>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        async function openSpotifyPlaylistDetail(playlistId, playlistName, playlistUri, imgUrl, countLabel) {
+            const box = document.getElementById('spotifyPlaylistDetailBox');
+            const title = document.getElementById('spotifyDetailTitle');
+            const sub = document.getElementById('spotifyDetailSub');
+            const list = document.getElementById('spotifyDetailTracksList');
+            const playBtn = document.getElementById('btnPlayFullSpotifyPlaylist');
+
+            title.textContent = playlistName;
+            sub.textContent = countLabel || 'Spotify Çalma Listesi';
+            box.style.display = 'block';
+            box.scrollIntoView({ behavior: 'smooth' });
+
+            playBtn.onclick = () => playSpotifyContext(playlistUri, playlistName);
+
+            list.innerHTML = `
+                <div style="text-align:center; padding:1.5rem 1rem;">
+                    ${imgUrl ? `<img src="${imgUrl}" style="width:90px; height:90px; border-radius:8px; margin-bottom:10px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">` : ''}
+                    <h4 style="margin:0 0 6px 0; color:#1e293b;">${playlistName}</h4>
+                    <p style="color:#64748b; font-size:0.88rem; margin-bottom:1rem;">Bu çalma listesini doğrudan Raspberry Pi AUX ses çıkışından başlatmak için butona basabilirsiniz.</p>
+                    <button class="btn-action btn-green" onclick="playSpotifyContext('${playlistUri}', '${escapeHtml(playlistName)}')" style="padding:0.6rem 1.5rem; font-size:1rem; border-radius:20px; font-weight:700;">
+                        ▶ Bu Listeyi Şimdi Çal
+                    </button>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`/api/spotify/playlist/${playlistId}/tracks`);
+                const data = await res.json();
+                if (data.success && data.tracks && data.tracks.length > 0) {
+                    sub.textContent = `${data.tracks.length} şarkı`;
+                    list.innerHTML = data.tracks.map((tr, idx) => `
+                        <div class="track-item" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:6px 8px; border-radius:6px;" onclick="playSpotifyTrack('${playlistUri}', ${idx}, '${escapeHtml(tr.name)}')">
+                            <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+                                ${tr.image ? `<img src="${tr.image}" style="width:32px; height:32px; border-radius:4px; object-fit:cover;">` : `<span>🎵</span>`}
+                                <div style="min-width:0; flex:1;">
+                                    <strong style="color:#1e293b; font-size:0.88rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${tr.name}</strong>
+                                    <small style="color:#64748b; font-size:0.75rem;">${tr.artists}</small>
+                                </div>
+                            </div>
+                            <button class="btn-action btn-green" style="padding:0.25rem 0.6rem; font-size:0.75rem;">▶</button>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                // Keep the default prominent player card
+            }
+        }
+
+        async function playSpotifyContext(contextUri, name) {
+            showToast(`"${name}" Raspberry Pi üzerinde başlatılıyor...`);
+            try {
+                const res = await fetch('/api/spotify/play', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ context_uri: contextUri })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`"${name}" çalıyor!`);
+                    document.getElementById('nowPlayingTitle').textContent = `🟢 Spotify: ${name}`;
+                } else {
+                    showToast('Spotify oynatma başlatılamadı: ' + (data.error || ''), 'error');
+                }
+            } catch (e) {
+                showToast('İşlem başarısız', 'error');
+            }
+        }
+
+        async function playSpotifyTrack(contextUri, offsetIdx, trackName) {
+            showToast(`"${trackName}" başlatılıyor...`);
+            try {
+                const res = await fetch('/api/spotify/play', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ context_uri: contextUri, offset: { position: offsetIdx } })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`"${trackName}" çalıyor!`);
+                    document.getElementById('nowPlayingTitle').textContent = `🟢 Spotify: ${trackName}`;
+                }
+            } catch (e) {}
+        }
+
+        async function searchSpotify() {
+            const q = document.getElementById('spotifySearchInput').value.trim();
+            if (!q) return;
+            const box = document.getElementById('spotifySearchResultsBox');
+            const list = document.getElementById('spotifySearchResultsList');
+            box.style.display = 'block';
+            list.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:1rem;">Aranıyor...</div>';
+
+            try {
+                const res = await fetch(`/api/spotify/search?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                if (data.success) {
+                    let html = '';
+                    if (data.tracks && data.tracks.length > 0) {
+                        data.tracks.forEach(tr => {
+                            html += `
+                                <div class="track-item" style="background:white; border:1px solid #e2e8f0; border-radius:8px; padding:6px 10px; cursor:pointer;" onclick="playSpotifyTrackUri('${tr.uri}', '${escapeHtml(tr.name)}')">
+                                    <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+                                        ${tr.image ? `<img src="${tr.image}" style="width:32px; height:32px; border-radius:4px;">` : `<span>🎵</span>`}
+                                        <div style="min-width:0; flex:1;">
+                                            <strong style="color:#1e293b; font-size:0.85rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${tr.name}</strong>
+                                            <small style="color:#64748b; font-size:0.75rem;">${tr.artists}</small>
+                                        </div>
+                                    </div>
+                                    <button class="btn-action btn-green" style="padding:0.25rem 0.5rem; font-size:0.75rem;">▶</button>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html = '<div style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:1rem;">Sonuç bulunamadı</div>';
+                    }
+                    list.innerHTML = html;
+                }
+            } catch (e) {
+                list.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#ef4444; padding:1rem;">Arama hatası</div>';
+            }
+        }
+
+        async function playSpotifyTrackUri(trackUri, trackName) {
+            showToast(`"${trackName}" başlatılıyor...`);
+            try {
+                const res = await fetch('/api/spotify/play', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uris: [trackUri] })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`"${trackName}" çalıyor!`);
+                    document.getElementById('nowPlayingTitle').textContent = `🟢 Spotify: ${trackName}`;
+                }
+            } catch (e) {}
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        checkSpotifyAuthStatus();
         fetchRadioStatus();
         loadStations();
         loadLibrary();

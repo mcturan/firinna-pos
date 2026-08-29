@@ -673,14 +673,7 @@
             <video id="local-video" src="{{ (settings.playlist_videos[0]) if settings and settings.playlist_videos and settings.playlist_videos|length > 0 else ((settings.local_videos[0]) if settings and settings.local_videos and settings.local_videos|length > 0 else '/static/tv_media/videos/bayrak.mp4') }}" style="display:block; width:100%; height:100%; object-fit:cover;" autoplay muted playsinline webkit-playsinline></video>
             <div id="record-player"></div>
 
-            <!-- 📻 Canlı Çalan Radyo / Şarkı Göstergesi (Daha zarif ve küçük) -->
-            <div id="ml-radio-now-playing" style="display:none; position:absolute; top:8px; right:8px; background:rgba(15,23,42,0.82); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.2); border-radius:20px; padding:3px 10px; color:#FFFFFF; z-index:45; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.4); font-family:'Plus Jakarta Sans', sans-serif; transition:all 0.3s ease;">
-                <span style="font-size:0.9rem;" id="ml-radio-icon">📻</span>
-                <div style="display:flex; flex-direction:column; max-width:180px;">
-                    <span style="font-size:0.55rem; color:#38BDF8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; line-height:1;">CANLI YAYIN</span>
-                    <span id="ml-radio-title" style="font-size:0.75rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#F8FAFC; line-height:1.2;">Power FM</span>
-                </div>
-            </div>
+
 
             <!-- Discrete percentage download indicator in bottom right corner with video name (%0 - %100) -->
             <div id="ml-dl-badge" style="position:absolute; bottom:8px; right:10px; background:rgba(0,0,0,0.45); color:rgba(255,255,255,0.75); font-size:0.72rem; font-weight:500; font-family:monospace, system-ui, -apple-system, sans-serif; padding:2px 6px; border-radius:4px; z-index:45; display:none; pointer-events:none; backdrop-filter:blur(2px); transition:opacity 0.4s ease; border:1px solid rgba(255,255,255,0.15);"></div>
@@ -844,16 +837,8 @@
             });
         }
 
-        audEl.onended = () => {
-            if(localAudioList.length > 0) {
-                currentLocalAudioIndex = (currentLocalAudioIndex + 1) % localAudioList.length;
-                audEl.src = localAudioList[currentLocalAudioIndex];
-                audEl.play().catch(e=>{});
-            }
-        };
-
-        audEl.onplay = () => { recordPlayer.style.display = 'block'; recordPlayer.classList.add('spinning'); };
-        audEl.onpause = () => { recordPlayer.style.display = 'none'; recordPlayer.classList.remove('spinning'); };
+        audEl.onplay = () => { if (recordPlayer) { recordPlayer.style.display = 'block'; recordPlayer.classList.add('spinning'); } };
+        audEl.onpause = () => { if (recordPlayer) { recordPlayer.style.display = 'none'; recordPlayer.classList.remove('spinning'); } };
 
         function switchSource(sourceType) {
             console.log("Switching source to: " + sourceType + ", AndroidTV exists: " + (!!window.AndroidTV));
@@ -2757,19 +2742,41 @@
         initAppOnStartup();
         setInterval(fetchSettings, 5000); 
 
-        // Auto-Reload / Restart every 5 hours (5 * 60 * 60 * 1000 ms) to keep memory clean and auto-fetch updates
-        const AUTO_RELOAD_MS = 5 * 60 * 60 * 1000;
-        setTimeout(() => {
-            tvLog("[AUTO-RELOAD] 5 hours reached, reloading TV player application...");
-            flushTvLogsToServer(true);
-            window.location.reload(true);
-        }, AUTO_RELOAD_MS); 
+        // Safe Memory & Page Refresh Manager
+        // Sadece ekran aktif ve görünür durumdaysa, gece saat 04:00 civarında veya en az 6 saat sonra güvenli yenileme yapar.
+        let appStartTime = Date.now();
+        setInterval(() => {
+            const now = new Date();
+            const elapsedHours = (Date.now() - appStartTime) / (1000 * 60 * 60);
+            
+            // Eğer gece 04:00 - 04:30 arasındaysa VE uygulama en az 4 saattir açıksa VE ekran odaktaysa
+            const isNightMaintenanceWindow = (now.getHours() === 4 && now.getMinutes() >= 0 && now.getMinutes() <= 30);
+            const isLongRunning = elapsedHours >= 8;
+
+            if ((isNightMaintenanceWindow || isLongRunning) && document.visibilityState === 'visible' && !document.hidden) {
+                tvLog("[AUTO-RELOAD] Scheduled maintenance window reached. Refreshing safely...");
+                flushTvLogsToServer(true);
+                appStartTime = Date.now();
+                window.location.href = window.location.pathname + '?reload=' + Date.now();
+            }
+        }, 15 * 60 * 1000); // 15 dakikada bir kontrol eder
+
+        // GPU / Render Context Crash Recovery
+        window.addEventListener('error', (e) => {
+            if (e && e.message && (e.message.includes('context lost') || e.message.includes('WebGL') || e.message.includes('RenderThread'))) {
+                tvLog("[CRASH DETECTED] GPU context lost or render error: " + e.message);
+                setTimeout(() => {
+                    window.location.href = window.location.pathname + '?recover=' + Date.now();
+                }, 3000);
+            }
+        }); 
 
         // ==========================================
         // 📻 MERKEZİ RADYO & MÜZİK ÇALAR TV SENKRONİZASYONU
         // ==========================================
         let currentRadioState = null;
         let isAudioUnlocked = false;
+        let activePlayingRadioUrl = "";
 
         // Unlock Web Audio & HTML5 Audio on TV Stick (Handles Bluetooth & WebView autoplay restrictions)
         function unlockAudioEngine() {
@@ -2803,9 +2810,6 @@
 
                 const audEl = document.getElementById('local-audio');
                 const vidEl = document.getElementById('local-video');
-                const badgeEl = document.getElementById('ml-radio-now-playing');
-                const titleEl = document.getElementById('ml-radio-title');
-                const iconEl = document.getElementById('ml-radio-icon');
 
                 // TV'de video sesi daima sessiz (muted) kalır, radyo sesi öne geçer
                 if (vidEl) {
@@ -2820,35 +2824,27 @@
                         audEl.volume = 1.0;
                     }
 
-                    // Update audio element source if changed
-                    if (audEl.src !== state.current_url && !audEl.src.endsWith(state.current_url)) {
+                    // Sadece URL gerçekten değiştiğinde src güncelle ve yükle!
+                    if (activePlayingRadioUrl !== state.current_url) {
+                        console.log("[RADIO] Switching audio source:", state.current_url);
+                        activePlayingRadioUrl = state.current_url;
                         audEl.src = state.current_url;
                         audEl.load();
-                    }
-                    
-                    if (audEl.paused) {
                         const p = audEl.play();
                         if (p !== undefined) {
                             p.catch(e => {
-                                console.log("[RADIO AUTOPLAY] Retrying audio play with user trigger...", e);
+                                console.log("[RADIO AUTOPLAY] Retrying audio play...", e);
                                 unlockAudioEngine();
                             });
                         }
-                    }
-
-                    // Show now-playing pill on TV screen
-                    if (badgeEl && titleEl) {
-                        titleEl.textContent = state.current_title || 'Canlı Müzik';
-                        if (iconEl) iconEl.textContent = state.source_type === 'station' ? '📻' : '🎵';
-                        badgeEl.style.display = 'inline-flex';
+                    } else if (audEl.paused) {
+                        audEl.play().catch(e => unlockAudioEngine());
                     }
                 } else {
                     // Paused or TV audio disabled
+                    activePlayingRadioUrl = "";
                     if (audEl && !audEl.paused) {
                         audEl.pause();
-                    }
-                    if (badgeEl) {
-                        badgeEl.style.display = 'none';
                     }
                 }
             } catch (e) {
@@ -2856,22 +2852,99 @@
             }
         }
 
+
+
         audEl.onended = () => {
-            // Tell server to advance next track in central queue
-            fetch('/api/radio/control', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'next' })
-            }).then(() => syncTvRadioStream()).catch(e=>{});
+            // Managed by backend audio supervisor
         };
 
         audEl.onerror = (e) => {
-            console.warn("[RADIO AUDIO] Stream error event:", e);
-            setTimeout(syncTvRadioStream, 2000);
+            // Ignore background audio glitches on TV client
         };
 
         syncTvRadioStream();
         setInterval(syncTvRadioStream, 3500);
+            // --- Spotify Web Playback SDK ---
+            window.onSpotifyWebPlaybackSDKReady = () => {
+                console.log("Spotify SDK Ready");
+                
+                // Fetch initial token to see if connected
+                fetch('/api/spotify/token').then(r => r.json()).then(data => {
+                    if (data.success && data.access_token) {
+                        initSpotifyPlayer(data.access_token);
+                    } else {
+                        console.log("Spotify not connected or token missing");
+                        // We will periodically check if spotify gets connected
+                        setInterval(checkSpotifyConnect, 10000);
+                    }
+                }).catch(e => console.log("Spotify check error", e));
+            };
+
+            function checkSpotifyConnect() {
+                if (window.spotifyPlayer) return;
+                fetch('/api/spotify/token').then(r => r.json()).then(data => {
+                    if (data.success && data.access_token) {
+                        initSpotifyPlayer(data.access_token);
+                    }
+                });
+            }
+
+            function initSpotifyPlayer(initialToken) {
+                if (window.spotifyPlayer) return;
+
+                const player = new Spotify.Player({
+                    name: 'Firinna TV',
+                    getOAuthToken: cb => {
+                        fetch('/api/spotify/token').then(r => r.json()).then(data => {
+                            if (data.success) {
+                                cb(data.access_token);
+                            } else {
+                                console.error("Failed to get Spotify token");
+                            }
+                        }).catch(() => console.error("Failed to get Spotify token"));
+                    },
+                    volume: 1.0
+                });
+
+                window.spotifyPlayer = player;
+
+                // Error handling
+                player.addListener('initialization_error', ({ message }) => { console.error(message); });
+                player.addListener('authentication_error', ({ message }) => { console.error(message); });
+                player.addListener('account_error', ({ message }) => { console.error(message); });
+                player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+                // Playback status updates
+                player.addListener('player_state_changed', state => {
+                    console.log("Spotify State:", state);
+                    if (!state) return;
+                    
+                    const isPlaying = !state.paused;
+                    if (isPlaying) {
+                        // Pause local HTML5 radio/video if spotify is playing
+                        const localAud = document.getElementById('local-audio');
+                        const localVid = document.getElementById('local-video');
+                        if (localAud) localAud.pause();
+                        if (localVid) localVid.muted = true;
+
+                        // Update the badge with Spotify info
+                        const badgeEl = document.getElementById('ml-radio-now-playing');
+                        const titleEl = document.getElementById('ml-radio-title');
+                        if (badgeEl && titleEl) {
+                            titleEl.textContent = state.track_window.current_track.name;
+                            badgeEl.style.display = 'inline-flex';
+                        }
+                    }
+                });
+
+                // Ready
+                player.addListener('ready', ({ device_id }) => {
+                    console.log('Ready with Device ID', device_id);
+                });
+
+                // Connect to the player!
+                player.connect();
+            }
     </script>
 </body>
 </html>

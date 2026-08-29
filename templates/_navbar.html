@@ -7,6 +7,67 @@
         }
     })();
 </script>
+
+<style>
+    /* Navbar Weather & Clock Widget */
+    .top-widget-wrap {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1.2rem;
+        text-align: center;
+    }
+    .clock-badge {
+        color: #e53e3e;
+        font-size: 1.7rem;
+        font-weight: 800;
+        font-family: monospace;
+        letter-spacing: 2px;
+        background: rgba(229,62,62,0.08);
+        padding: 4px 10px;
+        border-radius: 9px;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+        line-height: 1;
+        white-space: nowrap;
+    }
+    .weather-box {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Modern & Derli Toplu Entegre Müzik Çubuğu */
+    .radio-seek-slider {
+        flex: 1;
+        height: 5px;
+        -webkit-appearance: none;
+        appearance: none;
+        background: #334155;
+        border-radius: 4px;
+        outline: none;
+        cursor: pointer;
+    }
+    .radio-seek-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #38bdf8;
+        cursor: pointer;
+    }
+
+    @media (max-width: 900px) {
+        .top-widget-wrap { display: none !important; }
+
+        #navRadioTitle {
+            max-width: 100px !important;
+        }
+        #navRadioProgressWrap {
+            max-width: 120px !important;
+        }
+    }
+</style>
+
 <nav class="navbar">
     <a href="/" class="nav-brand">
         <svg id="navLogoFallback" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="26" height="26" style="flex-shrink:0;border-radius:7px;">
@@ -22,6 +83,34 @@
         <img id="navLogoImg" src="" alt="" style="display:none;max-height:28px;max-width:72px;object-fit:contain;flex-shrink:0;border-radius:5px;" onerror="this.style.display='none';document.getElementById('navLogoFallback').style.display='block'">
         Fırınna POS
     </a>
+
+    <!-- Top Clock & Weather Widget (Masaüstü/Tablet görünümü) -->
+    <div id="topWidget" class="top-widget-wrap">
+        <div id="clockWidget" class="clock-badge">
+            --:--:--
+        </div>
+        <div id="weatherWidget" class="weather-box">
+            <div style="font-size:0.82rem; color:#718096;">Hava Durumu Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- Navbar Radio & Donanımsal Ses Kontrolü Widget -->
+    <div id="navRadioWidget" style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.06); padding: 4px 10px; border-radius: 24px; margin: 0 6px;">
+        <button id="navRadioPlayBtn" onclick="navRadioTogglePlay()" style="background: #2d6a4f; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer; padding: 0;">▶</button>
+        
+        <a href="/radio" style="text-decoration: none; display: flex; align-items: center; gap: 4px; color: inherit;" title="Radyo & Müzik Paneline Git">
+            <span style="font-size: 0.9rem;">📻</span>
+            <span id="navRadioTitle" style="font-size: 0.82rem; font-weight: 700; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1e293b;">Hazır</span>
+        </a>
+
+        <!-- Ses Düzeyi Slider -->
+        <div style="display: flex; align-items: center; gap: 4px; margin-left: 4px; padding-left: 6px; border-left: 1px solid rgba(0,0,0,0.15);">
+            <button id="navRadioMuteBtn" onclick="navRadioToggleMute()" style="background: none; border: none; cursor: pointer; font-size: 0.95rem; padding: 0;" title="Sesi Aç/Kapat">🔊</button>
+            <input type="range" id="navRadioVolume" min="0" max="100" value="80" oninput="navRadioOnVolume(this.value)" style="width: 75px; height: 5px; accent-color: #2d6a4f; cursor: pointer;">
+            <span id="navRadioVolText" style="font-size: 0.75rem; font-weight: 700; color: #475569; min-width: 34px;">%80</span>
+        </div>
+    </div>
+
     <div class="nav-links">
         <a href="/" {% if request.path == '/' %}class="active"{% endif %}>Siparişler</a>
         <a href="/kitchen" {% if request.path == '/kitchen' %}class="active"{% endif %}>Mutfak</a>
@@ -51,9 +140,7 @@
         <div class="nav-dropdown" id="navDropdown">
             <button class="nav-dropdown-btn" onclick="toggleNav()">Yönetim ▾</button>
             <div class="nav-dropdown-menu">
-                <a href="/kasa"     {% if request.path == '/kasa'     %}class="active"{% endif %}>Kasa</a>
-                <a href="/muhasebe" {% if request.path == '/muhasebe' %}class="active"{% endif %}>Muhasebe</a>
-                <a href="/reports"  {% if request.path == '/reports'  %}class="active"{% endif %}>Raporlar</a>
+                <a href="/hesap" {% if request.path == "/hesap" %}class="active"{% endif %}>Kasa / Muhasebe / Rapor</a>
                 <hr>
                 <a href="/products" {% if request.path == '/products' %}class="active"{% endif %}>Ürünler</a>
                 <a href="/stok"     {% if request.path == '/stok'     %}class="active"{% endif %}>Stok</a>
@@ -70,83 +157,12 @@
     </div>
 </nav>
 
-<!-- Fırınna POS Global Mini Radyo / Müzik Kontrol Çubuğu -->
-<div id="globalNavRadioBar" style="background:#0f172a; border-bottom:1px solid #334155; color:white; padding:0.35rem 1.25rem; display:flex; align-items:center; justify-content:space-between; font-size:0.84rem; flex-wrap:wrap; gap:0.5rem; z-index:100; position:relative;">
-    <div style="display:flex; align-items:center; gap:0.6rem; min-width:200px;">
-        <span style="font-size:1.1rem;" id="navRadioIcon">📻</span>
-        <a href="/radio" style="color:#f8fafc; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:6px;" title="Radyo & Müzik Yönetimini Aç">
-            <span id="navRadioTitle" style="max-width:260px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Power FM</span>
-            <span id="navRadioModeBadge" style="background:#334155; color:#94a3b8; font-size:0.7rem; padding:1px 6px; border-radius:4px;">🔁 Sıralı</span>
-        </a>
-    </div>
-
-    <!-- Oynatma Kontrolleri -->
-    <div style="display:flex; align-items:center; gap:0.4rem;">
-        <button onclick="navRadioControl('prev')" style="background:transparent; border:none; color:#cbd5e1; cursor:pointer; font-size:0.9rem; padding:2px 6px;" title="Önceki">⏮</button>
-        <button onclick="navRadioTogglePlay()" id="navRadioPlayBtn" style="background:#2d6a4f; color:white; border:none; border-radius:6px; padding:3px 10px; font-size:0.8rem; font-weight:700; cursor:pointer;">▶ Çal</button>
-        <button onclick="navRadioControl('next')" style="background:transparent; border:none; color:#cbd5e1; cursor:pointer; font-size:0.9rem; padding:2px 6px;" title="Sonraki">⏭</button>
-    </div>
-
-    <!-- Web Ses ve TV Senkron Kontrolü -->
-    <div style="display:flex; align-items:center; gap:0.8rem;">
-        <div style="display:flex; align-items:center; gap:5px; background:rgba(255,255,255,0.08); padding:2px 8px; border-radius:12px;">
-            <button onclick="navToggleWebMute()" id="navWebMuteBtn" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:0.95rem; padding:0;" title="Web Sesini Aç/Kapa">🔇</button>
-            <input type="range" id="navWebVolSlider" min="0" max="100" value="0" oninput="navSetWebVolume(this.value)" style="width:55px; height:4px; cursor:pointer;">
-            <span id="navWebVolLabel" style="font-size:0.72rem; color:#94a3b8; width:25px;">%0</span>
-        </div>
-        <a href="/radio" style="color:#38bdf8; text-decoration:none; font-weight:700; font-size:0.78rem; display:flex; align-items:center; gap:3px;">
-            Yönetim ⚙️
-        </a>
-    </div>
-</div>
-
-<audio id="globalNavbarAudio" preload="none"></audio>
-
 <script>
 (function initGlobalRadioNavbar() {
-    var navAud = document.getElementById('globalNavbarAudio');
-    var navVol = localStorage.getItem('firinna_web_volume') !== null ? parseInt(localStorage.getItem('firinna_web_volume')) : 0;
-    var navMuted = localStorage.getItem('firinna_web_muted') === 'true' || navVol === 0;
-
-    function applyNavVol() {
-        if (!navAud) return;
-        var slider = document.getElementById('navWebVolSlider');
-        var label = document.getElementById('navWebVolLabel');
-        var btn = document.getElementById('navWebMuteBtn');
-        if (navMuted || navVol === 0) {
-            navAud.volume = 0;
-            if (slider) slider.value = 0;
-            if (label) label.textContent = '%0';
-            if (btn) btn.textContent = '🔇';
-        } else {
-            navAud.volume = navVol / 100;
-            if (slider) slider.value = navVol;
-            if (label) label.textContent = '%' + navVol;
-            if (btn) btn.textContent = '🔊';
-        }
-    }
-
-    window.navSetWebVolume = function(val) {
-        navVol = parseInt(val);
-        localStorage.setItem('firinna_web_volume', navVol);
-        navMuted = (navVol === 0);
-        localStorage.setItem('firinna_web_muted', navMuted ? 'true' : 'false');
-        applyNavVol();
-    };
-
-    window.navToggleWebMute = function() {
-        if (navMuted) {
-            navMuted = false;
-            navVol = (navVol === 0 ? 50 : navVol);
-        } else {
-            navMuted = true;
-        }
-        localStorage.setItem('firinna_web_muted', navMuted ? 'true' : 'false');
-        localStorage.setItem('firinna_web_volume', navVol);
-        applyNavVol();
-    };
-
     var currentRadioState = {};
+    var isNavDraggingVol = false;
+    var navVolDebounce = null;
+    var navLastVol = 80;
 
     window.syncNavRadio = async function() {
         try {
@@ -156,35 +172,24 @@
             
             var titleEl = document.getElementById('navRadioTitle');
             var btnEl = document.getElementById('navRadioPlayBtn');
-            var badgeEl = document.getElementById('navRadioModeBadge');
+            var volSlider = document.getElementById('navRadioVolume');
+            var volText = document.getElementById('navRadioVolText');
+            var muteBtn = document.getElementById('navRadioMuteBtn');
             
-            if (titleEl) titleEl.textContent = st.current_title || 'Hazır';
+            if (titleEl) titleEl.textContent = st.display_title || st.current_title || 'Hazır';
             if (btnEl) {
                 if (st.is_playing) {
-                    btnEl.textContent = '⏸ Durdur';
+                    btnEl.textContent = '⏸';
                     btnEl.style.background = '#2563eb';
                 } else {
-                    btnEl.textContent = '▶ Çal';
+                    btnEl.textContent = '▶';
                     btnEl.style.background = '#2d6a4f';
                 }
             }
-            if (badgeEl) {
-                badgeEl.textContent = st.mode === 'shuffle' ? '🔀 Karışık' : '🔁 Sıralı';
-            }
-
-            // Sync Web Audio Element (only if not on /radio page, which has its own player)
-            if (window.location.pathname !== '/radio') {
-                if (st.is_playing && st.current_url) {
-                    if (navAud.src !== st.current_url && !navAud.src.endsWith(st.current_url)) {
-                        navAud.src = st.current_url;
-                        navAud.load();
-                    }
-                    if (navAud.paused) {
-                        navAud.play().catch(function(e){});
-                    }
-                } else {
-                    if (!navAud.paused) navAud.pause();
-                }
+            if (st.volume !== undefined && !isNavDraggingVol) {
+                if (volSlider) volSlider.value = st.volume;
+                if (volText) volText.textContent = '%' + st.volume;
+                if (muteBtn) muteBtn.textContent = st.volume > 0 ? (st.volume > 50 ? '🔊' : '🔉') : '🔇';
             }
         } catch(e){}
     };
@@ -198,23 +203,42 @@
         }).then(function(){ syncNavRadio(); });
     };
 
-    window.navRadioControl = function(act) {
-        fetch('/api/radio/control', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({action: act})
-        }).then(function(){ syncNavRadio(); });
+    window.navRadioOnVolume = function(val) {
+        isNavDraggingVol = true;
+        var vol = parseInt(val, 10);
+        var volText = document.getElementById('navRadioVolText');
+        var muteBtn = document.getElementById('navRadioMuteBtn');
+        if (volText) volText.textContent = '%' + vol;
+        if (muteBtn) muteBtn.textContent = vol > 0 ? (vol > 50 ? '🔊' : '🔉') : '🔇';
+
+        clearTimeout(navVolDebounce);
+        navVolDebounce = setTimeout(function() {
+            fetch('/api/radio/volume', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({volume: vol})
+            });
+            setTimeout(function(){ isNavDraggingVol = false; }, 300);
+        }, 50);
     };
 
-    if (navAud) {
-        navAud.onended = function() {
-            window.navRadioControl('next');
-        };
-    }
+    window.navRadioToggleMute = function() {
+        var slider = document.getElementById('navRadioVolume');
+        if (!slider) return;
+        var cur = parseInt(slider.value, 10);
+        if (cur > 0) {
+            navLastVol = cur;
+            slider.value = 0;
+            navRadioOnVolume(0);
+        } else {
+            var rest = navLastVol > 0 ? navLastVol : 80;
+            slider.value = rest;
+            navRadioOnVolume(rest);
+        }
+    };
 
-    applyNavVol();
     syncNavRadio();
-    setInterval(syncNavRadio, 5000);
+    setInterval(syncNavRadio, 3000);
 })();
 </script>
 
@@ -288,6 +312,7 @@ async function loadAlerts() {
 }
 loadAlerts();
 setInterval(loadAlerts, 60000);
+
 (function loadNavLogo() {
     fetch('/api/settings/logo').then(function(r){ return r.json(); }).then(function(d) {
         if (d.url) {
@@ -301,6 +326,64 @@ setInterval(loadAlerts, 60000);
         }
     }).catch(function(){});
 })();
+
+// Clock Update
+setInterval(function() {
+    var d = new Date();
+    var clockEl = document.getElementById('clockWidget');
+    if (clockEl) {
+        clockEl.innerText = d.toLocaleTimeString('tr-TR', {hour12:false});
+    }
+}, 1000);
+
+// Weather Update (Istanbul/Beyoglu)
+const wmoCodes = {
+    0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+    45: '🌫️', 48: '🌫️', 51: '🌧️', 53: '🌧️', 55: '🌧️',
+    61: '🌧️', 63: '🌧️', 65: '🌧️', 71: '❄️', 73: '❄️', 75: '❄️',
+    80: '🌧️', 81: '🌧️', 82: '🌧️', 95: '⛈️'
+};
+function getWmoIcon(code) { return wmoCodes[code] || '🌡️'; }
+
+async function fetchWeather() {
+    try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=41.0369&longitude=28.9775&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto');
+        const data = await res.json();
+        
+        const curTemp = Math.round(data.current.temperature_2m);
+        const curIcon = getWmoIcon(data.current.weather_code);
+        
+        let html = '<div style="display:flex; align-items:center; gap:8px;">' +
+            '<div style="font-size:1rem; display:flex; align-items:center; gap:4px; padding-right:8px; border-right:1px solid #cbd5e1;">' +
+                '<span style="font-size:1.25rem" title="Şu an">' + curIcon + '</span> <strong>' + curTemp + '°C</strong>' +
+            '</div>' +
+            '<div style="display:flex; gap:5px; font-size:0.72rem;">';
+            
+        // Next 3 days
+        for(let i=1; i<=3; i++) {
+            const date = new Date(data.daily.time[i]);
+            const dayName = date.toLocaleDateString('tr-TR', {weekday:'short'});
+            const maxT = Math.round(data.daily.temperature_2m_max[i]);
+            const minT = Math.round(data.daily.temperature_2m_min[i]);
+            const icon = getWmoIcon(data.daily.weather_code[i]);
+            
+            html += '<div style="display:flex; flex-direction:column; align-items:center; background:rgba(0,0,0,0.03); padding:2px 5px; border-radius:5px;">' +
+                '<span style="color:#718096; font-weight:700; font-size:0.68rem;">' + dayName + '</span>' +
+                '<span style="font-size:0.85rem; margin:1px 0;">' + icon + '</span>' +
+                '<span><span style="color:#e53e3e; font-weight:700;">' + maxT + '°</span><span style="color:#3182ce; font-weight:700;"> ' + minT + '°</span></span>' +
+            '</div>';
+        }
+        html += '</div></div>';
+        var wEl = document.getElementById('weatherWidget');
+        if (wEl) wEl.innerHTML = html;
+    } catch(e) {
+        var wEl = document.getElementById('weatherWidget');
+        if (wEl) wEl.innerHTML = '<span style="color:#e53e3e;font-size:0.8rem;">Hava Durumu Alınamadı</span>';
+    }
+}
+fetchWeather();
+setInterval(fetchWeather, 30 * 60 * 1000); // 30 min
+
 </script>
 
 <div id="toast-container"></div>
@@ -342,4 +425,92 @@ function showToast(msg, type, duration) {
         setTimeout(function() { t.remove(); }, 300);
     }, duration);
 }
+
+// Version Display & Update Logic
+(function() {
+    var vDiv = document.createElement('div');
+    vDiv.style.position = 'fixed';
+    vDiv.style.bottom = '10px';
+    vDiv.style.right = '10px';
+    vDiv.style.fontSize = '0.75rem';
+    vDiv.style.color = '#718096';
+    vDiv.style.background = 'rgba(255,255,255,0.8)';
+    vDiv.style.padding = '2px 6px';
+    vDiv.style.borderRadius = '4px';
+    vDiv.style.zIndex = '9999';
+    vDiv.style.userSelect = 'none';
+    vDiv.style.cursor = 'pointer';
+    vDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+    document.body.appendChild(vDiv);
+
+    // Get actual app version from URL params (passed by mobile app wrapper)
+    var urlParams = new URLSearchParams(window.location.search);
+    var actualAppVersion = urlParams.get('app_version');
+    if (actualAppVersion) {
+        localStorage.setItem('garson_app_version', actualAppVersion);
+    } else {
+        actualAppVersion = localStorage.getItem('garson_app_version') || 'Bilinmiyor';
+    }
+    vDiv.textContent = 'Mobil v' + actualAppVersion;
+
+    function cmpVersions(a, b) {
+        if (!a || !b) return 0;
+        var pa = a.split('.');
+        var pb = b.split('.');
+        for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+            var na = parseInt(pa[i] || 0);
+            var nb = parseInt(pb[i] || 0);
+            if (na > nb) return 1;
+            if (nb > na) return -1;
+        }
+        return 0;
+    }
+
+    var serverVersion = null;
+    fetch('/api/mobile_version?_=' + Date.now())
+        .then(r => r.json())
+        .then(d => { 
+            serverVersion = d.version; 
+            if (actualAppVersion !== 'Bilinmiyor' && cmpVersions(serverVersion, actualAppVersion) > 0) {
+                if(confirm("Yeni bir güncelleme mevcut (v" + serverVersion + "). Uygulamayı şimdi güncellemek ister misiniz?")) {
+                    var fullUrl = window.location.origin + '/download_apk';
+                    if (window.AndroidNative && window.AndroidNative.downloadAndInstall) {
+                        window.AndroidNative.downloadAndInstall(fullUrl);
+                    } else {
+                        window.open(fullUrl, '_system') || window.open(fullUrl, '_blank');
+                        alert("İndirme işlemi tarayıcınızda başlatıldı. Lütfen indirme tamamlandığında bildirimlerden tıklayarak kurunuz.");
+                    }
+                }
+            }
+        })
+        .catch(e => { console.error('Versiyon alinamadi'); });
+
+    var pressTimer;
+    function startPress() {
+        pressTimer = setTimeout(function() {
+            if (serverVersion && actualAppVersion !== 'Bilinmiyor' && cmpVersions(serverVersion, actualAppVersion) <= 0) {
+                alert("Uygulamanız zaten son sürümde (v" + actualAppVersion + ").");
+                return;
+            }
+            if(confirm("Son sürüme (v" + (serverVersion || 'Yeni') + ") güncellensin mi?")) {
+                var fullUrl = window.location.origin + '/download_apk';
+                if (window.AndroidNative && window.AndroidNative.downloadAndInstall) {
+                    window.AndroidNative.downloadAndInstall(fullUrl);
+                } else {
+                    window.open(fullUrl, '_system') || window.open(fullUrl, '_blank');
+                    alert("İndirme işlemi tarayıcınızda başlatıldı. Lütfen indirme tamamlandığında bildirimlerden tıklayarak kurunuz.");
+                }
+            }
+        }, 3000);
+    }
+    function cancelPress() {
+        clearTimeout(pressTimer);
+    }
+    
+    vDiv.addEventListener('touchstart', startPress, {passive: true});
+    vDiv.addEventListener('touchend', cancelPress);
+    vDiv.addEventListener('mousedown', startPress);
+    vDiv.addEventListener('mouseup', cancelPress);
+    vDiv.addEventListener('mouseleave', cancelPress);
+})();
 </script>

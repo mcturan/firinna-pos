@@ -1,0 +1,76 @@
+{
+    "logo_url": "/static/uploads/logo.png",
+    "layout": "modern_grid",
+    "video_playlist": "",
+    "local_videos": [
+        "/static/tv_media/videos/1.mp4",
+        "/static/tv_media/videos/bayrak.mp4"
+    ],
+    "local_audio": [],
+    "media_source": "local",
+    "audio_priority": "music",
+    "promo_text": "",
+    "qr_code": "",
+    "qr_text": "",
+    "widgets": {
+        "weather": true,
+        "clock": true
+    },
+    "messages": [],
+    "ticker_enabled": true,
+    "ticker_text_enabled": true,
+    "ticker_currency_enabled": true,
+    "ticker_rss_enabled": true,
+    "ticker_effect": "slide_down",
+    "ticker_speed": 2.5,
+    "ticker_slide_duration": 6,
+    "rss_turkey_archaeo_enabled": true,
+    "rss_ds_arts_en_enabled": true,
+    "rss_aa_life_en_enabled": true,
+    "rss_turkey_exp_en_enabled": true,
+    "rss_goodnews_en_enabled": true,
+    "rss_custom_enabled": false,
+    "rss_refresh_mins": 15,
+    "rss_url": "",
+    "watermark_cycle": {
+        "interval_sec": 90,
+        "duration_sec": 12,
+        "cards": [
+            {
+                "id": "wm-card-0",
+                "title": "1. Fırınna Logo & Slogan",
+                "desc": "Klasik büyük logo ve www.firinna.com filigranı",
+                "image": "/static/img/watermarks/card_0_logo.png",
+                "enabled": true
+            },
+            {
+                "id": "wm-card-1",
+                "title": "2. Follow Us on Social Media",
+                "desc": "Instagram, TikTok, Google Maps ve Yandex Maps rozetleri",
+                "image": "/static/img/watermarks/card_1_social.png",
+                "enabled": true
+            },
+            {
+                "id": "wm-card-2",
+                "title": "3. Fırınna Supports Students",
+                "desc": "Beyoğlu Öğrenciye projesi, ücretsiz yemek ve burs desteği",
+                "image": "/static/img/watermarks/card_2_students.png",
+                "enabled": true
+            },
+            {
+                "id": "wm-card-3",
+                "title": "4. Fırınna Cares for Stray Animals",
+                "desc": "Sokak hayvanları mama, su ve yuva desteği",
+                "image": "/static/img/watermarks/card_3_animals.png",
+                "enabled": true
+            }
+        ]
+    },
+    "last_push": {
+        "action": "reload",
+        "target": "tv_3dj0p6c",
+        "timestamp": 1787398201812
+    },
+    "last_ping": "2026-08-22T14:38:33.877359",
+    "version": 1787398102495
+}
