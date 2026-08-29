@@ -2044,9 +2044,26 @@ def get_git_credentials():
         pass
     return {'username': '', 'token': ''}
 
+def ensure_git_remote_auth():
+    cred = get_git_credentials()
+    username = cred.get('username', '').strip()
+    token = cred.get('token', '').strip()
+    if username and token:
+        try:
+            subprocess.run(
+                ['/usr/bin/git', 'remote', 'set-url', 'origin',
+                 f'https://{username}:{token}@github.com/{username}/firinna-pos.git'],
+                cwd=GIT_DIR,
+                capture_output=True,
+                timeout=10
+            )
+        except Exception:
+            pass
+
 def run_git(args, timeout=30):
     """Git komutunu çalıştır, (success, output) döndür"""
     import os
+    ensure_git_remote_auth()
     env = os.environ.copy()
     env['GIT_TERMINAL_PROMPT'] = '0'
     try:
@@ -2107,12 +2124,7 @@ def api_git_credentials_set():
         with open(GIT_CRED_FILE, 'w') as f:
             _json.dump({'username': username, 'token': token}, f)
         os.chmod(GIT_CRED_FILE, 0o600)
-        if username and token:
-            subprocess.run(
-                ['/usr/bin/git', 'remote', 'set-url', 'origin',
-                 f'https://{username}:{token}@github.com/{username}/firinna-pos.git'],
-                cwd=GIT_DIR
-            )
+        ensure_git_remote_auth()
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
@@ -2120,6 +2132,7 @@ def api_git_credentials_set():
 @app.route('/api/git/status', methods=['GET'])
 def api_git_status():
     """Yerel ile GitHub arasındaki farkı göster"""
+    ensure_git_remote_auth()
     # Önce fetch yap
     run_git(['fetch', 'origin', 'main'])
     
@@ -2154,54 +2167,46 @@ def api_git_status():
 @app.route('/api/git/push', methods=['POST'])
 def api_git_push():
     """Tüm değişiklikleri commit + push (önce pull ile senkronize et)"""
+    ensure_git_remote_auth()
     data = request.json or {}
     msg = data.get('message', '').strip()
     if not msg:
         now = datetime.now().strftime('%d.%m.%Y %H:%M')
         msg = f'Güncelleme — {now}'
 
-    # 1. Önce commit edilmemiş değişiklikleri stash'e al
-    ok_s, dirty = run_git(['status', '--short'])
-    has_changes = bool(dirty.strip())
-
-    if has_changes:
-        ok1, out1 = run_git(['add', '-A'])
-        if not ok1:
-            return jsonify({'success': False, 'error': 'git add hatası: ' + out1})
-        ok2, out2 = run_git(['commit', '-m', msg])
-        if not ok2:
-            return jsonify({'success': False, 'error': 'git commit hatası: ' + out2})
-
-    # 2. Önce GitHub'dan pull (rebase ile — commit geçmişini temiz tutar)
-    ok_pull, out_pull = run_git(['pull', '--rebase', 'origin', 'main'], timeout=60)
-    if not ok_pull:
-        # Rebase çakışması — abort + force push yerine hata ver
-        run_git(['rebase', '--abort'])
-        return jsonify({'success': False, 'error': 'Pull/rebase hatası: ' + out_pull})
-
-    # 3. DB dump al ve commit'e ekle
+    # 1. DB dump al ve dosyaları ekle
     try:
         dump_path = db.dump_database_sql()
         run_git(['add', dump_path])
-        ok_dc, out_dc = run_git(['commit', '-m', f'DB dump — {datetime.now().strftime("%d.%m.%Y %H:%M")}'])
-    except Exception as e:
-        pass  # dump başarısız olsa da push devam eder
+    except Exception:
+        pass
 
-    # 4. Push
+    run_git(['add', '-A'])
+    run_git(['commit', '-m', msg])
+
+    # 2. Önce GitHub'dan pull (autostash ile)
+    ok_pull, out_pull = run_git(['pull', '--autostash', '--rebase', 'origin', 'main'], timeout=60)
+    if not ok_pull:
+        run_git(['rebase', '--abort'])
+        ok_pull, out_pull = run_git(['pull', '--no-rebase', 'origin', 'main', '-m', 'Merge remote changes'], timeout=60)
+        if not ok_pull:
+            return jsonify({'success': False, 'error': 'Pull/rebase hatası: ' + out_pull})
+
+    # 3. Push
     ok3, out3 = run_git(['push', 'origin', 'main'], timeout=60)
     if not ok3:
         return jsonify({'success': False, 'error': 'git push hatası: ' + out3})
 
     return jsonify({
         'success': True,
-        'had_changes': has_changes,
-        'output': out_pull + '\n' + out3
+        'output': (out_pull + '\n' + out3).strip()
     })
 
 
 @app.route('/api/git/pull', methods=['POST'])
 def api_git_pull():
     """GitHub'tan en son sürümü çek — DB dahil"""
+    ensure_git_remote_auth()
     # Önce fetch
     ok_fetch, out_fetch = run_git(['fetch', 'origin', 'main'], timeout=30)
     if not ok_fetch:
@@ -2214,17 +2219,13 @@ def api_git_pull():
     if already_up:
         return jsonify({'success': True, 'already_up': True, 'output': 'Zaten güncel.'})
 
-    # Yerel commit edilmemiş değişiklik varsa stash'e at
-    ok_s, dirty = run_git(['status', '--short'])
-    if dirty.strip():
-        run_git(['stash', '--include-untracked'])
-
-    # Pull
-    ok, out = run_git(['pull', 'origin', 'main', '--strategy-option=theirs'], timeout=60)
-    if not ok:
-        # Stash'i geri al
-        run_git(['stash', 'pop'])
-        return jsonify({'success': False, 'error': out})
+    # Pull (autostash ile)
+    ok_pull, out_pull = run_git(['pull', '--autostash', '--rebase', 'origin', 'main'], timeout=60)
+    if not ok_pull:
+        run_git(['rebase', '--abort'])
+        ok_pull, out_pull = run_git(['pull', '--no-rebase', 'origin', 'main', '-m', 'Merge remote changes'], timeout=60)
+        if not ok_pull:
+            return jsonify({'success': False, 'error': out_pull})
 
     # Servis restart et
     try:
