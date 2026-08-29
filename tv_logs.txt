@@ -1,31 +1,3 @@
-[18:25:09] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
-[2026-08-29 18:25:29] [tv_364a3114]
-[18:25:24] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
-[18:25:24] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
-[18:25:24] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
-[2026-08-29 18:25:44] [tv_364a3114]
-[18:25:39] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
-[18:25:39] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
-[18:25:39] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
-[2026-08-29 18:25:59] [tv_364a3114]
-[18:25:54] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
-[18:25:54] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
-[18:25:54] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
-[2026-08-29 18:26:14] [tv_364a3114]
-[18:26:09] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
-[18:26:09] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
-[18:26:09] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
-[2026-08-29 18:26:29] [tv_364a3114]
-[18:26:24] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
-[18:26:24] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
-[18:26:24] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
-[2026-08-29 18:26:44] [tv_364a3114]
-[18:26:39] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
-[18:26:39] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
-[18:26:39] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
-[2026-08-29 18:26:59] [tv_364a3114]
-[18:26:54] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
-[18:26:54] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
 [18:26:54] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
 [2026-08-29 18:27:14] [tv_364a3114]
 [18:27:09] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
@@ -498,3 +470,31 @@
 [18:56:54] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
 [18:56:54] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
 [18:56:54] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
+[2026-08-29 18:57:15] [tv_364a3114]
+[18:57:14] [NETWORK HEALTH] Connection ping failed, waiting for network... signal is aborted without reason
+[2026-08-29 18:57:29] [tv_364a3114]
+[18:57:24] [NETWORK HEALTH] Server connection RESTORED to ONLINE!
+[18:57:24] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
+[18:57:24] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
+[18:57:25] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
+[2026-08-29 18:57:45] [tv_364a3114]
+[18:57:40] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
+[18:57:40] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
+[18:57:40] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
+[2026-08-29 18:57:59] [tv_364a3114]
+[18:57:54] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
+[18:57:54] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
+[18:57:55] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
+[2026-08-29 18:58:18] [tv_364a3114]
+[18:58:13] [NETWORK HEALTH] Connection ping failed, waiting for network... signal is aborted without reason
+[2026-08-29 18:58:30] [tv_364a3114]
+[18:58:28] [NETWORK HEALTH] Connection ping failed, waiting for network... signal is aborted without reason
+[2026-08-29 18:58:50] [tv_364a3114]
+[18:58:39] [NETWORK HEALTH] Server connection RESTORED to ONLINE!
+[18:58:39] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
+[18:58:39] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
+[18:58:39] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
+[2026-08-29 18:58:59] [tv_364a3114]
+[18:58:55] [SYNC] Checking disk cache for playlist: bayrak.mp4, istanbul.mp4, 1.mp4
+[18:58:55] [SYNC QUEUE] Queued for background download: 1.mp4 (Queue depth: 1)
+[18:58:55] [DOWNLOAD ABORT] 1.mp4 is too large (355.7 MB). Skipping cache to prevent crash.
