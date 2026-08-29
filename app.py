@@ -4688,6 +4688,8 @@ def sync_local_audio_player():
                                 '--demuxer-max-bytes=16M',
                                 '--demuxer-readahead-secs=20',
                                 '--audio-buffer=0.4',
+                                '--ytdl=yes',
+                                '--ytdl-format=bestaudio/best',
                                 target_url
                             ],
                             env=env,
@@ -4898,12 +4900,107 @@ def api_radio_control():
             state['current_url'] = cur.get('stream_url') or cur.get('url') or ""
             state['current_item_id'] = cur.get('rel_path') or cur.get('id') or ""
             state['is_playing'] = True
+    elif action == 'play_url':
+        url = req.get('url', '').strip()
+        title = req.get('title', '').strip()
+        if url:
+            if not title:
+                if 'youtube.com' in url or 'youtu.be' in url or 'soundcloud.com' in url:
+                    try:
+                        out = subprocess.check_output(
+                            ['/usr/local/bin/yt-dlp', '--get-title', '--no-warnings', '--no-playlist', url],
+                            stderr=subprocess.DEVNULL,
+                            text=True,
+                            timeout=4
+                        ).strip()
+                        if out:
+                            title = out
+                    except Exception:
+                        pass
+                if not title:
+                    title = "YouTube / Medya Akışı"
+            state['is_playing'] = True
+            state['source_type'] = 'custom_url'
+            state['current_title'] = f"🔗 {title}"
+            state['current_url'] = url
+            state['current_item_id'] = url
+            state['queue'] = [{"title": title, "url": url, "stream_url": url}]
+            state['queue_index'] = 0
 
     state['updated_at'] = int(time.time())
     data['state'] = state
     save_radio_data(data)
     threading.Thread(target=sync_local_audio_player, daemon=True).start()
     return jsonify({"success": True, "state": state})
+
+@app.route('/api/radio/custom_links', methods=['GET', 'POST', 'DELETE'])
+def api_radio_custom_links():
+    data = load_radio_data()
+    if 'custom_links' not in data:
+        data['custom_links'] = [
+            {
+                "id": "yt_cafe_jazz",
+                "title": "☕ Cozy Cafe Jazz Piano (Canlı)",
+                "url": "https://www.youtube.com/watch?v=DXUAyRRkI6k",
+                "category": "YouTube"
+            },
+            {
+                "id": "yt_lofi_girl",
+                "title": "📚 Lofi Hip Hop Radio (Canlı)",
+                "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+                "category": "YouTube"
+            },
+            {
+                "id": "yt_acoustic_pop",
+                "title": "🎸 Relaxing Acoustic Pop Mix",
+                "url": "https://www.youtube.com/watch?v=5qap5aO4i9A",
+                "category": "YouTube"
+            }
+        ]
+        save_radio_data(data)
+    
+    if request.method == 'GET':
+        return jsonify({"success": True, "links": data.get('custom_links', [])})
+    
+    elif request.method == 'POST':
+        req = request.json or {}
+        title = req.get('title', '').strip()
+        url = req.get('url', '').strip()
+        category = req.get('category', 'YouTube').strip()
+        if not url:
+            return jsonify({"success": False, "error": "URL boş olamaz"}), 400
+        
+        if not title:
+            try:
+                out = subprocess.check_output(
+                    ['/usr/local/bin/yt-dlp', '--get-title', '--no-warnings', '--no-playlist', url],
+                    stderr=subprocess.DEVNULL,
+                    text=True,
+                    timeout=4
+                ).strip()
+                if out:
+                    title = out
+            except Exception:
+                pass
+            if not title:
+                title = "Özel Medya Linki"
+
+        link_id = f"link_{int(time.time()*1000)}"
+        data['custom_links'].append({
+            "id": link_id,
+            "title": title,
+            "url": url,
+            "category": category
+        })
+        save_radio_data(data)
+        return jsonify({"success": True, "links": data['custom_links']})
+    
+    elif request.method == 'DELETE':
+        req = request.json or {}
+        link_id = req.get('id')
+        data['custom_links'] = [l for l in data.get('custom_links', []) if l.get('id') != link_id]
+        save_radio_data(data)
+        return jsonify({"success": True, "links": data['custom_links']})
 
 @app.route('/api/radio/stations', methods=['GET', 'POST'])
 def api_radio_stations():

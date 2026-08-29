@@ -102,6 +102,7 @@
             <button class="radio-tab" onclick="switchRadioTab('tab-library', this)">📁 Klasör & Müzik Kütüphanesi</button>
             <button class="radio-tab" onclick="switchRadioTab('tab-playlists', this)">📑 Çalma Listeleri (Playlists)</button>
             <button class="radio-tab" onclick="switchRadioTab('tab-upload', this)">📤 Klasör & Dosya Yükle</button>
+            <button class="radio-tab" onclick="switchRadioTab('tab-link', this)" style="color: #ef4444; font-weight: 800;">🔗 YouTube & Link Çal</button>
         </div>
 
         <!-- TAB 1: ONLİNE RADYOLAR -->
@@ -225,6 +226,80 @@
                     </div>
                     <div id="uploadLog" style="margin-top: 10px; font-size: 0.82rem; color: #475569; max-height: 100px; overflow-y: auto;"></div>
                 </div>
+            </div>
+        <!-- TAB 5: YOUTUBE & LINK ÇAL -->
+        <div id="tab-link" class="tab-pane">
+            <!-- Anında Link Çalma Kutusu -->
+            <div class="radio-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h3 style="margin: 0 0 0.5rem 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                    <span>🔗</span> YouTube veya Medya Linki Çal
+                </h3>
+                <p style="color: #64748b; font-size: 0.9rem; margin: 0 0 1.25rem 0;">
+                    YouTube video/müzik linki, canlı yayın, podcast veya özel ses akışı (stream URL) yapıştırıp doğrudan Raspberry Pi amfisinden dinleyebilirsiniz.
+                </p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="directPlayUrlInput" placeholder="https://www.youtube.com/watch?v=... veya https://youtu.be/..." style="flex: 1; min-width: 280px; padding: 0.75rem 1rem; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+                    <button class="btn-action btn-green" onclick="playCustomLinkDirect()" style="padding: 0.75rem 1.5rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px;">
+                        ▶ Şimdi Çal
+                    </button>
+                    <button class="btn-action btn-blue" onclick="saveCurrentInputToFavorites()" style="padding: 0.75rem 1.2rem; font-size: 0.95rem; border-radius: 8px;">
+                        ⭐ Favorilere Ekle
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bilgisayar Sesi Bilgi Kutusu -->
+            <div class="radio-card" style="padding: 1.25rem; margin-bottom: 1.5rem; background: #f0fdf4; border: 1.5px solid #bbf7d0;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 2rem;">💻</span>
+                        <div>
+                            <strong style="color: #166534; font-size: 1rem; display: block;">Bilgisayarınızın Tüm Sesini Amfiye Aktarma:</strong>
+                            <span style="color: #15803d; font-size: 0.85rem;">Bilgisayarınızda (YouTube, Spotify, Web) ne açarsanız anında Raspberry Pi amfisine aktarabilirsiniz.</span>
+                        </div>
+                    </div>
+                    <div style="background: white; border: 1px solid #86efac; border-radius: 8px; padding: 6px 14px; font-size: 0.82rem; color: #166534; font-weight: 700;">
+                        💡 Masaüstündeki <b>"🔊 Amfi Ses Aktar"</b> simgesine tıklayarak tek tuşla açıp kapatabilirsiniz.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kayıtlı Favori Linkler Listesi -->
+            <div class="radio-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h3 style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                            <span>⭐</span> Kayıtlı YouTube & Medya Favorilerim
+                        </h3>
+                        <small style="color: #64748b;">Tek tıkla başlatabileceğiniz favori YouTube yayınları ve karışık listeler</small>
+                    </div>
+                    <button class="btn-action btn-blue" onclick="openAddCustomLinkModal()" style="font-size: 0.85rem;">
+                        ➕ Yeni Favori Link Ekle
+                    </button>
+                </div>
+                <div id="customLinksGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+                    <div style="text-align: center; color: #94a3b8; padding: 2rem; grid-column: 1/-1;">Yükleniyor...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Özel Link Ekle -->
+    <div id="modalAddCustomLink" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; padding: 1.5rem; width: 90%; max-width: 480px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);">
+            <h3 style="margin-top: 0; color: #1e293b;">⭐ Yeni YouTube / Medya Linki Ekle</h3>
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; color: #475569;">Başlık / İsim (İsteğe Bağlı)</label>
+                <input type="text" id="newLinkTitleInput" placeholder="Örn: 2 Saatlik Cafe Jazz Akustiği" style="width: 100%; padding: 0.6rem; border: 1.5px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                <small style="color: #94a3b8; font-size: 0.75rem;">Boş bırakırsanız YouTube video başlığı otomatik alınır.</small>
+            </div>
+            <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; color: #475569;">YouTube / Medya URL</label>
+                <input type="text" id="newLinkUrlInput" placeholder="https://www.youtube.com/watch?v=..." style="width: 100%; padding: 0.6rem; border: 1.5px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" class="btn-action btn-gray" onclick="closeAddCustomLinkModal()">İptal</button>
+                <button type="button" class="btn-action btn-green" onclick="saveCustomLinkModal()">💾 Kaydet</button>
             </div>
         </div>
     </div>
@@ -1047,10 +1122,199 @@
             }
         });
 
+        // --- Custom Links & YouTube Playback JS ---
+        let allCustomLinks = [];
+
+        async function loadCustomLinks() {
+            const grid = document.getElementById('customLinksGrid');
+            if (!grid) return;
+            try {
+                const res = await fetch('/api/radio/custom_links');
+                const data = await res.json();
+                if (data.success) {
+                    allCustomLinks = data.links || [];
+                    renderCustomLinks(allCustomLinks);
+                } else {
+                    grid.innerHTML = '<div style="color:#ef4444; text-align:center; padding:1.5rem; grid-column:1/-1;">Linkler yüklenemedi.</div>';
+                }
+            } catch (e) {
+                grid.innerHTML = '<div style="color:#ef4444; text-align:center; padding:1.5rem; grid-column:1/-1;">Bağlantı hatası</div>';
+            }
+        }
+
+        function renderCustomLinks(links) {
+            const grid = document.getElementById('customLinksGrid');
+            if (!grid) return;
+            if (!links || links.length === 0) {
+                grid.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:2rem; grid-column:1/-1;">Henüz kayıtlı favori link bulunmuyor. Yukarıdan ekleyebilirsiniz!</div>';
+                return;
+            }
+
+            let html = '';
+            links.forEach(item => {
+                const isYt = item.url.includes('youtube.com') || item.url.includes('youtu.be');
+                const icon = isYt ? '▶️' : '🔗';
+                const isCurrentlyPlaying = currentStatus.is_playing && currentStatus.current_url === item.url;
+                
+                html += `
+                    <div style="background: ${isCurrentlyPlaying ? '#ecfdf5' : '#ffffff'}; border: 1.5px solid ${isCurrentlyPlaying ? '#10b981' : '#e2e8f0'}; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
+                                <span style="font-size: 1.5rem;">${icon}</span>
+                                <div style="min-width: 0; flex: 1;">
+                                    <strong style="color: #1e293b; font-size: 0.92rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.title}">${item.title}</strong>
+                                    <small style="color: #64748b; font-size: 0.75rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.url}</small>
+                                </div>
+                            </div>
+                            <button onclick="deleteCustomLink('${item.id}', '${escapeHtml(item.title)}')" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px; font-size: 0.9rem;" title="Sil">🗑️</button>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 6px; margin-top: 4px;">
+                            <button class="btn-action btn-green" onclick="playCustomLink('${encodeURIComponent(item.url)}', '${escapeHtml(item.title)}')" style="padding: 0.35rem 0.8rem; font-size: 0.82rem; border-radius: 6px; font-weight: 700; width: 100%;">
+                                ${isCurrentlyPlaying ? '🔊 Çalıyor' : '▶ Başlat'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        async function playCustomLink(encodedUrl, title) {
+            const url = decodeURIComponent(encodedUrl);
+            showToast(`"${title}" Raspberry Pi üzerinde başlatılıyor...`);
+            try {
+                const res = await fetch('/api/radio/control', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'play_url', url: url, title: title })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`"${title}" çalıyor!`);
+                    fetchRadioStatus();
+                } else {
+                    showToast('Oynatma başlatılamadı: ' + (data.error || ''), 'error');
+                }
+            } catch (e) {
+                showToast('İşlem başarısız', 'error');
+            }
+        }
+
+        async function playCustomLinkDirect() {
+            const inp = document.getElementById('directPlayUrlInput');
+            const url = inp.value.trim();
+            if (!url) {
+                showToast('Lütfen bir YouTube veya medya linki girin', 'error');
+                return;
+            }
+            showToast('Link çözümleniyor ve Raspberry Pi üzerinde başlatılıyor...');
+            try {
+                const res = await fetch('/api/radio/control', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'play_url', url: url })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Link çalmaya başladı!');
+                    fetchRadioStatus();
+                } else {
+                    showToast('Oynatma başarısız: ' + (data.error || ''), 'error');
+                }
+            } catch (e) {
+                showToast('İşlem başarısız', 'error');
+            }
+        }
+
+        async function saveCurrentInputToFavorites() {
+            const inp = document.getElementById('directPlayUrlInput');
+            const url = inp.value.trim();
+            if (!url) {
+                showToast('Lütfen önce bir link girin', 'error');
+                return;
+            }
+            showToast('Favorilere ekleniyor...');
+            try {
+                const res = await fetch('/api/radio/custom_links', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Favorilere eklendi!');
+                    loadCustomLinks();
+                }
+            } catch (e) {
+                showToast('Kayıt başarısız', 'error');
+            }
+        }
+
+        function openAddCustomLinkModal() {
+            document.getElementById('newLinkTitleInput').value = '';
+            document.getElementById('newLinkUrlInput').value = '';
+            document.getElementById('modalAddCustomLink').style.display = 'flex';
+        }
+
+        function closeAddCustomLinkModal() {
+            document.getElementById('modalAddCustomLink').style.display = 'none';
+        }
+
+        async function saveCustomLinkModal() {
+            const title = document.getElementById('newLinkTitleInput').value.trim();
+            const url = document.getElementById('newLinkUrlInput').value.trim();
+            if (!url) {
+                showToast('URL zorunludur', 'error');
+                return;
+            }
+            showToast('Kaydediliyor...');
+            try {
+                const res = await fetch('/api/radio/custom_links', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: title, url: url })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Link başarıyla kaydedildi!');
+                    closeAddCustomLinkModal();
+                    loadCustomLinks();
+                } else {
+                    showToast('Kayıt başarısız: ' + (data.error || ''), 'error');
+                }
+            } catch (e) {
+                showToast('İşlem başarısız', 'error');
+            }
+        }
+
+        async function deleteCustomLink(id, title) {
+            if (!confirm(`"${title}" favorilerden silinsin mi?`)) return;
+            try {
+                const res = await fetch('/api/radio/custom_links', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Link silindi');
+                    loadCustomLinks();
+                }
+            } catch (e) {
+                showToast('Silme başarısız', 'error');
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
         fetchRadioStatus();
         loadStations();
         loadLibrary();
         loadPlaylists();
+        loadCustomLinks();
         setInterval(fetchRadioStatus, 4000);
     </script>
 </body>
