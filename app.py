@@ -17,9 +17,6 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
-
-from spotify_integration import spotify_bp
-app.register_blueprint(spotify_bp)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.jinja_env.auto_reload = True
 
@@ -1712,38 +1709,22 @@ def api_reclose_order(order_id):
     """Düzenlenen siparişi yeniden kapat"""
     d = request.json or {}
     conn = db.get_db()
-    existing = conn.execute('SELECT created_at, closed_at FROM orders WHERE id = ?', (order_id,)).fetchone()
-    if not existing:
-        conn.close()
-        return jsonify({'error': 'Sipariş bulunamadı'}), 404
-
     # Toplam yeniden hesapla
     total = conn.execute('''
         SELECT COALESCE(SUM(CASE WHEN is_complimentary=0 THEN quantity*price ELSE 0 END),0) as t
         FROM order_items WHERE order_id=?
     ''', (order_id,)).fetchone()['t']
-
-    custom_dt = d.get('closed_at') or d.get('date') or d.get('created_at')
-    if custom_dt:
-        dt_str = str(custom_dt).replace('T', ' ').strip()
-        if len(dt_str) == 16:
-            dt_str += ':00'
-        target_closed_at = dt_str
-        target_created_at = dt_str
-    else:
-        target_closed_at = existing['closed_at'] or existing['created_at'] or datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        target_created_at = existing['created_at'] or target_closed_at
-
-    conn.execute('''UPDATE orders SET status='closed', total=?, closed_at=?, created_at=?,
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    conn.execute('''UPDATE orders SET status='closed', total=?, closed_at=?,
         payment_cash=?, payment_card=?, tip_amount=?, tip_method=?
         WHERE id=?''',
-        (total, target_closed_at, target_created_at, d.get('payment_cash',0), d.get('payment_card',0), d.get('tip_amount',0), d.get('tip_method', 'cash'), order_id))
+        (total, now_str, d.get('payment_cash',0), d.get('payment_card',0), d.get('tip_amount',0), d.get('tip_method', 'cash'), order_id))
     conn.execute('DELETE FROM transactions WHERE related_order_id = ?', (order_id,))
     db.record_order_transaction(
         conn, order_id,
         d.get('payment_cash',0), d.get('payment_card',0),
         d.get('tip_amount',0), d.get('tip_method', 'cash'),
-        target_closed_at
+        now_str
     )
     conn.commit()
     conn.close()
@@ -2044,26 +2025,9 @@ def get_git_credentials():
         pass
     return {'username': '', 'token': ''}
 
-def ensure_git_remote_auth():
-    cred = get_git_credentials()
-    username = cred.get('username', '').strip()
-    token = cred.get('token', '').strip()
-    if username and token:
-        try:
-            subprocess.run(
-                ['/usr/bin/git', 'remote', 'set-url', 'origin',
-                 f'https://{username}:{token}@github.com/{username}/firinna-pos.git'],
-                cwd=GIT_DIR,
-                capture_output=True,
-                timeout=10
-            )
-        except Exception:
-            pass
-
 def run_git(args, timeout=30):
     """Git komutunu çalıştır, (success, output) döndür"""
     import os
-    ensure_git_remote_auth()
     env = os.environ.copy()
     env['GIT_TERMINAL_PROMPT'] = '0'
     try:
@@ -2124,7 +2088,12 @@ def api_git_credentials_set():
         with open(GIT_CRED_FILE, 'w') as f:
             _json.dump({'username': username, 'token': token}, f)
         os.chmod(GIT_CRED_FILE, 0o600)
-        ensure_git_remote_auth()
+        if username and token:
+            subprocess.run(
+                ['/usr/bin/git', 'remote', 'set-url', 'origin',
+                 f'https://{username}:{token}@github.com/{username}/firinna-pos.git'],
+                cwd=GIT_DIR
+            )
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
@@ -2132,7 +2101,6 @@ def api_git_credentials_set():
 @app.route('/api/git/status', methods=['GET'])
 def api_git_status():
     """Yerel ile GitHub arasındaki farkı göster"""
-    ensure_git_remote_auth()
     # Önce fetch yap
     run_git(['fetch', 'origin', 'main'])
     
@@ -2167,46 +2135,54 @@ def api_git_status():
 @app.route('/api/git/push', methods=['POST'])
 def api_git_push():
     """Tüm değişiklikleri commit + push (önce pull ile senkronize et)"""
-    ensure_git_remote_auth()
     data = request.json or {}
     msg = data.get('message', '').strip()
     if not msg:
         now = datetime.now().strftime('%d.%m.%Y %H:%M')
         msg = f'Güncelleme — {now}'
 
-    # 1. DB dump al ve dosyaları ekle
+    # 1. Önce commit edilmemiş değişiklikleri stash'e al
+    ok_s, dirty = run_git(['status', '--short'])
+    has_changes = bool(dirty.strip())
+
+    if has_changes:
+        ok1, out1 = run_git(['add', '-A'])
+        if not ok1:
+            return jsonify({'success': False, 'error': 'git add hatası: ' + out1})
+        ok2, out2 = run_git(['commit', '-m', msg])
+        if not ok2:
+            return jsonify({'success': False, 'error': 'git commit hatası: ' + out2})
+
+    # 2. Önce GitHub'dan pull (rebase ile — commit geçmişini temiz tutar)
+    ok_pull, out_pull = run_git(['pull', '--rebase', 'origin', 'main'], timeout=60)
+    if not ok_pull:
+        # Rebase çakışması — abort + force push yerine hata ver
+        run_git(['rebase', '--abort'])
+        return jsonify({'success': False, 'error': 'Pull/rebase hatası: ' + out_pull})
+
+    # 3. DB dump al ve commit'e ekle
     try:
         dump_path = db.dump_database_sql()
         run_git(['add', dump_path])
-    except Exception:
-        pass
+        ok_dc, out_dc = run_git(['commit', '-m', f'DB dump — {datetime.now().strftime("%d.%m.%Y %H:%M")}'])
+    except Exception as e:
+        pass  # dump başarısız olsa da push devam eder
 
-    run_git(['add', '-A'])
-    run_git(['commit', '-m', msg])
-
-    # 2. Önce GitHub'dan pull (autostash ile)
-    ok_pull, out_pull = run_git(['pull', '--autostash', '--rebase', 'origin', 'main'], timeout=60)
-    if not ok_pull:
-        run_git(['rebase', '--abort'])
-        ok_pull, out_pull = run_git(['pull', '--no-rebase', 'origin', 'main', '-m', 'Merge remote changes'], timeout=60)
-        if not ok_pull:
-            return jsonify({'success': False, 'error': 'Pull/rebase hatası: ' + out_pull})
-
-    # 3. Push
+    # 4. Push
     ok3, out3 = run_git(['push', 'origin', 'main'], timeout=60)
     if not ok3:
         return jsonify({'success': False, 'error': 'git push hatası: ' + out3})
 
     return jsonify({
         'success': True,
-        'output': (out_pull + '\n' + out3).strip()
+        'had_changes': has_changes,
+        'output': out_pull + '\n' + out3
     })
 
 
 @app.route('/api/git/pull', methods=['POST'])
 def api_git_pull():
     """GitHub'tan en son sürümü çek — DB dahil"""
-    ensure_git_remote_auth()
     # Önce fetch
     ok_fetch, out_fetch = run_git(['fetch', 'origin', 'main'], timeout=30)
     if not ok_fetch:
@@ -2219,13 +2195,17 @@ def api_git_pull():
     if already_up:
         return jsonify({'success': True, 'already_up': True, 'output': 'Zaten güncel.'})
 
-    # Pull (autostash ile)
-    ok_pull, out_pull = run_git(['pull', '--autostash', '--rebase', 'origin', 'main'], timeout=60)
-    if not ok_pull:
-        run_git(['rebase', '--abort'])
-        ok_pull, out_pull = run_git(['pull', '--no-rebase', 'origin', 'main', '-m', 'Merge remote changes'], timeout=60)
-        if not ok_pull:
-            return jsonify({'success': False, 'error': out_pull})
+    # Yerel commit edilmemiş değişiklik varsa stash'e at
+    ok_s, dirty = run_git(['status', '--short'])
+    if dirty.strip():
+        run_git(['stash', '--include-untracked'])
+
+    # Pull
+    ok, out = run_git(['pull', 'origin', 'main', '--strategy-option=theirs'], timeout=60)
+    if not ok:
+        # Stash'i geri al
+        run_git(['stash', 'pop'])
+        return jsonify({'success': False, 'error': out})
 
     # Servis restart et
     try:
@@ -4806,25 +4786,7 @@ def api_radio_status():
     data = load_radio_data()
     state = dict(data.get('state', {}))
     state['volume'] = get_system_volume()
-    
-    if state.get('source_type') == 'spotify':
-        try:
-            from spotify_integration import get_valid_access_token
-            token = get_valid_access_token()
-            if token:
-                s_res = requests.get('https://api.spotify.com/v1/me/player', headers={'Authorization': f'Bearer {token}'}, timeout=1.5)
-                if s_res.status_code == 200 and s_res.text:
-                    s_data = s_res.json()
-                    if s_data.get('is_playing'):
-                        state['is_playing'] = True
-                        it = s_data.get('item') or {}
-                        artists = ", ".join([a.get('name') for a in it.get('artists', [])])
-                        track_name = it.get('name', 'Spotify Müzik')
-                        state['display_title'] = f"🟢 {track_name} - {artists}"
-                        state['current_title'] = f"{track_name} - {artists}"
-        except Exception:
-            pass
-    elif state.get('is_playing') and state.get('source_type') == 'station':
+    if state.get('is_playing') and state.get('source_type') == 'station':
         live_title = get_live_stream_title_fast(state.get('current_url'))
         if live_title:
             state['live_track_title'] = live_title

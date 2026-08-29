@@ -105,7 +105,7 @@
   "state": {
     "is_playing": true,
     "mode": "shuffle",
-    "source_type": "spotify",
+    "source_type": "station",
     "current_title": "Nashe Radio Ukraine",
     "current_url": "https://online.nasheradio.ua/NasheRadio_HD",
     "current_item_id": "ua_nashe",
@@ -122,7 +122,7 @@
     ],
     "queue_index": 0,
     "tv_audio_enabled": true,
-    "updated_at": 1788019152,
+    "updated_at": 1788019381,
     "volume": 82
   },
   "stations": [
