@@ -1,11 +1,13 @@
-const CACHE_NAME = 'firinna-v1.0';
+const CACHE_NAME = 'firinna-v2.0';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/menu.html',
   '/style.css',
   '/script.js',
-  '/logo.png',
+  '/logo.webp',
+  '/robots.txt',
+  '/sitemap.xml',
   '/web_products.json',
   '/web_categories.json'
 ];
