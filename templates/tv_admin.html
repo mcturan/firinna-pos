@@ -557,7 +557,7 @@
                         <strong style="color:#0f172a; font-size:0.92rem;">Türkçe:</strong>
                         <input type="text" id="ah_title_tr" value="Şu Anda Hizmet Vermemekteyiz" style="flex:1; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-weight:700;">
                     </div>
-                    <textarea id="ah_text_tr" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Değerli misafirlerimiz, şu anda kapalıyız. Sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.</textarea>
+                    <textarea id="ah_text_tr" rows="2" style="width:100%; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.88rem; margin-bottom:6px; box-sizing:border-box;">Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Açılışımızla birlikte sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.</textarea>
                     <input type="text" id="ah_badge_tr" value="☀️ Açılış: Sabah 08:00 (Her Gün)" placeholder="Açılış Rozeti" style="width:100%; padding:5px 10px; border:1px solid #86efac; background:#f0fdf4; border-radius:6px; font-size:0.85rem; font-weight:700; color:#15803d; box-sizing:border-box;">
                 </div>
 
@@ -917,7 +917,7 @@
                 const esMsg = msgs.find(m => m.lang === 'es') || {};
 
                 setVal('ah_title_tr', trMsg.title || 'Şu Anda Hizmet Vermemekteyiz');
-                setVal('ah_text_tr', trMsg.text || 'Değerli misafirlerimiz, şu anda kapalıyız. Sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.');
+                setVal('ah_text_tr', trMsg.text || 'Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Açılışımızla birlikte sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.');
                 setVal('ah_badge_tr', trMsg.badge || trMsg.opening_badge || '☀️ Açılış: Sabah 08:00 (Her Gün)');
 
                 setVal('ah_title_en', enMsg.title || 'We Are Currently Closed');

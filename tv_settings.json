@@ -807,7 +807,7 @@
                 "flag": "🇹🇷",
                 "tag": "🇹🇷 TÜRKÇE",
                 "title": "Şu Anda Hizmet Vermemekteyiz",
-                "text": "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 11:00'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
+                "text": "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Açılışımızla birlikte sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
                 "badge": "☀️ Açılış: Sabah 08:00 (Her Gün)"
             },
             {
@@ -815,7 +815,7 @@
                 "flag": "🇬🇧",
                 "tag": "🇬🇧 ENGLISH",
                 "title": "We Are Currently Closed",
-                "text": "Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 11:00 with fresh bakery and warm hospitality.",
+                "text": "Dear guests, we are currently closed. We look forward to welcoming you with fresh artisan bakery and warm hospitality upon opening.",
                 "badge": "☀️ Opening: 08:00 AM (Daily)"
             },
             {
@@ -823,7 +823,7 @@
                 "flag": "🇷🇺",
                 "tag": "🇷🇺 РУССКИЙ",
                 "title": "В настоящее время мы закрыты",
-                "text": "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 11:00 со свежей выпечкой и горячим чаем.",
+                "text": "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас со свежей выпечкой и горячим чаем к открытию.",
                 "badge": "☀️ Открытие: 08:00 (Ежедневно)"
             },
             {
@@ -831,7 +831,7 @@
                 "flag": "🇸🇦",
                 "tag": "🇸🇦 العربية",
                 "title": "نحن مغلقون حالياً",
-                "text": "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 11:00 صباحاً مع أشهى المخبوزات الطازجة.",
+                "text": "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم مع أشهى المخبوزات الطازجة والضيافة الدافئة عند الافتتاح.",
                 "badge": "☀️ الافتتاح: 08:00 صباحاً (يومياً)"
             },
             {
@@ -839,7 +839,7 @@
                 "flag": "🇪🇸",
                 "tag": "🇪🇸 ESPAÑOL",
                 "title": "Actualmente estamos cerrados",
-                "text": "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 11:00 con nuestros deliciosos productos de panadería.",
+                "text": "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles con nuestros deliciosos productos de panadería artesanal al momento de abrir.",
                 "badge": "☀️ Apertura: 08:00 (Todos los días)"
             }
         ]
@@ -861,7 +861,7 @@
                 "flag": "🇹🇷",
                 "tag": "🇹🇷 TÜRKÇE",
                 "title": "Şu Anda Hizmet Vermemekteyiz",
-                "text": "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Sabah 11:00'de sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
+                "text": "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Açılışımızla birlikte sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
                 "badge": "☀️ Açılış: Sabah 08:00 (Her Gün)"
             },
             {
@@ -869,7 +869,7 @@
                 "flag": "🇬🇧",
                 "tag": "🇬🇧 ENGLISH",
                 "title": "We Are Currently Closed",
-                "text": "Dear guests, we are currently closed. We look forward to welcoming you back tomorrow morning at 11:00 with fresh bakery and warm hospitality.",
+                "text": "Dear guests, we are currently closed. We look forward to welcoming you with fresh artisan bakery and warm hospitality upon opening.",
                 "badge": "☀️ Opening: 08:00 AM (Daily)"
             },
             {
@@ -877,7 +877,7 @@
                 "flag": "🇷🇺",
                 "tag": "🇷🇺 РУССКИЙ",
                 "title": "В настоящее время мы закрыты",
-                "text": "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас завтра в 11:00 со свежей выпечкой и горячим чаем.",
+                "text": "Уважаемые гости, кафе временно закрыто. Будем рады приветствовать вас со свежей выпечкой и горячим чаем к открытию.",
                 "badge": "☀️ Открытие: 08:00 (Ежедневно)"
             },
             {
@@ -885,7 +885,7 @@
                 "flag": "🇸🇦",
                 "tag": "🇸🇦 العربية",
                 "title": "نحن مغلقون حالياً",
-                "text": "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم غداً في تمام الساعة 11:00 صباحاً مع أشهى المخبوزات الطازجة.",
+                "text": "ضيوفنا الأعزاء، نحن حالياً خارج أوقات العمل. يسعدنا استقبالكم مع أشهى المخبوزات الطازجة والضيافة الدافئة عند الافتتاح.",
                 "badge": "☀️ الافتتاح: 08:00 صباحاً (يومياً)"
             },
             {
@@ -893,7 +893,7 @@
                 "flag": "🇪🇸",
                 "tag": "🇪🇸 ESPAÑOL",
                 "title": "Actualmente estamos cerrados",
-                "text": "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles mañana a las 11:00 con nuestros deliciosos productos de panadería.",
+                "text": "Estimados clientes, actualmente estamos fuera del horario de atención. Estaremos encantados de recibirles con nuestros deliciosos productos de panadería artesanal al momento de abrir.",
                 "badge": "☀️ Apertura: 08:00 (Todos los días)"
             }
         ]

@@ -795,6 +795,12 @@
     </div>
 
     <audio id="local-audio" style="display:none;"></audio>
+    <script>
+        (function(){
+            var a = document.getElementById('local-audio');
+            if (a) a.volume = 0.4;
+        })();
+    </script>
 
     <!-- YouTube API Script -->
     <script>
@@ -1425,7 +1431,7 @@
                     lang: "tr",
                     flag: "🇹🇷",
                     title: "Şu Anda Hizmet Vermemekteyiz",
-                    text: "Değerli misafirlerimiz, şu anda kapalıyız. Sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
+                    text: "Değerli misafirlerimiz, şu anda mesai saatleri dışındayız. Açılışımızla birlikte sıcacık taş fırın lezzetlerimiz ve taze çayımızla sizleri ağırlamaktan mutluluk duyacağız.",
                     badge: "☀️ Açılış: Sabah 08:30"
                 },
                 {
@@ -2777,24 +2783,24 @@
         let currentRadioState = null;
         let isAudioUnlocked = false;
         let activePlayingRadioUrl = "";
+        const tvAudEl = document.getElementById('local-audio');
+        if (tvAudEl) {
+            tvAudEl.volume = 0.4;
+        }
 
         // Unlock Web Audio & HTML5 Audio on TV Stick (Handles Bluetooth & WebView autoplay restrictions)
-        function unlockAudioEngine() {
-            if (isAudioUnlocked) return;
+        async function unlockAudioEngine() {
             try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (AudioContext) {
-                    const ctx = new AudioContext();
+                if (window.AudioContext || window.webkitAudioContext) {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
                     ctx.resume().then(() => {
-                        isAudioUnlocked = true;
                         console.log("[AUDIO] AudioContext resumed successfully.");
                     }).catch(e=>{});
                 }
             } catch(e){}
-            const audEl = document.getElementById('local-audio');
-            if (audEl) {
-                audEl.muted = false;
-                audEl.volume = 1.0;
+            if (tvAudEl) {
+                tvAudEl.muted = false;
+                tvAudEl.volume = (currentRadioState && currentRadioState.volume !== undefined) ? (currentRadioState.volume / 100.0) : 0.4;
             }
         }
 
@@ -2808,7 +2814,7 @@
                 const state = await res.json();
                 currentRadioState = state;
 
-                const audEl = document.getElementById('local-audio');
+                const audEl = tvAudEl || document.getElementById('local-audio');
                 const vidEl = document.getElementById('local-video');
 
                 // TV'de video sesi daima sessiz (muted) kalır, radyo sesi öne geçer
@@ -2818,10 +2824,10 @@
                 }
 
                 if (state.is_playing && state.tv_audio_enabled !== false && state.current_url) {
-                    // Make sure audio element is unmuted and volume is 100%
+                    // Make sure audio element is unmuted and volume is applied
                     if (audEl) {
                         audEl.muted = false;
-                        audEl.volume = 1.0;
+                        audEl.volume = (state.volume !== undefined) ? (state.volume / 100.0) : 0.4;
                     }
 
                     // Sadece URL gerçekten değiştiğinde src güncelle ve yükle!
@@ -2852,17 +2858,18 @@
             }
         }
 
+        if (tvAudEl) {
+            tvAudEl.onended = () => {
+                // Managed by backend audio supervisor
+            };
 
-
-        audEl.onended = () => {
-            // Managed by backend audio supervisor
-        };
-
-        audEl.onerror = (e) => {
-            // Ignore background audio glitches on TV client
-        };
+            tvAudEl.onerror = (e) => {
+                // Ignore background audio glitches on TV client
+            };
+        }
 
         syncTvRadioStream();
+        setInterval(syncTvRadioStream, 3000);
     </script>
 </body>
 </html>
