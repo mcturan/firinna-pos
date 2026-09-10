@@ -1170,7 +1170,7 @@ function renderAdminCameras() {
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1.25rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.5rem;">
                 <div style="display:flex; align-items:center; gap:0.5rem;">
-                    <span style="font-weight:700; font-size:1.05rem; color:#1e293b;">📹 ${idx + 1}. Kamera (${escapeHtml(cam.name || cam.id)})</span>
+                    <span style="font-weight:700; font-size:1.05rem; color:#1e293b;">📹 ${idx + 1}. Kamera</span>
                     <span style="font-size:0.75rem; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-family:monospace; font-weight:700;">ID: ${escapeHtml(cam.id)}</span>
                 </div>
                 <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; font-size:0.85rem; font-weight:600; color:#334155;">
