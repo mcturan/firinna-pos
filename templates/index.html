@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fırınna POS</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=2.2">
 </head>
 <body>
     {% include '_navbar.html' %}
@@ -16,48 +16,44 @@
     </div>
 
     <div class="container">
-        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
-            <div class="zone-tabs" id="zoneTabs" style="display:none; margin-bottom:0;"></div>
-            <div style="margin-left:auto; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-                <!-- Entegre Mini Radyo / Müzik Kontrol Kutusu (Saf Uzaktan Kumanda) -->
-                <div id="pageRadioWidget" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.45rem 0.75rem; background:white; border:1.5px solid #cbd5e1; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-                    <!-- Şarkı Adı & Link -->
-                    <div style="display:flex; align-items:center; gap:5px; min-width:0;">
-                        <span style="font-size:1rem;" id="navRadioIcon">📻</span>
-                        <a href="/radio" style="color:#0f172a; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:4px; min-width:0;" title="Radyo & Müzik Yönetimini Aç">
-                            <span id="navRadioTitle" style="max-width:140px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:inline-block; font-size:0.84rem;">Hazır</span>
-                            <span id="navRadioModeBadge" style="background:#f1f5f9; color:#64748b; font-size:0.65rem; padding:1px 4px; border-radius:3px; flex-shrink:0;">🔁</span>
-                        </a>
-                    </div>
-
-                    <!-- Kontroller -->
-                    <div style="display:flex; align-items:center; gap:3px; flex-shrink:0; margin-left:2px;">
-                        <button onclick="navRadioControl('prev')" style="background:#f1f5f9; border:1px solid #e2e8f0; border-radius:5px; color:#475569; cursor:pointer; font-size:0.8rem; padding:3px 6px;" title="Önceki">⏮</button>
-                        <button onclick="navRadioTogglePlay()" id="navRadioPlayBtn" style="background:#2d6a4f; color:white; border:none; border-radius:5px; padding:3px 8px; font-size:0.78rem; font-weight:700; cursor:pointer;">▶ Çal</button>
-                        <button onclick="navRadioControl('next')" style="background:#f1f5f9; border:1px solid #e2e8f0; border-radius:5px; color:#475569; cursor:pointer; font-size:0.8rem; padding:3px 6px;" title="Sonraki">⏭</button>
-                    </div>
-
-                    <!-- Ayar Linki -->
-                    <a href="/radio" style="color:#2563eb; text-decoration:none; font-weight:700; font-size:0.85rem; padding:0 2px;" title="Müzik Yönetimi">⚙️</a>
-                </div>
-
-                <!-- Web Status Toggle -->
-                <div style="display:inline-flex; align-items:center; gap:0.4rem; padding:0.45rem 0.6rem; background:white; border:1.5px solid #cbd5e1; border-radius:10px; font-weight:700; color:#334155; font-size:0.84rem; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-                    <span style="font-size:1rem;">🌐</span>
-                    <span>Web:</span>
-                    <select id="webStatusSelect" onchange="updateWebStatus(this.value)" style="border:none; outline:none; background:transparent; font-weight:700; color:#2563eb; cursor:pointer; font-family:inherit; font-size:0.84rem;">
+        <!-- En Üst Logo ve Başlık Alanı -->
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 0.5rem; margin-bottom: 1.25rem;">
+            <img src="/static/uploads/logo.png" alt="Fırınna Logo" onerror="this.style.display='none'" style="max-height: 80px; max-width: 220px; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); margin-bottom: 0.85rem;">
+            
+            <!-- Butonlar (Dükkan Açılış, Radyo Teyp, Hızlı Not) -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; flex-wrap: wrap; width: 100%;">
+                <!-- Web Status Toggle (Dükkan Açılış / Kapanış) -->
+                <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.75rem; background: white; border: 1.5px solid #cbd5e1; border-radius: 12px; font-weight: 700; color: #334155; font-size: 0.85rem; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                    <span style="font-size: 1.05rem;">🌐</span>
+                    <span>Dükkan:</span>
+                    <select id="webStatusSelect" onchange="updateWebStatus(this.value)" style="border: none; outline: none; background: transparent; font-weight: 700; color: #2563eb; cursor: pointer; font-family: inherit; font-size: 0.85rem;">
                         <option value="auto">⏱️ Otomatik</option>
                         <option value="open">🟢 Manuel Açık</option>
                         <option value="closed">🔴 Manuel Kapalı</option>
                     </select>
                 </div>
 
-                <button onclick="openQuickNotePrintModal()" style="display:inline-flex; align-items:center; gap:0.4rem; padding:0.45rem 0.9rem; background:white; border:1.5px solid #cbd5e1; border-radius:10px; font-weight:700; color:#334155; font-size:0.84rem; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.03); transition:all 0.2s;" onmouseover="this.style.borderColor='#94a3b8'; this.style.background='#f8fafc';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='white';">
-                    <span style="font-size:1rem;">📋</span>
+                <!-- Radyo & Teyp Müzik Çalar Butonu -->
+                <button onclick="openRadioPlayerModal()" id="btnTopRadio" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.95rem; background: white; border: 1.5px solid #cbd5e1; border-radius: 12px; font-weight: 700; color: #334155; font-size: 0.85rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.03); transition: all 0.2s;" onmouseover="this.style.borderColor='#94a3b8'; this.style.background='#f8fafc';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='white';" title="Fırınna Teyp & Radyo Çalar">
+                    <span id="topRadioIcon" style="font-size: 1.15rem;">📻</span>
+                    <!-- Canlı Ekolayzır -->
+                    <div id="topRadioEqBars" style="display: none; align-items: flex-end; gap: 2px; height: 12px;">
+                        <div style="width: 2.5px; height: 35%; background: #10b981; border-radius: 1px; animation: navEqBounce 0.9s infinite alternate;"></div>
+                        <div style="width: 2.5px; height: 90%; background: #38bdf8; border-radius: 1px; animation: navEqBounce 1.3s infinite alternate 0.2s;"></div>
+                        <div style="width: 2.5px; height: 60%; background: #10b981; border-radius: 1px; animation: navEqBounce 0.7s infinite alternate 0.4s;"></div>
+                    </div>
+                    <span id="topRadioTitle" style="max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Müzik Çalar</span>
+                </button>
+
+                <!-- Hızlı Not Fişi Butonu -->
+                <button onclick="openQuickNotePrintModal()" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.95rem; background: white; border: 1.5px solid #cbd5e1; border-radius: 12px; font-weight: 700; color: #334155; font-size: 0.85rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.03); transition: all 0.2s;" onmouseover="this.style.borderColor='#94a3b8'; this.style.background='#f8fafc';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='white';">
+                    <span style="font-size: 1.05rem;">📋</span>
                     <span>Hızlı Not Fişi</span>
                 </button>
             </div>
         </div>
+
+        <div class="zone-tabs" id="zoneTabs" style="display:none; margin-bottom:0;"></div>
         <div class="tables-grid" id="tablesGrid"></div>
 
         <!-- Bugünün Siparişleri — Collapsible & Modal Panel -->
@@ -879,7 +875,6 @@
                 
                 tablesGrid.innerHTML = `
                     <div class="blueprint-wrapper">
-                        <img id="blueprintLogo" src="/static/uploads/logo.png" onerror="this.style.display='none'" alt="Logo" class="blueprint-logo">
                         <div class="blueprint-container">
                             <div class="blueprint-side" onclick="window.location.href='/kitchen'">
                                 <div class="icon">🧑‍🍳</div>
@@ -1637,6 +1632,21 @@
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        async function printHistoryReceipt(orderId) {
+            if (!orderId) return;
+            try {
+                showToast('Fiş yazdırılıyor...', 'info');
+                const result = await fetch(`/api/print/receipt/${orderId}`, {method: 'POST'}).then(r => r.json());
+                if (result.success) {
+                    showToast('Fiş başarıyla yazdırıldı', 'success');
+                } else {
+                    showToast('Yazıcı hatası: ' + (result.error || 'Bilinmiyor'), 'error');
+                }
+            } catch (err) {
+                showToast('Yazıcı bağlantı hatası', 'error');
+            }
         }
 
         async function loadHistoryPanel() {
@@ -2437,6 +2447,305 @@ async function doMerge(targetTableId, targetTableName) {
             </div>
         </div>
     </div>
+
+    <!-- Fırınna Retro Teyp & Radyo Çalar Modalı (Garson ve Masaüstü Tam Kontrol) -->
+    <div id="radioPlayerModal" class="modal">
+        <div class="modal-content" style="max-width: 600px; border-radius: 18px; overflow: hidden; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); color: #f8fafc; border: 1.5px solid #475569; box-shadow: 0 16px 36px rgba(0,0,0,0.6);">
+            <!-- Modal Header -->
+            <div class="modal-header" style="background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid rgba(255,255,255,0.12); padding: 0.9rem 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.3rem;">📻</span>
+                    <div>
+                        <h2 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0; line-height: 1.2;">Fırınna Teyp & Müzik Çalar</h2>
+                        <span style="font-size: 0.72rem; color: #94a3b8;">Merkezi Müzik ve Radyo Kontrolü</span>
+                    </div>
+                </div>
+                <span class="close" onclick="closeRadioPlayerModal()" style="color: #94a3b8; font-size: 1.6rem; cursor: pointer; line-height: 1;">&times;</span>
+            </div>
+            
+            <div style="padding: 1.25rem; display: flex; flex-direction: column; gap: 14px;">
+                <!-- Retro Kaset & Dijital Gösterge Bloğu -->
+                <div style="background: #020617; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 14px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                        <!-- Sol: Dönen Kaset Makarası & Başlık -->
+                        <div style="display: flex; align-items: center; gap: 12px; min-width: 220px; flex: 1;">
+                            <div style="position: relative; width: 46px; height: 46px; border-radius: 10px; background: #0f172a; border: 1.5px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;" id="rpmIconBox">
+                                <span id="rpmNowPlayingIcon" style="font-size: 1.4rem; z-index: 1;">📻</span>
+                                <div id="rpmTapeSpin" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; opacity: 0.2; border: 3px dashed #10b981; display: none; animation: spin 3s linear infinite;"></div>
+                            </div>
+
+                            <div style="min-width: 0; flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+                                    <span id="rpmBadge" style="background: rgba(16,185,129,0.2); color: #34d399; font-size: 0.68rem; font-weight: 800; padding: 1px 7px; border-radius: 10px; text-transform: uppercase; border: 1px solid rgba(16,185,129,0.3);">RADYO</span>
+                                    <div id="rpmEqBars" style="display: none; align-items: flex-end; gap: 2px; height: 12px;">
+                                        <div style="width: 2.5px; height: 35%; background: #10b981; border-radius: 1px; animation: navEqBounce 0.9s infinite alternate;"></div>
+                                        <div style="width: 2.5px; height: 90%; background: #38bdf8; border-radius: 1px; animation: navEqBounce 1.3s infinite alternate 0.2s;"></div>
+                                        <div style="width: 2.5px; height: 60%; background: #10b981; border-radius: 1px; animation: navEqBounce 0.7s infinite alternate 0.4s;"></div>
+                                    </div>
+                                </div>
+                                <div id="rpmTitle" style="font-size: 1.05rem; font-weight: 800; color: #38bdf8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Hazır / Durduruldu</div>
+                            </div>
+                        </div>
+
+                        <!-- Sağ: Eski Teyp Dijital Sayaç -->
+                        <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 12px; display: flex; align-items: center; gap: 12px; font-family: 'Courier New', Courier, monospace;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.6rem; color: #64748b; text-transform: uppercase; font-weight: 800; font-family: sans-serif;">GEÇEN</div>
+                                <div id="rpmElapsed" style="font-size: 1.05rem; font-weight: 800; color: #38bdf8;">00:00</div>
+                            </div>
+                            <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.15);"></div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.6rem; color: #64748b; text-transform: uppercase; font-weight: 800; font-family: sans-serif;">TOPLAM</div>
+                                <div id="rpmDuration" style="font-size: 1.05rem; font-weight: 800; color: #a7f3d0;">--:--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- İnteraktif Süre & İlerleme Çubuğu (YouTube Tarzı Scrub) -->
+                    <div style="margin-top: 12px;">
+                        <div id="rpmSeekBar" onclick="rpmSeekClick(event)" style="width: 100%; height: 16px; display: flex; align-items: center; cursor: pointer; position: relative;">
+                            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; position: relative; pointer-events: none;">
+                                <div id="rpmProgressFill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981, #38bdf8); transition: width 0.3s linear;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kontrol Butonları & Teyp Fonksiyonları -->
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                    <!-- Oynatıcı Düğmeleri -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="btn" onclick="rpmControl('prev')" title="Önceki" style="background: #334155; color: white; border: none; border-radius: 10px; padding: 0.55rem 0.9rem; font-size: 1.1rem; cursor: pointer;">⏮</button>
+                        <button id="rpmPlayBtn" class="btn" onclick="rpmTogglePlay()" style="background: #10b981; color: white; border: none; border-radius: 12px; padding: 0.6rem 1.6rem; font-size: 1.05rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.3);">▶ Oynat</button>
+                        <button class="btn" onclick="rpmControl('next')" title="Sonraki" style="background: #334155; color: white; border: none; border-radius: 10px; padding: 0.55rem 0.9rem; font-size: 1.1rem; cursor: pointer;">⏭</button>
+                        <button id="rpmModeBtn" class="btn" onclick="rpmControl('toggle_mode')" style="background: #334155; color: white; border: none; border-radius: 10px; padding: 0.55rem 0.85rem; font-size: 0.85rem; cursor: pointer;" title="Çalma Modu">🔁 Sıralı</button>
+                    </div>
+
+                    <!-- Donanımsal Ses Kontrolü -->
+                    <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px;">
+                        <button onclick="rpmToggleMute()" id="rpmMuteBtn" style="background: none; border: none; font-size: 1.15rem; cursor: pointer; color: white; padding: 0; display: flex; align-items: center;">🔊</button>
+                        <button onclick="rpmStepVolume(-5)" style="background: none; border: none; font-size: 1.4rem; font-weight: bold; cursor: pointer; color: white; padding: 0 4px;" title="Sesi Azalt">-</button>
+                        <input type="range" id="rpmVolSlider" min="0" max="100" value="40" oninput="rpmOnVolume(this.value)" onchange="rpmOnVolumeChange(this.value)" style="width: 200px; height: 6px; accent-color: #10b981; cursor: pointer;">
+                        <button onclick="rpmStepVolume(5)" style="background: none; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; color: white; padding: 0 4px;" title="Sesi Artır">+</button>
+                        <span id="rpmVolText" style="font-size: 0.82rem; font-weight: 800; color: #a7f3d0; min-width: 38px; text-align: right;">%40</span>
+                    </div>
+                </div>
+
+                <!-- Hızlı Seçenekler -->
+                <div style="display: flex; gap: 8px; margin-top: 2px;">
+                    <button onclick="rpmPlayFolder()" style="flex: 1; padding: 0.65rem; background: #0369a1; color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <span>📁</span> Müzik Arşivini Çal
+                    </button>
+                    <a href="/radio" style="text-align: center; flex: 1; padding: 0.65rem; background: #334155; color: white; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 0.84rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <span>⚙️</span> Radyo Yönetim Paneli ↗
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    let rpmState = {};
+    let rpmIsDraggingVol = false;
+    let rpmVolTimer = null;
+
+    async function openRadioPlayerModal() {
+        document.getElementById('radioPlayerModal').style.display = 'block';
+        await syncRpmStatus();
+    }
+
+    function closeRadioPlayerModal() {
+        document.getElementById('radioPlayerModal').style.display = 'none';
+    }
+
+    async function syncRpmStatus() {
+        try {
+            const res = await fetch('/api/radio/status?_t=' + Date.now());
+            const st = await res.json();
+            rpmState = st;
+            updateRpmUI(st);
+        } catch(e) {}
+    }
+
+    function updateRpmUI(st) {
+        const topIcon = document.getElementById('topRadioIcon');
+        const topTitle = document.getElementById('topRadioTitle');
+        const topEq = document.getElementById('topRadioEqBars');
+        const btnTopRadio = document.getElementById('btnTopRadio');
+
+        const titleText = st.display_title || st.current_title || 'Fırınna Müzik';
+        if (topTitle) topTitle.textContent = titleText;
+        if (topIcon) topIcon.textContent = st.is_playing ? '🔊' : '📻';
+        if (topEq) topEq.style.display = st.is_playing ? 'inline-flex' : 'none';
+        if (btnTopRadio) {
+            btnTopRadio.style.borderColor = st.is_playing ? '#10b981' : '#cbd5e1';
+            btnTopRadio.style.background = st.is_playing ? '#f0fdf4' : 'white';
+        }
+
+        const rpmTitle = document.getElementById('rpmTitle');
+        const rpmPlayBtn = document.getElementById('rpmPlayBtn');
+        const rpmEqBars = document.getElementById('rpmEqBars');
+        const rpmTapeSpin = document.getElementById('rpmTapeSpin');
+        const rpmModeBtn = document.getElementById('rpmModeBtn');
+        const rpmBadge = document.getElementById('rpmBadge');
+        const rpmVolSlider = document.getElementById('rpmVolSlider');
+        const rpmVolText = document.getElementById('rpmVolText');
+        const rpmMuteBtn = document.getElementById('rpmMuteBtn');
+
+        if (rpmTitle) rpmTitle.textContent = titleText;
+        if (rpmEqBars) rpmEqBars.style.display = st.is_playing ? 'inline-flex' : 'none';
+        if (rpmTapeSpin) rpmTapeSpin.style.display = st.is_playing ? 'block' : 'none';
+        if (rpmPlayBtn) {
+            rpmPlayBtn.textContent = st.is_playing ? '⏸ Duraklat' : '▶ Oynat';
+            rpmPlayBtn.style.background = st.is_playing ? '#2563eb' : '#10b981';
+        }
+        if (rpmModeBtn) {
+            rpmModeBtn.textContent = st.mode === 'shuffle' ? '🔀 Karışık' : '🔁 Sıralı';
+        }
+        if (rpmBadge) {
+            if (st.source_type === 'station') rpmBadge.textContent = 'CANLI RADYO';
+            else if (st.source_type === 'custom_url') rpmBadge.textContent = 'YOUTUBE / URL';
+            else rpmBadge.textContent = 'MÜZİK ARŞİVİ';
+        }
+
+        if (!rpmIsDraggingVol && st.volume !== undefined) {
+            if (rpmVolSlider) rpmVolSlider.value = st.volume;
+            if (rpmVolText) rpmVolText.textContent = '%' + st.volume;
+            if (rpmMuteBtn) rpmMuteBtn.textContent = st.volume > 0 ? (st.volume > 50 ? '🔊' : '🔉') : '🔇';
+        }
+
+        // Progress bar
+        const dur = st.duration || 0;
+        const el = st.elapsed || 0;
+        const fmt = (sec) => {
+            sec = Math.floor(sec || 0);
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        };
+        const elSpan = document.getElementById('rpmElapsed');
+        const durSpan = document.getElementById('rpmDuration');
+        const fill = document.getElementById('rpmProgressFill');
+        if (elSpan) elSpan.textContent = fmt(el);
+        if (durSpan) durSpan.textContent = dur > 0 ? fmt(dur) : (st.source_type === 'station' ? 'CANLI' : '--:--');
+        if (fill) {
+            const pct = dur > 0 ? Math.min(100, Math.max(0, (el / dur) * 100)) : (st.is_playing ? 100 : 0);
+            fill.style.width = pct + '%';
+        }
+    }
+
+    async function rpmControl(action, payload = {}) {
+        try {
+            const res = await fetch('/api/radio/control', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, ...payload })
+            });
+            const d = await res.json();
+            if (d.success) {
+                rpmState = d.state;
+                updateRpmUI(d.state);
+            }
+        } catch(e) {}
+    }
+
+    function rpmTogglePlay() {
+        rpmControl(rpmState.is_playing ? 'pause' : 'play');
+    }
+
+    function rpmOnVolume(val) {
+        rpmIsDraggingVol = true;
+        const vol = parseInt(val, 10);
+        document.getElementById('rpmVolText').textContent = '%' + vol;
+        document.getElementById('rpmMuteBtn').textContent = vol > 0 ? (vol > 50 ? '🔊' : '🔉') : '🔇';
+        clearTimeout(rpmVolTimer);
+        rpmVolTimer = setTimeout(() => {
+            fetch('/api/radio/volume', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ volume: vol })
+            });
+        }, 50);
+    }
+
+    function rpmOnVolumeChange(val) {
+        const vol = parseInt(val, 10);
+        fetch('/api/radio/volume', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ volume: vol })
+        });
+        setTimeout(() => { rpmIsDraggingVol = false; }, 400);
+    }
+
+    function rpmStepVolume(delta) {
+        const slider = document.getElementById('rpmVolSlider');
+        if (!slider) return;
+        let cur = parseInt(slider.value, 10) || 0;
+        let target = Math.max(0, Math.min(100, cur + delta));
+        slider.value = target;
+        const volText = document.getElementById('rpmVolText');
+        const muteBtn = document.getElementById('rpmMuteBtn');
+        if (volText) volText.textContent = '%' + target;
+        if (muteBtn) muteBtn.textContent = target > 0 ? (target > 50 ? '🔊' : '🔉') : '🔇';
+        rpmOnVolumeChange(target);
+    }
+
+    function rpmToggleMute() {
+        const slider = document.getElementById('rpmVolSlider');
+        if (!slider) return;
+        let cur = parseInt(slider.value, 10);
+        if (cur > 0) {
+            slider.value = 0;
+            const volText = document.getElementById('rpmVolText');
+            const muteBtn = document.getElementById('rpmMuteBtn');
+            if (volText) volText.textContent = '%0';
+            if (muteBtn) muteBtn.textContent = '🔇';
+            rpmOnVolumeChange(0);
+        } else {
+            slider.value = 80;
+            const volText = document.getElementById('rpmVolText');
+            const muteBtn = document.getElementById('rpmMuteBtn');
+            if (volText) volText.textContent = '%80';
+            if (muteBtn) muteBtn.textContent = '🔊';
+            rpmOnVolumeChange(80);
+        }
+    }
+
+    function rpmSeekClick(e) {
+        if (!rpmState.duration || rpmState.duration <= 0) return;
+        const bar = document.getElementById('rpmSeekBar');
+        const rect = bar.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const pct = Math.max(0, Math.min(1, clickX / rect.width));
+        const targetSec = pct * rpmState.duration;
+        rpmControl('seek', { position: targetSec });
+    }
+
+    async function rpmPlayFolder() {
+        try {
+            const res = await fetch('/api/radio/library');
+            const data = await res.json();
+            if (data.all_tracks && data.all_tracks.length > 0) {
+                rpmControl('play_queue', {
+                    items: data.all_tracks,
+                    start_index: 0,
+                    source_type: 'folder',
+                    title_prefix: 'Tüm Arşiv'
+                });
+                showToast('Müzik kütüphanesi başlatıldı', 'success');
+            } else {
+                showToast('Kütüphanede müzik bulunamadı', 'warn');
+            }
+        } catch(e) {
+            showToast('Kütüphaneye erişilemedi', 'error');
+        }
+    }
+
+    // Periyodik radyo durumu eşitleme
+    setInterval(syncRpmStatus, 3000);
+    document.addEventListener('DOMContentLoaded', syncRpmStatus);
+</script>
 <!-- Garson Mode Script -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -2708,6 +3017,41 @@ async function promptSplitTable() {
     }
 }
 
+async function printOrderDirect(orderId) {
+    try {
+        const res = await fetch(`/api/print/receipt/${orderId}`, {method: 'POST'}).then(r => r.json());
+        if(res.success) showToast('Fiş yazdırıldı', 'success');
+        else showToast('Yazdırma hatası: ' + (res.error || ''), 'error');
+    } catch (e) {
+        showToast('Yazıcı bağlantı hatası', 'error');
+    }
+}
+
+async function quickPayDirect(orderId, total) {
+    const payType = confirm(`Fiş Toplamı: ${fmtTL(total)}\n\nNAKİT ile hesabı kapatmak için "Tamam" (OK) tıklayın.\nKART ile kapatmak için "İptal" (Cancel) tıklayın.\n\nNot: Bu işlem hesabı anında kapatır!`);
+    const pTypeStr = payType ? 'cash' : 'card';
+    
+    if(!confirm(`Tüm hesap (${fmtTL(total)}) ${pTypeStr==='cash'?'NAKİT':'KREDİ KARTI'} olarak kapatılacak. Onaylıyor musunuz?`)) return;
+    
+    try {
+        await fetch(`/api/orders/${orderId}/close-with-payment`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                payment_cash: pTypeStr === 'cash' ? total : 0,
+                payment_card: pTypeStr === 'card' ? total : 0,
+                tip_amount: 0,
+                tip_method: 'cash',
+                closed_at: getCustomDatetime()
+            })
+        });
+        showToast('Hesap başarıyla kapatıldı!', 'success');
+        refreshZone();
+    } catch(e) {
+        showToast('Hesap kapatılamadı', 'error');
+    }
+}
+
 async function cancelOrder() {
     if (!confirm("Fişi iptal etmek istediğinize emin misiniz?\n\nTüm ürünler silinecek!")) return;
 
@@ -2718,42 +3062,7 @@ async function cancelOrder() {
             const d = await r.json();
             if (!d.success) { showToast('Silme hatası: ' + (d.error||'bilinmeyen'), 'error'); return; }
         } catch (e) {
-            showToast('Yazıcıya bağlanılamadı.', 'error');
-        }
-    }
-
-    async function printOrderDirect(orderId) {
-        try {
-            const res = await fetch(`/api/print/receipt/${orderId}`, {method: 'POST'}).then(r => r.json());
-            if(res.success) showToast('Fiş yazdırıldı', 'success');
-            else showToast('Yazdırma hatası', 'error');
-        } catch (e) {
-            showToast('Yazıcı bağlantı hatası', 'error');
-        }
-    }
-    
-    async function quickPayDirect(orderId, total) {
-        const payType = confirm(`Fiş Toplamı: ${fmtTL(total)}\n\nNAKİT ile hesabı kapatmak için "Tamam" (OK) tıklayın.\nKART ile kapatmak için "İptal" (Cancel) tıklayın.\n\nNot: Bu işlem hesabı anında kapatır!`);
-        const pTypeStr = payType ? 'cash' : 'card';
-        
-        if(!confirm(`Tüm hesap (${fmtTL(total)}) ${pTypeStr==='cash'?'NAKİT':'KREDİ KARTI'} olarak kapatılacak. Onaylıyor musunuz?`)) return;
-        
-        try {
-            await fetch(`/api/orders/${orderId}/close-with-payment`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    payment_cash: pTypeStr === 'cash' ? total : 0,
-                    payment_card: pTypeStr === 'card' ? total : 0,
-                    tip_amount: 0,
-                    tip_method: 'cash',
-                    closed_at: getCustomDatetime()
-                })
-            });
-            showToast('Hesap başarıyla kapatıldı!', 'success');
-            refreshZone();
-        } catch(e) {
-            showToast('Hesap kapatılamadı', 'error');
+            showToast('Hata oluştu.', 'error');
         }
     }
 
@@ -3049,4 +3358,573 @@ async function submitQuickNotePrint() {
         showToast('Yazdırma sunucusuna ulaşılamadı', 'error');
     }
 }
+</script>
+
+<!-- DİKEY GÜVENLİK KAMERALARI YAN PANELİ (SAĞ TARAF) -->
+<style>
+    /* Canlı yeşil yanıp sönen nokta */
+    .cam-pulse-dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background: #16a34a;
+        border-radius: 50%;
+        box-shadow: 0 0 6px #16a34a;
+        animation: camPulse 1.8s infinite;
+    }
+    @keyframes camPulse {
+        0% { transform: scale(0.95); opacity: 0.8; }
+        50% { transform: scale(1.3); opacity: 1; }
+        100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* Sayfa sağ taraf dikey kamera paneli */
+    #cameraDockWrapper {
+        position: fixed;
+        right: 12px;
+        top: 68px;
+        z-index: 450;
+        font-family: inherit;
+    }
+
+    .cam-dock-panel {
+        width: 235px;
+        background: #0f172a;
+        border: 1.5px solid #334155;
+        border-radius: 14px;
+        box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.55);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 80px);
+        transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+    }
+
+    .cam-dock-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: #1e293b;
+        border-bottom: 1px solid #334155;
+        user-select: none;
+    }
+
+    .cam-dock-title {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #f8fafc;
+        font-size: 0.85rem;
+        font-weight: 800;
+    }
+
+    .cam-dock-close-btn {
+        background: #334155;
+        border: 1px solid #475569;
+        color: #94a3b8;
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        line-height: 1;
+    }
+    .cam-dock-close-btn:hover {
+        background: #dc2626;
+        border-color: #ef4444;
+        color: white;
+    }
+
+    .cam-dock-list {
+        padding: 9px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+
+    .cam-vcard {
+        background: #1e293b;
+        border: 1.5px solid #334155;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+        transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .cam-vcard:hover {
+        transform: translateY(-2px) scale(1.02);
+        border-color: #38bdf8;
+        box-shadow: 0 6px 14px rgba(14, 165, 233, 0.35);
+    }
+
+    .cam-vcard-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 8px;
+        background: rgba(15, 23, 42, 0.92);
+        position: relative;
+        z-index: 2;
+    }
+
+    .cam-vcard-name {
+        font-size: 0.78rem;
+        font-weight: 800;
+        color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .cam-dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background: #22c55e;
+        border-radius: 50%;
+        box-shadow: 0 0 6px #22c55e;
+    }
+    .cam-vcard-time {
+        font-size: 0.68rem;
+        color: #94a3b8;
+        font-family: monospace;
+        font-weight: 600;
+    }
+
+    .cam-vcard-thumb {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #020617;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .cam-vcard-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.2s ease;
+    }
+    .cam-vcard:hover .cam-vcard-thumb img {
+        transform: scale(1.04);
+    }
+
+    .cam-vcard-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.32);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+    }
+    .cam-vcard:hover .cam-vcard-overlay {
+        opacity: 1;
+    }
+    .cam-vcard-overlay span {
+        background: rgba(14, 165, 233, 0.95);
+        color: #ffffff;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+    }
+
+    /* Küçültülmüş Kenar Butonu (Collapsed Tab) */
+    .cam-dock-tab {
+        display: none;
+        position: fixed;
+        right: 0;
+        top: 110px;
+        background: #0f172a;
+        border: 1.5px solid #334155;
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        padding: 10px 6px;
+        cursor: pointer;
+        flex-direction: column;
+        align-items: center;
+        color: #f8fafc;
+        box-shadow: -4px 0 15px rgba(0, 0, 0, 0.35);
+        transition: all 0.2s ease;
+        user-select: none;
+        z-index: 450;
+    }
+    .cam-dock-tab:hover {
+        background: #1e293b;
+        border-color: #38bdf8;
+        color: #38bdf8;
+        padding-right: 9px;
+    }
+    .cam-dock-tab-text {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        margin: 4px 0;
+        color: #cbd5e1;
+    }
+
+    /* Masalar ve Bugünün Siparişleri Alanını Daraltarak Kameraların Üste Gelmesini Önler */
+    body.cams-sidebar-open .container {
+        padding-right: 258px !important;
+        transition: padding-right 0.2s ease;
+    }
+    @media (max-width: 900px) {
+        body.cams-sidebar-open .container {
+            padding-right: 1.25rem !important;
+        }
+        #cameraDockWrapper {
+            right: 6px;
+            top: 60px;
+        }
+        .cam-dock-panel {
+            width: 175px;
+        }
+    }
+
+    /* Canlı Video Modal Stilleri */
+    #cameraModal {
+        display: none;
+        position: fixed;
+        z-index: 99999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        box-sizing: border-box;
+    }
+    .camera-modal-content {
+        background: #0f172a;
+        border: 1.5px solid #334155;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 1080px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .camera-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1.15rem;
+        background: #1e293b;
+        border-bottom: 1px solid #334155;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .cam-modal-pills {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+    }
+    .cam-pill-btn {
+        background: #334155;
+        border: 1px solid #475569;
+        color: #cbd5e1;
+        padding: 0.3rem 0.7rem;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: inherit;
+    }
+    .cam-pill-btn:hover {
+        background: #475569;
+        color: white;
+    }
+    .cam-pill-btn.active {
+        background: #0284c7;
+        border-color: #38bdf8;
+        color: white;
+        box-shadow: 0 0 10px rgba(14, 165, 233, 0.4);
+    }
+    .camera-video-wrapper {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #000000;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .camera-video-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: #000;
+    }
+</style>
+
+<!-- SAĞ KENAR DİKEY KAMERA YAN PANELİ -->
+<div id="cameraDockWrapper">
+    <!-- Açık Panel -->
+    <div id="cameraSidebarPanel" class="cam-dock-panel">
+        <div class="cam-dock-header">
+            <div class="cam-dock-title">
+                <span style="font-size: 1rem;">📹</span>
+                <span>Kameralar</span>
+                <span class="cam-pulse-dot" title="Canlı Önizleme (1 sn)"></span>
+                <span style="font-size: 0.65rem; background: #15803d; color: white; padding: 1px 5px; border-radius: 4px; font-weight: 700;">1 sn</span>
+            </div>
+            <button type="button" onclick="toggleCameraSidebar(false)" class="cam-dock-close-btn" title="Gizle">
+                ✕
+            </button>
+        </div>
+        <div class="cam-dock-list">
+            <!-- 1: Masalar 1 -->
+            <div class="cam-vcard" onclick="openCameraLiveModal('masalar1', 'Masalar 1')">
+                <div class="cam-vcard-bar">
+                    <span class="cam-vcard-name"><span class="cam-dot"></span>Masalar 1</span>
+                    <span class="cam-vcard-time" id="cam-time-masalar1">--:--:--</span>
+                </div>
+                <div class="cam-vcard-thumb">
+                    <img id="cam-img-masalar1" src="/api/camera/snapshot/masalar1" alt="Masalar 1" loading="eager">
+                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
+                </div>
+            </div>
+
+            <!-- 2: Masalar 2 -->
+            <div class="cam-vcard" onclick="openCameraLiveModal('masalar2', 'Masalar 2')">
+                <div class="cam-vcard-bar">
+                    <span class="cam-vcard-name"><span class="cam-dot"></span>Masalar 2</span>
+                    <span class="cam-vcard-time" id="cam-time-masalar2">--:--:--</span>
+                </div>
+                <div class="cam-vcard-thumb">
+                    <img id="cam-img-masalar2" src="/api/camera/snapshot/masalar2" alt="Masalar 2" loading="eager">
+                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
+                </div>
+            </div>
+
+            <!-- 3: Kapı -->
+            <div class="cam-vcard" onclick="openCameraLiveModal('kapi', 'Kapı')">
+                <div class="cam-vcard-bar">
+                    <span class="cam-vcard-name"><span class="cam-dot"></span>Kapı</span>
+                    <span class="cam-vcard-time" id="cam-time-kapi">--:--:--</span>
+                </div>
+                <div class="cam-vcard-thumb">
+                    <img id="cam-img-kapi" src="/api/camera/snapshot/kapi" alt="Kapı" loading="eager">
+                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
+                </div>
+            </div>
+
+            <!-- 4: Mutfak -->
+            <div class="cam-vcard" onclick="openCameraLiveModal('mutfak', 'Mutfak')">
+                <div class="cam-vcard-bar">
+                    <span class="cam-vcard-name"><span class="cam-dot"></span>Mutfak</span>
+                    <span class="cam-vcard-time" id="cam-time-mutfak">--:--:--</span>
+                </div>
+                <div class="cam-vcard-thumb">
+                    <img id="cam-img-mutfak" src="/api/camera/snapshot/mutfak" alt="Mutfak" loading="eager">
+                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Küçültülmüş Kenar Sekmesi (Collapsed Tab) -->
+    <div id="cameraCollapsedTab" class="cam-dock-tab" onclick="toggleCameraSidebar(true)" title="Kameraları Göster">
+        <span style="font-size: 1.1rem;">📹</span>
+        <span class="cam-pulse-dot" style="margin: 3px 0;"></span>
+        <span class="cam-dock-tab-text">KAMERALAR</span>
+        <span style="font-size: 0.7rem; margin-top: 3px;">◀</span>
+    </div>
+</div>
+
+<!-- GÜVENLİK KAMERALARI CANLI AKIŞ MODALI -->
+<div id="cameraModal" onclick="onCameraModalBackdrop(event)">
+    <div class="camera-modal-content" onclick="event.stopPropagation()">
+        <div class="camera-modal-header">
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.4rem; color: #f8fafc; font-weight: 800; font-size: 1rem;">
+                    <span style="display:inline-block; width:8px; height:8px; background:#ef4444; border-radius:50%; box-shadow:0 0 8px #ef4444; animation: camPulse 1.2s infinite;"></span>
+                    <span id="cameraModalTitle">Masalar 1</span>
+                    <span style="font-size: 0.7rem; background: #dc2626; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800; letter-spacing: 0.5px;">CANLI (WebRTC)</span>
+                </div>
+                <!-- Kamera Değiştirme Butonları -->
+                <div class="cam-modal-pills">
+                    <button type="button" class="cam-pill-btn" data-cam="masalar1" onclick="switchCameraLive('masalar1', 'Masalar 1')">Masalar 1</button>
+                    <button type="button" class="cam-pill-btn" data-cam="masalar2" onclick="switchCameraLive('masalar2', 'Masalar 2')">Masalar 2</button>
+                    <button type="button" class="cam-pill-btn" data-cam="kapi" onclick="switchCameraLive('kapi', 'Kapı')">Kapı</button>
+                    <button type="button" class="cam-pill-btn" data-cam="mutfak" onclick="switchCameraLive('mutfak', 'Mutfak')">Mutfak</button>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <button type="button" onclick="toggleCameraFullscreen()" title="Tam Ekran" style="background: #334155; border: 1px solid #475569; color: #f8fafc; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
+                    ⛶ Tam Ekran
+                </button>
+                <button type="button" onclick="closeCameraLiveModal()" title="Kapat (ESC)" style="background: #ef4444; border: none; color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 1.1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;">
+                    ✕
+                </button>
+            </div>
+        </div>
+        <div class="camera-video-wrapper" id="cameraVideoWrapper">
+            <iframe id="cameraLiveIframe" src="about:blank" allow="autoplay; fullscreen"></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+// -------------------------------------------------------------
+// Güvenlik Kameraları Dikey Sağ Panel & WebRTC Akış Mantığı
+// -------------------------------------------------------------
+let cameraPollInterval = null;
+const cameraList = ['masalar1', 'masalar2', 'kapi', 'mutfak'];
+const cameraFetching = { masalar1: false, masalar2: false, kapi: false, mutfak: false };
+let currentActiveCamera = null;
+
+function refreshCameraThumbnails() {
+    if (document.hidden) return;
+    const panel = document.getElementById('cameraSidebarPanel');
+    if (!panel || panel.style.display === 'none') return;
+
+    const timeStr = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+    cameraList.forEach(camId => {
+        if (cameraFetching[camId]) return; // Önceki istek henüz tamamlanmadıysa biriktirme yapma
+
+        const imgEl = document.getElementById('cam-img-' + camId);
+        const timeEl = document.getElementById('cam-time-' + camId);
+        if (!imgEl) return;
+
+        cameraFetching[camId] = true;
+        const preload = new Image();
+        const nextUrl = '/api/camera/snapshot/' + camId + '?t=' + Date.now();
+        preload.onload = function() {
+            imgEl.src = nextUrl;
+            imgEl.style.opacity = '1';
+            if (timeEl) timeEl.textContent = timeStr;
+            cameraFetching[camId] = false;
+        };
+        preload.onerror = function() {
+            cameraFetching[camId] = false;
+        };
+        preload.src = nextUrl;
+    });
+}
+
+function startCameraPolling() {
+    if (cameraPollInterval) clearInterval(cameraPollInterval);
+    refreshCameraThumbnails();
+    cameraPollInterval = setInterval(refreshCameraThumbnails, 1000); // 1 saniyede bir canlı yenileme
+}
+
+function toggleCameraSidebar(show) {
+    const panel = document.getElementById('cameraSidebarPanel');
+    const tab = document.getElementById('cameraCollapsedTab');
+    if (!panel || !tab) return;
+
+    if (show) {
+        panel.style.display = 'flex';
+        tab.style.display = 'none';
+        document.body.classList.add('cams-sidebar-open');
+        localStorage.setItem('firinna_cams_sidebar_collapsed', '0');
+        startCameraPolling();
+    } else {
+        panel.style.display = 'none';
+        tab.style.display = 'flex';
+        document.body.classList.remove('cams-sidebar-open');
+        localStorage.setItem('firinna_cams_sidebar_collapsed', '1');
+        if (cameraPollInterval) {
+            clearInterval(cameraPollInterval);
+            cameraPollInterval = null;
+        }
+    }
+}
+
+function openCameraLiveModal(camId, camName) {
+    const modal = document.getElementById('cameraModal');
+    const iframe = document.getElementById('cameraLiveIframe');
+    const title = document.getElementById('cameraModalTitle');
+    if (!modal || !iframe) return;
+
+    currentActiveCamera = camId;
+    if (title) title.textContent = camName;
+
+    document.querySelectorAll('.cam-pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-cam') === camId);
+    });
+
+    // go2rtc WebRTC canlı video akışı
+    iframe.src = '/go2rtc/webrtc.html?src=' + encodeURIComponent(camId) + '&media=video';
+    modal.style.display = 'flex';
+}
+
+function switchCameraLive(camId, camName) {
+    openCameraLiveModal(camId, camName);
+}
+
+function closeCameraLiveModal() {
+    const modal = document.getElementById('cameraModal');
+    const iframe = document.getElementById('cameraLiveIframe');
+    if (iframe) {
+        iframe.src = 'about:blank'; // Akışı hemen kes
+    }
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    currentActiveCamera = null;
+}
+
+function onCameraModalBackdrop(event) {
+    if (event.target.id === 'cameraModal') {
+        closeCameraLiveModal();
+    }
+}
+
+function toggleCameraFullscreen() {
+    const el = document.getElementById('cameraVideoWrapper');
+    if (!el) return;
+    if (!document.fullscreenElement) {
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+    }
+}
+
+// ESC ile kapatma
+window.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('cameraModal');
+        if (modal && modal.style.display === 'flex') {
+            closeCameraLiveModal();
+        }
+    }
+});
+
+// Sayfa görünürlüğü değiştiğinde
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        refreshCameraThumbnails();
+    }
+});
+
+// Başlangıç durumu
+document.addEventListener('DOMContentLoaded', function() {
+    const isCollapsed = localStorage.getItem('firinna_cams_sidebar_collapsed') === '1';
+    toggleCameraSidebar(!isCollapsed);
+});
 </script>

@@ -202,6 +202,14 @@ def index():
 def web_home():
     return send_from_directory('web', 'index.html')
 
+@app.route('/robots.txt')
+def robots_txt():
+    return send_from_directory('web', 'robots.txt', mimetype='text/plain')
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    return send_from_directory('web', 'sitemap.xml', mimetype='application/xml')
+
 @app.route('/yeni_menu.json')
 def yeni_menu_json():
     return send_from_directory('web', 'yeni_menu.json')
@@ -880,6 +888,8 @@ def get_tomorrow_schedule_alert():
 
 @app.route('/api/reports/daily-close/send-telegram', methods=['POST'])
 def api_send_daily_close_telegram():
+    if db.get_setting('telegram_notify_daily_close', '1') != '1':
+        return jsonify({'success': False, 'error': 'Gün sonu bildirimleri kapalı'}), 403
     data = request.json or {}
     date = data.get('date', datetime.now().strftime('%Y-%m-%d'))
     report = db.get_daily_close_report(date)
@@ -1172,16 +1182,32 @@ def settings_page():
 @app.route('/api/settings/printer', methods=['GET', 'POST'])
 def api_printer_settings():
     global PRINTER_IP, PRINTER_PORT, printer
-    
+
     if request.method == 'GET':
-        return jsonify({'ip': PRINTER_IP, 'port': PRINTER_PORT})
-    
+        # Global tanımlı değilse DB'den oku
+        try:
+            ip = PRINTER_IP
+        except NameError:
+            ip = db.get_setting('printer_ip', '192.168.1.99')
+        try:
+            port = PRINTER_PORT
+        except NameError:
+            port = db.get_setting('printer_port', '9100')
+        return jsonify({'ip': ip, 'port': port})
+
     elif request.method == 'POST':
-        data = request.json
-        PRINTER_IP = data['ip']
-        PRINTER_PORT = int(data['port'])
-        printer = ThermalPrinter(PRINTER_IP, PRINTER_PORT)
-        return jsonify({'success': True})
+        data = request.json or {}
+        PRINTER_IP = data.get('ip', db.get_setting('printer_ip', '192.168.1.99'))
+        PRINTER_PORT = int(data.get('port', db.get_setting('printer_port', '9100')))
+        # DB'ye de kaydet
+        db.set_setting('printer_ip', PRINTER_IP)
+        db.set_setting('printer_port', str(PRINTER_PORT))
+        try:
+            printer = ThermalPrinter(PRINTER_IP, PRINTER_PORT)
+        except Exception:
+            pass
+        return jsonify({'success': True, 'ip': PRINTER_IP, 'port': PRINTER_PORT})
+
 @app.route('/api/orders/items/<int:item_id>/quantity', methods=['PATCH'])
 
 def api_update_item_quantity(item_id):
@@ -1547,16 +1573,37 @@ def api_preview_note():
 
 @app.route('/api/settings/telegram', methods=['GET'])
 def api_get_telegram():
+    token = db.get_setting('telegram_bot_token', '')
+    masked_token = ''
+    if token:
+        if len(token) > 12:
+            masked_token = token[:4] + '*' * (len(token) - 8) + token[-4:]
+        else:
+            masked_token = '***'
     return jsonify({
-        'token': db.get_setting('telegram_bot_token', ''),
-        'chat_id': db.get_setting('telegram_chat_id', '')
+        'token': masked_token,
+        'has_token': bool(token),
+        'chat_id': db.get_setting('telegram_chat_id', ''),
+        'notify_low_stock': db.get_setting('telegram_notify_low_stock', '1') == '1',
+        'notify_daily_close': db.get_setting('telegram_notify_daily_close', '1') == '1',
+        'notify_web_msg': db.get_setting('telegram_notify_web_msg', '1') == '1'
     })
 
 @app.route('/api/settings/telegram', methods=['POST'])
 def api_save_telegram():
-    data = request.get_json()
-    db.set_setting('telegram_bot_token', data.get('token', '').strip())
+    data = request.get_json() or {}
+    new_token = data.get('token', '').strip()
+    # If user left masked token unchanged, keep the existing one
+    if new_token and '*' not in new_token:
+        db.set_setting('telegram_bot_token', new_token)
+    elif not new_token:
+        db.set_setting('telegram_bot_token', '')
     db.set_setting('telegram_chat_id', data.get('chat_id', '').strip())
+    
+    db.set_setting('telegram_notify_low_stock', '1' if data.get('notify_low_stock', True) else '0')
+    db.set_setting('telegram_notify_daily_close', '1' if data.get('notify_daily_close', True) else '0')
+    db.set_setting('telegram_notify_web_msg', '1' if data.get('notify_web_msg', True) else '0')
+
     return jsonify({'success': True})
 
 @app.route('/api/settings/telegram/test', methods=['POST'])
@@ -1648,6 +1695,8 @@ def api_telegram_get_updates():
 
 @app.route('/api/settings/telegram/send', methods=['POST'])
 def api_send_telegram_note():
+    if db.get_setting('telegram_notify_web_msg', '1') != '1':
+        return jsonify({'success': False, 'error': 'Web mesajları kapalı'}), 403
     data = request.get_json()
     message = data.get('message', '').strip()
     chat_id = (data.get('chat_id') or '').strip()  # opsiyonel — None veya boşsa default
@@ -1978,36 +2027,24 @@ def api_pdf_kitchen(order_id):
 
 @app.route('/debug/transactions')
 def debug_transactions():
-    import os
     try:
         conn = db.get_db()
-        # Hangi DB dosyası kullanılıyor?
-        db_path = db.DB_PATH
-        abs_path = os.path.abspath(db_path)
-        # transactions tablosu var mı?
         tables = [r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
-        # Son 10 transaction
         txns = []
         if 'transactions' in tables:
             txns = [dict(r) for r in conn.execute("SELECT * FROM transactions ORDER BY id DESC LIMIT 10").fetchall()]
-        # Son 5 stock_movement
         moves = []
         if 'stock_movements' in tables:
             moves = [dict(r) for r in conn.execute("SELECT * FROM stock_movements ORDER BY id DESC LIMIT 5").fetchall()]
         conn.close()
         return jsonify({
-            'db_path_relative': db_path,
-            'db_path_absolute': abs_path,
-            'db_exists': os.path.exists(abs_path),
-            'db_size_bytes': os.path.getsize(abs_path) if os.path.exists(abs_path) else 0,
-            'cwd': os.getcwd(),
-            'tables': tables,
+            'status': 'ok',
+            'tables_count': len(tables),
             'last_transactions': txns,
             'last_stock_movements': moves,
         })
     except Exception as e:
-        import traceback
-        return jsonify({'error': str(e), 'trace': traceback.format_exc()})
+        return jsonify({'error': str(e)})
 
 
 # ===== GİTHUB SYNC (#40) =====
@@ -2281,8 +2318,9 @@ def start_telegram_auto_send():
         while _telegram_auto_send_running:
             try:
                 enabled = db.get_setting('telegram_daily_close_enabled', '0')
+                notify_daily_close = db.get_setting('telegram_notify_daily_close', '1') == '1'
                 t = db.get_setting('telegram_daily_close_time', '')
-                if enabled == '1' and t:
+                if enabled == '1' and notify_daily_close and t:
                     now = datetime.now()
                     h, m = map(int, t.split(':'))
                     today = now.strftime('%Y-%m-%d')
@@ -2728,9 +2766,8 @@ def save_web_settings():
         json.dump(data, f, indent=4, ensure_ascii=False)
     return jsonify({"success": True})
 
-@app.route('/api/web/status', methods=['GET'])
-def get_store_status():
-    """Public CORS-enabled real-time Store Status API for external crawlers & directories."""
+def compute_store_status_data():
+    """Computes store open/closed status based on settings, hours, manual overrides and open tables."""
     settings = {}
     if os.path.exists(SETTINGS_FILE):
         try:
@@ -2767,7 +2804,8 @@ def get_store_status():
             if db.get_table_order(t['id']):
                 has_open_tables = True
                 break
-    except: pass
+    except Exception:
+        pass
 
     if has_open_tables:
         manual_status = 'open'
@@ -2806,12 +2844,8 @@ def get_store_status():
     is_exceptional_open = False
     if is_open and (current_hm < open_str or current_hm > close_str):
         is_exceptional_open = True
-    elif not is_open and (open_str <= current_hm <= close_str):
-        is_exceptional_closed = True # just in case we need it later
-        
-    res = jsonify({
-        "status": "success",
-        "store_name": "Fırınna Cafe & Restaurant",
+
+    return {
         "is_open": is_open,
         "is_exceptional_open": is_exceptional_open,
         "status_text": "Açık" if is_open else "Kapalı",
@@ -2819,7 +2853,24 @@ def get_store_status():
         "current_day": current_day_tr,
         "current_time": current_hm,
         "today_hours": f"{open_str} - {close_str}",
-        "hours": daily_hours,
+        "hours": daily_hours
+    }
+
+@app.route('/api/web/status', methods=['GET'])
+def get_store_status():
+    """Public CORS-enabled real-time Store Status API for external crawlers & directories."""
+    data = compute_store_status_data()
+    res = jsonify({
+        "status": "success",
+        "store_name": "Fırınna Cafe & Restaurant",
+        "is_open": data["is_open"],
+        "is_exceptional_open": data["is_exceptional_open"],
+        "status_text": data["status_text"],
+        "status_badge": data["status_badge"],
+        "current_day": data["current_day"],
+        "current_time": data["current_time"],
+        "today_hours": data["today_hours"],
+        "hours": data["hours"],
         "address": "Şahkulu Mah. Kumbaracı Yokuşu Sok. No:41A, Beyoğlu, İstanbul",
         "phone": "+905456301214",
         "website": "https://firinna.com"
@@ -2848,6 +2899,8 @@ def upload_menu():
 
 import secrets
 import time as _time
+import hmac
+import hashlib
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Token -> expiry timestamp (24 saat)
@@ -2884,11 +2937,23 @@ def _get_password_hash():
 def verify_admin_auth():
     _cleanup_expired_tokens()
     token = request.headers.get('X-Admin-Token') or request.headers.get('Authorization', '').replace('Bearer ', '').strip()
-    if token and token in VALID_ADMIN_TOKENS:
-        if _time.time() <= VALID_ADMIN_TOKENS[token]:
-            return True
-        else:
-            VALID_ADMIN_TOKENS.pop(token, None)
+    if token:
+        if ':' in token:
+            try:
+                exp_str, sig = token.split(':', 1)
+                exp = float(exp_str)
+                if _time.time() <= exp:
+                    secret = getattr(app, 'secret_key', None) or 'firinna-secret-2026'
+                    expected = hmac.new(secret.encode('utf-8'), exp_str.encode('utf-8'), hashlib.sha256).hexdigest()
+                    if hmac.compare_digest(sig, expected):
+                        return True
+            except Exception:
+                pass
+        if token in VALID_ADMIN_TOKENS:
+            if _time.time() <= VALID_ADMIN_TOKENS[token]:
+                return True
+            else:
+                VALID_ADMIN_TOKENS.pop(token, None)
     auth = request.authorization
     if auth and auth.password:
         pw_hash = _get_password_hash()
@@ -2903,8 +2968,12 @@ def admin_login():
     pw_hash = _get_password_hash()
     if check_password_hash(pw_hash, password):
         _cleanup_expired_tokens()
-        token = secrets.token_hex(32)
-        VALID_ADMIN_TOKENS[token] = _time.time() + TOKEN_EXPIRY_SECONDS
+        exp = _time.time() + TOKEN_EXPIRY_SECONDS
+        exp_str = str(int(exp))
+        secret = getattr(app, 'secret_key', None) or 'firinna-secret-2026'
+        sig = hmac.new(secret.encode('utf-8'), exp_str.encode('utf-8'), hashlib.sha256).hexdigest()
+        token = f"{exp_str}:{sig}"
+        VALID_ADMIN_TOKENS[token] = exp
         return jsonify({"success": True, "token": token})
     return jsonify({"success": False, "error": "Hatalı şifre!"})
 
@@ -2968,8 +3037,10 @@ def reset_analytics():
                 if not (start_date <= (v.get("iso_date") or "") <= end_date)
             ]
 
-        with open(analytics_file, 'w', encoding='utf-8') as f:
+        temp_file = f"{analytics_file}.tmp.{os.getpid()}"
+        with open(temp_file, 'w', encoding='utf-8') as f:
             json.dump(stats, f, indent=4, ensure_ascii=False)
+        os.replace(temp_file, analytics_file)
 
         return jsonify({"success": True, "message": "İstatistikler başarıyla sıfırlandı/güncellendi."})
     except Exception as e:
@@ -3216,10 +3287,15 @@ def track_visit():
         
     analytics_file = '/opt/firinna-pos/web_analytics.json'
     try:
+        stats = None
         if os.path.exists(analytics_file):
-            with open(analytics_file, 'r', encoding='utf-8') as f:
-                stats = json.load(f)
-        else:
+            try:
+                with open(analytics_file, 'r', encoding='utf-8') as f:
+                    stats = json.load(f)
+            except Exception as e:
+                print(f"[Analytics File Read Warning]: {e}")
+                stats = None
+        if not stats or not isinstance(stats, dict):
             stats = {
                 "today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0, "last_date": "",
                 "devices": {"Mobil": 0, "Masaüstü": 0},
@@ -3405,8 +3481,10 @@ def track_visit():
         elif event == 'map':
             stats["map_clicks"] = stats.get("map_clicks", 0) + 1
             
-        with open(analytics_file, 'w', encoding='utf-8') as f:
+        temp_file = f"{analytics_file}.tmp.{os.getpid()}"
+        with open(temp_file, 'w', encoding='utf-8') as f:
             json.dump(stats, f, indent=4, ensure_ascii=False)
+        os.replace(temp_file, analytics_file)
             
         return jsonify({"success": True})
     except Exception as e:
@@ -3415,12 +3493,19 @@ def track_visit():
 @app.route('/api/web/analytics', methods=['GET'])
 def get_analytics():
     analytics_file = '/opt/firinna-pos/web_analytics.json'
+    data = None
     if os.path.exists(analytics_file):
-        with open(analytics_file, 'r') as f:
-            response = jsonify(json.load(f))
-    else:
-        response = jsonify({"today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0})
+        try:
+            with open(analytics_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+        except Exception as e:
+            print(f"[Analytics Load Error]: {e}")
+            data = None
+
+    if not data or not isinstance(data, dict):
+        data = {"today": 0, "month": 0, "total": 0, "menu": 0, "actions": 0}
         
+    response = jsonify(data)
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '-1'
@@ -4422,7 +4507,8 @@ def load_radio_data():
                             "queue": [],
                             "queue_index": 0,
                             "tv_audio_enabled": False,
-                            "updated_at": int(time.time())
+                            "updated_at": int(time.time()),
+                            "volume": 40
                         }
                     return data
             except Exception:
@@ -4442,7 +4528,8 @@ def load_radio_data():
                 "queue": [],
                 "queue_index": 0,
                 "tv_audio_enabled": False,
-                "updated_at": int(time.time())
+                "updated_at": int(time.time()),
+                "volume": 40
             }
         }
 
@@ -4455,6 +4542,67 @@ def save_radio_data(data):
         os.replace(temp_name, RADIO_DATA_FILE)
 
 AUDIO_EXTENSIONS = ('.mp3', '.m4a', '.aac', '.flac', '.wav', '.ogg')
+RADIO_DURATIONS_FILE = os.path.join(os.path.dirname(__file__), 'radio_durations.json')
+
+_track_duration_cache = {}
+try:
+    if os.path.exists(RADIO_DURATIONS_FILE):
+        with open(RADIO_DURATIONS_FILE, 'r', encoding='utf-8') as _df:
+            _track_duration_cache = json.load(_df)
+except Exception:
+    _track_duration_cache = {}
+
+def _save_duration_cache():
+    try:
+        with open(RADIO_DURATIONS_FILE, 'w', encoding='utf-8') as _df:
+            json.dump(_track_duration_cache, _df)
+    except Exception:
+        pass
+
+def _get_audio_file_duration(full_path):
+    global _track_duration_cache
+    if not full_path or not os.path.exists(full_path):
+        return 0
+    try:
+        mtime = int(os.path.getmtime(full_path))
+        fsize = int(os.path.getsize(full_path))
+    except Exception:
+        mtime = 0
+        fsize = 0
+    
+    cached = _track_duration_cache.get(full_path)
+    if not cached and os.path.exists(RADIO_DURATIONS_FILE):
+        try:
+            with open(RADIO_DURATIONS_FILE, 'r', encoding='utf-8') as _df:
+                _track_duration_cache = json.load(_df)
+            cached = _track_duration_cache.get(full_path)
+        except Exception:
+            pass
+
+    if isinstance(cached, dict) and (cached.get('mtime') == mtime or cached.get('duration', 0) > 0):
+        return cached.get('duration', 0.0)
+    elif isinstance(cached, (int, float)) and cached > 0:
+        return float(cached)
+
+    # Hızlı ffprobe dene (0.8s zaman aşımı)
+    try:
+        out = subprocess.check_output(
+            ['/usr/bin/ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', full_path],
+            stderr=subprocess.DEVNULL, timeout=0.8
+        ).decode('utf-8').strip()
+        dur = float(out) if out else 0.0
+        if dur > 0:
+            _track_duration_cache[full_path] = {'duration': dur, 'mtime': mtime}
+            _save_duration_cache()
+            return dur
+    except Exception:
+        pass
+
+    # Kütüphane taramasını asla kilitleme: dosya boyutundan yaklaşık süre hesapla (~128kbps)
+    approx_dur = round((fsize / (16000)), 1) if fsize > 0 else 180.0
+    _track_duration_cache[full_path] = {'duration': approx_dur, 'mtime': mtime}
+    _save_duration_cache()
+    return approx_dur
 
 def scan_music_library():
     """Recursively scans /home/turan/firinna_music_library and groups files by directories"""
@@ -4474,13 +4622,16 @@ def scan_music_library():
         folder_tracks = []
         for file in sorted(files):
             if file.lower().endswith(AUDIO_EXTENSIONS):
-                rel_file_path = os.path.relpath(os.path.join(root, file), root_path)
+                full_fpath = os.path.join(root, file)
+                rel_file_path = os.path.relpath(full_fpath, root_path)
                 track_title = os.path.splitext(file)[0].replace('_', ' ')
+                track_dur = _get_audio_file_duration(full_fpath)
                 track_info = {
                     "filename": file,
                     "rel_path": rel_file_path.replace('\\', '/'),
                     "title": track_title,
                     "folder": folder_display_name,
+                    "duration": track_dur,
                     "stream_url": f"/api/radio/stream/{urllib.parse.quote(rel_file_path.replace(os.path.sep, '/'))}"
                 }
                 folder_tracks.append(track_info)
@@ -4500,6 +4651,7 @@ def scan_music_library():
         "all_tracks": all_tracks,
         "total_tracks": len(all_tracks)
     }
+
 
 _stream_meta_cache = {}
 _stream_meta_fetching = set()
@@ -4559,72 +4711,132 @@ def _get_audio_env():
     env['PATH'] = f"{env.get('PATH', '')}:/usr/bin:/usr/local/bin:/bin:/usr/sbin:/sbin"
     return env
 
+
+# Volume önbelleği: her 3 sn polling'de subprocess fork'unu engeller
+_volume_cache = {'value': 40, 'ts': 0.0}
+
 def get_system_volume():
-    env = _get_audio_env()
-    for cmd in [
-        ['/usr/bin/amixer', '-c', '0', 'sget', 'PCM'],
-        ['amixer', '-c', '0', 'sget', 'PCM'],
-        ['/usr/bin/pactl', 'get-sink-volume', '@DEFAULT_SINK@'],
-        ['pactl', 'get-sink-volume', '@DEFAULT_SINK@'],
-        ['/usr/bin/amixer', 'get', 'Master'],
-        ['amixer', 'get', 'Master'],
-        ['/usr/bin/amixer', 'get', 'Headphone'],
-        ['amixer', 'get', 'Headphone']
-    ]:
-        try:
-            out = subprocess.check_output(cmd, env=env, stderr=subprocess.DEVNULL, universal_newlines=True)
-            m = re.search(r'(?:\[|\s)(\d+)%', out)
-            if m:
-                return int(m.group(1))
-        except Exception:
-            continue
-    return 80
+    data = load_radio_data()
+    vol = data.get('state', {}).get('volume', 40)
+    if not isinstance(vol, (int, float)) or vol <= 0 or vol > 100:
+        vol = 40
+    return int(vol)
 
 def set_system_volume(volume):
     try:
         vol = max(0, min(100, int(volume)))
     except (ValueError, TypeError):
-        vol = 80
+        vol = 40
     env = _get_audio_env()
     
-    # Raspberry Pi ALSA card 0 PCM control
+    # 1. ALSA Master control (fallback / sync)
     for amixer_bin in ['/usr/bin/amixer', 'amixer']:
         try:
-            subprocess.run([amixer_bin, '-c', '0', 'sset', 'PCM', f'{vol}%', 'unmute'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run([amixer_bin, 'set', 'Master', f'{vol}%', 'unmute'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception:
             pass
-        for ctrl in ['Master', 'Headphone', 'PCM', 'Speaker']:
-            try:
-                subprocess.run([amixer_bin, 'set', ctrl, f'{vol}%', 'unmute'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            except Exception:
-                pass
 
+    # 2. PulseAudio / PipeWire Master Sink volume:
+    # Sesi tek bir noktadan (Ana Sink) kontrol ediyoruz.
+    # Sink-input ve mpv iç sesini 100%'de tutuyoruz; aksi halde katlanarak logaritmik düşüş
+    # (vol% * vol% * vol%) nedeniyle %5'lik değişimler aşırı sıçramaya neden olur.
     for pactl_bin in ['/usr/bin/pactl', 'pactl']:
         try:
             subprocess.run([pactl_bin, 'set-sink-volume', '@DEFAULT_SINK@', f'{vol}%'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             subprocess.run([pactl_bin, 'set-sink-mute', '@DEFAULT_SINK@', '0' if vol > 0 else '1'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # Aktif sink-input'ların sesini %100'de sabitle (katlanmayı önle) ve sessizliği kaldır
             try:
-                out = subprocess.check_output([pactl_bin, 'list', 'sink-inputs', 'short'], env=env, text=True, stderr=subprocess.DEVNULL)
-                for line in out.strip().splitlines():
-                    if line:
-                        input_id = line.split()[0]
-                        subprocess.run([pactl_bin, 'set-sink-input-volume', input_id, '100%'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                        subprocess.run([pactl_bin, 'set-sink-input-mute', input_id, '0' if vol > 0 else '1'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                si_out = subprocess.check_output([pactl_bin, 'list', 'short', 'sink-inputs'], env=env, stderr=subprocess.DEVNULL, text=True)
+                for line in si_out.strip().split('\n'):
+                    if line.strip():
+                        si_id = line.split()[0]
+                        subprocess.run([pactl_bin, 'set-sink-input-volume', si_id, '100%'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        subprocess.run([pactl_bin, 'set-sink-input-mute', si_id, '0' if vol > 0 else '1'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             except Exception:
                 pass
             break
         except Exception:
             pass
 
+    # 3. MPV IPC socket üzerinden çalışan mpv oynatıcısının iç sesini 100%'de tut
+    try:
+        _send_mpv_command(["set_property", "volume", 100])
+    except Exception:
+        pass
+
+    # Önbelleği hemen güncelle
+    _volume_cache['value'] = vol
+    _volume_cache['ts'] = time.time()
+
     return vol
+
+# Sistem açılışında / servis yeniden başladığında kesinlikle güvenli %40 ses uygula
+try:
+    _init_vol = 40
+    if os.path.exists(RADIO_DATA_FILE):
+        try:
+            with open(RADIO_DATA_FILE, 'r', encoding='utf-8') as _rf:
+                _init_vol = json.load(_rf).get('state', {}).get('volume', 40)
+        except Exception:
+            pass
+    if not isinstance(_init_vol, (int, float)) or _init_vol > 60 or _init_vol <= 0:
+        _init_vol = 40
+    set_system_volume(_init_vol)
+except Exception:
+    pass
+
 
 # ==================== LOCAL AUDIO PLAYBACK ENGINE (RPI HARDWARE AUX JACK) ====================
 PLAYER_PID_FILE = '/tmp/firinna_audio_player.pid'
 PLAYER_LOCK_FILE = '/tmp/firinna_audio_player.lock'
 MONITOR_LOCK_FILE = '/tmp/firinna_audio_monitor.lock'
+MPV_IPC_SOCKET = '/tmp/firinna_mpv_ipc.sock'
+
+def _is_pid_alive(pid):
+    if not pid:
+        return False
+    try:
+        pid_int = int(pid)
+    except (ValueError, TypeError):
+        return False
+    status_path = f"/proc/{pid_int}/status"
+    try:
+        with open(status_path, 'r') as sf:
+            for line in sf:
+                if line.startswith('State:'):
+                    # Z (zombie) and X (dead) mean the process has ended
+                    state_code = line.split()[1]
+                    return state_code not in ('Z', 'X')
+        return True
+    except (FileNotFoundError, ProcessLookupError, PermissionError):
+        return False
+    except Exception:
+        return False
+
+def _send_mpv_command(command_list):
+    """Sends JSON IPC command to running mpv process"""
+    if not os.path.exists(MPV_IPC_SOCKET):
+        return False, "mpv ipc socket not found"
+    try:
+        import socket
+        client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        client.settimeout(1.5)
+        client.connect(MPV_IPC_SOCKET)
+        msg = json.dumps({"command": command_list}) + "\n"
+        client.sendall(msg.encode('utf-8'))
+        resp = client.recv(1024).decode('utf-8')
+        client.close()
+        return True, resp
+    except Exception as e:
+        return False, str(e)
 
 def _stop_all_audio_processes():
     try:
+        if os.path.exists(MPV_IPC_SOCKET):
+            try:
+                os.remove(MPV_IPC_SOCKET)
+            except Exception:
+                pass
         if os.path.exists(PLAYER_PID_FILE):
             with open(PLAYER_PID_FILE, 'r') as f:
                 pid_str = f.read().strip()
@@ -4632,9 +4844,16 @@ def _stop_all_audio_processes():
                     pid = int(pid_str)
                     try:
                         os.kill(pid, signal.SIGTERM)
-                        time.sleep(0.05)
-                        if os.path.exists(f"/proc/{pid}"):
+                        time.sleep(0.1)
+                        if _is_pid_alive(pid):
                             os.kill(pid, signal.SIGKILL)
+                        # Zombie temizleme: prosesin çıkmasını bekle
+                        try:
+                            os.waitpid(pid, os.WNOHANG)
+                        except ChildProcessError:
+                            pass
+                        except Exception:
+                            pass
                     except ProcessLookupError:
                         pass
                     except Exception:
@@ -4645,12 +4864,24 @@ def _stop_all_audio_processes():
                 pass
     except Exception:
         pass
-    # Safety sweep: kill any leftover mpv with our signature
+    # Safety sweep: kill any leftover mpv/cvlc/ffplay with our signature
     try:
-        subprocess.run(['pkill', '-9', '-f', 'mpv.*--ao=alsa'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(['pkill', '-9', '-f', 'firinna_mpv_ipc'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.run(['pkill', '-9', '-f', 'cvlc.*--network-caching'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(['pkill', '-9', '-f', 'ffplay.*-nodisp'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except Exception:
         pass
+    # Herhangi kalan zombie çocukları temizle
+    try:
+        while True:
+            pid, _ = os.waitpid(-1, os.WNOHANG)
+            if pid == 0:
+                break
+    except ChildProcessError:
+        pass
+    except Exception:
+        pass
+
 
 def sync_local_audio_player():
     try:
@@ -4677,28 +4908,41 @@ def sync_local_audio_player():
                 if is_playing and target_url:
                     env = _get_audio_env()
                     proc = None
+                    current_vol = state.get('volume', 40)
+                    set_system_volume(current_vol)
+
                     if os.path.exists('/usr/bin/mpv'):
-                        proc = subprocess.Popen(
-                            [
-                                '/usr/bin/mpv',
-                                '--no-video',
-                                '--ao=alsa',
-                                '--audio-device=alsa/default',
-                                '--cache=yes',
-                                '--demuxer-max-bytes=16M',
-                                '--demuxer-readahead-secs=20',
-                                '--audio-buffer=0.4',
-                                '--ytdl=yes',
-                                '--ytdl-format=bestaudio/best',
-                                target_url
-                            ],
-                            env=env,
-                            stdout=subprocess.DEVNULL,
-                            stderr=subprocess.DEVNULL
-                        )
+                        # ao=pulse: PulseAudio tam entegrasyon + dynaudnorm: Akıllı Ses Dengeleme (Normalizasyon)
+                        mpv_cmd = [
+                            '/usr/bin/mpv',
+                            '--no-video',
+                            '--ao=pulse',
+                            f'--input-ipc-server={MPV_IPC_SOCKET}',
+                            '--volume=100',
+                            '--cache=yes',
+                            '--demuxer-max-bytes=16M',
+                            '--demuxer-readahead-secs=20',
+                            '--audio-buffer=0.4',
+                            '--af=dynaudnorm=f=150:g=15:m=12:r=0.9:b=1',
+                            '--stream-lavf-o=reconnect=1,reconnect_streamed=1,reconnect_delay_max=5',
+                            '--network-timeout=15',
+                            '--ytdl=yes',
+                            '--ytdl-format=bestaudio/best',
+                            target_url
+                        ]
+                        proc = subprocess.Popen(mpv_cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        # 0.3s bekleyip hemen çıktıysa (ao=pulse başarısız) ao=alsa ile tekrar dene
+                        time.sleep(0.3)
+                        if proc.poll() is not None:
+                            print("[Radio Engine] ao=pulse başarısız, ao=alsa fallback deneniyor...", flush=True)
+                            mpv_cmd[2] = '--ao=alsa'
+                            mpv_cmd.pop(4)  # --volume kaldır (alsa modunda amixer vs üzerinden yönetiliyor)
+                            # audio-device ekle
+                            mpv_cmd.insert(4, '--audio-device=alsa/default')
+                            proc = subprocess.Popen(mpv_cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     elif os.path.exists('/usr/bin/cvlc'):
                         proc = subprocess.Popen(
-                            ['/usr/bin/cvlc', '--no-video', '--network-caching=2000', target_url],
+                            ['/usr/bin/cvlc', '--no-video', '--aout=pulse', '--network-caching=2000', target_url],
                             env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
                         )
                     elif os.path.exists('/usr/bin/ffplay'):
@@ -4706,11 +4950,18 @@ def sync_local_audio_player():
                             ['/usr/bin/ffplay', '-nodisp', '-nostats', '-loglevel', 'quiet', target_url],
                             env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
                         )
-                    
+
                     if proc and proc.pid:
                         with open(PLAYER_PID_FILE, 'w') as pf:
                             pf.write(str(proc.pid))
                         print(f"[Radio Engine] (PID {proc.pid}) Playing: {target_url}", flush=True)
+                        
+                        import threading
+                        def _apply_vol_delayed():
+                            import time
+                            time.sleep(1.5)
+                            set_system_volume(current_vol)
+                        threading.Thread(target=_apply_vol_delayed, daemon=True).start()
                 else:
                     print("[Radio Engine] Playback stopped.", flush=True)
             finally:
@@ -4728,12 +4979,33 @@ def _local_player_monitor_loop():
         return
 
     print("[Radio Engine] Single supervisor monitor active.", flush=True)
+    _last_after_hours_check = 0
+    _last_dead_station_time = 0
+    _station_fail_count = 0
     while True:
         try:
             time.sleep(2)
+            now_ts = time.time()
             data = load_radio_data()
             state = data.get('state', {})
-            if state.get('is_playing') and state.get('source_type') in ('folder', 'playlist'):
+
+            # Mesai Dışı (After-Hours) Otomatik Müzik Durdurma Kontrolü (Her 10 saniyede bir)
+            if state.get('is_playing') and (now_ts - _last_after_hours_check > 10):
+                _last_after_hours_check = now_ts
+                try:
+                    store_info = compute_store_status_data()
+                    # Eğer dükkan kapalıysa (mesai dışı ve açık masa yoksa) müziği durdur
+                    if not store_info.get('is_open', True):
+                        print(f"[Radio Engine] Mesai dışı saat tespit edildi ({store_info.get('current_time')}), müzik otomatik durduruluyor.", flush=True)
+                        state['is_playing'] = False
+                        state['updated_at'] = int(now_ts)
+                        data['state'] = state
+                        save_radio_data(data)
+                        sync_local_audio_player()
+                except Exception as err:
+                    print(f"[Radio Engine] Store status check error: {err}", flush=True)
+
+            if state.get('is_playing'):
                 pid = None
                 if os.path.exists(PLAYER_PID_FILE):
                     try:
@@ -4744,10 +5016,39 @@ def _local_player_monitor_loop():
                     except Exception:
                         pass
                 
-                # If song process ended naturally, advance to next
-                if pid is not None and not os.path.exists(f"/proc/{pid}"):
-                    print(f"[Radio Engine] Track PID {pid} finished naturally, advancing...", flush=True)
-                    _advance_next_track()
+                # Check if song/stream process ended naturally or died (including zombie check)
+                if pid is not None and not _is_pid_alive(pid):
+                    source_type = state.get('source_type', 'folder')
+                    if source_type in ('folder', 'playlist'):
+                        print(f"[Radio Engine] Track PID {pid} finished naturally, advancing...", flush=True)
+                        _advance_next_track()
+                    elif source_type in ('station', 'custom_url'):
+                        # Online radyo yayını koptuysa 4 sn arayla tekrar dene, 3 denemede olmazsa yedekli yayına geç
+                        if now_ts - _last_dead_station_time > 4:
+                            _last_dead_station_time = now_ts
+                            _station_fail_count += 1
+                            if _station_fail_count >= 3:
+                                print(f"[Radio Engine] Canlı radyo yayını kesildi! Kesintisiz müzik için yedekli yerel kütüphaneye geçiliyor...", flush=True)
+                                lib = scan_music_library()
+                                if lib and lib.get('all_tracks'):
+                                    state['source_type'] = 'folder'
+                                    state['queue'] = lib['all_tracks']
+                                    state['queue_index'] = 0
+                                    cur = state['queue'][0]
+                                    state['current_title'] = f"🛡️ [Yedek Yayın] {cur.get('title')}"
+                                    state['current_url'] = cur.get('stream_url')
+                                    state['current_item_id'] = cur.get('rel_path')
+                                    state['duration'] = cur.get('duration', 0)
+                                    state['started_at'] = int(now_ts)
+                                    state['updated_at'] = int(now_ts)
+                                    state['is_playing'] = True
+                                    data['state'] = state
+                                    save_radio_data(data)
+                                    _station_fail_count = 0
+                                    sync_local_audio_player()
+                            else:
+                                print(f"[Radio Engine] Station/stream PID {pid} disconnected, auto-reconnecting (Deneme {_station_fail_count}/3)...", flush=True)
+                                sync_local_audio_player()
         except Exception:
             pass
 
@@ -4769,6 +5070,8 @@ def _advance_next_track():
             state['current_title'] = cur.get('title') or cur.get('name') or "Müzik"
             state['current_url'] = cur.get('stream_url') or cur.get('url') or ""
             state['current_item_id'] = cur.get('rel_path') or cur.get('id') or ""
+            state['duration'] = cur.get('duration', 0)
+            state['started_at'] = int(time.time())
             state['is_playing'] = True
             state['updated_at'] = int(time.time())
             data['state'] = state
@@ -4788,6 +5091,23 @@ def api_radio_status():
     data = load_radio_data()
     state = dict(data.get('state', {}))
     state['volume'] = get_system_volume()
+    
+    # If currently playing local file and duration isn't set, try to resolve it
+    if state.get('is_playing') and not state.get('duration') and state.get('source_type') in ('folder', 'playlist'):
+        cur_url = state.get('current_url', '')
+        if cur_url.startswith('/api/radio/stream/'):
+            rel_f = urllib.parse.unquote(cur_url.replace('/api/radio/stream/', ''))
+            f_path = os.path.join(MUSIC_LIBRARY_DIR, rel_f)
+            state['duration'] = _get_audio_file_duration(f_path)
+
+    # If playing, calculate elapsed seconds
+    started_at = state.get('started_at')
+    if state.get('is_playing') and started_at:
+        elapsed = max(0, int(time.time() - started_at))
+        state['elapsed'] = elapsed
+    else:
+        state['elapsed'] = 0
+
     if state.get('is_playing') and state.get('source_type') == 'station':
         live_title = get_live_stream_title_fast(state.get('current_url'))
         if live_title:
@@ -4800,7 +5120,7 @@ def api_radio_status():
 def api_radio_volume():
     if request.method == 'POST':
         req = request.json or {}
-        vol = req.get('volume', 80)
+        vol = req.get('volume', 45)
         actual_vol = set_system_volume(vol)
         data = load_radio_data()
         state = data.get('state', {})
@@ -4822,10 +5142,12 @@ def api_radio_control():
     
     if action == 'play':
         state['is_playing'] = True
+        if not state.get('started_at'):
+            state['started_at'] = int(time.time())
     elif action == 'pause':
         state['is_playing'] = False
     elif action == 'set_volume':
-        vol = req.get('volume', 80)
+        vol = req.get('volume', 45)
         actual_vol = set_system_volume(vol)
         state['volume'] = actual_vol
     elif action == 'toggle_mode':
@@ -4843,6 +5165,8 @@ def api_radio_control():
             state['current_title'] = st.get('name')
             state['current_url'] = st.get('url')
             state['current_item_id'] = st.get('id')
+            state['duration'] = 0
+            state['started_at'] = int(time.time())
             state['queue'] = [st]
             state['queue_index'] = 0
     elif action == 'play_queue':
@@ -4873,6 +5197,8 @@ def api_radio_control():
                 state['current_title'] = f"{title_prefix} - {state['current_title']}"
             state['current_url'] = cur.get('stream_url') or cur.get('url') or ""
             state['current_item_id'] = cur.get('rel_path') or cur.get('id') or ""
+            state['duration'] = cur.get('duration', 0)
+            state['started_at'] = int(time.time())
     elif action == 'next':
         queue = state.get('queue', [])
         if queue:
@@ -4888,6 +5214,8 @@ def api_radio_control():
             state['current_title'] = cur.get('title') or cur.get('name') or "Müzik"
             state['current_url'] = cur.get('stream_url') or cur.get('url') or ""
             state['current_item_id'] = cur.get('rel_path') or cur.get('id') or ""
+            state['duration'] = cur.get('duration', 0)
+            state['started_at'] = int(time.time())
             state['is_playing'] = True
     elif action == 'prev':
         queue = state.get('queue', [])
@@ -4899,6 +5227,8 @@ def api_radio_control():
             state['current_title'] = cur.get('title') or cur.get('name') or "Müzik"
             state['current_url'] = cur.get('stream_url') or cur.get('url') or ""
             state['current_item_id'] = cur.get('rel_path') or cur.get('id') or ""
+            state['duration'] = cur.get('duration', 0)
+            state['started_at'] = int(time.time())
             state['is_playing'] = True
     elif action == 'play_url':
         url = req.get('url', '').strip()
@@ -4924,14 +5254,61 @@ def api_radio_control():
             state['current_title'] = f"🔗 {title}"
             state['current_url'] = url
             state['current_item_id'] = url
+            state['duration'] = 0
+            state['started_at'] = int(time.time())
             state['queue'] = [{"title": title, "url": url, "stream_url": url}]
             state['queue_index'] = 0
+
+    elif action == 'seek':
+        seek_pos = float(req.get('position', 0))
+        # 1. Try instant IPC seek via mpv socket: ["seek", target_seconds, "absolute"]
+        ok, resp = _send_mpv_command(["seek", seek_pos, "absolute"])
+        state['started_at'] = int(time.time() - seek_pos)
+        state['elapsed'] = int(seek_pos)
+        state['updated_at'] = int(time.time())
+        data['state'] = state
+        save_radio_data(data)
+        if not ok:
+            # If socket wasn't available, re-sync player
+            threading.Thread(target=sync_local_audio_player, daemon=True).start()
+        return jsonify({"success": True, "state": state, "ipc_ok": ok})
 
     state['updated_at'] = int(time.time())
     data['state'] = state
     save_radio_data(data)
     threading.Thread(target=sync_local_audio_player, daemon=True).start()
     return jsonify({"success": True, "state": state})
+
+@app.route('/api/tv-audio/status', methods=['GET'])
+def api_tv_audio_status():
+    """TV ses iletimi (pardus → Pi PipeWire tüneli) durumu."""
+    data = load_radio_data()
+    state = data.get('state', {})
+    tv_enabled = state.get('tv_audio_enabled', False)
+
+    # PulseAudio sink-input üzerinden aktif tünel var mı kontrol et
+    tunnel_active = False
+    tunnel_volume = None
+    try:
+        env = _get_audio_env()
+        out = subprocess.check_output(
+            ['pactl', 'list', 'sink-inputs'],
+            env=env, stderr=subprocess.DEVNULL, universal_newlines=True, timeout=2
+        )
+        # PipeWire tünel stream'i
+        if 'tünel' in out or 'tunnel' in out.lower() or 'PipeWire' in out:
+            tunnel_active = True
+            m = re.search(r'Volume:.*?(\d+)%', out)
+            if m:
+                tunnel_volume = int(m.group(1))
+    except Exception:
+        pass
+
+    return jsonify({
+        "tv_audio_enabled": tv_enabled,
+        "tunnel_active": tunnel_active,
+        "tunnel_volume": tunnel_volume
+    })
 
 @app.route('/api/radio/custom_links', methods=['GET', 'POST', 'DELETE'])
 def api_radio_custom_links():
@@ -5195,6 +5572,311 @@ def api_radio_stream(filename):
     resp.headers['Cache-Control'] = 'public, max-age=86400'
     return resp
 
+
+# ==================== YOUTUBE & SPOTIFY PLAYLIST DOWNLOADER ====================
+DOWNLOADER_STATE_FILE = "/tmp/firinna_downloader_state.json"
+_DEFAULT_DOWNLOADER_STATE = {
+    "active": False,
+    "source": "",
+    "playlist_name": "",
+    "target_folder": "",
+    "total_tracks": 0,
+    "completed_tracks": 0,
+    "current_track": "",
+    "percent": 0,
+    "status": "idle",  # "idle", "fetching_info", "downloading", "completed", "error", "cancelled"
+    "log": [],
+    "error_message": "",
+    "cancel_requested": False
+}
+
+def _get_downloader_state():
+    try:
+        if os.path.exists(DOWNLOADER_STATE_FILE):
+            with open(DOWNLOADER_STATE_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return dict(_DEFAULT_DOWNLOADER_STATE)
+
+def _save_downloader_state(state):
+    try:
+        tmp = DOWNLOADER_STATE_FILE + ".tmp"
+        with open(tmp, 'w', encoding='utf-8') as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+        os.replace(tmp, DOWNLOADER_STATE_FILE)
+    except Exception as e:
+        print(f"Error saving downloader state: {e}")
+
+def _parse_spotify_playlist(url):
+    m = re.search(r'(playlist|album)/([a-zA-Z0-9]+)', url)
+    if not m:
+        return None, []
+    item_type, item_id = m.group(1), m.group(2)
+    embed_url = f"https://open.spotify.com/embed/{item_type}/{item_id}"
+    req = urllib.request.Request(embed_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        html = resp.read().decode('utf-8', errors='ignore')
+        match = re.search(r'__NEXT_DATA__.*?>(.*?)</script>', html)
+        if not match:
+            return None, []
+        data = json.loads(match.group(1))
+        entity = data.get("props", {}).get("pageProps", {}).get("state", {}).get("data", {}).get("entity", {})
+        raw_tracks = entity.get("trackList", [])
+        pl_name = entity.get("title") or "Spotify Playlist"
+        clean_tracks = []
+        for t in raw_tracks:
+            title = (t.get("title") or "").strip()
+            subtitle = (t.get("subtitle") or "").strip()
+            if title:
+                search_query = f"{subtitle} - {title}" if subtitle else title
+                clean_tracks.append({
+                    "title": f"{subtitle} - {title}" if subtitle else title,
+                    "query": search_query
+                })
+        return pl_name, clean_tracks
+
+def _parse_youtube_playlist(url):
+    cmd = ['yt-dlp', '--js-runtimes', 'node:/usr/bin/node', '--flat-playlist', '-J', url]
+    out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL, timeout=30, text=True)
+    data = json.loads(out)
+    pl_name = data.get("title") or "YouTube Playlist"
+    entries = data.get("entries") or []
+    clean_tracks = []
+    if not entries and data.get("id"):
+        clean_tracks.append({
+            "title": data.get("title", "YouTube Track"),
+            "url": url
+        })
+    else:
+        for e in entries:
+            t_title = e.get("title")
+            t_url = e.get("url") or f"https://www.youtube.com/watch?v={e.get('id')}"
+            if t_title:
+                clean_tracks.append({
+                    "title": t_title,
+                    "url": t_url
+                })
+    return pl_name, clean_tracks
+
+def _run_playlist_downloader_worker(url, folder_name):
+    state = dict(_DEFAULT_DOWNLOADER_STATE)
+    state["active"] = True
+    state["cancel_requested"] = False
+    state["status"] = "fetching_info"
+    state["percent"] = 5
+    state["log"] = [f"Bağlantı taranıyor: {url}"]
+    state["error_message"] = ""
+    _save_downloader_state(state)
+
+    try:
+        is_spotify = 'spotify.com' in url
+        is_youtube = 'youtube.com' in url or 'youtu.be' in url
+
+        if is_spotify:
+            state["source"] = "spotify"
+            _save_downloader_state(state)
+            pl_name, tracks = _parse_spotify_playlist(url)
+        elif is_youtube:
+            state["source"] = "youtube"
+            _save_downloader_state(state)
+            pl_name, tracks = _parse_youtube_playlist(url)
+        else:
+            raise ValueError("Desteklenmeyen link formatı. Sadece YouTube veya Spotify bağlantıları desteklenir.")
+
+        if not tracks:
+            raise ValueError("Çalma listesinde parça bulunamadı veya liste gizli/erişilemez.")
+
+        clean_folder = folder_name.strip() if folder_name and folder_name.strip() else pl_name
+        clean_folder = "".join(c for c in clean_folder if c not in '/\\:*?"<>|').strip() or "İndirilen Liste"
+        state["playlist_name"] = pl_name
+        state["target_folder"] = clean_folder
+        state["total_tracks"] = len(tracks)
+        state["completed_tracks"] = 0
+        state["status"] = "downloading"
+        state["log"].append(f"📁 Hedef Klasör: '{clean_folder}' ({len(tracks)} parça)")
+        _save_downloader_state(state)
+
+        target_dir = os.path.join(MUSIC_LIBRARY_DIR, clean_folder)
+        os.makedirs(target_dir, exist_ok=True)
+
+        for idx, trk in enumerate(tracks, 1):
+            curr_state = _get_downloader_state()
+            if curr_state.get("cancel_requested"):
+                state["status"] = "cancelled"
+                state["cancel_requested"] = True
+                state["log"].append("⏹ İndirme kullanıcı tarafından iptal edildi.")
+                _save_downloader_state(state)
+                break
+
+            title = trk.get("title", f"Parça {idx}")
+            clean_track_title = "".join(c for c in title if c not in '/\\:*?"<>|').strip()
+            state["current_track"] = clean_track_title
+            state["log"].append(f"[{idx}/{len(tracks)}] İndiriliyor: {clean_track_title}")
+            _save_downloader_state(state)
+
+            out_template = os.path.join(target_dir, f"{idx:02d} - {clean_track_title}.%(ext)s")
+            target_spec = f"ytsearch1:{trk.get('query')}" if is_spotify else trk.get("url")
+
+            dl_cmd = [
+                'yt-dlp',
+                '--js-runtimes', 'node:/usr/bin/node',
+                '-x',
+                '--audio-format', 'mp3',
+                '--audio-quality', '0',
+                '--no-playlist',
+                '--no-warnings',
+                '-o', out_template,
+                target_spec
+            ]
+            try:
+                subprocess.run(dl_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=180)
+                state["completed_tracks"] = idx
+                state["percent"] = int((idx / len(tracks)) * 100)
+                _save_downloader_state(state)
+            except Exception as e:
+                state["log"].append(f"⚠️ Hata ({clean_track_title}): {str(e)}")
+                _save_downloader_state(state)
+
+        curr_state = _get_downloader_state()
+        if not curr_state.get("cancel_requested"):
+            state["status"] = "completed"
+            state["percent"] = 100
+            state["log"].append(f"✅ İndirme tamamlandı! {clean_folder} klasörüne {state['completed_tracks']} parça eklendi.")
+            _save_downloader_state(state)
+            scan_music_library()
+    except Exception as err:
+        state["status"] = "error"
+        state["error_message"] = str(err)
+        state["log"].append(f"❌ Hata: {str(err)}")
+        _save_downloader_state(state)
+    finally:
+        state["active"] = False
+        _save_downloader_state(state)
+
+@app.route('/api/radio/downloader/start', methods=['POST'])
+def api_radio_downloader_start():
+    req = request.json or {}
+    url = req.get('url', '').strip()
+    folder_name = req.get('folder_name', '').strip()
+    if not url:
+        return jsonify({"success": False, "error": "Lütfen geçerli bir YouTube veya Spotify linki girin."}), 400
+    current_state = _get_downloader_state()
+    if current_state.get('active'):
+        return jsonify({"success": False, "error": "Şu anda devam eden bir indirme işlemi var."}), 400
+    threading.Thread(target=_run_playlist_downloader_worker, args=(url, folder_name), daemon=True).start()
+    return jsonify({"success": True, "message": "İndirme arka planda başlatıldı."})
+
+@app.route('/api/radio/downloader/status', methods=['GET'])
+def api_radio_downloader_status():
+    return jsonify(_get_downloader_state())
+
+@app.route('/api/radio/downloader/cancel', methods=['POST'])
+def api_radio_downloader_cancel():
+    state = _get_downloader_state()
+    state['cancel_requested'] = True
+    _save_downloader_state(state)
+    return jsonify({"success": True})
+
+
+# -----------------------------------------------------------------------------
+# Güvenlik Kameraları API (Canlı Snapshot & go2rtc Entegrasyonu)
+# -----------------------------------------------------------------------------
+import requests
+from requests.auth import HTTPDigestAuth
+
+CAMERA_CONFIGS = {
+    'kapi': {
+        'name': 'Kapı',
+        'url': 'http://192.168.1.21/ISAPI/Streaming/channels/1/picture',
+        'user': 'admin',
+        'pass': 'Hqhyk7t8kg...'
+    },
+    'masalar1': {
+        'name': 'Masalar 1',
+        'url': 'http://192.168.1.22/ISAPI/Streaming/channels/1/picture',
+        'user': 'admin',
+        'pass': 'Hqhyk7t8kg...'
+    },
+    'masalar2': {
+        'name': 'Masalar 2',
+        'url': 'http://192.168.1.20:30083/ISAPI/Streaming/channels/1/picture',
+        'user': 'admin',
+        'pass': 'Hqhyk7t8kg...'
+    },
+    'mutfak': {
+        'name': 'Mutfak',
+        'url': 'http://192.168.1.20:30082/ISAPI/Streaming/channels/1/picture',
+        'user': 'admin',
+        'pass': 'Hqhyk7t8kg...'
+    }
+}
+
+_cam_session = requests.Session()
+_cam_cache = {}
+_cam_cache_lock = threading.Lock()
+CAM_CACHE_TTL = 0.5  # Saniye (1 saniyelik canlı yenileme için optimize önbellek)
+
+@app.route('/api/camera/snapshot/<cam_id>')
+@limiter.exempt
+def api_camera_snapshot(cam_id):
+    cfg = CAMERA_CONFIGS.get(cam_id)
+    if not cfg:
+        return ("Camera not found", 404)
+
+    now = time.time()
+    with _cam_cache_lock:
+        cached = _cam_cache.get(cam_id)
+        if cached and (now - cached['time'] < CAM_CACHE_TTL):
+            resp = make_response(cached['data'])
+            resp.headers['Content-Type'] = cached.get('mime', 'image/jpeg')
+            resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            return resp
+
+    try:
+        r = _cam_session.get(
+            cfg['url'],
+            auth=HTTPDigestAuth(cfg['user'], cfg['pass']),
+            timeout=3.5
+        )
+        if r.status_code == 200:
+            mime = r.headers.get('content-type', 'image/jpeg')
+            with _cam_cache_lock:
+                _cam_cache[cam_id] = {
+                    'data': r.content,
+                    'time': now,
+                    'mime': mime
+                }
+            resp = make_response(r.content)
+            resp.headers['Content-Type'] = mime
+            resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            return resp
+        else:
+            with _cam_cache_lock:
+                cached = _cam_cache.get(cam_id)
+                if cached:
+                    resp = make_response(cached['data'])
+                    resp.headers['Content-Type'] = cached.get('mime', 'image/jpeg')
+                    return resp
+            return (f"Camera error: {r.status_code}", 502)
+    except Exception as e:
+        with _cam_cache_lock:
+            cached = _cam_cache.get(cam_id)
+            if cached:
+                resp = make_response(cached['data'])
+                resp.headers['Content-Type'] = cached.get('mime', 'image/jpeg')
+                return resp
+        return (f"Camera connection failed: {str(e)}", 504)
+
+@app.route('/api/camera/list')
+@limiter.exempt
+def api_camera_list():
+    return jsonify([
+        {'id': 'masalar1', 'name': 'Masalar 1'},
+        {'id': 'masalar2', 'name': 'Masalar 2'},
+        {'id': 'kapi', 'name': 'Kapı'},
+        {'id': 'mutfak', 'name': 'Mutfak'}
+    ])
 
 
 if __name__ == '__main__':
