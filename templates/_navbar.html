@@ -165,8 +165,7 @@
                 <a href="/tables"   {% if request.path == '/tables'   %}class="active"{% endif %}>Sipariş Noktaları</a>
                 <hr>
                 <a href="/backup"   {% if request.path == '/backup'   %}class="active"{% endif %}>Yedek</a>
-                <a href="/settings" {% if request.path == '/settings' and not request.args.get('tab') == 'kamera' %}class="active"{% endif %}>Ayarlar</a>
-                <a href="/settings?tab=kamera" {% if request.args.get('tab') == 'kamera' %}class="active"{% endif %}>📹 Kamera Ayarları</a>
+                <a href="/settings" {% if request.path == '/settings' %}class="active"{% endif %}>Ayarlar</a>
                 <hr>
                 <a href="/radio"    {% if request.path == '/radio'    %}class="active"{% endif %}>📻 Radyo & Müzik</a>
                 <a href="/tv-admin" {% if request.path == '/tv-admin' %}class="active"{% endif %}>Dijital Tabela (TV)</a>
