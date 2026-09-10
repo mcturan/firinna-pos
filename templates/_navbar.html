@@ -56,6 +56,12 @@
         cursor: pointer;
     }
 
+    @keyframes navEqBounce {
+        0% { height: 20%; }
+        50% { height: 95%; }
+        100% { height: 35%; }
+    }
+
     @media (max-width: 900px) {
         .top-widget-wrap { display: none !important; }
         #pageRadioWidget {
@@ -99,18 +105,26 @@
 
     <!-- Navbar Radio & Donanımsal Ses Kontrolü Widget -->
     <div id="navRadioWidget" style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.06); padding: 4px 10px; border-radius: 24px; margin: 0 6px;">
-        <button id="navRadioPlayBtn" onclick="navRadioTogglePlay()" style="background: #2d6a4f; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer; padding: 0;">▶</button>
+        <button id="navRadioPlayBtn" onclick="navRadioTogglePlay()" style="background: #2d6a4f; color: white; border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer; padding: 0; flex-shrink: 0;">▶</button>
         
-        <a href="/radio" style="text-decoration: none; display: flex; align-items: center; gap: 4px; color: inherit;" title="Radyo & Müzik Paneline Git">
+        <a href="/radio" style="text-decoration: none; display: flex; align-items: center; gap: 6px; color: inherit;" title="Radyo & Müzik Paneline Git">
             <span style="font-size: 0.9rem;">📻</span>
+            <!-- Navbar Canlı Müzik Çubukları (Equalizer) -->
+            <div id="navRadioEqBars" style="display: none; align-items: flex-end; gap: 2px; height: 12px; margin: 0 2px;">
+                <div style="width: 2.5px; height: 35%; background: #10b981; border-radius: 1px; animation: navEqBounce 0.9s infinite alternate;"></div>
+                <div style="width: 2.5px; height: 90%; background: #38bdf8; border-radius: 1px; animation: navEqBounce 1.3s infinite alternate 0.2s;"></div>
+                <div style="width: 2.5px; height: 60%; background: #10b981; border-radius: 1px; animation: navEqBounce 0.7s infinite alternate 0.4s;"></div>
+            </div>
             <span id="navRadioTitle" style="font-size: 0.82rem; font-weight: 700; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1e293b;">Hazır</span>
         </a>
 
         <!-- Ses Düzeyi Slider -->
-        <div style="display: flex; align-items: center; gap: 4px; margin-left: 4px; padding-left: 6px; border-left: 1px solid rgba(0,0,0,0.15);">
-            <button id="navRadioMuteBtn" onclick="navRadioToggleMute()" style="background: none; border: none; cursor: pointer; font-size: 0.95rem; padding: 0;" title="Sesi Aç/Kapat">🔊</button>
-            <input type="range" id="navRadioVolume" min="0" max="100" value="80" oninput="navRadioOnVolume(this.value)" style="width: 75px; height: 5px; accent-color: #2d6a4f; cursor: pointer;">
-            <span id="navRadioVolText" style="font-size: 0.75rem; font-weight: 700; color: #475569; min-width: 34px;">%80</span>
+        <div style="display: flex; align-items: center; gap: 6px; margin-left: 4px; padding-left: 8px; border-left: 1px solid rgba(0,0,0,0.15);">
+            <button id="navRadioMuteBtn" onclick="navRadioToggleMute()" style="background: none; border: none; cursor: pointer; font-size: 1.05rem; padding: 2px 4px; display: flex; align-items: center;" title="Sesi Aç/Kapat">🔊</button>
+            <button onclick="navRadioStepVolume(-5)" style="background: none; border: none; font-size: 1.3rem; font-weight: bold; cursor: pointer; color: #475569; padding: 0 3px;" title="Sesi Azalt">-</button>
+            <input type="range" id="navRadioVolume" min="0" max="100" value="40" oninput="navRadioOnVolume(this.value)" onchange="navRadioOnVolumeChange(this.value)" style="width: 170px; height: 6px; accent-color: #2d6a4f; cursor: pointer;">
+            <button onclick="navRadioStepVolume(5)" style="background: none; border: none; font-size: 1.15rem; font-weight: bold; cursor: pointer; color: #475569; padding: 0 3px;" title="Sesi Artır">+</button>
+            <span id="navRadioVolText" style="font-size: 0.78rem; font-weight: 700; color: #475569; min-width: 38px;">%40</span>
         </div>
     </div>
 
@@ -151,7 +165,8 @@
                 <a href="/tables"   {% if request.path == '/tables'   %}class="active"{% endif %}>Sipariş Noktaları</a>
                 <hr>
                 <a href="/backup"   {% if request.path == '/backup'   %}class="active"{% endif %}>Yedek</a>
-                <a href="/settings" {% if request.path == '/settings' %}class="active"{% endif %}>Ayarlar</a>
+                <a href="/settings" {% if request.path == '/settings' and not request.args.get('tab') == 'kamera' %}class="active"{% endif %}>Ayarlar</a>
+                <a href="/settings?tab=kamera" {% if request.args.get('tab') == 'kamera' %}class="active"{% endif %}>📹 Kamera Ayarları</a>
                 <hr>
                 <a href="/radio"    {% if request.path == '/radio'    %}class="active"{% endif %}>📻 Radyo & Müzik</a>
                 <a href="/tv-admin" {% if request.path == '/tv-admin' %}class="active"{% endif %}>Dijital Tabela (TV)</a>
@@ -165,7 +180,8 @@
     var currentRadioState = {};
     var isNavDraggingVol = false;
     var navVolDebounce = null;
-    var navLastVol = 80;
+    var navLastVol = 40;
+    var lastUserVolAction = 0;
 
     window.syncNavRadio = async function() {
         try {
@@ -178,8 +194,10 @@
             var volSlider = document.getElementById('navRadioVolume');
             var volText = document.getElementById('navRadioVolText');
             var muteBtn = document.getElementById('navRadioMuteBtn');
+            var eqBars = document.getElementById('navRadioEqBars');
             
             if (titleEl) titleEl.textContent = st.display_title || st.current_title || 'Hazır';
+            if (eqBars) eqBars.style.display = st.is_playing ? 'inline-flex' : 'none';
             if (btnEl) {
                 if (st.is_playing) {
                     btnEl.textContent = '⏸';
@@ -189,7 +207,7 @@
                     btnEl.style.background = '#2d6a4f';
                 }
             }
-            if (st.volume !== undefined && !isNavDraggingVol) {
+            if (st.volume !== undefined && !isNavDraggingVol && (Date.now() - lastUserVolAction > 1500)) {
                 if (volSlider) volSlider.value = st.volume;
                 if (volText) volText.textContent = '%' + st.volume;
                 if (muteBtn) muteBtn.textContent = st.volume > 0 ? (st.volume > 50 ? '🔊' : '🔉') : '🔇';
@@ -208,6 +226,7 @@
 
     window.navRadioOnVolume = function(val) {
         isNavDraggingVol = true;
+        lastUserVolAction = Date.now();
         var vol = parseInt(val, 10);
         var volText = document.getElementById('navRadioVolText');
         var muteBtn = document.getElementById('navRadioMuteBtn');
@@ -221,8 +240,31 @@
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({volume: vol})
             });
-            setTimeout(function(){ isNavDraggingVol = false; }, 300);
         }, 50);
+    };
+
+    window.navRadioOnVolumeChange = function(val) {
+        lastUserVolAction = Date.now();
+        var vol = parseInt(val, 10);
+        fetch('/api/radio/volume', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({volume: vol})
+        });
+        setTimeout(function(){ isNavDraggingVol = false; }, 400);
+    };
+
+    window.navRadioStepVolume = function(delta) {
+        var slider = document.getElementById('navRadioVolume');
+        if (!slider) return;
+        var cur = parseInt(slider.value, 10) || 0;
+        var target = Math.max(0, Math.min(100, cur + delta));
+        slider.value = target;
+        var volText = document.getElementById('navRadioVolText');
+        var muteBtn = document.getElementById('navRadioMuteBtn');
+        if (volText) volText.textContent = '%' + target;
+        if (muteBtn) muteBtn.textContent = target > 0 ? (target > 50 ? '🔊' : '🔉') : '🔇';
+        navRadioOnVolumeChange(target);
     };
 
     window.navRadioToggleMute = function() {
@@ -232,11 +274,19 @@
         if (cur > 0) {
             navLastVol = cur;
             slider.value = 0;
-            navRadioOnVolume(0);
+            var volText = document.getElementById('navRadioVolText');
+            var muteBtn = document.getElementById('navRadioMuteBtn');
+            if (volText) volText.textContent = '%0';
+            if (muteBtn) muteBtn.textContent = '🔇';
+            navRadioOnVolumeChange(0);
         } else {
             var rest = navLastVol > 0 ? navLastVol : 80;
             slider.value = rest;
-            navRadioOnVolume(rest);
+            var volText = document.getElementById('navRadioVolText');
+            var muteBtn = document.getElementById('navRadioMuteBtn');
+            if (volText) volText.textContent = '%' + rest;
+            if (muteBtn) muteBtn.textContent = rest > 50 ? '🔊' : '🔉';
+            navRadioOnVolumeChange(rest);
         }
     };
 

@@ -5780,37 +5780,121 @@ def api_radio_downloader_cancel():
 
 
 # -----------------------------------------------------------------------------
-# Güvenlik Kameraları API (Canlı Snapshot & go2rtc Entegrasyonu)
+# Güvenlik Kameraları API (Canlı Snapshot & go2rtc Entegrasyonu & Yönetim)
 # -----------------------------------------------------------------------------
 import requests
+import subprocess
 from requests.auth import HTTPDigestAuth
 
-CAMERA_CONFIGS = {
-    'kapi': {
-        'name': 'Kapı',
-        'url': 'http://192.168.1.21/ISAPI/Streaming/channels/1/picture',
-        'user': 'admin',
-        'pass': 'Hqhyk7t8kg...'
-    },
-    'masalar1': {
+CAMERA_SETTINGS_FILE = os.path.join(os.path.dirname(__file__), 'camera_settings.json')
+
+DEFAULT_CAMERA_SETTINGS = [
+    {
+        'id': 'masalar1',
         'name': 'Masalar 1',
-        'url': 'http://192.168.1.22/ISAPI/Streaming/channels/1/picture',
+        'ip': '192.168.1.22',
+        'snapshot_url': 'http://192.168.1.22/ISAPI/Streaming/channels/1/picture',
+        'stream_url': 'rtsp://admin:Hqhyk7t8kg...@192.168.1.22:554/live/ch0',
         'user': 'admin',
-        'pass': 'Hqhyk7t8kg...'
+        'pass': 'Hqhyk7t8kg...',
+        'enabled': True
     },
-    'masalar2': {
+    {
+        'id': 'masalar2',
         'name': 'Masalar 2',
-        'url': 'http://192.168.1.20:30083/ISAPI/Streaming/channels/1/picture',
+        'ip': '192.168.1.20:30083',
+        'snapshot_url': 'http://192.168.1.20:30083/ISAPI/Streaming/channels/1/picture',
+        'stream_url': 'exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30083/Streaming/Channels/102 -c:v copy -an -f rtsp {output}',
         'user': 'admin',
-        'pass': 'Hqhyk7t8kg...'
+        'pass': 'Hqhyk7t8kg...',
+        'enabled': True
     },
-    'mutfak': {
+    {
+        'id': 'mutfak',
         'name': 'Mutfak',
-        'url': 'http://192.168.1.20:30082/ISAPI/Streaming/channels/1/picture',
+        'ip': '192.168.1.21',
+        'snapshot_url': 'http://192.168.1.21/ISAPI/Streaming/channels/1/picture',
+        'stream_url': 'rtsp://admin:Hqhyk7t8kg...@192.168.1.21:554/live/ch0',
         'user': 'admin',
-        'pass': 'Hqhyk7t8kg...'
+        'pass': 'Hqhyk7t8kg...',
+        'enabled': True
+    },
+    {
+        'id': 'kapi',
+        'name': 'Kapı',
+        'ip': '192.168.1.20:30082',
+        'snapshot_url': 'http://192.168.1.20:30082/ISAPI/Streaming/channels/1/picture',
+        'stream_url': 'exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30082/Streaming/Channels/102 -c:v copy -an -f rtsp {output}',
+        'user': 'admin',
+        'pass': 'Hqhyk7t8kg...',
+        'enabled': True
     }
-}
+]
+
+def load_camera_settings():
+    if os.path.exists(CAMERA_SETTINGS_FILE):
+        try:
+            with open(CAMERA_SETTINGS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print("Kamera ayarları okuma hatası:", e)
+    return DEFAULT_CAMERA_SETTINGS
+
+def save_camera_settings_to_disk(cams_data):
+    with open(CAMERA_SETTINGS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(cams_data, f, ensure_ascii=False, indent=2)
+
+    # go2rtc.yaml otomatik güncelleme
+    streams_yaml = ["streams:"]
+    for cam in cams_data:
+        if cam.get('enabled', True) and cam.get('stream_url'):
+            cid = cam.get('id')
+            surl = cam.get('stream_url')
+            streams_yaml.append(f"  {cid}:")
+            streams_yaml.append(f"    - {surl}")
+    streams_yaml.extend([
+        "",
+        'api:',
+        '  listen: "127.0.0.1:1984"',
+        "",
+        'webrtc:',
+        '  listen: ":8555"',
+        '  candidates:',
+        '    - 192.168.1.2',
+        "",
+        'log:',
+        '  level: info',
+        ""
+    ])
+    yaml_content = "\n".join(streams_yaml)
+    for path in ['/opt/firinna-pos/go2rtc.yaml', os.path.join(os.path.dirname(__file__), 'go2rtc.yaml')]:
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(yaml_content)
+        except Exception as e:
+            pass
+
+    # go2rtc yeniden başlat
+    try:
+        subprocess.run(['sudo', 'systemctl', 'restart', 'go2rtc'], check=False)
+    except Exception as e:
+        print("go2rtc restart hatası:", e)
+
+def get_camera_configs_dict():
+    cams = load_camera_settings()
+    cfg = {}
+    for c in cams:
+        cid = c.get('id')
+        cfg[cid] = {
+            'name': c.get('name', cid),
+            'url': c.get('snapshot_url', ''),
+            'user': c.get('user', 'admin'),
+            'pass': c.get('pass', ''),
+            'stream_url': c.get('stream_url', ''),
+            'ip': c.get('ip', ''),
+            'enabled': c.get('enabled', True)
+        }
+    return cfg
 
 _cam_session = requests.Session()
 _cam_cache = {}
@@ -5820,7 +5904,7 @@ CAM_CACHE_TTL = 0.5  # Saniye (1 saniyelik canlı yenileme için optimize önbel
 @app.route('/api/camera/snapshot/<cam_id>')
 @limiter.exempt
 def api_camera_snapshot(cam_id):
-    cfg = CAMERA_CONFIGS.get(cam_id)
+    cfg = get_camera_configs_dict().get(cam_id)
     if not cfg:
         return ("Camera not found", 404)
 
@@ -5871,12 +5955,79 @@ def api_camera_snapshot(cam_id):
 @app.route('/api/camera/list')
 @limiter.exempt
 def api_camera_list():
+    cams = load_camera_settings()
     return jsonify([
-        {'id': 'masalar1', 'name': 'Masalar 1'},
-        {'id': 'masalar2', 'name': 'Masalar 2'},
-        {'id': 'kapi', 'name': 'Kapı'},
-        {'id': 'mutfak', 'name': 'Mutfak'}
+        {'id': c['id'], 'name': c.get('name', c['id']), 'enabled': c.get('enabled', True)}
+        for c in cams if c.get('enabled', True)
     ])
+
+@app.route('/api/settings/cameras', methods=['GET', 'POST'])
+def api_settings_cameras():
+    if request.method == 'GET':
+        return jsonify(load_camera_settings())
+    
+    try:
+        data = request.json
+        if not isinstance(data, list):
+            return jsonify({"status": "error", "message": "Geçersiz veri formatı. Liste bekleniyor."}), 400
+        
+        cleaned = []
+        for item in data:
+            cid = str(item.get('id', '')).strip()
+            if not cid:
+                continue
+            cleaned.append({
+                'id': cid,
+                'name': str(item.get('name', cid)).strip(),
+                'ip': str(item.get('ip', '')).strip(),
+                'snapshot_url': str(item.get('snapshot_url', '')).strip(),
+                'stream_url': str(item.get('stream_url', '')).strip(),
+                'user': str(item.get('user', 'admin')).strip(),
+                'pass': str(item.get('pass', '')).strip(),
+                'enabled': bool(item.get('enabled', True))
+            })
+        
+        save_camera_settings_to_disk(cleaned)
+        with _cam_cache_lock:
+            _cam_cache.clear()
+            
+        return jsonify({"status": "success", "message": "Kamera ayarları kaydedildi ve servisler güncellendi.", "cameras": cleaned})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/camera/test_connection', methods=['POST'])
+def api_camera_test_connection():
+    try:
+        data = request.json or {}
+        url = data.get('url') or data.get('snapshot_url')
+        user = data.get('user', 'admin')
+        password = data.get('pass', '')
+        
+        if not url:
+            return jsonify({"success": False, "error": "Test için URL belirtilmedi."}), 400
+        
+        t0 = time.time()
+        r = _cam_session.get(url, auth=HTTPDigestAuth(user, password), timeout=3.0)
+        dur = round((time.time() - t0), 2)
+        
+        if r.status_code == 200:
+            import base64
+            img_b64 = base64.b64encode(r.content).decode('ascii')
+            mime = r.headers.get('content-type', 'image/jpeg')
+            return jsonify({
+                "success": True,
+                "status_code": r.status_code,
+                "duration": f"{dur}s",
+                "preview_base64": f"data:{mime};base64,{img_b64}"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "status_code": r.status_code,
+                "error": f"Kamera HTTP {r.status_code} döndürdü."
+            })
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Bağlantı hatası: {str(e)}"})
 
 
 if __name__ == '__main__':

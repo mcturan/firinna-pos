@@ -66,6 +66,7 @@
             <button class="settings-tab" onclick="switchTab('not',this)">📝 Not</button>
             <button class="settings-tab" onclick="switchTab('telegram',this)">📲 Telegram</button>
             <button class="settings-tab" onclick="switchTab('foto',this)">📸 Fotoğraf</button>
+            <button class="settings-tab" onclick="switchTab('kamera',this)" id="tab-btn-kamera">📹 Kameralar</button>
             <button class="settings-tab" onclick="window.location.href='/tv-admin'" style="color:#2d6a4f; font-weight:bold;">📺 Dijital Tabela</button>
         </div>
 
@@ -170,7 +171,17 @@
             await loadPrinterSettings();
             await loadLogoSettings();
             await loadAutoPullSetting();
+            await loadCameraSettings();
             loadSavedNotes();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            if (tabParam) {
+                const targetBtn = document.querySelector(`.settings-tab[onclick*="'${tabParam}'"]`);
+                if (targetBtn) {
+                    switchTab(tabParam, targetBtn);
+                }
+            }
         });
 
         async function loadBusinessSettings() {
@@ -270,10 +281,13 @@
         async function saveTelegram() {
             const token = document.getElementById('tg-token').value.trim();
             const chat_id = document.getElementById('tg-chat-id').value.trim();
+            const notify_low_stock = document.getElementById('tg-notify-low-stock').checked;
+            const notify_daily_close = document.getElementById('tg-notify-daily-close').checked;
+            const notify_web_msg = document.getElementById('tg-notify-web-msg').checked;
             const res = await fetch('/api/settings/telegram', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({token, chat_id})
+                body: JSON.stringify({token, chat_id, notify_low_stock, notify_daily_close, notify_web_msg})
             });
             const d = await res.json();
             if (d.success) showToast('Telegram ayarları kaydedildi!', 'success');
@@ -544,6 +558,9 @@
                 const tg = await fetch('/api/settings/telegram').then(r=>r.json()).catch(()=>({}));
                 if (tg.token) document.getElementById('tg-token').value = tg.token;
                 if (tg.chat_id) document.getElementById('tg-chat-id').value = tg.chat_id;
+                document.getElementById('tg-notify-low-stock').checked = tg.notify_low_stock !== false;
+                document.getElementById('tg-notify-daily-close').checked = tg.notify_daily_close !== false;
+                document.getElementById('tg-notify-web-msg').checked = tg.notify_web_msg !== false;
 
                 // Telegram rehberi yükle
                 loadContacts();
@@ -802,6 +819,25 @@
             <div id="tg-status" style="margin-top:1rem;padding:.75rem;border-radius:8px;display:none;font-size:.9rem;font-weight:600;"></div>
         </div>
 
+        <!-- 4. Bildirim Tercihleri -->
+        <div class="settings-card">
+            <h3>🔔 Bildirim Tercihleri</h3>
+            <div class="field-group">
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+                    <input type="checkbox" id="tg-notify-low-stock" style="width:1.2rem;height:1.2rem;" onchange="saveTelegram()">
+                    Düşük Stok Uyarısı (Otomatik)
+                </label>
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+                    <input type="checkbox" id="tg-notify-daily-close" style="width:1.2rem;height:1.2rem;" onchange="saveTelegram()">
+                    Gün Sonu Bildirimi
+                </label>
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+                    <input type="checkbox" id="tg-notify-web-msg" style="width:1.2rem;height:1.2rem;" onchange="saveTelegram()">
+                    Web Mesajları
+                </label>
+            </div>
+        </div>
+
         </div><!-- /tab-telegram -->
 
         <!-- Fotoğraf Yazdır -->
@@ -849,6 +885,39 @@
         </div>
         </div><!-- /tab-foto -->
 
+        <!-- Kamera Ayarları -->
+        <div id="tab-kamera" class="settings-panel" style="display:none;">
+            <div class="settings-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                    <h3 style="margin:0;">📹 Güvenlik Kameraları & Akış Ayarları</h3>
+                    <div style="display:flex; gap:0.5rem;">
+                        <button class="btn btn-primary" onclick="saveCameraSettings()" id="btn-save-cameras" style="background:#2d6a4f;">💾 Kamera Ayarlarını Kaydet</button>
+                    </div>
+                </div>
+                <p style="font-size:0.88rem; color:#64748b; margin-top:0; margin-bottom:1.5rem;">
+                    Sipariş ekranındaki canlı dikey kamera panelinde ve detay penceresinde gösterilen kameraların isimlerini, IP adreslerini, RTSP akış ve anlık resim URL'lerini buradan yönetebilirsiniz.
+                </p>
+
+                <div id="camera-settings-container" style="display:flex; flex-direction:column; gap:1.25rem;">
+                    <!-- JS ile dinamik kamera form kartları üretilecek -->
+                </div>
+
+                <div style="margin-top:1.5rem; display:flex; justify-content:flex-end;">
+                    <button class="btn btn-primary" onclick="saveCameraSettings()" style="background:#2d6a4f; padding:0.75rem 2rem; font-size:1rem;">💾 Tüm Değişiklikleri Kaydet</button>
+                </div>
+            </div>
+
+            <!-- Bilgilendirme Kutusu -->
+            <div class="settings-card" style="background:#f0fdf4; border:1px solid #bbf7d0;">
+                <h4 style="margin:0 0 0.5rem; color:#166534; display:flex; align-items:center; gap:0.5rem;">ℹ️ NVR & Kamera Kurulum İpuçları</h4>
+                <ul style="margin:0; padding-left:1.25rem; font-size:0.85rem; color:#15803d; line-height:1.6;">
+                    <li><strong>Doğrudan IP Kameralar:</strong> Standart RTSP portu <code>554</code> ve ISAPI yolu <code>/ISAPI/Streaming/channels/1/picture</code> kullanır.</li>
+                    <li><strong>NVR PoE Arkasındaki Kameralar:</strong> NVR'ın HTTP port eşleştirmesi üzerinden (ör. <code>30082</code>, <code>30083</code>) alt akış (substream 102) HTTP tunneling ile akıtılır.</li>
+                    <li><strong>WebRTC Canlı Yayın:</strong> Kamera ayarları kaydedildiğinde arka plandaki <code>go2rtc</code> akış servisi ve POS anlık önizleme servisi otomatik olarak güncellenir.</li>
+                </ul>
+            </div>
+        </div><!-- /tab-kamera -->
+
     </div><!-- /container -->
 
     <script>
@@ -859,6 +928,183 @@
             document.getElementById('tab-' + name).style.display = 'block';
             btn.classList.add('active');
             
+        }
+
+        // ===== GÜVENLİK KAMERALARI YÖNETİMİ =====
+        let currentCameraSettings = [];
+
+        async function loadCameraSettings() {
+            try {
+                const res = await fetch('/api/settings/cameras');
+                const data = await res.json();
+                currentCameraSettings = data || [];
+                renderCameraSettingsCards();
+            } catch (err) {
+                console.error('Kamera ayarları yüklenemedi:', err);
+            }
+        }
+
+        function renderCameraSettingsCards() {
+            const container = document.getElementById('camera-settings-container');
+            if (!container) return;
+            
+            if (!currentCameraSettings || currentCameraSettings.length === 0) {
+                container.innerHTML = '<div style="padding:1rem;color:#64748b;">Kamera yapılandırması bulunamadı.</div>';
+                return;
+            }
+
+            container.innerHTML = currentCameraSettings.map((cam, idx) => `
+                <div class="printer-box" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:1.25rem;" id="cam-box-${idx}">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.6rem;">
+                        <div style="display:flex; align-items:center; gap:0.6rem;">
+                            <span style="font-weight:800; font-size:1.05rem; color:#1e293b;">📹 ${idx + 1}. Kamera (${escapeHtml(cam.name || cam.id)})</span>
+                            <span style="font-size:0.75rem; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-family:monospace; font-weight:700;">ID: ${escapeHtml(cam.id)}</span>
+                        </div>
+                        <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; font-size:0.88rem; font-weight:600; color:#334155;">
+                            <input type="checkbox" id="cam-enabled-${idx}" ${cam.enabled !== false ? 'checked' : ''} style="width:16px; height:16px;">
+                            Aktif
+                        </label>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1rem;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">Görünen İsim / Başlık</label>
+                            <input type="text" id="cam-name-${idx}" value="${escapeHtml(cam.name || '')}" placeholder="Örn: Masalar 1" style="width:100%; padding:0.6rem; border:2px solid #e2e8f0; border-radius:8px; font-size:0.95rem; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">IP Adresi / Host (Port Dahil)</label>
+                            <input type="text" id="cam-ip-${idx}" value="${escapeHtml(cam.ip || '')}" placeholder="Örn: 192.168.1.22 veya 192.168.1.20:30083" style="width:100%; padding:0.6rem; border:2px solid #e2e8f0; border-radius:8px; font-size:0.95rem; box-sizing:border-box;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">Anlık Görüntü (Snapshot) URL</label>
+                        <input type="text" id="cam-snap-${idx}" value="${escapeHtml(cam.snapshot_url || '')}" placeholder="http://192.168.1.x/ISAPI/Streaming/channels/1/picture" style="width:100%; padding:0.6rem; border:2px solid #e2e8f0; border-radius:8px; font-size:0.9rem; font-family:monospace; box-sizing:border-box;">
+                    </div>
+
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">Canlı Akış Kaynağı (RTSP veya exec:ffmpeg)</label>
+                        <input type="text" id="cam-stream-${idx}" value="${escapeHtml(cam.stream_url || '')}" placeholder="rtsp://admin:şifre@192.168.1.x:554/live/ch0" style="width:100%; padding:0.6rem; border:2px solid #e2e8f0; border-radius:8px; font-size:0.9rem; font-family:monospace; box-sizing:border-box;">
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1rem; align-items:end;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">Kullanıcı Adı</label>
+                            <input type="text" id="cam-user-${idx}" value="${escapeHtml(cam.user || 'admin')}" style="width:100%; padding:0.6rem; border:2px solid #e2e8f0; border-radius:8px; font-size:0.9rem; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">Şifre</label>
+                            <input type="password" id="cam-pass-${idx}" value="${escapeHtml(cam.pass || '')}" style="width:100%; padding:0.6rem; border:2px solid #e2e8f0; border-radius:8px; font-size:0.9rem; box-sizing:border-box;">
+                        </div>
+                        <div style="display:flex; gap:0.5rem;">
+                            <button type="button" class="btn btn-secondary" onclick="testCameraSnapshot(${idx})" id="btn-test-cam-${idx}" style="width:100%; padding:0.6rem; font-weight:600; font-size:0.88rem;">🔌 Test Et</button>
+                        </div>
+                    </div>
+
+                    <!-- Test Sonuç Kutusu -->
+                    <div id="cam-test-result-${idx}" style="display:none; margin-top:0.75rem; padding:0.75rem; border-radius:8px; font-size:0.85rem;"></div>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        async function saveCameraSettings() {
+            const btn = document.getElementById('btn-save-cameras');
+            if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
+
+            const updated = currentCameraSettings.map((cam, idx) => {
+                return {
+                    id: cam.id,
+                    name: document.getElementById(`cam-name-${idx}`)?.value.trim() || cam.id,
+                    ip: document.getElementById(`cam-ip-${idx}`)?.value.trim() || '',
+                    snapshot_url: document.getElementById(`cam-snap-${idx}`)?.value.trim() || '',
+                    stream_url: document.getElementById(`cam-stream-${idx}`)?.value.trim() || '',
+                    user: document.getElementById(`cam-user-${idx}`)?.value.trim() || 'admin',
+                    pass: document.getElementById(`cam-pass-${idx}`)?.value.trim() || '',
+                    enabled: document.getElementById(`cam-enabled-${idx}`) ? document.getElementById(`cam-enabled-${idx}`).checked : true
+                };
+            });
+
+            try {
+                const res = await fetch('/api/settings/cameras', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(updated)
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast('Kamera ayarları başarıyla kaydedildi!', 'success');
+                    currentCameraSettings = data.cameras || updated;
+                    renderCameraSettingsCards();
+                } else {
+                    showToast(data.message || 'Kayıt hatası!', 'error');
+                }
+            } catch (e) {
+                showToast('Bağlantı hatası: ' + e.message, 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = '💾 Kamera Ayarlarını Kaydet'; }
+            }
+        }
+
+        async function testCameraSnapshot(idx) {
+            const btn = document.getElementById(`btn-test-cam-${idx}`);
+            const resBox = document.getElementById(`cam-test-result-${idx}`);
+            if (!resBox) return;
+
+            const url = document.getElementById(`cam-snap-${idx}`)?.value.trim();
+            const user = document.getElementById(`cam-user-${idx}`)?.value.trim();
+            const pass = document.getElementById(`cam-pass-${idx}`)?.value.trim();
+
+            if (!url) {
+                resBox.style.display = 'block';
+                resBox.style.background = '#fee2e2';
+                resBox.style.color = '#991b1b';
+                resBox.textContent = 'Lütfen önce Anlık Görüntü (Snapshot) URL alanını doldurun.';
+                return;
+            }
+
+            if (btn) { btn.disabled = true; btn.textContent = 'Bağlanıyor...'; }
+            resBox.style.display = 'block';
+            resBox.style.background = '#f1f5f9';
+            resBox.style.color = '#334155';
+            resBox.textContent = 'Kameraya bağlanılıyor ve görüntü test ediliyor...';
+
+            try {
+                const res = await fetch('/api/camera/test_connection', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url, user, pass})
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    resBox.style.background = '#dcfce7';
+                    resBox.style.color = '#15803d';
+                    resBox.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+                            <div>
+                                <strong>✅ Bağlantı Başarılı!</strong> (HTTP ${data.status_code} - Yanıt: ${data.duration})<br>
+                                <span style="font-size:0.8rem; color:#166534;">Kamera anlık görüntüsü başarıyla alındı.</span>
+                            </div>
+                            ${data.preview_base64 ? `<img src="${data.preview_base64}" style="width:90px; height:50px; object-fit:cover; border-radius:6px; border:1px solid #86efac;">` : ''}
+                        </div>
+                    `;
+                } else {
+                    resBox.style.background = '#fee2e2';
+                    resBox.style.color = '#991b1b';
+                    resBox.innerHTML = `<strong>❌ Bağlantı Başarısız:</strong> ${data.error || 'Hata oluştu'}`;
+                }
+            } catch (err) {
+                resBox.style.background = '#fee2e2';
+                resBox.style.color = '#991b1b';
+                resBox.innerHTML = `<strong>❌ Test Hatası:</strong> ${err.message}`;
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = '🔌 Test Et'; }
+            }
         }
 
         // ===== FOTOĞRAF YAZDIR =====

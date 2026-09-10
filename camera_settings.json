@@ -1,0 +1,42 @@
+[
+  {
+    "id": "masalar1",
+    "name": "Masalar 1",
+    "ip": "192.168.1.22",
+    "snapshot_url": "http://192.168.1.22/ISAPI/Streaming/channels/1/picture",
+    "stream_url": "rtsp://admin:Hqhyk7t8kg...@192.168.1.22:554/live/ch0",
+    "user": "admin",
+    "pass": "Hqhyk7t8kg...",
+    "enabled": true
+  },
+  {
+    "id": "masalar2",
+    "name": "Masalar 2",
+    "ip": "192.168.1.20:30083",
+    "snapshot_url": "http://192.168.1.20:30083/ISAPI/Streaming/channels/1/picture",
+    "stream_url": "exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30083/Streaming/Channels/102 -c:v copy -an -f rtsp {output}",
+    "user": "admin",
+    "pass": "Hqhyk7t8kg...",
+    "enabled": true
+  },
+  {
+    "id": "mutfak",
+    "name": "Mutfak",
+    "ip": "192.168.1.21",
+    "snapshot_url": "http://192.168.1.21/ISAPI/Streaming/channels/1/picture",
+    "stream_url": "rtsp://admin:Hqhyk7t8kg...@192.168.1.21:554/live/ch0",
+    "user": "admin",
+    "pass": "Hqhyk7t8kg...",
+    "enabled": true
+  },
+  {
+    "id": "kapi",
+    "name": "Kapı",
+    "ip": "192.168.1.20:30082",
+    "snapshot_url": "http://192.168.1.20:30082/ISAPI/Streaming/channels/1/picture",
+    "stream_url": "exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30082/Streaming/Channels/102 -c:v copy -an -f rtsp {output}",
+    "user": "admin",
+    "pass": "Hqhyk7t8kg...",
+    "enabled": true
+  }
+]

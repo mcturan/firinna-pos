@@ -52,6 +52,8 @@ function initAdmin() {
                 loadWebProducts();
             } else if (targetId === 'settings') {
                 fetchSettings();
+            } else if (targetId === 'camera-mgmt') {
+                loadAdminCameras();
             }
         });
     });
@@ -356,13 +358,13 @@ function renderGroupedVisitors() {
         return;
     }
 
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = new Date().toLocaleDateString('en-CA');
 
     // Raw ziyaretçileri seçilen zaman filtresine göre süz
     let filteredVisitors = currentRawVisitors.filter(v => {
         const iso = v.iso_date || '';
         if (visitorFilterMode === 'today') {
-            return iso === todayStr || (v.time && v.time.includes('Ağustos')); // bugün kontrolü
+            return iso === todayStr || (v.raw_time && v.raw_time.startsWith(todayStr));
         } else if (visitorFilterMode === 'range') {
             if (filterStartDate && filterEndDate && iso) {
                 return iso >= filterStartDate && iso <= filterEndDate;
@@ -1133,5 +1135,180 @@ async function deleteProduct(id) {
         }
     } catch(e) {
         console.error("Delete error:", e);
+    }
+}
+
+// ==========================================
+// KAMERA AYARLARI YÖNETİMİ
+// ==========================================
+let adminCameraData = [];
+
+async function loadAdminCameras() {
+    const list = document.getElementById('admin-camera-list');
+    if (list) list.innerHTML = '<div style="padding:1.5rem; text-align:center; color:#64748b;">Kamera ayarları yükleniyor...</div>';
+    
+    try {
+        const res = await fetch('/api/settings/cameras');
+        const data = await res.json();
+        adminCameraData = data || [];
+        renderAdminCameras();
+    } catch(err) {
+        if (list) list.innerHTML = `<div style="padding:1.5rem; color:#dc2626;">Kamera ayarları yüklenirken hata oluştu: ${err.message}</div>`;
+    }
+}
+
+function renderAdminCameras() {
+    const list = document.getElementById('admin-camera-list');
+    if (!list) return;
+
+    if (!adminCameraData || adminCameraData.length === 0) {
+        list.innerHTML = '<div style="padding:1rem; color:#64748b;">Yapılandırılmış kamera bulunamadı.</div>';
+        return;
+    }
+
+    list.innerHTML = adminCameraData.map((cam, idx) => `
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.5rem;">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <span style="font-weight:700; font-size:1.05rem; color:#1e293b;">📹 ${idx + 1}. Kamera (${escapeHtml(cam.name || cam.id)})</span>
+                    <span style="font-size:0.75rem; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-family:monospace; font-weight:700;">ID: ${escapeHtml(cam.id)}</span>
+                </div>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; font-size:0.85rem; font-weight:600; color:#334155;">
+                    <input type="checkbox" id="admin-cam-enabled-${idx}" ${cam.enabled !== false ? 'checked' : ''} style="width:16px; height:16px;">
+                    Aktif
+                </label>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:0.85rem;">
+                <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">Görünen İsim / Başlık</label>
+                    <input type="text" id="admin-cam-name-${idx}" value="${escapeHtml(cam.name || '')}" placeholder="Örn: Masalar 1" style="width:100%; padding:0.6rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.9rem; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">IP Adresi / Host</label>
+                    <input type="text" id="admin-cam-ip-${idx}" value="${escapeHtml(cam.ip || '')}" placeholder="Örn: 192.168.1.22" style="width:100%; padding:0.6rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.9rem; box-sizing:border-box;">
+                </div>
+            </div>
+
+            <div style="margin-bottom:0.85rem;">
+                <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">Anlık Görüntü (Snapshot) URL</label>
+                <input type="text" id="admin-cam-snap-${idx}" value="${escapeHtml(cam.snapshot_url || '')}" placeholder="http://..." style="width:100%; padding:0.6rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
+            </div>
+
+            <div style="margin-bottom:0.85rem;">
+                <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">Canlı Akış (RTSP / ffmpeg) Kaynağı</label>
+                <input type="text" id="admin-cam-stream-${idx}" value="${escapeHtml(cam.stream_url || '')}" placeholder="rtsp://..." style="width:100%; padding:0.6rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; font-family:monospace; box-sizing:border-box;">
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; align-items:end;">
+                <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">Kullanıcı Adı</label>
+                    <input type="text" id="admin-cam-user-${idx}" value="${escapeHtml(cam.user || 'admin')}" style="width:100%; padding:0.55rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.3rem; color:#475569;">Şifre</label>
+                    <input type="password" id="admin-cam-pass-${idx}" value="${escapeHtml(cam.pass || '')}" style="width:100%; padding:0.55rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; box-sizing:border-box;">
+                </div>
+                <div>
+                    <button type="button" onclick="testAdminCameraSnapshot(${idx})" id="btn-admin-test-cam-${idx}" style="width:100%; padding:0.55rem; background:#475569; color:white; border:none; border-radius:6px; font-weight:600; font-size:0.85rem; cursor:pointer;">🔌 Bağlantıyı Test Et</button>
+                </div>
+            </div>
+
+            <div id="admin-cam-test-res-${idx}" style="display:none; margin-top:0.75rem; padding:0.6rem 0.85rem; border-radius:6px; font-size:0.85rem;"></div>
+        </div>
+    `).join('');
+}
+
+async function saveAdminCameraSettings() {
+    const btn = document.getElementById('btn-save-admin-cams');
+    if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
+
+    const updated = adminCameraData.map((cam, idx) => {
+        return {
+            id: cam.id,
+            name: document.getElementById(`admin-cam-name-${idx}`)?.value.trim() || cam.id,
+            ip: document.getElementById(`admin-cam-ip-${idx}`)?.value.trim() || '',
+            snapshot_url: document.getElementById(`admin-cam-snap-${idx}`)?.value.trim() || '',
+            stream_url: document.getElementById(`admin-cam-stream-${idx}`)?.value.trim() || '',
+            user: document.getElementById(`admin-cam-user-${idx}`)?.value.trim() || 'admin',
+            pass: document.getElementById(`admin-cam-pass-${idx}`)?.value.trim() || '',
+            enabled: document.getElementById(`admin-cam-enabled-${idx}`) ? document.getElementById(`admin-cam-enabled-${idx}`).checked : true
+        };
+    });
+
+    try {
+        const res = await fetch('/api/settings/cameras', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(updated)
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            alert('✅ Kamera ayarları başarıyla kaydedildi!');
+            adminCameraData = data.cameras || updated;
+            renderAdminCameras();
+        } else {
+            alert('❌ Kayıt hatası: ' + (data.message || 'Bilinmeyen hata'));
+        }
+    } catch (e) {
+        alert('❌ Bağlantı hatası: ' + e.message);
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Ayarları Kaydet'; }
+    }
+}
+
+async function testAdminCameraSnapshot(idx) {
+    const btn = document.getElementById(`btn-admin-test-cam-${idx}`);
+    const resBox = document.getElementById(`admin-cam-test-res-${idx}`);
+    if (!resBox) return;
+
+    const url = document.getElementById(`admin-cam-snap-${idx}`)?.value.trim();
+    const user = document.getElementById(`admin-cam-user-${idx}`)?.value.trim();
+    const pass = document.getElementById(`admin-cam-pass-${idx}`)?.value.trim();
+
+    if (!url) {
+        resBox.style.display = 'block';
+        resBox.style.background = '#fee2e2';
+        resBox.style.color = '#991b1b';
+        resBox.textContent = 'Lütfen önce Snapshot URL alanını doldurun.';
+        return;
+    }
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Bağlanıyor...'; }
+    resBox.style.display = 'block';
+    resBox.style.background = '#f1f5f9';
+    resBox.style.color = '#334155';
+    resBox.textContent = 'Kameraya bağlanılıyor...';
+
+    try {
+        const res = await fetch('/api/camera/test_connection', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({url, user, pass})
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            resBox.style.background = '#dcfce7';
+            resBox.style.color = '#15803d';
+            resBox.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+                    <div>
+                        <strong>✅ Bağlantı Başarılı!</strong> (HTTP ${data.status_code} - Süre: ${data.duration})
+                    </div>
+                    ${data.preview_base64 ? `<img src="${data.preview_base64}" style="width:80px; height:45px; object-fit:cover; border-radius:4px; border:1px solid #86efac;">` : ''}
+                </div>
+            `;
+        } else {
+            resBox.style.background = '#fee2e2';
+            resBox.style.color = '#991b1b';
+            resBox.innerHTML = `<strong>❌ Bağlantı Başarısız:</strong> ${data.error || 'Hata oluştu'}`;
+        }
+    } catch (err) {
+        resBox.style.background = '#fee2e2';
+        resBox.style.color = '#991b1b';
+        resBox.innerHTML = `<strong>❌ Test Hatası:</strong> ${err.message}`;
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '🔌 Bağlantıyı Test Et'; }
     }
 }

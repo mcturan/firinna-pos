@@ -3718,19 +3718,7 @@ async function submitQuickNotePrint() {
                 </div>
             </div>
 
-            <!-- 3: Kapı -->
-            <div class="cam-vcard" onclick="openCameraLiveModal('kapi', 'Kapı')">
-                <div class="cam-vcard-bar">
-                    <span class="cam-vcard-name"><span class="cam-dot"></span>Kapı</span>
-                    <span class="cam-vcard-time" id="cam-time-kapi">--:--:--</span>
-                </div>
-                <div class="cam-vcard-thumb">
-                    <img id="cam-img-kapi" src="/api/camera/snapshot/kapi" alt="Kapı" loading="eager">
-                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
-                </div>
-            </div>
-
-            <!-- 4: Mutfak -->
+            <!-- 3: Mutfak -->
             <div class="cam-vcard" onclick="openCameraLiveModal('mutfak', 'Mutfak')">
                 <div class="cam-vcard-bar">
                     <span class="cam-vcard-name"><span class="cam-dot"></span>Mutfak</span>
@@ -3738,6 +3726,18 @@ async function submitQuickNotePrint() {
                 </div>
                 <div class="cam-vcard-thumb">
                     <img id="cam-img-mutfak" src="/api/camera/snapshot/mutfak" alt="Mutfak" loading="eager">
+                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
+                </div>
+            </div>
+
+            <!-- 4: Kapı -->
+            <div class="cam-vcard" onclick="openCameraLiveModal('kapi', 'Kapı')">
+                <div class="cam-vcard-bar">
+                    <span class="cam-vcard-name"><span class="cam-dot"></span>Kapı</span>
+                    <span class="cam-vcard-time" id="cam-time-kapi">--:--:--</span>
+                </div>
+                <div class="cam-vcard-thumb">
+                    <img id="cam-img-kapi" src="/api/camera/snapshot/kapi" alt="Kapı" loading="eager">
                     <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
                 </div>
             </div>
@@ -3767,8 +3767,8 @@ async function submitQuickNotePrint() {
                 <div class="cam-modal-pills">
                     <button type="button" class="cam-pill-btn" data-cam="masalar1" onclick="switchCameraLive('masalar1', 'Masalar 1')">Masalar 1</button>
                     <button type="button" class="cam-pill-btn" data-cam="masalar2" onclick="switchCameraLive('masalar2', 'Masalar 2')">Masalar 2</button>
-                    <button type="button" class="cam-pill-btn" data-cam="kapi" onclick="switchCameraLive('kapi', 'Kapı')">Kapı</button>
                     <button type="button" class="cam-pill-btn" data-cam="mutfak" onclick="switchCameraLive('mutfak', 'Mutfak')">Mutfak</button>
+                    <button type="button" class="cam-pill-btn" data-cam="kapi" onclick="switchCameraLive('kapi', 'Kapı')">Kapı</button>
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -3791,8 +3791,8 @@ async function submitQuickNotePrint() {
 // Güvenlik Kameraları Dikey Sağ Panel & WebRTC Akış Mantığı
 // -------------------------------------------------------------
 let cameraPollInterval = null;
-const cameraList = ['masalar1', 'masalar2', 'kapi', 'mutfak'];
-const cameraFetching = { masalar1: false, masalar2: false, kapi: false, mutfak: false };
+const cameraList = ['masalar1', 'masalar2', 'mutfak', 'kapi'];
+const cameraFetching = { masalar1: false, masalar2: false, mutfak: false, kapi: false };
 let currentActiveCamera = null;
 
 function refreshCameraThumbnails() {

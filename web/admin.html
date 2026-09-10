@@ -60,6 +60,9 @@
                 <a href="#" class="nav-item" data-target="messages">
                     <i class="ph-bold ph-envelope-simple"></i> İletişim Mesajları
                 </a>
+                <a href="#" class="nav-item" data-target="camera-mgmt">
+                    <i class="ph-bold ph-video-camera"></i> Kamera Ayarları
+                </a>
             </nav>
             
             <div class="sidebar-footer">
@@ -711,6 +714,27 @@
                         <p class="card-desc">Müşterilerden gelen iletişim mesajları doğrudan yetkili <strong>Telegram</strong> grubunuza yönlendirilmektedir.</p>
                         <div style="padding: 20px; background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 4px;">
                             <p style="color: #1e3a8a; font-weight: 500;"><i class="ph-fill ph-telegram-logo"></i> Telegram Entegrasyonu Aktif. Tüm mesajlar anlık olarak cebinize gelmektedir.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- KAMERA AYARLARI -->
+                <section id="camera-mgmt" class="admin-section" style="display:none;">
+                    <div class="card" style="max-width: 100%;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                            <div>
+                                <h3 style="margin:0;">📹 Güvenlik Kameraları & Akış Ayarları</h3>
+                                <p class="card-desc" style="margin:0.25rem 0 0;">POS sipariş ekranında gösterilen kameraların başlık, IP adresi, anlık resim ve RTSP akış ayarlarını düzenleyebilirsiniz.</p>
+                            </div>
+                            <button class="btn btn-primary" onclick="saveAdminCameraSettings()" id="btn-save-admin-cams" style="background:#2563eb; color:white; border:none; padding:0.6rem 1.25rem; border-radius:8px; font-weight:700; cursor:pointer;">💾 Ayarları Kaydet</button>
+                        </div>
+
+                        <div id="admin-camera-list" style="display:flex; flex-direction:column; gap:1.25rem; margin-top:1.5rem;">
+                            <!-- Dinamik kamera listesi -->
+                        </div>
+
+                        <div style="margin-top:1.5rem; display:flex; justify-content:flex-end;">
+                            <button class="btn btn-primary" onclick="saveAdminCameraSettings()" style="background:#2563eb; color:white; border:none; padding:0.75rem 2rem; border-radius:8px; font-weight:700; cursor:pointer;">💾 Tüm Değişiklikleri Kaydet</button>
                         </div>
                     </div>
                 </section>
