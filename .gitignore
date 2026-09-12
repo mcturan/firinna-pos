@@ -17,9 +17,11 @@ firinna.db
 
 # Yedekler & Geçici
 backups/
-*.bak
-*.backup*
+*.bak*
+*backup*
+*_backup_*
 *.faz1backup
+gitignore
 *.tmp
 *.swp
 firinna_local.json
