@@ -3462,7 +3462,7 @@ async function submitQuickNotePrint() {
     #cameraDockWrapper {
         position: fixed;
         right: 12px;
-        top: 68px;
+        top: 86px;
         z-index: 450;
         font-family: inherit;
     }
@@ -3476,7 +3476,7 @@ async function submitQuickNotePrint() {
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        max-height: calc(100vh - 80px);
+        max-height: calc(100vh - 100px);
         transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
     }
 
@@ -3658,18 +3658,11 @@ async function submitQuickNotePrint() {
         color: #cbd5e1;
     }
 
-    /* Masalar ve Bugünün Siparişleri Alanını Daraltarak Kameraların Üste Gelmesini Önler */
-    body.cams-sidebar-open .container {
-        padding-right: 258px !important;
-        transition: padding-right 0.2s ease;
-    }
+    /* Kamera paneli açıldığında orta alan sola itilmesin - sabit kalsın */
     @media (max-width: 900px) {
-        body.cams-sidebar-open .container {
-            padding-right: 1.25rem !important;
-        }
         #cameraDockWrapper {
             right: 6px;
-            top: 60px;
+            top: 72px;
         }
         .cam-dock-panel {
             width: 175px;
@@ -3911,6 +3904,24 @@ function startCameraPolling() {
     cameraPollInterval = setInterval(refreshCameraThumbnails, 1000); // 1 saniyede bir canlı yenileme
 }
 
+function alignCameraDock() {
+    const nav = document.querySelector('.navbar');
+    const dock = document.getElementById('cameraDockWrapper');
+    const tab = document.getElementById('cameraCollapsedTab');
+    if (nav && dock) {
+        const navRect = nav.getBoundingClientRect();
+        const topPos = Math.max(Math.round(navRect.bottom + 8), 84);
+        dock.style.top = topPos + 'px';
+        const panel = document.getElementById('cameraSidebarPanel');
+        if (panel) {
+            panel.style.maxHeight = 'calc(100vh - ' + (topPos + 16) + 'px)';
+        }
+        if (tab) {
+            tab.style.top = (topPos + 24) + 'px';
+        }
+    }
+}
+
 function toggleCameraSidebar(show) {
     const panel = document.getElementById('cameraSidebarPanel');
     const tab = document.getElementById('cameraCollapsedTab');
@@ -3921,12 +3932,14 @@ function toggleCameraSidebar(show) {
         tab.style.display = 'none';
         document.body.classList.add('cams-sidebar-open');
         localStorage.setItem('firinna_cams_sidebar_collapsed', '0');
+        alignCameraDock();
         startCameraPolling();
     } else {
         panel.style.display = 'none';
         tab.style.display = 'flex';
         document.body.classList.remove('cams-sidebar-open');
         localStorage.setItem('firinna_cams_sidebar_collapsed', '1');
+        alignCameraDock();
         if (cameraPollInterval) {
             clearInterval(cameraPollInterval);
             cameraPollInterval = null;
@@ -4006,5 +4019,15 @@ document.addEventListener('visibilitychange', function() {
 document.addEventListener('DOMContentLoaded', function() {
     const isCollapsed = localStorage.getItem('firinna_cams_sidebar_collapsed') === '1';
     toggleCameraSidebar(!isCollapsed);
+    alignCameraDock();
+    if (window.ResizeObserver) {
+        const navEl = document.querySelector('.navbar');
+        if (navEl) {
+            new ResizeObserver(function() {
+                alignCameraDock();
+            }).observe(navEl);
+        }
+    }
 });
+window.addEventListener('resize', alignCameraDock);
 </script>
