@@ -103,7 +103,7 @@
     }
   ],
   "state": {
-    "is_playing": false,
+    "is_playing": true,
     "mode": "shuffle",
     "source_type": "folder",
     "current_title": "SPANISH / DESEO - 01 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 164)",
@@ -204,8 +204,9 @@
     ],
     "queue_index": 0,
     "tv_audio_enabled": true,
-    "updated_at": 1788023002,
-    "volume": 40
+    "updated_at": 1789215151,
+    "volume": 40,
+    "started_at": 1789215151
   },
   "stations": [
     {
