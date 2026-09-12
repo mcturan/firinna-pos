@@ -15,25 +15,123 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 1.2rem;
+        gap: 1.5rem;
         text-align: center;
+        margin: 0 0.5rem;
     }
     .clock-badge {
         color: #e53e3e;
-        font-size: 1.7rem;
+        font-size: 1.75rem;
         font-weight: 800;
         font-family: monospace;
         letter-spacing: 2px;
         background: rgba(229,62,62,0.08);
-        padding: 4px 10px;
-        border-radius: 9px;
+        padding: 5px 12px;
+        border-radius: 10px;
         box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
         line-height: 1;
         white-space: nowrap;
+        border: 1px solid rgba(229,62,62,0.15);
     }
     .weather-box {
         display: flex;
         align-items: center;
+    }
+    .weather-wrap {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: rgba(0, 0, 0, 0.035);
+        padding: 4px 14px 4px 12px;
+        border-radius: 30px;
+        border: 1px solid rgba(0, 0, 0, 0.07);
+    }
+    body.dark-mode .weather-wrap {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+    .weather-current {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-right: 14px;
+        border-right: 1.5px solid rgba(0, 0, 0, 0.12);
+    }
+    body.dark-mode .weather-current {
+        border-right-color: rgba(255, 255, 255, 0.2);
+    }
+    .weather-current-icon {
+        font-size: 1.85rem;
+        line-height: 1;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.12));
+    }
+    .weather-current-temp {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #1e293b;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+    }
+    body.dark-mode .weather-current-temp {
+        color: #f1f5f9;
+    }
+    .weather-current-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #64748b;
+        letter-spacing: 0.5px;
+    }
+    body.dark-mode .weather-current-label {
+        color: #94a3b8;
+    }
+    .weather-forecast {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .weather-day-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.75);
+        padding: 4px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        min-width: 48px;
+    }
+    body.dark-mode .weather-day-card {
+        background: rgba(30, 41, 59, 0.75);
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+    .weather-day-name {
+        color: #475569;
+        font-weight: 800;
+        font-size: 0.78rem;
+        line-height: 1.2;
+    }
+    body.dark-mode .weather-day-name {
+        color: #cbd5e1;
+    }
+    .weather-day-icon {
+        font-size: 1.25rem;
+        margin: 2px 0;
+        line-height: 1;
+    }
+    .weather-day-temp {
+        font-size: 0.82rem;
+        font-weight: 700;
+        display: flex;
+        gap: 4px;
+        line-height: 1.2;
+    }
+    .weather-temp-max {
+        color: #dc2626;
+        font-weight: 800;
+    }
+    .weather-temp-min {
+        color: #2563eb;
+        font-weight: 700;
     }
 
     /* Modern & Derli Toplu Entegre Müzik Çubuğu */
@@ -99,7 +197,7 @@
             --:--:--
         </div>
         <div id="weatherWidget" class="weather-box">
-            <div style="font-size:0.82rem; color:#718096;">Hava Durumu Yükleniyor...</div>
+            <div style="font-size:0.86rem; font-weight:600; color:#64748b; padding:4px 10px;">⛅ Hava Durumu Yükleniyor...</div>
         </div>
     </div>
 
@@ -405,24 +503,32 @@ async function fetchWeather() {
         const curTemp = Math.round(data.current.temperature_2m);
         const curIcon = getWmoIcon(data.current.weather_code);
         
-        let html = '<div style="display:flex; align-items:center; gap:8px;">' +
-            '<div style="font-size:1rem; display:flex; align-items:center; gap:4px; padding-right:8px; border-right:1px solid #cbd5e1;">' +
-                '<span style="font-size:1.25rem" title="Şu an">' + curIcon + '</span> <strong>' + curTemp + '°C</strong>' +
+        let html = '<div class="weather-wrap">' +
+            '<div class="weather-current" title="İstanbul / Beyoğlu Anlık Hava Durumu">' +
+                '<span class="weather-current-icon">' + curIcon + '</span>' +
+                '<div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.1;">' +
+                    '<span class="weather-current-temp">' + curTemp + '°C</span>' +
+                    '<span class="weather-current-label">Beyoğlu</span>' +
+                '</div>' +
             '</div>' +
-            '<div style="display:flex; gap:5px; font-size:0.72rem;">';
+            '<div class="weather-forecast">';
             
-        // Next 3 days
-        for(let i=1; i<=3; i++) {
+        // Gelecek 4 gün tahmini (üst alanda yer bol olduğundan ferah ve büyük)
+        const daysCount = Math.min(4, data.daily.time.length - 1);
+        for(let i=1; i<=daysCount; i++) {
             const date = new Date(data.daily.time[i]);
-            const dayName = date.toLocaleDateString('tr-TR', {weekday:'short'});
+            const dayName = i === 1 ? 'Yarın' : date.toLocaleDateString('tr-TR', {weekday:'short'});
             const maxT = Math.round(data.daily.temperature_2m_max[i]);
             const minT = Math.round(data.daily.temperature_2m_min[i]);
             const icon = getWmoIcon(data.daily.weather_code[i]);
             
-            html += '<div style="display:flex; flex-direction:column; align-items:center; background:rgba(0,0,0,0.03); padding:2px 5px; border-radius:5px;">' +
-                '<span style="color:#718096; font-weight:700; font-size:0.68rem;">' + dayName + '</span>' +
-                '<span style="font-size:0.85rem; margin:1px 0;">' + icon + '</span>' +
-                '<span><span style="color:#e53e3e; font-weight:700;">' + maxT + '°</span><span style="color:#3182ce; font-weight:700;"> ' + minT + '°</span></span>' +
+            html += '<div class="weather-day-card" title="' + date.toLocaleDateString('tr-TR') + '">' +
+                '<span class="weather-day-name">' + dayName + '</span>' +
+                '<span class="weather-day-icon">' + icon + '</span>' +
+                '<div class="weather-day-temp">' +
+                    '<span class="weather-temp-max">' + maxT + '°</span>' +
+                    '<span class="weather-temp-min">' + minT + '°</span>' +
+                '</div>' +
             '</div>';
         }
         html += '</div></div>';
@@ -430,7 +536,7 @@ async function fetchWeather() {
         if (wEl) wEl.innerHTML = html;
     } catch(e) {
         var wEl = document.getElementById('weatherWidget');
-        if (wEl) wEl.innerHTML = '<span style="color:#e53e3e;font-size:0.8rem;">Hava Durumu Alınamadı</span>';
+        if (wEl) wEl.innerHTML = '<span style="color:#e53e3e;font-size:0.85rem;font-weight:700;">Hava Durumu Alınamadı</span>';
     }
 }
 fetchWeather();
