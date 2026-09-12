@@ -28,6 +28,7 @@ firinna_local.json
 dev_requests.json
 radio_durations.json
 web_analytics.json
+web_settings.json
 
 # Ortam & Güvenlik
 .env
