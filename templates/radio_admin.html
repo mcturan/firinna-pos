@@ -40,6 +40,23 @@
         .station-card.station-error { border-color: #fca5a5; background: #fff1f2; }
         .spin-icon { display: inline-block; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Equalizer Bars Animation */
+        .equalizer-bars { display: inline-flex; align-items: flex-end; gap: 3px; height: 16px; }
+        .eq-bar { width: 3px; background: #10b981; border-radius: 2px; animation: eqBounce 1.2s ease-in-out infinite alternate; }
+        .eq-b1 { height: 40%; animation-delay: 0.1s; background: #34d399; }
+        .eq-b2 { height: 80%; animation-delay: 0.3s; background: #10b981; }
+        .eq-b3 { height: 100%; animation-delay: 0.0s; background: #38bdf8; }
+        .eq-b4 { height: 60%; animation-delay: 0.4s; background: #10b981; }
+        .eq-b5 { height: 90%; animation-delay: 0.2s; background: #34d399; }
+
+        @keyframes eqBounce {
+            0% { height: 15%; }
+            50% { height: 95%; }
+            100% { height: 35%; }
+        }
+
+        .tape-reel.spinning { display: block !important; animation: spin 3s linear infinite; }
     </style>
 </head>
 <body>
@@ -67,31 +84,83 @@
                 </div>
             </div>
 
-            <!-- Şu an çalan göstergesi -->
-            <div style="margin-top: 1.25rem; background: rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 44px; height: 44px; border-radius: 8px; background: #2d6a4f; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;" id="nowPlayingIcon">
-                        🎵
+            <!-- Retro Tape & Modern Player Deck -->
+            <div class="player-deck-container" style="margin-top: 1.25rem; background: linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 16px 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.35);">
+                
+                <!-- Üst Bölüm: Kaset/Tape Ekranı & Şarkı Başlığı -->
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px;">
+                    <div style="display: flex; align-items: center; gap: 14px; min-width: 260px; flex: 1;">
+                        <!-- Tape Reel / Speaker İkonu + Çubuklar -->
+                        <div style="position: relative; width: 52px; height: 52px; border-radius: 12px; background: #0f172a; border: 1.5px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);" id="nowPlayingIconBox">
+                            <span id="nowPlayingIcon" style="font-size: 1.6rem; z-index: 1;">📻</span>
+                            <!-- Tape mini reel animation -->
+                            <div class="tape-reel" id="tapeReelSpin" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; opacity: 0.15; border: 4px dashed #10b981; display: none;"></div>
+                        </div>
+
+                        <div style="min-width: 0; flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <span class="badge-source" id="nowPlayingSourceBadge" style="background: rgba(16,185,129,0.2); color: #34d399; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(16,185,129,0.3);">RADYO</span>
+                                <!-- Canlı Animasyonlu Ekolayzır Çubukları -->
+                                <div class="equalizer-bars" id="radioPageEqualizer" style="display: none; align-items: flex-end; gap: 3px; height: 16px; padding: 0 4px;">
+                                    <div class="eq-bar eq-b1"></div>
+                                    <div class="eq-bar eq-b2"></div>
+                                    <div class="eq-bar eq-b3"></div>
+                                    <div class="eq-bar eq-b4"></div>
+                                    <div class="eq-bar eq-b5"></div>
+                                </div>
+                                <span id="tapeLiveIndicator" style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">CANLI</span>
+                            </div>
+                            <div style="font-size: 1.15rem; font-weight: 800; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="nowPlayingTitle">Hazır / Durduruldu</div>
+                            <div id="nowPlayingSubinfo" style="font-size: 0.8rem; color: #94a3b8; margin-top: 2px; display: none;"></div>
+                        </div>
                     </div>
-                    <div>
-                        <div style="font-size: 0.78rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Şu An Çalıyor</div>
-                        <div style="font-size: 1.1rem; font-weight: 800; color: #f8fafc;" id="nowPlayingTitle">Hazır / Durduruldu</div>
+
+                    <!-- Sağ Taraf: Eski Tape / Dijital Sayaç & Bilgi Paneli -->
+                    <div style="background: #020617; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; display: flex; align-items: center; gap: 16px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); font-family: 'Courier New', Courier, monospace;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; font-weight: 800; font-family: sans-serif;">GEÇEN SÜRE</div>
+                            <div id="tapeElapsedDisplay" style="font-size: 1.15rem; font-weight: 800; color: #38bdf8; letter-spacing: 1px;">00:00</div>
+                        </div>
+                        <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.15);"></div>
+                        <div style="text-align: center;" id="tapeDurationBox">
+                            <div style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; font-weight: 800; font-family: sans-serif;" id="tapeDurationLabel">TOPLAM / KALAN</div>
+                            <div id="tapeRemainingDisplay" style="font-size: 1.15rem; font-weight: 800; color: #a7f3d0; letter-spacing: 1px;">--:--</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Kontrol Butonları -->
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="btn-action btn-gray" onclick="radioControl('prev')" title="Önceki" style="padding: 0.45rem 0.8rem;">⏮</button>
-                    <button class="btn-action btn-green" onclick="togglePlayPause()" id="mainPlayBtn" style="padding: 0.55rem 1.2rem; font-size: 1rem;">▶ Oynat</button>
-                    <button class="btn-action btn-gray" onclick="radioControl('next')" title="Sonraki" style="padding: 0.45rem 0.8rem;">⏭</button>
-                    <button class="btn-action btn-gray" onclick="togglePlayMode()" id="playModeBtn" style="padding: 0.45rem 0.8rem;" title="Çalma Modu">🔁 Sıralı</button>
+                <!-- Şarkı İlerleme Çubuğu (YouTube / Interactive Seek Bar) -->
+                <div id="trackProgressWrap" style="margin-bottom: 14px; display: none;">
+                    <div id="seekTrackContainer" onclick="handleProgressBarClick(event)" onmousemove="handleProgressBarHover(event)" onmouseleave="handleProgressBarLeave()" style="width: 100%; height: 16px; display: flex; align-items: center; cursor: pointer; position: relative; padding: 4px 0;">
+                        <!-- Track Background -->
+                        <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; position: relative; pointer-events: none;">
+                            <div id="trackProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981, #38bdf8); transition: width 0.3s linear;"></div>
+                        </div>
+                        <!-- Scrub Head Pin -->
+                        <div id="seekThumbPin" style="position: absolute; left: 0%; top: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; border-radius: 50%; background: #ffffff; box-shadow: 0 0 8px rgba(0,0,0,0.5), 0 0 0 2px #38bdf8; pointer-events: none; transition: transform 0.1s, left 0.3s linear;"></div>
+                        <!-- Tooltip on hover -->
+                        <div id="seekHoverTooltip" style="position: absolute; display: none; bottom: 22px; transform: translateX(-50%); background: #0f172a; border: 1px solid #38bdf8; color: #f8fafc; font-size: 0.75rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; pointer-events: none; white-space: nowrap; font-family: monospace; z-index: 10;">00:00</div>
+                    </div>
                 </div>
 
-                <!-- Ses Seviyesi Kontrolü (Raspberry Pi Donanımsal Ses) -->
-                <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px;">
-                    <button id="btnMuteToggle" onclick="toggleMute()" style="background: none; border: none; font-size: 1.15rem; cursor: pointer; color: white; padding: 0; display: flex; align-items: center;" title="Sesi Kapat / Aç">🔊</button>
-                    <input type="range" id="volumeSlider" min="0" max="100" value="100" oninput="onVolumeInput(this.value)" onchange="onVolumeChange(this.value)" style="width: 110px; accent-color: #10b981; cursor: pointer;">
-                    <span id="volumePercentText" style="font-size: 0.85rem; font-weight: 700; color: #a7f3d0; min-width: 42px;">%100</span>
+                <!-- Alt Kontrol Paneli (Sabit Düzen: Butonlar Sol-Orta, Ses Sağ) -->
+                <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                    <!-- Kontrol Butonları -->
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn-action btn-gray" onclick="radioControl('prev')" title="Önceki Şarkı" style="padding: 0.5rem 0.9rem; font-size: 0.95rem;">⏮</button>
+                        <button class="btn-action btn-green" onclick="togglePlayPause()" id="mainPlayBtn" style="padding: 0.55rem 1.4rem; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(45,106,79,0.4);">▶ Oynat</button>
+                        <button class="btn-action btn-gray" onclick="radioControl('next')" title="Sonraki Şarkı" style="padding: 0.5rem 0.9rem; font-size: 0.95rem;">⏭</button>
+                        <button class="btn-action btn-gray" onclick="togglePlayMode()" id="playModeBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;" title="Çalma Modu (Sıralı / Karışık)">🔁 Sıralı</button>
+                    </div>
+
+                    <!-- Ses Seviyesi Kontrolü (Raspberry Pi Donanımsal Ses) -->
+                    <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.2); padding: 7px 16px; border-radius: 24px;">
+                        <button id="btnMuteToggle" onclick="toggleMute()" style="background: none; border: none; font-size: 1.15rem; cursor: pointer; color: white; padding: 0; display: flex; align-items: center;" title="Sesi Kapat / Aç">🔊</button>
+                        <button onclick="stepVolume(-5)" style="background: none; border: none; font-size: 1.5rem; font-weight: bold; cursor: pointer; color: white; padding: 0 5px;" title="Sesi Azalt">-</button>
+                        <input type="range" id="volumeSlider" min="0" max="100" value="40" oninput="onVolumeInput(this.value)" onchange="onVolumeChange(this.value)" style="width: 200px; height: 6px; accent-color: #10b981; cursor: pointer;">
+                        <button onclick="stepVolume(5)" style="background: none; border: none; font-size: 1.3rem; font-weight: bold; cursor: pointer; color: white; padding: 0 5px;" title="Sesi Artır">+</button>
+                        <span id="volumePercentText" style="font-size: 0.85rem; font-weight: 800; color: #a7f3d0; min-width: 42px;">%40</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -102,7 +171,7 @@
             <button class="radio-tab" onclick="switchRadioTab('tab-library', this)">📁 Klasör & Müzik Kütüphanesi</button>
             <button class="radio-tab" onclick="switchRadioTab('tab-playlists', this)">📑 Çalma Listeleri (Playlists)</button>
             <button class="radio-tab" onclick="switchRadioTab('tab-upload', this)">📤 Klasör & Dosya Yükle</button>
-            <button class="radio-tab" onclick="switchRadioTab('tab-link', this)" style="color: #ef4444; font-weight: 800;">🔗 YouTube & Link Çal</button>
+            <button class="radio-tab" onclick="switchRadioTab('tab-link', this)" style="color: #0284c7; font-weight: 800;">📥 YouTube & Spotify İndir & Çal</button>
         </div>
 
         <!-- TAB 1: ONLİNE RADYOLAR -->
@@ -229,10 +298,57 @@
             </div>
         <!-- TAB 5: YOUTUBE & LINK ÇAL -->
         <div id="tab-link" class="tab-pane">
+            <!-- 📥 YouTube & Spotify Çalma Listesi İndirici (Arşive Ekle) -->
+            <div class="radio-card" style="padding: 1.5rem; margin-bottom: 1.5rem; border: 2px solid #38bdf8; background: #f0f9ff;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 0.75rem;">
+                    <h3 style="margin: 0; color: #0369a1; display: flex; align-items: center; gap: 8px; font-size: 1.15rem;">
+                        <span>📥</span> YouTube & Spotify Çalma Listesi İndirici (Yerel Arşive Ekle)
+                    </h3>
+                    <span style="font-size: 0.78rem; background: #e0f2fe; color: #0284c7; padding: 3px 10px; border-radius: 12px; font-weight: 700;">
+                        Oto-MP3 Dönüştürücü & Etiketleyici
+                    </span>
+                </div>
+                <p style="color: #475569; font-size: 0.88rem; margin: 0 0 1rem 0;">
+                    YouTube veya Spotify çalma listesi / şarkı linkini yapıştırın; sunucu tüm şarkıları otomatik yüksek kaliteli MP3 olarak indirip kütüphaneye klasör şeklinde eklesin.
+                </p>
+
+                <div style="display: flex; gap: 10px; flex-direction: column;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="text" id="downloaderUrlInput" placeholder="Örn: https://www.youtube.com/playlist?list=... veya https://open.spotify.com/playlist/..." style="flex: 2; min-width: 260px; padding: 0.75rem 1rem; border: 1.5px solid #93c5fd; border-radius: 8px; font-size: 0.95rem; background: white;">
+                        <input type="text" id="downloaderFolderInput" placeholder="Klasör Adı (Boş bırakırsanız liste adı kullanılır)" style="flex: 1; min-width: 200px; padding: 0.75rem 1rem; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: white;">
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="btnStartDownload" class="btn-action btn-blue" onclick="startPlaylistDownload()" style="padding: 0.75rem 1.6rem; font-size: 0.95rem; font-weight: 800; border-radius: 8px; box-shadow: 0 4px 12px rgba(2,132,199,0.25);">
+                            📥 Listeyi İndir ve Arşive Kaydet
+                        </button>
+                        <button id="btnCancelDownload" class="btn-action btn-gray" onclick="cancelPlaylistDownload()" style="display: none; padding: 0.75rem 1.2rem; font-size: 0.9rem; color: #ef4444;">
+                            ⏹ İptal Et
+                        </button>
+                    </div>
+                </div>
+
+                <!-- İndirme İlerleme Kutusu -->
+                <div id="downloaderProgressBox" style="display: none; margin-top: 1.25rem; background: white; border: 1px solid #bae6fd; border-radius: 10px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span id="downloaderStatusText" style="font-size: 0.88rem; font-weight: 700; color: #0284c7;">Bağlantı taranıyor...</span>
+                        <span id="downloaderPercentText" style="font-size: 0.88rem; font-weight: 800; color: #0284c7;">%0</span>
+                    </div>
+                    <div style="width: 100%; height: 10px; background: #e0f2fe; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
+                        <div id="downloaderProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #0284c7, #10b981); transition: width 0.3s;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <small id="downloaderCurrentTrack" style="color: #64748b; font-family: monospace; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;"></small>
+                        <button id="btnPlayDownloadedFolder" class="btn-action btn-green" onclick="playDownloadedFolderNow()" style="display: none; padding: 0.4rem 1rem; font-size: 0.85rem; font-weight: 700;">
+                            ▶ İndirilen Klasörü Şimdi Çal
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Anında Link Çalma Kutusu -->
             <div class="radio-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
                 <h3 style="margin: 0 0 0.5rem 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-                    <span>🔗</span> YouTube veya Medya Linki Çal
+                    <span>🔗</span> YouTube veya Medya Linki Çal (Canlı / Tek Parça)
                 </h3>
                 <p style="color: #64748b; font-size: 0.9rem; margin: 0 0 1.25rem 0;">
                     YouTube video/müzik linki, canlı yayın, podcast veya özel ses akışı (stream URL) yapıştırıp doğrudan Raspberry Pi amfisinden dinleyebilirsiniz.
@@ -384,8 +500,114 @@
             }
         }
 
+        function formatTimeSec(s) {
+            if (!s || isNaN(s) || s < 0) return '00:00';
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+
         function updateStatusUI(data) {
-            document.getElementById('nowPlayingTitle').textContent = data.display_title || data.current_title || 'Hazır / Durduruldu';
+            const title = data.display_title || data.current_title || 'Hazır / Durduruldu';
+            document.getElementById('nowPlayingTitle').textContent = title;
+            
+            const isPlaying = !!data.is_playing;
+            const srcType = data.source_type || 'station';
+
+            // İkon & Kaynak Badge
+            const iconEl = document.getElementById('nowPlayingIcon');
+            const badgeEl = document.getElementById('nowPlayingSourceBadge');
+            const eqBars = document.getElementById('radioPageEqualizer');
+            const tapeReel = document.getElementById('tapeReelSpin');
+            const liveInd = document.getElementById('tapeLiveIndicator');
+            const subinfo = document.getElementById('nowPlayingSubinfo');
+
+            if (srcType === 'station') {
+                if (iconEl) iconEl.textContent = '📻';
+                if (badgeEl) {
+                    badgeEl.textContent = 'CANLI RADYO';
+                    badgeEl.style.background = 'rgba(59,130,246,0.2)';
+                    badgeEl.style.color = '#60a5fa';
+                    badgeEl.style.borderColor = 'rgba(59,130,246,0.3)';
+                }
+                if (liveInd) liveInd.textContent = isPlaying ? '● CANLI YAYIN' : 'DURDURULDU';
+                if (liveInd) liveInd.style.color = isPlaying ? '#34d399' : '#94a3b8';
+            } else if (srcType === 'custom_url') {
+                if (iconEl) iconEl.textContent = '🔗';
+                if (badgeEl) {
+                    badgeEl.textContent = 'MEDYA / YOUTUBE';
+                    badgeEl.style.background = 'rgba(239,68,68,0.2)';
+                    badgeEl.style.color = '#f87171';
+                    badgeEl.style.borderColor = 'rgba(239,68,68,0.3)';
+                }
+                if (liveInd) liveInd.textContent = isPlaying ? '● AKIŞ ÇALIYOR' : 'DURDURULDU';
+                if (liveInd) liveInd.style.color = isPlaying ? '#34d399' : '#94a3b8';
+            } else {
+                if (iconEl) iconEl.textContent = '📼';
+                if (badgeEl) {
+                    badgeEl.textContent = srcType === 'playlist' ? 'ÇALMA LİSTESİ' : 'MÜZİK KASETİ';
+                    badgeEl.style.background = 'rgba(16,185,129,0.2)';
+                    badgeEl.style.color = '#34d399';
+                    badgeEl.style.borderColor = 'rgba(16,185,129,0.3)';
+                }
+                if (liveInd) liveInd.textContent = isPlaying ? '● KASET DÖNÜYOR' : 'DURDURULDU';
+                if (liveInd) liveInd.style.color = isPlaying ? '#34d399' : '#94a3b8';
+            }
+
+            // Ekolayzır Çubukları Animasyonu
+            if (eqBars) {
+                eqBars.style.display = isPlaying ? 'inline-flex' : 'none';
+            }
+            if (tapeReel) {
+                if (isPlaying) tapeReel.classList.add('spinning');
+                else tapeReel.classList.remove('spinning');
+            }
+
+            // Tape Süre Göstergeleri (Geçen / Kalan / Toplam Süre)
+            const elapsedDisp = document.getElementById('tapeElapsedDisplay');
+            const remainDisp = document.getElementById('tapeRemainingDisplay');
+            const durLabel = document.getElementById('tapeDurationLabel');
+            const progressWrap = document.getElementById('trackProgressWrap');
+            const progressBar = document.getElementById('trackProgressBar');
+            const thumbPin = document.getElementById('seekThumbPin');
+
+            const elapsedSec = data.elapsed || 0;
+            const durationSec = data.duration || 0;
+
+            const allowSeekUiUpdate = !isSeekingTrack && (Date.now() - lastSeekActionTime > 1200);
+
+            if (elapsedDisp && allowSeekUiUpdate) {
+                elapsedDisp.textContent = formatTimeSec(elapsedSec);
+            }
+
+            if (durationSec > 0) {
+                // Kayıtlı şarkı: Toplam ve Kalan Süre
+                const remSec = Math.max(0, durationSec - elapsedSec);
+                if (durLabel && allowSeekUiUpdate) durLabel.textContent = `KALAN (-${formatTimeSec(remSec)})`;
+                if (remainDisp) {
+                    remainDisp.textContent = formatTimeSec(durationSec);
+                    remainDisp.style.color = '#a7f3d0';
+                }
+                if (progressWrap) progressWrap.style.display = 'block';
+                if (progressBar && allowSeekUiUpdate) {
+                    const pct = Math.min(100, Math.max(0, (elapsedSec / durationSec) * 100));
+                    progressBar.style.width = pct + '%';
+                    if (thumbPin) thumbPin.style.left = pct + '%';
+                }
+                if (subinfo && allowSeekUiUpdate) {
+                    subinfo.style.display = 'block';
+                    subinfo.textContent = `Kayıt Süresi: ${formatTimeSec(durationSec)} • Kalan: ${formatTimeSec(remSec)}`;
+                }
+            } else {
+                // Canlı Radyo / Stream
+                if (durLabel) durLabel.textContent = 'YAYIN TÜRÜ';
+                if (remainDisp) {
+                    remainDisp.textContent = isPlaying ? 'CANLI' : '--:--';
+                    remainDisp.style.color = isPlaying ? '#38bdf8' : '#94a3b8';
+                }
+                if (progressWrap) progressWrap.style.display = 'none';
+                if (subinfo) subinfo.style.display = 'none';
+            }
             
             const playBtn = document.getElementById('mainPlayBtn');
             if (data.is_playing) {
@@ -425,7 +647,7 @@
                 }
             });
 
-            if (data.volume !== undefined && !isDraggingVolume) {
+            if (data.volume !== undefined && !isDraggingVolume && (Date.now() - lastUserVolTime > 1500)) {
                 const volSlider = document.getElementById('volumeSlider');
                 const volText = document.getElementById('volumePercentText');
                 const muteBtn = document.getElementById('btnMuteToggle');
@@ -435,12 +657,83 @@
             }
         }
 
+        let isSeekingTrack = false;
+        let lastSeekActionTime = 0;
+
+        function handleProgressBarHover(e) {
+            if (!currentStatus || !currentStatus.duration || currentStatus.duration <= 0) return;
+            const container = document.getElementById('seekTrackContainer');
+            const tooltip = document.getElementById('seekHoverTooltip');
+            if (!container || !tooltip) return;
+
+            const rect = container.getBoundingClientRect();
+            const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+            const pct = clickX / rect.width;
+            const hoverSec = pct * currentStatus.duration;
+
+            tooltip.style.display = 'block';
+            tooltip.style.left = (pct * 100) + '%';
+            tooltip.textContent = formatTimeSec(hoverSec);
+        }
+
+        function handleProgressBarLeave() {
+            const tooltip = document.getElementById('seekHoverTooltip');
+            if (tooltip) tooltip.style.display = 'none';
+        }
+
+        async function handleProgressBarClick(e) {
+            if (!currentStatus || !currentStatus.duration || currentStatus.duration <= 0) return;
+            const container = document.getElementById('seekTrackContainer');
+            if (!container) return;
+
+            const rect = container.getBoundingClientRect();
+            const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+            const pct = Math.max(0, Math.min(1, clickX / rect.width));
+            const targetSec = Math.round(pct * currentStatus.duration);
+
+            isSeekingTrack = true;
+            lastSeekActionTime = Date.now();
+
+            // Anında UI güncellemesi (YouTube gibi hızlı geri bildirim)
+            const progressBar = document.getElementById('trackProgressBar');
+            const thumbPin = document.getElementById('seekThumbPin');
+            const elapsedDisp = document.getElementById('tapeElapsedDisplay');
+            const remainDisp = document.getElementById('tapeRemainingDisplay');
+            const durLabel = document.getElementById('tapeDurationLabel');
+
+            if (progressBar) progressBar.style.width = (pct * 100) + '%';
+            if (thumbPin) thumbPin.style.left = (pct * 100) + '%';
+            if (elapsedDisp) elapsedDisp.textContent = formatTimeSec(targetSec);
+            if (remainDisp) {
+                const rem = Math.max(0, currentStatus.duration - targetSec);
+                if (durLabel) durLabel.textContent = `KALAN (-${formatTimeSec(rem)})`;
+            }
+
+            try {
+                const res = await fetch('/api/radio/control', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'seek', position: targetSec })
+                });
+                const resData = await res.json();
+                if (resData && resData.state) {
+                    currentStatus = resData.state;
+                }
+            } catch (err) {
+                console.error('Seek error', err);
+            } finally {
+                setTimeout(() => { isSeekingTrack = false; }, 800);
+            }
+        }
+
         let isDraggingVolume = false;
         let volumeDebounceTimer = null;
         let lastNonZeroVolume = 80;
+        let lastUserVolTime = 0;
 
         function onVolumeInput(val) {
             isDraggingVolume = true;
+            lastUserVolTime = Date.now();
             const vol = parseInt(val, 10);
             const volText = document.getElementById('volumePercentText');
             if (volText) volText.textContent = `%${vol}`;
@@ -454,6 +747,7 @@
         }
 
         function onVolumeChange(val) {
+            lastUserVolTime = Date.now();
             const vol = parseInt(val, 10);
             sendVolumeToServer(vol);
             setTimeout(() => { isDraggingVolume = false; }, 400);
@@ -471,6 +765,19 @@
             }
         }
 
+        function stepVolume(delta) {
+            const volSlider = document.getElementById('volumeSlider');
+            if (!volSlider) return;
+            let cur = parseInt(volSlider.value, 10) || 0;
+            let target = Math.max(0, Math.min(100, cur + delta));
+            volSlider.value = target;
+            const volText = document.getElementById('volumePercentText');
+            if (volText) volText.textContent = `%${target}`;
+            const muteBtn = document.getElementById('btnMuteToggle');
+            if (muteBtn) muteBtn.textContent = target > 0 ? (target > 50 ? '🔊' : '🔉') : '🔇';
+            onVolumeChange(target);
+        }
+
         function toggleMute() {
             const volSlider = document.getElementById('volumeSlider');
             if (!volSlider) return;
@@ -478,12 +785,18 @@
             if (current > 0) {
                 lastNonZeroVolume = current;
                 volSlider.value = 0;
-                onVolumeInput(0);
+                const volText = document.getElementById('volumePercentText');
+                if (volText) volText.textContent = '%0';
+                const muteBtn = document.getElementById('btnMuteToggle');
+                if (muteBtn) muteBtn.textContent = '🔇';
                 onVolumeChange(0);
             } else {
                 let restore = lastNonZeroVolume > 0 ? lastNonZeroVolume : 80;
                 volSlider.value = restore;
-                onVolumeInput(restore);
+                const volText = document.getElementById('volumePercentText');
+                if (volText) volText.textContent = `%${restore}`;
+                const muteBtn = document.getElementById('btnMuteToggle');
+                if (muteBtn) muteBtn.textContent = restore > 50 ? '🔊' : '🔉';
                 onVolumeChange(restore);
             }
         }
@@ -1308,6 +1621,133 @@
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // ==========================================
+        // 📥 YOUTUBE & SPOTIFY DOWNLOADER JS
+        // ==========================================
+        let downloaderPollInterval = null;
+        let lastDownloadedFolder = "";
+
+        async function startPlaylistDownload() {
+            const urlInp = document.getElementById('downloaderUrlInput');
+            const folderInp = document.getElementById('downloaderFolderInput');
+            const url = urlInp.value.trim();
+            const folder = folderInp.value.trim();
+
+            if (!url) {
+                showToast('Lütfen geçerli bir YouTube veya Spotify linki girin', 'error');
+                return;
+            }
+
+            const btnStart = document.getElementById('btnStartDownload');
+            const btnCancel = document.getElementById('btnCancelDownload');
+            const progressBox = document.getElementById('downloaderProgressBox');
+            const statusText = document.getElementById('downloaderStatusText');
+            const percentText = document.getElementById('downloaderPercentText');
+            const progressBar = document.getElementById('downloaderProgressBar');
+            const currentTrackEl = document.getElementById('downloaderCurrentTrack');
+            const btnPlay = document.getElementById('btnPlayDownloadedFolder');
+
+            btnStart.disabled = true;
+            btnStart.style.opacity = '0.6';
+            btnCancel.style.display = 'inline-block';
+            progressBox.style.display = 'block';
+            btnPlay.style.display = 'none';
+            statusText.textContent = 'Bağlantı analiz ediliyor...';
+            percentText.textContent = '%0';
+            progressBar.style.width = '0%';
+            currentTrackEl.textContent = '';
+
+            try {
+                const res = await fetch('/api/radio/downloader/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, folder_name: folder })
+                });
+                const d = await res.json();
+                if (!d.success) {
+                    showToast(d.error || 'İndirme başlatılamadı', 'error');
+                    resetDownloaderUI();
+                    return;
+                }
+                showToast('İndirme arka planda başlatıldı!');
+                if (downloaderPollInterval) clearInterval(downloaderPollInterval);
+                downloaderPollInterval = setInterval(pollPlaylistDownloader, 1500);
+            } catch (err) {
+                showToast('Sunucu bağlantı hatası', 'error');
+                resetDownloaderUI();
+            }
+        }
+
+        async function cancelPlaylistDownload() {
+            if (!confirm('Devam eden indirme işlemini iptal etmek istediğinize emin misiniz?')) return;
+            try {
+                await fetch('/api/radio/downloader/cancel', { method: 'POST' });
+                showToast('İptal isteği gönderildi');
+            } catch (e) {}
+        }
+
+        async function pollPlaylistDownloader() {
+            try {
+                const res = await fetch('/api/radio/downloader/status?_t=' + Date.now());
+                const st = await res.json();
+
+                const statusText = document.getElementById('downloaderStatusText');
+                const percentText = document.getElementById('downloaderPercentText');
+                const progressBar = document.getElementById('downloaderProgressBar');
+                const currentTrackEl = document.getElementById('downloaderCurrentTrack');
+                const btnPlay = document.getElementById('btnPlayDownloadedFolder');
+                const btnCancel = document.getElementById('btnCancelDownload');
+                const btnStart = document.getElementById('btnStartDownload');
+
+                if (st.status === 'downloading' || st.status === 'fetching_info') {
+                    const pct = st.percent || 0;
+                    progressBar.style.width = pct + '%';
+                    percentText.textContent = '%' + pct;
+                    statusText.textContent = `İndiriliyor: ${st.completed_tracks} / ${st.total_tracks} parça (${st.target_folder || ''})`;
+                    currentTrackEl.textContent = st.current_track ? `▶ ${st.current_track}` : 'Hazırlanıyor...';
+                    btnCancel.style.display = 'inline-block';
+                } else if (st.status === 'completed') {
+                    clearInterval(downloaderPollInterval);
+                    downloaderPollInterval = null;
+                    progressBar.style.width = '100%';
+                    percentText.textContent = '%100';
+                    statusText.textContent = `✅ Tamamlandı! ${st.completed_tracks} parça indirildi (${st.target_folder})`;
+                    currentTrackEl.textContent = 'Müzik kütüphanesine eklendi.';
+                    lastDownloadedFolder = st.target_folder;
+                    btnPlay.style.display = 'inline-block';
+                    btnCancel.style.display = 'none';
+                    btnStart.disabled = false;
+                    btnStart.style.opacity = '1';
+                    showToast(`"${st.target_folder}" arşive başarıyla eklendi!`);
+                    loadLibrary();
+                } else if (st.status === 'error' || st.status === 'cancelled') {
+                    clearInterval(downloaderPollInterval);
+                    downloaderPollInterval = null;
+                    statusText.textContent = st.status === 'cancelled' ? '⏹ İptal Edildi' : `❌ Hata: ${st.error_message || 'Bilinmeyen hata'}`;
+                    currentTrackEl.textContent = '';
+                    resetDownloaderUI();
+                    showToast(st.status === 'cancelled' ? 'İndirme iptal edildi' : 'İndirme sırasında hata oluştu', 'error');
+                }
+            } catch (err) {}
+        }
+
+        function resetDownloaderUI() {
+            const btnStart = document.getElementById('btnStartDownload');
+            const btnCancel = document.getElementById('btnCancelDownload');
+            if (btnStart) {
+                btnStart.disabled = false;
+                btnStart.style.opacity = '1';
+            }
+            if (btnCancel) btnCancel.style.display = 'none';
+        }
+
+        function playDownloadedFolderNow() {
+            if (!lastDownloadedFolder) return;
+            switchRadioTab('tab-library', document.querySelectorAll('.radio-tab')[1]);
+            playFolder(lastDownloadedFolder);
+            showToast(`"${lastDownloadedFolder}" klasörü çalınıyor...`);
         }
 
         fetchRadioStatus();

@@ -389,8 +389,8 @@
             <div class="sum-card" style="--accent:#6366f1;">
                 <div class="sum-icon">🧮</div>
                 <div class="sum-value" style="color:#6366f1;">${fmt(d.vat_amount||0)}</div>
-                <div class="sum-label">KDV (%${d.vat_rate||18})</div>
-                <div style="font-size:.75rem;color:#a0aec0;margin-top:.25rem;">KDV hariç: ${fmt(d.sales_excl_vat||0)}</div>
+                <div class="sum-label">KDV (%${d.vat_rate||10} - Sadece Kart)</div>
+                <div style="font-size:.75rem;color:#a0aec0;margin-top:.25rem;">KDV hariç ciro: ${fmt(d.sales_excl_vat||0)}</div>
             </div>
         `;
     }

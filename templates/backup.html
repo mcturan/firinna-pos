@@ -367,9 +367,15 @@ async function loadGitStatus() {
             }).join('\n');
             diffHtml = '<div class="diff-box">' + lines + '</div>';
         }
+        var lastPushHtml = '';
+        if (d.last_push && d.last_push.timestamp) {
+            var lpBadge = d.last_push.success ? '<span class="badge-ok">✅ Başarılı (' + d.last_push.timestamp + ')</span>' : '<span class="badge-behind">❌ Hata (' + d.last_push.timestamp + ')</span>';
+            lastPushHtml = '<div class="sync-row"><label>Son Push Durumu</label><span>' + lpBadge + '</span></div>';
+        }
         box.innerHTML =
             '<div class="sync-row"><label>Senkronizasyon</label><span>' + ahead + behind + sync + '</span></div>' +
             '<div class="sync-row"><label>Yerel değişiklik</label><span>' + dirty + '</span></div>' +
+            lastPushHtml +
             '<div class="sync-row"><label>Son yerel commit</label><span>' + (d.last_local||'-') + '</span></div>' +
             '<div class="sync-row"><label>Son GitHub commit</label><span>' + (d.last_remote||'-') + '</span></div>' +
             diffHtml;

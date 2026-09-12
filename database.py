@@ -100,6 +100,12 @@ def init_db():
         c.execute('ALTER TABLE settings ADD COLUMN updated_at TEXT')
     except:
         pass
+
+    try:
+        c.execute("INSERT OR IGNORE INTO settings (key, value, updated_at) VALUES ('vat_rate', '10', datetime('now','localtime'))")
+        c.execute("UPDATE settings SET value = '10', updated_at = datetime('now','localtime') WHERE key = 'vat_rate' AND value = '18'")
+    except:
+        pass
     
     c.execute('''CREATE TABLE IF NOT EXISTS saved_notes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

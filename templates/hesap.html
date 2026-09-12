@@ -798,13 +798,16 @@
 
             <div class="kpi-card purple">
                 <div class="kpi-header">
-                    <span class="kpi-label">KDV & Matrah (%<span id="kpiVatRate">18</span>)</span>
+                    <span class="kpi-label">KDV & Matrah (%<span id="kpiVatRate">10</span> - Sadece Kart)</span>
                     <span class="kpi-icon">🧾</span>
                 </div>
                 <div class="kpi-value" style="color:var(--purple);" id="kpiVatAmount">0,00 ₺</div>
                 <div class="kpi-sub">
                     <span>KDV Hariç Ciro:</span>
                     <b id="kpiSalesExclVat">0,00 ₺</b>
+                </div>
+                <div class="kpi-sub" style="margin-top:2px; font-size:0.75rem; opacity:0.85;">
+                    <span>Kart Matrahı: <b id="kpiCardBase">0,00 ₺</b> (Nakit KDV'siz)</span>
                 </div>
             </div>
         </div>
@@ -1381,9 +1384,13 @@
             document.getElementById('kpiOrderCount').textContent = d.order_count || 0;
             document.getElementById('kpiTips').textContent = fmt(d.total_tips);
 
-            document.getElementById('kpiVatRate').textContent = d.vat_rate || 18;
+            document.getElementById('kpiVatRate').textContent = d.vat_rate || 10;
             document.getElementById('kpiVatAmount').textContent = fmt(d.vat_amount);
             document.getElementById('kpiSalesExclVat').textContent = fmt(d.sales_excl_vat);
+            const cardBaseEl = document.getElementById('kpiCardBase');
+            if (cardBaseEl) {
+                cardBaseEl.textContent = fmt(d.card_vat_base !== undefined ? d.card_vat_base : (d.total_card - d.vat_amount));
+            }
 
             // Açık masa uyarısı
             const alertBox = document.getElementById('openOrdersAlert');

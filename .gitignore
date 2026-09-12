@@ -6,51 +6,69 @@ venv/
 .venv/
 *.egg-info/
 
-# Veritabanı (prod DB'yi commit etme)
+# Veritabanı
 pos_data.db
+pos.db
+firinna.db
+*.db
 *.db-journal
+*.sqlite
+*.sqlite3
 
-# Yedekler
+# Yedekler & Geçici
 backups/
-*.bak
-*.backup
-
-# Ortam
-.env
-*.env
-
-# Log
-*.log
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-
-# Geçici
-*.tmp
-*.swp
-firinna_local.json
-*.bak_faza_*
-*.bak_2026*
-*.bak_*
-*.bak_*
 *.bak
 *.backup*
 *.faz1backup
-gitignore
-CHANGELOG.md
-ROADMAP.md
-.claude/worktrees/
-dev_notes/.claude/worktrees/
-pos_data.db
+*.tmp
+*.swp
+firinna_local.json
+.firinna_git_credentials.json
+.last_git_status.json
+dev_requests.json
+radio_durations.json
+web_analytics.json
+
+# Ortam & Güvenlik
+.env
+*.env
 .git_credentials.json
+
+# Loglar
+*.log
+tv_logs/
+tv_logs.txt
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Büyük Medya & Yüklemeler (Repo şişmesini önle)
+tv_media/
+uploads/
+receipts/
+img/
+css/
+js/
 static/tv_media/videos/*
 static/tv_media/audio/*
 !static/tv_media/videos/.gitkeep
 !static/tv_media/audio/.gitkeep
-tv_logs/
+static/uploads/*
+!static/uploads/.gitkeep
 *.apk
+*.apk.idsig
+
+# Kök dizine yanlışlıkla kopyalanan şablon ve stil dosyaları
+/*.html
+/*.css
+/*.svg
+
+# Belge & Notlar
+CHANGELOG.md
+ROADMAP.md
+.claude/worktrees/
+dev_notes/.claude/worktrees/
+

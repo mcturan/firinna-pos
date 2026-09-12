@@ -1826,10 +1826,13 @@ def api_hesap_overview():
     data['open_orders'] = [dict(r) for r in open_orders]
     data['open_orders_count'] = len(open_orders)
 
-    vat_rate = float(db.get_setting('vat_rate', '18'))
+    vat_rate = float(db.get_setting('vat_rate', '10'))
     data['vat_rate'] = vat_rate
-    data['vat_amount'] = round(data['total_sales'] * vat_rate / (100 + vat_rate), 2)
-    data['sales_excl_vat'] = round(data['total_sales'] - data['vat_amount'], 2)
+    # Kural: Sadece kart ile ödemelerin KDV'si (%10) alınır, nakit ödemelerde KDV yoktur.
+    card_sales = float(data.get('total_card') or 0)
+    data['vat_amount'] = round(card_sales * vat_rate / (100 + vat_rate), 2) if card_sales > 0 else 0.0
+    data['sales_excl_vat'] = round(float(data.get('total_sales') or 0) - data['vat_amount'], 2)
+    data['card_vat_base'] = round(card_sales - data['vat_amount'], 2)
 
     return jsonify(data)
 
@@ -1863,10 +1866,13 @@ def api_muhasebe():
     conn.close()
     data['expense_categories'] = [dict(r) for r in cats]
 
-    vat_rate = float(db.get_setting('vat_rate', '18'))
+    vat_rate = float(db.get_setting('vat_rate', '10'))
     data['vat_rate'] = vat_rate
-    data['vat_amount'] = round(data['total_sales'] * vat_rate / (100 + vat_rate), 2)
-    data['sales_excl_vat'] = round(data['total_sales'] - data['vat_amount'], 2)
+    # Kural: Sadece kart ile ödemelerin KDV'si (%10) alınır, nakit ödemelerde KDV yoktur.
+    card_sales = float(data.get('total_card') or 0)
+    data['vat_amount'] = round(card_sales * vat_rate / (100 + vat_rate), 2) if card_sales > 0 else 0.0
+    data['sales_excl_vat'] = round(float(data.get('total_sales') or 0) - data['vat_amount'], 2)
+    data['card_vat_base'] = round(card_sales - data['vat_amount'], 2)
 
     return jsonify(data)
 
@@ -2062,9 +2068,55 @@ def get_git_credentials():
         pass
     return {'username': '', 'token': ''}
 
-def run_git(args, timeout=30):
+def cleanup_git_locks():
+    """Git kilit dosyalarını temizle (.git/index.lock, HEAD.lock vb.)"""
+    lock_files = [
+        os.path.join(GIT_DIR, '.git', 'index.lock'),
+        os.path.join(GIT_DIR, '.git', 'HEAD.lock'),
+        os.path.join(GIT_DIR, '.git', 'refs', 'heads', 'main.lock'),
+        os.path.join(GIT_DIR, '.git', 'refs', 'remotes', 'origin', 'main.lock'),
+    ]
+    import time
+    for lf in lock_files:
+        if os.path.exists(lf):
+            try:
+                if os.path.isfile(lf):
+                    mtime = os.path.getmtime(lf)
+                    # 5 saniyeden eskiyse veya 0 baytsa kilit kesinlikle bayattır
+                    if (time.time() - mtime) > 5 or os.path.getsize(lf) == 0:
+                        os.remove(lf)
+                        print(f"[git] Bayat kilit dosyası temizlendi: {lf}")
+            except Exception as e:
+                print(f"[git] Kilit silinemedi ({lf}): {e}")
+
+_LAST_PUSH_STATUS_PATH = os.path.join(os.path.dirname(__file__), '.last_git_status.json')
+
+def save_last_push_status(success: bool, msg: str, had_changes: bool = False):
+    try:
+        data = {
+            'timestamp': datetime.now().strftime('%d.%m.%Y %H:%M:%S'),
+            'success': success,
+            'message': msg,
+            'had_changes': had_changes
+        }
+        with open(_LAST_PUSH_STATUS_PATH, 'w') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except Exception:
+        pass
+
+def get_last_push_status():
+    try:
+        if os.path.exists(_LAST_PUSH_STATUS_PATH):
+            with open(_LAST_PUSH_STATUS_PATH, 'r') as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {}
+
+def run_git(args, timeout=60):
     """Git komutunu çalıştır, (success, output) döndür"""
     import os
+    cleanup_git_locks()
     env = os.environ.copy()
     env['GIT_TERMINAL_PROMPT'] = '0'
     try:
@@ -2075,10 +2127,22 @@ def run_git(args, timeout=30):
             capture_output=True, text=True, timeout=timeout
         )
         out = (result.stdout + result.stderr).strip()
+        # Eğer index.lock hatası aldıysa, kilidi temizleyip 1 kez daha dene
+        if result.returncode != 0 and 'index.lock' in out:
+            cleanup_git_locks()
+            result = subprocess.run(
+                ['/usr/bin/git'] + args,
+                cwd=GIT_DIR,
+                env=env,
+                capture_output=True, text=True, timeout=timeout
+            )
+            out = (result.stdout + result.stderr).strip()
         return result.returncode == 0, out
     except subprocess.TimeoutExpired:
+        cleanup_git_locks()
         return False, f'Zaman aşımı ({timeout}s)'
     except Exception as e:
+        cleanup_git_locks()
         return False, str(e)
 
 # ── Local config (makine başına ayarlar — git'e gitmez) ──
@@ -2138,8 +2202,9 @@ def api_git_credentials_set():
 @app.route('/api/git/status', methods=['GET'])
 def api_git_status():
     """Yerel ile GitHub arasındaki farkı göster"""
+    cleanup_git_locks()
     # Önce fetch yap
-    run_git(['fetch', 'origin', 'main'])
+    run_git(['fetch', 'origin', 'main'], timeout=45)
     
     # Kaç commit geride/ileride?
     ok, ahead = run_git(['rev-list', '--count', 'origin/main..HEAD'])
@@ -2159,6 +2224,8 @@ def api_git_status():
     # Kirli dosyalar (commit edilmemiş değişiklikler)
     ok6, dirty = run_git(['status', '--short'])
     
+    last_push = get_last_push_status()
+
     return jsonify({
         'ahead': ahead,
         'behind': behind,
@@ -2166,54 +2233,88 @@ def api_git_status():
         'last_local': last_local if ok4 else '?',
         'last_remote': last_remote if ok5 else '?',
         'dirty': dirty if ok6 else '',
-        'dirty_count': len([l for l in dirty.split('\n') if l.strip()]) if dirty else 0
+        'dirty_count': len([l for l in dirty.split('\n') if l.strip()]) if dirty else 0,
+        'last_push': last_push
     })
+
+def execute_sync_push(msg=None):
+    """Tüm değişiklikleri commit + pull --rebase + DB dump + push (sağlam ve kilitlenmez)"""
+    cleanup_git_locks()
+    
+    # Git kimlik bilgilerini kontrol et ve origin URL'sini güvenceye al
+    cred = get_git_credentials()
+    username = cred.get('username', '').strip()
+    token = cred.get('token', '').strip()
+    if username and token:
+        run_git(['remote', 'set-url', 'origin', f'https://{username}:{token}@github.com/{username}/firinna-pos.git'])
+
+    if not msg:
+        now_str = datetime.now().strftime('%d.%m.%Y %H:%M')
+        msg = f'Güncelleme — {now_str}'
+
+    # 1. Yerel değişiklikleri ekle ve commit et
+    ok_s, dirty = run_git(['status', '--short'])
+    has_changes = bool(dirty.strip())
+    if has_changes:
+        ok1, out1 = run_git(['add', '-A'], timeout=60)
+        if not ok1:
+            err = f'git add hatası: {out1}'
+            save_last_push_status(False, err, has_changes)
+            return False, err, has_changes
+
+        ok2, out2 = run_git(['commit', '-m', msg], timeout=30)
+        if not ok2 and 'nothing to commit' not in out2:
+            err = f'git commit hatası: {out2}'
+            save_last_push_status(False, err, has_changes)
+            return False, err, has_changes
+
+    # 2. Uzak depodan fetch yap
+    ok_fetch, out_fetch = run_git(['fetch', 'origin', 'main'], timeout=60)
+
+    # 3. Pull rebase ile yereli uzağın üstüne al
+    ok_pull, out_pull = run_git(['pull', '--rebase', '-X', 'theirs', 'origin', 'main'], timeout=60)
+    if not ok_pull:
+        # Rebase çakışırsa iptal et, normal merge dene
+        run_git(['rebase', '--abort'])
+        ok_merge, out_merge = run_git(['merge', 'origin/main', '-m', 'Merge remote origin/main', '-X', 'theirs'], timeout=60)
+        if not ok_merge:
+            err = f'Pull / Senkronizasyon hatası: {out_pull}\n{out_merge}'
+            save_last_push_status(False, err, has_changes)
+            return False, err, has_changes
+        out_pull = out_merge
+
+    # 4. DB dump al ve commit'e ekle
+    try:
+        dump_path = db.dump_database_sql()
+        if dump_path and os.path.exists(dump_path):
+            run_git(['add', dump_path], timeout=30)
+            run_git(['commit', '-m', f'DB dump — {datetime.now().strftime("%d.%m.%Y %H:%M")}'], timeout=30)
+    except Exception:
+        pass
+
+    # 5. Push et
+    ok_push, out_push = run_git(['push', 'origin', 'main'], timeout=90)
+    if not ok_push:
+        err = f'git push hatası: {out_push}'
+        save_last_push_status(False, err, has_changes)
+        return False, err, has_changes
+
+    out_all = (out_pull + '\n' + out_push).strip()
+    save_last_push_status(True, out_all, has_changes)
+    return True, out_all, has_changes
 
 @app.route('/api/git/push', methods=['POST'])
 def api_git_push():
     """Tüm değişiklikleri commit + push (önce pull ile senkronize et)"""
     data = request.json or {}
     msg = data.get('message', '').strip()
-    if not msg:
-        now = datetime.now().strftime('%d.%m.%Y %H:%M')
-        msg = f'Güncelleme — {now}'
-
-    # 1. Önce commit edilmemiş değişiklikleri stash'e al
-    ok_s, dirty = run_git(['status', '--short'])
-    has_changes = bool(dirty.strip())
-
-    if has_changes:
-        ok1, out1 = run_git(['add', '-A'])
-        if not ok1:
-            return jsonify({'success': False, 'error': 'git add hatası: ' + out1})
-        ok2, out2 = run_git(['commit', '-m', msg])
-        if not ok2:
-            return jsonify({'success': False, 'error': 'git commit hatası: ' + out2})
-
-    # 2. Önce GitHub'dan pull (rebase ile — commit geçmişini temiz tutar)
-    ok_pull, out_pull = run_git(['pull', '--rebase', 'origin', 'main'], timeout=60)
-    if not ok_pull:
-        # Rebase çakışması — abort + force push yerine hata ver
-        run_git(['rebase', '--abort'])
-        return jsonify({'success': False, 'error': 'Pull/rebase hatası: ' + out_pull})
-
-    # 3. DB dump al ve commit'e ekle
-    try:
-        dump_path = db.dump_database_sql()
-        run_git(['add', dump_path])
-        ok_dc, out_dc = run_git(['commit', '-m', f'DB dump — {datetime.now().strftime("%d.%m.%Y %H:%M")}'])
-    except Exception as e:
-        pass  # dump başarısız olsa da push devam eder
-
-    # 4. Push
-    ok3, out3 = run_git(['push', 'origin', 'main'], timeout=60)
-    if not ok3:
-        return jsonify({'success': False, 'error': 'git push hatası: ' + out3})
-
+    success, out, had_changes = execute_sync_push(msg)
+    if not success:
+        return jsonify({'success': False, 'error': out, 'had_changes': had_changes})
     return jsonify({
         'success': True,
-        'had_changes': has_changes,
-        'output': out_pull + '\n' + out3
+        'had_changes': had_changes,
+        'output': out
     })
 
 
@@ -2475,11 +2576,11 @@ def start_auto_push():
                             last_time_push_date = today
 
                 if should_push:
-                    ok_add, _ = run_git(['add', '-A'])
-                    if ok_add:
-                        msg = f"Otomatik push - {now.strftime('%d.%m.%Y %H:%M')}"
-                        run_git(['commit', '-m', msg])
-                    run_git(['push', 'origin', 'main'])
+                    ok_p, out_p, _ = execute_sync_push(f"Otomatik push — {now.strftime('%d.%m.%Y %H:%M')}")
+                    if ok_p:
+                        print(f"[Auto Push] Başarılı: {now.strftime('%d.%m.%Y %H:%M')}")
+                    else:
+                        print(f"[Auto Push] Hata: {out_p}")
                     last_interval_push = _time.time()
                     _time.sleep(70)
                     continue

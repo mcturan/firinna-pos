@@ -603,16 +603,17 @@ footer { text-align: center; padding: 1.5rem 1rem; color: var(--ink-4); font-siz
     .blueprint-wrapper {
         margin-top: 10px;
     }
+    .blueprint-logo {
+        order: 1;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        max-width: 170px;
+    }
     .blueprint-container {
+        order: 2;
         flex-direction: column;
         padding: 5px;
         gap: 12px;
-    }
-    .blueprint-logo {
-        order: 3;
-        margin-top: 30px;
-        margin-bottom: 10px;
-        max-width: 160px;
     }
     .blueprint-side {
         width: 100%;

@@ -339,19 +339,45 @@ class ThermalPrinter:
             print(f"Logo bitmap hatası: {e}")
             return b''
 
+    def _get_font(self, font_size=22):
+        """Çok dilli (Kiril, Türkçe, Arapça, Yunanca, Asya) destekli font listesinden ilk bulunanı yükle"""
+        from PIL import ImageFont
+        import os
+
+        font_candidates = [
+            '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+            '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+            '/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf',
+            '/usr/share/fonts/truetype/freefont/FreeSans.ttf',
+            '/usr/share/fonts/truetype/freefont/FreeSerif.ttf',
+            '/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf',
+            '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf',
+        ]
+        for path in font_candidates:
+            if os.path.exists(path):
+                try:
+                    return ImageFont.truetype(path, font_size)
+                except Exception:
+                    continue
+        try:
+            return ImageFont.load_default()
+        except Exception:
+            return None
+
     def _render_text_image(self, text, font_size=22):
-        """Metni bitmap görsele çevir — Rusça/Arapça/Farsça dahil çok dilli destek"""
+        """Metni bitmap görsele çevir — Rusça (Kiril), Türkçe, Arapça, Farsça, Yunanca tam destek"""
         try:
             from PIL import Image, ImageDraw, ImageFont
             import unicodedata
 
-            FONT_PATH  = '/usr/share/fonts/truetype/freefont/FreeSerif.ttf'
             paper_width = db.get_setting('paper_width', '80')
             IMG_WIDTH  = 560 if str(paper_width) == '80' else 376
             PADDING    = 4
             LINE_GAP   = 6
 
-            font = ImageFont.truetype(FONT_PATH, font_size)
+            font = self._get_font(font_size)
+            if not font:
+                return None
 
             def _has_rtl(s):
                 for ch in s:
@@ -368,8 +394,11 @@ class ThermalPrinter:
                     return s
 
             def _text_width(s):
-                bb = font.getbbox(s)
-                return bb[2] - bb[0]
+                try:
+                    bb = font.getbbox(s)
+                    return bb[2] - bb[0]
+                except Exception:
+                    return len(s) * (font_size // 2)
 
             def _wrap_ltr(line):
                 """Kelime sınırından sar — kelime ortasından kesme"""
@@ -382,7 +411,6 @@ class ThermalPrinter:
                     else:
                         if cur:
                             rows.append(cur)
-                        # Tek kelime satıra sığmıyorsa karakter bazında sar
                         if _text_width(word) > IMG_WIDTH - 2 * PADDING:
                             partial = ''
                             for ch in word:
@@ -411,7 +439,7 @@ class ThermalPrinter:
                         rendered.append((wl, False))
 
             line_h = font_size + LINE_GAP
-            img_h  = len(rendered) * line_h + 2 * PADDING
+            img_h  = max(line_h, len(rendered) * line_h + 2 * PADDING)
             img    = Image.new('L', (IMG_WIDTH, img_h), 255)
             draw   = ImageDraw.Draw(img)
 
@@ -479,7 +507,7 @@ class ThermalPrinter:
         return self.send_command(data)
 
     def print_note(self, title, note_text):
-        """Serbest metin not fişi yazdır (#17)"""
+        """Serbest metin not fişi yazdır — Kiril/Rusça, Türkçe, Arapça tam destekli (#17)"""
         ESC = b'\x1B'
         INIT = ESC + b'@'
         CENTER = ESC + b'a\x01'
@@ -520,15 +548,32 @@ class ThermalPrinter:
         if restaurant_phone:
             data += tr(f"Tel: {restaurant_phone}\n").encode('ascii', errors='replace')
         data += "==========================================\n".encode('ascii', errors='replace')
-        data += BOLD_ON
-        data += tr(f"--- {title} ---\n").encode('ascii', errors='replace')
-        data += BOLD_OFF
+        
+        # Başlık Kiril veya özel karakter içeriyorsa görsel render et
+        title_has_non_ascii = any(ord(c) > 127 for c in tr(title))
+        if title_has_non_ascii:
+            data += CENTER
+            t_img = self._render_text_image(f"--- {title} ---", font_size=24)
+            if t_img:
+                data += t_img
+            else:
+                data += BOLD_ON
+                data += f"--- {title} ---\n".encode('ascii', errors='replace')
+                data += BOLD_OFF
+        else:
+            data += CENTER
+            data += BOLD_ON
+            data += tr(f"--- {title} ---\n").encode('ascii', errors='replace')
+            data += BOLD_OFF
+
+        data += CENTER
         data += tr(f"{now}\n").encode('ascii', errors='replace')
         data += "==========================================\n".encode('ascii', errors='replace')
         data += LEFT
         data += b'\n'
+        
         # Metin görsel olarak render et (çok dilli + doğru kelime sarma)
-        note_img_bytes = self._render_text_image(note_text)
+        note_img_bytes = self._render_text_image(note_text, font_size=22)
         if note_img_bytes:
             data += note_img_bytes
         else:

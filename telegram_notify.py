@@ -70,6 +70,9 @@ def check_low_stock_after_order(order_id: int):
     Sipariş sonrası minimum altına düşen stokları kontrol et.
     Sadece bu siparişte düşen kalemleri bildir — tekrar tekrar mesaj atmaz.
     """
+    if db.get_setting('telegram_notify_low_stock', '1') != '1':
+        return
+
     try:
         import sqlite3
         conn = sqlite3.connect(db.DB_PATH)
