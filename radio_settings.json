@@ -106,9 +106,9 @@
     "is_playing": true,
     "mode": "shuffle",
     "source_type": "folder",
-    "current_title": "Paris-cafe-French-Vintage-Jazz Media v5vraYmukHs 009 128k",
-    "current_url": "/api/radio/stream/FRENCH/Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
-    "current_item_id": "FRENCH/Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
+    "current_title": "Chill-Mood-Music-Spanish- -French-Relaxi Media 9Wljq9bp8L0 009 128k",
+    "current_url": "/api/radio/stream/FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
+    "current_item_id": "FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
     "queue": [
       {
         "duration": 5576.5,
@@ -151,12 +151,12 @@
         "title": "Cigarette-in-Paris-Deep-House-Mood-Frenc Media hUQ6B0fcSzc 009 128k"
       }
     ],
-    "queue_index": 2,
+    "queue_index": 1,
     "tv_audio_enabled": true,
-    "updated_at": 1789298174,
-    "volume": 50,
-    "started_at": 1789293916,
-    "duration": 17072.4
+    "updated_at": 1789310751,
+    "volume": 45,
+    "started_at": 1789310331,
+    "duration": 9451.3
   },
   "stations": [
     {
