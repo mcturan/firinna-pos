@@ -103,7 +103,7 @@
     }
   ],
   "state": {
-    "is_playing": false,
+    "is_playing": true,
     "mode": "shuffle",
     "source_type": "folder",
     "current_title": "Chill-Mood-Music-Spanish- -French-Relaxi Media 9Wljq9bp8L0 009 128k",
@@ -153,7 +153,7 @@
     ],
     "queue_index": 1,
     "tv_audio_enabled": true,
-    "updated_at": 1789316587,
+    "updated_at": 1789318037,
     "volume": 45,
     "started_at": 1789310331,
     "duration": 9451.3
