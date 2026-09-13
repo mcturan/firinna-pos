@@ -135,8 +135,8 @@
     },
     "last_push": {
         "action": "reload",
-        "target": "tv_364a3114",
-        "timestamp": 1789224356580
+        "target": "all",
+        "timestamp": 1789286641882
     },
     "last_ping": "2026-08-25T14:20:26.563111",
     "version": 1787670677758,
@@ -904,5 +904,42 @@
     "auto_reboot": {
         "enabled": false,
         "time": "08:30"
+    },
+    "daily_hours": {
+        "Pazartesi": {
+            "open": "08:45",
+            "close": "19:00",
+            "active": true
+        },
+        "Salı": {
+            "open": "08:45",
+            "close": "19:00",
+            "active": true
+        },
+        "Çarşamba": {
+            "open": "08:45",
+            "close": "19:00",
+            "active": true
+        },
+        "Perşembe": {
+            "open": "08:45",
+            "close": "19:00",
+            "active": true
+        },
+        "Cuma": {
+            "open": "08:45",
+            "close": "19:00",
+            "active": true
+        },
+        "Cumartesi": {
+            "open": "08:45",
+            "close": "19:00",
+            "active": true
+        },
+        "Pazar": {
+            "open": "08:45",
+            "close": "19:00",
+            "active": true
+        }
     }
 }
