@@ -1,5 +1,5 @@
 -- Fırınna POS DB Dump
--- 2026-09-13 18:51:55
+-- 2026-09-13 19:09:57
 
 BEGIN TRANSACTION;
 CREATE TABLE categories (
@@ -4133,6 +4133,7 @@ INSERT INTO "order_items" VALUES(4496,1360,15,2,40.0,'2026-09-13 14:44:20',0,NUL
 INSERT INTO "order_items" VALUES(4497,1360,17,1,150.0,'2026-09-13 14:44:22',0,NULL,'Kahve Cappucino',1);
 INSERT INTO "order_items" VALUES(4498,1361,14,1,300.0,'2026-09-13 15:20:45',0,NULL,'Bazlama (Etli)',1);
 INSERT INTO "order_items" VALUES(4499,1361,15,2,40.0,'2026-09-13 15:20:47',0,NULL,'Çay',1);
+INSERT INTO "order_items" VALUES(4500,1361,19,1,120.0,'2026-09-13 15:59:40',0,NULL,'Türk Kahvesi',1);
 CREATE TABLE orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         table_id INTEGER,
@@ -5426,7 +5427,7 @@ INSERT INTO "orders" VALUES(1357,1,610.0,'closed','2026-09-13 14:26:44','2026-09
 INSERT INTO "orders" VALUES(1358,1,1500.0,'closed','2026-09-13 15:58:04','2026-09-13 17:12:01',NULL,0.0,NULL,0.0,1500.0,0.0,'cash',0,'');
 INSERT INTO "orders" VALUES(1359,3,240.0,'closed','2026-09-13 17:02:00','2026-09-13 17:25:00',NULL,0.0,NULL,0.0,240.0,0.0,'cash',0,'');
 INSERT INTO "orders" VALUES(1360,4,630.0,'closed','2026-09-13 17:44:15','2026-09-13 18:27:58',NULL,0.0,NULL,630.0,0.0,120.0,'cash',0,'');
-INSERT INTO "orders" VALUES(1361,1,380.0,'open','2026-09-13 18:20:45',NULL,NULL,0.0,NULL,0.0,0.0,0.0,NULL,0,'');
+INSERT INTO "orders" VALUES(1361,1,500.0,'open','2026-09-13 18:20:45',NULL,NULL,0.0,NULL,0.0,0.0,0.0,NULL,0,'');
 CREATE TABLE products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -15323,7 +15324,7 @@ INSERT INTO "sqlite_sequence" VALUES('tables',14);
 INSERT INTO "sqlite_sequence" VALUES('categories',10);
 INSERT INTO "sqlite_sequence" VALUES('products',40);
 INSERT INTO "sqlite_sequence" VALUES('orders',1361);
-INSERT INTO "sqlite_sequence" VALUES('order_items',4499);
+INSERT INTO "sqlite_sequence" VALUES('order_items',4500);
 INSERT INTO "sqlite_sequence" VALUES('telegram_contacts',5);
 INSERT INTO "sqlite_sequence" VALUES('transactions',1818);
 INSERT INTO "sqlite_sequence" VALUES('stock_items',25);
