@@ -2865,6 +2865,33 @@ def save_web_settings():
     data = request.json
     with open(SETTINGS_FILE, 'w') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
+    
+    # TV mesai dışı ve gece modu saatlerini web çalışma saatleriyle otomatik senkronize et
+    try:
+        daily_hours = data.get('daily_hours') or {}
+        now = datetime.now()
+        days_tr = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
+        cur_day = days_tr[now.weekday()]
+        t_cfg = daily_hours.get(cur_day) or {}
+        open_time = t_cfg.get('open') or '08:45'
+        close_time = t_cfg.get('close') or '19:00'
+
+        tv_settings = get_tv_settings()
+        for sec in ('after_hours', 'night_mode'):
+            if sec in tv_settings and isinstance(tv_settings[sec], dict):
+                tv_settings[sec]['end_time'] = open_time
+                tv_settings[sec]['start_time'] = close_time
+        
+        # TV ekranlarını anında yenilemeye zorla (push reload)
+        tv_settings['last_push'] = {
+            'action': 'reload',
+            'target': 'all',
+            'timestamp': int(datetime.now().timestamp() * 1000)
+        }
+        save_tv_settings(tv_settings)
+    except Exception as e:
+        print(f"[SYNC_TV_ERROR] {e}")
+
     return jsonify({"success": True})
 
 def compute_store_status_data():
@@ -3699,6 +3726,27 @@ def get_tv_settings():
                             "/static/tv_media/videos/bayrak.mp4"
                         ]))
                         data['local_videos'] = all_sync_videos
+
+                        # Web sayfası çalışma saatlerini dinamik olarak TV ayarlarına ve mesai dışı ekranına entegre et
+                        try:
+                            if os.path.exists(SETTINGS_FILE):
+                                with open(SETTINGS_FILE, 'r', encoding='utf-8') as wf:
+                                    wdata = json.load(wf)
+                                    w_daily = wdata.get('daily_hours') or {}
+                                    data['daily_hours'] = w_daily
+                                    now = datetime.now()
+                                    days_tr = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
+                                    cur_day = days_tr[now.weekday()]
+                                    t_cfg = w_daily.get(cur_day) or {}
+                                    w_open = t_cfg.get('open') or '08:45'
+                                    w_close = t_cfg.get('close') or '19:00'
+                                    for sec in ('after_hours', 'night_mode'):
+                                        if sec in data and isinstance(data[sec], dict):
+                                            data[sec]['end_time'] = w_open
+                                            data[sec]['start_time'] = w_close
+                        except Exception:
+                            pass
+
                         return data
                 except Exception:
                     time.sleep(0.05)

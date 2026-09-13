@@ -1499,13 +1499,19 @@
                 const res = await fetch('/api/web/status?_t=' + Date.now());
                 if (res.ok) {
                     const data = await res.json();
+                    let hoursChanged = false;
                     if (data.hours) {
                         webDailyHours = data.hours;
+                        hoursChanged = true;
                         try { localStorage.setItem('firinna_daily_hours', JSON.stringify(webDailyHours)); } catch(e) {}
                     }
                     if (typeof data.is_open === 'boolean') {
                         webStoreIsOpen = data.is_open;
                         try { localStorage.setItem('firinna_store_is_open', JSON.stringify(webStoreIsOpen)); } catch(e) {}
+                    }
+                    if (isAfterHoursActive || hoursChanged) {
+                        checkAfterHoursSchedule();
+                        if (isAfterHoursActive) renderAfterHoursCurrentLang();
                     }
                 }
             } catch(e) {
@@ -1638,6 +1644,8 @@
                     modernLayout.style.display = 'none';
                     applyAfterHoursMedia();
                     startAfterHoursRotators();
+                } else {
+                    renderAfterHoursCurrentLang();
                 }
                 updateAfterHoursTheme();
             } else {
@@ -2666,11 +2674,18 @@
                     updateWatermarkCardsFromSettings(data.watermark_cycle);
                 }
 
+                // Apply daily hours from server if available
+                if (data.daily_hours) {
+                    webDailyHours = data.daily_hours;
+                    try { localStorage.setItem('firinna_daily_hours', JSON.stringify(webDailyHours)); } catch(e) {}
+                }
+
                 // Apply After-Hours / Mesai Dışı Settings
                 const ahData = data.after_hours || data.night_mode;
                 if (ahData) {
                     afterHoursSettings = Object.assign({}, afterHoursSettings, ahData);
                     checkAfterHoursSchedule();
+                    if (isAfterHoursActive) renderAfterHoursCurrentLang();
                 }
             } catch(err) {
                 console.error("applySettings error:", err);

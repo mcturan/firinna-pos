@@ -471,9 +471,10 @@
                         <span>⏰ Otomatik Mod (Web Çalışma Saatleri + POS Durumu)</span>
                     </label>
                 </div>
-                <div id="ah_auto_info" style="background:#ecfdf5; border:1px solid #86efac; border-radius:8px; padding:10px 14px; margin-bottom:12px;">
+                <div id="ah_auto_info" style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:10px 14px; margin-bottom:12px;">
                     <span style="font-size:0.85rem; color:#065f46;">
                         ✅ <strong>Otomatik Mod Açık:</strong> TV, web sitesindeki çalışma saatlerini ve POS durumunu kullanır. Masada müşteri varken TV kapalı moduna <strong>geçmez</strong>.
+                        <span id="ah_auto_hours_display" style="display:block; margin-top:4px; font-weight:700; color:#047857;"></span>
                     </span>
                 </div>
                 <div id="ah_manual_info" style="background:#fef3c7; border:1px solid #fbbf24; border-radius:8px; padding:10px 14px; margin-bottom:12px; display:none;">
@@ -901,12 +902,22 @@
                 setChecked('ah_force_active', !!ah.force_active);
                 setChecked('ah_auto_schedule', ah.auto_schedule !== false);
                 onAutoScheduleChange(ah.auto_schedule !== false);
-                setVal('ah_start_time', ah.start_time || '23:00');
-                setVal('ah_end_time', ah.end_time || '08:00');
+                setVal('ah_start_time', ah.start_time || '19:00');
+                setVal('ah_end_time', ah.end_time || '08:45');
                 setVal('ah_media_type', ah.media_type || 'video');
                 setVal('ah_media_url', ah.media_type === 'image' ? (ah.image_url || '/static/uploads/logo.png') : (ah.video_url || '/static/tv_media/videos/1.mp4'));
                 setVal('ah_cycle_duration', ah.cycle_duration || 7);
                 setVal('ah_qr_link', ah.qr_link || 'https://firinna.com');
+
+                // Canlı web çalışma saatlerini getirip göster
+                fetch('/api/web/status?_t=' + Date.now())
+                    .then(r => r.json())
+                    .then(wdata => {
+                        const hDisp = document.getElementById('ah_auto_hours_display');
+                        if (hDisp && wdata.today_hours) {
+                            hDisp.textContent = `🕒 Web Çalışma Saatleri (${wdata.current_day}): ${wdata.today_hours}`;
+                        }
+                    }).catch(e => {});
 
                 // 5 Dilli Mesajları Yükle
                 const msgs = ah.messages || [];
@@ -1386,10 +1397,23 @@
             }
         }
 
-        function fetchWebOpeningHours() {
-            document.getElementById('ah_start_time').value = '23:00';
-            document.getElementById('ah_end_time').value = '08:30';
-            alert("✅ Fırınna web çalışma saatleri uygulandı (Kapanış: 23:00, Açılış: 08:30).");
+        async function fetchWebOpeningHours() {
+            try {
+                const res = await fetch('/api/web/status?_t=' + Date.now());
+                if (res.ok) {
+                    const data = await res.json();
+                    const currentDay = data.current_day;
+                    const hours = (data.hours && currentDay && data.hours[currentDay]) ? data.hours[currentDay] : null;
+                    const openTime = hours ? hours.open : (data.today_hours ? data.today_hours.split('-')[0].trim() : '08:45');
+                    const closeTime = hours ? hours.close : (data.today_hours ? data.today_hours.split('-')[1].trim() : '19:00');
+                    
+                    document.getElementById('ah_start_time').value = closeTime;
+                    document.getElementById('ah_end_time').value = openTime;
+                    alert(`✅ Fırınna web çalışma saatleri uygulandı (Kapanış: ${closeTime}, Açılış: ${openTime}).`);
+                    return;
+                }
+            } catch(e) {}
+            alert("⚠️ Web saatleri sunucudan alınamadı.");
         }
 
         async function uploadAfterHoursMedia() {
