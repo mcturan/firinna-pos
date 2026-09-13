@@ -17,12 +17,12 @@
     <div id="splash">
         <div class="spinner"></div>
         <h1>FIRINNA TV</h1>
-        <p id="statusMsg">Sunucuya bağlanıyor (192.168.1.2)...</p>
+        <p id="statusMsg">Sunucuya bağlanıyor (192.168.1.10)...</p>
         <small id="retryMsg" style="margin-top:10px; color:#94a3b8; font-size:0.85rem;"></small>
     </div>
 
     <script>
-        const PRIMARY_LAN_IP = "192.168.1.2";
+        const PRIMARY_LAN_IP = "192.168.1.10";
         const PRIMARY_SERVER_URL = "http://" + PRIMARY_LAN_IP + ":5000";
         const WAN_FALLBACK_URL = "https://pos.firinna.com";
         const MAX_LAN_RETRIES = 15;
