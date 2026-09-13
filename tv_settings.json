@@ -9,6 +9,9 @@
     ],
     "local_videos": [
         "/static/tv_media/videos/1.mp4",
+        "/static/tv_media/videos/30agustos_1.mp4",
+        "/static/tv_media/videos/30agustos_2.mp4",
+        "/static/tv_media/videos/ataturk.mp4",
         "/static/tv_media/videos/bayrak.mp4",
         "/static/tv_media/videos/istanbul.mp4"
     ],
@@ -132,8 +135,8 @@
     },
     "last_push": {
         "action": "reload",
-        "target": "all",
-        "timestamp": 1787995698669
+        "target": "tv_364a3114",
+        "timestamp": 1789224356580
     },
     "last_ping": "2026-08-25T14:20:26.563111",
     "version": 1787670677758,
