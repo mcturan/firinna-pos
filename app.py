@@ -6046,9 +6046,12 @@ def get_camera_configs_dict():
     return cfg
 
 _cam_session = requests.Session()
+_cam_adapter = requests.adapters.HTTPAdapter(pool_connections=10, pool_maxsize=10)
+_cam_session.mount('http://', _cam_adapter)
+_cam_session.mount('https://', _cam_adapter)
 _cam_cache = {}
 _cam_cache_lock = threading.Lock()
-CAM_CACHE_TTL = 0.5  # Saniye (1 saniyelik canlı yenileme için optimize önbellek)
+CAM_CACHE_TTL = 3.5  # Saniye (5 saniyelik yenileme için optimize RAM önbellek)
 
 @app.route('/api/camera/snapshot/<cam_id>')
 @limiter.exempt

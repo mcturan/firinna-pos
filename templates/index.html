@@ -3880,33 +3880,39 @@ function refreshCameraThumbnails() {
 
     const timeStr = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 
-    cameraList.forEach(camId => {
-        if (cameraFetching[camId]) return; // Önceki istek henüz tamamlanmadıysa biriktirme yapma
+    cameraList.forEach((camId, idx) => {
+        // Ağ ve worker yığılmasını önlemek için kameraları 400ms aralıklarla kademeli (staggered) iste
+        setTimeout(() => {
+            if (document.hidden) return;
+            const currentPanel = document.getElementById('cameraSidebarPanel');
+            if (!currentPanel || currentPanel.style.display === 'none') return;
+            if (cameraFetching[camId]) return; // Önceki istek henüz tamamlanmadıysa biriktirme yapma
 
-        const imgEl = document.getElementById('cam-img-' + camId);
-        const timeEl = document.getElementById('cam-time-' + camId);
-        if (!imgEl) return;
+            const imgEl = document.getElementById('cam-img-' + camId);
+            const timeEl = document.getElementById('cam-time-' + camId);
+            if (!imgEl) return;
 
-        cameraFetching[camId] = true;
-        const preload = new Image();
-        const nextUrl = '/api/camera/snapshot/' + camId + '?t=' + Date.now();
-        preload.onload = function() {
-            imgEl.src = nextUrl;
-            imgEl.style.opacity = '1';
-            if (timeEl) timeEl.textContent = timeStr;
-            cameraFetching[camId] = false;
-        };
-        preload.onerror = function() {
-            cameraFetching[camId] = false;
-        };
-        preload.src = nextUrl;
+            cameraFetching[camId] = true;
+            const preload = new Image();
+            const nextUrl = '/api/camera/snapshot/' + camId + '?t=' + Date.now();
+            preload.onload = function() {
+                imgEl.src = nextUrl;
+                imgEl.style.opacity = '1';
+                if (timeEl) timeEl.textContent = timeStr;
+                cameraFetching[camId] = false;
+            };
+            preload.onerror = function() {
+                cameraFetching[camId] = false;
+            };
+            preload.src = nextUrl;
+        }, idx * 400);
     });
 }
 
 function startCameraPolling() {
     if (cameraPollInterval) clearInterval(cameraPollInterval);
     refreshCameraThumbnails();
-    cameraPollInterval = setInterval(refreshCameraThumbnails, 1000); // 1 saniyede bir canlı yenileme
+    cameraPollInterval = setInterval(refreshCameraThumbnails, 5000); // 5 saniyede bir optimize yenileme
 }
 
 function alignCameraDock() {
