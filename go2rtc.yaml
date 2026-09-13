@@ -14,7 +14,7 @@ api:
 webrtc:
   listen: ":8555"
   candidates:
-    - 192.168.1.2
+    - 192.168.1.10
 
 log:
   level: info

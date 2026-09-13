@@ -6019,7 +6019,7 @@ def save_camera_settings_to_disk(cams_data):
         'webrtc:',
         '  listen: ":8555"',
         '  candidates:',
-        '    - 192.168.1.2',
+        '    - 192.168.1.10',
         "",
         'log:',
         '  level: info',
@@ -6227,4 +6227,4 @@ if __name__ == '__main__':
         
     
 
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5001, debug=False)

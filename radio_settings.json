@@ -103,12 +103,12 @@
     }
   ],
   "state": {
-    "is_playing": true,
+    "is_playing": false,
     "mode": "shuffle",
     "source_type": "folder",
-    "current_title": "Chill-Mood-Music-Spanish- -French-Relaxi Media 9Wljq9bp8L0 009 128k",
-    "current_url": "/api/radio/stream/FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
-    "current_item_id": "FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
+    "current_title": "Cigarette-in-Paris-French-Emotional-Chil Media yR2uxU4faik 008 128k",
+    "current_url": "/api/radio/stream/FRENCH/Cigarette-in-Paris-French-Emotional-Chil_Media_yR2uxU4faik_008_128k.mp3",
+    "current_item_id": "FRENCH/Cigarette-in-Paris-French-Emotional-Chil_Media_yR2uxU4faik_008_128k.mp3",
     "queue": [
       {
         "duration": 5576.5,
@@ -151,12 +151,13 @@
         "title": "Cigarette-in-Paris-Deep-House-Mood-Frenc Media hUQ6B0fcSzc 009 128k"
       }
     ],
-    "queue_index": 1,
+    "queue_index": 3,
     "tv_audio_enabled": true,
-    "updated_at": 1789318037,
+    "updated_at": 1789322666,
     "volume": 45,
-    "started_at": 1789310331,
-    "duration": 9451.3
+    "started_at": 1789321580,
+    "duration": 9437.4,
+    "elapsed": 1877
   },
   "stations": [
     {
