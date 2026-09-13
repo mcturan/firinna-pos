@@ -506,6 +506,7 @@ footer { text-align: center; padding: 1.5rem 1rem; color: var(--ink-4); font-siz
     text-align: center;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 15px rgba(0,0,0,0.05), inset 0 2px 4px rgba(255,255,255,1);
+    position: relative;
 }
 
 .blueprint-side:hover {
@@ -587,7 +588,8 @@ footer { text-align: center; padding: 1.5rem 1rem; color: var(--ink-4); font-siz
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.blueprint-table .dur-badge {
+.blueprint-table .dur-badge,
+.blueprint-side .dur-badge {
     position: absolute;
     top: -12px;
     right: -12px;

@@ -57,7 +57,7 @@
         <div class="tables-grid" id="tablesGrid"></div>
 
         <!-- Bugünün Siparişleri — Collapsible & Modal Panel -->
-        <div id="todayOrdersCollapsible" style="margin-top:1.5rem; background:white; border:1.5px solid #cbd5e1; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+        <div id="todayOrdersCollapsible" style="max-width:900px; width:100%; margin:1.5rem auto 0 auto; background:white; border:1.5px solid #cbd5e1; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
             <div onclick="toggleHistPanel()" id="histToggleHeader"
                 style="display:flex; align-items:center; justify-content:space-between; padding:0.85rem 1.25rem; background:#f8fafc; cursor:pointer; user-select:none; transition:background 0.15s;"
                 onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
@@ -769,10 +769,15 @@
 
         function calcDuration(startedAt) {
             if (!startedAt) return null;
-            // SQLite CURRENT_TIMESTAMP is UTC — append Z so JS parses correctly
-            const ts = startedAt.includes('Z') ? startedAt : startedAt.replace(' ', 'T') + 'Z';
-            const mins = Math.floor((Date.now() - new Date(ts).getTime()) / 60000);
-            if (mins < 0) return null;
+            // startedAt is local server time ("YYYY-MM-DD HH:MM:SS" or ISO)
+            const ts = startedAt.replace(' ', 'T');
+            const startTime = new Date(ts).getTime();
+            if (isNaN(startTime)) return null;
+            let mins = Math.floor((Date.now() - startTime) / 60000);
+            if (mins < 0) {
+                if (mins >= -2) mins = 0; // tolerance for slight clock skew
+                else return null;
+            }
             if (mins < 60) return { text: mins + ' dk', cls: mins < 45 ? 'dur-green' : 'dur-orange' };
             const h = Math.floor(mins / 60), m = mins % 60;
             return { text: h + 'sa ' + m + 'dk', cls: 'dur-red' };
