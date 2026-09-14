@@ -106,57 +106,257 @@
     "is_playing": true,
     "mode": "shuffle",
     "source_type": "folder",
-    "current_title": "FRENCH - Chill-Mood-Music-Spanish- -French-Relaxi Media 9Wljq9bp8L0 009 128k",
-    "current_url": "/api/radio/stream/FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
-    "current_item_id": "FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
+    "current_title": "SPANISH / DESEO - 30 - Relaxing Spanish Chill 🎧 – Mood Playlist ｜ DESEO",
+    "current_url": "/api/radio/stream/SPANISH/DESEO/30%20-%20Relaxing%20Spanish%20Chill%20%F0%9F%8E%A7%20%E2%80%93%20Mood%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+    "current_item_id": "SPANISH/DESEO/30 - Relaxing Spanish Chill 🎧 – Mood Playlist ｜ DESEO.mp3",
     "queue": [
       {
-        "duration": 9451.3,
-        "filename": "Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
-        "folder": "FRENCH",
-        "rel_path": "FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
-        "stream_url": "/api/radio/stream/FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
-        "title": "Chill-Mood-Music-Spanish- -French-Relaxi Media 9Wljq9bp8L0 009 128k"
+        "duration": 3622.752,
+        "filename": "30 - Relaxing Spanish Chill 🎧 – Mood Playlist ｜ DESEO.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/30 - Relaxing Spanish Chill 🎧 – Mood Playlist ｜ DESEO.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/30%20-%20Relaxing%20Spanish%20Chill%20%F0%9F%8E%A7%20%E2%80%93%20Mood%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+        "title": "30 - Relaxing Spanish Chill 🎧 – Mood Playlist ｜ DESEO"
       },
       {
-        "duration": 17072.4,
-        "filename": "Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
-        "folder": "FRENCH",
-        "rel_path": "FRENCH/Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
-        "stream_url": "/api/radio/stream/FRENCH/Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
-        "title": "Paris-cafe-French-Vintage-Jazz Media v5vraYmukHs 009 128k"
+        "duration": 3745.176,
+        "filename": "20 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/20 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/20%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Cozy%20Relaxing%20Playlist.mp3",
+        "title": "20 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist"
       },
       {
-        "duration": 9437.4,
-        "filename": "Cigarette-in-Paris-French-Emotional-Chil_Media_yR2uxU4faik_008_128k.mp3",
-        "folder": "FRENCH",
-        "rel_path": "FRENCH/Cigarette-in-Paris-French-Emotional-Chil_Media_yR2uxU4faik_008_128k.mp3",
-        "stream_url": "/api/radio/stream/FRENCH/Cigarette-in-Paris-French-Emotional-Chil_Media_yR2uxU4faik_008_128k.mp3",
-        "title": "Cigarette-in-Paris-French-Emotional-Chil Media yR2uxU4faik 008 128k"
+        "duration": 7405.776,
+        "filename": "08 - Spanish Chillout Misic ｜ Vocal House, Nu Disco, Chillout Mix ｜ Relaxing Playlist (vol. 101).mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/08 - Spanish Chillout Misic ｜ Vocal House, Nu Disco, Chillout Mix ｜ Relaxing Playlist (vol. 101).mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/08%20-%20Spanish%20Chillout%20Misic%20%EF%BD%9C%20Vocal%20House%2C%20Nu%20Disco%2C%20Chillout%20Mix%20%EF%BD%9C%20Relaxing%20Playlist%20%28vol.%20101%29.mp3",
+        "title": "08 - Spanish Chillout Misic ｜ Vocal House, Nu Disco, Chillout Mix ｜ Relaxing Playlist (vol. 101)"
       },
       {
-        "duration": 4715.1,
-        "filename": "Cigarette-in-Paris-Deep-House-Mood-Frenc_Media_hUQ6B0fcSzc_009_128k.mp3",
-        "folder": "FRENCH",
-        "rel_path": "FRENCH/Cigarette-in-Paris-Deep-House-Mood-Frenc_Media_hUQ6B0fcSzc_009_128k.mp3",
-        "stream_url": "/api/radio/stream/FRENCH/Cigarette-in-Paris-Deep-House-Mood-Frenc_Media_hUQ6B0fcSzc_009_128k.mp3",
-        "title": "Cigarette-in-Paris-Deep-House-Mood-Frenc Media hUQ6B0fcSzc 009 128k"
+        "duration": 8062.848,
+        "filename": "15 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Deep House Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/15 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Deep House Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/15%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Deep%20House%20Relaxing%20Playlist.mp3",
+        "title": "15 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Deep House Relaxing Playlist"
       },
       {
-        "duration": 5576.5,
-        "filename": "Cigarette-in-Paris-French-Chillout-Autum_Media_uhz8WfHRaPk_009_128k.mp3",
-        "folder": "FRENCH",
-        "rel_path": "FRENCH/Cigarette-in-Paris-French-Chillout-Autum_Media_uhz8WfHRaPk_009_128k.mp3",
-        "stream_url": "/api/radio/stream/FRENCH/Cigarette-in-Paris-French-Chillout-Autum_Media_uhz8WfHRaPk_009_128k.mp3",
-        "title": "Cigarette-in-Paris-French-Chillout-Autum Media uhz8WfHRaPk 009 128k"
+        "duration": 7409.736,
+        "filename": "14 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Deep House Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/14 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Deep House Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/14%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Deep%20House%20Relaxing%20Playlist.mp3",
+        "title": "14 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Deep House Relaxing Playlist"
+      },
+      {
+        "duration": 3915.984,
+        "filename": "22 - Spanish Soulful Chill 🎧 – Mood Playlist ｜ DESEO.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/22 - Spanish Soulful Chill 🎧 – Mood Playlist ｜ DESEO.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/22%20-%20Spanish%20Soulful%20Chill%20%F0%9F%8E%A7%20%E2%80%93%20Mood%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+        "title": "22 - Spanish Soulful Chill 🎧 – Mood Playlist ｜ DESEO"
+      },
+      {
+        "duration": 7292.112,
+        "filename": "10 - Spanish Chill Music 🎧 ｜ Relaxing Playlist for Study & Work.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/10 - Spanish Chill Music 🎧 ｜ Relaxing Playlist for Study & Work.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/10%20-%20Spanish%20Chill%20Music%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist%20for%20Study%20%26%20Work.mp3",
+        "title": "10 - Spanish Chill Music 🎧 ｜ Relaxing Playlist for Study & Work"
+      },
+      {
+        "duration": 7360.92,
+        "filename": "04 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 144).mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/04 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 144).mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/04%20-%20DESEO%20%EF%BD%9C%20Spanish%20Soulful%20Chill%20%EF%BD%9C%20Mood%20Playlist%20%28vol.%20144%29.mp3",
+        "title": "04 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 144)"
+      },
+      {
+        "duration": 6789.3,
+        "filename": "25 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/25 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/25%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Cozy%20Relaxing%20Playlist.mp3",
+        "title": "25 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist"
+      },
+      {
+        "duration": 7773.648,
+        "filename": "01 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 164).mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/01 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 164).mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/01%20-%20DESEO%20%EF%BD%9C%20Spanish%20Soulful%20Chill%20%EF%BD%9C%20Mood%20Playlist%20%28vol.%20164%29.mp3",
+        "title": "01 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 164)"
+      },
+      {
+        "duration": 3604.152,
+        "filename": "23 - Spanish Soulful Chill 🎧 – Mood Playlist ｜ DESEO.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/23 - Spanish Soulful Chill 🎧 – Mood Playlist ｜ DESEO.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/23%20-%20Spanish%20Soulful%20Chill%20%F0%9F%8E%A7%20%E2%80%93%20Mood%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+        "title": "23 - Spanish Soulful Chill 🎧 – Mood Playlist ｜ DESEO"
+      },
+      {
+        "duration": 7239.744,
+        "filename": "11 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/11 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/11%20-%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+        "title": "11 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO"
+      },
+      {
+        "duration": 7664.112,
+        "filename": "17 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/17 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/17%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist.mp3",
+        "title": "17 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Relaxing Playlist"
+      },
+      {
+        "duration": 3541.416,
+        "filename": "24 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/24 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/24%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist.mp3",
+        "title": "24 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Relaxing Playlist"
+      },
+      {
+        "duration": 3790.752,
+        "filename": "26 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Tenerife Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/26 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Tenerife Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/26%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Tenerife%20Relaxing%20Playlist.mp3",
+        "title": "26 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Tenerife Relaxing Playlist"
+      },
+      {
+        "duration": 7355.448,
+        "filename": "05 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.136).mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/05 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.136).mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/05%20-%20Spanish%20Chill%20Mood%20Music%20%F0%9F%8E%A7%20%E2%80%93%20Relaxing%20Playlist%20%28vol.136%29.mp3",
+        "title": "05 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.136)"
+      },
+      {
+        "duration": 7291.584,
+        "filename": "19 - DESEO ｜ Soulful Spanish Chillout for Studying & Unwinding.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/19 - DESEO ｜ Soulful Spanish Chillout for Studying & Unwinding.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/19%20-%20DESEO%20%EF%BD%9C%20Soulful%20Spanish%20Chillout%20for%20Studying%20%26%20Unwinding.mp3",
+        "title": "19 - DESEO ｜ Soulful Spanish Chillout for Studying & Unwinding"
+      },
+      {
+        "duration": 7389.48,
+        "filename": "16 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/16 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/16%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Cozy%20Relaxing%20Playlist.mp3",
+        "title": "16 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist"
+      },
+      {
+        "duration": 7723.752,
+        "filename": "07 - Chill & Relax Playlist 2026 🎧 – Spanish Chill Mood.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/07 - Chill & Relax Playlist 2026 🎧 – Spanish Chill Mood.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/07%20-%20Chill%20%26%20Relax%20Playlist%202026%20%F0%9F%8E%A7%20%E2%80%93%20Spanish%20Chill%20Mood.mp3",
+        "title": "07 - Chill & Relax Playlist 2026 🎧 – Spanish Chill Mood"
+      },
+      {
+        "duration": 3957.84,
+        "filename": "21 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/21 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/21%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Cozy%20Relaxing%20Playlist.mp3",
+        "title": "21 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist"
+      },
+      {
+        "duration": 7906.488,
+        "filename": "13 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/13 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/13%20-%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+        "title": "13 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO"
+      },
+      {
+        "duration": 7341.864,
+        "filename": "12 - Spanish Chill Mood Music 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/12 - Spanish Chill Mood Music 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/12%20-%20Spanish%20Chill%20Mood%20Music%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+        "title": "12 - Spanish Chill Mood Music 🎧 ｜ Relaxing Playlist ｜ DESEO"
+      },
+      {
+        "duration": 7597.512,
+        "filename": "06 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.131).mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/06 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.131).mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/06%20-%20Spanish%20Chill%20Mood%20Music%20%F0%9F%8E%A7%20%E2%80%93%20Relaxing%20Playlist%20%28vol.131%29.mp3",
+        "title": "06 - Spanish Chill Mood Music 🎧 – Relaxing Playlist (vol.131)"
+      },
+      {
+        "duration": 7187.136,
+        "filename": "09 - Spanish Chill Playlist 2026 🎧 ｜ Relaxing Music for Study & Work.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/09 - Spanish Chill Playlist 2026 🎧 ｜ Relaxing Music for Study & Work.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/09%20-%20Spanish%20Chill%20Playlist%202026%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Music%20for%20Study%20%26%20Work.mp3",
+        "title": "09 - Spanish Chill Playlist 2026 🎧 ｜ Relaxing Music for Study & Work"
+      },
+      {
+        "duration": 3701.304,
+        "filename": "28 - Spanish Chill Mood 🎧 – Relax & Deep Feelings Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/28 - Spanish Chill Mood 🎧 – Relax & Deep Feelings Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/28%20-%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%E2%80%93%20Relax%20%26%20Deep%20Feelings%20Playlist.mp3",
+        "title": "28 - Spanish Chill Mood 🎧 – Relax & Deep Feelings Playlist"
+      },
+      {
+        "duration": 7336.728,
+        "filename": "02 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 143).mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/02 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 143).mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/02%20-%20DESEO%20%EF%BD%9C%20Spanish%20Soulful%20Chill%20%EF%BD%9C%20Mood%20Playlist%20%28vol.%20143%29.mp3",
+        "title": "02 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol. 143)"
+      },
+      {
+        "duration": 7230.96,
+        "filename": "03 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol.145).mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/03 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol.145).mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/03%20-%20DESEO%20%EF%BD%9C%20Spanish%20Soulful%20Chill%20%EF%BD%9C%20Mood%20Playlist%20%28vol.145%29.mp3",
+        "title": "03 - DESEO ｜ Spanish Soulful Chill ｜ Mood Playlist (vol.145)"
+      },
+      {
+        "duration": 3790.752,
+        "filename": "27 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/27 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/27%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Cozy%20Relaxing%20Playlist.mp3",
+        "title": "27 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist"
+      },
+      {
+        "duration": 3622.752,
+        "filename": "29 - Spanish Chill Music 🎧 – Autumn Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/29 - Spanish Chill Music 🎧 – Autumn Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/29%20-%20Spanish%20Chill%20Music%20%F0%9F%8E%A7%20%E2%80%93%20Autumn%20Playlist.mp3",
+        "title": "29 - Spanish Chill Music 🎧 – Autumn Playlist"
+      },
+      {
+        "duration": 8070.312,
+        "filename": "18 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Relaxing Playlist.mp3",
+        "folder": "SPANISH / DESEO",
+        "rel_path": "SPANISH/DESEO/18 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Relaxing Playlist.mp3",
+        "stream_url": "/api/radio/stream/SPANISH/DESEO/18%20-%20DESEO%20%EF%BD%9C%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist.mp3",
+        "title": "18 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Relaxing Playlist"
       }
     ],
     "queue_index": 0,
     "tv_audio_enabled": true,
-    "updated_at": 1789386806,
-    "volume": 50,
-    "started_at": 1789384452,
-    "duration": 9451.3,
+    "updated_at": 1789393837,
+    "volume": 45,
+    "started_at": 1789393837,
+    "duration": 3622.752,
     "elapsed": 2284
   },
   "stations": [
