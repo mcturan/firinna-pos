@@ -103,7 +103,7 @@
     }
   ],
   "state": {
-    "is_playing": true,
+    "is_playing": false,
     "mode": "shuffle",
     "source_type": "folder",
     "current_title": "Cigarette-in-Paris-French-Chillout-Autum Media uhz8WfHRaPk 009 128k",
@@ -153,9 +153,9 @@
     ],
     "queue_index": 4,
     "tv_audio_enabled": true,
-    "updated_at": 1789480721,
+    "updated_at": 1789488038,
     "volume": 45,
-    "started_at": 1789480721,
+    "started_at": 1789485021,
     "duration": 5576.5,
     "elapsed": 160
   },
