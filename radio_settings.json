@@ -106,9 +106,9 @@
     "is_playing": true,
     "mode": "shuffle",
     "source_type": "folder",
-    "current_title": "Chill-Mood-Music-Spanish- -French-Relaxi Media 9Wljq9bp8L0 009 128k",
-    "current_url": "/api/radio/stream/FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
-    "current_item_id": "FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
+    "current_title": "Cigarette-in-Paris-French-Chillout-Autum Media uhz8WfHRaPk 009 128k",
+    "current_url": "/api/radio/stream/FRENCH/Cigarette-in-Paris-French-Chillout-Autum_Media_uhz8WfHRaPk_009_128k.mp3",
+    "current_item_id": "FRENCH/Cigarette-in-Paris-French-Chillout-Autum_Media_uhz8WfHRaPk_009_128k.mp3",
     "queue": [
       {
         "duration": 9451.3,
@@ -151,12 +151,12 @@
         "title": "Cigarette-in-Paris-French-Chillout-Autum Media uhz8WfHRaPk 009 128k"
       }
     ],
-    "queue_index": 0,
+    "queue_index": 4,
     "tv_audio_enabled": true,
-    "updated_at": 1789458277,
+    "updated_at": 1789480721,
     "volume": 45,
-    "started_at": 1789458277,
-    "duration": 9451.3,
+    "started_at": 1789480721,
+    "duration": 5576.5,
     "elapsed": 160
   },
   "stations": [
