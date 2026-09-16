@@ -1,5 +1,5 @@
 -- Fırınna POS DB Dump
--- 2026-09-16 11:05:21
+-- 2026-09-16 17:05:35
 
 BEGIN TRANSACTION;
 CREATE TABLE categories (
@@ -4210,6 +4210,40 @@ INSERT INTO "order_items" VALUES(4575,1384,14,1,300.0,'2026-09-16 07:19:37',0,NU
 INSERT INTO "order_items" VALUES(4576,1385,6,1,250.0,'2026-09-16 07:46:29',0,NULL,'Menemen',1);
 INSERT INTO "order_items" VALUES(4577,1385,7,1,350.0,'2026-09-16 07:46:29',0,NULL,'Menemen (Etli)',1);
 INSERT INTO "order_items" VALUES(4578,1385,15,2,40.0,'2026-09-16 07:46:31',0,NULL,'Çay',1);
+INSERT INTO "order_items" VALUES(4579,1385,19,2,120.0,'2026-09-16 08:18:55',0,NULL,'Türk Kahvesi',1);
+INSERT INTO "order_items" VALUES(4580,1386,7,1,350.0,'2026-09-16 08:52:45',0,NULL,'Menemen (Etli)',1);
+INSERT INTO "order_items" VALUES(4581,1386,15,2,40.0,'2026-09-16 08:52:51',0,NULL,'Çay',1);
+INSERT INTO "order_items" VALUES(4582,1387,7,1,350.0,'2026-09-16 08:53:03',0,NULL,'Menemen (Etli)',1);
+INSERT INTO "order_items" VALUES(4583,1387,13,1,250.0,'2026-09-16 08:53:04',0,NULL,'Bazlama (Sucuklu)',1);
+INSERT INTO "order_items" VALUES(4584,1387,15,2,40.0,'2026-09-16 08:53:06',0,NULL,'Çay',1);
+INSERT INTO "order_items" VALUES(4585,1388,6,3,250.0,'2026-09-16 09:00:12',0,NULL,'Menemen',1);
+INSERT INTO "order_items" VALUES(4586,1388,9,1,170.0,'2026-09-16 09:00:21',0,NULL,'Omlet Peynirli',1);
+INSERT INTO "order_items" VALUES(4587,1388,4,1,400.0,'2026-09-16 09:00:26',0,NULL,'Pizza Karışık',1);
+INSERT INTO "order_items" VALUES(4588,1388,14,2,300.0,'2026-09-16 09:00:33',0,NULL,'Bazlama (Etli)',1);
+INSERT INTO "order_items" VALUES(4589,1387,6,1,250.0,'2026-09-16 09:06:02',0,NULL,'Menemen',1);
+INSERT INTO "order_items" VALUES(4590,1388,13,1,250.0,'2026-09-16 09:06:10',0,NULL,'Bazlama (Sucuklu)',1);
+INSERT INTO "order_items" VALUES(4591,1387,19,2,120.0,'2026-09-16 09:20:55',0,NULL,'Türk Kahvesi',1);
+INSERT INTO "order_items" VALUES(4592,1388,15,10,40.0,'2026-09-16 09:56:25',0,NULL,'Çay',1);
+INSERT INTO "order_items" VALUES(4593,1389,30,1,150.0,'2026-09-16 10:15:28',0,NULL,'Limonata',1);
+INSERT INTO "order_items" VALUES(4594,1389,16,1,150.0,'2026-09-16 10:15:39',0,NULL,'Kahve Latte',1);
+INSERT INTO "order_items" VALUES(4595,1389,34,1,250.0,'2026-09-16 10:16:09',0,NULL,'Bazlama (Tavuklu)',1);
+INSERT INTO "order_items" VALUES(4596,1389,11,1,250.0,'2026-09-16 10:16:16',0,NULL,'Omlet (Etli)',1);
+INSERT INTO "order_items" VALUES(4597,1390,6,1,250.0,'2026-09-16 10:37:35',0,NULL,'Menemen',1);
+INSERT INTO "order_items" VALUES(4598,1390,14,1,300.0,'2026-09-16 10:37:37',0,NULL,'Bazlama (Etli)',1);
+INSERT INTO "order_items" VALUES(4599,1390,15,2,40.0,'2026-09-16 10:37:39',0,NULL,'Çay',1);
+INSERT INTO "order_items" VALUES(4600,1391,6,1,250.0,'2026-09-16 11:11:30',0,NULL,'Menemen',1);
+INSERT INTO "order_items" VALUES(4601,1391,4,1,400.0,'2026-09-16 11:11:50',0,NULL,'Pizza Karışık',1);
+INSERT INTO "order_items" VALUES(4602,1391,30,2,150.0,'2026-09-16 11:12:00',0,NULL,'Limonata',1);
+INSERT INTO "order_items" VALUES(4603,1392,6,1,250.0,'2026-09-16 11:46:31',0,NULL,'Menemen',1);
+INSERT INTO "order_items" VALUES(4604,1392,30,1,150.0,'2026-09-16 11:46:33',0,NULL,'Limonata',1);
+INSERT INTO "order_items" VALUES(4605,1393,3,1,380.0,'2026-09-16 11:46:38',0,NULL,'Pizza Margarita',1);
+INSERT INTO "order_items" VALUES(4606,1393,15,1,40.0,'2026-09-16 11:46:41',0,NULL,'Çay',1);
+INSERT INTO "order_items" VALUES(4607,1394,4,1,400.0,'2026-09-16 12:46:10',0,NULL,'Pizza Karışık',1);
+INSERT INTO "order_items" VALUES(4608,1394,3,1,380.0,'2026-09-16 12:46:11',0,NULL,'Pizza Margarita',1);
+INSERT INTO "order_items" VALUES(4609,1394,30,2,150.0,'2026-09-16 12:46:13',0,NULL,'Limonata',1);
+INSERT INTO "order_items" VALUES(4610,1395,3,1,380.0,'2026-09-16 13:08:55',0,NULL,'Pizza Margarita',1);
+INSERT INTO "order_items" VALUES(4611,1395,30,2,150.0,'2026-09-16 13:08:57',0,NULL,'Limonata',1);
+INSERT INTO "order_items" VALUES(4612,1396,19,2,120.0,'2026-09-16 13:49:53',0,NULL,'Türk Kahvesi',1);
 CREATE TABLE orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         table_id INTEGER,
@@ -5527,7 +5561,18 @@ INSERT INTO "orders" VALUES(1381,3,1270.0,'closed','2026-09-16 09:51:29','2026-0
 INSERT INTO "orders" VALUES(1382,1,900.0,'closed','2026-09-16 09:58:11','2026-09-16 10:19:24',NULL,0.0,NULL,0.0,900.0,0.0,'cash',0,'');
 INSERT INTO "orders" VALUES(1383,2,290.0,'closed','2026-09-16 10:19:28','2026-09-16 11:04:07',NULL,0.0,NULL,0.0,290.0,0.0,'cash',0,'');
 INSERT INTO "orders" VALUES(1384,1,650.0,'closed','2026-09-16 10:19:36','2026-09-16 11:04:05',NULL,0.0,NULL,0.0,650.0,0.0,'cash',0,'');
-INSERT INTO "orders" VALUES(1385,3,680.0,'open','2026-09-16 10:46:28',NULL,NULL,0.0,NULL,0.0,0.0,0.0,NULL,0,'');
+INSERT INTO "orders" VALUES(1385,3,920.0,'closed','2026-09-16 10:46:28','2026-09-16 11:52:58',NULL,0.0,NULL,0.0,920.0,0.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1386,1,430.0,'closed','2026-09-16 11:52:45','2026-09-16 12:05:59',NULL,0.0,NULL,0.0,430.0,0.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1387,4,1170.0,'closed','2026-09-16 11:53:03','2026-09-16 12:40:10',NULL,0.0,NULL,0.0,1170.0,0.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1388,2,2570.0,'closed','2026-09-16 12:00:12','2026-09-16 13:10:04',NULL,0.0,NULL,0.0,2570.0,40.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1389,3,800.0,'closed','2026-09-16 13:15:28','2026-09-16 14:04:26',NULL,0.0,NULL,800.0,0.0,0.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1390,1,630.0,'closed','2026-09-16 13:37:34','2026-09-16 14:17:04',NULL,0.0,NULL,0.0,630.0,0.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1391,3,950.0,'closed','2026-09-16 14:11:30','2026-09-16 15:01:05',NULL,0.0,NULL,0.0,950.0,0.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1392,1,400.0,'closed','2026-09-16 14:46:31','2026-09-16 15:02:22',NULL,0.0,NULL,0.0,400.0,0.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1393,2,420.0,'closed','2026-09-16 14:46:38','2026-09-16 15:01:01',NULL,0.0,NULL,420.0,0.0,0.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1394,4,1080.0,'closed','2026-09-16 15:46:10','2026-09-16 16:49:49',NULL,0.0,NULL,0.0,1080.0,0.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1395,1,680.0,'closed','2026-09-16 16:08:55','2026-09-16 16:38:35',NULL,0.0,NULL,680.0,0.0,20.0,'cash',0,'');
+INSERT INTO "orders" VALUES(1396,1,240.0,'open','2026-09-16 16:49:53',NULL,NULL,0.0,NULL,0.0,0.0,0.0,NULL,0,'');
 CREATE TABLE products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -5720,30 +5765,30 @@ CREATE TABLE stock_items (
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 INSERT INTO "stock_items" VALUES(1,'Pizza Margarita','adet',0.0,3.0,0.0,'Tahıl/Un',1,'2026-03-09 18:09:40');
-INSERT INTO "stock_items" VALUES(2,'Pizza Karışık','adet',-161.0,3.0,0.0,'Tahıl/Un',1,'2026-03-09 18:10:35');
-INSERT INTO "stock_items" VALUES(3,'Peynir','gr',-100700.0,500.0,0.0,'Süt Ürünleri',1,'2026-03-09 18:11:07');
-INSERT INTO "stock_items" VALUES(4,'Kavurma','gr',-50200.0,100.0,0.0,'Et/Tavuk',1,'2026-03-09 18:11:29');
-INSERT INTO "stock_items" VALUES(5,'Yumurta','adet',-2334.0,6.0,0.0,'Et/Tavuk',1,'2026-03-09 18:12:48');
+INSERT INTO "stock_items" VALUES(2,'Pizza Karışık','adet',-164.0,3.0,0.0,'Tahıl/Un',1,'2026-03-09 18:10:35');
+INSERT INTO "stock_items" VALUES(3,'Peynir','gr',-102000.0,500.0,0.0,'Süt Ürünleri',1,'2026-03-09 18:11:07');
+INSERT INTO "stock_items" VALUES(4,'Kavurma','gr',-50700.0,100.0,0.0,'Et/Tavuk',1,'2026-03-09 18:11:29');
+INSERT INTO "stock_items" VALUES(5,'Yumurta','adet',-2360.0,6.0,0.0,'Et/Tavuk',1,'2026-03-09 18:12:48');
 INSERT INTO "stock_items" VALUES(6,'Süt','lt',0.0,0.5,0.0,'Süt Ürünleri',1,'2026-03-09 18:13:28');
-INSERT INTO "stock_items" VALUES(7,'Bazlama','adet',-641.0,2.0,0.0,'Tahıl/Un',1,'2026-03-09 18:15:32');
-INSERT INTO "stock_items" VALUES(8,'Ekmek','adet',-431.0,1.0,0.0,'Tahıl/Un',1,'2026-03-09 18:15:40');
+INSERT INTO "stock_items" VALUES(7,'Bazlama','adet',-646.0,2.0,0.0,'Tahıl/Un',1,'2026-03-09 18:15:32');
+INSERT INTO "stock_items" VALUES(8,'Ekmek','adet',-436.5,1.0,0.0,'Tahıl/Un',1,'2026-03-09 18:15:40');
 INSERT INTO "stock_items" VALUES(9,'Madensuyu','adet',-65.0,4.0,0.0,'İçecek',1,'2026-03-09 18:16:21');
 INSERT INTO "stock_items" VALUES(10,'Sarıyer Kola','adet',-37.0,5.0,0.0,'İçecek',1,'2026-03-09 18:16:37');
 INSERT INTO "stock_items" VALUES(11,'Sarıyer Portakal','adet',-24.0,5.0,0.0,'İçecek',1,'2026-03-09 18:17:06');
 INSERT INTO "stock_items" VALUES(12,'Fusetea Soğukçay','adet',-45.0,5.0,0.0,'İçecek',1,'2026-03-09 18:17:20');
-INSERT INTO "stock_items" VALUES(13,'Menemen domates sosu','gr',-146540.0,1000.0,0.0,'Sebze/Meyve',1,'2026-03-09 18:18:02');
+INSERT INTO "stock_items" VALUES(13,'Menemen domates sosu','gr',-148410.0,1000.0,0.0,'Sebze/Meyve',1,'2026-03-09 18:18:02');
 INSERT INTO "stock_items" VALUES(14,'Çikolatalı kek','adet',-166.0,4.0,0.0,'Tahıl/Un',1,'2026-03-09 18:18:44');
-INSERT INTO "stock_items" VALUES(15,'Sucuk','gr',-25850.0,100.0,0.0,'Et/Tavuk',1,'2026-03-09 18:19:00');
+INSERT INTO "stock_items" VALUES(15,'Sucuk','gr',-26050.0,100.0,0.0,'Et/Tavuk',1,'2026-03-09 18:19:00');
 INSERT INTO "stock_items" VALUES(16,'Baklava','adet',0.0,10.0,0.0,'Sebze/Meyve',1,'2026-03-09 18:20:20');
 INSERT INTO "stock_items" VALUES(17,'İçme suyu','lt',0.0,5.0,0.0,'Sebze/Meyve',1,'2026-03-10 15:54:55');
-INSERT INTO "stock_items" VALUES(18,'Türk kahvesi','gr',-1940.0,20.0,0.0,'İçecek',1,'2026-03-15 20:23:55');
-INSERT INTO "stock_items" VALUES(19,'Çekirdek kahve','gr',-3247.0,20.0,0.0,'İçecek',1,'2026-03-15 20:24:09');
+INSERT INTO "stock_items" VALUES(18,'Türk kahvesi','gr',-1960.0,20.0,0.0,'İçecek',1,'2026-03-15 20:23:55');
+INSERT INTO "stock_items" VALUES(19,'Çekirdek kahve','gr',-3262.0,20.0,0.0,'İçecek',1,'2026-03-15 20:24:09');
 INSERT INTO "stock_items" VALUES(20,'Dondurma','gr',-3825.0,100.0,0.0,'Süt Ürünleri',1,'2026-03-15 20:26:43');
 INSERT INTO "stock_items" VALUES(21,'Su (500ml)','adet',-281.0,5.0,0.0,'İçecek',1,'2026-03-15 20:33:21');
 INSERT INTO "stock_items" VALUES(22,'Şıra','ml',-6600.0,400.0,0.0,'İçecek',1,'2026-03-15 20:38:18');
 INSERT INTO "stock_items" VALUES(23,'Küp şeker','adet',0.0,40.0,0.0,'Tahıl/Un',0,'2026-03-15 20:40:06');
-INSERT INTO "stock_items" VALUES(24,'Küp şeker','adet',-2728.0,40.0,0.0,'Tahıl/Un',1,'2026-03-15 20:41:10');
-INSERT INTO "stock_items" VALUES(25,'Çay','gr',-6820.0,100.0,0.0,'Tahıl/Un',1,'2026-03-15 20:42:16');
+INSERT INTO "stock_items" VALUES(24,'Küp şeker','adet',-2766.0,40.0,0.0,'Tahıl/Un',1,'2026-03-15 20:41:10');
+INSERT INTO "stock_items" VALUES(25,'Çay','gr',-6915.0,100.0,0.0,'Tahıl/Un',1,'2026-03-15 20:42:16');
 CREATE TABLE stock_movements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         stock_item_id INTEGER NOT NULL,
@@ -13813,6 +13858,85 @@ INSERT INTO "stock_movements" VALUES(8054,15,'out',100.0,0.0,'satis','Sipariş #
 INSERT INTO "stock_movements" VALUES(8055,3,'out',50.0,0.0,'satis','Sipariş #1383',NULL,'2026-09-16 08:04:07',NULL);
 INSERT INTO "stock_movements" VALUES(8056,24,'out',2.0,0.0,'satis','Sipariş #1383',NULL,'2026-09-16 08:04:07',NULL);
 INSERT INTO "stock_movements" VALUES(8057,25,'out',5.0,0.0,'satis','Sipariş #1383',NULL,'2026-09-16 08:04:07',NULL);
+INSERT INTO "stock_movements" VALUES(8058,13,'out',170.0,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8059,5,'out',2.0,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8060,3,'out',50.0,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8061,8,'out',0.5,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8062,13,'out',170.0,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8063,4,'out',50.0,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8064,3,'out',50.0,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8065,5,'out',2.0,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8066,8,'out',0.5,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8067,24,'out',4.0,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8068,25,'out',10.0,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8069,18,'out',10.0,0.0,'satis','Sipariş #1385',NULL,'2026-09-16 08:52:58',NULL);
+INSERT INTO "stock_movements" VALUES(8070,13,'out',170.0,0.0,'satis','Sipariş #1386',NULL,'2026-09-16 09:05:59',NULL);
+INSERT INTO "stock_movements" VALUES(8071,4,'out',50.0,0.0,'satis','Sipariş #1386',NULL,'2026-09-16 09:05:59',NULL);
+INSERT INTO "stock_movements" VALUES(8072,3,'out',50.0,0.0,'satis','Sipariş #1386',NULL,'2026-09-16 09:05:59',NULL);
+INSERT INTO "stock_movements" VALUES(8073,5,'out',2.0,0.0,'satis','Sipariş #1386',NULL,'2026-09-16 09:05:59',NULL);
+INSERT INTO "stock_movements" VALUES(8074,8,'out',0.5,0.0,'satis','Sipariş #1386',NULL,'2026-09-16 09:05:59',NULL);
+INSERT INTO "stock_movements" VALUES(8075,24,'out',4.0,0.0,'satis','Sipariş #1386',NULL,'2026-09-16 09:05:59',NULL);
+INSERT INTO "stock_movements" VALUES(8076,25,'out',10.0,0.0,'satis','Sipariş #1386',NULL,'2026-09-16 09:05:59',NULL);
+INSERT INTO "stock_movements" VALUES(8077,13,'out',170.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8078,4,'out',50.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8079,3,'out',50.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8080,5,'out',2.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8081,8,'out',0.5,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8082,7,'out',1.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8083,15,'out',100.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8084,3,'out',50.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8085,24,'out',4.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8086,25,'out',10.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8087,13,'out',170.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8088,5,'out',2.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8089,3,'out',50.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8090,8,'out',0.5,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8091,18,'out',10.0,0.0,'satis','Sipariş #1387',NULL,'2026-09-16 09:40:10',NULL);
+INSERT INTO "stock_movements" VALUES(8092,13,'out',510.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8093,5,'out',6.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8094,3,'out',150.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8095,8,'out',1.5,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8096,5,'out',2.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8097,3,'out',50.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8098,2,'out',1.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8099,3,'out',50.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8100,7,'out',2.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8101,4,'out',200.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8102,3,'out',100.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8103,7,'out',1.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8104,15,'out',100.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8105,3,'out',50.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8106,24,'out',20.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8107,25,'out',50.0,0.0,'satis','Sipariş #1388',NULL,'2026-09-16 10:09:52',NULL);
+INSERT INTO "stock_movements" VALUES(8108,19,'out',15.0,0.0,'satis','Sipariş #1389',NULL,'2026-09-16 11:04:26',NULL);
+INSERT INTO "stock_movements" VALUES(8109,4,'out',50.0,0.0,'satis','Sipariş #1389',NULL,'2026-09-16 11:04:26',NULL);
+INSERT INTO "stock_movements" VALUES(8110,5,'out',2.0,0.0,'satis','Sipariş #1389',NULL,'2026-09-16 11:04:26',NULL);
+INSERT INTO "stock_movements" VALUES(8111,13,'out',170.0,0.0,'satis','Sipariş #1390',NULL,'2026-09-16 11:17:04',NULL);
+INSERT INTO "stock_movements" VALUES(8112,5,'out',2.0,0.0,'satis','Sipariş #1390',NULL,'2026-09-16 11:17:04',NULL);
+INSERT INTO "stock_movements" VALUES(8113,3,'out',50.0,0.0,'satis','Sipariş #1390',NULL,'2026-09-16 11:17:04',NULL);
+INSERT INTO "stock_movements" VALUES(8114,8,'out',0.5,0.0,'satis','Sipariş #1390',NULL,'2026-09-16 11:17:04',NULL);
+INSERT INTO "stock_movements" VALUES(8115,7,'out',1.0,0.0,'satis','Sipariş #1390',NULL,'2026-09-16 11:17:04',NULL);
+INSERT INTO "stock_movements" VALUES(8116,4,'out',100.0,0.0,'satis','Sipariş #1390',NULL,'2026-09-16 11:17:04',NULL);
+INSERT INTO "stock_movements" VALUES(8117,3,'out',50.0,0.0,'satis','Sipariş #1390',NULL,'2026-09-16 11:17:04',NULL);
+INSERT INTO "stock_movements" VALUES(8118,24,'out',4.0,0.0,'satis','Sipariş #1390',NULL,'2026-09-16 11:17:04',NULL);
+INSERT INTO "stock_movements" VALUES(8119,25,'out',10.0,0.0,'satis','Sipariş #1390',NULL,'2026-09-16 11:17:04',NULL);
+INSERT INTO "stock_movements" VALUES(8120,3,'out',100.0,0.0,'satis','Sipariş #1393',NULL,'2026-09-16 12:01:01',NULL);
+INSERT INTO "stock_movements" VALUES(8121,24,'out',2.0,0.0,'satis','Sipariş #1393',NULL,'2026-09-16 12:01:01',NULL);
+INSERT INTO "stock_movements" VALUES(8122,25,'out',5.0,0.0,'satis','Sipariş #1393',NULL,'2026-09-16 12:01:01',NULL);
+INSERT INTO "stock_movements" VALUES(8123,13,'out',170.0,0.0,'satis','Sipariş #1391',NULL,'2026-09-16 12:01:05',NULL);
+INSERT INTO "stock_movements" VALUES(8124,5,'out',2.0,0.0,'satis','Sipariş #1391',NULL,'2026-09-16 12:01:05',NULL);
+INSERT INTO "stock_movements" VALUES(8125,3,'out',50.0,0.0,'satis','Sipariş #1391',NULL,'2026-09-16 12:01:05',NULL);
+INSERT INTO "stock_movements" VALUES(8126,8,'out',0.5,0.0,'satis','Sipariş #1391',NULL,'2026-09-16 12:01:05',NULL);
+INSERT INTO "stock_movements" VALUES(8127,2,'out',1.0,0.0,'satis','Sipariş #1391',NULL,'2026-09-16 12:01:05',NULL);
+INSERT INTO "stock_movements" VALUES(8128,3,'out',50.0,0.0,'satis','Sipariş #1391',NULL,'2026-09-16 12:01:05',NULL);
+INSERT INTO "stock_movements" VALUES(8129,13,'out',170.0,0.0,'satis','Sipariş #1392',NULL,'2026-09-16 12:02:22',NULL);
+INSERT INTO "stock_movements" VALUES(8130,5,'out',2.0,0.0,'satis','Sipariş #1392',NULL,'2026-09-16 12:02:22',NULL);
+INSERT INTO "stock_movements" VALUES(8131,3,'out',50.0,0.0,'satis','Sipariş #1392',NULL,'2026-09-16 12:02:22',NULL);
+INSERT INTO "stock_movements" VALUES(8132,8,'out',0.5,0.0,'satis','Sipariş #1392',NULL,'2026-09-16 12:02:22',NULL);
+INSERT INTO "stock_movements" VALUES(8133,3,'out',100.0,0.0,'satis','Sipariş #1395',NULL,'2026-09-16 13:38:35',NULL);
+INSERT INTO "stock_movements" VALUES(8134,2,'out',1.0,0.0,'satis','Sipariş #1394',NULL,'2026-09-16 13:49:49',NULL);
+INSERT INTO "stock_movements" VALUES(8135,3,'out',50.0,0.0,'satis','Sipariş #1394',NULL,'2026-09-16 13:49:49',NULL);
+INSERT INTO "stock_movements" VALUES(8136,3,'out',100.0,0.0,'satis','Sipariş #1394',NULL,'2026-09-16 13:49:49',NULL);
 CREATE TABLE tables (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -15623,6 +15747,19 @@ INSERT INTO "transactions" VALUES(1849,'2026-09-16','in',1270.0,'satis','cash','
 INSERT INTO "transactions" VALUES(1850,'2026-09-16','in',30.0,'bahsis','cash','Bahşiş - Sipariş #1381',1381,'2026-09-16 10:43:09');
 INSERT INTO "transactions" VALUES(1851,'2026-09-16','in',650.0,'satis','card','Sipariş #1384',1384,'2026-09-16 11:04:05');
 INSERT INTO "transactions" VALUES(1852,'2026-09-16','in',290.0,'satis','card','Sipariş #1383',1383,'2026-09-16 11:04:07');
+INSERT INTO "transactions" VALUES(1853,'2026-09-16','in',920.0,'satis','card','Sipariş #1385',1385,'2026-09-16 11:52:58');
+INSERT INTO "transactions" VALUES(1854,'2026-09-16','in',430.0,'satis','card','Sipariş #1386',1386,'2026-09-16 12:05:59');
+INSERT INTO "transactions" VALUES(1855,'2026-09-16','in',1170.0,'satis','card','Sipariş #1387',1387,'2026-09-16 12:40:10');
+INSERT INTO "transactions" VALUES(1857,'2026-09-16','in',2570.0,'satis','card','Sipariş #1388',1388,'2026-09-16 13:10:04');
+INSERT INTO "transactions" VALUES(1858,'2026-09-16','in',40.0,'bahsis','cash','Bahşiş - Sipariş #1388',1388,'2026-09-16 13:10:04');
+INSERT INTO "transactions" VALUES(1859,'2026-09-16','in',800.0,'satis','cash','Sipariş #1389',1389,'2026-09-16 14:04:26');
+INSERT INTO "transactions" VALUES(1860,'2026-09-16','in',630.0,'satis','card','Sipariş #1390',1390,'2026-09-16 14:17:04');
+INSERT INTO "transactions" VALUES(1861,'2026-09-16','in',420.0,'satis','cash','Sipariş #1393',1393,'2026-09-16 15:01:01');
+INSERT INTO "transactions" VALUES(1862,'2026-09-16','in',950.0,'satis','card','Sipariş #1391',1391,'2026-09-16 15:01:05');
+INSERT INTO "transactions" VALUES(1863,'2026-09-16','in',400.0,'satis','card','Sipariş #1392',1392,'2026-09-16 15:02:22');
+INSERT INTO "transactions" VALUES(1864,'2026-09-16','in',680.0,'satis','cash','Sipariş #1395',1395,'2026-09-16 16:38:35');
+INSERT INTO "transactions" VALUES(1865,'2026-09-16','in',20.0,'bahsis','cash','Bahşiş - Sipariş #1395',1395,'2026-09-16 16:38:35');
+INSERT INTO "transactions" VALUES(1866,'2026-09-16','in',1080.0,'satis','card','Sipariş #1394',1394,'2026-09-16 16:49:49');
 CREATE TABLE zones (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -15639,12 +15776,12 @@ INSERT INTO "sqlite_sequence" VALUES('zones',3);
 INSERT INTO "sqlite_sequence" VALUES('tables',14);
 INSERT INTO "sqlite_sequence" VALUES('categories',10);
 INSERT INTO "sqlite_sequence" VALUES('products',40);
-INSERT INTO "sqlite_sequence" VALUES('orders',1385);
-INSERT INTO "sqlite_sequence" VALUES('order_items',4578);
+INSERT INTO "sqlite_sequence" VALUES('orders',1396);
+INSERT INTO "sqlite_sequence" VALUES('order_items',4612);
 INSERT INTO "sqlite_sequence" VALUES('telegram_contacts',5);
-INSERT INTO "sqlite_sequence" VALUES('transactions',1852);
+INSERT INTO "sqlite_sequence" VALUES('transactions',1866);
 INSERT INTO "sqlite_sequence" VALUES('stock_items',25);
 INSERT INTO "sqlite_sequence" VALUES('recipes',50);
-INSERT INTO "sqlite_sequence" VALUES('stock_movements',8057);
+INSERT INTO "sqlite_sequence" VALUES('stock_movements',8136);
 INSERT INTO "sqlite_sequence" VALUES('saved_notes',15);
 COMMIT;
