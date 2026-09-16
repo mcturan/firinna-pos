@@ -103,12 +103,12 @@
     }
   ],
   "state": {
-    "is_playing": false,
+    "is_playing": true,
     "mode": "shuffle",
     "source_type": "folder",
-    "current_title": "Cigarette-in-Paris-French-Chillout-Autum Media uhz8WfHRaPk 009 128k",
-    "current_url": "/api/radio/stream/FRENCH/Cigarette-in-Paris-French-Chillout-Autum_Media_uhz8WfHRaPk_009_128k.mp3",
-    "current_item_id": "FRENCH/Cigarette-in-Paris-French-Chillout-Autum_Media_uhz8WfHRaPk_009_128k.mp3",
+    "current_title": "FRENCH - Chill-Mood-Music-Spanish- -French-Relaxi Media 9Wljq9bp8L0 009 128k",
+    "current_url": "/api/radio/stream/FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
+    "current_item_id": "FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
     "queue": [
       {
         "duration": 9451.3,
@@ -117,14 +117,6 @@
         "rel_path": "FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
         "stream_url": "/api/radio/stream/FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
         "title": "Chill-Mood-Music-Spanish- -French-Relaxi Media 9Wljq9bp8L0 009 128k"
-      },
-      {
-        "duration": 17072.4,
-        "filename": "Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
-        "folder": "FRENCH",
-        "rel_path": "FRENCH/Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
-        "stream_url": "/api/radio/stream/FRENCH/Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
-        "title": "Paris-cafe-French-Vintage-Jazz Media v5vraYmukHs 009 128k"
       },
       {
         "duration": 9437.4,
@@ -149,15 +141,23 @@
         "rel_path": "FRENCH/Cigarette-in-Paris-French-Chillout-Autum_Media_uhz8WfHRaPk_009_128k.mp3",
         "stream_url": "/api/radio/stream/FRENCH/Cigarette-in-Paris-French-Chillout-Autum_Media_uhz8WfHRaPk_009_128k.mp3",
         "title": "Cigarette-in-Paris-French-Chillout-Autum Media uhz8WfHRaPk 009 128k"
+      },
+      {
+        "duration": 17072.4,
+        "filename": "Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
+        "folder": "FRENCH",
+        "rel_path": "FRENCH/Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
+        "stream_url": "/api/radio/stream/FRENCH/Paris-cafe-French-Vintage-Jazz_Media_v5vraYmukHs_009_128k.mp3",
+        "title": "Paris-cafe-French-Vintage-Jazz Media v5vraYmukHs 009 128k"
       }
     ],
-    "queue_index": 4,
+    "queue_index": 0,
     "tv_audio_enabled": true,
-    "updated_at": 1789488038,
+    "updated_at": 1789543195,
     "volume": 45,
-    "started_at": 1789485021,
-    "duration": 5576.5,
-    "elapsed": 160
+    "started_at": 1789543195,
+    "duration": 9451.3,
+    "elapsed": 83
   },
   "stations": [
     {
