@@ -3771,54 +3771,8 @@ async function submitQuickNotePrint() {
                 ✕
             </button>
         </div>
-        <div class="cam-dock-list">
-            <!-- 1: Masalar 1 -->
-            <div class="cam-vcard" onclick="openCameraLiveModal('masalar1', 'Masalar 1')">
-                <div class="cam-vcard-bar">
-                    <span class="cam-vcard-name"><span class="cam-dot"></span>Masalar 1</span>
-                    <span class="cam-vcard-time" id="cam-time-masalar1">--:--:--</span>
-                </div>
-                <div class="cam-vcard-thumb">
-                    <img id="cam-img-masalar1" src="/api/camera/snapshot/masalar1" alt="Masalar 1" loading="eager">
-                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
-                </div>
-            </div>
-
-            <!-- 2: Masalar 2 -->
-            <div class="cam-vcard" onclick="openCameraLiveModal('masalar2', 'Masalar 2')">
-                <div class="cam-vcard-bar">
-                    <span class="cam-vcard-name"><span class="cam-dot"></span>Masalar 2</span>
-                    <span class="cam-vcard-time" id="cam-time-masalar2">--:--:--</span>
-                </div>
-                <div class="cam-vcard-thumb">
-                    <img id="cam-img-masalar2" src="/api/camera/snapshot/masalar2" alt="Masalar 2" loading="eager">
-                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
-                </div>
-            </div>
-
-            <!-- 3: Mutfak -->
-            <div class="cam-vcard" onclick="openCameraLiveModal('mutfak', 'Mutfak')">
-                <div class="cam-vcard-bar">
-                    <span class="cam-vcard-name"><span class="cam-dot"></span>Mutfak</span>
-                    <span class="cam-vcard-time" id="cam-time-mutfak">--:--:--</span>
-                </div>
-                <div class="cam-vcard-thumb">
-                    <img id="cam-img-mutfak" src="/api/camera/snapshot/mutfak" alt="Mutfak" loading="eager">
-                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
-                </div>
-            </div>
-
-            <!-- 4: Kapı -->
-            <div class="cam-vcard" onclick="openCameraLiveModal('kapi', 'Kapı')">
-                <div class="cam-vcard-bar">
-                    <span class="cam-vcard-name"><span class="cam-dot"></span>Kapı</span>
-                    <span class="cam-vcard-time" id="cam-time-kapi">--:--:--</span>
-                </div>
-                <div class="cam-vcard-thumb">
-                    <img id="cam-img-kapi" src="/api/camera/snapshot/kapi" alt="Kapı" loading="eager">
-                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
-                </div>
-            </div>
+        <div class="cam-dock-list" id="cameraDockList">
+            <!-- Dinamik yüklenecek -->
         </div>
     </div>
 
@@ -3838,15 +3792,12 @@ async function submitQuickNotePrint() {
             <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                 <div style="display: flex; align-items: center; gap: 0.4rem; color: #f8fafc; font-weight: 800; font-size: 1rem;">
                     <span style="display:inline-block; width:8px; height:8px; background:#ef4444; border-radius:50%; box-shadow:0 0 8px #ef4444; animation: camPulse 1.2s infinite;"></span>
-                    <span id="cameraModalTitle">Masalar 1</span>
+                    <span id="cameraModalTitle">Masalar</span>
                     <span style="font-size: 0.7rem; background: #dc2626; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800; letter-spacing: 0.5px;">CANLI (WebRTC)</span>
                 </div>
                 <!-- Kamera Değiştirme Butonları -->
-                <div class="cam-modal-pills">
-                    <button type="button" class="cam-pill-btn" data-cam="masalar1" onclick="switchCameraLive('masalar1', 'Masalar 1')">Masalar 1</button>
-                    <button type="button" class="cam-pill-btn" data-cam="masalar2" onclick="switchCameraLive('masalar2', 'Masalar 2')">Masalar 2</button>
-                    <button type="button" class="cam-pill-btn" data-cam="mutfak" onclick="switchCameraLive('mutfak', 'Mutfak')">Mutfak</button>
-                    <button type="button" class="cam-pill-btn" data-cam="kapi" onclick="switchCameraLive('kapi', 'Kapı')">Kapı</button>
+                <div class="cam-modal-pills" id="cameraModalPills">
+                    <!-- Dinamik yüklenecek -->
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -3868,19 +3819,71 @@ async function submitQuickNotePrint() {
 // -------------------------------------------------------------
 // Güvenlik Kameraları Dikey Sağ Panel & WebRTC Akış Mantığı
 // -------------------------------------------------------------
+let activeCameras = [
+    {id: 'masalar', name: 'Masalar'},
+    {id: 'mutfak', name: 'Mutfak / Kasa'},
+    {id: 'kapi', name: 'Kapı'}
+];
+let cameraFetching = {};
 let cameraPollInterval = null;
-const cameraList = ['masalar1', 'masalar2', 'mutfak', 'kapi'];
-const cameraFetching = { masalar1: false, masalar2: false, mutfak: false, kapi: false };
 let currentActiveCamera = null;
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function loadActiveCameras() {
+    try {
+        const res = await fetch('/api/camera/list');
+        if (res.ok) {
+            const list = await res.json();
+            if (Array.isArray(list) && list.length > 0) {
+                activeCameras = list;
+            }
+        }
+    } catch(e) {
+        console.warn('Kamera listesi alınamadı, varsayılanlar kullanılacak:', e);
+    }
+    renderActiveCameras();
+    refreshCameraThumbnails();
+}
+
+function renderActiveCameras() {
+    const listEl = document.getElementById('cameraDockList');
+    if (listEl) {
+        listEl.innerHTML = activeCameras.map(cam => `
+            <div class="cam-vcard" onclick="openCameraLiveModal('${escapeHtml(cam.id)}', '${escapeHtml(cam.name)}')">
+                <div class="cam-vcard-bar">
+                    <span class="cam-vcard-name"><span class="cam-dot"></span>${escapeHtml(cam.name)}</span>
+                    <span class="cam-vcard-time" id="cam-time-${escapeHtml(cam.id)}">--:--:--</span>
+                </div>
+                <div class="cam-vcard-thumb">
+                    <img id="cam-img-${escapeHtml(cam.id)}" src="/api/camera/snapshot/${escapeHtml(cam.id)}" alt="${escapeHtml(cam.name)}" loading="eager">
+                    <div class="cam-vcard-overlay"><span>▶ Canlı</span></div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    const pillsEl = document.getElementById('cameraModalPills');
+    if (pillsEl) {
+        pillsEl.innerHTML = activeCameras.map(cam => `
+            <button type="button" class="cam-pill-btn ${currentActiveCamera === cam.id ? 'active' : ''}" data-cam="${escapeHtml(cam.id)}" onclick="switchCameraLive('${escapeHtml(cam.id)}', '${escapeHtml(cam.name)}')">${escapeHtml(cam.name)}</button>
+        `).join('');
+    }
+}
 
 function refreshCameraThumbnails() {
     if (document.hidden) return;
     const panel = document.getElementById('cameraSidebarPanel');
     if (!panel || panel.style.display === 'none') return;
+    if (!activeCameras || activeCameras.length === 0) return;
 
     const timeStr = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 
-    cameraList.forEach((camId, idx) => {
+    activeCameras.forEach((cam, idx) => {
+        const camId = cam.id;
         // Ağ ve worker yığılmasını önlemek için kameraları 400ms aralıklarla kademeli (staggered) iste
         setTimeout(() => {
             if (document.hidden) return;
@@ -4028,6 +4031,7 @@ document.addEventListener('visibilitychange', function() {
 
 // Başlangıç durumu
 document.addEventListener('DOMContentLoaded', function() {
+    loadActiveCameras();
     const isCollapsed = localStorage.getItem('firinna_cams_sidebar_collapsed') === '1';
     toggleCameraSidebar(!isCollapsed);
     alignCameraDock();

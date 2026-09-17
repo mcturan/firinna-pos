@@ -1157,6 +1157,46 @@ async function loadAdminCameras() {
     }
 }
 
+function syncAdminCameraInputs() {
+    adminCameraData = adminCameraData.map((cam, idx) => {
+        const nameEl = document.getElementById(`admin-cam-name-${idx}`);
+        const ipEl = document.getElementById(`admin-cam-ip-${idx}`);
+        const snapEl = document.getElementById(`admin-cam-snap-${idx}`);
+        const streamEl = document.getElementById(`admin-cam-stream-${idx}`);
+        const userEl = document.getElementById(`admin-cam-user-${idx}`);
+        const passEl = document.getElementById(`admin-cam-pass-${idx}`);
+        const enabledEl = document.getElementById(`admin-cam-enabled-${idx}`);
+        return {
+            id: cam.id,
+            name: nameEl ? nameEl.value.trim() : (cam.name || cam.id),
+            ip: ipEl ? ipEl.value.trim() : (cam.ip || ''),
+            snapshot_url: snapEl ? snapEl.value.trim() : (cam.snapshot_url || ''),
+            stream_url: streamEl ? streamEl.value.trim() : (cam.stream_url || ''),
+            user: userEl ? userEl.value.trim() : (cam.user || 'admin'),
+            pass: passEl ? passEl.value : (cam.pass || ''),
+            enabled: enabledEl ? enabledEl.checked : (cam.enabled !== false)
+        };
+    });
+}
+
+function moveAdminCameraUp(idx) {
+    if (idx <= 0 || idx >= adminCameraData.length) return;
+    syncAdminCameraInputs();
+    const temp = adminCameraData[idx];
+    adminCameraData[idx] = adminCameraData[idx - 1];
+    adminCameraData[idx - 1] = temp;
+    renderAdminCameras();
+}
+
+function moveAdminCameraDown(idx) {
+    if (idx < 0 || idx >= adminCameraData.length - 1) return;
+    syncAdminCameraInputs();
+    const temp = adminCameraData[idx];
+    adminCameraData[idx] = adminCameraData[idx + 1];
+    adminCameraData[idx + 1] = temp;
+    renderAdminCameras();
+}
+
 function renderAdminCameras() {
     const list = document.getElementById('admin-camera-list');
     if (!list) return;
@@ -1167,16 +1207,26 @@ function renderAdminCameras() {
     }
 
     list.innerHTML = adminCameraData.map((cam, idx) => `
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1.25rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.5rem;">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1.25rem;" id="admin-cam-box-${idx}">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.5rem; gap:0.5rem; flex-wrap:wrap;">
                 <div style="display:flex; align-items:center; gap:0.5rem;">
                     <span style="font-weight:700; font-size:1.05rem; color:#1e293b;">📹 ${idx + 1}. Kamera</span>
                     <span style="font-size:0.75rem; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-family:monospace; font-weight:700;">ID: ${escapeHtml(cam.id)}</span>
                 </div>
-                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; font-size:0.85rem; font-weight:600; color:#334155;">
-                    <input type="checkbox" id="admin-cam-enabled-${idx}" ${cam.enabled !== false ? 'checked' : ''} style="width:16px; height:16px;">
-                    Aktif
-                </label>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <div style="display:inline-flex; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden; background:white;">
+                        <button type="button" onclick="moveAdminCameraUp(${idx})" ${idx === 0 ? 'disabled' : ''} title="Yukarı Taşı" style="background:${idx === 0 ? '#f8fafc' : 'white'}; border:none; padding:4px 9px; font-size:0.8rem; font-weight:700; cursor:${idx === 0 ? 'not-allowed' : 'pointer'}; color:${idx === 0 ? '#94a3b8' : '#334155'}; border-right:1px solid #cbd5e1;">
+                            ⬆️ Yukarı
+                        </button>
+                        <button type="button" onclick="moveAdminCameraDown(${idx})" ${idx === adminCameraData.length - 1 ? 'disabled' : ''} title="Aşağı Taşı" style="background:${idx === adminCameraData.length - 1 ? '#f8fafc' : 'white'}; border:none; padding:4px 9px; font-size:0.8rem; font-weight:700; cursor:${idx === adminCameraData.length - 1 ? 'not-allowed' : 'pointer'}; color:${idx === adminCameraData.length - 1 ? '#94a3b8' : '#334155'};">
+                            ⬇️ Aşağı
+                        </button>
+                    </div>
+                    <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; font-size:0.85rem; font-weight:600; color:#334155; margin-left:0.25rem;">
+                        <input type="checkbox" id="admin-cam-enabled-${idx}" ${cam.enabled !== false ? 'checked' : ''} style="width:16px; height:16px;">
+                        Aktif
+                    </label>
+                </div>
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:0.85rem;">
@@ -1223,18 +1273,8 @@ async function saveAdminCameraSettings() {
     const btn = document.getElementById('btn-save-admin-cams');
     if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
 
-    const updated = adminCameraData.map((cam, idx) => {
-        return {
-            id: cam.id,
-            name: document.getElementById(`admin-cam-name-${idx}`)?.value.trim() || cam.id,
-            ip: document.getElementById(`admin-cam-ip-${idx}`)?.value.trim() || '',
-            snapshot_url: document.getElementById(`admin-cam-snap-${idx}`)?.value.trim() || '',
-            stream_url: document.getElementById(`admin-cam-stream-${idx}`)?.value.trim() || '',
-            user: document.getElementById(`admin-cam-user-${idx}`)?.value.trim() || 'admin',
-            pass: document.getElementById(`admin-cam-pass-${idx}`)?.value.trim() || '',
-            enabled: document.getElementById(`admin-cam-enabled-${idx}`) ? document.getElementById(`admin-cam-enabled-${idx}`).checked : true
-        };
-    });
+    syncAdminCameraInputs();
+    const updated = adminCameraData;
 
     try {
         const res = await fetch('/api/settings/cameras', {

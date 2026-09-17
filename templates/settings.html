@@ -943,6 +943,62 @@
             }
         }
 
+        function syncCurrentCameraInputs() {
+            currentCameraSettings = currentCameraSettings.map((cam, idx) => {
+                const nameEl = document.getElementById(`cam-name-${idx}`);
+                const ipEl = document.getElementById(`cam-ip-${idx}`);
+                const snapEl = document.getElementById(`cam-snap-${idx}`);
+                const streamEl = document.getElementById(`cam-stream-${idx}`);
+                const userEl = document.getElementById(`cam-user-${idx}`);
+                const passEl = document.getElementById(`cam-pass-${idx}`);
+                const enabledEl = document.getElementById(`cam-enabled-${idx}`);
+                return {
+                    id: cam.id,
+                    name: nameEl ? nameEl.value.trim() : (cam.name || cam.id),
+                    ip: ipEl ? ipEl.value.trim() : (cam.ip || ''),
+                    snapshot_url: snapEl ? snapEl.value.trim() : (cam.snapshot_url || ''),
+                    stream_url: streamEl ? streamEl.value.trim() : (cam.stream_url || ''),
+                    user: userEl ? userEl.value.trim() : (cam.user || 'admin'),
+                    pass: passEl ? passEl.value : (cam.pass || ''),
+                    enabled: enabledEl ? enabledEl.checked : (cam.enabled !== false)
+                };
+            });
+        }
+
+        function moveCameraUp(idx) {
+            if (idx <= 0 || idx >= currentCameraSettings.length) return;
+            syncCurrentCameraInputs();
+            const temp = currentCameraSettings[idx];
+            currentCameraSettings[idx] = currentCameraSettings[idx - 1];
+            currentCameraSettings[idx - 1] = temp;
+            renderCameraSettingsCards();
+            highlightMovedCamera(idx - 1);
+        }
+
+        function moveCameraDown(idx) {
+            if (idx < 0 || idx >= currentCameraSettings.length - 1) return;
+            syncCurrentCameraInputs();
+            const temp = currentCameraSettings[idx];
+            currentCameraSettings[idx] = currentCameraSettings[idx + 1];
+            currentCameraSettings[idx + 1] = temp;
+            renderCameraSettingsCards();
+            highlightMovedCamera(idx + 1);
+        }
+
+        function highlightMovedCamera(idx) {
+            setTimeout(() => {
+                const el = document.getElementById(`cam-box-${idx}`);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    el.style.boxShadow = '0 0 0 3px #0284c7';
+                    el.style.transition = 'box-shadow 0.4s ease';
+                    setTimeout(() => {
+                        el.style.boxShadow = 'none';
+                    }, 800);
+                }
+            }, 50);
+        }
+
         function renderCameraSettingsCards() {
             const container = document.getElementById('camera-settings-container');
             if (!container) return;
@@ -954,15 +1010,25 @@
 
             container.innerHTML = currentCameraSettings.map((cam, idx) => `
                 <div class="printer-box" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:1.25rem;" id="cam-box-${idx}">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.6rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.6rem; gap:0.5rem; flex-wrap:wrap;">
                         <div style="display:flex; align-items:center; gap:0.6rem;">
                             <span style="font-weight:800; font-size:1.05rem; color:#1e293b;">📹 ${idx + 1}. Kamera</span>
                             <span style="font-size:0.75rem; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-family:monospace; font-weight:700;">ID: ${escapeHtml(cam.id)}</span>
                         </div>
-                        <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; font-size:0.88rem; font-weight:600; color:#334155;">
-                            <input type="checkbox" id="cam-enabled-${idx}" ${cam.enabled !== false ? 'checked' : ''} style="width:16px; height:16px;">
-                            Aktif
-                        </label>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <div style="display:inline-flex; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden; background:white;">
+                                <button type="button" onclick="moveCameraUp(${idx})" ${idx === 0 ? 'disabled' : ''} title="Yukarı Taşı" style="background:${idx === 0 ? '#f8fafc' : 'white'}; border:none; padding:4px 10px; font-size:0.82rem; font-weight:700; cursor:${idx === 0 ? 'not-allowed' : 'pointer'}; color:${idx === 0 ? '#94a3b8' : '#334155'}; border-right:1px solid #cbd5e1;">
+                                    ⬆️ Yukarı
+                                </button>
+                                <button type="button" onclick="moveCameraDown(${idx})" ${idx === currentCameraSettings.length - 1 ? 'disabled' : ''} title="Aşağı Taşı" style="background:${idx === currentCameraSettings.length - 1 ? '#f8fafc' : 'white'}; border:none; padding:4px 10px; font-size:0.82rem; font-weight:700; cursor:${idx === currentCameraSettings.length - 1 ? 'not-allowed' : 'pointer'}; color:${idx === currentCameraSettings.length - 1 ? '#94a3b8' : '#334155'};">
+                                    ⬇️ Aşağı
+                                </button>
+                            </div>
+                            <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; font-size:0.88rem; font-weight:600; color:#334155; margin-left:0.25rem;">
+                                <input type="checkbox" id="cam-enabled-${idx}" ${cam.enabled !== false ? 'checked' : ''} style="width:16px; height:16px;">
+                                Aktif
+                            </label>
+                        </div>
                     </div>
 
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1rem;">
@@ -1015,18 +1081,8 @@
             const btn = document.getElementById('btn-save-cameras');
             if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
 
-            const updated = currentCameraSettings.map((cam, idx) => {
-                return {
-                    id: cam.id,
-                    name: document.getElementById(`cam-name-${idx}`)?.value.trim() || cam.id,
-                    ip: document.getElementById(`cam-ip-${idx}`)?.value.trim() || '',
-                    snapshot_url: document.getElementById(`cam-snap-${idx}`)?.value.trim() || '',
-                    stream_url: document.getElementById(`cam-stream-${idx}`)?.value.trim() || '',
-                    user: document.getElementById(`cam-user-${idx}`)?.value.trim() || 'admin',
-                    pass: document.getElementById(`cam-pass-${idx}`)?.value.trim() || '',
-                    enabled: document.getElementById(`cam-enabled-${idx}`) ? document.getElementById(`cam-enabled-${idx}`).checked : true
-                };
-            });
+            syncCurrentCameraInputs();
+            const updated = currentCameraSettings;
 
             try {
                 const res = await fetch('/api/settings/cameras', {
