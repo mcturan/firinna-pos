@@ -1,10 +1,10 @@
 streams:
   masalar:
-    - exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30080/Streaming/Channels/102 -c:v copy -an -f rtsp {output}
+    - exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30080/Streaming/Channels/101 -c:v copy -an -f rtsp {output}
   mutfak:
     - rtsp://admin:Hqhyk7t8kg...@192.168.1.21:554/live/ch0
   kapi:
-    - exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30082/Streaming/Channels/102 -c:v copy -an -f rtsp {output}
+    - exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30082/Streaming/Channels/101 -c:v copy -an -f rtsp {output}
 
 api:
   listen: "127.0.0.1:1984"
