@@ -103,12 +103,12 @@
     }
   ],
   "state": {
-    "is_playing": false,
+    "is_playing": true,
     "mode": "shuffle",
     "source_type": "folder",
-    "current_title": "08 - Spanish Chillout Misic ｜ Vocal House, Nu Disco, Chillout Mix ｜ Relaxing Playlist (vol. 101)",
-    "current_url": "/api/radio/stream/SPANISH/DESEO/08%20-%20Spanish%20Chillout%20Misic%20%EF%BD%9C%20Vocal%20House%2C%20Nu%20Disco%2C%20Chillout%20Mix%20%EF%BD%9C%20Relaxing%20Playlist%20%28vol.%20101%29.mp3",
-    "current_item_id": "SPANISH/DESEO/08 - Spanish Chillout Misic ｜ Vocal House, Nu Disco, Chillout Mix ｜ Relaxing Playlist (vol. 101).mp3",
+    "current_title": "09 - Spanish Chill Playlist 2026 🎧 ｜ Relaxing Music for Study & Work",
+    "current_url": "/api/radio/stream/SPANISH/DESEO/09%20-%20Spanish%20Chill%20Playlist%202026%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Music%20for%20Study%20%26%20Work.mp3",
+    "current_item_id": "SPANISH/DESEO/09 - Spanish Chill Playlist 2026 🎧 ｜ Relaxing Music for Study & Work.mp3",
     "queue": [
       {
         "duration": 7187.136,
@@ -351,12 +351,12 @@
         "title": "25 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Cozy Relaxing Playlist"
       }
     ],
-    "queue_index": 25,
+    "queue_index": 0,
     "tv_audio_enabled": true,
-    "updated_at": 1789918090,
+    "updated_at": 1789977106,
     "volume": 45,
-    "started_at": 1789915459,
-    "duration": 7405.776,
+    "started_at": 1789977106,
+    "duration": 7187.136,
     "elapsed": 1235
   },
   "stations": [
