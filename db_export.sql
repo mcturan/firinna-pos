@@ -1,5 +1,5 @@
 -- Fırınna POS DB Dump
--- 2026-09-22 17:42:30
+-- 2026-09-22 23:42:43
 
 BEGIN TRANSACTION;
 CREATE TABLE categories (
