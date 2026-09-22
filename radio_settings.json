@@ -103,10 +103,10 @@
     }
   ],
   "state": {
-    "is_playing": false,
+    "is_playing": true,
     "mode": "shuffle",
     "source_type": "folder",
-    "current_title": "FRENCH - Chill-Mood-Music-Spanish- -French-Relaxi Media 9Wljq9bp8L0 009 128k",
+    "current_title": "Chill-Mood-Music-Spanish- -French-Relaxi Media 9Wljq9bp8L0 009 128k",
     "current_url": "/api/radio/stream/FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
     "current_item_id": "FRENCH/Chill-Mood-Music-Spanish-_-French-Relaxi_Media_9Wljq9bp8L0_009_128k.mp3",
     "queue": [
@@ -153,9 +153,9 @@
     ],
     "queue_index": 0,
     "tv_audio_enabled": true,
-    "updated_at": 1790006462,
+    "updated_at": 1790063213,
     "volume": 45,
-    "started_at": 1790002760,
+    "started_at": 1790063213,
     "duration": 9451.3,
     "elapsed": 1235
   },
