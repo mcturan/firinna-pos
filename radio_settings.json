@@ -103,7 +103,7 @@
     }
   ],
   "state": {
-    "is_playing": true,
+    "is_playing": false,
     "mode": "shuffle",
     "source_type": "folder",
     "current_title": "18 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Relaxing Playlist",
@@ -353,7 +353,7 @@
     ],
     "queue_index": 3,
     "tv_audio_enabled": true,
-    "updated_at": 1790086187,
+    "updated_at": 1790092860,
     "volume": 45,
     "started_at": 1790086187,
     "duration": 8070.312,

@@ -37,6 +37,6 @@
     "stream_url": "exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30081/Streaming/Channels/102 -c:v copy -an -f rtsp {output}",
     "user": "admin",
     "pass": "Hqhyk7t8kg...",
-    "enabled": false
+    "enabled": true
   }
 ]
