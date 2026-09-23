@@ -4,7 +4,7 @@
     "name": "Masalar",
     "ip": "192.168.1.20:30080",
     "snapshot_url": "http://192.168.1.20:30080/ISAPI/Streaming/channels/1/picture",
-    "stream_url": "exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30080/Streaming/Channels/102 -c:v copy -an -f rtsp {output}",
+    "stream_url": "exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30080/Streaming/Channels/101 -c:v copy -an -f rtsp {output}",
     "user": "admin",
     "pass": "Hqhyk7t8kg...",
     "enabled": true
@@ -24,7 +24,17 @@
     "name": "Kapı",
     "ip": "192.168.1.20:30082",
     "snapshot_url": "http://192.168.1.20:30082/ISAPI/Streaming/channels/1/picture",
-    "stream_url": "exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30082/Streaming/Channels/102 -c:v copy -an -f rtsp {output}",
+    "stream_url": "exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30082/Streaming/Channels/101 -c:v copy -an -f rtsp {output}",
+    "user": "admin",
+    "pass": "Hqhyk7t8kg...",
+    "enabled": true
+  },
+  {
+    "id": "kamera4",
+    "name": "4. Kamera (Kanal 2)",
+    "ip": "192.168.1.20:30081",
+    "snapshot_url": "http://192.168.1.20:30081/ISAPI/Streaming/channels/1/picture",
+    "stream_url": "exec:ffmpeg -hide_banner -v error -rtsp_transport http -i rtsp://admin:Hqhyk7t8kg...@192.168.1.20:30081/Streaming/Channels/102 -c:v copy -an -f rtsp {output}",
     "user": "admin",
     "pass": "Hqhyk7t8kg...",
     "enabled": true
