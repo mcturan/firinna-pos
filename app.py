@@ -4856,7 +4856,17 @@ def _get_audio_env():
     except Exception:
         pass
     env['XDG_RUNTIME_DIR'] = f'/run/user/{uid}'
-    env['PULSE_SERVER'] = f'unix:/run/user/{uid}/pulse/native'
+    # Eğer ortamda veya firinna_local.json içinde pulse_server belirtilmişse onu kullan
+    pulse_remote = os.environ.get('PULSE_SERVER')
+    if not pulse_remote:
+        try:
+            pulse_remote = read_local_config().get('pulse_server')
+        except Exception:
+            pass
+    if pulse_remote:
+        env['PULSE_SERVER'] = pulse_remote
+    else:
+        env['PULSE_SERVER'] = f'unix:/run/user/{uid}/pulse/native'
     env['PATH'] = f"{env.get('PATH', '')}:/usr/bin:/usr/local/bin:/bin:/usr/sbin:/sbin"
     return env
 
