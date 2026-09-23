@@ -103,12 +103,12 @@
     }
   ],
   "state": {
-    "is_playing": true,
+    "is_playing": false,
     "mode": "shuffle",
     "source_type": "folder",
-    "current_title": "23 - Spanish Soulful Chill 🎧 – Mood Playlist ｜ DESEO",
-    "current_url": "/api/radio/stream/SPANISH/DESEO/23%20-%20Spanish%20Soulful%20Chill%20%F0%9F%8E%A7%20%E2%80%93%20Mood%20Playlist%20%EF%BD%9C%20DESEO.mp3",
-    "current_item_id": "SPANISH/DESEO/23 - Spanish Soulful Chill 🎧 – Mood Playlist ｜ DESEO.mp3",
+    "current_title": "11 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO",
+    "current_url": "/api/radio/stream/SPANISH/DESEO/11%20-%20Spanish%20Chill%20Mood%20%F0%9F%8E%A7%20%EF%BD%9C%20Relaxing%20Playlist%20%EF%BD%9C%20DESEO.mp3",
+    "current_item_id": "SPANISH/DESEO/11 - Spanish Chill Mood 🎧 ｜ Relaxing Playlist ｜ DESEO.mp3",
     "queue": [
       {
         "duration": 7773.648,
@@ -351,12 +351,12 @@
         "title": "14 - DESEO ｜ Spanish Chill Mood 🎧 ｜ Deep House Relaxing Playlist"
       }
     ],
-    "queue_index": 17,
+    "queue_index": 22,
     "tv_audio_enabled": true,
-    "updated_at": 1790158068,
+    "updated_at": 1790178505,
     "volume": 45,
-    "started_at": 1790158068,
-    "duration": 3604.152,
+    "started_at": 1790172983,
+    "duration": 7239.744,
     "elapsed": 1235
   },
   "stations": [
