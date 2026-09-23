@@ -3974,8 +3974,8 @@ function openCameraLiveModal(camId, camName) {
         btn.classList.toggle('active', btn.getAttribute('data-cam') === camId);
     });
 
-    // go2rtc WebRTC canlı video akışı
-    iframe.src = '/go2rtc/webrtc.html?src=' + encodeURIComponent(camId) + '&media=video';
+    // go2rtc Canlı video akışı (MSE modu ile anında ve yüksek kaliteli yayın)
+    iframe.src = '/go2rtc/stream.html?src=' + encodeURIComponent(camId) + '&mode=mse';
     modal.style.display = 'flex';
 }
 
